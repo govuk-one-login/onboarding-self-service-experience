@@ -1,0 +1,37 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+    <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+
+                <h1 class="govuk-heading-l">Create a self-service account or sign in</h1>
+
+                <p>You’ll need an email address and a UK mobile phone number. It will take about 2 minutes.
+                <p>
+
+                    {{ govukButton({
+                        text: "Create an account",
+                        href: "/create/get-email"
+                    }) }}
+
+                <p class="govuk-body">If you already have a self-service account you can <a
+                            href="/sign-in"
+                            class="govuk-link">sign in</a>.</p>
+
+                <details class="govuk-details" data-module="govuk-details">
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">About self-service accounts</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <p>Blah blah blah. Blah blah. Blah blah blah, blah blaaaah.</p>
+
+                        <p>We're still trying to work out what to call this.</p>
+                    </div>
+                </details>
+
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
