@@ -1,12 +1,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 // Create clients and set shared const values outside of the handler.
+import {DynamoDBClient, GetItemCommand} from "@aws-sdk/client-dynamodb";
+import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
 
 // Get the DynamoDB table name from environment variables
 const tableName = process.env.SAMPLE_TABLE;
 
 // Create a DocumentClient that represents the query to add an item
-const dynamodb = require('aws-sdk/clients/dynamodb');
-const docClient = new dynamodb.DocumentClient();
+const dynamodb = new DynamoDBClient({ region: "eu-west-2" });
 
 /**
  * A simple example includes a HTTP get method to get one item by id from a DynamoDB table.
@@ -23,11 +24,14 @@ export const getByIdHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
  
   // Get the item from the table
   // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#get-property
-  var params = {
+  console.log("MARSHALLED:")
+  console.log(marshall({S: id}))
+  const params = {
     TableName : tableName,
-    Key: { id: id },
+    Key:  marshall({id: id}),
   };
-  const data = await docClient.get(params).promise();
+  const command = new GetItemCommand(params);
+  const data = await dynamodb.send(command);
   const item = data.Item;
  
   const response = {

@@ -1,13 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import {DynamoDB} from "@aws-sdk/client-dynamodb";
+import {DynamoDBClient, ScanCommand} from "@aws-sdk/client-dynamodb";
 // Create clients and set shared const values outside of the handler.
 
 // Get the DynamoDB table name from environment variables
 const tableName = process.env.SAMPLE_TABLE;
 
 // Create a DocumentClient that represents the query to add an item
-const dynamodb = new DynamoDB();
-const docClient = new dynamodb.DocumentClient();
+const dynamodb = new DynamoDBClient({ region: "eu-west-2" });
 
 /**
  * A simple example includes a HTTP get method to get all items from a DynamoDB table.
@@ -25,7 +24,8 @@ export const getAllItemsHandler = async (event: APIGatewayProxyEvent): Promise<A
     var params = {
         TableName : tableName
     };
-    const data = await docClient.scan(params).promise();
+    const command = new ScanCommand(params);
+    const data = await dynamodb.send(command);
     const items = data.Items;
 
     const response = {
