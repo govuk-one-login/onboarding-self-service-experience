@@ -1,6 +1,6 @@
 {% extends "../layout.njk" %}
 
-{%  block content %}
+{% block content %}
     <div class="govuk-width-container">
         {% if errorMessages and errorMessages.size != 0 %}
             <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
@@ -22,21 +22,39 @@
                 </div>
             </div>
         {% endif %}
-
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-l">
-                    Enter your email address
+                    Check your email
                 </h1>
+                <div class="govuk-inset-text">
+                    <p>We have sent an email to: <strong>{{ emailAddress }}</strong></p>
+                </div>
 
-                <p>Enter your email address to create an account.</p>
-                <form class="form" action="/create/get-email" method="post">
+                <p>The email contains a 6 digit security code.</p>
+
+                <p>Your email might take a few minutes to arrive. If you do not get an email, check your spam
+                    folder.</p>
+
+                <p>Your code will expire after 15 minutes.</p>
+
+
+                <form class="form" action="/create/check-email" method="post">
                     <div class="govuk-form-group">
-                        <label class="govuk-label" for="email">
-                            Email address
-                        </label>
-                        <input class="govuk-input govuk-input--width-20" id="email" name="emailAddress" type="email" spellcheck="false" aria-describedby="email-hint" autocomplete="email">
+                        <label class="govuk-label" for="otp">Enter the 6 digit security code</label>
+
+                        <input class="govuk-input govuk-input--width-5" id="otp" name="create-email-otp" type="text"
+                               autocomplete="one-time-code" inputmode="numeric" spellcheck="false">
+
                     </div>
+
+                    <p><a href="/create-email-v1">Request a new code </a> if:</p>
+
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>the code is not working or has expired, or you did not receive one</li>
+                        <li>you want to use a different email address</li>
+                    </ul>
+
                     {{ govukButton({
                         text: "Continue"
                     }) }}

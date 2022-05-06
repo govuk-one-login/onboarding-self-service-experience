@@ -1,0 +1,47 @@
+{% extends "../layout.njk" %}
+
+{%  block content %}
+    <div class="govuk-width-container">
+        {% if errorMessages and errorMessages.size != 0 %}
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
+                 tabindex="-1"
+                 data-module="govuk-error-summary">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">
+                    There is a problem
+                </h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        {% for field in fieldOrder %}
+                            {% if errorMessages.get(field) %}
+                                <li>
+                                    <a href="#{{ field }}">{{ errorMessages.get(field) }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">
+                    Enter your email address
+                </h1>
+
+                <p>Enter your email address to create an account.</p>
+                <form class="form" action="/create/get-email" method="post">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="email">
+                            Email address
+                        </label>
+                        <input class="govuk-input govuk-input--width-20" id="email" name="emailAddress" type="email" spellcheck="false" aria-describedby="email-hint" autocomplete="email" {%  if values and values.get('emailAddress') %}value="{{ values.get('emailAddress') }}"{% endif %}>
+                    </div>
+                    {{ govukButton({
+                        text: "Continue"
+                    }) }}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

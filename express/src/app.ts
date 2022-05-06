@@ -1,10 +1,13 @@
 import express, {NextFunction, Request, Response} from 'express';
 import configureViews from './lib/configureViews';
 import createAccount from "./routes/create-account-or-sign-in";
+import signIn from "./routes/sign-in";
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import sessions from 'express-session';
 import {CognitoClient} from "./lib/cognito";
+import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import manageAccount from "./routes/manage-account";
 
 const app = express();
 app.set('cognitoClient', new CognitoClient());
@@ -24,7 +27,9 @@ app.use(sessions({
 declare module 'express-session' {
     interface SessionData {
         emailAddress: string;
-        session: string
+        mobileNumber: string;
+        session: string;
+        authenticationResult: AuthenticationResultType
     }
 }
 
@@ -37,5 +42,5 @@ app.get("/", function (req: Request, res: Response) {
 });
 
 app.use("/", createAccount);
-
-app.post('/create-account', )
+app.use("/", signIn);
+app.use("/", manageAccount);

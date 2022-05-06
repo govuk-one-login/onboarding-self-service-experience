@@ -6,7 +6,11 @@ import {
     VerifyUserAttributeCommand,
     GetUserCommand,
     GetUserAttributeVerificationCodeCommand,
-    AdminCreateUserCommand, RespondToAuthChallengeCommand
+    AdminCreateUserCommand,
+    RespondToAuthChallengeCommand,
+    UpdateUserAttributesCommand,
+    AdminUpdateUserAttributesCommand,
+    AdminGetUserCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 
 
@@ -23,8 +27,7 @@ export class CognitoClient {
         });
         this.userPoolId = process.env.USERPOOL_ID;
         this.clientId = process.env.CLIENT_ID;
-        console.error(this.clientId)
-        console.error(this.userPoolId)
+
         if(this.clientId === undefined || this.userPoolId === undefined) {
             console.error(
                 `Cannot start application
@@ -35,6 +38,7 @@ Either USERPOOL_ID or CLIENT_ID has not been set.
     CLIENT_ID=${this.clientId}
 
 These values are set using environment variables.  If you are running the application locally the values can be taken from the file .env. You can copy .env.example, rename it and edit the values inside and re-start the application.
+
 If the app is being deployed to PaaS then you may have to update manifest.yaml or provide values in the github environment that you're deploying from.`);
             process.kill(process.pid, 'SIGTERM');
         }
@@ -51,19 +55,13 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             ]
         }
         let command = new AdminCreateUserCommand(createUserParams);
-        try {
-            let response = await this.cognitoClient.send(command);
-            return response;
-        } catch (error) {
-            console.error("Error creating user:\n" + error);
-            return error;
-        }
+        return await this.cognitoClient.send(command);
     }
 
     async register(email: string, password: string, phone_number: string) {
         console.debug("Registering ...")
         let signUpParams = {
-            ClientId: '5b5ujvkrkirrqulbq23s1vh5ct',
+            ClientId: this.clientId,
             Username: email,
             Password: password,
             UserAttributes: [
@@ -73,39 +71,26 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
 
 
         let command = new SignUpCommand(signUpParams);
-        try {
-            console.debug("Sending register command to Cognito")
-            let response = await this.cognitoClient.send(command);
-            return response;
-        } catch (error) {
-            console.error("Error registering:\n" + error);
-            return error;
-        }
+        console.debug("Sending register command to Cognito")
+        return await this.cognitoClient.send(command);
     }
 
     async verify(confirmationCode: string, username: string) {
         let params = {
             UserPoolId: this.userPoolId,
-            ClientId: '5b5ujvkrkirrqulbq23s1vh5ct',
+            ClientId: this.clientId,
             ConfirmationCode: confirmationCode,
             Username: username
         }
 
         let command = new ConfirmSignUpCommand(params);
-        let confirmation;
-        try {
-            confirmation = await this.cognitoClient.send(command);
-        } catch (error) {
-            console.error(error);
-            confirmation = error
-        }
-        return confirmation;
+        return await this.cognitoClient.send(command);
     }
 
     async login(email: string, password: string) {
         let params = {
             UserPoolId: this.userPoolId,
-            ClientId: '5b5ujvkrkirrqulbq23s1vh5ct',
+            ClientId: this.clientId,
             AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
             AuthParameters: {
                 USERNAME: email,
@@ -114,13 +99,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         }
 
         let command = new AdminInitiateAuthCommand(params);
-        try {
-            return await this.cognitoClient.send(command);
-        } catch (error) {
-            console.error(error);
-            return error;
-        }
-
+        return await this.cognitoClient.send(command);
     }
 
     async setNewPassword(email: string, password: string, session: string) {
@@ -130,46 +109,70 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
                 "NEW_PASSWORD": password,
                 "USERNAME": email
             },
-            ClientId: '5b5ujvkrkirrqulbq23s1vh5ct',
+            ClientId: this.clientId,
             Session: session
         }
         let command = new RespondToAuthChallengeCommand(params);
-        try {
-            return await this.cognitoClient.send(command);
-        } catch (error) {
-            console.error(error);
-            return error;
-        }
+        return await this.cognitoClient.send(command);
     }
 
-    async getUser(accessToken: string) {
+    async getUser(username: string) {
         let params = {
-            AccessToken: accessToken
+            Username: username,
+            UserPoolId: this.userPoolId
         }
-        let command = new GetUserCommand(params);
-        try {
-            return await this.cognitoClient.send(command);
-        } catch (error) {
-            console.error(error);
-            return error;
-        }
+        let command = new AdminGetUserCommand(params);
+
+        return await this.cognitoClient.send(command);
     }
 
-    async getUserAttributeVerificationCode() {
-
+    async setEmailAsVerified(username: string) {
+        let params = {
+            UserPoolId: this.userPoolId,
+            Username: username,
+            UserAttributes: [
+                {
+                    Name: "email_verified",
+                    Value: "true"
+                }
+            ]
+        }
+        let command = new AdminUpdateUserAttributesCommand(params);
+        return await  this.cognitoClient.send(command);
     }
 
-    async verifyUserAttribute() {
-        // const params = {
-        //
-        // }
-        // let command = new VerifyUserAttributeCommand(params);
-        // try {
-        //     return await this.cognitoClient.send(command);
-        // } catch (error) {
-        //     console.error(error);
-        //     return error;
-        // }
+    async setPhoneNumber(username: string, phoneNumber: string) {
+        let params = {
+            UserPoolId: this.userPoolId,
+            Username: username,
+            UserAttributes: [
+                {
+                    Name: "phone_number",
+                    Value: phoneNumber
+                }
+            ]
+        }
+        let command = new AdminUpdateUserAttributesCommand(params);
+        return await  this.cognitoClient.send(command);
+    }
+
+    async sendMobileNumberVerificationCode(accessToken: string) {
+        let params = {
+            AccessToken: accessToken,
+            AttributeName: "phone_number"
+        }
+        let command = new GetUserAttributeVerificationCodeCommand(params);
+        return await this.cognitoClient.send(command);
+    }
+
+    async verifySmsCode(accessToken: string, code: string) {
+        const params = {
+            AccessToken: accessToken,
+            AttributeName: 'phone_number',
+            Code: code
+        }
+        let command = new VerifyUserAttributeCommand(params);
+        return await this.cognitoClient.send(command);
     }
 }
 
