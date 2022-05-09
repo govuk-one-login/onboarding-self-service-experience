@@ -40,6 +40,7 @@ export const processGetEmailForm = async function (req: Request, res: Response) 
                 return;
             }
             res.redirect("/create/get-email");
+            return;
         }
         res.redirect('check-email');
     } else {
@@ -64,7 +65,7 @@ export const showCheckEmailForm = function (req: Request, res: Response) {
     }
 }
 
-export const showNewPasswordForm = async function (req: Request, res: Response) {
+export const getEmailOtp = async function (req: Request, res: Response) {
     const cognitoClient = await req.app.get('cognitoClient');
 
     if (!req.session.emailAddress) {
@@ -89,7 +90,8 @@ export const showNewPasswordForm = async function (req: Request, res: Response) 
     try {
         const response = await cognitoClient.login(req.session.emailAddress as string, req.body['create-email-otp']);
         req.session.session = response.Session;
-        res.render('create-account/new-password.njk');
+        res.redirect('/create/update-password');
+        return;
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
             // show the form again with an error message though
@@ -97,6 +99,14 @@ export const showNewPasswordForm = async function (req: Request, res: Response) 
             res.render('create-account/check-email.njk', {emailAddress: req.session.emailAddress});
 
         }
+    }
+}
+
+export const showNewPasswordForm = async function (req: Request, res: Response) {
+    console.log("Show new password")
+    if(req.session.session !== undefined) {
+        res.render( 'create-account/new-password.njk');
+       return;
     }
 }
 

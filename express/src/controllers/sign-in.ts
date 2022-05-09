@@ -33,7 +33,7 @@ export const processSignInForm = async function(req: Request, res: Response) {
     const cognitoClient = req.app.get('cognitoClient');
     try {
         const response = await cognitoClient.login(email, password);
-        req.session.authenticationResult = response.authenticationResult;
+        req.session.authenticationResult = response.AuthenticationResult;
         req.session.emailAddress = email;
         res.redirect('/account/list-services');
         return;
