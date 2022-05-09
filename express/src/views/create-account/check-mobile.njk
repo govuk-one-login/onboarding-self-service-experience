@@ -5,40 +5,35 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-l">
-                    Check your email
+                    Check your phone
                 </h1>
 
-                <div class="govuk-inset-text">
-                    <p>We have sent an email to: <strong>{{ emailAddress }}</strong></p>
-                </div>
+                <p class="govuk-body">We sent a code to {{ mobileNumber }}.</p>
 
-                <p>The email contains a 6 digit security code.</p>
-
-                <p>Your email might take a few minutes to arrive. If you do not get an email, check your spam
-                    folder.</p>
-
-                <p>Your code will expire after 15 minutes.</p>
+                <p class="govuk-body">It might take a few minutes to arrive. The code will expire after 15 minutes.</p>
 
 
-                <form class="form" action="/create/check-email" method="post">
+                <form method="post" action="/create/verify-phone-code">
                     <div class="govuk-form-group">
+
                         <label class="govuk-label" for="otp">Enter the 6 digit security code</label>
 
-                        <input class="govuk-input govuk-input--width-5" id="otp" name="create-email-otp" type="text"
+                        <input class="govuk-input govuk-input--width-5" id="otp" name="create-sms-otp" type="text"
                                autocomplete="one-time-code" inputmode="numeric" spellcheck="false">
 
                     </div>
 
-                    <p><a href="/create-email-v1">Request a new code </a> if:</p>
+                    <p class="govuk-body"><a href="/create/get-new-phone-code">Request a new code </a> if:</p>
 
                     <ul class="govuk-list govuk-list--bullet">
                         <li>the code is not working or has expired, or you did not receive one</li>
-                        <li>you want to use a different email address</li>
+                        <li>you want to use a different phone number</li>
                     </ul>
 
                     {{ govukButton({
                         text: "Continue"
                     }) }}
+
                 </form>
             </div>
         </div>

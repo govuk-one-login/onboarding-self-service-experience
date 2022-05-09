@@ -1,0 +1,57 @@
+{% extends "layout.njk" %}
+
+{% block pageTitle %}
+    Get started with GOV.UK Sign In
+{% endblock %}
+
+{% block beforeContent %}
+    <div class="govuk-width-container">
+        <div class="govuk-breadcrumbs">
+            <ol class="govuk-breadcrumbs__list">
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="#">GOV.UK services</a>
+                </li>
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="#">GOV.UK Sign In</a>
+                </li>
+                <li class="govuk-breadcrumbs__list-item" style="font-weight: bold;">
+                    Register your services
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+{% block content %}
+
+    <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">Get started with GOV.UK Sign In</h1>
+                <h2 class="govuk-heading-m">1. Check if GOV.UK Sign In is right for you</h2>
+                <p class="govuk-body">GOV.UK Sign In is for central government services that need authentication.</p>
+                <p class="govuk-body">You will also need to have development expertise in your team.</p>
+                <p class="govuk-body"><a class="govuk-link" href="https://www.sign-in.service.gov.uk/find-out-more">Find out more about GOV.UK Sign In.</a></p>
+                <h2 class="govuk-heading-m">2. Create an account to test GOV.UK Sign In</h2>
+                <p class="govuk-body">Create an account to access our test environment. This will let you see how GOV.UK Sign In would work with your service.</p>
+                <p class="govuk-body">You need to use your gov.uk email address.</p>
+                {{ govukButton({
+                    text: "Create account",
+                    href: "/create-account-or-sign-in"
+                }) }}
+                <h2 class="govuk-heading-m">3. Request to join private beta</h2>
+                <p class="govuk-body">If you think GOV.UK Sign In is right for your service, you’ll be able to request to join private beta from within your GOV.UK Sign In account.</p>
+                <h2 class="govuk-heading-m">4. Go live</h2>
+                <p class="govuk-body">Once you’ve been accepted into the private beta, you’ll need to sign our memorandum of understanding.</p>
+                <p class="govuk-body">You can then go live with support from our technical team, who will be available 24/7 for urgent incidents.</p>
+                <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+                <h2 class="govuk-heading-m">Contact us</h2>
+                <p class="govuk-body">Use our <a class="govuk-link" href="https://www.sign-in.service.gov.uk/support">online form</a> to report problems, ask questions or suggest improvements.</p>
+                <p class="govuk-body">You can also get in touch via our <a class="govuk-link" href="https://ukgovernmentdigital.slack.com/archives/C02AQUJ6WTC">Slack channel.</a></p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

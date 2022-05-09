@@ -1,0 +1,35 @@
+{% extends "../layout.njk" %}
+
+{% block content %}
+    <div class="govuk-width-container">
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">
+                    Enter your mobile phone number
+                </h1>
+
+                <p class="govuk-body">We will send a 6 digit security code to the number you give us.</p>
+
+                <p class="govuk-body">You must use a UK mobile phone number.</p>
+
+                <form method="post" action="/create/enter-mobile">
+                    <div class="govuk-form-group">
+
+                        <label class="govuk-label" for="mobile-number">UK phone number</label>
+
+                        <input class="govuk-input govuk-input--width-20" id="mobile-number" name="mobileNumber"
+                               type="tel"
+                               spellcheck="false" autocomplete="tel">
+
+                    </div>
+
+                    {{ govukButton({
+                        text: "Continue"
+                    }) }}
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
