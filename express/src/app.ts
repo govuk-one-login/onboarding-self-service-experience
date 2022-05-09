@@ -34,13 +34,14 @@ declare module 'express-session' {
 }
 
 configureViews(app);
-const port = process.env.PORT || 3000
-app.listen(port, () => console.log(`Server running; listening on port ${port}`));
+
+app.use("/", createAccount);
+app.use("/", signIn);
+app.use("/", manageAccount);
 
 app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {active: 'get-started'});
 });
 
-app.use("/", createAccount);
-app.use("/", signIn);
-app.use("/", manageAccount);
+const port = process.env.PORT || 3000
+app.listen(port, () => console.log(`Server running; listening on port ${port}`));

@@ -28,15 +28,15 @@
                     Check your email
                 </h1>
                 <div class="govuk-inset-text">
-                    <p>We have sent an email to: <strong>{{ emailAddress }}</strong></p>
+                    <p class="govuk-body">We have sent an email to: <strong>{{ emailAddress }}</strong></p>
                 </div>
 
-                <p>The email contains a 6 digit security code.</p>
+                <p class="govuk-body">The email contains a 6 digit security code.</p>
 
-                <p>Your email might take a few minutes to arrive. If you do not get an email, check your spam
+                <p class="govuk-body">Your email might take a few minutes to arrive. If you do not get an email, check your spam
                     folder.</p>
 
-                <p>Your code will expire after 15 minutes.</p>
+                <p class="govuk-body">Your code will expire after 15 minutes.</p>
 
 
                 <form class="form" action="/create/check-email" method="post">
@@ -48,7 +48,7 @@
 
                     </div>
 
-                    <p><a href="/create-email-v1">Request a new code </a> if:</p>
+                    <p class="govuk-body"><a href="/create-email-v1">Request a new code </a> if:</p>
 
                     <ul class="govuk-list govuk-list--bullet">
                         <li>the code is not working or has expired, or you did not receive one</li>
