@@ -43,5 +43,24 @@ app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {active: 'get-started'});
 });
 
+////// Testing routes - begin //////
+
+//Testing route for service name get request
+app.get("/add-service-name", function (req: Request, res: Response) {
+    res.render("add-service-name.njk");
+});
+
+// Testing route for service name  get request with error
+app.get("/add-service-name-error", function (req: Request, res: Response) {
+    let errorMessages: Map<String, String> = new Map<String, String>();
+    let errorUrls: Map<String, String> = new Map<String, String>();
+    errorMessages.set('serviceName', 'Enter your service name');
+    res.render("add-service-name.njk",{ errors: errorMessages });
+});
+
+////// Testing routes - end //////
+
+
+
 const port = process.env.PORT || 3000
 app.listen(port, () => console.log(`Server running; listening on port ${port}`));
