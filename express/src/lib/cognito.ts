@@ -12,9 +12,10 @@ import {
     AdminUpdateUserAttributesCommand,
     AdminGetUserCommand
 } from "@aws-sdk/client-cognito-identity-provider";
+import CognitoInterface from "./cognito/CognitoInterface";
 
 
-export class CognitoClient {
+export class CognitoClient implements CognitoInterface {
     cognitoClient;
     userPoolId: string | undefined;
     clientId: string | undefined;

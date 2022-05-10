@@ -6,7 +6,7 @@ import {
     showNewPasswordForm,
     updatePassword,
     showEnterMobileForm,
-    processEnterMobileForm, submitMobileVerificationCode
+    processEnterMobileForm, submitMobileVerificationCode, checkEmailOtp
 } from "../controllers/create-account";
 
 const router = express.Router();
@@ -18,8 +18,9 @@ router.get('/create/get-email', showGetEmailForm);
 router.post('/create/get-email', processGetEmailForm);
 
 router.get('/create/check-email', showCheckEmailForm);
-router.post('/create/check-email', showNewPasswordForm);
+router.post('/create/check-email', checkEmailOtp);
 
+router.get('/create/update-password', showNewPasswordForm);
 router.post('/create/update-password', updatePassword);
 
 router.get('/create/enter-mobile', showEnterMobileForm);

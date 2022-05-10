@@ -1,4 +1,4 @@
-import express, {Request, Response} from "express";
+import express, {NextFunction, Request, Response} from "express";
 import {CognitoClient} from '../lib/cognito'
 import {
     AuthenticationResultType,
@@ -65,7 +65,7 @@ export const showCheckEmailForm = function (req: Request, res: Response) {
     }
 }
 
-export const getEmailOtp = async function (req: Request, res: Response) {
+export const checkEmailOtp = async function (req: Request, res: Response) {
     const cognitoClient = await req.app.get('cognitoClient');
 
     if (!req.session.emailAddress) {
@@ -102,11 +102,14 @@ export const getEmailOtp = async function (req: Request, res: Response) {
     }
 }
 
-export const showNewPasswordForm = async function (req: Request, res: Response) {
+export const showNewPasswordForm = async function (req: Request, res: Response, next: NextFunction) {
     console.log("Show new password")
     if(req.session.session !== undefined) {
         res.render( 'create-account/new-password.njk');
        return;
+    } else {
+        // this flow needs designing
+        res.redirect('/sign-in');
     }
 }
 
@@ -124,7 +127,6 @@ export const updatePassword = async function (req: Request, res: Response) {
 
     res.redirect('/create/enter-mobile');
 }
-
 
 export const showEnterMobileForm = async function (req: Request, res: Response) {
     let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
