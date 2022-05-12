@@ -64,6 +64,12 @@ app.get("/add-service-name-error", function (req: Request, res: Response) {
     res.render("add-service-name.njk",{ errors: errorMessages });
 });
 
+// Testing route for client details dashboard
+app.get("/service-dashboard-client-details", function (req: Request, res: Response) {
+    res.render("service-dashboard-client-details.njk");
+});
+
+
 ////// Testing routes - end //////
 
 
