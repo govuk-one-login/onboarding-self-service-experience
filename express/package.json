@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node -r 'dotenv/config' dist/app.js",
     "local": "npm run build && node -r 'dotenv/config' dist/app.js",
-    "dev": "nodemon --config nodemon.json -r 'dotenv/config' src/app.ts",
+    "dev": "COGNITO_CLIENT=StubCognitoClient nodemon --config nodemon.json -r 'dotenv/config' src/app.ts",
     "buildts": "tsc -p .",
     "buildsass": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js assets/css/app.scss dist/assets/app.css",
     "buildjs": "uglifyjs --verbose node_modules/govuk-frontend/govuk/all.js -o dist/assets/govuk-all.js && uglifyjs --verbose assets/javascripts/cookies.js -o dist/assets/cookies.js",
