@@ -1,0 +1,15 @@
+{
+  "createUser": [
+    {
+      "criteria": [
+        {
+          "parameter": "email",
+          "value": "inuse@foo.gov.uk"
+        }
+      ],
+      "action": {
+        "throw": "UsernameExistsException"
+      }
+    }
+  ]
+}

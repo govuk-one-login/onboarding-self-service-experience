@@ -1,0 +1,16 @@
+{
+  "createUser": [
+    {
+      "parameter": "email",
+      "value": "inuse@foo.gov.uk",
+      "throw": "UsernameExistsException"
+    },
+    {
+      "parameter": "email",
+        "value": "returnsomething@foo.gov.uk",
+      "return": {
+        "$metadata": {"foo":  "bar"}
+      }
+    }
+  ]
+}

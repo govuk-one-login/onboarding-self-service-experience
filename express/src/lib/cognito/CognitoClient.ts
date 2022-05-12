@@ -10,9 +10,20 @@ import {
     RespondToAuthChallengeCommand,
     UpdateUserAttributesCommand,
     AdminUpdateUserAttributesCommand,
-    AdminGetUserCommand
+    AdminGetUserCommand,
+    ConfirmSignUpCommandOutput,
+    AdminInitiateAuthCommandOutput,
+    RespondToAuthChallengeCommandOutput,
+    AdminGetUserCommandOutput,
+    AdminUpdateUserAttributesCommandOutput,
+    GetUserAttributeVerificationCodeCommandOutput,
+    VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
-import CognitoInterface from "./cognito/CognitoInterface";
+import CognitoInterface from "./CognitoInterface";
+import {
+    AdminCreateUserCommandOutput
+} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/AdminCreateUserCommand";
+import {SignUpCommandOutput} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/SignUpCommand";
 
 
 export class CognitoClient implements CognitoInterface {
@@ -45,7 +56,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         }
     }
 
-    async createUser(email: string) {
+    async createUser(email: string): Promise<AdminCreateUserCommandOutput> {
         console.debug(`Adding a user with email ${{email}}`);
         let createUserParams = {
             DesiredDeliveryMediums: [ "EMAIL" ],
@@ -59,36 +70,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
-    async register(email: string, password: string, phone_number: string) {
-        console.debug("Registering ...")
-        let signUpParams = {
-            ClientId: this.clientId,
-            Username: email,
-            Password: password,
-            UserAttributes: [
-                {Name: "email", Value: email},
-                {Name: "phone_number", Value: phone_number}]
-        }
-
-
-        let command = new SignUpCommand(signUpParams);
-        console.debug("Sending register command to Cognito")
-        return await this.cognitoClient.send(command);
-    }
-
-    async verify(confirmationCode: string, username: string) {
-        let params = {
-            UserPoolId: this.userPoolId,
-            ClientId: this.clientId,
-            ConfirmationCode: confirmationCode,
-            Username: username
-        }
-
-        let command = new ConfirmSignUpCommand(params);
-        return await this.cognitoClient.send(command);
-    }
-
-    async login(email: string, password: string) {
+    async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
         let params = {
             UserPoolId: this.userPoolId,
             ClientId: this.clientId,
@@ -103,7 +85,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
-    async setNewPassword(email: string, password: string, session: string) {
+    async setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
         let params = {
             ChallengeName: "NEW_PASSWORD_REQUIRED",
             ChallengeResponses: {
@@ -117,7 +99,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
-    async getUser(username: string) {
+    async getUser(username: string): Promise<AdminGetUserCommandOutput> {
         let params = {
             Username: username,
             UserPoolId: this.userPoolId
@@ -127,7 +109,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
-    async setEmailAsVerified(username: string) {
+    async setEmailAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput> {
         let params = {
             UserPoolId: this.userPoolId,
             Username: username,
@@ -142,7 +124,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await  this.cognitoClient.send(command);
     }
 
-    async setPhoneNumber(username: string, phoneNumber: string) {
+    async setPhoneNumber(username: string, phoneNumber: string): Promise<AdminUpdateUserAttributesCommandOutput> {
         let params = {
             UserPoolId: this.userPoolId,
             Username: username,
@@ -157,7 +139,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await  this.cognitoClient.send(command);
     }
 
-    async sendMobileNumberVerificationCode(accessToken: string) {
+    async sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput> {
         let params = {
             AccessToken: accessToken,
             AttributeName: "phone_number"
@@ -166,7 +148,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
-    async verifySmsCode(accessToken: string, code: string) {
+    async verifySmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput> {
         const params = {
             AccessToken: accessToken,
             AttributeName: 'phone_number',
