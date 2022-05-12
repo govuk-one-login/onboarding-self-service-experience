@@ -61,6 +61,13 @@ app.get("/add-service-name-error", function (req: Request, res: Response) {
 ////// Testing routes - end //////
 
 
+app.use(function (err: unknown, req: Request, res: Response, next: NextFunction) {
+    // in async controller methods, you need to catch and next(error); to reach this.
+    console.log("Error handler");
+    res.send('This should be the something went wrong page');
+});
 
 const port = process.env.PORT || 3000
 app.listen(port, () => console.log(`Server running; listening on port ${port}`));
+
+
