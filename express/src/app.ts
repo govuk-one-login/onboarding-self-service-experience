@@ -5,12 +5,18 @@ import signIn from "./routes/sign-in";
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import sessions from 'express-session';
-import {CognitoClient} from "./lib/cognito";
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import manageAccount from "./routes/manage-account";
+import CognitoInterface from "./lib/cognito/CognitoInterface";
+import(`./lib/cognito/${process.env.COGNITO_CLIENT||"CognitoClient"}`).then(
+    client => {
+        app.set('cognitoClient', new client.default.CognitoClient);
+    }
+);
 
 const app = express();
-app.set('cognitoClient', new CognitoClient());
+
+
 app.use('/dist', express.static('./dist/assets'));
 app.use(express.static('./dist'));
 app.use(bodyParser.urlencoded({

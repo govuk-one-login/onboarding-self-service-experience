@@ -1,10 +1,11 @@
-import express, {NextFunction, Request, Response} from "express";
-import {CognitoClient} from '../lib/cognito'
+import {NextFunction, Request, Response} from "express";
 import {
-    AuthenticationResultType,
+    AdminUpdateUserAttributesCommandOutput,
+    AttributeType,
     NotAuthorizedException,
     UsernameExistsException
 } from "@aws-sdk/client-cognito-identity-provider";
+import CognitoInterface from "../lib/cognito/CognitoInterface";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     res.render('create-account/get-email.njk');
@@ -13,47 +14,35 @@ export const showGetEmailForm = function (req: Request, res: Response) {
 export const processGetEmailForm = async function (req: Request, res: Response) {
     const emailAddress: string = req.body.emailAddress;
     const validEmail = emailAddress.endsWith(".gov.uk"); // improve this
-    const cognitoClient = await req.app.get('cognitoClient');
+    const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
 
-    if (validEmail) {
-        req.session.emailAddress = emailAddress;
-        let result: any;
-        try {
-            result = await cognitoClient.createUser(emailAddress);
-        } catch (error) {
+    req.session.emailAddress = emailAddress;
+    let result: any;
+    try {
+        result = await cognitoClient.createUser(emailAddress);
+        console.debug(result);
+    } catch (error) {
+        if (error instanceof UsernameExistsException) {
+            // Actually, we should check whether they've verified their email
+            // If not, we should redirect them to the verify email page and tell them to check their email
+            // That page should offer the chance to send a new code to their email address
+            console.error("User already exists");
             console.error(error);
-            if (error instanceof UsernameExistsException) {
-                // Actually, we should check whether they've verified their email
-                // If not, we should redirect them to the verify email page and tell them to check their email
-                // That page should offer the chance to send a new code to their email address
-                console.error("User already exists");
-                console.error(error);
-                const errorMessages = new Map<string, string>();
-                const values = new Map<string, string>();
-                errorMessages.set('emailAddress', `${emailAddress} has already been registered.`);
-                values.set('emailAddress', emailAddress);
-                res.render('create-account/get-email.njk', {
-                    values: values,
-                    errorMessages: errorMessages,
-                    fieldOrder: ['emailAddress']
-                });
-                return;
-            }
-            res.redirect("/create/get-email");
+            const errorMessages = new Map<string, string>();
+            const values = new Map<string, string>();
+            errorMessages.set('emailAddress', `${emailAddress} has already been registered.`);
+            values.set('emailAddress', emailAddress);
+            res.render('create-account/get-email.njk', {
+                values: values,
+                errorMessages: errorMessages,
+                fieldOrder: ['emailAddress']
+            });
             return;
         }
-        res.redirect('check-email');
-    } else {
-        const errorMessages = new Map<string, string>();
-        const values = new Map<string, string>();
-        errorMessages.set("emailAddress", "You must provide a government email address");
-        values.set('emailAddress', emailAddress);
-        res.render('create-account/get-email.njk', {
-            errorMessages: errorMessages,
-            values: values,
-            fieldOrder: ['emailAddress']
-        });
+        res.redirect("/create/get-email");
+        return;
     }
+    res.redirect('check-email'); // this is really a something went wrong moment and there must be other cases for us to try in particular - bad co
 }
 
 export const showCheckEmailForm = function (req: Request, res: Response) {
@@ -104,26 +93,35 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
 
 export const showNewPasswordForm = async function (req: Request, res: Response, next: NextFunction) {
     console.log("Show new password")
-    if(req.session.session !== undefined) {
-        res.render( 'create-account/new-password.njk');
-       return;
+    if (req.session.session !== undefined) {
+        res.render('create-account/new-password.njk');
+        return;
     } else {
         // this flow needs designing
         res.redirect('/sign-in');
     }
 }
 
-export const updatePassword = async function (req: Request, res: Response) {
-    const cognitoClient = await req.app.get('cognitoClient');
+export const updatePassword = async function (req: Request, res: Response, next: NextFunction) {
+    const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
 
     const response = await cognitoClient.setNewPassword(req.session.emailAddress as string, req.body['create-password-1'], req.session.session as string);
     req.session.session = response.Session;
     req.session.authenticationResult = response.AuthenticationResult;
 
     let user = await cognitoClient.getUser(req.session.emailAddress as string);
+    let email: string | undefined;
 
-    let updateResponse = await cognitoClient.setEmailAsVerified(
-        user.UserAttributes.filter((attribute: { Name: string; }) => attribute.Name === 'email')[0].Value);
+    if (user.UserAttributes) {
+        email = user.UserAttributes.filter((attribute: AttributeType) => attribute.Name === 'email')[0].Value;
+    }
+
+    let updateResponse: AdminUpdateUserAttributesCommandOutput;
+    if (email === undefined) {
+        next(); // Who knows what could have gone wrong?
+    } else {
+        await cognitoClient.setEmailAsVerified(email);
+    }
 
     res.redirect('/create/enter-mobile');
 }
@@ -143,7 +141,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
         // user must login before we can process their mobile number
-        res.redirect('/login')
+        res.redirect('/sign-in')
         return;
     }
 
