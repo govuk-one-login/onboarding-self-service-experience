@@ -1,0 +1,27 @@
+{
+  "name": "rfc822-validate",
+  "version": "1.0.0",
+  "description": "Validate an email address in Node or RequireJS/AMD.  Provide validation that an email address conforms to RFC822.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wprl/rfc822-validate.git"
+  },
+  "keywords": [
+    "email",
+    "validation",
+    "validate",
+    "validator",
+    "rfc822",
+    "rfc2822",
+    "rfc 822",
+    "rfc 2822"
+  ],
+  "author": "William Riley-Land",
+  "dependencies": {
+    "amdefine": "0.0.4"
+  }
+}
