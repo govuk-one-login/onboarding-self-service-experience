@@ -42,7 +42,9 @@ export const processGetEmailForm = async function (req: Request, res: Response) 
         res.redirect("/create/get-email");
         return;
     }
-    res.redirect('check-email'); // this is really a something went wrong moment and there must be other cases for us to try in particular - bad co
+    res.redirect("/create/get-email");
+
+    // res.redirect('check-email'); // this is really a something went wrong moment and there must be other cases for us to try in particular - bad co
 }
 
 export const showCheckEmailForm = function (req: Request, res: Response) {
