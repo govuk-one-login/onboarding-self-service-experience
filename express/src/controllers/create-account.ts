@@ -13,7 +13,6 @@ export const showGetEmailForm = function (req: Request, res: Response) {
 
 export const processGetEmailForm = async function (req: Request, res: Response) {
     const emailAddress: string = req.body.emailAddress;
-    const validEmail = emailAddress.endsWith(".gov.uk"); // improve this
     const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
 
     req.session.emailAddress = emailAddress;
