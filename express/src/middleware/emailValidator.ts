@@ -21,7 +21,7 @@ export async function emailValidator(req: Request, res: Response, next: NextFunc
     }
 
     if(! await checkEmailDomain(req, res, next, emailAddress) ) {
-        await errorResponse(req, res, 'emailAddress', 'Please check your email is formatted correctly.');
+        await errorResponse(req, res, 'emailAddress', 'Please ensuret that you are using a .gov.uk email address.');
         return;
     }
 
@@ -41,7 +41,7 @@ async function errorResponse(req: Request, res: Response, key: string, message: 
     });
 }
 
-async function  checkEmailDomain(req: Request, res: Response, next: NextFunction, emailAddress: string): Promise<boolean> {
+async function  checkEmailDomainDELETEME(req: Request, res: Response, next: NextFunction, emailAddress: string): Promise<boolean> {
     // get domains from file
     const p = path.join(__dirname, 'valid-email-domains.txt')
     const data = await fs.readFile(p, {
@@ -56,4 +56,15 @@ async function  checkEmailDomain(req: Request, res: Response, next: NextFunction
         }
     });
     return false;
+}
+
+async function  checkEmailDomain(req: Request, res: Response, next: NextFunction, emailAddress: string): Promise<boolean> {
+    // get domains from file
+    const p = path.join(__dirname, 'valid-email-domains.txt')
+    const data = await fs.readFile(p, {
+        encoding: 'utf8'
+    })
+
+    const validEmailDomains = data.split('\n')
+    return validEmailDomains.filter((domain: string) => emailAddress.endsWith(domain)).length > 0;
 }
