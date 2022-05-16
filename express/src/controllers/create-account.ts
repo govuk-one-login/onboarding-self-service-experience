@@ -1,11 +1,13 @@
 import {NextFunction, Request, Response} from "express";
 import {
     AdminUpdateUserAttributesCommandOutput,
-    AttributeType,
+    AttributeType, CodeMismatchException,
     NotAuthorizedException,
     UsernameExistsException
 } from "@aws-sdk/client-cognito-identity-provider";
 import CognitoInterface from "../lib/cognito/CognitoInterface";
+import axios, {Axios} from "axios";
+import {randomUUID} from "crypto";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     res.render('create-account/get-email.njk');
@@ -25,8 +27,6 @@ export const processGetEmailForm = async function (req: Request, res: Response) 
             // Actually, we should check whether they've verified their email
             // If not, we should redirect them to the verify email page and tell them to check their email
             // That page should offer the chance to send a new code to their email address
-            console.error("User already exists");
-            console.error(error);
             const errorMessages = new Map<string, string>();
             const values = new Map<string, string>();
             errorMessages.set('emailAddress', `${emailAddress} has already been registered.`);
@@ -109,6 +109,8 @@ export const updatePassword = async function (req: Request, res: Response, next:
     req.session.authenticationResult = response.AuthenticationResult;
 
     let user = await cognitoClient.getUser(req.session.emailAddress as string);
+    // do something better with this
+    req.session.user = user;
     let email: string | undefined;
 
     if (user.UserAttributes) {
@@ -168,7 +170,44 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         res.render('create-account/check-mobile.njk', {mobileNumber: req.session.mobileNumber});
         return;
     }
-    let response = await cognitoClient.verifySmsCode(req.session.authenticationResult?.AccessToken, otp);
-    console.log(response);
-    res.redirect('/');
+    try {
+        let response = await cognitoClient.verifySmsCode(req.session.authenticationResult?.AccessToken, otp);
+        console.log("Got SMS Verification code response")
+        console.log(response);
+
+        const URL = process.env.API_BASE_URL
+        const uuid = randomUUID();
+        const email = req.session.user?.UserAttributes?.filter((attribute: AttributeType) => attribute.Name === 'email')[0].Value;
+        const phone = req.session.mobileNumber;
+
+        let user = {
+                "pk": `user#${uuid}`,
+                "sk": `cognito_username#${req.session.user?.Username}`,
+                "data": "we haven't collected this full name",
+                first_name: "we haven't collected this first name",
+                last_name: "we haven't collected this last name",
+                email: email,
+                phone: phone
+        }
+
+        let instance = await axios.create({
+            baseURL: URL,
+            headers: {
+                "Authorization": req.session.authenticationResult?.AccessToken as string,
+                "Content-Type": "application/json"
+            }
+        });
+
+        let clientUpdate = await instance.post('/Prod/put-user', user);
+        console.log(clientUpdate);
+        res.redirect('/add-service-name');
+        return;
+    } catch (error) {
+        if (error instanceof CodeMismatchException) {
+            console.debug("Code did not match")
+            res.render('create-account/check-mobile.njk', {mobileNumber: req.session.mobileNumber});
+        }
+        console.error(error);
+        res.render('/create/verify-phone-code');
+    }
 }
