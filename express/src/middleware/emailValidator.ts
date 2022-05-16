@@ -1,9 +1,11 @@
 import {NextFunction, Request, Response} from "express";
 const fs = require('fs/promises')
 const path = require('path')
+const rfc822Validator = require('rfc822-validate')
 
 export async function emailValidator(req: Request, res: Response, next: NextFunction) {
     let emailAddress: string = req.body.emailAddress;
+
     // trim
     emailAddress = emailAddress.trim();
 
@@ -22,10 +24,12 @@ export async function emailValidator(req: Request, res: Response, next: NextFunc
 
     // check if email address is empty
     if (emailAddress === "") {
-        errorResponse('emailAddress', 'You must enter an email address.');
+        errorResponse('emailAddress', 'Please ensure that all fields have been filled.');
     }
     // check if email address is valid
-    
+    if(rfc822Validator(emailAddress) === false) { // temporary
+        errorResponse('emailAddress', 'Please check your email is formatted correctly.');
+    }
 
     // check if email address has valid domain
     async function checkEmailDomain(emailAddress: string) {
