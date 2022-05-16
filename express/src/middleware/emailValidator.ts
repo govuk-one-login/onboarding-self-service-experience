@@ -2,12 +2,12 @@ import {NextFunction, Request, Response} from "express";
 
 const fs = require('fs/promises')
 const path = require('path')
-const rfc822Validator = require('./rfc822-validate')
+import { rfc822EmailValidator } from "./rfc822-validate/validator";
 
 
 export async function emailValidator(req: Request, res: Response, next: NextFunction) {
     let emailAddress: string = req.body.emailAddress;
-    console.log(rfc822Validator(emailAddress));
+    rfc822EmailValidator(emailAddress);
 
     emailAddress = emailAddress.trim();
     if (emailAddress === "" || emailAddress === undefined || emailAddress === null) {
@@ -15,7 +15,7 @@ export async function emailValidator(req: Request, res: Response, next: NextFunc
         return;
     }
 
-    if (!rfc822Validator(emailAddress)) { // temporary
+    if (!rfc822EmailValidator(emailAddress)) { // temporary
         await errorResponse(req, res, 'emailAddress', 'Please check your email is formatted correctly.');
         return;
     }
@@ -39,23 +39,6 @@ async function errorResponse(req: Request, res: Response, key: string, message: 
         values: values,
         fieldOrder: ['emailAddress']
     });
-}
-
-async function  checkEmailDomainDELETEME(req: Request, res: Response, next: NextFunction, emailAddress: string): Promise<boolean> {
-    // get domains from file
-    const p = path.join(__dirname, 'valid-email-domains.txt')
-    const data = await fs.readFile(p, {
-        encoding: 'utf8'
-    })
-
-    const validEmailDomains = data.split('\n')
-
-    validEmailDomains.forEach((domain: string) => {
-        if (emailAddress.endsWith(domain)) {
-            return true;
-        }
-    });
-    return false;
 }
 
 async function  checkEmailDomain(req: Request, res: Response, next: NextFunction, emailAddress: string): Promise<boolean> {
