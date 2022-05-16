@@ -1,0 +1,167 @@
+{% extends "layout.njk" %}
+{% from "./macros/error-summary.njk" import errorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-main-wrapper-layout-with-left-nav" %}
+
+{% block pageTitle %}
+  Client details update GOV.UK Sign In
+{% endblock %}
+
+{% block beforeContent %}
+
+{% endblock %}
+
+
+{% block content %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-body govuk-!-font-weight-bold">Dummyvalue</div>
+    <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <nav class="sub-navigation">
+          <ul class="govuk-list sub_navigation_list_2">
+            <li class="sub-navigation__item sub-navigation__item--active">
+              <a class="govuk-link govuk-link--no-visited-state" href="/service-dashboard-client-details">Client details</a>
+            </li>
+            <li class="sub-navigation__item">
+              <a class="govuk-link govuk-link--no-visited-state" href="#">Request to join private beta</a>
+            </li>
+            <li class="sub-navigation__item">
+              <a class="govuk-link govuk-link--no-visited-state" href="#">Settings</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+        {{ errorSummary ({
+          errors: errors,
+          hrefs: {
+            'clientNameDetails': '#clientNameDetails',
+            'redirectUrl': '#redirectUrl',
+            'userPublicKey': '#userPublicKey',
+            'postLogoutRedirectUrl': '#postLogoutRedirectUrl',
+            'sectorIdentifierUrl': '#sectorIdentifierUrl'
+          }
+        }) }}
+        <h1 class="govuk-heading-l govuk-!-margin-top-3">Update client details</h1>
+        <p class="govuk-body">See the <a class="govuk-link" href="https://docs.sign-in.service.gov.uk">technical documentation</a> for guidance on updating this information.</p>
+        <form class="form" action="/amend-details-v1" method="post">
+
+          {{ govukInput({
+            label: {
+              text: "Client name"
+            },
+            name: "clientNameDetails",
+            id: "clientNameDetails",
+            classes: "govuk-input--width-20",
+            errorMessage: {
+              text: errors.get('clientNameDetails')
+            } if errors and errors.has('clientNameDetails'),
+            value: "Dummyvalue"
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Redirect URI"
+            },
+            hint: {
+              text: "The page you want your users to see after logging in"
+            },
+            name: "redirectUrl",
+            id: "redirectUrl",
+            errorMessage: {
+              text: errors.get('redirectUrl')
+            } if errors and errors.has('redirectUrl'),
+            value: 'Dummyvalue'
+          }) }}
+
+          {{ govukCheckboxes({
+            name: "optionalScopes",
+            fieldset: {
+              legend: {
+                text: "Optional scopes"
+              }
+            },
+            hint: {
+              text: "The optional user attributes your service can request. You will always receive the ‘OpenID’ scope."
+            },
+            items: [
+              {
+                value: "Email",
+                text: "Email",
+                checked: true
+              },
+              {
+                value: "Phone",
+                text: "Phone",
+                checked: true
+              },
+              {
+                value: "Offline access",
+                text: "Offline access",
+                checked: false
+              }
+            ]
+          }) }}
+
+          {{ govukTextarea({
+            name: "userPublicKey",
+            id: "userPublicKey",
+            label: {
+              text: "Public key"
+            },
+            errorMessage: {
+              text: errors.get('userPublicKey')
+            } if errors and errors.has('userPublicKey'),
+            value: "Dummyvalue"
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Post logout redirect URIs"
+            },
+            hint: {
+              text: "The page you want your users to see after logging out"
+            },
+            name: "postLogoutRedirectUrl",
+            id: "postLogoutRedirectUrl",
+            errorMessage: {
+              text: errors.get('postLogoutRedirectUrl')
+            } if errors and errors.has('postLogoutRedirectUrl'),
+            value: 'Dummyvalue'
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Sector identifier URI"
+            },
+            hint: {
+              text: "A unique URI that identifies your department"
+            },
+            name: "sectorIdentifierUrl",
+            id: "sectorIdentifierUrl",
+            errorMessage: {
+              text: errors.get('sectorIdentifierUrl')
+            } if errors and errors.has('sectorIdentifierUrl'),
+            value: 'Dummyvalue'
+          }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Confirm"
+          }) }}
+          <a class="govuk-link" href="/service-dashboard-client-details">Cancel</a>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+

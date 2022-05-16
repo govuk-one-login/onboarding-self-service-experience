@@ -13,6 +13,7 @@ import(`./lib/cognito/${process.env.COGNITO_CLIENT||"CognitoClient"}`).then(
         app.set('cognitoClient', new client.default.CognitoClient);
     }
 );
+import testingRoutes from "./routes/testing-routes";
 
 const app = express();
 
@@ -44,34 +45,11 @@ configureViews(app);
 app.use("/", createAccount);
 app.use("/", signIn);
 app.use("/", manageAccount);
+app.use("/", testingRoutes);
 
 app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {active: 'get-started'});
 });
-
-////// Testing routes - begin //////
-
-//Testing route for service name get request
-app.get("/add-service-name", function (req: Request, res: Response) {
-    res.render("add-service-name.njk");
-});
-
-// Testing route for service name  get request with error
-app.get("/add-service-name-error", function (req: Request, res: Response) {
-    let errorMessages: Map<String, String> = new Map<String, String>();
-    let errorUrls: Map<String, String> = new Map<String, String>();
-    errorMessages.set('serviceName', 'Enter your service name');
-    res.render("add-service-name.njk",{ errors: errorMessages });
-});
-
-// Testing route for client details dashboard
-app.get("/service-dashboard-client-details", function (req: Request, res: Response) {
-    res.render("service-dashboard-client-details.njk");
-});
-
-
-////// Testing routes - end //////
-
 
 app.use(function (err: unknown, req: Request, res: Response, next: NextFunction) {
     // in async controller methods, you need to catch and next(error); to reach this.
