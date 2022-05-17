@@ -13,6 +13,6 @@ let sAddrSpec = sLocalPart + '\\x40' + sDomain; // complete RFC822 email address
 let sValidEmail = '^' + sAddrSpec + '$'; // as whole string
 let reValidEmail = new RegExp(sValidEmail);
 
-export function rfc822EmailValidator(email: string ) {
+export function rfc822EmailValidator(email: string ): boolean {
     return reValidEmail.test(email);
 }
