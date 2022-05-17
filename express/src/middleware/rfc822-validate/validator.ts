@@ -14,6 +14,5 @@ var sValidEmail = '^' + sAddrSpec + '$'; // as whole string
 var reValidEmail = new RegExp(sValidEmail);
 
 export function rfc822EmailValidator(email: string ) {
-    console.log("TS VALIDATOR SAYS :" , reValidEmail.test(email));
     return reValidEmail.test(email);
 }

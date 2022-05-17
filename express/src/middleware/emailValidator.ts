@@ -11,43 +11,66 @@ export async function emailValidator(req: Request, res: Response, next: NextFunc
 
     emailAddress = emailAddress.trim();
     if (emailAddress === "" || emailAddress === undefined || emailAddress === null) {
-        await errorResponse(req, res, 'emailAddress', 'Please ensure that all fields have been filled.');
+        await errorResponse(emailAddress, res, 'emailAddress', 'Please ensure that all fields have been filled in correctly.');
         return;
     }
 
     if (!rfc822EmailValidator(emailAddress)) { // temporary
-        await errorResponse(req, res, 'emailAddress', 'Please check your email is formatted correctly.');
+        await errorResponse(emailAddress, res, 'emailAddress', 'Please check that your email is formatted correctly.');
         return;
     }
 
-    if(! await checkEmailDomain(req, res, next, emailAddress) ) {
-        await errorResponse(req, res, 'emailAddress', 'Please ensuret that you are using a .gov.uk email address.');
+    if(! await checkEmailDomain( emailAddress) ) {
+        await errorResponse(emailAddress, res, 'emailAddress', 'Please ensure that you are using a .gov.uk email address.');
         return;
     }
 
     next();
 }
 
-
-async function errorResponse(req: Request, res: Response, key: string, message: string) {
+export async function errorResponse(emailAddress: string, res: Response, key: string, message: string) {
     const errorMessages = new Map<string, string>();
     const values = new Map<string, string>();
-    errorMessages.set(key, message);
-    values.set('emailAddress', req.body.emailAddress);
-    res.render('create-account/get-email.njk', {
-        errorMessages: errorMessages,
-        values: values,
-        fieldOrder: ['emailAddress']
-    });
+    try{
+        errorMessages.set(key, message);
+        values.set('emailAddress', emailAddress);
+        res.render('create-account/get-email.njk', {
+            errorMessages: errorMessages,
+            values: values,
+            fieldOrder: ['emailAddress']
+        });
+    }catch (e) {
+        console.log(e)
+    }
 }
 
-async function  checkEmailDomain(req: Request, res: Response, next: NextFunction, emailAddress: string): Promise<boolean> {
-    // get domains from file
-    const p = path.join(__dirname, 'valid-email-domains.txt')
-    const data = await fs.readFile(p, {
-        encoding: 'utf8'
-    })
-
-    const validEmailDomains = data.split('\n')
-    return validEmailDomains.filter((domain: string) => emailAddress.endsWith(domain)).length > 0;
+export async function  checkEmailDomain( emailAddress: string ): Promise<boolean> {
+    try{
+        const p = path.join(__dirname, 'valid-email-domains.txt')
+        const data = await fs.readFile(p, {
+            encoding: 'utf8'
+        })
+        const validEmailDomains = data.split('\n')
+        return validEmailDomains.filter((domain: string) => emailAddress.endsWith(domain)).length > 0;
+    }catch (e) {
+        console.log(e)
+        console.log('there was an error')
+    }
+    return false;
 }
+
+export async function sayHello( emailAddress: string  ) {
+    try{
+        const p = path.join(__dirname, 'valid-email-domains.txt')
+        const data = await fs.readFile(p, {
+            encoding: 'utf8'
+        })
+        const validEmailDomains = data.split('\n')
+        return validEmailDomains.filter((domain: string) => emailAddress.endsWith(domain)).length > 0;
+    }catch (e) {
+        console.log(e)
+        console.log('there was an HELLO error')
+    }
+
+}
+// module.exports = emailValidator , checkEmailDomain , errorResponse, rfc822EmailValidator;
