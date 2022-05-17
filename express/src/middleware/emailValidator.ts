@@ -7,7 +7,6 @@ import { rfc822EmailValidator } from "./rfc822-validate/validator";
 
 export async function emailValidator(req: Request, res: Response, next: NextFunction) {
     let emailAddress: string = req.body.emailAddress;
-    rfc822EmailValidator(emailAddress);
 
     emailAddress = emailAddress.trim();
     if (emailAddress === "" || emailAddress === undefined || emailAddress === null) {
@@ -15,12 +14,12 @@ export async function emailValidator(req: Request, res: Response, next: NextFunc
         return;
     }
 
-    if (!rfc822EmailValidator(emailAddress)) { // temporary
+    if (!rfc822EmailValidator(emailAddress)) { 
         await errorResponse(emailAddress, res, 'emailAddress', 'Please check that your email is formatted correctly.');
         return;
     }
 
-    if(! await checkEmailDomain( emailAddress) ) {
+    if(! await isAllowedDomain( emailAddress) ) {
         await errorResponse(emailAddress, res, 'emailAddress', 'Please ensure that you are using a .gov.uk email address.');
         return;
     }
@@ -44,14 +43,14 @@ export async function errorResponse(emailAddress: string, res: Response, key: st
     }
 }
 
-export async function  checkEmailDomain( emailAddress: string ): Promise<boolean> {
+export async function  isAllowedDomain( emailAddress: string ): Promise<boolean> {
     try{
         const p = path.join(__dirname, 'valid-email-domains.txt')
         const data = await fs.readFile(p, {
             encoding: 'utf8'
         })
         const validEmailDomains = data.split('\n')
-        return validEmailDomains.filter((domain: string) => emailAddress.endsWith(domain)).length > 0;
+        return validEmailDomains.filter((domain: string) => emailAddress.endsWith(`.${domain}`)).length > 0;
     }catch (e) {
         console.log(e)
     }
