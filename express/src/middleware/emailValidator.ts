@@ -54,23 +54,6 @@ export async function  checkEmailDomain( emailAddress: string ): Promise<boolean
         return validEmailDomains.filter((domain: string) => emailAddress.endsWith(domain)).length > 0;
     }catch (e) {
         console.log(e)
-        console.log('there was an error')
     }
     return false;
 }
-
-export async function sayHello( emailAddress: string  ) {
-    try{
-        const p = path.join(__dirname, 'valid-email-domains.txt')
-        const data = await fs.readFile(p, {
-            encoding: 'utf8'
-        })
-        const validEmailDomains = data.split('\n')
-        return validEmailDomains.filter((domain: string) => emailAddress.endsWith(domain)).length > 0;
-    }catch (e) {
-        console.log(e)
-        console.log('there was an HELLO error')
-    }
-
-}
-// module.exports = emailValidator , checkEmailDomain , errorResponse, rfc822EmailValidator;

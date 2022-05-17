@@ -62,5 +62,3 @@ describe('Error Response', () => {
         await errorResponse(emailAddress, res, 'emailAddress', 'Please check that your email is formatted correctly.');
     });
 });
-
-
