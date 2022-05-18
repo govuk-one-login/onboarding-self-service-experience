@@ -1,3 +1,5 @@
+Ported from the npm package rfc822-validate; original README as follows:
+
 rfc822-validate
 ===============
 
