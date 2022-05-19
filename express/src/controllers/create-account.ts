@@ -182,7 +182,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
 
         let user = {
                 "pk": `user#${uuid}`,
-                "sk": `cognito_username#${req.session.user?.Username}`,
+                "sk": `cognito_id#${req.session.user?.Username}`,
                 "data": "we haven't collected this full name",
                 first_name: "we haven't collected this first name",
                 last_name: "we haven't collected this last name",

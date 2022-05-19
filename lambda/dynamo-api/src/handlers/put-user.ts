@@ -1,10 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-// Create clients and set shared const values outside of the handler.
-
 import DynamoClient from "../client/DynamoClient";
-import {PutItemCommandOutput} from "@aws-sdk/client-dynamodb";
-
-// Get the DynamoDB table name from environment variables
 
 const tableName = process.env.SAMPLE_TABLE;
 const client = new DynamoClient(tableName as string);
