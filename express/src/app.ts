@@ -3,20 +3,18 @@ import configureViews from './lib/configureViews';
 import createAccount from "./routes/create-account-or-sign-in";
 import signIn from "./routes/sign-in";
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
 import sessions from 'express-session';
-import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import {AdminGetUserCommandOutput, AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import manageAccount from "./routes/manage-account";
-import CognitoInterface from "./lib/cognito/CognitoInterface";
+
+import testingRoutes from "./routes/testing-routes";
+
+const app = express();
 import(`./lib/cognito/${process.env.COGNITO_CLIENT||"CognitoClient"}`).then(
     client => {
         app.set('cognitoClient', new client.default.CognitoClient);
     }
 );
-import testingRoutes from "./routes/testing-routes";
-
-const app = express();
-
 
 app.use('/dist', express.static('./dist/assets'));
 app.use(express.static('./dist'));
@@ -37,6 +35,7 @@ declare module 'express-session' {
         mobileNumber: string;
         session: string;
         authenticationResult: AuthenticationResultType
+        user: AdminGetUserCommandOutput
     }
 }
 

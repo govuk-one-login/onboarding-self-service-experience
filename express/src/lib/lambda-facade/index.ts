@@ -1,0 +1,1 @@
+import LambdaFacade from './LambdaFacade';
