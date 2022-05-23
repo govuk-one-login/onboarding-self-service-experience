@@ -71,7 +71,6 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/handlers/put-service.ts
-
 Outputs:
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"

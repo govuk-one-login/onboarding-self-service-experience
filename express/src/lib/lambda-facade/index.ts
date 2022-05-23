@@ -1,1 +1,3 @@
-import LambdaFacade from './LambdaFacade';
+import {lambdaFacadeInstance} from './LambdaFacade';
+
+export default lambdaFacadeInstance;
