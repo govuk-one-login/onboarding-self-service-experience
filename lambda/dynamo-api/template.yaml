@@ -71,6 +71,22 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/handlers/put-service.ts
+
+  NewServiceStepFunction:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: ./src/state-machines/newService.json
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName:
+              !Ref putServiceFunction
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /new-service
+            Method: Post
+
 Outputs:
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"

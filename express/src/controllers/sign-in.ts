@@ -3,7 +3,8 @@ import express, {Request, Response} from "express";
 import {
     AuthenticationResultType,
     NotAuthorizedException,
-    UsernameExistsException
+    UsernameExistsException,
+    AttributeType
 } from "@aws-sdk/client-cognito-identity-provider";
 
 export const showSignInForm = async function(req: Request, res: Response) {
@@ -35,7 +36,8 @@ export const processSignInForm = async function(req: Request, res: Response) {
         const response = await cognitoClient.login(email, password);
         req.session.authenticationResult = response.AuthenticationResult;
         req.session.emailAddress = email;
-        res.redirect('/account/list-services');
+        req.session.selfServiceUser = {data: "", email: "", phone: ""}
+        res.redirect('/add-service-name');
         return;
     } catch (error) {
         if(error instanceof NotAuthorizedException) {
