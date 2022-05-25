@@ -53,6 +53,7 @@ app.get("/", function (req: Request, res: Response) {
 app.use(function (err: unknown, req: Request, res: Response, next: NextFunction) {
     // in async controller methods, you need to catch and next(error); to reach this.
     console.log("Error handler");
+    console.log(err)
     res.send('This should be the something went wrong page');
 });
 
