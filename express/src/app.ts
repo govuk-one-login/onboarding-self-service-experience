@@ -8,6 +8,7 @@ import {AdminGetUserCommandOutput, AuthenticationResultType} from "@aws-sdk/clie
 import manageAccount from "./routes/manage-account";
 
 import testingRoutes from "./routes/testing-routes";
+import {User} from "../@types/User";
 
 const app = express();
 import(`./lib/cognito/${process.env.COGNITO_CLIENT||"CognitoClient"}`).then(
@@ -34,8 +35,9 @@ declare module 'express-session' {
         emailAddress: string;
         mobileNumber: string;
         session: string;
-        authenticationResult: AuthenticationResultType
-        user: AdminGetUserCommandOutput
+        authenticationResult: AuthenticationResultType;
+        cognitoUser: AdminGetUserCommandOutput;
+        selfServiceUser: User;
     }
 }
 

@@ -6,7 +6,7 @@ import {
     UsernameExistsException
 } from "@aws-sdk/client-cognito-identity-provider";
 import CognitoInterface from "../lib/cognito/CognitoInterface";
-import axios, {Axios} from "axios";
+import lambdaFacadeInstance from "../lib/lambda-facade";
 import {randomUUID} from "crypto";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
@@ -110,7 +110,7 @@ export const updatePassword = async function (req: Request, res: Response, next:
 
     let user = await cognitoClient.getUser(req.session.emailAddress as string);
     // do something better with this
-    req.session.user = user;
+    req.session.cognitoUser = user;
     let email: string | undefined;
 
     if (user.UserAttributes) {
@@ -164,6 +164,11 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
 }
 
 export const submitMobileVerificationCode = async function (req: Request, res: Response) {
+    // need to check for access token in middleware
+    if(req.session.authenticationResult?.AccessToken === undefined) {
+        res.redirect('/sign-in');
+        return;
+    }
     const cognitoClient = await req.app.get('cognitoClient');
     let otp = req.body['create-sms-otp'];
     if (otp === undefined) {
@@ -175,14 +180,13 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         console.log("Got SMS Verification code response")
         console.log(response);
 
-        const URL = process.env.API_BASE_URL
         const uuid = randomUUID();
-        const email = req.session.user?.UserAttributes?.filter((attribute: AttributeType) => attribute.Name === 'email')[0].Value;
+        const email = req.session.cognitoUser?.UserAttributes?.filter((attribute: AttributeType) => attribute.Name === 'email')[0].Value;
         const phone = req.session.mobileNumber;
 
         let user = {
                 "pk": `user#${uuid}`,
-                "sk": `cognito_id#${req.session.user?.Username}`,
+                "sk": `cognito_username#${req.session.cognitoUser?.Username}`,
                 "data": "we haven't collected this full name",
                 first_name: "we haven't collected this first name",
                 last_name: "we haven't collected this last name",
@@ -190,16 +194,8 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
                 phone: phone
         }
 
-        let instance = await axios.create({
-            baseURL: URL,
-            headers: {
-                "Authorization": req.session.authenticationResult?.AccessToken as string,
-                "Content-Type": "application/json"
-            }
-        });
-
-        let clientUpdate = await instance.post('/Prod/put-user', user);
-        console.log(clientUpdate);
+        let clientUpdate = await lambdaFacadeInstance.putUser(user, req.session.authenticationResult?.AccessToken);
+        req.session.selfServiceUser = user;
         res.redirect('/add-service-name');
         return;
     } catch (error) {

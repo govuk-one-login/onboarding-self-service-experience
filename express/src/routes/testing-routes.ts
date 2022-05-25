@@ -3,9 +3,6 @@ import express, {Request, Response} from 'express';
 const router = express.Router();
 
 //Testing route for service name get request
-router.get('/add-service-name', (req, res) => {
-  res.render("add-service-name.njk");
-});
 
 // Testing route for service name  get request with error
 router.get('/add-service-name-error', (req, res) => {
