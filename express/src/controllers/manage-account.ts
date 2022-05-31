@@ -21,8 +21,15 @@ export const processAddServiceForm = async function (req: Request, res: Response
         "service_name": req.body.serviceName
     }
     let user = req.session.selfServiceUser as User;
-    console.log(service);
-    await lambdaFacadeInstance.newService(service, req.session.authenticationResult?.AccessToken as string, user);
+    try {
+        let newUser: any = {};
+        // @ts-ignore
+        Object.keys(user).forEach(key => newUser[key] = user[key]["S"])
+        console.log(newUser)
+        await lambdaFacadeInstance.newService(service, newUser, req.session.authenticationResult?.AccessToken as string);
+    } catch (error) {
+        console.error(error);
+    }
     res.redirect("/create-service");
 }
 
