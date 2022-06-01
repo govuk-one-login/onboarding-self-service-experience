@@ -1,4 +1,8 @@
 {% extends "../layout.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "../macros/error-summary.njk" import errorSummary %}
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-4 govuk-!-margin-bottom-6 govuk-!-padding-bottom-0 " %}
+
 {% block beforeContent %}
     <div class="govuk-width-container">
         <p class="govuk-phase-banner__content govuk-!-margin-top-2">
@@ -15,36 +19,31 @@
         <a href="/create/enter-mobile" class="govuk-back-link">Back</a>
     </div>
 {% endblock %}
+
+
 {% block content %}
     <div class="govuk-width-container">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-l">
-                    Check your phone
+                    Resend security code
                 </h1>
-                <div class="govuk-inset-text">
-                    <p class="govuk-body">We sent a code to {{ mobileNumber }}.</p>
-                </div>
 
-                <p class="govuk-body">It might take a few minutes to arrive. The code will expire after 15 minutes.</p>
+                <p class="govuk-body">
+                    Text messages sometimes take a few minutes to arrive. If you did not receive a security code via text, we can send you a new one.
+                </p>
 
+                <p class="govuk-body">
+                    If you no longer have access to the phone with the number registered for this service, use our
+                    <a href="https://www.sign-in.service.gov.uk/support">support form</a>
+                     or 
+                    <a href="https://ukgovernmentdigital.slack.com/archives/C02AQUJ6WTC">Slack channel </a>  to raise this.
+                </p>
 
-                <form method="post" action="/create/verify-phone-code">
-                    <div class="govuk-form-group">
-
-                        <label class="govuk-label" for="otp">Enter the 6 digit security code</label>
-
-                        <input class="govuk-input govuk-input--width-5" id="otp" name="create-sms-otp" type="text"
-                               autocomplete="one-time-code" inputmode="numeric" spellcheck="false">
-
-                    </div>
-
-                    <p class="govuk-body"><a href="/create/resend-phone-code">Not received a text message?</a></p>
-
+                <form method="post" action="/create/resend-phone-code">
                     {{ govukButton({
-                        text: "Continue"
+                        text: "Resend security code"
                     }) }}
-
                 </form>
             </div>
         </div>
