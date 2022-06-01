@@ -13,7 +13,9 @@
     "buildgovuk": "cp -v -r node_modules/govuk-frontend/govuk/assets/* ./dist/assets && echo \"Done!\"",
     "buildlocalimages": "cp -v -r assets/images/* ./dist/assets/images",
     "build": "npm run buildts && npm run buildsass && npm run buildjs && npm run buildgovuk && npm run buildlocalimages",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run build && jest",
+    "cucumber": "./node_modules/.bin/cucumber-js --require-module ts-node/register --require features/support/test-setup.ts --require features/support/steps/**/*.ts --publish-quiet --tags 'not @wip'",
+    "cucumber-report": "npm run cucumbers -- --format html:test-report.html"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.80.0",

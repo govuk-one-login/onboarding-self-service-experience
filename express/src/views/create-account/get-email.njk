@@ -37,9 +37,9 @@
                         </label>
                         <input class="govuk-input govuk-input--width-20" id="email" name="emailAddress" type="email" spellcheck="false" aria-describedby="email-hint" autocomplete="email" {%  if values and values.get('emailAddress') %}value="{{ values.get('emailAddress') }}"{% endif %}>
                     </div>
-                    {{ govukButton({
-                        text: "Continue"
-                    }) }}
+                    <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
+                       Continue
+                    </button>
                 </form>
             </div>
         </div>
