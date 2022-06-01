@@ -57,7 +57,6 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
     }
 
     async createUser(email: string): Promise<AdminCreateUserCommandOutput> {
-        console.debug(`Adding a user with email ${{email}}`);
         let createUserParams = {
             DesiredDeliveryMediums: [ "EMAIL" ],
             Username: email,

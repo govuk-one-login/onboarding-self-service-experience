@@ -31,6 +31,18 @@ class DynamoClient {
         const command = new QueryCommand(params);
         return await this.dynamodb.send(command);
     }
+
+    async queryBySortKeyAndUnmarshal(sortKey: string): Promise<QueryCommandOutput> {
+        const params = {
+            TableName: this.tableName,
+            IndexName: 'sk-index',
+            ExpressionAttributeValues: {":sortKey": {S: sortKey}},
+            KeyConditionExpression: "sk = :sortKey"
+        }
+        console.log(params);
+        const command = new QueryCommand(params);
+        return await this.dynamodb.send(command);
+    }
 }
 
 export default DynamoClient;

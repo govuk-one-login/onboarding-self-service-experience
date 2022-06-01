@@ -171,7 +171,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
         return;
     }
 
-    let mobileNumber: string = req.body.mobileNumber;
+    let mobileNumber: string | undefined = req.session.mobileNumber;
     const cognitoClient = await req.app.get('cognitoClient');
     if (mobileNumber === undefined) {
         res.render('create-account/enter-mobile.njk');
@@ -185,7 +185,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     console.debug("VERIFICATION CODE RESPONSE");
     console.debug(codeSent);
     req.session.mobileNumber = mobileNumber;
-    res.render('create-account/check-mobile.njk', {mobileNumber: mobileNumber});
+    res.render('create-account/check-mobile.njk', {mobileNumber: req.body.mobileNumber});
 }
 
 export const resendMobileVerificationCode  = async function (req: Request, res: Response) {
@@ -225,8 +225,8 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         }
 
         const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
-        let clientUpdate = lambdaFacade.putUser(user, req.session.authenticationResult?.AccessToken);
-        req.session.selfServiceUser = user;
+        let addedUser = await lambdaFacade.putUser(user, req.session.authenticationResult?.AccessToken);
+        req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${req.session.cognitoUser?.Username}`, req.session?.authenticationResult?.AccessToken as string)).data.Items[0]
         res.redirect('/add-service-name');
         return;
     } catch (error) {
@@ -253,6 +253,7 @@ export const showResendPhoneCodeForm = async function (req: Request, res: Respon
         }
         res.render('create-account/resend-phone-code.njk');
 }
+
 export const showResendEmailCodeForm = async function (req: Request, res: Response) {
     res.render('create-account/resend-email-code.njk');
 }
