@@ -18,6 +18,7 @@ export const putServiceUserHandler = async (event: APIGatewayProxyEvent, context
         pk: payload.service.pk,
         sk: payload.user.pk,
         data: payload.user.email,
+        role: 'admin',
         service_name: payload.service.service_name
     }
     let response = {statusCode: 200, body: JSON.stringify("OK")};
