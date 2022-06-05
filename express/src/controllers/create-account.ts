@@ -10,7 +10,13 @@ import lambdaFacadeInstance from "../lib/lambda-facade";
 import {randomUUID} from "crypto";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
-    res.render('create-account/get-email.njk');
+    if (req.session.emailAddress) {
+        const values = new Map<string, string>();
+        values.set('emailAddress', req.session.emailAddress);
+        res.render('create-account/get-email.njk', {values: values});
+    } else {
+        res.render('create-account/get-email.njk');
+    }
 }
 
 export const processGetEmailForm = async function (req: Request, res: Response) {
@@ -61,19 +67,35 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
         return;
     }
 
-    if (req.body['create-email-otp'] === "") {
-        console.log("No password entered");
-        let fieldOrder = ['create-email-otp'];
+    const any6CharacterLongPattern = /^.{6}$/;
+    const onlyNumbersPattern = /^[0-9]+$/;
+    const otpToTest = req.body['create-email-otp'];
+
+    if (!any6CharacterLongPattern.test(otpToTest)) {
+        console.log("No otp code entered or number of symbols does not equal to 6");
         const errorMessages = new Map<string, string>();
-        errorMessages.set('create-email-otp', "You must enter the password we emailed you.")
+        errorMessages.set('create-email-otp', "Your code should be 6 characters long");
+        const value : object = {otp: otpToTest};
         res.render('create-account/check-email.njk', {
             emailAddress: req.session.emailAddress,
             errorMessages: errorMessages,
-            fieldOrder: fieldOrder
+            value: value
         });
         return;
     }
 
+    if (!onlyNumbersPattern.test(otpToTest)) {
+        console.log("Otp code is not only numbers");
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('create-email-otp', "Your security code should only include numbers");
+        const value : object = {otp: otpToTest};
+        res.render('create-account/check-email.njk', {
+            emailAddress: req.session.emailAddress,
+            errorMessages: errorMessages,
+            value: value
+        });
+        return;
+    }
 
     try {
         const response = await cognitoClient.login(req.session.emailAddress as string, req.body['create-email-otp']);
