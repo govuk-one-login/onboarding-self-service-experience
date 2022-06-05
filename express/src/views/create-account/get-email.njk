@@ -1,47 +1,62 @@
 {% extends "../layout.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "../macros/error-summary.njk" import errorSummary %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-4 govuk-!-margin-bottom-6 govuk-!-padding-bottom-0 " %}
+
+{% block pageTitle %}Enter your email address{% endblock %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    <a href="/create-account-or-sign-in" class="govuk-back-link">Back</a>
+  </div>
+{% endblock %}
 
 {%  block content %}
-    <div class="govuk-width-container">
-        {% if errorMessages and errorMessages.size != 0 %}
-            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
-                 tabindex="-1"
-                 data-module="govuk-error-summary">
-                <h2 class="govuk-error-summary__title" id="error-summary-title">
-                    There is a problem
-                </h2>
-                <div class="govuk-error-summary__body">
-                    <ul class="govuk-list govuk-error-summary__list">
-                        {% for field in fieldOrder %}
-                            {% if errorMessages.get(field) %}
-                                <li>
-                                    <a href="#{{ field }}">{{ errorMessages.get(field) }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        {% endif %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
 
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-                <h1 class="govuk-heading-l">
-                    Enter your email address
-                </h1>
+        {{ errorSummary ({
+            errors: errorMessages,
+            hrefs: {
+                'emailAddress': '#email'
+            }
+        }) }}
 
-                <p class="govuk-body">Enter your email address to create an account.</p>
-                <form class="form" action="/create/get-email" method="post">
-                    <div class="govuk-form-group">
-                        <label class="govuk-label" for="email">
-                            Email address
-                        </label>
-                        <input class="govuk-input govuk-input--width-20"  id="email" name="emailAddress" spellcheck="false" aria-describedby="email-hint" autocomplete="email" {%  if values and values.get('emailAddress') %}value="{{ values.get('emailAddress') }}"{% endif %}>
-                    </div>
-                    {{ govukButton({
-                        text: "Continue"
-                    }) }}
-                </form>
-            </div>
-        </div>
+        <h1 class="govuk-heading-l">Enter your email address</h1>
+
+        <form class="form" action="/create/get-email" method="post">
+
+          {{ govukInput({
+              label: {
+                  text: "Email address"
+              },
+              hint: {
+                  text: "Must be a government email address"
+              },
+              name: "emailAddress",
+              id: "email",
+              classes: "govuk-input--width-20",
+              errorMessage: {
+                  text: errorMessages.get('emailAddress')
+              } if errorMessages else false,
+              value: values.email
+
+          }) }}
+
+          <h2 class="govuk-heading-m">Agree to our privacy notice</h2>
+          <p class="govuk-body">We will collect and save your information securely. We will not share your personal information without your consent.</p>
+          <p class="govuk-body govuk-!-margin-bottom-6">By continuing, you confirm that you agree to our <a class="govuk-link" href="/privacy-policy">privacy notice</a>.</p>
+
+          {{ govukButton({
+              text: "Continue"
+          }) }}
+
+        </form>
+
+      </div>
     </div>
+  </div>
+
 {% endblock %}

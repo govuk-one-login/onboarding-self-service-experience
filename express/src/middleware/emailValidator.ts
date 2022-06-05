@@ -9,12 +9,12 @@ export async function emailValidator(req: Request, res: Response, next: NextFunc
     emailAddress = emailAddress.trim();
 
     if (emailAddress === "" || emailAddress === undefined || emailAddress === null) {
-        await errorResponse(emailAddress, res, 'emailAddress', 'Please ensure that all fields have been filled in correctly.');
+        await errorResponse(emailAddress, res, 'emailAddress', 'Enter an email address in the correct format, like name@example.com');
         return;
     }
 
     if (!isRfc822Compliant(emailAddress)) {
-        await errorResponse(emailAddress, res, 'emailAddress', 'Please check that your email is formatted correctly.');
+        await errorResponse(emailAddress, res, 'emailAddress', 'Enter an email address in the correct format, like name@example.com');
         return;
     }
 
@@ -29,13 +29,12 @@ export async function emailValidator(req: Request, res: Response, next: NextFunc
 
 export function errorResponse(emailAddress: string, res: Response, key: string, message: string) {
     const errorMessages = new Map<string, string>();
-    const values = new Map<string, string>();
+    let values : object = {};
     errorMessages.set(key, message);
-    values.set('emailAddress', emailAddress);
+    values = {email: emailAddress};
     res.render('create-account/get-email.njk', {
         errorMessages: errorMessages,
-        values: values,
-        fieldOrder: ['emailAddress']
+        values: values
     });
 }
 

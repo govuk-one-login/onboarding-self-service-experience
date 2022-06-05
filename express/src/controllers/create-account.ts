@@ -28,13 +28,12 @@ export const processGetEmailForm = async function (req: Request, res: Response) 
             // If not, we should redirect them to the verify email page and tell them to check their email
             // That page should offer the chance to send a new code to their email address
             const errorMessages = new Map<string, string>();
-            const values = new Map<string, string>();
+            let values : object = {};
             errorMessages.set('emailAddress', `${emailAddress} has already been registered.`);
-            values.set('emailAddress', emailAddress);
+            values = {email: emailAddress};
             res.render('create-account/get-email.njk', {
                 values: values,
-                errorMessages: errorMessages,
-                fieldOrder: ['emailAddress']
+                errorMessages: errorMessages
             });
             return;
         }
