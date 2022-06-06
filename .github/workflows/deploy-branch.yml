@@ -5,12 +5,12 @@ on: workflow_dispatch
 jobs:
   build:
     name: Build
-    uses: alphagov/di-onboarding-self-service-experience/.github/workflows/build.yml@af6740b31a24f85e5d22ca0854fae419cc077628
+    uses: alphagov/di-onboarding-self-service-experience/.github/workflows/build.yml@649edef0b75f2730d66acc2ed28cfc6f5ed84011
 
   deploy-preview:
     name: Preview
     needs: build
-    uses: alphagov/di-onboarding-self-service-experience/.github/workflows/deploy-to-paas.yml@af6740b31a24f85e5d22ca0854fae419cc077628
+    uses: alphagov/di-onboarding-self-service-experience/.github/workflows/deploy-to-paas.yml@649edef0b75f2730d66acc2ed28cfc6f5ed84011
     with:
       environment: preview
       cf_space_name: self-service-mvp
