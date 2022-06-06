@@ -1,0 +1,42 @@
+name: Build
+
+on: workflow_call
+
+defaults:
+  run:
+    working-directory: ./express
+
+jobs:
+  build:
+    name: Self-service experience
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v2
+
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          cache: 'npm'
+          cache-dependency-path: ./express/package-lock.json
+
+      - name: Install Node dependencies
+        run: | 
+          npm install
+
+      - name: Build app
+        run: |
+          npm run build
+
+      - name: Archive distribution artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: self-service
+          retention-days: 7
+          path: |
+            express/dist
+            express/src/views
+            express/package*.json
+            express/manifest.yml
+            express/valid-email-domains.txt
+            express/stubs-config.json

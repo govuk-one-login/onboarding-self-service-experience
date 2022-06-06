@@ -1,0 +1,53 @@
+{
+  "Comment": "Put new service and service user record into DynamoDB by calling two different lambdas",
+  "StartAt": "Add service",
+  "States": {
+    "Add service": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$",
+      "Parameters": {
+        "FunctionName": "${PutServiceFunctionArn}",
+        "Payload.$": "$"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "ResultPath": "$.Payload",
+      "Next": "Add service user",
+      "Comment": "Finger crossed"
+    },
+    "Add service user": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${PutServiceUserFunctionArn}",
+        "Payload.$": "$"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true,
+      "Comment": "Finger crossed"
+    }
+  }
+}

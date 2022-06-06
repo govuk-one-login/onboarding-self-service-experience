@@ -30,9 +30,6 @@ Resources:
           Properties:
             Path: /put-user
             Method: POST
-            RestApiId:
-              Ref: StepFunctionAPIGateway
-
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -64,9 +61,6 @@ Resources:
           Properties:
             Path: /get-user
             Method: POST
-            RestApiId:
-              Ref: StepFunctionAPIGateway
-
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -100,9 +94,6 @@ Resources:
           Properties:
             Path: /put-service
             Method: POST
-            RestApiId:
-              Ref: StepFunctionAPIGateway
-
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -136,9 +127,6 @@ Resources:
           Properties:
             Path: /put-service-user
             Method: POST
-            RestApiId:
-              Ref: StepFunctionAPIGateway
-
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -147,91 +135,6 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/handlers/put-service-user.ts
-
-  StepFunctionAPIGateway:
-    Type: AWS::Serverless::Api
-    DependsOn:
-      - NewServiceStepFunction
-      - putUserFunction
-      - getUserFunction
-      - putServiceFunction
-      - putServiceUserFunction
-
-    Properties:
-      StageName: Prod
-      DefinitionBody:
-        swagger: "2.0"
-        info:
-          version: "1.0"
-          title: "dynamo-lambdas"
-        host: "hzs3irscf6.execute-api.eu-west-2.amazonaws.com"
-        basePath: "/Prod"
-        schemes:
-          - "https"
-        paths:
-          /get-user:
-            post:
-              responses: { }
-              x-amazon-apigateway-integration:
-                httpMethod: "POST"
-                uri:
-                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getUserFunction.Arn}/invocations
-                passthroughBehavior: "when_no_match"
-                type: "aws_proxy"
-          /new-service:
-            post:
-              consumes:
-                - "application/json"
-              responses:
-                "200":
-                  description: "200 response"
-                "400":
-                  description: "400 response"
-              x-amazon-apigateway-integration:
-                credentials:
-                  Fn::Sub: arn:aws:iam::494650018671:role/${NewServiceStepFunctionApiRole}
-                httpMethod: "POST"
-                uri:
-                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution
-                responses:
-                  "200":
-                    statusCode: "200"
-                  "400":
-                    statusCode: "400"
-                requestTemplates:
-                  application/json:
-                    Fn::Sub:  "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\"\
-                    \\\\'\",\"'\")\", \"stateMachineArn\": \"${NewServiceStepFunction}\"\
-                    }"
-                passthroughBehavior: "when_no_match"
-                type: "aws"
-          /put-service:
-            post:
-              responses: { }
-              x-amazon-apigateway-integration:
-                httpMethod: "POST"
-                uri:
-                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${putServiceFunction.Arn}/invocations
-                passthroughBehavior: "when_no_match"
-                type: "aws_proxy"
-          /put-service-user:
-            post:
-              responses: { }
-              x-amazon-apigateway-integration:
-                httpMethod: "POST"
-                uri:
-                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${putServiceUserFunction.Arn}/invocations
-                passthroughBehavior: "when_no_match"
-                type: "aws_proxy"
-          /put-user:
-            post:
-              responses: { }
-              x-amazon-apigateway-integration:
-                httpMethod: "POST"
-                uri:
-                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${putUserFunction.Arn}/invocations
-                passthroughBehavior: "when_no_match"
-                type: "aws_proxy"
 
   NewServiceStepFunction:
     Type: AWS::Serverless::StateMachine
@@ -248,15 +151,14 @@ Resources:
             FunctionName:
               !Ref putServiceUserFunction
       Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /new-service
-            Method: Post
-            RestApiId:
-              Ref: StepFunctionAPIGateway
+        PostApi:
+          Api:
+            Type: Api
+            Properties:
+              Path: /new-service
+              Method: Post
 
 Outputs:
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${StepFunctionAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
