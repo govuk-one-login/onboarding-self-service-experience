@@ -31,7 +31,7 @@ jobs:
       - name: Get distribution artifact
         uses: actions/download-artifact@v2
         with:
-          name: product-pages
+          name: self-service
 
       - name: Install Cloud Foundry client
         env:
