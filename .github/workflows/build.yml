@@ -1,8 +1,11 @@
 name: Build
 
 on: workflow_call
+
 defaults:
   run:
+    working-directory: ./express
+  with:
     working-directory: ./express
     
 jobs:
