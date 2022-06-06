@@ -10,7 +10,7 @@ jobs:
   deploy-preview:
     name: Preview
     needs: build
-    uses: alphagov/di-onboarding-self-service-experience/.github/workflows/deploy-to-paas.yml@7db9076ab867598429c189e883a46cba1c709405
+    uses: alphagov/di-onboarding-self-service-experience/.github/workflows/deploy-to-paas.yml@6886388b7ead03aca510128b30d5053a1693502e
     with:
       environment: preview
       cf_space_name: self-service-mvp
