@@ -18,7 +18,7 @@ export class CognitoClient implements CognitoInterface {
     overrides: Promise<any>;
 
     constructor() {
-        this.overrides = fs.readFile("./stubs-config.json");
+        this.overrides = fs.readFile("./stubs-stubs-config.json");
     }
 
     async createUser(email: string): Promise<AdminCreateUserCommandOutput> {
