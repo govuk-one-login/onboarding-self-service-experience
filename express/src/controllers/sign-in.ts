@@ -1,10 +1,17 @@
 import express, {Request, Response} from "express";
-
+import LambdaFacade from "../lib/lambda-facade";
 import {
     AuthenticationResultType,
     NotAuthorizedException,
-    UsernameExistsException
+    UsernameExistsException,
+    AttributeType,
+    AdminInitiateAuthCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
+
+import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
+
+import CognitoInterface from "../lib/cognito/CognitoInterface";
+import {User} from "../../@types/User";
 
 export const showSignInForm = async function(req: Request, res: Response) {
     res.render('sign-in.njk', {values: new Map<String, String>(), errorMessages: new Map<String, String>()});
@@ -30,13 +37,10 @@ export const processSignInForm = async function(req: Request, res: Response) {
         return;
     }
 
-    const cognitoClient = req.app.get('cognitoClient');
+    const cognitoClient: CognitoInterface = req.app.get('cognitoClient');
+    let response: AdminInitiateAuthCommandOutput;
     try {
-        const response = await cognitoClient.login(email, password);
-        req.session.authenticationResult = response.AuthenticationResult;
-        req.session.emailAddress = email;
-        res.redirect('/account/list-services');
-        return;
+         response = await cognitoClient.login(email, password);
     } catch (error) {
         if(error instanceof NotAuthorizedException) {
             errorMessages.set('email', 'Either your email address or password was wrong');
@@ -45,4 +49,19 @@ export const processSignInForm = async function(req: Request, res: Response) {
         }
         throw error;
     }
+
+    req.session.authenticationResult = response.AuthenticationResult;
+    req.session.emailAddress = email;
+
+    const payload = (req.session.authenticationResult?.IdToken as string).split('.');
+    const claims = Buffer.from(payload[1], 'base64').toString('utf-8');
+    const cognitoId = JSON.parse(claims)["cognito:username"];
+
+    console.log(cognitoId)
+    req.session.selfServiceUser = (await LambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)).data.Items[0]
+    console.log(req.session.selfServiceUser as User);
+    res.redirect('/add-service-name');
+    return;
+
+
 }
