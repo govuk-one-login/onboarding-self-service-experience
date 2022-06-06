@@ -29,9 +29,8 @@ export async function emailValidator(req: Request, res: Response, next: NextFunc
 
 export function errorResponse(emailAddress: string, res: Response, key: string, message: string) {
     const errorMessages = new Map<string, string>();
-    let values : object = {};
     errorMessages.set(key, message);
-    values = {email: emailAddress};
+    let values = {email: emailAddress};
     res.render('create-account/get-email.njk', {
         errorMessages: errorMessages,
         values: values
