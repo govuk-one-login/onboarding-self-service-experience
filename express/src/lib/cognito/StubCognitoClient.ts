@@ -16,28 +16,13 @@ import {Override, Overrides} from "../../../@types/StubCognitoClient";
 
 export class CognitoClient implements CognitoInterface {
     overrides: Promise<any>;
-    otherOverrides: Promise<any>;
 
     constructor() {
-        this.overrides = fs.readFile("./config.json");
-        this.otherOverrides = fs.readFile("./otherConfig.json");
-    }
-
-    private async getOtherOverrides(): Promise<Overrides> {
-        let thing: any = await this.otherOverrides;
-        let parsed: Overrides = JSON.parse(thing);
-        console.log(parsed);
-        console.log(parsed.createUser?.[0]);
-        return parsed;
+        this.overrides = fs.readFile("./stubs-config.json");
     }
 
     async createUser(email: string): Promise<AdminCreateUserCommandOutput> {
         let overrides: any = await this.getOverridesFor('createUser');
-        let otherOverrides = await this.getOtherOverrides();
-
-        //let conditions: (function boolean)[] = []
-        //otherOverrides.createUser?.filter()
-
 
         if (overrides === undefined) {
             return Promise.resolve({$metadata: {}});
