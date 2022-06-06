@@ -1,4 +1,15 @@
 {% extends "../layout.njk" %}
+{% block beforeContent %}
+    <div class="govuk-width-container">
+        <div class="govuk-breadcrumbs">
+            <ol class="govuk-breadcrumbs__list">
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/create/enter-mobile">Back</a>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
 
 {% block content %}
     <div class="govuk-width-container">
@@ -8,9 +19,20 @@
                     Resend security code
                 </h1>
 
+                <p class="govuk-body">
+                    Text messages sometimes take a few minutes to arrive. If you did not receive a security code via text, we can send you a new one.
+                </p>
+
+                <p class="govuk-body">
+                    If you no longer have access to the phone with the number registered for this service, use our
+                    <a href="/support">support form</a>
+                     or 
+                    <a href="https://ukgovernmentdigital.slack.com/archives/C02AQUJ6WTC">Slack channel </a>  to raise this.
+                </p>
+
                 <form method="post" action="/create/resend-phone-code">
                     {{ govukButton({
-                        text: "Continue"
+                        text: "Resend security code"
                     }) }}
                 </form>
             </div>
