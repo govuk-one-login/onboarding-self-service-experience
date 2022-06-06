@@ -1,0 +1,7 @@
+---
+applications:
+  - name: onboarding-self-service-experience
+    memory: 512M
+    disk_quota: 512M
+    env:
+      COGNITO_CLIENT: "StubCognitoClient"

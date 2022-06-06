@@ -1,0 +1,20 @@
+name: Deploy branch
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: Build
+    uses: alphagov/di-onboarding-self-service-experience/.github/workflows/build.yml
+
+  deploy-preview:
+    name: Preview
+    needs: build
+    uses: alphagov/di-onboarding-self-service-experience/.github/workflows/deploy-to-paas.ymlf
+    with:
+      environment: preview
+      cf_space_name: self-service-mvp
+      app_name: di-sse-prev-${{ github.ref_name }}
+    secrets:
+      cf_username: ${{ secrets.CF_USERNAME }}
+      cf_password: ${{ secrets.CF_PASSWORD }}
