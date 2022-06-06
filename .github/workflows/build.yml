@@ -1,7 +1,10 @@
 name: Build
 
 on: workflow_call
-
+defaults:
+  run:
+    working-directory: ./express
+    
 jobs:
   build:
     name: Self-service experience
@@ -17,12 +20,10 @@ jobs:
 
       - name: Install Node dependencies
         run: | 
-          cd express;
           npm install
 
       - name: Build app
         run: |
-          cd express
           npm run build
 
       - name: Archive distribution artifact
@@ -33,7 +34,7 @@ jobs:
           path: |
             express/dist
             express/src/views
-            exspress/package*.json
+            express/package*.json
             express/manifest.yml
             express/valid-email-domains.txt
             express/stubs-config.json
