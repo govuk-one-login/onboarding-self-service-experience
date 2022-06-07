@@ -30,4 +30,8 @@ router.post('/create/enter-mobile', mobileValidator, processEnterMobileForm);
 
 router.post('/create/verify-phone-code', submitMobileVerificationCode);
 
+router.get('/there-is-a-problem', (req: Request, res: Response) => {
+    res.render('there-is-a-problem.njk');
+});
+
 export default router;
