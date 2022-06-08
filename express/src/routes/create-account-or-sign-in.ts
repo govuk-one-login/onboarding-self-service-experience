@@ -10,6 +10,7 @@ import {
 } from "../controllers/create-account";
 import {emailValidator} from "../middleware/emailValidator";
 import {mobileValidator} from "../middleware/mobileValidator";
+import {passwordValidator} from "../middleware/passwordValidator";
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ router.get('/create/check-email', showCheckEmailForm);
 router.post('/create/check-email', checkEmailOtp);
 
 router.get('/create/update-password', showNewPasswordForm);
-router.post('/create/update-password', updatePassword);
+router.post('/create/update-password', passwordValidator, updatePassword);
 
 router.get('/create/enter-mobile', showEnterMobileForm);
 router.post('/create/enter-mobile', mobileValidator, processEnterMobileForm);
