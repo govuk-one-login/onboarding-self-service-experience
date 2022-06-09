@@ -43,7 +43,10 @@
             name: "create-email-otp",
             id: "create-email-otp",
             classes: "govuk-input--width-5",
-            type: "number",
+            type: "text",
+            inputmode: "numeric",
+            pattern: "[0-9]*",
+            spellcheck: false,
             value: value.otp,
             errorMessage: {
               text: errorMessages.get('create-email-otp')
@@ -51,7 +54,10 @@
           }) }}
 
           {{ govukButton({
-            text: "Continue"
+            text: "Continue",
+            attributes: {
+              formnovalidate: ""
+            }
           }) }}
 
         </form>
