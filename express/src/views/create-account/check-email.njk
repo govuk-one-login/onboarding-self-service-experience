@@ -1,65 +1,62 @@
 {% extends "../layout.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "../macros/error-summary.njk" import errorSummary %}
 
-{% block content %}
-    <div class="govuk-width-container">
-        {% if errorMessages and errorMessages.size != 0 %}
-            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
-                 tabindex="-1"
-                 data-module="govuk-error-summary">
-                <h2 class="govuk-error-summary__title" id="error-summary-title">
-                    There is a problem
-                </h2>
-                <div class="govuk-error-summary__body">
-                    <ul class="govuk-list govuk-error-summary__list">
-                        {% for field in fieldOrder %}
-                            {% if errorMessages.get(field) %}
-                                <li>
-                                    <a href="#{{ field }}">{{ errorMessages.get(field) }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        {% endif %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-                <h1 class="govuk-heading-l">
-                    Check your email
-                </h1>
-                <div class="govuk-inset-text">
-                    <p class="govuk-body">We have sent an email to: <strong>{{ emailAddress }}</strong></p>
-                </div>
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-4 govuk-!-margin-bottom-6 govuk-!-padding-bottom-0 " %}
 
-                <p class="govuk-body">The email contains a 6 digit security code.</p>
+{% block pageTitle %}Check your email{% endblock %}
 
-                <p class="govuk-body">Your email might take a few minutes to arrive. If you do not get an email, check your spam
-                    folder.</p>
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    <a href="/create/get-email" class="govuk-back-link">Back</a>
+  </div>
+{% endblock %}
 
-                <p class="govuk-body">Your code will expire after 15 minutes.</p>
+{%  block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
 
+        {{ errorSummary ({
+          errors: errorMessages,
+          hrefs: {
+            'create-email-otp': '#create-email-otp'
+          }
+        }) }}
 
-                <form class="form" action="/create/check-email" method="post">
-                    <div class="govuk-form-group">
-                        <label class="govuk-label" for="otp">Enter the 6 digit security code</label>
+        <h1 class="govuk-heading-l">Check your email</h1>
 
-                        <input class="govuk-input govuk-input--width-5" id="otp" name="create-email-otp" type="text"
-                               autocomplete="one-time-code" inputmode="numeric" spellcheck="false">
-
-                    </div>
-
-                    <p class="govuk-body"><a href="/create-email-v1">Request a new code </a> if:</p>
-
-                    <ul class="govuk-list govuk-list--bullet">
-                        <li>the code is not working or has expired, or you did not receive one</li>
-                        <li>you want to use a different email address</li>
-                    </ul>
-
-                    {{ govukButton({
-                        text: "Continue"
-                    }) }}
-                </form>
-            </div>
+        <div class="govuk-inset-text">
+          We have sent an email to: <span class="govuk-!-font-weight-bold">{{ emailAddress }}</span>
         </div>
+
+        <p class="govuk-body">The email contains a 6 digit security code.</p>
+        <p class="govuk-body">Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.</p>
+        <p class="govuk-body">The code will expire after 15 minutes.</p>
+
+        <form class="form" action="/create/check-email" method="post">
+
+          {{ govukInput({
+            label: {
+              text: "Enter the 6 digit security code"
+            },
+            name: "create-email-otp",
+            id: "create-email-otp",
+            classes: "govuk-input--width-5",
+            type: "number",
+            value: value.otp,
+            errorMessage: {
+              text: errorMessages.get('create-email-otp')
+            } if errorMessages else false
+          }) }}
+
+          {{ govukButton({
+            text: "Continue"
+          }) }}
+
+        </form>
+
+      </div>
     </div>
+  </div>
 {% endblock %}
