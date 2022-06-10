@@ -70,11 +70,10 @@ export function lengthCheck(mobileNumber: string) {
 
 export function errorResponse(mobileNumber: number, res: Response, key: string, message: string) {
     let errorMessages = new Map<string, string>();
-    let values = new Map<string, number>();
     errorMessages.set(key, message);
-    values.set('mobileNumber', mobileNumber);
+    const value : object = {mobileNumber: mobileNumber};
     res.render('create-account/enter-mobile.njk', {
         errors: errorMessages,
-        values: values
+        value: value
     });
 }
