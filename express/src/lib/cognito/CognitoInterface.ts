@@ -13,6 +13,7 @@ import {
 
 export default interface CognitoInterface {
     createUser(email: string): Promise<AdminCreateUserCommandOutput>;
+    resendEmailAuthCode(email: string): Promise<AdminCreateUserCommandOutput>;
     login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput>;
     setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput>;
     getUser(username: string): Promise<AdminGetUserCommandOutput>;
