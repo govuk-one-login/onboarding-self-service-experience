@@ -149,7 +149,15 @@ export const showEnterMobileForm = async function (req: Request, res: Response) 
         res.redirect('/login')
         return;
     }
-    res.render('create-account/enter-mobile.njk');
+    if (req.session.mobileNumber === undefined ) {
+        res.render('create-account/enter-mobile.njk');
+    } else {
+        const value : object = {mobileNumber: req.session.mobileNumber};
+        res.render('create-account/enter-mobile.njk', {
+            value: value
+        });
+    }
+
 }
 
 export const processEnterMobileForm = async function (req: Request, res: Response) {
@@ -215,10 +223,15 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         return;
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            console.debug("Code did not match")
-            res.render('create-account/check-mobile.njk', {mobileNumber: req.session.mobileNumber});
+            console.debug("Code did not match");
+            const errorMessages = new Map<string, string>();
+            errorMessages.set('createSmsOtp', 'Code did not match');
+            res.render('create-account/check-mobile.njk', {
+                mobileNumber: req.session.mobileNumber,
+                errorMessages: errorMessages
+            });
         }
         console.error(error);
-        res.render('/create/verify-phone-code');
+        res.render('/there-is-a-problem');
     }
 }

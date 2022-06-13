@@ -1,41 +1,68 @@
 {% extends "../layout.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "../macros/error-summary.njk" import errorSummary %}
 
-{% block content %}
-    <div class="govuk-width-container">
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-                <h1 class="govuk-heading-l">
-                    Check your phone
-                </h1>
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-4 govuk-!-margin-bottom-6 govuk-!-padding-bottom-0 " %}
 
-                <p class="govuk-body">We sent a code to {{ mobileNumber }}.</p>
+{% block pageTitle %}Check your phone{% endblock %}
 
-                <p class="govuk-body">It might take a few minutes to arrive. The code will expire after 15 minutes.</p>
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    <a href="/create/enter-mobile" class="govuk-back-link">Back</a>
+  </div>
+{% endblock %}
 
+{%  block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
 
-                <form method="post" action="/create/verify-phone-code">
-                    <div class="govuk-form-group">
+        {{ errorSummary ({
+          errors: errorMessages,
+          hrefs: {
+            'createSmsOtp': '#create-sms-otp'
+          }
+        }) }}
 
-                        <label class="govuk-label" for="otp">Enter the 6 digit security code</label>
+        <h1 class="govuk-heading-l">Check your phone</h1>
 
-                        <input class="govuk-input govuk-input--width-5" id="otp" name="create-sms-otp" type="text"
-                               autocomplete="one-time-code" inputmode="numeric" spellcheck="false">
-
-                    </div>
-
-                    <p class="govuk-body"><a href="/create/get-new-phone-code">Request a new code </a> if:</p>
-
-                    <ul class="govuk-list govuk-list--bullet">
-                        <li>the code is not working or has expired, or you did not receive one</li>
-                        <li>you want to use a different phone number</li>
-                    </ul>
-
-                    {{ govukButton({
-                        text: "Continue"
-                    }) }}
-
-                </form>
-            </div>
+        <div class="govuk-inset-text">
+          We have sent a code to: <span class="govuk-!-font-weight-bold">{{ mobileNumber }}</span>
         </div>
+
+        <p class="govuk-body">It might take a few minutes to arrive. The code will expire after 15 minutes.</p>
+
+        <form class="form" action="/create/verify-phone-code" method="post">
+
+          {{ govukInput({
+            label: {
+              text: "Enter the 6 digit security code"
+            },
+            name: "create-sms-otp",
+            id: "create-sms-otp",
+            classes: "govuk-input--width-5",
+            type: "text",
+            inputmode: "numeric",
+            pattern: "[0-9]*",
+            spellcheck: false,
+            value: value.otp,
+            errorMessage: {
+              text: errorMessages.get('createSmsOtp')
+            } if errorMessages else false
+          }) }}
+
+          {{ govukButton({
+            text: "Continue",
+            attributes: {
+              formnovalidate: ""
+            }
+          }) }}
+
+        </form>
+
+        <p class="govuk-body"><a href="/create/get-new-phone-code">Not received a text message?</a></p>
+
+      </div>
     </div>
+  </div>
 {% endblock %}
