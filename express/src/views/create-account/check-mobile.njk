@@ -1,39 +1,45 @@
 {% extends "../layout.njk" %}
-
-{% block content %}
+{% block beforeContent %}
     <div class="govuk-width-container">
+        <p class="govuk-phase-banner__content govuk-!-margin-top-2">
+            <strong class="govuk-tag govuk-phase-banner__content__tag">
+            BETA
+            </strong>
+            <span class="govuk-phase-banner__text">
+            This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.
+            </span>
+        </p>
+        <hr class="govuk-section-break govuk-section-break govuk-section-break--visible govuk-!-margin-top-2">
+    </div>
+    <div class="govuk-width-container">
+        <a href="/create/enter-mobile" class="govuk-back-link">Back</a>
+    </div>
+{% endblock %}
+{% block content %}
+    <div class="govuk-width-container govuk-!-margin-top-4">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-l">
                     Check your phone
                 </h1>
-
-                <p class="govuk-body">We sent a code to {{ mobileNumber }}.</p>
+                <div class="govuk-inset-text">
+                    <p class="govuk-body">We sent a code to:  <strong>{{ mobileNumber }}</strong>.</p>
+                </div>
 
                 <p class="govuk-body">It might take a few minutes to arrive. The code will expire after 15 minutes.</p>
 
-
                 <form method="post" action="/create/verify-phone-code">
                     <div class="govuk-form-group">
-
                         <label class="govuk-label" for="otp">Enter the 6 digit security code</label>
-
-                        <input class="govuk-input govuk-input--width-5" id="otp" name="create-sms-otp" type="text"
+                        <input class="govuk-input govuk-input--width-5 govuk-link" id="otp" name="create-sms-otp" type="text"
                                autocomplete="one-time-code" inputmode="numeric" spellcheck="false">
-
                     </div>
 
-                    <p class="govuk-body"><a href="/create/get-new-phone-code">Request a new code </a> if:</p>
+                    <button id="submit" type="submit" class="govuk-button  data-module="govuk-button">
+                        Continue
+                     </button>
 
-                    <ul class="govuk-list govuk-list--bullet">
-                        <li>the code is not working or has expired, or you did not receive one</li>
-                        <li>you want to use a different phone number</li>
-                    </ul>
-
-                    {{ govukButton({
-                        text: "Continue"
-                    }) }}
-
+                     <p class="govuk-body"><a id="resend-code-page" class="govuk-link" href="/create/resend-phone-code">Not received a text message?</a></p>
                 </form>
             </div>
         </div>
