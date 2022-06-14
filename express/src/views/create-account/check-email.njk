@@ -7,9 +7,20 @@
 {% block pageTitle %}Check your email{% endblock %}
 
 {% block beforeContent %}
-  <div class="govuk-width-container">
-    <a href="/create/get-email" class="govuk-back-link">Back</a>
-  </div>
+    <div class="govuk-width-container">
+        <p class="govuk-phase-banner__content govuk-!-margin-top-2">
+            <strong class="govuk-tag govuk-phase-banner__content__tag">
+            BETA
+            </strong>
+            <span class="govuk-phase-banner__text">
+            This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.
+            </span>
+        </p>
+        <hr class="govuk-section-break govuk-section-break govuk-section-break--visible govuk-!-margin-top-2">
+    </div>
+    <div class="govuk-width-container">
+      <a href="/create/get-email" class="govuk-back-link">Back</a>
+    </div>
 {% endblock %}
 
 {%  block content %}
@@ -53,12 +64,13 @@
             } if errorMessages else false
           }) }}
 
-            <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
-                Continue
-            </button>
-          </form>
-          
-      </div>
-    </div>
+          <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
+            Continue
+         </button>
+         
+         <p class="govuk-body"><a id="resend-code-page" class="govuk-link" href="/create/resend-email-code">Not received an email?</a></p>
+
+      </form>
   </div>
-{% endblock %}
+
+  {% endblock %}

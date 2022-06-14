@@ -42,6 +42,27 @@ export class CognitoClient implements CognitoInterface {
         }
     }
 
+    async resendEmailAuthCode(email: string): Promise<AdminCreateUserCommandOutput> {
+        let overrides: any = await this.getOverridesFor('createUser');
+
+        if (overrides === undefined) {
+            return Promise.resolve({$metadata: {}});
+        }
+
+        let override: any = overrides.filter(
+            (override: { value: string }) => (override.value === email))[0];
+
+        if (override === undefined) {
+            return Promise.resolve({$metadata: {}});
+        }
+
+        if (override?.throw) {
+            throw this.getException(override.throw);
+        } else {
+            return Promise.resolve(override.return); // something from the config file
+        }
+    }
+
     getUser(username: string): Promise<AdminGetUserCommandOutput> {
         return Promise.resolve({$metadata: {}, Username: username});
     }

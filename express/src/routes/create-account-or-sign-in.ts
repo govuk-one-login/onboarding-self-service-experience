@@ -1,3 +1,6 @@
+
+
+
 import express, {Request, Response} from "express";
 import {
     processGetEmailForm,
@@ -7,7 +10,8 @@ import {
     updatePassword,
     showEnterMobileForm,
     processEnterMobileForm, submitMobileVerificationCode, checkEmailOtp,
-    showResendPhoneCodeForm, resendMobileVerificationCode
+    showResendPhoneCodeForm, resendMobileVerificationCode,
+    showResendEmailCodeForm, resendEmailVerificationCode
 } from "../controllers/create-account";
 import {emailValidator} from "../middleware/emailValidator";
 import {mobileValidator} from "../middleware/mobileValidator";
@@ -38,5 +42,8 @@ router.get('/there-is-a-problem', (req: Request, res: Response) => {
 
 router.get('/create/resend-phone-code', showResendPhoneCodeForm);
 router.post('/create/resend-phone-code', resendMobileVerificationCode);
+
+router.get('/create/resend-email-code', showResendEmailCodeForm);
+router.post('/create/resend-email-code', resendEmailVerificationCode);
 
 export default router;
