@@ -15,6 +15,7 @@ $govuk-new-link-styles: true;
 @import "modules/related-items";
 @import "modules/responsive-embed";
 @import "modules/sub-navigation";
+@import "modules/show-password";
 
 @media (min-width: 415px) {
   div.feature-row {

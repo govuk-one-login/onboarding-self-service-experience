@@ -186,6 +186,11 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     res.render('create-account/check-mobile.njk', {mobileNumber: mobileNumber});
 }
 
+export const resendMobileVerificationCode  = async function (req: Request, res: Response) {
+    req.body.mobileNumber = req.session.mobileNumber;
+    processEnterMobileForm(req, res);
+}
+
 export const submitMobileVerificationCode = async function (req: Request, res: Response) {
     // need to check for access token in middleware
     if(req.session.authenticationResult?.AccessToken === undefined) {
@@ -234,4 +239,14 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         console.error(error);
         res.redirect('/there-is-a-problem');
     }
+}
+
+export const showResendPhoneCodeForm = async function (req: Request, res: Response) {
+        let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
+        if (accessToken === undefined) {
+            // user must login before we can process their mobile number
+            res.redirect('/login')
+            return;
+        }
+        res.render('create-account/resend-phone-code.njk');
 }

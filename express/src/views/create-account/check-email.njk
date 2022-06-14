@@ -53,15 +53,11 @@
             } if errorMessages else false
           }) }}
 
-          {{ govukButton({
-            text: "Continue",
-            attributes: {
-              formnovalidate: ""
-            }
-          }) }}
-
-        </form>
-
+            <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
+                Continue
+            </button>
+          </form>
+          
       </div>
     </div>
   </div>
