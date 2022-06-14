@@ -232,6 +232,6 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
             });
         }
         console.error(error);
-        res.render('/there-is-a-problem');
+        res.redirect('/there-is-a-problem');
     }
 }
