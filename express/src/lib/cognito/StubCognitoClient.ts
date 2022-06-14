@@ -67,8 +67,26 @@ export class CognitoClient implements CognitoInterface {
         return Promise.resolve({$metadata: {}, Username: username});
     }
 
-    login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
-        return Promise.resolve({Session: "What does a session value even look like?", $metadata: {}});
+    async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
+        let overrides: any = await this.getOverridesFor('login');
+
+        if (overrides === undefined) {
+            return Promise.resolve({$metadata: {}});
+        }
+
+        let override: any = overrides.filter(
+            (override: { value: string }) => (override.value === email))[0];
+
+
+        if (override === undefined) {
+            return Promise.resolve({$metadata: {}});
+        }
+
+        if (override?.throw) {
+            throw this.getException(override.throw);
+        } else {
+            return Promise.resolve(override.return); // something from the config file
+        }
     }
 
     sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput> {

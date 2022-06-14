@@ -7,9 +7,24 @@
     },
     {
       "parameter": "email",
-        "value": "returnsomething@foo.gov.uk",
+      "value": "returnsomething@foo.gov.uk",
       "return": {
-        "$metadata": {"foo":  "bar"}
+        "$metadata": {
+          "foo": "bar"
+        }
+      }
+    }
+  ],
+  "login": [
+    {
+      "parameter": "email",
+      "value": "registered@gds.gov.uk",
+      "return": {
+        "Session": {
+          "authenticationResult": {
+            "AccessToken": "Fooo"
+          }
+        }
       }
     }
   ]
