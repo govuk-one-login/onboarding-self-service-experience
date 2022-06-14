@@ -15,7 +15,7 @@ export function mobileValidator(req: Request, res: Response, next: NextFunction)
     }
 
     if(!ukNumberCheck(mobileNumber)){
-        errorResponse(mobileNumber, res , 'mobileNumber', 'Make sure you have enterd a correct UK phone number .');
+        errorResponse(mobileNumber, res , 'mobileNumber', 'Make sure you have entered a correct UK phone number .');
         return;
     }
     if (beginsWith070(mobileNumber)) {
