@@ -10,6 +10,7 @@ on:
       instances: { required: false, type: number, default: 1 }
       rolling_deployment: { required: false, type: boolean, default: false }
       cognito_client: { required: false, type: string, default: "CognitoClient"}
+      lambda_facade: { require: false, tyep: string, default: "LambdaFacade" }
     secrets:
       cf_username: { required: true }
       cf_password: { required: true }
@@ -74,4 +75,5 @@ jobs:
         run: |
           cf push ${{ steps.set_deployment_hostname.outputs.hostname }} \
             --instances ${{ inputs.instances }} $([[ $ROLLING_DEPLOYMENT == "true" ]] && echo --strategy rolling) \
-            --var cognito_client=${{ inputs.cognito_client }}
+            --var cognito_client=${{ inputs.cognito_client }} \
+            --var lambda_facade=${{ inputs.lambda_facade }}

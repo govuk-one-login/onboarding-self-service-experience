@@ -1,5 +1,5 @@
 import express, {Request, Response} from "express";
-import LambdaFacade from "../lib/lambda-facade";
+import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {
     AuthenticationResultType,
     NotAuthorizedException,
@@ -57,8 +57,9 @@ export const processSignInForm = async function(req: Request, res: Response) {
     const claims = Buffer.from(payload[1], 'base64').toString('utf-8');
     const cognitoId = JSON.parse(claims)["cognito:username"];
 
+    const lambdaFacade : LambdaFacadeInterface = req.app.get("lambdaFacade");
     console.log(cognitoId)
-    req.session.selfServiceUser = (await LambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)).data.Items[0]
+    req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)).data.Items[0]
     console.log(req.session.selfServiceUser as User);
     res.redirect('/add-service-name');
     return;

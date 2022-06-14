@@ -62,6 +62,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             DesiredDeliveryMediums: [ "EMAIL" ],
             Username: email,
             UserPoolId: this.userPoolId,
+            TemporaryPassword: Math.floor(Math.random() * 100_000).toString().padStart(6, '0'),
             UserAttributes: [
                 {Name: "email", Value: email}
             ]
