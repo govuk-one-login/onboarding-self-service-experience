@@ -2,8 +2,9 @@ import axios, {Axios, AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {User} from "../../../@types/User";
 import {Service} from "../../../@types/Service";
+import LambdaFacadeInterface from "./LambdaFacadeInterface";
 
-class LambdaFacade {
+class LambdaFacade implements LambdaFacadeInterface {
     private instance: Axios;
 
     constructor(baseURL: string) {
@@ -45,5 +46,4 @@ class LambdaFacade {
         });
     }
 }
-
 export const lambdaFacadeInstance = new LambdaFacade(process.env.API_BASE_URL as string);

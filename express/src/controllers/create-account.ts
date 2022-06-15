@@ -6,7 +6,8 @@ import {
     UsernameExistsException
 } from "@aws-sdk/client-cognito-identity-provider";
 import CognitoInterface from "../lib/cognito/CognitoInterface";
-import lambdaFacadeInstance from "../lib/lambda-facade";
+import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
+
 import {randomUUID} from "crypto";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
@@ -149,7 +150,15 @@ export const showEnterMobileForm = async function (req: Request, res: Response) 
         res.redirect('/login')
         return;
     }
-    res.render('create-account/enter-mobile.njk');
+    if (req.session.mobileNumber === undefined ) {
+        res.render('create-account/enter-mobile.njk');
+    } else {
+        const value : object = {mobileNumber: req.session.mobileNumber};
+        res.render('create-account/enter-mobile.njk', {
+            value: value
+        });
+    }
+
 }
 
 export const processEnterMobileForm = async function (req: Request, res: Response) {
@@ -180,7 +189,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
 
 export const resendMobileVerificationCode  = async function (req: Request, res: Response) {
     req.body.mobileNumber = req.session.mobileNumber;
-    processEnterMobileForm(req, res);
+    await processEnterMobileForm(req, res);
 }
 
 export const submitMobileVerificationCode = async function (req: Request, res: Response) {
@@ -214,17 +223,23 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
                 phone: phone
         }
 
-        let clientUpdate = await lambdaFacadeInstance.putUser(user, req.session.authenticationResult?.AccessToken);
+        const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
+        let clientUpdate = lambdaFacade.putUser(user, req.session.authenticationResult?.AccessToken);
         req.session.selfServiceUser = user;
         res.redirect('/add-service-name');
         return;
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            console.debug("Code did not match")
-            res.render('create-account/check-mobile.njk', {mobileNumber: req.session.mobileNumber});
+            console.debug("Code did not match");
+            const errorMessages = new Map<string, string>();
+            errorMessages.set('createSmsOtp', 'Code did not match');
+            res.render('create-account/check-mobile.njk', {
+                mobileNumber: req.session.mobileNumber,
+                errorMessages: errorMessages
+            });
         }
         console.error(error);
-        res.render('/create/verify-phone-code');
+        res.redirect('/there-is-a-problem');
     }
 }
 

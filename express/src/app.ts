@@ -17,6 +17,14 @@ import(`./lib/cognito/${process.env.COGNITO_CLIENT||"CognitoClient"}`).then(
     }
 );
 
+import(`./lib/lambda-facade/${process.env.LAMBDA_FACADE||"LambdaFacade"}`).then(
+    facade => {
+        console.log(facade)
+        app.set('lambdaFacade', facade.lambdaFacadeInstance);
+        console.log(app.get('lambdaFacade'))
+    }
+);
+
 app.use('/dist', express.static('./dist/assets'));
 app.use(express.static('./dist'));
 app.use(bodyParser.urlencoded({

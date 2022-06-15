@@ -1,6 +1,6 @@
 import express, {Request, Response} from "express";
 import router from "../routes/testing-routes";
-import lambdaFacadeInstance from "../lib/lambda-facade";
+import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {randomUUID} from "crypto";
 import {User} from "../../@types/User";
 
@@ -23,10 +23,11 @@ export const processAddServiceForm = async function (req: Request, res: Response
     let user = req.session.selfServiceUser as User;
     try {
         let newUser: any = {};
+        const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
         // @ts-ignore
         Object.keys(user).forEach(key => newUser[key] = user[key]["S"])
         console.log(newUser)
-        await lambdaFacadeInstance.newService(service, newUser, req.session.authenticationResult?.AccessToken as string);
+        await lambdaFacade.newService(service, newUser, req.session.authenticationResult?.AccessToken as string);
     } catch (error) {
         console.error(error);
     }
