@@ -4,7 +4,7 @@ export async function serviceNameValidator(req: Request, res: Response, next: Ne
     let serviceName: string = req.body['serviceName'];
     serviceName = serviceName.trim();
     if (!atLeastOneCharacter(serviceName)) {
-        await errorResponse(serviceName, res, 'serviceName', 'Your password must be at least 8 characters long');
+        await errorResponse(serviceName, res, 'serviceName', 'Your Service name must be at least 1 characters long');
         return;
     }
     next();
