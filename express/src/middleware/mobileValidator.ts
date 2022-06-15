@@ -15,7 +15,7 @@ export function mobileValidator(req: Request, res: Response, next: NextFunction)
     }
 
     if(!ukNumberCheck(mobileNumber)){
-        errorResponse(mobileNumber, res , 'mobileNumber', 'Make sure you have enterd a correct UK phone number .');
+        errorResponse(mobileNumber, res , 'mobileNumber', 'Make sure you have entered a correct UK phone number .');
         return;
     }
     if (beginsWith070(mobileNumber)) {
@@ -70,11 +70,10 @@ export function lengthCheck(mobileNumber: string) {
 
 export function errorResponse(mobileNumber: number, res: Response, key: string, message: string) {
     let errorMessages = new Map<string, string>();
-    let values = new Map<string, number>();
     errorMessages.set(key, message);
-    values.set('mobileNumber', mobileNumber);
+    const value : object = {mobileNumber: mobileNumber};
     res.render('create-account/enter-mobile.njk', {
         errors: errorMessages,
-        values: values
+        value: value
     });
 }

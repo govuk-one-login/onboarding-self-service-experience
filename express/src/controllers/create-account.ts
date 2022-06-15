@@ -252,3 +252,23 @@ export const showResendPhoneCodeForm = async function (req: Request, res: Respon
         }
         res.render('create-account/resend-phone-code.njk');
 }
+export const showResendEmailCodeForm = async function (req: Request, res: Response) {
+    res.render('create-account/resend-email-code.njk');
+}
+
+export const resendEmailVerificationCode = async function (req: Request, res: Response) {
+    req.body.emailAddress  = req.session.emailAddress;
+    const emailAddress: string = req.body.emailAddress;
+    const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
+
+    let result: any;
+    try {
+        result = await cognitoClient.resendEmailAuthCode(emailAddress);
+        console.debug(result);
+    } catch (error) {
+        console.error(error);
+        res.redirect('/there-is-a-problem');
+        return;
+    }
+    res.redirect('check-email');
+}

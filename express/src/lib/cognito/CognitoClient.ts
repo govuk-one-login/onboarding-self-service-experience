@@ -71,6 +71,21 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
+    async resendEmailAuthCode(email: string): Promise<AdminCreateUserCommandOutput> {
+        console.debug(`Re-sending verification code to this adress : ${{email}}`);
+        let createUserParams = {
+            DesiredDeliveryMediums: [ "EMAIL" ],
+            Username: email,
+            UserPoolId: this.userPoolId,
+            MessageAction: "RESEND",
+            UserAttributes: [
+                {Name: "email", Value: email}
+            ]
+        }
+        let command = new AdminCreateUserCommand(createUserParams);
+        return await this.cognitoClient.send(command);
+    }
+
     async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
         let params = {
             UserPoolId: this.userPoolId,
