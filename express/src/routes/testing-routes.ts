@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/add-service-name-error', (req, res) => {
   let errorMessages: Map<String, String> = new Map<String, String>();
   errorMessages.set('serviceName', 'Enter your service name');
-  res.render("add-service-name.njk",{ errors: errorMessages });
+  res.render("add-service-name.njk",{ errorMessages: errorMessages });
 });
 
 // Testing route for client details dashboard
