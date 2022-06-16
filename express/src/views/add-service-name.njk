@@ -15,30 +15,28 @@
       <div class="govuk-grid-column-two-thirds">
 
         {{ errorSummary ({
-          errors: errors,
+          errors:  errorMessages,
           hrefs: {
             'serviceName': '#create-service-name'
           }
         }) }}
 
+        <h1 class="govuk-heading-l">Add your service name</h1>
+        <p class="govuk-body">Add the name of the service you want to test with GOV.UK Sign In.</p>
+        <p class="govuk-body">This is only seen by you. You can change it later.</p>
+
         <form class="form" action="/create-service-name-validation" method="post">
 
             {{ govukInput({
               label: {
-                text: "Add your service name",
-                isPageHeading: true,
-                classes: "govuk-label--l"
-              },
-              hint: {
-                text: "You can change this later"
+                text: "Service name"
               },
               name: "serviceName",
               id: "create-service-name",
-              classes: "govuk-input--width-20",
+              classes: "govuk-!-width-full",
               errorMessage: {
-                text: errors.get('serviceName')
-              } if errors else false,
-              value: data['serviceName']
+                text:  errorMessages.get('serviceName')
+              } if  errorMessages else false
             }) }}
 
           {{ govukButton({

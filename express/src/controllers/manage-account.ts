@@ -31,6 +31,7 @@ export const processAddServiceForm = async function (req: Request, res: Response
     } catch (error) {
         console.error(error);
     }
-    res.redirect("/create-service");
+    //This will need to update, when functionality for creating service is implemented
+    res.redirect("/service-dashboard-client-details");
 }
 
