@@ -24,13 +24,13 @@ router.get('/create-account-or-sign-in', (req: Request, res: Response) => {
     res.render('create-account-or-sign-in.njk');
 });
 router.get('/create/get-email', showGetEmailForm);
-router.post('/create/get-email', emailValidator, processGetEmailForm);
+router.post('/create/get-email', emailValidator('create-account/get-email.njk'), processGetEmailForm);
 
 router.get('/create/check-email', showCheckEmailForm);
 router.post('/create/check-email', checkEmailOtp);
 
 router.get('/create/update-password', showNewPasswordForm);
-router.post('/create/update-password', passwordValidator, updatePassword);
+router.post('/create/update-password', passwordValidator('create-account/new-password.njk'), updatePassword);
 
 router.get('/create/enter-mobile', showEnterMobileForm);
 router.post('/create/enter-mobile', mobileValidator, processEnterMobileForm);

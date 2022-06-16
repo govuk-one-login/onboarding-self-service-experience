@@ -120,7 +120,7 @@ export const showNewPasswordForm = async function (req: Request, res: Response, 
 export const updatePassword = async function (req: Request, res: Response, next: NextFunction) {
     const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
 
-    const response = await cognitoClient.setNewPassword(req.session.emailAddress as string, req.body['create-password-1'], req.session.session as string);
+    const response = await cognitoClient.setNewPassword(req.session.emailAddress as string, req.body['password'], req.session.session as string);
     req.session.session = response.Session;
     req.session.authenticationResult = response.AuthenticationResult;
 
