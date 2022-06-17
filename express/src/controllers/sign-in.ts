@@ -1,14 +1,6 @@
-import express, {Request, Response} from "express";
+import {Request, Response} from "express";
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
-import {
-    AuthenticationResultType,
-    NotAuthorizedException,
-    UsernameExistsException,
-    AttributeType,
-    AdminInitiateAuthCommandOutput
-} from "@aws-sdk/client-cognito-identity-provider";
-
-import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
+import {AdminInitiateAuthCommandOutput, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
 
 import CognitoInterface from "../lib/cognito/CognitoInterface";
 import {User} from "../../@types/User";
@@ -23,8 +15,9 @@ export const showSignInFormEmail = async function(req: Request, res: Response) {
 
 export const showLoginOtpMobile = async function(req: Request, res: Response) {
     if (req.session.emailAddress) {
-        // TO DO we need to pull users number here, test value used at the moment
-        const mobileNumber = '*******6789';
+        const mobileNumberRaw = String(req.session.mobileNumber);
+        const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
+        const mobileNumber = '*******' + mobileNumberLast4Digits;
         res.render('sign-in-otp-mobile.njk', { mobileNumber: mobileNumber });
     } else {
         res.redirect('/sign-in');
@@ -76,6 +69,7 @@ export const processSignInForm = async function(req: Request, res: Response) {
     const payload = (req.session.authenticationResult?.IdToken as string).split('.');
     const claims = Buffer.from(payload[1], 'base64').toString('utf-8');
     const cognitoId = JSON.parse(claims)["cognito:username"];
+    req.session.mobileNumber = JSON.parse(claims)["phone_number"];
 
     const lambdaFacade : LambdaFacadeInterface = req.app.get("lambdaFacade");
     console.log(cognitoId)
