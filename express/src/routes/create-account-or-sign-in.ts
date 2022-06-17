@@ -35,7 +35,7 @@ router.post('/create/update-password', passwordValidator, updatePassword);
 router.get('/create/enter-mobile', showEnterMobileForm);
 router.post('/create/enter-mobile', mobileValidator, processEnterMobileForm);
 
-router.post('/create/verify-phone-code', mobileOtpValidator, submitMobileVerificationCode);
+router.post('/create/verify-phone-code', mobileOtpValidator('create-account/check-mobile.njk'), submitMobileVerificationCode);
 
 router.get('/there-is-a-problem', (req: Request, res: Response) => {
     res.render('there-is-a-problem.njk');

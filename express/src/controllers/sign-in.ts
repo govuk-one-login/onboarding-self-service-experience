@@ -17,6 +17,21 @@ export const showSignInForm = async function(req: Request, res: Response) {
     res.render('sign-in.njk', {values: new Map<String, String>(), errorMessages: new Map<String, String>()});
 }
 
+export const showLoginOtpMobile = async function(req: Request, res: Response) {
+    if (req.session.emailAddress) {
+        // TO DO we need to pull users number here, test value used at the moment
+        const mobileNumber = '*******6789';
+        res.render('sign-in-otp-mobile.njk', { mobileNumber: mobileNumber });
+    } else {
+        res.redirect('/sign-in');
+    }
+}
+
+export const processLoginOtpMobile = async function(req: Request, res: Response) {
+    // TO DO add the functionality to process the login mobile otp
+    res.redirect('/add-service-name');
+}
+
 export const processSignInForm = async function(req: Request, res: Response) {
     let email = req.body.email;
     let password = req.body.password;
