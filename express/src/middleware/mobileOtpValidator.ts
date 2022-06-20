@@ -1,11 +1,19 @@
 import {NextFunction, Request, Response} from "express";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
-export function mobileOtpValidator(render: string): MiddlewareFunction<Request, Response, NextFunction> {
+export function mobileOtpValidator(render: string, isMobileHidden: boolean): MiddlewareFunction<Request, Response, NextFunction> {
     return async (req: Request, res: Response, next: NextFunction) => {
         let otp: string = req.body['create-sms-otp'];
         otp = otp.trim();
-        const mobileNumber: string = String(req.session.mobileNumber);
+        let mobileNumber: string;
+        if (isMobileHidden) {
+            const mobileNumberRaw = String(req.session.mobileNumber);
+            const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
+            mobileNumber = '*******' + mobileNumberLast4Digits;
+        } else  {
+            mobileNumber = String(req.session.mobileNumber);
+        }
+
         if (!sixDigits(otp)) {
             await errorResponse(render,otp, res, 'createSmsOtp', 'Enter the 6 digit security code', mobileNumber);
             return;
