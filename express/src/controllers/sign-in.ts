@@ -56,11 +56,15 @@ export const processSignInForm = async function(req: Request, res: Response) {
     try {
          response = await cognitoClient.login(email, password);
     } catch (error) {
-        if(error instanceof NotAuthorizedException) {
-            res.render('there-is-a-problem.njk');
+        if (error instanceof NotAuthorizedException) {
+            const errorMessages = new Map<string, string>();
+            errorMessages.set('password', 'Password is wrong');
+            res.render('sign-in-password.njk', {errorMessages: errorMessages});
             return;
         }
-        throw error;
+        console.log(error);
+        res.render('there-is-a-problem.njk');
+        return;
     }
 
     req.session.authenticationResult = response.AuthenticationResult;
