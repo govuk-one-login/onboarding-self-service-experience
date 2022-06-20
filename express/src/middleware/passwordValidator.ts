@@ -1,13 +1,17 @@
 import {NextFunction, Request, Response} from "express";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
-export function passwordValidator(render: string): MiddlewareFunction<Request, Response, NextFunction> {
+export function passwordValidator(render: string, isLogIn: boolean): MiddlewareFunction<Request, Response, NextFunction> {
     return async (req: Request, res: Response, next: NextFunction) =>
     {
         let password: string = req.body['password'];
         password = password.trim();
         if (!eightDigitsMinimum(password)) {
-            await errorResponse(render, password, res, 'password', 'Your password must be at least 8 characters long');
+            if (isLogIn) {
+                await errorResponse(render, password, res, 'password', 'Enter your password');
+            } else {
+                await errorResponse(render, password, res, 'password', 'Your password must be at least 8 characters long');
+            }
             return;
         }
         next();

@@ -16,7 +16,7 @@ const router = express.Router();
 router.get('/sign-in', showSignInFormEmail);
 router.post('/sign-in', emailValidator('sign-in.njk'), processEmailAddress);
 router.get('/sign-in-password', showSignInFormPassword);
-router.post('/sign-in-password', passwordValidator('sign-in-password.njk'), processSignInForm);
+router.post('/sign-in-password', passwordValidator('sign-in-password.njk', true), processSignInForm);
 router.get('/sign-in-otp-mobile', showLoginOtpMobile);
 router.post('/sign-in-otp-mobile', mobileOtpValidator('sign-in-otp-mobile.njk', true), processLoginOtpMobile);
 

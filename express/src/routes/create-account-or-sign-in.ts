@@ -30,7 +30,7 @@ router.get('/create/check-email', showCheckEmailForm);
 router.post('/create/check-email', checkEmailOtp);
 
 router.get('/create/update-password', showNewPasswordForm);
-router.post('/create/update-password', passwordValidator('create-account/new-password.njk'), updatePassword);
+router.post('/create/update-password', passwordValidator('create-account/new-password.njk', false), updatePassword);
 
 router.get('/create/enter-mobile', showEnterMobileForm);
 router.post('/create/enter-mobile', mobileValidator, processEnterMobileForm);

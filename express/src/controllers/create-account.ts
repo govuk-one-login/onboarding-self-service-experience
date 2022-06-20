@@ -108,6 +108,7 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
 
 export const showNewPasswordForm = async function (req: Request, res: Response, next: NextFunction) {
     console.log("Show new password")
+    console.log(req.session);
     if (req.session.session !== undefined) {
         res.render('create-account/new-password.njk');
         return;
