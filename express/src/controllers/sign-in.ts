@@ -1,53 +1,70 @@
-import express, {Request, Response} from "express";
+import {Request, Response} from "express";
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
-import {
-    AuthenticationResultType,
-    NotAuthorizedException,
-    UsernameExistsException,
-    AttributeType,
-    AdminInitiateAuthCommandOutput
-} from "@aws-sdk/client-cognito-identity-provider";
-
-import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
+import {AdminInitiateAuthCommandOutput, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
 
 import CognitoInterface from "../lib/cognito/CognitoInterface";
 import {User} from "../../@types/User";
 
-export const showSignInForm = async function(req: Request, res: Response) {
-    res.render('sign-in.njk', {values: new Map<String, String>(), errorMessages: new Map<String, String>()});
+export const showSignInFormEmail = async function(req: Request, res: Response) {
+    if (req.session.emailAddress) {
+        res.render('sign-in.njk', { emailAddress: req.session.emailAddress });
+    } else {
+        res.render('sign-in.njk');
+    }
+}
+
+export const showLoginOtpMobile = async function(req: Request, res: Response) {
+    if (req.session.emailAddress) {
+        const mobileNumberRaw = String(req.session.mobileNumber);
+        const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
+        const mobileNumber = '*******' + mobileNumberLast4Digits;
+        res.render('sign-in-otp-mobile.njk', { mobileNumber: mobileNumber });
+    } else {
+        res.redirect('/sign-in');
+    }
+}
+
+export const processLoginOtpMobile = async function(req: Request, res: Response) {
+    // TO DO add the functionality to process the login mobile otp
+    res.redirect('/add-service-name');
+}
+
+export const processEmailAddress = async function (req: Request, res: Response) {
+    res.redirect('/sign-in-password');
+}
+
+
+export const showSignInFormPassword = async function(req: Request, res: Response) {
+    if (req.session.emailAddress) {
+        res.render('sign-in-password.njk');
+    } else {
+        res.redirect('/sign-in');
+    }
 }
 
 export const processSignInForm = async function(req: Request, res: Response) {
-    let email = req.body.email;
+    let email;
+    if (req.session.emailAddress) {
+        email = req.session.emailAddress;
+    } else {
+        email = "There is no email"
+    }
     let password = req.body.password;
-    let errorMessages: Map<String, String> = new Map<String, String>();
-    let values = new Map<string, string>(Object.entries(req.body));
-
-    if( email === "" ) {
-        errorMessages.set('email', 'You must enter your email address');
-    }
-
-    if(password === "" ) {
-        errorMessages.set('password', 'You must enter your password');
-    }
-
-    console.log(errorMessages);
-    if(errorMessages.size != 0) {
-        res.render('sign-in.njk', { fieldOrder: ['email', 'password'], errorMessages: errorMessages, values: values });
-        return;
-    }
 
     const cognitoClient: CognitoInterface = req.app.get('cognitoClient');
     let response: AdminInitiateAuthCommandOutput;
     try {
          response = await cognitoClient.login(email, password);
     } catch (error) {
-        if(error instanceof NotAuthorizedException) {
-            errorMessages.set('email', 'Either your email address or password was wrong');
-            res.render('sign-in.njk', { fieldOrder: ['email'], errorMessages: errorMessages, values: values });
+        if (error instanceof NotAuthorizedException) {
+            const errorMessages = new Map<string, string>();
+            errorMessages.set('password', 'Password is wrong');
+            res.render('sign-in-password.njk', {errorMessages: errorMessages});
             return;
         }
-        throw error;
+        console.log(error);
+        res.render('there-is-a-problem.njk');
+        return;
     }
 
     req.session.authenticationResult = response.AuthenticationResult;
@@ -56,13 +73,13 @@ export const processSignInForm = async function(req: Request, res: Response) {
     const payload = (req.session.authenticationResult?.IdToken as string).split('.');
     const claims = Buffer.from(payload[1], 'base64').toString('utf-8');
     const cognitoId = JSON.parse(claims)["cognito:username"];
+    req.session.mobileNumber = JSON.parse(claims)["phone_number"];
 
     const lambdaFacade : LambdaFacadeInterface = req.app.get("lambdaFacade");
     console.log(cognitoId)
     req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)).data.Items[0]
     console.log(req.session.selfServiceUser as User);
-    res.redirect('/add-service-name');
+    res.redirect('/sign-in-otp-mobile');
     return;
-
 
 }

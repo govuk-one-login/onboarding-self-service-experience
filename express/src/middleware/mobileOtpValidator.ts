@@ -1,21 +1,32 @@
 import {NextFunction, Request, Response} from "express";
 
-export async function mobileOtpValidator(req: Request, res: Response, next: NextFunction) {
-    let otp: string = req.body['create-sms-otp'];
-    otp = otp.trim();
-    const mobileNumber: string = String(req.session.mobileNumber);
-    if (!sixDigits(otp)) {
-        await errorResponse(otp, res, 'createSmsOtp', 'Enter the 6 digit security code', mobileNumber);
-        return;
+type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
+export function mobileOtpValidator(render: string, isMobileHidden: boolean): MiddlewareFunction<Request, Response, NextFunction> {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        let otp: string = req.body['create-sms-otp'];
+        otp = otp.trim();
+        let mobileNumber: string;
+        if (isMobileHidden) {
+            const mobileNumberRaw = String(req.session.mobileNumber);
+            const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
+            mobileNumber = '*******' + mobileNumberLast4Digits;
+        } else  {
+            mobileNumber = String(req.session.mobileNumber);
+        }
+
+        if (!sixDigits(otp)) {
+            await errorResponse(render,otp, res, 'createSmsOtp', 'Enter the 6 digit security code', mobileNumber);
+            return;
+        }
+        next();
     }
-    next();
 }
 
-export function errorResponse(otp: string, res: Response, key: string, message: string, mobileNumber: string) {
+export function errorResponse(render:string, otp: string, res: Response, key: string, message: string, mobileNumber: string) {
     const errorMessages = new Map<string, string>();
     const value : object = {otp: otp};
     errorMessages.set(key, message);
-    res.render('create-account/check-mobile.njk', {
+    res.render(render, {
         errorMessages: errorMessages,
         value: value,
         mobileNumber: mobileNumber,
