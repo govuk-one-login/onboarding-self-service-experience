@@ -13,7 +13,10 @@ router.get('/add-service-name-error', (req, res) => {
 
 // Testing route for client details dashboard
 router.get('/service-dashboard-client-details', (req, res) => {
-  res.render("service-dashboard-client-details.njk");
+  res.render("service-dashboard-client-details.njk", {
+      publicKeyAndUrlsNotUpdatedByUser: true,
+      userDetailsUpdated: false
+  });
 });
 
 // Testing route for client details dashboard update view
