@@ -29,4 +29,23 @@ router.get('/service-dashboard-client-details-update-error', (req, res) => {
   res.render("service-dashboard-client-details-update.njk",{ errors: errorMessages });
 });
 
+// Testing routes for Change your client name page
+router.get('/change-client-name', (req, res) => {
+    res.render("dashboard/change-client-name.njk", {
+        value: 'My juggling service'
+    });
+});
+
+router.post('/change-client-name', (req, res) => {
+    let clientName = req.body.clientName;
+    if (clientName === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('clientName', 'Enter your client name');
+        res.render('dashboard/change-client-name.njk', {errorMessages: errorMessages});
+        return;
+    }
+    res.redirect('/service-dashboard-client-details');
+});
+
+
 export default router;
