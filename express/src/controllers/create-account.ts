@@ -98,10 +98,15 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
         return;
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
-            // show the form again with an error message though
+            // show the form again with an error message 
             console.log("Showing them the check-email form again")
-            res.render('create-account/check-email.njk', {emailAddress: req.session.emailAddress});
-
+            const errorMessages = new Map<string, string>();
+            errorMessages.set('create-email-otp', "The code you entered is not correct or has expired - enter it again or request a new code");
+            res.render('create-account/check-email.njk', {
+                emailAddress: req.session.emailAddress,
+                errorMessages: errorMessages,
+            });
+            return;
         }
     }
 }
