@@ -1,0 +1,85 @@
+{% extends "../layout-dashboard.njk" %}
+{% from "../macros/error-summary.njk" import errorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav" %}
+
+{% block pageTitle %}
+  Change redirect URIs - GOV.UK Sign In
+{% endblock %}
+
+{% block beforeContent %}
+
+{% endblock %}
+
+
+{% block content %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-body govuk-!-font-weight-bold">My juggling service</div>
+    <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <nav class="sub-navigation govuk-!-margin-top-3">
+          <ul class="govuk-list sub_navigation_list_2">
+            <li class="sub-navigation__item sub-navigation__item--active">
+              <a class="govuk-link govuk-link--no-visited-state" href="/service-dashboard-client-details">Client details</a>
+            </li>
+            <li class="sub-navigation__item">
+              <a class="govuk-link govuk-link--no-visited-state" href="#">Joining private beta</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+
+        {{ errorSummary ({
+          errors:  errorMessages,
+          hrefs: {
+            'redirectURIs': '#redirectURIs'
+          }
+        }) }}
+
+        <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your redirect URIs</h1>
+
+        <p class="govuk-body">Add the URI for the page you want your users to see after they sign in to your service.</p>
+        <p class="govuk-body">You can add multiple redirect URIs if you want different groups of users to see different pages once they sign in to your service. To do this, enter the URIs separated by a space.</p>
+
+        <form class="form" action="/change-redirect-URIs" method="post">
+
+          {{ govukInput({
+            label: {
+              text: "Redirect URIs"
+            },
+            hint: {
+              text: "Enter URIs starting with https://"
+            },
+            name: "redirectURIs",
+            id: "redirectURIs",
+            classes: "govuk-!-width-full",
+            value: value,
+            errorMessage: {
+              text:  errorMessages.get('redirectURIs')
+            } if  errorMessages else false
+          }) }}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Confirm"
+            }) }}
+            <a class="govuk-link" href="/service-dashboard-client-details">Cancel</a>
+          </div>
+
+        </form>
+
+
+      </div>
+
+    </div>
+  </div>
+
+
+
+{% endblock %}
+
