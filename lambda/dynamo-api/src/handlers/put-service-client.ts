@@ -6,12 +6,11 @@ const client = new DynamoClient(tableName as string);
 
 
 export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const payload = JSON.parse(event.body as string);
-
+    const payload = JSON.parse((event as any).body as string);
     let record = {
-        pk: payload.serviceId,
-        sk: payload.clientId,
-        data: `${payload.serviceName} test client`,
+        pk: payload.service.pk,
+        sk: payload.pk,
+        data: payload.service.service_name,
         type: 'integration'
     };
 
@@ -20,9 +19,11 @@ export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Prom
         .put(record)
         .then((putItemOutput) => {
             response.statusCode = 200;
-            response.body = JSON.stringify(putItemOutput)
+            response.body = JSON.stringify(payload);
         })
-        .catch((putItemOutput) => { response.statusCode = 500; response.body = JSON.stringify(putItemOutput)});
+        .catch((putItemOutput) => {
+            console.log(putItemOutput)
+            response.statusCode = 500; response.body = JSON.stringify(putItemOutput)});
 
     return response;
 };
