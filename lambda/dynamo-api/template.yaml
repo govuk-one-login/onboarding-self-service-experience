@@ -4,6 +4,11 @@ Description: >-
 Transform:
 - AWS::Serverless-2016-10-31
 
+Parameters:
+  AuthRegistrationBaseUrl:
+    Type: String
+    Description: API Gateway endpoint for client registration
+
 Resources:
 
   putUserFunction:
@@ -30,8 +35,6 @@ Resources:
           Properties:
             Path: /put-user
             Method: POST
-            RestApiId:
-              Ref: StepFunctionAPIGateway
 
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
@@ -64,8 +67,6 @@ Resources:
           Properties:
             Path: /get-user
             Method: POST
-            RestApiId:
-              Ref: StepFunctionAPIGateway
 
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
@@ -100,8 +101,6 @@ Resources:
           Properties:
             Path: /put-service
             Method: POST
-            RestApiId:
-              Ref: StepFunctionAPIGateway
 
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
@@ -111,6 +110,90 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/handlers/put-service.ts
+
+  registerClientFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/register-client.registerClientHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Assumes a cross-account role and invokes the Auth register lambda
+      Environment:
+        Variables:
+          AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
+
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /regsiter-client
+            Method: POST
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/register-client.ts
+
+  putClientFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/put-client.putClientHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: A simple example includes a HTTP post method to add a service to a DynamoDB table.
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: 'onboarding'
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          SAMPLE_TABLE: 'onboarding'
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/put-client.ts
+
+  putServiceClientFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/put-service-client.putServiceClientHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: A simple example includes a HTTP post method to add a service to a DynamoDB table.
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: 'onboarding'
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          SAMPLE_TABLE: 'onboarding'
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/put-service-client.ts
 
   putServiceUserFunction:
     Type: AWS::Serverless::Function
@@ -130,15 +213,6 @@ Resources:
         Variables:
           # Make table name accessible as environment variable from function code during execution
           SAMPLE_TABLE: 'onboarding'
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /put-service-user
-            Method: POST
-            RestApiId:
-              Ref: StepFunctionAPIGateway
-
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -148,115 +222,187 @@ Resources:
         EntryPoints:
           - src/handlers/put-service-user.ts
 
-  StepFunctionAPIGateway:
-    Type: AWS::Serverless::Api
-    DependsOn:
-      - NewServiceStepFunction
-      - putUserFunction
-      - getUserFunction
-      - putServiceFunction
-      - putServiceUserFunction
-
+  newServiceHandler:
+    Type: AWS::Serverless::Function
     Properties:
-      StageName: Prod
-      DefinitionBody:
-        swagger: "2.0"
-        info:
-          version: "1.0"
-          title: "dynamo-lambdas"
-        host: "hzs3irscf6.execute-api.eu-west-2.amazonaws.com"
-        basePath: "/Prod"
-        schemes:
-          - "https"
-        paths:
-          /get-user:
-            post:
-              responses: { }
-              x-amazon-apigateway-integration:
-                httpMethod: "POST"
-                uri:
-                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getUserFunction.Arn}/invocations
-                passthroughBehavior: "when_no_match"
-                type: "aws_proxy"
-          /new-service:
-            post:
-              consumes:
-                - "application/json"
-              responses:
-                "200":
-                  description: "200 response"
-                "400":
-                  description: "400 response"
-              x-amazon-apigateway-integration:
-                credentials:
-                  Fn::Sub: arn:aws:iam::494650018671:role/${NewServiceStepFunctionApiRole}
-                httpMethod: "POST"
-                uri:
-                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution
-                responses:
-                  "200":
-                    statusCode: "200"
-                  "400":
-                    statusCode: "400"
-                requestTemplates:
-                  application/json:
-                    Fn::Sub:  "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\"\
-                    \\\\'\",\"'\")\", \"stateMachineArn\": \"${NewServiceStepFunction}\"\
-                    }"
-                passthroughBehavior: "when_no_match"
-                type: "aws"
-          /put-service:
-            post:
-              responses: { }
-              x-amazon-apigateway-integration:
-                httpMethod: "POST"
-                uri:
-                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${putServiceFunction.Arn}/invocations
-                passthroughBehavior: "when_no_match"
-                type: "aws_proxy"
-          /put-service-user:
-            post:
-              responses: { }
-              x-amazon-apigateway-integration:
-                httpMethod: "POST"
-                uri:
-                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${putServiceUserFunction.Arn}/invocations
-                passthroughBehavior: "when_no_match"
-                type: "aws_proxy"
-          /put-user:
-            post:
-              responses: { }
-              x-amazon-apigateway-integration:
-                httpMethod: "POST"
-                uri:
-                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${putUserFunction.Arn}/invocations
-                passthroughBehavior: "when_no_match"
-                type: "aws_proxy"
-
-  NewServiceStepFunction:
-    Type: AWS::Serverless::StateMachine
-    Properties:
-      DefinitionUri: ./src/state-machines/newService.json
-      DefinitionSubstitutions:
-        PutServiceFunctionArn: !GetAtt putServiceFunction.Arn
-        PutServiceUserFunctionArn: !GetAtt putServiceUserFunction.Arn
+      Handler: src/handlers/new-service.newServiceHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: A invokes a step function and returns the output through the API Gateway.
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !GetAtt NewServiceStepFunction.Arn
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName:
-              !Ref putServiceFunction
-        - LambdaInvokePolicy:
-            FunctionName:
-              !Ref putServiceUserFunction
+        Statement: [
+          {
+            Effect: Allow,
+            Action: [
+                "states:StartSyncExecution"
+            ],
+            Resource: {
+              Fn::Sub: [
+                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                  {
+                    stateMachineName: {
+                      Fn::GetAtt: [NewServiceStepFunction, Name]
+                  }
+                }
+              ]
+            }
+          }
+        ]
       Events:
         Api:
           Type: Api
           Properties:
             Path: /new-service
-            Method: Post
-            RestApiId:
-              Ref: StepFunctionAPIGateway
+            Method: POST
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/new-service.ts
+
+  newClientHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/new-client.newClientHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: A invokes a step function and returns the output through the API Gateway.
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !GetAtt NewClientStepFunction.Arn
+      Policies:
+        Statement: [
+          {
+            Effect: Allow,
+            Action: [
+                "states:StartSyncExecution"
+            ],
+            Resource: {
+              Fn::Sub: [
+                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  stateMachineName: {
+                    Fn::GetAtt: [NewClientStepFunction, Name]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /new-client
+            Method: POST
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/new-client.ts
+
+  StepFunctionExecRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub "states.${AWS::Region}.amazonaws.com"
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: StepFunctionExecRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogDelivery
+                  - logs:GetLogDelivery
+                  - logs:UpdateLogDelivery
+                  - logs:DeleteLogDelivery
+                  - logs:ListLogDeliveries
+                  - logs:PutResourcePolicy
+                  - logs:DescribeResourcePolicies
+                  - logs:DescribeLogGroups
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt putServiceFunction.Arn
+                  - !GetAtt putServiceUserFunction.Arn
+                  - !GetAtt registerClientFunction.Arn
+                  - !GetAtt putClientFunction.Arn
+                  - !GetAtt putServiceClientFunction.Arn
+
+  NewServiceStepFunction:
+    Type: AWS::Serverless::StateMachine
+    DependsOn:
+      - StepFunctionsLogGroup
+      - StepFunctionExecRole
+
+    Properties:
+      Name: new-service
+      Type: EXPRESS
+      Role: !GetAtt StepFunctionExecRole.Arn
+      Logging:
+        Level: ALL
+        IncludeExecutionData: True
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StepFunctionsLogGroup.Arn
+      DefinitionUri: ./src/state-machines/newService.json
+      DefinitionSubstitutions:
+        PutServiceFunctionArn: !GetAtt putServiceFunction.Arn
+        PutServiceUserFunctionArn: !GetAtt putServiceUserFunction.Arn
+
+  NewClientStepFunction:
+    Type: AWS::Serverless::StateMachine
+    DependsOn:
+      - StepFunctionsLogGroup
+      - StepFunctionExecRole
+
+    Properties:
+      Name: new-client
+      Type: EXPRESS
+      Role: !GetAtt StepFunctionExecRole.Arn
+      Logging:
+        Level: ALL
+        IncludeExecutionData: True
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StepFunctionsLogGroup.Arn
+      DefinitionUri: ./src/state-machines/newClient.json
+      DefinitionSubstitutions:
+        RegisterClientFunctionArn: !GetAtt registerClientFunction.Arn
+        PutClientFunctionArn: !GetAtt putClientFunction.Arn
+        PutServiceClientFunctionArn: !GetAtt putServiceClientFunction.Arn
+
+  StepFunctionsLogGroup:
+    Type: AWS::Logs::LogGroup
 
 Outputs:
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${StepFunctionAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

@@ -1,8 +1,8 @@
 {
-  "Comment": "Put new service and service user record into DynamoDB by calling two different lambdas",
-  "StartAt": "Add service",
+  "Comment": "Put new service, service user and default client data records into DynamoDB by calling a number of different lambdas",
+  "StartAt": "Put service",
   "States": {
-    "Add service": {
+    "Put service": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$",
@@ -23,13 +23,14 @@
         }
       ],
       "ResultPath": "$.Payload",
-      "Next": "Add service user",
-      "Comment": "Finger crossed"
+      "Next": "Put service user",
+      "Comment": "Adds a service to the DDB"
     },
-    "Add service user": {
+    "Put service user": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "OutputPath": "$.Payload",
+      "ResultPath": "$",
+      "OutputPath": "$",
       "Parameters": {
         "FunctionName": "${PutServiceUserFunctionArn}",
         "Payload.$": "$"
@@ -47,7 +48,7 @@
         }
       ],
       "End": true,
-      "Comment": "Finger crossed"
+      "Comment": "Adds user that can be retrieved using the CognitoID and an index "
     }
   }
 }
