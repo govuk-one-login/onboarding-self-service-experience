@@ -1,17 +1,29 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import DynamoClient from "../client/DynamoClient";
+import {randomUUID} from "crypto";
 
 const tableName = process.env.SAMPLE_TABLE;
 const client = new DynamoClient(tableName as string);
 
 
 export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const payload = JSON.parse((event as any).body as string);
+    const payload = JSON.parse(event.body as string);
+    console.log(payload)
+    const clientId = `client#${randomUUID()}`;
     let record = {
         pk: payload.service.pk,
-        sk: payload.pk,
+        sk: clientId,
         data: payload.service.service_name,
-        type: 'integration'
+        clientId: payload.client_id,
+        type: 'integration',
+        public_key: payload.public_key,
+        redirect_uris: payload.redirect_uris,
+        contacts: payload.contacts,
+        scopes: payload.scopes,
+        post_logout_redirect_uris: payload.post_logout_redirect_uris,
+        subject_type: payload.subject_type,
+        service_type: payload.service_type,
+        default_fields: ['data', 'public_key', 'redirect_uris','scopes','post_logout_redirect_uris','subject_type','service_type']
     };
 
     let response = {statusCode: 200, body: JSON.stringify("OK")};
