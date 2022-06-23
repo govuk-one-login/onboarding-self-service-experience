@@ -29,4 +29,24 @@ router.get('/service-dashboard-client-details-update-error', (req, res) => {
   res.render("service-dashboard-client-details-update.njk",{ errors: errorMessages });
 });
 
+
+// Testing routes for Change user attributes page
+router.get('/change-user-attributes', (req, res) => {
+    res.render("dashboard/change-user-attributes.njk");
+});
+
+router.post('/change-user-attributes', (req, res) => {
+    let attributes = req.body.userAttributes;
+    console.log(attributes);
+    if (!attributes) {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('userAttributes', 'No attribute selected');
+        res.render('dashboard/change-user-attributes.njk', {errorMessages: errorMessages});
+        return;
+    }
+    res.redirect('/service-dashboard-client-details');
+});
+
+
+
 export default router;

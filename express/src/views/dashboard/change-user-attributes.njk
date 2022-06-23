@@ -1,0 +1,103 @@
+{% extends "../layout-dashboard.njk" %}
+{% from "../macros/error-summary.njk" import errorSummary %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav" %}
+
+{% block pageTitle %}
+  Change user attributes - GOV.UK Sign In
+{% endblock %}
+
+{% block beforeContent %}
+
+{% endblock %}
+
+
+{% block content %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-body govuk-!-font-weight-bold">My juggling service</div>
+    <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <nav class="sub-navigation govuk-!-margin-top-3">
+          <ul class="govuk-list sub_navigation_list_2">
+            <li class="sub-navigation__item sub-navigation__item--active">
+              <a class="govuk-link govuk-link--no-visited-state" href="/service-dashboard-client-details">Client details</a>
+            </li>
+            <li class="sub-navigation__item">
+              <a class="govuk-link govuk-link--no-visited-state" href="#">Joining private beta</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+
+        {{ errorSummary ({
+          errors:  errorMessages,
+          hrefs: {
+            'userAttributes': '#userAttributes'
+          }
+        }) }}
+
+        <h1 class="govuk-heading-l govuk-!-margin-top-3">Change the user attributes you get</h1>
+
+        <p class="govuk-body">Select the  <a class="govuk-link" href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/choose-which-user-attributes-your-service-can-request/" target="_blank">user attributes (opens in new tab)</a> you would like your service to receive. These are also known as ‘scopes’ in the OpenID Connect (OIDC) specification.</p>
+
+
+
+        <form class="form" action="/change-user-attributes" method="post">
+
+          {{ govukCheckboxes({
+            name: "userAttributes",
+            id: "userAttributes",
+            fieldset: {
+              legend: {
+                text: "User attributes"
+              }
+            },
+            errorMessage: {
+              text: errorMessages.get('userAttributes')
+            } if  errorMessages else false,
+            items: [
+              {
+                value: "email",
+                text: "Email",
+                checked: true
+              },
+              {
+                value: "phone",
+                text: "Phone",
+                checked: true
+              },
+              {
+                value: "offlineAccess",
+                text: "Offline access",
+                hint: {
+                  html: "This gives you a refresh token so you can access the <span class='dashboard-attribute-pink'>/userinfo</span> endpoint for longer than 3 minutes"
+                },
+                checked: false
+              }
+            ]
+          }) }}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Confirm"
+            }) }}
+            <a class="govuk-link" href="/service-dashboard-client-details">Cancel</a>
+          </div>
+
+        </form>
+
+
+      </div>
+
+    </div>
+  </div>
+
+
+
+{% endblock %}
+
