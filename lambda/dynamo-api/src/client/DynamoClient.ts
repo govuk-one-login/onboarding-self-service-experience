@@ -23,7 +23,7 @@ class DynamoClient {
     async queryBySortKey(sortKey: string): Promise<QueryCommandOutput> {
         const params = {
             TableName: this.tableName,
-            IndexName: 'sk-index',
+            IndexName: 'gsi1',
             ExpressionAttributeValues: {":sortKey": {S: sortKey}},
             KeyConditionExpression: "sk = :sortKey"
         }
@@ -32,12 +32,13 @@ class DynamoClient {
         return await this.dynamodb.send(command);
     }
 
-    async queryBySortKeyAndUnmarshal(sortKey: string): Promise<QueryCommandOutput> {
+    async getServices(userId: string): Promise<QueryCommandOutput> {
         const params = {
             TableName: this.tableName,
-            IndexName: 'sk-index',
-            ExpressionAttributeValues: {":sortKey": {S: sortKey}},
-            KeyConditionExpression: "sk = :sortKey"
+            IndexName: 'gsi1',
+            ExpressionAttributeNames: {"#userId": "sk", "#serviceId": "pk"},
+            ExpressionAttributeValues: {":userId": {S: `user#${userId}`}, ":serviceIdPrefix": {S: "service#"}},
+            KeyConditionExpression: "#userId = :userId AND begins_with ( #serviceId, :serviceIdPrefix )"
         }
         console.log(params);
         const command = new QueryCommand(params);
