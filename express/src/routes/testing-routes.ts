@@ -15,7 +15,14 @@ router.get('/add-service-name-error', (req, res) => {
 router.get('/client-details', (req, res) => {
   res.render("service-dashboard-client-details.njk", {
       publicKeyAndUrlsNotUpdatedByUser: true,
-      userDetailsUpdated: false
+      userDetailsUpdated: false,
+      clientName: "My juggling service",
+      serviceName: "My juggling service",
+      clientId: "X8rnOEw0SqOdEAOnWyPQ6YsJugQ",
+      redirectUrls: "https://get-a-juggling-licence.gov.uk/redirect/endpoint",
+      userAttributesRequired: "Email address<br>Phone number",
+      userPublicKey: "Not yet added",
+      postLogoutRedirectUrls: "Not yet added"
   });
 });
 

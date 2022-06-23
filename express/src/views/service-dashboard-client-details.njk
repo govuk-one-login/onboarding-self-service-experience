@@ -17,7 +17,7 @@
 {% block content %}
 
   <div class="govuk-width-container">
-    <div class="govuk-body govuk-!-font-weight-bold">My juggling service</div>
+    <div class="govuk-body govuk-!-font-weight-bold">{{ serviceName }}</div>
     <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
@@ -75,7 +75,7 @@
                 text: "Client name"
               },
               value: {
-                text: "My juggling service"
+                text: clientName
               },
               actions: {
                 items: [
@@ -92,7 +92,7 @@
                 text: "Client ID"
               },
               value: {
-                text: "X8rnOEw0SqOdEAOnWyPQ6YsJugQ"
+                text: clientId
               }
             },
             {
@@ -100,7 +100,7 @@
                 text: "Redirect URIs"
               },
               value: {
-                text: "https://get-a-juggling-licence.gov.uk/redirect/endpoint"
+                text: redirectUrls
               },
               actions: {
                 items: [
@@ -117,7 +117,7 @@
                 text: "User attributes required"
               },
               value: {
-               html: "Email address<br>Phone number"
+               html: userAttributesRequired
               },
               actions: {
                 items: [
@@ -134,7 +134,7 @@
                 text: "Public key"
               },
               value: {
-                text: "Not yet added"
+                text: userPublicKey
               },
               actions: {
                 items: [
@@ -151,7 +151,7 @@
                 text: "Post logout redirect URIs"
               },
               value: {
-                text: "Not yet added"
+                text: postLogoutRedirectUrls
               },
               actions: {
                 items: [
