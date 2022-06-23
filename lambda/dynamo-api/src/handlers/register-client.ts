@@ -37,6 +37,7 @@ export const registerClientHandler = async (event: APIGatewayProxyEvent): Promis
         service_type: service_type,
         sector_identifier_uri: sector_identifier_uri
     }
+
     const result = await (await instance).post("/connect/register", JSON.stringify(clientConfig));
     const body = {...clientConfig, ...result.data, ...payload};
 
