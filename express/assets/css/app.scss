@@ -156,18 +156,20 @@ div.feature-panel {
   }
 }
 
-@media (min-width: 640px) {
+@media (min-width: 920px) {
   #main-content.govuk-main-wrapper-layout-with-left-nav.main-dashboard  {
     .govuk-summary-list__key {
-      width: 38%;
+      width: 36%;
+      padding-right: 18px;
     }
 
     .govuk-summary-list__value {
       width: 52%;
+      padding-right: 10px;
     }
 
     .govuk-summary-list__actions {
-      width: 10%;
+      width: 12%;
     }
   }
 }
