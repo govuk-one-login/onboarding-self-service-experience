@@ -48,6 +48,22 @@ router.post('/change-user-attributes', (req, res) => {
     res.redirect('/client-details');
 });
 
+// Testing routes for Change your post logout redirect URIs page
+router.get('/change-post-logout-URIs', (req, res) => {
+    res.render("dashboard/change-post-logout-URIs.njk", {
+        value: 'https://get-a-juggling-licence.gov.uk/redirect/endpoint'
+    });
+});
 
+router.post('/change-post-logout-URIs', (req, res) => {
+    let clientName = req.body.postLogoutURIs;
+    if (clientName === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('postLogoutURIs', 'Enter your post logout redirect URIs');
+        res.render('dashboard/change-post-logout-URIs.njk', {errorMessages: errorMessages});
+        return;
+    }
+    res.redirect('/client-details');
+});
 
 export default router;

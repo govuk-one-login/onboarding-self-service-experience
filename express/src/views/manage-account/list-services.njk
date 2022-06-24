@@ -11,7 +11,7 @@
                 {% for service in services %}
                     <p>
                         <a class="govuk-body"
-                           href="/service-dashboard-client-details/{{ service.pk.S.substring(8) }}/">{{ service.service_name.S }}</a>
+                           href="/client-details/{{ service.pk.S.substring(8) }}/">{{ service.service_name.S }}</a>
                     </p>
                 {% endfor %}
             </div>

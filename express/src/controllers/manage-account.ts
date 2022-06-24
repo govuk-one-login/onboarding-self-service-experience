@@ -18,7 +18,7 @@ export const listServices = async function(req: Request, res: Response) {
     }
     console.log(services.data.Items);
     if(services.data.Items.length === 1) {
-        res.redirect(`/service-dashboard-client-details/${services.data.Items[0].pk.S.substring(8)}`);
+        res.redirect(`/client-details/${services.data.Items[0].pk.S.substring(8)}`);
         return;
     }
 
