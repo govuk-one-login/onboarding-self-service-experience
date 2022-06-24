@@ -1,12 +1,12 @@
 {% extends "../layout-dashboard.njk" %}
 {% from "../macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 
 {% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav" %}
 
 {% block pageTitle %}
-  Change redirect URIs - GOV.UK Sign In
+  Change public key - GOV.UK Sign In
 {% endblock %}
 
 {% block beforeContent %}
@@ -37,30 +37,31 @@
         {{ errorSummary ({
           errors:  errorMessages,
           hrefs: {
-            'redirectURIs': '#redirectURIs'
+            'serviceUserPublicKey': '#serviceUserPublicKey'
           }
         }) }}
 
-        <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your redirect URIs</h1>
+        <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
 
-        <p class="govuk-body">Add the URI for the page you want your users to see after they sign in to your service.</p>
-        <p class="govuk-body">You can add multiple redirect URIs if you want different groups of users to see different pages once they sign in to your service. To do this, enter the URIs separated by a space.</p>
+        <p class="govuk-body">You need to generate a key pair (opens in new tab) and add the public key. This is so our services can securely send messages to each other.</p>
+        <p class="govuk-body"> You can paste in your new public key or upload it as a file.</p>
 
-        <form class="form" action="/change-redirect-URIs" method="post">
+        <h2 class="govuk-heading-m">Paste in your public key</h2>
 
-          {{ govukInput({
+        <form class="form" action="/change-public-key" method="post">
+
+          {{ govukTextarea({
+            name: "serviceUserPublicKey",
+            id: "serviceUserPublicKey",
             label: {
-              text: "Redirect URIs"
+              text: "Public key"
             },
             hint: {
-              text: "Enter URIs starting with https://"
+              text: "Paste in the entire public key in PEM format, including the headers"
             },
-            name: "redirectURIs",
-            id: "redirectURIs",
-            classes: "govuk-!-width-full",
             value: value,
             errorMessage: {
-              text:  errorMessages.get('redirectURIs')
+              text:  errorMessages.get('serviceUserPublicKey')
             } if  errorMessages else false
           }) }}
 
@@ -73,13 +74,10 @@
 
         </form>
 
-
       </div>
 
     </div>
   </div>
-
-
 
 {% endblock %}
 
