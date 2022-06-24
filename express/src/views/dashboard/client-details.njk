@@ -1,4 +1,4 @@
-{% extends "layout-dashboard.njk" %}
+{% extends "../layout-dashboard.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
@@ -24,7 +24,7 @@
         <nav class="sub-navigation govuk-!-margin-top-3">
           <ul class="govuk-list sub_navigation_list_2">
             <li class="sub-navigation__item sub-navigation__item--active">
-              <a class="govuk-link govuk-link--no-visited-state" href="/client-details">Client details</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/:serviceId">Client details</a>
             </li>
             <li class="sub-navigation__item">
               <a class="govuk-link govuk-link--no-visited-state" href="#">Joining private beta</a>
@@ -139,7 +139,7 @@
               actions: {
                 items: [
                   {
-                    href: "#",
+                    href: "/change-public-key",
                     text: "Change",
                     visuallyHiddenText: "public key"
                   }
@@ -156,7 +156,7 @@
               actions: {
                 items: [
                   {
-                    href: "#",
+                    href: "/change-post-logout-URIs",
                     text: "Change",
                     visuallyHiddenText: "post logout redirect uris"
                   }
