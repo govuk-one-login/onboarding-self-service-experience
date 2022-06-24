@@ -35,7 +35,7 @@ router.post('/change-redirect-URIs', (req, res) => {
         res.render('dashboard/change-redirect-URIs.njk', {errorMessages: errorMessages});
         return;
     }
-    res.redirect('/service-dashboard-client-details');
+    res.redirect('/client-details');
 });
 
 export default router;
