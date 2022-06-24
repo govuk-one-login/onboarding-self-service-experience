@@ -45,7 +45,7 @@ router.get('/change-user-attributes', (req, res) => {
 });
 
 router.post('/change-user-attributes', (req, res) => {
-    res.redirect('/service-dashboard-client-details');
+    res.redirect('/client-details');
 });
 
 
