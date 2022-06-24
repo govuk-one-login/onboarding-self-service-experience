@@ -31,7 +31,7 @@ export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Prom
         .put(record)
         .then((putItemOutput) => {
             response.statusCode = 200;
-            response.body = JSON.stringify(payload);
+            response.body = JSON.stringify(record)
         })
         .catch((putItemOutput) => {
             console.log(putItemOutput)

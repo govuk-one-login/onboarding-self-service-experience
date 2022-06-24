@@ -1,5 +1,5 @@
 export interface User {
-    [id | pk]: string;
+    pk: {S: string};
     [cognitoId | sk]: string;
     data: string;
     [firstName | first_name]: string | undefined;
