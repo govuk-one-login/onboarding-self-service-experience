@@ -36,9 +36,9 @@ export const processAddServiceForm = async function (req: Request, res: Response
     }
 
     let newServiceData = JSON.parse(newServiceOutput?.data.output);
-    const generatedClient = await lambdaFacade.generateClient(newServiceData.serviceId, service, newUser.email as string, req.session.authenticationResult?.AccessToken as string)
+    const generatedClient = await lambdaFacade.generateClient(newServiceData.serviceId, service, newUser.email as string, req.session.authenticationResult?.AccessToken as string);
+    console.debug(generatedClient);
     res.redirect("/client-details");
-}
 
 export const generateClient = async function (req: Request, res: Response) {
 
