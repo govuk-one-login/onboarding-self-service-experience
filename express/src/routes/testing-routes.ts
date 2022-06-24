@@ -20,4 +20,22 @@ router.post('/change-client-name', (req, res) => {
     res.redirect('/client-details');
 });
 
+// Testing routes for Change your redirect URIs page
+router.get('/change-redirect-URIs', (req, res) => {
+    res.render("dashboard/change-redirect-URIs.njk", {
+        value: 'https://get-a-juggling-licence.gov.uk/redirect/endpoint'
+    });
+});
+
+router.post('/change-redirect-URIs', (req, res) => {
+    let clientName = req.body.redirectURIs;
+    if (clientName === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('redirectURIs', 'Enter your redirect URIs');
+        res.render('dashboard/change-redirect-URIs.njk', {errorMessages: errorMessages});
+        return;
+    }
+    res.redirect('/client-details');
+});
+
 export default router;
