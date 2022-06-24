@@ -21,7 +21,7 @@ jobs:
           cache-dependency-path: ./express/package-lock.json
 
       - name: Install Node dependencies
-        run: | 
+        run: |
           npm install
 
       - name: Build app

@@ -10,9 +10,6 @@ const tableName = process.env.SAMPLE_TABLE;
 const client = new DynamoClient(tableName as string);
 
 export const putServiceUserHandler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
-    console.log("Received event:")
-    console.log(event);
-    console.log(context);
     const payload = event?.body ? JSON.parse(event.body as string) : event;
     const record = {
         pk: payload.service.pk,
@@ -21,14 +18,10 @@ export const putServiceUserHandler = async (event: APIGatewayProxyEvent, context
         role: 'admin',
         service_name: payload.service.service_name
     }
-    let response = {statusCode: 200, body: JSON.stringify("OK")};
+    let response = {statusCode: 200, body: JSON.stringify(record)};
     await client
         .put(record)
-        .then((putItemOutput) => {
-            response.statusCode = 200;
-            response.body = JSON.stringify(putItemOutput)
-        })
         .catch((putItemOutput) => { response.statusCode = 500; response.body = JSON.stringify(putItemOutput)});
-
+    console.log(response)
     return response;
 };
