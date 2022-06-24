@@ -5,12 +5,30 @@ import {User} from "../../@types/User";
 import {Service} from "../../@types/Service";
 
 export const listServices = async function(req: Request, res: Response) {
-    res.render('manage-account/list-services.njk');
+    const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    if(req.session.selfServiceUser == undefined) {
+        res.render('there-is-a-problem.njk');
+        return;
+    }
+    const user: User = req.session.selfServiceUser;
+    const services = await lambdaFacade.listServices(user.pk.S as string, req.session.authenticationResult?.AccessToken as string);
+    if(services.data.Items.length === 0) {
+        res.redirect('/add-service-name');
+        return;
+    }
+    console.log(services.data.Items);
+    if(services.data.Items.length === 1) {
+        res.redirect(`/service-dashboard-client-details/${services.data.Items[0].pk.S.substring(8)}`);
+        return;
+    }
+
+    res.render('manage-account/list-services.njk', {services: services.data.Items});
 }
 
 export const showAddServiceForm = async function (req: Request, res: Response) {
     res.render("add-service-name.njk");
 }
+
 export const processAddServiceForm = async function (req: Request, res: Response) {
     const uuid = randomUUID();
     const service: Service = {
@@ -36,10 +54,9 @@ export const processAddServiceForm = async function (req: Request, res: Response
     }
 
     let newServiceData = JSON.parse(newServiceOutput?.data.output);
-    const generatedClient = await lambdaFacade.generateClient(newServiceData.serviceId, service, newUser.email as string, req.session.authenticationResult?.AccessToken as string);
-    console.debug(generatedClient);
-    res.redirect("/client-details");
+    const generatedClient = await lambdaFacade.generateClient(newServiceData.serviceId, service, newUser.email as string, req.session.authenticationResult?.AccessToken as string)
+    const body = JSON.parse(generatedClient.data.output).body;
+    const clientId = JSON.parse(body).clientId;
 
-export const generateClient = async function (req: Request, res: Response) {
-
+    res.redirect(`/client-details/${clientId}`);
 }

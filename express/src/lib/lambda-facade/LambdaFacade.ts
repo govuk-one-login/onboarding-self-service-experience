@@ -58,5 +58,10 @@ class LambdaFacade implements LambdaFacadeInterface {
             }
         });
     }
+
+    async listServices(userId: string, accessToken: string): Promise<AxiosResponse> {
+        const bareUserId = userId.substring(5);
+        return await (await this.instance).get(`/Prod/get-services/${bareUserId}`);
+    }
 }
 export const lambdaFacadeInstance = new LambdaFacade(process.env.API_BASE_URL as string);

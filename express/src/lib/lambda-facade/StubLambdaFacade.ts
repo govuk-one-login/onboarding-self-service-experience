@@ -27,5 +27,9 @@ class StubLambdaFacade implements LambdaFacadeInterface {
     generateClient(serviceId: string, service: Service, contactEmail: string, accessToken: string): Promise<AxiosResponse> {
         return Promise.resolve({} as AxiosResponse);
     }
+
+    listServices(userId: string, accessToken: string): Promise<AxiosResponse> {
+        return Promise.resolve({} as AxiosResponse);
+    }
 }
 export const lambdaFacadeInstance = new StubLambdaFacade();

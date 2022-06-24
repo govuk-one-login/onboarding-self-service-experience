@@ -26,7 +26,7 @@ export const showLoginOtpMobile = async function(req: Request, res: Response) {
 
 export const processLoginOtpMobile = async function(req: Request, res: Response) {
     // TO DO add the functionality to process the login mobile otp
-    res.redirect('/add-service-name');
+    res.redirect('/account/list-services');
 }
 
 export const processEmailAddress = async function (req: Request, res: Response) {
