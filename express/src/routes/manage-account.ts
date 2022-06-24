@@ -10,7 +10,7 @@ router.get('/account/list-services', checkAuthorisation, listServices);
 router.get('/add-service-name', checkAuthorisation, showAddServiceForm);
 router.post('/create-service-name-validation', checkAuthorisation, serviceNameValidator, processAddServiceForm);
 
-router.get('/client-details', (req, res) => {
+router.get('/client-details/:serviceId', (req, res) => {
     res.render("client-details.njk", {
         publicKeyAndUrlsNotUpdatedByUser: true,
         userDetailsUpdated: false,
