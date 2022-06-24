@@ -6,7 +6,7 @@
 {% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav" %}
 
 {% block pageTitle %}
-  Change post logout redirect URis - GOV.UK Sign In
+  Change client name - GOV.UK Sign In
 {% endblock %}
 
 {% block beforeContent %}
@@ -37,31 +37,32 @@
         {{ errorSummary ({
           errors:  errorMessages,
           hrefs: {
-            'postLogoutURIs': '#postLogoutURIs'
+            'clientName': '#clientName'
           }
         }) }}
 
-        <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your post logout redirect URIs</h1>
+        <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your client name</h1>
 
-        <p class="govuk-body">Add the URI for the page you want your users to see after they sign out of your service.</p>
-        <p class="govuk-body">You can add multiple post logout redirect URIs if you want different groups of users to see different pages once they sign out of your service. To do this, enter the URIs separated by a space.</p>
-        <p class="govuk-body">If you do not specify one, your users will be redirected to the <a class="govuk-link" href="https://signin.account.gov.uk/signed-out">default GOV.UK sign out page</a>.</p>
+        {{ govukWarningText({
+          text: "Your client name is shown to your users.",
+          iconFallbackText: "Warning"
+        }) }}
 
-        <form class="form" action="/change-post-logout-URIs" method="post">
+        <p class="govuk-body">It should usually be your service name as written on your service start page.</p>
+        <p class="govuk-body">It needs to fit into a sentence like “You can now continue to the [client name] service.”</p>
+
+        <form class="form" action="/change-client-name" method="post">
 
           {{ govukInput({
             label: {
-              text: "Post logout redirect URIs"
+              text: "Client name"
             },
-            hint: {
-              text: "Enter URIs starting with https://"
-            },
-            name: "postLogoutURIs",
-            id: "postLogoutURIs",
+            name: "clientName",
+            id: "clientName",
             classes: "govuk-!-width-full",
             value: value,
             errorMessage: {
-              text:  errorMessages.get('postLogoutURIs')
+              text:  errorMessages.get('clientName')
             } if  errorMessages else false
           }) }}
 
@@ -73,6 +74,12 @@
           </div>
 
         </form>
+
+
+
+
+
+
 
 
       </div>

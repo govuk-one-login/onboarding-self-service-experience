@@ -10,8 +10,18 @@ router.get('/account/list-services', checkAuthorisation, listServices);
 router.get('/add-service-name', checkAuthorisation, showAddServiceForm);
 router.post('/create-service-name-validation', checkAuthorisation, serviceNameValidator, processAddServiceForm);
 
-router.get('/service-dashboard-client-details', (req, res) => {
-    res.render("service-dashboard-client-details.njk");
+router.get('/client-details/:serviceId', (req, res) => {
+    res.render("client-details.njk", {
+        publicKeyAndUrlsNotUpdatedByUser: true,
+        userDetailsUpdated: false,
+        clientName: "My juggling service",
+        serviceName: "My juggling service",
+        clientId: "X8rnOEw0SqOdEAOnWyPQ6YsJugQ",
+        redirectUrls: "https://get-a-juggling-licence.gov.uk/redirect/endpoint",
+        userAttributesRequired: "Email address<br>Phone number",
+        userPublicKey: "Not yet added",
+        postLogoutRedirectUrls: "Not yet added"
+    });
 });
 
 export default router;
