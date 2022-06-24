@@ -60,5 +60,3 @@ export const processAddServiceForm = async function (req: Request, res: Response
 
     res.redirect(`/client-details/${clientId}`);
 }
-
-

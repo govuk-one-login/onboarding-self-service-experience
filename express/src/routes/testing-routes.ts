@@ -38,4 +38,16 @@ router.post('/change-redirect-URIs', (req, res) => {
     res.redirect('/client-details');
 });
 
+
+// Testing routes for Change user attributes page
+router.get('/change-user-attributes', (req, res) => {
+    res.render("dashboard/change-user-attributes.njk");
+});
+
+router.post('/change-user-attributes', (req, res) => {
+    res.redirect('/client-details');
+});
+
+
+
 export default router;
