@@ -141,33 +141,6 @@ Resources:
         EntryPoints:
           - src/handlers/register-client.ts
 
-  putClientFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: src/handlers/put-client.putClientHandler
-      Runtime: nodejs16.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
-      Description: A simple example includes a HTTP post method to add a service to a DynamoDB table.
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
-        - DynamoDBCrudPolicy:
-            TableName: 'onboarding'
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: 'onboarding'
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: "es2020"
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/put-client.ts
-
   putServiceClientFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -353,7 +326,6 @@ Resources:
                   - !GetAtt putServiceFunction.Arn
                   - !GetAtt putServiceUserFunction.Arn
                   - !GetAtt registerClientFunction.Arn
-                  - !GetAtt putClientFunction.Arn
                   - !GetAtt putServiceClientFunction.Arn
 
   NewServiceStepFunction:
@@ -396,7 +368,6 @@ Resources:
       DefinitionUri: ./src/state-machines/newClient.json
       DefinitionSubstitutions:
         RegisterClientFunctionArn: !GetAtt registerClientFunction.Arn
-        PutClientFunctionArn: !GetAtt putClientFunction.Arn
         PutServiceClientFunctionArn: !GetAtt putServiceClientFunction.Arn
 
   StepFunctionsLogGroup:
