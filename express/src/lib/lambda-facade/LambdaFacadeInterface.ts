@@ -10,4 +10,5 @@ export default interface LambdaFacadeInterface {
     newService(service: Service, user: User, accessToken: string): Promise<AxiosResponse>;
     generateClient(serviceId: string, service: Service, contactEmail: string, accessToken: string): Promise<AxiosResponse>;
     listServices(userId: string, accessToken: string): Promise<AxiosResponse>;
+    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse>;
 }

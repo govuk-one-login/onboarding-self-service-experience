@@ -23,6 +23,7 @@ export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Prom
         post_logout_redirect_uris: payload.post_logout_redirect_uris,
         subject_type: payload.subject_type,
         service_type: payload.service_type,
+        service_name: payload.service.service_name,
         default_fields: ['data', 'public_key', 'redirect_uris','scopes','post_logout_redirect_uris','subject_type','service_type']
     };
 

@@ -24,7 +24,7 @@
         <nav class="sub-navigation govuk-!-margin-top-3">
           <ul class="govuk-list sub_navigation_list_2">
             <li class="sub-navigation__item sub-navigation__item--active">
-              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/:serviceId">Client details</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{clientId}}">Client details</a>
             </li>
             <li class="sub-navigation__item">
               <a class="govuk-link govuk-link--no-visited-state" href="#">Joining private beta</a>
@@ -46,7 +46,7 @@
         <p class="govuk-body">Add the URI for the page you want your users to see after they sign in to your service.</p>
         <p class="govuk-body">You can add multiple redirect URIs if you want different groups of users to see different pages once they sign in to your service. To do this, enter the URIs separated by a space.</p>
 
-        <form class="form" action="/change-redirect-URIs" method="post">
+        <form class="form" action="/change-redirect-URIs/{{clientId}}" method="post">
 
           {{ govukInput({
             label: {
@@ -68,7 +68,7 @@
             {{ govukButton({
               text: "Confirm"
             }) }}
-            <a class="govuk-link" href="/client-details/:serviceId">Cancel</a>
+            <a class="govuk-link" href="/client-details/{{clientId}}">Cancel</a>
           </div>
 
         </form>
