@@ -44,6 +44,20 @@ class DynamoClient {
         const command = new QueryCommand(params);
         return await this.dynamodb.send(command);
     }
+
+    async getClients(serviceId: string): Promise<QueryCommandOutput> {
+        const params = {
+            TableName: this.tableName,
+            ExpressionAttributeNames: {"#serviceId": "pk", "#clientId": "sk"},
+            ExpressionAttributeValues: {":serviceId": {S: `service#${serviceId}`}, ":clientIdPrefix": {S: "client#"}},
+            KeyConditionExpression: "#serviceId = :serviceId AND begins_with ( #clientId, :clientIdPrefix )"
+        }
+        console.log(params);
+        const command = new QueryCommand(params);
+        const items = await this.dynamodb.send(command);
+        console.log(items);
+        return items;
+    }
 }
 
 export default DynamoClient;

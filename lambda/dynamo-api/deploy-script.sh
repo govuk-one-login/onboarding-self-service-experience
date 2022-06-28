@@ -16,7 +16,7 @@ then
 fi
 osascript -e 'say "Yipee! We managed to build it!"'
 
-if ! gds aws di-onboarding-development -- sam deploy --parameter-overrides "RegisterClientRoleArn=* RegisterCientFunctionName=roger AuthRegistrationBaseUrl=https://oidc.integration.account.gov.uk"
+if ! gds aws di-onboarding-development -- sam deploy --parameter-overrides "AuthRegistrationBaseUrl=https://oidc.integration.account.gov.uk"
 then
   osascript -e 'say "Oh no, it did not deploy!"'
   exit
