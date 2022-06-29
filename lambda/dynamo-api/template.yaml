@@ -208,6 +208,36 @@ Resources:
         EntryPoints:
           - src/handlers/register-client.ts
 
+  updateClientFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/update-client.updateClientHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Updates a client using http endpoint
+      Environment:
+        Variables:
+          AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
+
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /update-client
+            Method: POST
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/update-client.ts
+
   putServiceClientFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -358,6 +388,54 @@ Resources:
         EntryPoints:
           - src/handlers/new-client.ts
 
+  doUpdateClientHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/do-update-client.doUpdateClientHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: A invokes a step function and returns the output through the API Gateway.
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !GetAtt UpdateClientStepFunction.Arn
+      Policies:
+        Statement: [
+          {
+            Effect: Allow,
+            Action: [
+                "states:StartSyncExecution"
+            ],
+            Resource: {
+              Fn::Sub: [
+                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  stateMachineName: {
+                    Fn::GetAtt: [UpdateClientStepFunction, Name]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /do-update-client
+            Method: POST
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/do-update-client.ts
+
   StepFunctionExecRole:
     Type: AWS::IAM::Role
     Properties:
@@ -394,6 +472,7 @@ Resources:
                   - !GetAtt putServiceUserFunction.Arn
                   - !GetAtt registerClientFunction.Arn
                   - !GetAtt putServiceClientFunction.Arn
+                  - !GetAtt updateClientFunction.Arn
 
   NewServiceStepFunction:
     Type: AWS::Serverless::StateMachine
@@ -433,6 +512,26 @@ Resources:
       DefinitionUri: ./src/state-machines/newClient.json
       DefinitionSubstitutions:
         RegisterClientFunctionArn: !GetAtt registerClientFunction.Arn
+        PutServiceClientFunctionArn: !GetAtt putServiceClientFunction.Arn
+
+  UpdateClientStepFunction:
+    Type: AWS::Serverless::StateMachine
+    DependsOn:
+      - StepFunctionsLogGroup
+      - StepFunctionExecRole
+
+    Properties:
+      Type: EXPRESS
+      Role: !GetAtt StepFunctionExecRole.Arn
+      Logging:
+        Level: ALL
+        IncludeExecutionData: True
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StepFunctionsLogGroup.Arn
+      DefinitionUri: ./src/state-machines/updateClient.json
+      DefinitionSubstitutions:
+        UpdateClientFunctionArn: !GetAtt updateClientFunction.Arn
         PutServiceClientFunctionArn: !GetAtt putServiceClientFunction.Arn
 
   StepFunctionsLogGroup:

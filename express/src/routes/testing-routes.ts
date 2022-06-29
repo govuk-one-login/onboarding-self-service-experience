@@ -1,4 +1,5 @@
 import express, {Request, Response} from 'express';
+import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ router.get('/change-client-name/:clientId', (req, res) => {
     });
 });
 
-router.post('/change-client-name/:clientId', (req, res) => {
+router.post('/change-client-name/:clientId', async (req, res) => {
     let clientName = req.body.clientName;
     if (clientName === "") {
         const errorMessages = new Map<string, string>();
@@ -18,6 +19,15 @@ router.post('/change-client-name/:clientId', (req, res) => {
         res.render('dashboard/change-client-name.njk', {errorMessages: errorMessages, clientId: req.params.clientId});
         return;
     }
+    const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    let result;
+    try {
+        result = await facade.updateClient(req.params.clientId, {client_name: clientName}, req.session.authenticationResult?.AccessToken as string);
+    } catch (error) {
+        console.log(error)
+    }
+    console.log("RESULT ".repeat(5))
+    console.log(result)
     res.redirect(`/client-details/${req.params.clientId}`);
 });
 
