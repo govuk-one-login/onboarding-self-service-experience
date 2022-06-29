@@ -113,7 +113,6 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
 
 export const showNewPasswordForm = async function (req: Request, res: Response, next: NextFunction) {
     console.log("Show new password")
-    console.log(req.session);
     if (req.session.session !== undefined) {
         res.render('create-account/new-password.njk');
         return;
@@ -182,7 +181,6 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
         res.render('create-account/enter-mobile.njk');
     }
     let response = await cognitoClient.setPhoneNumber(req.session.emailAddress, mobileNumber);
-    console.log(response);
 
     // presumably that was fine so let's try to veerify the number
 

@@ -28,7 +28,7 @@ Resources:
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: 'onboarding'
+          TABLE: 'onboarding'
       Events:
         Api:
           Type: Api
@@ -60,7 +60,7 @@ Resources:
             TableName: 'onboarding'
       Environment:
         Variables:
-          SAMPLE_TABLE: 'onboarding'
+          TABLE: 'onboarding'
       Events:
         Api:
           Type: Api
@@ -94,7 +94,7 @@ Resources:
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: 'onboarding'
+          TABLE: 'onboarding'
       Events:
         Api:
           Type: Api
@@ -208,6 +208,36 @@ Resources:
         EntryPoints:
           - src/handlers/register-client.ts
 
+  updateClientInRegistryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/update-client-in-registry.updateClientInRegistryHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Updates a client using http endpoint
+      Environment:
+        Variables:
+          AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
+
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /update-client
+            Method: POST
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/update-client-in-registry.ts
+
   putServiceClientFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -225,7 +255,7 @@ Resources:
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: 'onboarding'
+          TABLE: 'onboarding'
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -234,6 +264,33 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/handlers/put-service-client.ts
+
+  updateServiceClientFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/update-service-client.updateServiceClientHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Update service client in DDB.
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: 'onboarding'
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          TABLE: 'onboarding'
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/update-service-client.ts
 
   putServiceUserFunction:
     Type: AWS::Serverless::Function
@@ -252,7 +309,7 @@ Resources:
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: 'onboarding'
+          TABLE: 'onboarding'
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -358,6 +415,54 @@ Resources:
         EntryPoints:
           - src/handlers/new-client.ts
 
+  doUpdateClientHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/do-update-client.doUpdateClientHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: A invokes a step function and returns the output through the API Gateway.
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !GetAtt UpdateClientStepFunction.Arn
+      Policies:
+        Statement: [
+          {
+            Effect: Allow,
+            Action: [
+                "states:StartSyncExecution"
+            ],
+            Resource: {
+              Fn::Sub: [
+                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  stateMachineName: {
+                    Fn::GetAtt: [UpdateClientStepFunction, Name]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /do-update-client
+            Method: POST
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/do-update-client.ts
+
   StepFunctionExecRole:
     Type: AWS::IAM::Role
     Properties:
@@ -394,6 +499,8 @@ Resources:
                   - !GetAtt putServiceUserFunction.Arn
                   - !GetAtt registerClientFunction.Arn
                   - !GetAtt putServiceClientFunction.Arn
+                  - !GetAtt updateServiceClientFunction.Arn
+                  - !GetAtt updateClientInRegistryFunction.Arn
 
   NewServiceStepFunction:
     Type: AWS::Serverless::StateMachine
@@ -434,6 +541,26 @@ Resources:
       DefinitionSubstitutions:
         RegisterClientFunctionArn: !GetAtt registerClientFunction.Arn
         PutServiceClientFunctionArn: !GetAtt putServiceClientFunction.Arn
+
+  UpdateClientStepFunction:
+    Type: AWS::Serverless::StateMachine
+    DependsOn:
+      - StepFunctionsLogGroup
+      - StepFunctionExecRole
+
+    Properties:
+      Type: EXPRESS
+      Role: !GetAtt StepFunctionExecRole.Arn
+      Logging:
+        Level: ALL
+        IncludeExecutionData: True
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StepFunctionsLogGroup.Arn
+      DefinitionUri: ./src/state-machines/updateClient.json
+      DefinitionSubstitutions:
+        UpdateClientInRegistryFunctionArn: !GetAtt updateClientInRegistryFunction.Arn
+        UpdateServiceClientFunctionArn: !GetAtt updateServiceClientFunction.Arn
 
   StepFunctionsLogGroup:
     Type: AWS::Logs::LogGroup

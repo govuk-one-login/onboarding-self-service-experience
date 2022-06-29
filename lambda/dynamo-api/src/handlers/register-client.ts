@@ -6,11 +6,11 @@ import axios, {Axios, AxiosResponse} from "axios"; // until Onboarding takes ove
 let instance: Axios;
 
 instance = axios.create({
-        baseURL: process.env.AUTH_REGISTRATION_BASE_URL,
-        headers: {
-            "Content-Type": "application/json"
-        }
-    });
+    baseURL: process.env.AUTH_REGISTRATION_BASE_URL,
+    headers: {
+        "Content-Type": "application/json"
+    }
+});
 
 
 export const registerClientHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {

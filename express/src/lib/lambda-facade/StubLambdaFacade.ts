@@ -28,6 +28,10 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         return Promise.resolve({} as AxiosResponse);
     }
 
+    updateClient(serviceId: string, selfServiceClientId: string, clientId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
+        return Promise.resolve({} as AxiosResponse);
+    }
+
     listServices(userId: string, accessToken: string): Promise<AxiosResponse> {
         return Promise.resolve({} as AxiosResponse);
     }

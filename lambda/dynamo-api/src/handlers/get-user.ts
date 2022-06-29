@@ -1,7 +1,7 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import {APIGatewayProxyEvent, APIGatewayProxyResult} from 'aws-lambda';
 import DynamoClient from "../client/DynamoClient";
 
-const tableName = process.env.SAMPLE_TABLE;
+const tableName = process.env.TABLE;
 const client = new DynamoClient(tableName as string);
 
 export const getUserHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -16,7 +16,11 @@ export const getUserHandler = async (event: APIGatewayProxyEvent): Promise<APIGa
             response.statusCode = 200;
             response.body = JSON.stringify(queryCommandOutput);
         })
-        .catch((queryCommandOutput) => { console.error(queryCommandOutput); response.statusCode = 500; response.body = JSON.stringify(queryCommandOutput)});
+        .catch((queryCommandOutput) => {
+            console.error(queryCommandOutput);
+            response.statusCode = 500;
+            response.body = JSON.stringify(queryCommandOutput)
+        });
 
     return response;
 };

@@ -6,7 +6,7 @@
 {% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav" %}
 
 {% block pageTitle %}
-  Change client name - GOV.UK Sign In
+    Change client name - GOV.UK Sign In
 {% endblock %}
 
 {% block beforeContent %}
@@ -16,69 +16,72 @@
 
 {% block content %}
 
-  <div class="govuk-width-container">
-    <div class="govuk-body govuk-!-font-weight-bold">My juggling service</div>
-    <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-third">
-        <nav class="sub-navigation govuk-!-margin-top-3">
-          <ul class="govuk-list sub_navigation_list_2">
-            <li class="sub-navigation__item sub-navigation__item--active">
-              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{clientId}}">Client details</a>
-            </li>
-            <li class="sub-navigation__item">
-              <a class="govuk-link govuk-link--no-visited-state" href="#">Joining private beta</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-      <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-width-container">
+        <div class="govuk-body govuk-!-font-weight-bold">My juggling service</div>
+        <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-third">
+                <nav class="sub-navigation govuk-!-margin-top-3">
+                    <ul class="govuk-list sub_navigation_list_2">
+                        <li class="sub-navigation__item sub-navigation__item--active">
+                            <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client
+                                details</a>
+                        </li>
+                        <li class="sub-navigation__item">
+                            <a class="govuk-link govuk-link--no-visited-state" href="#">Joining private beta</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="govuk-grid-column-two-thirds">
 
-        {{ errorSummary ({
-          errors:  errorMessages,
-          hrefs: {
-            'clientName': '#clientName'
-          }
-        }) }}
+                {{ errorSummary ({
+                    errors:  errorMessages,
+                    hrefs: {
+                        'clientName': '#clientName'
+                    }
+                }) }}
 
-        <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your client name</h1>
+                <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your client name</h1>
 
-        {{ govukWarningText({
-          text: "Your client name is shown to your users.",
-          iconFallbackText: "Warning"
-        }) }}
+                {{ govukWarningText({
+                    text: "Your client name is shown to your users.",
+                    iconFallbackText: "Warning"
+                }) }}
 
-        <p class="govuk-body">It should usually be your service name as written on your service start page.</p>
-        <p class="govuk-body">It needs to fit into a sentence like “You can now continue to the [client name] service.”</p>
+                <p class="govuk-body">It should usually be your service name as written on your service start page.</p>
+                <p class="govuk-body">It needs to fit into a sentence like “You can now continue to the [client name]
+                    service.”</p>
 
-        <form class="form" action="/change-client-name/{{clientId}}" method="post">
+                <form class="form" action="/change-client-name/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}"
+                      method="post">
 
-          {{ govukInput({
-            label: {
-              text: "Client name"
-            },
-            name: "clientName",
-            id: "clientName",
-            classes: "govuk-!-width-full",
-            value: value,
-            errorMessage: {
-              text:  errorMessages.get('clientName')
-            } if  errorMessages else false
-          }) }}
+                    {{ govukInput({
+                        label: {
+                            text: "Client name"
+                        },
+                        name: "clientName",
+                        id: "clientName",
+                        classes: "govuk-!-width-full",
+                        value: value,
+                        errorMessage: {
+                            text:  errorMessages.get('clientName')
+                        } if  errorMessages else false
+                    }) }}
 
-          <div class="govuk-button-group">
-            {{ govukButton({
-              text: "Confirm"
-            }) }}
-            <a class="govuk-link" href="/client-details/{{clientId}}">Cancel</a>
-          </div>
+                    <div class="govuk-button-group">
+                        {{ govukButton({
+                            text: "Confirm"
+                        }) }}
+                        <a class="govuk-link" href="/client-details/{{ serviceId }}">Cancel</a>
+                    </div>
 
-        </form>
+                </form>
 
-      </div>
+            </div>
 
+        </div>
     </div>
-  </div>
 
 {% endblock %}
 
