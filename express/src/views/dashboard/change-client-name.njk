@@ -24,7 +24,7 @@
         <nav class="sub-navigation govuk-!-margin-top-3">
           <ul class="govuk-list sub_navigation_list_2">
             <li class="sub-navigation__item sub-navigation__item--active">
-              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/:serviceId">Client details</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{clientId}}">Client details</a>
             </li>
             <li class="sub-navigation__item">
               <a class="govuk-link govuk-link--no-visited-state" href="#">Joining private beta</a>
@@ -51,7 +51,7 @@
         <p class="govuk-body">It should usually be your service name as written on your service start page.</p>
         <p class="govuk-body">It needs to fit into a sentence like “You can now continue to the [client name] service.”</p>
 
-        <form class="form" action="/change-client-name" method="post">
+        <form class="form" action="/change-client-name/{{clientId}}" method="post">
 
           {{ govukInput({
             label: {
@@ -70,7 +70,7 @@
             {{ govukButton({
               text: "Confirm"
             }) }}
-            <a class="govuk-link" href="/client-details/:serviceId">Cancel</a>
+            <a class="govuk-link" href="/client-details/{{clientId}}">Cancel</a>
           </div>
 
         </form>

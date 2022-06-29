@@ -402,7 +402,6 @@ Resources:
       - StepFunctionExecRole
 
     Properties:
-      Name: new-service
       Type: EXPRESS
       Role: !GetAtt StepFunctionExecRole.Arn
       Logging:
@@ -423,7 +422,6 @@ Resources:
       - StepFunctionExecRole
 
     Properties:
-      Name: new-client
       Type: EXPRESS
       Role: !GetAtt StepFunctionExecRole.Arn
       Logging:
