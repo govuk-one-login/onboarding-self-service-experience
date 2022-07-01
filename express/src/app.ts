@@ -46,6 +46,24 @@ declare module 'express-session' {
         authenticationResult: AuthenticationResultType;
         cognitoUser: AdminGetUserCommandOutput;
         selfServiceUser: User;
+
+            clientName: string;
+            clientId: string;
+            serviceName: string;
+            redirectUrls: string[];
+            userAttributesRequired: string[];
+            userPublicKey: string;
+            postLogoutRedirectUrls: string[];
+            urls: {
+                changeClientName: string;
+                changeRedirectUris: string;
+                changeUserAttributes: string;
+                changePublicKey: string;
+                changePostLogoutUris: string;
+            }
+
+
+
     }
 }
 
