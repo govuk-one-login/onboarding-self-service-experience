@@ -32,8 +32,6 @@ router.get('/client-details/:serviceId', async (req, res) => {
     req.session.urls.changePublicKey = `/change-public-key/${client.clientId}`,
     req.session.urls.changePostLogoutUris = `/change-post-logout-urris/${client.clientId}`;
     
-
-
     res.render("dashboard/client-details.njk", {
         serviceId: req.params.serviceId,
         publicKeyAndUrlsNotUpdatedByUser: true,
