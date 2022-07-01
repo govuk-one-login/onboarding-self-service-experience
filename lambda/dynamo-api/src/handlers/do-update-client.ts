@@ -9,7 +9,7 @@ import {
 
 const stepFunctionsClient = new SFNClient({region: 'eu-west-2'});
 
-export const newClientHandler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+export const doUpdateClientHandler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
     const payload = event?.body ? JSON.parse(event.body as string) : event;
     console.debug(payload)
     const stateMachineArn = process.env.STATE_MACHINE_ARN as string;

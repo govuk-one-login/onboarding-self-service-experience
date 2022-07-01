@@ -37,8 +37,6 @@ class LambdaFacade implements LambdaFacadeInterface {
             service: service,
             user: user
         }
-        console.log("SENDING TO STEP FUNCTION ".repeat(10))
-        console.log(JSON.stringify(body))
         return await (await this.instance).post('/Prod/new-service', JSON.stringify(body), {
             headers: {
                 "authorised-by": accessToken
@@ -59,15 +57,29 @@ class LambdaFacade implements LambdaFacadeInterface {
         });
     }
 
+    async updateClient(serviceId: string, selfServiceClientId: string, clientId: string, updates: object, accessToken: string): Promise<AxiosResponse> { // constrain type later
+        let body = {
+            serviceId: serviceId,
+            selfServiceClientId: selfServiceClientId,
+            clientId: clientId,
+            updates: updates,
+        }
+        return await (await this.instance).post(`/Prod/do-update-client`, JSON.stringify(body), {
+            headers: {
+                "authorised-by": accessToken
+            }
+        });
+    }
+
     async listServices(userId: string, accessToken: string): Promise<AxiosResponse> {
         const bareUserId = userId.substring(5);
         return await (await this.instance).get(`/Prod/get-services/${bareUserId}`);
     }
 
     async listClients(serviceId: string, accessToken: string): Promise<AxiosResponse> {
-        console.log("ServiceId is: " + serviceId)
         const bareServiceId = serviceId.startsWith("service#") ? serviceId.substring(8) : serviceId;
         return await (await this.instance).get(`/Prod/get-service-clients/${bareServiceId}`);
     }
 }
+
 export const lambdaFacadeInstance = new LambdaFacade(process.env.API_BASE_URL as string);
