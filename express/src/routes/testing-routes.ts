@@ -20,11 +20,11 @@ async function clientDetailsRedirect(req: Request , res: Response, updatedField:
         userPublicKey: req.session.userPublicKey,
         postLogoutRedirectUrls: req.session.postLogoutRedirectUrls,
         urls: {
-            changeClientName: req.session.urls?.changeClientName,
-            changeRedirectUris: req.session.urls?.changeRedirectUris,
-            changeUserAttributes: req.session.urls?.changeUserAttributes,
-            changePublicKey: req.session.urls?.changePublicKey,
-            changePostLogoutUris: req.session.urls?.changePostLogoutUris,
+            changeClientName: req.session.changeClientName,
+            changeRedirectUris: req.session.changeRedirectUris,
+            changeUserAttributes: req.session.changeUserAttributes,
+            changePublicKey: req.session.changePublicKey,
+            changePostLogoutUris: req.session.changePostLogoutUris,
         }
     })
 }
