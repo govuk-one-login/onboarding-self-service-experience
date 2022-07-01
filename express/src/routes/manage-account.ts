@@ -26,11 +26,11 @@ router.get('/client-details/:serviceId', async (req, res) => {
     req.session.userAttributesRequired = client.scopes[0];
     req.session.userPublicKey = client.default_fields.includes("public_key") ? "" : client.public_key;
     req.session.postLogoutRedirectUrls = client.post_logout_redirect_uris[0];
-    req.session.urls.changeClientName = `/change-client-name/${client.clientId}`,
-    req.session.urls.changeRedirectUris = `/change-redirect-uris/${client.clientId}`,
-    req.session.urls.changeUserAttributes = `/change-user-attributes/${client.clientId}`,
-    req.session.urls.changePublicKey = `/change-public-key/${client.clientId}`,
-    req.session.urls.changePostLogoutUris = `/change-post-logout-urris/${client.clientId}`;
+    req.session.changeClientName = `/change-client-name/${client.clientId}`,
+    req.session.changeRedirectUris = `/change-redirect-uris/${client.clientId}`,
+    req.session.changeUserAttributes = `/change-user-attributes/${client.clientId}`,
+    req.session.changePublicKey = `/change-public-key/${client.clientId}`,
+    req.session.changePostLogoutUris = `/change-post-logout-urris/${client.clientId}`;
     
     res.render("dashboard/client-details.njk", {
         serviceId: req.params.serviceId,
