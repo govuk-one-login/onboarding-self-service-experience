@@ -6,12 +6,12 @@ const router = express.Router();
 
 // a function call clientDetailsRedirect
 
-async function clientDetailsRedirect(req: Request , res: Response, updatedField: string ) {
+async function clientDetailsRedirect(req: Request , res: Response, updatedField: string , success: boolean) {
     res.render("dashboard/client-details.njk", {
         updatedField: updatedField,
         serviceId: req.params.serviceId,
         publicKeyAndUrlsNotUpdatedByUser: true,
-        userDetailsUpdated: true,
+        userDetailsUpdated: success,
         clientName: req.session.clientName,
         serviceName: req.session.serviceName,
         clientId: req.session.clientId ,
@@ -54,11 +54,13 @@ router.post('/change-client-name/:clientId', async (req, res) => {
     }
     console.log("RESULT ".repeat(5))
     console.log(result)
-    if( result?.status === 200) {
+    if( result?.status === 200) { // change to 200 when the lambda function is updated
         req.session.clientName = clientName;
-        clientDetailsRedirect(req, res, "Client name");
+        clientDetailsRedirect(req, res, "Client name" , true);
+    }else {
+        res.redirect('/there-is-a-problem');
     }
-    res.redirect(`/client-details/${req.params.clientId}`);
+    clientDetailsRedirect(req, res, "Client name" , false);
 });
 
 // Testing routes for Change your redirect URIs page
