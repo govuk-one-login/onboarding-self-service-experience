@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  DynaomDB table for di-onboarding-self-service-experience
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  AuthRegistrationBaseUrl:
+    Type: String
+    Description: API Gateway endpoint for client registration
+
+Resources:
+  Table:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableClass: STANDARD
+      AttributeDefinitions:
+        -
+          AttributeName: pk
+          AttributeType: S
+        -
+          AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        -
+          AttributeName: pk
+          KeyType: HASH
+        -
+          AttributeName: sk
+          KeyType: RANGE
+
+      BillingMode: PROVISIONED
+
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+      GlobalSecondaryIndexes:
+        -
+          IndexName: gsi1
+          KeySchema:
+            -
+              AttributeName: sk
+              KeyType: HASH
+            -
+              AttributeName: pk
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+
+Outputs:
+  TableName:
+    Description: TableName generated for this stack
+    Value: !Ref Table
+    Export:
+      Name: !Sub "${AWS::StackName}-Self-Service-table"
