@@ -135,4 +135,12 @@ router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', (req
     res.redirect(`/client-details/${req.params.serviceId}`);
 });
 
+// Testing route for "Finish connecting the sign in journey to your service" page
+router.get('/redirect-placeholder ', (req, res) => {
+    res.render("dashboard/finish-connecting-sign-in-journey.njk", {
+        changeRedirectURIsUrl: "/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId",
+        changePublicKeyUrl: "/change-public-key/:serviceId/:selfServiceClientId/:clientId"
+    });
+});
+
 export default router;

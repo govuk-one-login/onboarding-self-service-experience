@@ -1,0 +1,27 @@
+{% extends "../layout-no-top-nav.njk" %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0" %}
+
+{% block pageTitle %}
+  Redirect URI placeholder - GOV.UK Sign In
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l govuk-!-margin-top-4">Finish connecting GOV.UK Sign In to your user journey</h1>
+        <p class="govuk-body">This is a placeholder page.</p>
+        <p class="govuk-body"> You need to update 2 pieces of information in your client configuration to connect the sign in flow to your service.</p>
+        <ol class="govuk-list govuk-list--number">
+          <li><a class="govuk-link" href="{{ changeRedirectURIsUrl }}">Add your redirect URI</a>. This is the page your users see once they sign in to your service.</li>
+          <li><a class="govuk-link" href="{{ changePublicKeyUrl }}">Add your public key</a>. This will mean messages can be sent securely between GOV.UK Sign In and your service.</li>
+        </ol>
+        <p class="govuk-body">
+         <a class="govuk-link" href="https://www.sign-in.service.gov.uk/contact-us">Contact us</a> if you need support.
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
