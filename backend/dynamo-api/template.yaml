@@ -574,6 +574,6 @@ Resources:
     Type: AWS::Logs::LogGroup
 
 Outputs:
-  WebEndpoint:
-    Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  ApiBaseUrl:
+    Description: "API base URL - URL used by epxress frontend - supplied as an env var."
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
