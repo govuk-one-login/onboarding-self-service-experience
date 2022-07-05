@@ -7,6 +7,7 @@ Transform:
 Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
+    DependsOn: SmsRole
     Properties:
       Policies:
         PasswordPolicy:
@@ -327,7 +328,7 @@ Resources:
       EmailConfiguration:
         EmailSendingAccount: COGNITO_DEFAULT
       SmsConfiguration:
-        SnsCallerArn: arn:aws:iam::494650018671:role/service-role/onboardingprototype-SMS-Role
+        SnsCallerArn: !GetAtt SmsRole.Arn
         ExternalId: a90cd871-8238-4473-b10b-82dc4e843df5
         SnsRegion: eu-west-2
       UserPoolTags: { }
@@ -489,6 +490,30 @@ Resources:
       ExplicitAuthFlows:
         - ALLOW_ADMIN_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
+
+  SmsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "cognito-idp.amazonaws.com"
+            Action: "sts:AssumeRole"
+            Condition:
+              StringEquals:
+                sts:ExternalId: "a90cd871-8238-4473-b10b-82dc4e843df5"
+      Policies:
+        - PolicyName: !Sub "${AWS::StackName}-SnsPublishPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              Effect: "Allow"
+              Action:
+                "sns:publish"
+              Resource:
+                "*"
 
 Outputs:
   UserPoolName:
