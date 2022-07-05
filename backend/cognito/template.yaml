@@ -480,6 +480,16 @@ Resources:
         RecoveryMechanisms:
           - Priority: 1
             Name: verified_email
+
+  Client:
+    Type: AWS::Cognito::UserPoolClient
+    DependsOn: UserPool
+    Properties:
+      UserPoolId: !Ref UserPool
+      ExplicitAuthFlows:
+        - ALLOW_ADMIN_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
 Outputs:
   UserPoolName:
     Description: User Pool generated for this stack
@@ -487,8 +497,8 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-Self-Service-user-pool"
 
-
-
-
-
-
+  ClientId:
+    Description: ID for the client attached to the user pool
+    Value: !Ref Client
+    Export:
+      Name: !Sub "${AWS::StackName}-Self-Service-user-pool-client"
