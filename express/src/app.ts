@@ -46,6 +46,7 @@ declare module 'express-session' {
         authenticationResult: AuthenticationResultType;
         cognitoUser: AdminGetUserCommandOutput;
         selfServiceUser: User;
+        updatedField: string;
     }
 }
 

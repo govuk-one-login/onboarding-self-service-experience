@@ -18,10 +18,11 @@ router.get('/client-details/:serviceId', async (req, res) => {
     const selfServiceClientId = client.sk.substring("client#".length);
     const serviceId = req.params.serviceId;
     const authClientId = client.clientId;
+
     res.render("dashboard/client-details.njk", {
         serviceId: req.params.serviceId,
         publicKeyAndUrlsNotUpdatedByUser: true,
-        userDetailsUpdated: false,
+        updatedField: req.session.updatedField,
         clientName: client.data,
         serviceName: client.service_name,
         clientId: client.clientId,
@@ -37,6 +38,9 @@ router.get('/client-details/:serviceId', async (req, res) => {
             changePostLogoutUris: `/change-post-logout-URIs/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(arraysToString(client.post_logout_redirect_uris))}`,
         }
     });
+
+    req.session.updatedField = "";
+
 });
 
 function arraysToString(array: string[]): string {
