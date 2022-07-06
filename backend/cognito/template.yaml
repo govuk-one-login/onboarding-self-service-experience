@@ -329,7 +329,6 @@ Resources:
         EmailSendingAccount: COGNITO_DEFAULT
       SmsConfiguration:
         SnsCallerArn: !GetAtt SmsRole.Arn
-        ExternalId: a90cd871-8238-4473-b10b-82dc4e843df5
         SnsRegion: eu-west-2
       UserPoolTags: { }
       AdminCreateUserConfig:
@@ -501,9 +500,6 @@ Resources:
             Principal:
               Service: "cognito-idp.amazonaws.com"
             Action: "sts:AssumeRole"
-            Condition:
-              StringEquals:
-                sts:ExternalId: "a90cd871-8238-4473-b10b-82dc4e843df5"
       Policies:
         - PolicyName: !Sub "${AWS::StackName}-SnsPublishPolicy"
           PolicyDocument:
