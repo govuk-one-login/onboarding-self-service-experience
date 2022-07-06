@@ -128,7 +128,7 @@ router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', (req
     let clientName = req.body.serviceUserPublicKey;
     if (clientName === "") {
         const errorMessages = new Map<string, string>();
-        errorMessages.set('serviceUserPublicKey', 'Paste in or upload a public key');
+        errorMessages.set('serviceUserPublicKey', 'Paste in a public key');
         res.render('dashboard/change-public-key.njk', {errorMessages: errorMessages, clientId: req.params.clientId});
         return;
     }
