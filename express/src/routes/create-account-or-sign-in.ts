@@ -20,9 +20,6 @@ import {passwordValidator} from "../middleware/passwordValidator";
 
 const router = express.Router();
 
-router.get('/create-account-or-sign-in', (req: Request, res: Response) => {
-    res.render('create-account-or-sign-in.njk');
-});
 router.get('/create/get-email', showGetEmailForm);
 router.post('/create/get-email', emailValidator('create-account/get-email.njk'), processGetEmailForm);
 
