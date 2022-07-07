@@ -63,15 +63,40 @@ router.post('/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId', u
 
 // Testing routes for Change user attributes page
 router.get('/change-user-attributes/:serviceId/:selfServiceClientId/:clientId', (req, res) => {
+    const userAttributes = (req.query?.userAttributes as string).split(" ");
+    const email: boolean = userAttributes.includes("email");
+    const phone: boolean = userAttributes.includes("phone");
+    const offline_access: boolean = userAttributes.includes("offline_access");
+
     res.render("dashboard/change-user-attributes.njk", {
-        value: req.query?.clientName || 'My juggling service', // clientName is not the right thing for this
+        email: email,
+        phone: phone,
+        offline_access: offline_access,
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId
     });
 });
 
-router.post('/change-user-attributes/:serviceId/:selfServiceClientId/:clientId', (req, res) => {
+router.post('/change-user-attributes/:serviceId/:selfServiceClientId/:clientId', async (req, res) => {
+    const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    const attributes: string[] = ["openid"];
+
+    if(Array.isArray(req.body.userAttributes)) {
+        attributes.push( ...req.body.userAttributes );
+    } else if( typeof req.body.userAttributes === "string" ) {
+        attributes.push( req.body.userAttributes );
+    }
+
+    console.log(attributes)
+    try {
+        await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {scopes: attributes}, req.session.authenticationResult?.AccessToken as string);
+    } catch (error) {
+        console.log(error)
+        res.redirect('/there-is-a-problem');
+        return;
+    }
+    req.session.updatedField = "required user attributes";
     res.redirect(`/client-details/${req.params.serviceId}`);
 });
 
