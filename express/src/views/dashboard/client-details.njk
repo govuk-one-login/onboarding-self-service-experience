@@ -36,11 +36,11 @@
             </div>
             <div class="govuk-grid-column-two-thirds">
 
-                {% if userDetailsUpdated %}
+                {% if updatedField %}
 
                     {% set htmlNotificationBanner %}
                         <h3 class="govuk-notification-banner__heading">
-                            You have changed your [client name]
+                            You have changed your {{ updatedField }}
                         </h3>
                     {% endset %}
 

@@ -22,14 +22,14 @@ router.post('/change-client-name/:serviceId/:selfServiceClientId/:clientId', asy
         return;
     }
     const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
-    let result;
     try {
-        result = await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {data: clientName}, req.session.authenticationResult?.AccessToken as string);
+        await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {data: clientName}, req.session.authenticationResult?.AccessToken as string);
     } catch (error) {
         console.log(error)
         res.redirect('/there-is-a-problem');
         return;
     }
+    req.session.updatedField = "client name";
     res.redirect(`/client-details/${req.params.serviceId}`);
 });
 
