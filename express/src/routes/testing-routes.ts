@@ -117,21 +117,43 @@ router.post('/change-post-logout-URIs/:serviceId/:selfServiceClientId/:clientId'
 // Testing routes for Change your public key page
 router.get('/change-public-key/:serviceId/:selfServiceClientId/:clientId', (req, res) => {
     res.render("dashboard/change-public-key.njk", {
-        value: req.query?.clientName || 'My juggling service', // this is not clientName
+        value: '', // this is not clientName
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId
     });
 });
 
-router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', (req, res) => {
-    let clientName = req.body.serviceUserPublicKey;
-    if (clientName === "") {
+router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', async (req, res) => {
+    let publicKey = req.body.serviceUserPublicKey;
+    if (publicKey === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set('serviceUserPublicKey', 'Paste in a public key');
         res.render('dashboard/change-public-key.njk', {errorMessages: errorMessages, clientId: req.params.clientId});
         return;
     }
+
+    if (!publicKey.startsWith("-----BEGIN PUBLIC KEY-----") || !publicKey.endsWith("-----END PUBLIC KEY-----")) {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('serviceUserPublicKey', 'Enter a valid public key in PEM format, including the headers');
+        res.render('dashboard/change-public-key.njk', {errorMessages: errorMessages, clientId: req.params.clientId});
+        return;
+    }
+
+    if (publicKey.startsWith("-----BEGIN PUBLIC KEY-----") && publicKey.endsWith("-----END PUBLIC KEY-----")) {
+        // remove the -----BEGIN PUBLIC KEY----- and -----END PUBLIC KEY-----
+        publicKey = publicKey.substring(26, publicKey.length - 24);
+    }
+
+    const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    try {
+       await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {public_key: publicKey}, req.session.authenticationResult?.AccessToken as string);
+    } catch (error) {
+        console.log(error)
+        res.redirect('/there-is-a-problem');
+        return;
+    }
+    req.session.updatedField = "public key";
     res.redirect(`/client-details/${req.params.serviceId}`);
 });
 

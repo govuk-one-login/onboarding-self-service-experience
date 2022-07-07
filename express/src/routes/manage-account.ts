@@ -15,6 +15,7 @@ router.get('/client-details/:serviceId', async (req, res) => {
     const lambdaFacade = req.app.get("lambdaFacade");
     const listOfClients = await lambdaFacade.listClients(req.params.serviceId, req.session?.authenticationResult?.AccessToken as string);
     const client = unmarshall(listOfClients.data.Items[0]);
+    console.log(client);
     const selfServiceClientId = client.sk.substring("client#".length);
     const serviceId = req.params.serviceId;
     const authClientId = client.clientId;
@@ -28,7 +29,7 @@ router.get('/client-details/:serviceId', async (req, res) => {
         clientId: client.clientId,
         redirectUrls: arraysToString(client.redirect_uris),
         userAttributesRequired: arraysToString(client.scopes),
-        userPublicKey: client.default_fields.includes("public_key") ? "" : client.public_key,
+        userPublicKey: client.public_key,
         postLogoutRedirectUrls: arraysToString(client.post_logout_redirect_uris),
         urls: {
             changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURI(client.data)}`,
@@ -38,9 +39,7 @@ router.get('/client-details/:serviceId', async (req, res) => {
             changePostLogoutUris: `/change-post-logout-URIs/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(arraysToString(client.post_logout_redirect_uris))}`,
         }
     });
-
-    req.session.updatedField = "";
-
+    req.session.updatedField = undefined;
 });
 
 function arraysToString(array: string[]): string {
