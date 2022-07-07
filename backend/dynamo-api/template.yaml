@@ -575,5 +575,5 @@ Resources:
 
 Outputs:
   ApiBaseUrl:
-    Description: "API base URL - URL used by epxress frontend - supplied as an env var."
+    Description: "API base URL - URL used by Express frontend - supplied as an env var."
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
