@@ -1,6 +1,6 @@
-import express, {Request, Response} from 'express';
+import express, {Request, Response , NextFunction} from 'express';
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
-
+import { uriValidator } from "../middleware/urlValidator"
 const router = express.Router();
 
 // Testing routes for Change your client name page
@@ -58,21 +58,29 @@ router.post('/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId', a
         return;
     }
 
-    // further error handling around a valid array of valid URIs
-
     const redirectUris = req.body.redirectURIs.split(" ");
-
-    const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
-    let result;
-    try {
-        result = await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {redirect_uris: redirectUris}, req.session.authenticationResult?.AccessToken as string);
-    } catch (error) {
-        console.log(error)
-        res.redirect('/there-is-a-problem');
-        return;
+    if(!uriValidator(redirectUris , req , res  )){
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('postLogoutURIs', 'Enter your redirect URIs in the format https://example.com');
+        return res.render('dashboard/change-redirect-URIs.njk', {
+            errorMessages: errorMessages,
+            value: redirectUris.toString().replaceAll(",", " "),
+            serviceId: req.params.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId
+        });
     }
 
-    res.redirect(`/client-details/${req.params.serviceId}`);
+    const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    try {
+        await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {redirect_uris: redirectUris}, req.session.authenticationResult?.AccessToken as string);
+    } catch (error) {
+        console.log(error)
+        return res.redirect('/there-is-a-problem');
+    }
+    
+    req.session.updatedField = "redirect uris";
+    return res.redirect(`/client-details/${req.params.serviceId}`);
 });
 
 
