@@ -135,4 +135,15 @@ router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', (req
     res.redirect(`/client-details/${req.params.serviceId}`);
 });
 
+// Testing routes for Your account page
+router.get('/account', (req, res) => {
+    res.render("account/account.njk", {
+        emailAddress: 'your.email@digital.cabinet-office.gov.uk',
+        mobilePhoneNumber: '07123456789',
+        passwordLastChanged: 'Last changed 1 month ago',
+        serviceName: 'My juggling service'
+
+    });
+});
+
 export default router;

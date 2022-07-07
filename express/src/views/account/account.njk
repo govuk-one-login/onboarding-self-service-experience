@@ -1,0 +1,86 @@
+{% extends "../layout-dashboard.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-no-left-nav-account" %}
+{% set active = 'your-account' %}
+
+{% block pageTitle %}
+  Your account - GOV.UK Sign In
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        
+        <h1 class="govuk-heading-l govuk-!-margin-top-4 govuk-!-margin-bottom-4">Your account</h1>
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: {
+              text: "Email address"
+            },
+              value: {
+              text: emailAddress
+            },
+              actions: {
+              items: [
+                {
+                  href: '/change-email-address',
+                  text: "Change",
+                  visuallyHiddenText: "email address"
+                }
+              ]
+            }
+            },
+            {
+              key: {
+              text: "Mobile phone number"
+            },
+              value: {
+              text: mobilePhoneNumber
+            },
+              actions: {
+              items: [
+                {
+                  href: '/change-phone-number',
+                  text: "Change",
+                  visuallyHiddenText: "mobile phone number"
+                }
+              ]
+            }
+            },
+            {
+              key: {
+              text: "Password"
+            },
+              value: {
+              text: passwordLastChanged
+            },
+              actions: {
+              items: [
+                {
+                  href: '/change-password',
+                  text: "Change",
+                  visuallyHiddenText: "password"
+                }
+              ]
+            }
+            }
+          ]
+        }) }}
+
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-3">Services</h2>
+        <div class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">{{ serviceName }}</div>
+        <div class="govuk-body govuk-!-margin-bottom-2"><a class="govuk-link" href="/client-details">View service</a></div>
+        <div class="govuk-body"><a class="govuk-link" href="/change-service-name">Change service name</a></div>
+        <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5 govuk-!-margin-top-4">
+        <p class="govuk-body">In future, you’ll be able to add more services and switch between them.</p>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
