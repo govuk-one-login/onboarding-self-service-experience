@@ -1,5 +1,6 @@
 import express, {Request, Response} from 'express';
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
+import {urisValidator} from "../middleware/urisValidator";
 
 const router = express.Router();
 
@@ -43,24 +44,8 @@ router.get('/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId', (r
     });
 });
 
-router.post('/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId', async (req, res) => {
-    let redirectURIs = req.body.redirectURIs;
-    if (redirectURIs === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set('redirectURIs', 'Enter your redirect URIs');
-        res.render('dashboard/change-redirect-URIs.njk', {
-            errorMessages: errorMessages,
-            value: req.body.redirectURIs,
-            serviceId: req.params.serviceId,
-            selfServiceClientId: req.params.selfServiceClientId,
-            clientId: req.params.clientId
-        });
-        return;
-    }
-
-    // further error handling around a valid array of valid URIs
-
-    const redirectUris = req.body.redirectURIs.split(" ");
+router.post('/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId', urisValidator("dashboard/change-redirect-URIs.njk", "redirectURIs"), async (req, res) => {
+    const redirectUris = req.body.redirectURIs.split(" ").filter((url: string) => url !== "");
 
     const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
     let result;
@@ -71,7 +56,7 @@ router.post('/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId', a
         res.redirect('/there-is-a-problem');
         return;
     }
-
+    req.session.updatedField = "redirect URLs";
     res.redirect(`/client-details/${req.params.serviceId}`);
 });
 
@@ -93,24 +78,24 @@ router.post('/change-user-attributes/:serviceId/:selfServiceClientId/:clientId',
 // Testing routes for Change your post logout redirect URIs page
 router.get('/change-post-logout-URIs/:serviceId/:selfServiceClientId/:clientId', (req, res) => {
     res.render("dashboard/change-post-logout-URIs.njk", {
-        value: req.query?.clientName || 'My juggling service', // this is not clientName
+        value: req.query?.redirectUris, // this is not clientName
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId
     });
 });
 
-router.post('/change-post-logout-URIs/:serviceId/:selfServiceClientId/:clientId', (req, res) => {
-    let clientName = req.body.postLogoutURIs;
-    if (clientName === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set('postLogoutURIs', 'Enter your post logout redirect URIs');
-        res.render('dashboard/change-post-logout-URIs.njk', {
-            errorMessages: errorMessages,
-            clientId: req.params.clientId
-        });
+router.post('/change-post-logout-URIs/:serviceId/:selfServiceClientId/:clientId', urisValidator("dashboard/change-post-logout-URIs.njk", "postLogoutURIs"), async (req, res) => {
+    let postLogoutURIs = req.body.postLogoutURIs.split(" ").filter((url: string) => url !== "");
+    const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    try {
+        await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {post_logout_redirect_uris: postLogoutURIs}, req.session.authenticationResult?.AccessToken as string);
+    } catch (error) {
+        console.log(error)
+        res.redirect('/there-is-a-problem');
         return;
     }
+    req.session.updatedField = "post-logout redirect URLs";
     res.redirect(`/client-details/${req.params.serviceId}`);
 });
 
