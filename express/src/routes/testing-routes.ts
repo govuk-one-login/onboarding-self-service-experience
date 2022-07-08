@@ -82,10 +82,10 @@ router.post('/change-user-attributes/:serviceId/:selfServiceClientId/:clientId',
     const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
     const attributes: string[] = ["openid"];
 
-    if(Array.isArray(req.body.userAttributes)) {
-        attributes.push( ...req.body.userAttributes );
-    } else if( typeof req.body.userAttributes === "string" ) {
-        attributes.push( req.body.userAttributes );
+    if (Array.isArray(req.body.userAttributes)) {
+        attributes.push(...req.body.userAttributes);
+    } else if (typeof req.body.userAttributes === "string") {
+        attributes.push(req.body.userAttributes);
     }
 
     console.log(attributes)
@@ -139,14 +139,22 @@ router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', asyn
     if (publicKey === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set('serviceUserPublicKey', 'Paste in a public key');
-        res.render('dashboard/change-public-key.njk', {errorMessages: errorMessages, clientId: req.params.clientId});
+        res.render('dashboard/change-public-key.njk', {
+            errorMessages: errorMessages, serviceId: req.params.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId
+        });
         return;
     }
 
     if (!publicKey.startsWith("-----BEGIN PUBLIC KEY-----") || !publicKey.endsWith("-----END PUBLIC KEY-----")) {
         const errorMessages = new Map<string, string>();
         errorMessages.set('serviceUserPublicKey', 'Enter a valid public key in PEM format, including the headers');
-        res.render('dashboard/change-public-key.njk', {errorMessages: errorMessages, clientId: req.params.clientId});
+        res.render('dashboard/change-public-key.njk', {
+            errorMessages: errorMessages, serviceId: req.params.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId
+        });
         return;
     }
 
@@ -157,7 +165,7 @@ router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', asyn
 
     const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
     try {
-       await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {public_key: publicKey}, req.session.authenticationResult?.AccessToken as string);
+        await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {public_key: publicKey}, req.session.authenticationResult?.AccessToken as string);
     } catch (error) {
         console.log(error)
         res.redirect('/there-is-a-problem');
