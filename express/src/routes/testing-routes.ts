@@ -1,6 +1,9 @@
 import express, {Request, Response} from 'express';
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {urisValidator} from "../middleware/urisValidator";
+import {createPublicKey} from 'crypto';
+import getAuthApiCompliantPublicKey from '../lib/publicKeyUtils/public-key-utils'
+import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 
 const router = express.Router();
 
@@ -134,35 +137,9 @@ router.get('/change-public-key/:serviceId/:selfServiceClientId/:clientId', (req,
     });
 });
 
-router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', async (req, res) => {
-    let publicKey = req.body.serviceUserPublicKey;
-    if (publicKey === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set('serviceUserPublicKey', 'Paste in a public key');
-        res.render('dashboard/change-public-key.njk', {
-            errorMessages: errorMessages, serviceId: req.params.serviceId,
-            selfServiceClientId: req.params.selfServiceClientId,
-            clientId: req.params.clientId
-        });
-        return;
-    }
+router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', convertPublicKeyForAuth, async (req, res) => {
 
-    if (!publicKey.startsWith("-----BEGIN PUBLIC KEY-----") || !publicKey.endsWith("-----END PUBLIC KEY-----")) {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set('serviceUserPublicKey', 'Enter a valid public key in PEM format, including the headers');
-        res.render('dashboard/change-public-key.njk', {
-            errorMessages: errorMessages, serviceId: req.params.serviceId,
-            selfServiceClientId: req.params.selfServiceClientId,
-            clientId: req.params.clientId
-        });
-        return;
-    }
-
-    if (publicKey.startsWith("-----BEGIN PUBLIC KEY-----") && publicKey.endsWith("-----END PUBLIC KEY-----")) {
-        // remove the -----BEGIN PUBLIC KEY----- and -----END PUBLIC KEY-----
-        publicKey = publicKey.substring(26, publicKey.length - 24);
-    }
-
+    const publicKey = req.body.authCompliantPublicKey as string;
     const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
     try {
         await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {public_key: publicKey}, req.session.authenticationResult?.AccessToken as string);
