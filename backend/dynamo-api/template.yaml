@@ -8,6 +8,9 @@ Parameters:
   AuthRegistrationBaseUrl:
     Type: String
     Description: API Gateway endpoint for client registration
+  DynamoDbTableStackName:
+    Type: String
+    Description: The name of the stack exporting the table we want
 
 Resources:
 
@@ -22,13 +25,13 @@ Resources:
       Timeout: 100
       Description: A simple example includes a HTTP post method to add one item to a DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
-            TableName: 'onboarding'
+            TableName: !ImportValue
+              'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
-          TABLE: 'onboarding'
+          TABLE: !ImportValue
+                   'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Events:
         Api:
           Type: Api
@@ -57,10 +60,12 @@ Resources:
       Description: Retrieve a user item from the table.
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: 'onboarding'
+            TableName: !ImportValue
+              'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
-          TABLE: 'onboarding'
+          TABLE: !ImportValue
+            'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Events:
         Api:
           Type: Api
@@ -88,13 +93,13 @@ Resources:
       Timeout: 100
       Description: A simple example includes a HTTP post method to add a service to a DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
-            TableName: 'onboarding'
+            TableName: !ImportValue
+              'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
-          TABLE: 'onboarding'
+          TABLE: !ImportValue
+            'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Events:
         Api:
           Type: Api
@@ -122,12 +127,13 @@ Resources:
       Timeout: 100
       Description: Return services related to a given userId.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
-            TableName: 'onboarding'
+            TableName: !ImportValue
+              'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
-          TABLE: 'onboarding'
+          TABLE: !ImportValue
+            'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
 
       Events:
         Api:
@@ -157,10 +163,12 @@ Resources:
       Description: Return services related to a given userId.
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: 'onboarding'
+            TableName: !ImportValue
+              'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
-          TABLE: 'onboarding'
+          TABLE: !ImportValue
+            'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
 
       Events:
         Api:
@@ -249,13 +257,13 @@ Resources:
       Timeout: 100
       Description: A simple example includes a HTTP post method to add a service to a DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
-            TableName: 'onboarding'
+            TableName: !ImportValue
+              'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
-          TABLE: 'onboarding'
+          TABLE: !ImportValue
+            'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -276,13 +284,13 @@ Resources:
       Timeout: 100
       Description: Update service client in DDB.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
-            TableName: 'onboarding'
+            TableName: !ImportValue
+              'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
-          TABLE: 'onboarding'
+          TABLE: !ImportValue
+            'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -303,13 +311,13 @@ Resources:
       Timeout: 100
       Description: A simple example includes a HTTP post method to add a service to a DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
-            TableName: 'onboarding'
+            TableName: !ImportValue
+              'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
-          TABLE: 'onboarding'
+          TABLE: !ImportValue
+            'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -566,6 +574,6 @@ Resources:
     Type: AWS::Logs::LogGroup
 
 Outputs:
-  WebEndpoint:
-    Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  ApiBaseUrl:
+    Description: "API base URL - URL used by Express frontend - supplied as an env var."
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
