@@ -152,6 +152,16 @@ router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', conv
     res.redirect(`/client-details/${req.params.serviceId}`);
 });
 
+// Testing routes for Your account page
+router.get('/account', (req, res) => {
+    res.render("account/account.njk", {
+        emailAddress: 'your.email@digital.cabinet-office.gov.uk',
+        mobilePhoneNumber: '07123456789',
+        passwordLastChanged: 'Last changed 1 month ago',
+        serviceName: 'My juggling service'
+     });
+});
+
 // Testing route for "Finish connecting the sign in journey to your service" page
 router.get('/redirect-placeholder', (req, res) => {
     res.render("dashboard/finish-connecting-sign-in-journey.njk", {
