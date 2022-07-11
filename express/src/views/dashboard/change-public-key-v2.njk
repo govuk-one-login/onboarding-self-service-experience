@@ -1,0 +1,155 @@
+{% extends "../layout-dashboard.njk" %}
+{% from "../macros/error-summary.njk" import errorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav" %}
+
+{% block pageTitle %}
+  Change public key - GOV.UK Sign In
+{% endblock %}
+
+{% block beforeContent %}
+
+{% endblock %}
+
+
+{% block content %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-body govuk-!-font-weight-bold">{{ serviceName }}</div>
+    <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <nav class="sub-navigation govuk-!-margin-top-3">
+          <ul class="govuk-list sub_navigation_list_2">
+            <li class="sub-navigation__item sub-navigation__item--active">
+              {# When attached to backend to be replaced with : href="/client-details/{{serviceId}}" #}
+              <a class="govuk-link govuk-link--no-visited-state" href="/client-details-mocked">Client details</a>
+            </li>
+            <li class="sub-navigation__item">
+              <a class="govuk-link govuk-link--no-visited-state" href="#">Joining private beta</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+
+        {{ errorSummary ({
+          errors:  errorMessages,
+          hrefs: {
+            'serviceUserPublicKey': '#serviceUserPublicKey',
+            'serviceUserPublicKeyText': '#serviceUserPublicKeyText',
+            'serviceUserPublicKeyFile': '#serviceUserPublicKeyFile'
+          }
+        }) }}
+
+        <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
+
+        <p class="govuk-body">You need to <a class="govuk-link" href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/generate-a-key/" rel="noreferrer noopener" target="_blank">generate a key pair (opens in new tab)</a> and add the public key. This is so our services can securely send messages to each other.</p>
+
+        {% if currentPublicKey %}
+          {% set currentPublicKeyBlock %}
+            <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">Current public key</p>
+            <p class="govuk-body current-public-key-container">{{ currentPublicKey }}</p>
+          {% endset -%}
+          {{ govukInsetText({
+            html: currentPublicKeyBlock
+          }) }}
+        {% endif %}
+
+        <form class="form" action="/change-public-key-v2/{{serviceId}}/{{selfServiceClientId}}/{{clientId}}" method="post">
+
+          {% set textFieldHtml %}
+            {{ govukTextarea({
+              name: "serviceUserPublicKeyText",
+              id: "serviceUserPublicKeyText",
+              label: {
+                text: "Public key"
+              },
+              hint: {
+                text: "Paste in the entire public key in PEM format, including the headers"
+              },
+              value: value,
+              errorMessage: {
+                text:  errorMessages.get('serviceUserPublicKeyText')
+              } if errorMessages and errorMessages.has('serviceUserPublicKeyText')
+            }) }}
+          {% endset -%}
+
+          {% set fileUploadHtml %}
+            {{ govukFileUpload({
+              id: "serviceUserPublicKeyFile",
+              name: "serviceUserPublicKeyFile",
+              label: {
+                text: "Upload a file in .PEM format"
+              },
+              attributes: {
+                accept: ".pem"
+              },
+              errorMessage: {
+                text:  errorMessages.get('serviceUserPublicKeyFile')
+              } if errorMessages and errorMessages.has('serviceUserPublicKeyFile')
+            }) }}
+          {% endset -%}
+
+          {% if serviceUserPublicKey === 'text' %}
+            {% set textChecked = true %}
+          {% endif %}
+
+          {% if serviceUserPublicKey === 'file' %}
+            {% set fileChecked = true %}
+          {% endif %}
+
+          {{ govukRadios({
+            name: "serviceUserPublicKey",
+            id: "serviceUserPublicKey",
+            fieldset: {
+              legend: {
+                text: "Choose how to change your public key",
+                classes: "govuk-fieldset__legend--m"
+              }
+            },
+            items: [
+              {
+                text: "Paste in your public key",
+                value: "text",
+                checked: textChecked,
+                conditional: {
+                  html: textFieldHtml
+                }
+              },
+              {
+                text: "Upload your public key as a file",
+                value: "file",
+                checked: fileChecked,
+                conditional: {
+                  html: fileUploadHtml
+                }
+              }
+            ],
+            errorMessage: {
+              text:  errorMessages.get('serviceUserPublicKey')
+            } if errorMessages and errorMessages.has('serviceUserPublicKey')
+
+          }) }}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Confirm"
+            }) }}
+            {# When attached to backend to be replaced with : href="/client-details/{{serviceId}}" #}
+            <a class="govuk-link" href="/client-details-mocked">Cancel</a>
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+
+{% endblock %}
+

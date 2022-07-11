@@ -1,8 +1,6 @@
 import express, {Request, Response} from 'express';
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {urisValidator} from "../middleware/urisValidator";
-import {createPublicKey} from 'crypto';
-import getAuthApiCompliantPublicKey from '../lib/publicKeyUtils/public-key-utils'
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 
 const router = express.Router();
@@ -186,6 +184,83 @@ router.post('/change-service-name', async (req, res) => {
         return;
     }
     res.redirect('/account');
+});
+
+////
+// Testing routes for Change your public key page version 2
+////
+
+//// Testing route without public key - "First time change"
+router.get('/change-public-key-v2', (req, res) => {
+    res.render("dashboard/change-public-key-v2.njk", {
+        serviceId: 'mockedServiceId',
+        selfServiceClientId: 'mockedSelfServiceClientId',
+        clientId: 'mockedClientId',
+        serviceName: 'My juggling service'
+    });
+});
+//// Testing route with public key - "Returning change"
+router.get('/change-public-key-v2-returning', (req, res) => {
+    res.render("dashboard/change-public-key-v2.njk", {
+        serviceId: 'mockedServiceId',
+        selfServiceClientId: 'mockedSelfServiceClientId',
+        clientId: 'mockedClientId',
+        serviceName: 'My juggling service',
+        currentPublicKey: 'gkqhkiG9w0BAQEFBBCCCQ8AMIIBCgKCAQEAozeSawLorZgEDia67XkRn61xmh/NyaI+lXxEDpip713csnGBWPGRdePw7/a/nGoLbOFC37rmEA05e7pKaklLTuceDaeTe/KPDorZcdnn8HO8HBVe8bgpsuNnf6QpWERPKHn78WNeA50apBkkB2GafqFn7tVr4HxwTwCaPuAtBhb+MBWz02OzA1g4XBPApXS+CZs7j3aUpSOYBUMshIAbQAlqwp+TfXDnnBS73w+IrbOhWhnPnZ7zVz8QqKt00FAqhvUInDQQFpNS9a0O2aHND2X3Nw7717yZdthjXWiMTj5DSJF4kd6QD6WITUqqhmarhO1qyM9uxKr7W9mteU+7wIDAQABMIIBIjANB'
+    });
+});
+//// Testing post route to test error messages
+router.post('/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/mockedClientId', async (req, res) => {
+    let serviceUserPublicKey = req.body.serviceUserPublicKey;
+    let serviceUserPublicKeyText = req.body.serviceUserPublicKeyText;
+    let serviceUserPublicKeyFile = req.body.serviceUserPublicKeyFile;
+
+    if (serviceUserPublicKey === "text" && serviceUserPublicKeyText ==="") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('serviceUserPublicKeyText', 'Enter a public key');
+        res.render('dashboard/change-public-key-v2.njk', {
+            errorMessages: errorMessages,
+            serviceId: 'mockedServiceId',
+            selfServiceClientId: 'mockedSelfServiceClientId',
+            clientId: 'mockedClientId',
+            serviceName: 'My juggling service',
+            serviceUserPublicKey: 'text'
+        });
+        return;
+    }
+
+    if (serviceUserPublicKey === "file" && serviceUserPublicKeyFile ==="") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('serviceUserPublicKeyFile', 'Upload a file');
+        res.render('dashboard/change-public-key-v2.njk', {
+            errorMessages: errorMessages,
+            serviceId: 'mockedServiceId',
+            selfServiceClientId: 'mockedSelfServiceClientId',
+            clientId: 'mockedClientId',
+            serviceName: 'My juggling service',
+            serviceUserPublicKey: 'file'
+        });
+        return;
+    }
+
+    if (serviceUserPublicKeyText === "" && serviceUserPublicKeyFile === "" ) {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('serviceUserPublicKey', 'Choose how to change your public key');
+        res.render('dashboard/change-public-key-v2.njk', {
+            errorMessages: errorMessages,
+            serviceId: 'mockedServiceId',
+            selfServiceClientId: 'mockedSelfServiceClientId',
+            clientId: 'mockedClientId',
+            serviceName: 'My juggling service'
+        });
+        return;
+    }
+
+    res.redirect('/client-details-mocked');
+});
+//// Testing route to redirect to client details
+router.get('/client-details-mocked', (req, res) => {
+    res.render("dashboard/client-details.njk");
 });
 
 export default router;
