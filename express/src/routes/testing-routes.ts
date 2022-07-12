@@ -170,4 +170,22 @@ router.get('/account', (req, res) => {
     });
 });
 
+// Testing routes for Change your service name page
+router.get('/change-service-name', (req, res) => {
+    res.render("account/change-service-name.njk", {
+        serviceName: 'My juggling service'
+    });
+});
+
+router.post('/change-service-name', async (req, res) => {
+    let serviceName = req.body.serviceName;
+    if (serviceName === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('serviceName', 'Enter your service name');
+        res.render('account/change-service-name.njk', {errorMessages: errorMessages});
+        return;
+    }
+    res.redirect('/account');
+});
+
 export default router;
