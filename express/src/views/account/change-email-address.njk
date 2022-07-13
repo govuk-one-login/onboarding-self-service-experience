@@ -1,0 +1,51 @@
+{% extends "../layout-dashboard.njk" %}
+{% from "../macros/error-summary.njk" import errorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-no-left-nav-account" %}
+{% set active = 'your-account' %}
+
+{% block pageTitle %}
+  Change email address - GOV.UK Sign In
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {{ errorSummary ({
+          errors:  errorMessages,
+          hrefs: {
+            'emailAddress': '#emailAddress'
+          }
+        }) }}
+        <h1 class="govuk-heading-l govuk-!-margin-top-4 govuk-!-margin-bottom-4">Change your email address</h1>
+        <form class="form" action="/change-email-address" method="post">
+          {{ govukInput({
+            label: {
+              text: "Email address"
+            },
+            hint: {
+              text: "Must be a government email address"
+            },
+            name: "emailAddress",
+            id: "emailAddress",
+            classes: "govuk-!-width-full",
+            value: emailAddress,
+            errorMessage: {
+              text:  errorMessages.get('emailAddress')
+            } if  errorMessages else false
+          }) }}
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Confirm"
+            }) }}
+            <a class="govuk-link" href="/account">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

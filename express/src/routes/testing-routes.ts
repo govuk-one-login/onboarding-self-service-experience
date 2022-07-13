@@ -2,6 +2,7 @@ import express, {Request, Response} from 'express';
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {urisValidator} from "../middleware/urisValidator";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
+import {emailValidator} from "../middleware/emailValidator";
 
 const router = express.Router();
 
@@ -261,6 +262,17 @@ router.post('/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/moc
 //// Testing route to redirect to client details
 router.get('/client-details-mocked', (req, res) => {
     res.render("dashboard/client-details.njk");
+});
+
+// Testing routes for Change your email address page
+router.get('/change-email-address', (req, res) => {
+    res.render("account/change-email-address.njk", {
+        emailAddress: 'your.email@digital.cabinet-office.gov.uk'
+    });
+});
+
+router.post('/change-email-address', emailValidator('account/change-email-address.njk'), async (req, res) => {
+    res.redirect('/account');
 });
 
 export default router;

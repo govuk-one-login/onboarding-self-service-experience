@@ -23,7 +23,7 @@ export function emailValidator(render: string): MiddlewareFunction<Request, Resp
         }
 
         if (!await isAllowedDomain(emailAddress)) {
-            await errorResponse(render, emailAddress, res, 'emailAddress', 'Please ensure that you are using a .gov.uk email address.');
+            await errorResponse(render, emailAddress, res, 'emailAddress', 'Enter a government email address');
             return;
         }
 
