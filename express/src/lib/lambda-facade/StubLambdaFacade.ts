@@ -40,4 +40,5 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         return Promise.resolve({} as AxiosResponse);
     }
 }
+
 export const lambdaFacadeInstance = new StubLambdaFacade();

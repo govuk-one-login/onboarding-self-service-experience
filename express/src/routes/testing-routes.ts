@@ -1,4 +1,4 @@
-import express, {Request, Response} from 'express';
+import express from 'express';
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {urisValidator} from "../middleware/urisValidator";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";

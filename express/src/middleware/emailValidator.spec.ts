@@ -1,6 +1,6 @@
 import {assert} from "chai";
 import {isAllowedDomain} from "./emailValidator";
-import isRfc822Compliant from "../lib/isRfc822Compliant";
+import isRfc822Compliant from "../lib/rfc822-validate";
 
 const EMAIL_WITH_ALLOWED_DOMAIN = 'allowed@email.gov.uk';
 const EMAIL_WITH_DISALLOWED_DOMAIN = 'allowed@hackers.co.uk';
@@ -35,4 +35,3 @@ describe('Checking that well formed email addresses are accepted and badly forme
         assert.equal(isRfc822Compliant(EMAIL_WITH_NO_AT_SYMBOL), false, `Expected ${EMAIL_COMPLYING_WITH_RFC822} to be rejected as invalid`);
     })
 });
-

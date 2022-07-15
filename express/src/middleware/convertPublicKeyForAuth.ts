@@ -1,10 +1,10 @@
 import {NextFunction, Request, Response} from "express";
-import getAuthApiCompliantPublicKey from "../lib/publicKeyUtils/public-key-utils";
+import getAuthApiCompliantPublicKey from "../lib/publicKeyUtils";
 
 export function convertPublicKeyForAuth(req: Request, res: Response, next: NextFunction) {
 
     try {
-        req.body.authCompliantPublicKey =  getAuthApiCompliantPublicKey(req.body.serviceUserPublicKey as string);
+        req.body.authCompliantPublicKey = getAuthApiCompliantPublicKey(req.body.serviceUserPublicKey as string);
     } catch (err) {
         console.log(err)
         const errorMessages = new Map<string, string>();
@@ -16,5 +16,6 @@ export function convertPublicKeyForAuth(req: Request, res: Response, next: NextF
         });
         return;
     }
+
     next();
 }
