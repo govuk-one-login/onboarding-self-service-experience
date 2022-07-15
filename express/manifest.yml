@@ -4,5 +4,5 @@ applications:
     memory: 512M
     disk_quota: 512M
     env:
-      COGNITO_CLIENT: "StubCognitoClient"
-      LAMBDA_FACADE: "StubLambdaFacade"
+      COGNITO_CLIENT: ((cognito-client))
+      LAMBDA_FACADE: ((lambda-facade))

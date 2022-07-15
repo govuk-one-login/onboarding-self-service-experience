@@ -4,20 +4,23 @@ on:
   workflow_call:
     inputs:
       environment: { required: true, type: string }
-      cf_space_name: { required: true, type: string }
-      app_name: { required: false, type: string }
+      cf-space-name: { required: true, type: string }
+      app-name-prefix: { required: false, type: string }
       url: { required: false, type: string }
       instances: { required: false, type: number, default: 1 }
-      rolling_deployment: { required: false, type: boolean, default: false }
-      cognito_client: { required: false, type: string, default: "CognitoClient"}
-      lambda_facade: { require: false, tyep: string, default: "LambdaFacade" }
+      rolling-deployment: { required: false, type: boolean, default: false }
+      cognito-client: { required: false, type: string, default: CognitoClient }
+      lambda-facade: { required: false, type: string, default: LambdaFacade }
     secrets:
-      cf_username: { required: true }
-      cf_password: { required: true }
+      cf-username: { required: true }
+      cf-password: { required: true }
     outputs:
-      deployment_url:
+      deployment-url:
         description: "The PaaS deployment URL"
-        value: ${{ jobs.deploy.outputs.deployment_url }}
+        value: ${{ jobs.deploy.outputs.deployment-url }}
+
+concurrency:
+  group: deploy-${{ github.head_ref || github.ref_name }}
 
 jobs:
   deploy:
@@ -25,55 +28,25 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
-      url: ${{ steps.set_deployment_url.outputs.deployment_url }}
+      url: ${{ steps.push-to-paas.outputs.deployment-url }}
     outputs:
-      deployment_url: ${{ steps.set_deployment_url.outputs.deployment_url }}
+      deployment-url: ${{ steps.push-to-paas.outputs.deployment-url }}
     steps:
       - name: Get distribution artifact
         uses: actions/download-artifact@v2
         with:
-          name: self-service
-
-      - name: Install Cloud Foundry client
-        env:
-          CF_CLI_DOWNLOAD_URL: https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github&version=v7
-        run: |
-          curl -sL ${CF_CLI_DOWNLOAD_URL} | sudo tar -zx -C /usr/local/bin
-          cf version
-
-      - name: Set deployment hostname
-        id: set_deployment_hostname
-        if: ${{ inputs.app_name != null }}
-        run: |
-          # Downcase the hostname and limit length to 63 characters as per PaaS requirements
-          hostname=$(echo ${{ inputs.app_name }} | tr '[:upper:]' '[:lower:]' | tr '_' '-' | cut -c1-63)
-          echo "::set-output name=hostname::${hostname}"
-
-      - name: Set deployment URL
-        id: set_deployment_url
-        run: |
-          url=${{ inputs.url }}
-          hostname=${{ steps.set_deployment_hostname.outputs.hostname }}
-          deployment_url=$([[ $url ]] && echo $url || echo "https://${hostname}.london.cloudapps.digital")
-          echo "::set-output name=deployment_url::${deployment_url}"
-
-      - name: PaaS login
-        env:
-          CF_API_URL: https://api.london.cloud.service.gov.uk
-          CF_ORG_NAME: gds-digital-identity-onboarding
-          CF_SPACE_NAME: ${{ inputs.cf_space_name }}
-          CF_USERNAME: ${{ secrets.cf_username }}
-          CF_PASSWORD: ${{ secrets.cf_password }}
-        run: |
-          cf api ${CF_API_URL}
-          cf auth
-          cf target -o ${CF_ORG_NAME} -s ${CF_SPACE_NAME}
+          name: self-service-front
 
       - name: Push to PaaS
-        env:
-          ROLLING_DEPLOYMENT: ${{ inputs.rolling_deployment }}
-        run: |
-          cf push ${{ steps.set_deployment_hostname.outputs.hostname }} \
-            --instances ${{ inputs.instances }} $([[ $ROLLING_DEPLOYMENT == "true" ]] && echo --strategy rolling) \
-            --var cognito_client=${{ inputs.cognito_client }} \
-            --var lambda_facade=${{ inputs.lambda_facade }}
+        id: push-to-paas
+        uses: alphagov/di-github-actions/paas/deploy-app@6503ace389666495b9510daa9140d8dbd8eb4865
+        with:
+          app-name-prefix: ${{ inputs.app-name-prefix }}
+          cf-org-name: gds-digital-identity-onboarding
+          cf-space-name: ${{ inputs.cf-space-name }}
+          cf-username: ${{ secrets.cf-username }}
+          cf-password: ${{ secrets.cf-password }}
+          rolling-deployment: ${{ inputs.rolling-deployment }}
+          variables: |
+            cognito-client = ${{ inputs.cognito-client }}
+            lambda-facade = ${{ inputs.lambda-facade }}
