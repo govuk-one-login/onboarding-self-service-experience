@@ -293,4 +293,34 @@ router.post('/change-phone-number', async (req, res) => {
     res.redirect('/account');
 });
 
+// Testing routes for Check your email address page
+// The url needs to be updated when implementing functionality
+router.get('/check-email-visual-test', (req, res) => {
+    res.render("account/check-email.njk", {
+        emailAddress: 'email@address.com'
+    });
+});
+
+router.post('/check-email-visual-test', async (req, res) => {
+    let otp = req.body['change-email-otp'];
+    if (otp === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('change-email-otp', 'Your code should be 6 characters long');
+        res.render('account/check-email.njk', {errorMessages: errorMessages});
+        return;
+    }
+    res.redirect('/account');
+});
+
+//// Testing route to redirect to account page success screen
+router.get('/account-success-screen-test', (req, res) => {
+    res.render("account/account.njk", {
+        emailAddress: 'your.email@digital.cabinet-office.gov.uk',
+        mobilePhoneNumber: '07123456789',
+        passwordLastChanged: 'Last changed 1 month ago',
+        serviceName: 'My juggling service',
+        updatedField: 'email address'
+    });
+});
+
 export default router;
