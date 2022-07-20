@@ -275,4 +275,22 @@ router.post('/change-email-address', emailValidator('account/change-email-addres
     res.redirect('/account');
 });
 
+// Testing routes for Change your mobile number page
+router.get('/change-phone-number', (req, res) => {
+    res.render("account/change-phone-number.njk", {
+        value: '07666555555'
+    });
+});
+
+router.post('/change-phone-number', async (req, res) => {
+    let mobile = req.body.mobileNumber;
+    if (mobile === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('mobileNumber', 'Enter your mobile number');
+        res.render('account/change-phone-number.njk', {errorMessages: errorMessages});
+        return;
+    }
+    res.redirect('/account');
+});
+
 export default router;
