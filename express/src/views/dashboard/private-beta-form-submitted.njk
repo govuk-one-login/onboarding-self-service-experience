@@ -1,0 +1,41 @@
+{% extends "../layout-dashboard.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav" %}
+
+{% block pageTitle %}
+  Private beta form submitted - GOV.UK Sign In
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-body govuk-!-font-weight-bold">{{ serviceName }}</div>
+    <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <nav class="sub-navigation govuk-!-margin-top-3">
+          <ul class="govuk-list sub_navigation_list_2">
+            <li class="sub-navigation__item">
+              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client
+                details</a>
+            </li>
+            <li class="sub-navigation__item sub-navigation__item--active">
+              <a class="govuk-link govuk-link--no-visited-state" href="#">Joining private beta</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukPanel({
+          titleText: "Form submitted",
+          classes: "govuk-!-margin-top-5 govuk-!-margin-bottom-6"
+        }) }}
+        <p class="govuk-body">Thank you for requesting to talk to us about joining the private beta. We’ll be in touch within 5 working days.</p>
+        <p class="govuk-body">If you have any questions in the meantime, contact us using our <a class="govuk-link" href="https://www.sign-in.service.gov.uk/contact-us">support form</a> or via our <a class="govuk-link" href="https://ukgovernmentdigital.slack.com/archives/C02AQUJ6WTC">Slack channel</a>.</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
