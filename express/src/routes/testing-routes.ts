@@ -370,4 +370,11 @@ router.post('/change-password', async (req, res) => {
     res.redirect('/account');
 });
 
+//// Testing route 'Form submitted' page for private beta
+router.get('/private-beta-form-submitted', (req, res) => {
+    res.render("dashboard/private-beta-form-submitted.njk", {
+        serviceName: 'My juggling service'
+    });
+});
+
 export default router;
