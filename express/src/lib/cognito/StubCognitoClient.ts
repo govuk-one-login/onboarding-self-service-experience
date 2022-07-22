@@ -1,18 +1,17 @@
 import CognitoInterface from "./CognitoInterface";
+import {ServiceException} from '@aws-sdk/smithy-client/dist-types/exceptions'
+import {promises as fs} from "fs";
 
 import {
-    AdminGetUserCommandOutput,
     AdminCreateUserCommandOutput,
+    AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
     AdminUpdateUserAttributesCommandOutput,
     GetUserAttributeVerificationCodeCommandOutput,
     RespondToAuthChallengeCommandOutput,
-    VerifyUserAttributeCommandOutput, UsernameExistsException
+    UsernameExistsException,
+    VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
-
-import { ServiceException } from '@aws-sdk/smithy-client/dist-types/exceptions'
-import {promises as fs} from "fs";
-import {Override, Overrides} from "../../../@types/StubCognitoClient";
 
 export class CognitoClient implements CognitoInterface {
     overrides: Promise<any>;
@@ -117,7 +116,7 @@ export class CognitoClient implements CognitoInterface {
         return JSON.parse(overrides)[method];
     }
 
-    private getException(exception: string): ServiceException  {
+    private getException(exception: string): ServiceException {
         switch (exception) {
             case 'UsernameExistsException' :
                 return new UsernameExistsException({$metadata: {}});

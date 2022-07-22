@@ -1,13 +1,12 @@
 import {NextFunction, Request, Response} from "express";
 import allowedEmailDomains from "../lib/allowedEmailDomains";
 
-import isRfc822Compliant from "../lib/isRfc822Compliant";
+import isRfc822Compliant from "../lib/rfc822-validate";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
-export function emailValidator(render: string): MiddlewareFunction<Request, Response, NextFunction>
-{
-    return async (req: Request, res: Response, next: NextFunction) =>
-    {
+
+export function emailValidator(render: string): MiddlewareFunction<Request, Response, NextFunction> {
+    return async (req: Request, res: Response, next: NextFunction) => {
         let emailAddress: string = req.body.emailAddress;
 
         emailAddress = emailAddress.trim();

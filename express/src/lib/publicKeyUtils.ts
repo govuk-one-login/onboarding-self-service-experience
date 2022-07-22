@@ -28,5 +28,4 @@ export default function getAuthApiCompliantPublicKey(publicKey: string): string 
     }
 
     throw new Error(`Failed to convert\n${publicKeyWithHeaders}\n`)
-
 }
