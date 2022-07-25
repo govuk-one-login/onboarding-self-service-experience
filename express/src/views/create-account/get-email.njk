@@ -24,30 +24,34 @@
             }
         }) }}
 
-        <h1 class="govuk-heading-l">Enter your email address</h1>
+        <h1 class="govuk-heading-l">Enter your government email address</h1>
 
+        <p class="govuk-body">You can only use this service if you have an email address that ends in:</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>gov.uk</li>
+          <li>highwaysengland.co.uk</li>
+          <li>socialworkengland.org.uk</li>
+        </ul>
+        <p class="govuk-body"><a class="govuk-link" href="https://www.sign-in.service.gov.uk/contact-us">Contact us</a> if you have a government email address that is not covered by this list.</p>
         <form class="form" action="/create/get-email" method="post">
 
           {{ govukInput({
               label: {
-                  text: "Email address"
-              },
-              hint: {
-                  text: "Must be a government email address"
+                  text: "Government email address"
               },
               name: "emailAddress",
               id: "email",
-              classes: "govuk-!-width-three-quarters",
+              classes: "govuk-!-width-three-quarters govuk-!-margin-top-3",
               errorMessage: {
                   text: errorMessages.get('emailAddress')
               } if errorMessages else false,
-              value: values.email
+              value: values.get('emailAddress') if values
 
           }) }}
 
-          <h2 class="govuk-heading-m">Agree to our privacy notice</h2>
-          <p class="govuk-body">We will collect and save your information securely. We will not share your personal information without your consent.</p>
-          <p class="govuk-body govuk-!-margin-bottom-6">By continuing, you confirm that you agree to our <a class="govuk-link" href="https://www.sign-in.service.gov.uk/privacy-policy">privacy notice</a>.</p>
+          <h2 class="govuk-heading-m">Read our privacy notice</h2>
+          <p class="govuk-body govuk-!-margin-bottom-6">By continuing, you confirm that you agree to our <a class="govuk-link" href="https://www.sign-in.service.gov.uk/privacy-policy">privacy notice</a>.
+            It sets out how we use your personal information.</p>
 
           <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
             Continue

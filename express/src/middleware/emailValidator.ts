@@ -34,7 +34,8 @@ export function emailValidator(render: string): MiddlewareFunction<Request, Resp
 export function errorResponse(render: string, emailAddress: string, res: Response, key: string, message: string) {
     const errorMessages = new Map<string, string>();
     errorMessages.set(key, message);
-    let values = {email: emailAddress};
+    let values = new Map();
+    values.set(key, emailAddress);
     res.render(render, {
         errorMessages: errorMessages,
         values: values
@@ -42,5 +43,5 @@ export function errorResponse(render: string, emailAddress: string, res: Respons
 }
 
 export async function isAllowedDomain(emailAddress: string): Promise<boolean> {
-    return (await allowedEmailDomains).filter((domain: string) => emailAddress.endsWith(`.${domain}`)).length > 0;
+    return (await allowedEmailDomains).filter((domain: string) => emailAddress.endsWith(`${domain}`)).length > 0;
 }
