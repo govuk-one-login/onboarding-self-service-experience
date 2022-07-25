@@ -262,7 +262,9 @@ router.post('/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/moc
 });
 //// Testing route to redirect to client details
 router.get('/client-details-mocked', (req, res) => {
-    res.render("dashboard/client-details.njk");
+    res.render("dashboard/client-details.njk", {
+        serviceName: 'My juggling service'
+    });
 });
 
 // Testing routes for Change your email address page
