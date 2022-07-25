@@ -1,18 +1,12 @@
 {% extends "../layout-dashboard.njk" %}
 {% from "../macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav" %}
 
 {% block pageTitle %}
   Change redirect URIs - GOV.UK Sign In
 {% endblock %}
-
-{% block beforeContent %}
-
-{% endblock %}
-
 
 {% block content %}
 
@@ -27,7 +21,7 @@
               <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{serviceId}}">Client details</a>
             </li>
             <li class="sub-navigation__item">
-              <a class="govuk-link govuk-link--no-visited-state" href="#">Joining private beta</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="/private-beta">Joining private beta</a>
             </li>
           </ul>
         </nav>
