@@ -9,6 +9,7 @@ import manageAccount from "./routes/manage-account";
 
 import testingRoutes from "./routes/testing-routes";
 import {User} from "../@types/User";
+import {setSignedInStatus} from "./middleware/setSignedInStatus/setSignedInStatus";
 
 const app = express();
 import(`./lib/cognito/${process.env.COGNITO_CLIENT||"CognitoClient"}`).then(
@@ -47,10 +48,13 @@ declare module 'express-session' {
         cognitoUser: AdminGetUserCommandOutput;
         selfServiceUser: User;
         updatedField: string;
+        isSignedIn: boolean;
     }
 }
 
 configureViews(app);
+
+app.use(setSignedInStatus);
 
 app.use("/", createAccount);
 app.use("/", signIn);
