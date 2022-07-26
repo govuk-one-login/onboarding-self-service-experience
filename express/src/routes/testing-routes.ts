@@ -434,5 +434,13 @@ router.post('/private-beta', async (req, res) => {
 
     res.redirect('/private-beta-form-submitted');
 });
+// Testing route for testing when the private beta request has already been submitted.
+router.get('/private-beta-submitted', (req, res) => {
+    res.render("dashboard/private-beta.njk", {
+        serviceName: 'My juggling service',
+        privateBetaRequestSubmitted: true,
+        dateRequestSubmitted: '10 May 2022'
+    });
+});
 
 export default router;

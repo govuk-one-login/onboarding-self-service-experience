@@ -47,62 +47,71 @@
         <p class="govuk-body">Submit your details and we’ll get in touch with you about joining the private beta.</p>
         <p class="govuk-body">We’ll arrange to talk more with your team about your service and what the private beta involves.</p>
 
-        <form class="form" action="/private-beta" method="post">
+        {% if privateBetaRequestSubmitted %}
 
-          {{ govukInput({
-            label: {
-              text: "Your name"
-            },
-            name: "yourName",
-            id: "yourName",
-            classes: "govuk-!-width-full",
-            value: value.yourName,
-            errorMessage: {
-              text: errorMessages.get('yourName')
-            } if errorMessages and errorMessages.has('yourName')
-          }) }}
+          <div class="govuk-inset-text">
+            You submitted your details on {{ dateRequestSubmitted }}.
+          </div>
 
-          {{ govukInput({
-            label: {
-              text: "Department"
-            },
-            name: "department",
-            id: "department",
-            classes: "govuk-!-width-full",
-            value: value.department,
-            errorMessage: {
-              text: errorMessages.get('department')
-            } if errorMessages and errorMessages.has('department')
-          }) }}
+        {% else %}
 
-          <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">Information we already have</p>
+          <form class="form" action="/private-beta" method="post">
 
-          {{ govukSummaryList({
-            rows: [
-              {
-                key: {
-                  text: "Email address"
-                },
-                value: {
-                  text: emailAddress
-                }
+            {{ govukInput({
+              label: {
+                text: "Your name"
               },
-              {
-                key: {
-                  text: "Service name"
+              name: "yourName",
+              id: "yourName",
+              classes: "govuk-!-width-full",
+              value: value.yourName,
+              errorMessage: {
+                text: errorMessages.get('yourName')
+              } if errorMessages and errorMessages.has('yourName')
+            }) }}
+
+            {{ govukInput({
+              label: {
+                text: "Department"
+              },
+              name: "department",
+              id: "department",
+              classes: "govuk-!-width-full",
+              value: value.department,
+              errorMessage: {
+                text: errorMessages.get('department')
+              } if errorMessages and errorMessages.has('department')
+            }) }}
+
+            <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">Information we already have</p>
+
+            {{ govukSummaryList({
+              rows: [
+                {
+                  key: {
+                    text: "Email address"
+                  },
+                  value: {
+                    text: emailAddress
+                  }
                 },
-                value: {
-                  text: serviceName
+                {
+                  key: {
+                    text: "Service name"
+                  },
+                  value: {
+                    text: serviceName
+                  }
                 }
-              }
-            ]
-          }) }}
+              ]
+            }) }}
 
-          {{ govukButton({
-            text: "Submit"
-          }) }}
+            {{ govukButton({
+              text: "Submit"
+            }) }}
 
-        </form>
+          </form>
+        {% endif %}
 
       </div>
 
