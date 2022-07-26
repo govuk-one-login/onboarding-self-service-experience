@@ -5,7 +5,8 @@ import {
     showSignInFormEmail,
     showSignInFormPassword,
     showLoginOtpMobile,
-    processLoginOtpMobile
+    processLoginOtpMobile,
+    signOut
 } from "../controllers/sign-in";
 import {emailValidator} from "../middleware/emailValidator";
 import {passwordValidator} from "../middleware/passwordValidator";
@@ -19,5 +20,7 @@ router.get('/sign-in-password', showSignInFormPassword);
 router.post('/sign-in-password', passwordValidator('sign-in-password.njk', true), processSignInForm);
 router.get('/sign-in-otp-mobile', showLoginOtpMobile);
 router.post('/sign-in-otp-mobile', mobileOtpValidator('sign-in-otp-mobile.njk', true), processLoginOtpMobile);
+
+router.get('/account/sign-out', signOut);
 
 export default router;

@@ -26,7 +26,12 @@ export const showLoginOtpMobile = async function(req: Request, res: Response) {
 
 export const processLoginOtpMobile = async function(req: Request, res: Response) {
     // TO DO add the functionality to process the login mobile otp
-    res.redirect('/account/list-services');
+    if (true) { // because OTP was correct and we've implemented that
+        req.session.isSignedIn = true;
+        res.redirect('/account/list-services');
+    } else {
+        res.redirect('/sign-in-otp-mobile');
+    }
 }
 
 export const processEmailAddress = async function (req: Request, res: Response) {
@@ -80,4 +85,8 @@ export const processSignInForm = async function(req: Request, res: Response) {
     res.redirect('/sign-in-otp-mobile');
     return;
 
+}
+
+export const signOut = async function(req: Request, res: Response) {
+    req.session.destroy(() => res.redirect('/'));
 }
