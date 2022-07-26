@@ -379,4 +379,70 @@ router.get('/private-beta-form-submitted', (req, res) => {
     });
 });
 
+//// Testing routs Create 'Joining a private beta' page
+router.get('/private-beta', (req, res) => {
+    res.render("dashboard/private-beta.njk", {
+        serviceName: 'My juggling service',
+        emailAddress: 'your.email@digital.cabinet-office.gov.uk'
+    });
+});
+
+router.post('/private-beta', async (req, res) => {
+    let yourName = req.body.yourName;
+    let department = req.body.department;
+
+    if (yourName ==="" && department ==="") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('yourName', 'Enter your name');
+        errorMessages.set('department', 'Enter your department');
+        const value : object = {
+            yourName: yourName,
+            department: department
+        };
+        res.render('dashboard/private-beta.njk', {
+            errorMessages: errorMessages,
+            value: value
+        });
+        return;
+    }
+
+    if (yourName ==="") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('yourName', 'Enter your name');
+        const value : object = {
+            yourName: yourName,
+            department: department
+        };
+        res.render('dashboard/private-beta.njk', {
+            errorMessages: errorMessages,
+            value: value
+        });
+        return;
+    }
+
+    if (department ==="") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('department', 'Enter your department');
+        const value : object = {
+            yourName: yourName,
+            department: department
+        };
+        res.render('dashboard/private-beta.njk', {
+            errorMessages: errorMessages,
+            value: value
+        });
+        return;
+    }
+
+    res.redirect('/private-beta-form-submitted');
+});
+// Testing route for testing when the private beta request has already been submitted.
+router.get('/private-beta-submitted', (req, res) => {
+    res.render("dashboard/private-beta.njk", {
+        serviceName: 'My juggling service',
+        privateBetaRequestSubmitted: true,
+        dateRequestSubmitted: '10 May 2022'
+    });
+});
+
 export default router;

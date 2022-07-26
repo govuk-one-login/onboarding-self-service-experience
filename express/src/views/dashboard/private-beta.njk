@@ -1,0 +1,122 @@
+{% extends "../layout-dashboard.njk" %}
+{% from "../macros/error-summary.njk" import errorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav" %}
+
+{% block pageTitle %}
+  Joining private beta - GOV.UK Sign In
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-body govuk-!-font-weight-bold">{{ serviceName }}</div>
+    <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <nav class="sub-navigation govuk-!-margin-top-3">
+          <ul class="govuk-list sub_navigation_list_2">
+            <li class="sub-navigation__item">
+              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{serviceId}}">Client details</a>
+            </li>
+            <li class="sub-navigation__item sub-navigation__item--active">
+              <a class="govuk-link govuk-link--no-visited-state" href="/private-beta">Joining private beta</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+
+        {{ errorSummary ({
+          errors:  errorMessages,
+          hrefs: {
+            'yourName': '#yourName',
+            'department': '#department'
+          }
+        }) }}
+
+        <h1 class="govuk-heading-l govuk-!-margin-top-3">Joining private beta</h1>
+
+        <p class="govuk-body">If you want to go live with GOV.UK Sign In and offer it to your users, you need to join our private beta.</p>
+        <p class="govuk-body">Discuss our <a class="govuk-link" href="https://www.sign-in.service.gov.uk/getting-started/private-beta" rel="noreferrer noopener" target="_blank">private beta guidance (opens in new tab)</a> with your team to see if it’s right for you.</p>
+
+        <h2 class="govuk-heading-m">Speak to us about joining private beta</h2>
+
+        <p class="govuk-body">Submit your details and we’ll get in touch with you about joining the private beta.</p>
+        <p class="govuk-body">We’ll arrange to talk more with your team about your service and what the private beta involves.</p>
+
+        {% if privateBetaRequestSubmitted %}
+
+          <div class="govuk-inset-text">
+            You submitted your details on {{ dateRequestSubmitted }}.
+          </div>
+
+        {% else %}
+
+          <form class="form" action="/private-beta" method="post">
+
+            {{ govukInput({
+              label: {
+                text: "Your name"
+              },
+              name: "yourName",
+              id: "yourName",
+              classes: "govuk-!-width-full",
+              value: value.yourName,
+              errorMessage: {
+                text: errorMessages.get('yourName')
+              } if errorMessages and errorMessages.has('yourName')
+            }) }}
+
+            {{ govukInput({
+              label: {
+                text: "Department"
+              },
+              name: "department",
+              id: "department",
+              classes: "govuk-!-width-full",
+              value: value.department,
+              errorMessage: {
+                text: errorMessages.get('department')
+              } if errorMessages and errorMessages.has('department')
+            }) }}
+
+            <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">Information we already have</p>
+
+            {{ govukSummaryList({
+              rows: [
+                {
+                  key: {
+                    text: "Email address"
+                  },
+                  value: {
+                    text: emailAddress
+                  }
+                },
+                {
+                  key: {
+                    text: "Service name"
+                  },
+                  value: {
+                    text: serviceName
+                  }
+                }
+              ]
+            }) }}
+
+            {{ govukButton({
+              text: "Submit"
+            }) }}
+
+          </form>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+
+{% endblock %}
+
