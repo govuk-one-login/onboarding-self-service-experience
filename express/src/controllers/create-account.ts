@@ -13,7 +13,7 @@ import {randomUUID} from "crypto";
 export const showGetEmailForm = function (req: Request, res: Response) {
     if (req.session.emailAddress) {
         const values = new Map<string, string>();
-        values.set('emailAddress', req.session.emailAddress);
+        values.set('email', req.session.emailAddress);
         res.render('create-account/get-email.njk', {values: values});
     } else {
         res.render('create-account/get-email.njk');
