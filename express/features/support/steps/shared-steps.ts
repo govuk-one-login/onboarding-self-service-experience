@@ -1,6 +1,7 @@
-import {Given, When, Then} from "@cucumber/cucumber";
-import {strict as assert} from "assert";
-import {getLink, checkUrl} from './shared-functions';
+import { Given, Then, When } from '@cucumber/cucumber';
+import { strict as assert } from 'assert';
+import { Page } from "puppeteer";
+import { checkUrl, getLink } from './shared-functions';
 
 Given('that the user is on the {string} page', async function (route: string) {
     await this.goToPath(route);
@@ -9,7 +10,7 @@ Given('that the user is on the {string} page', async function (route: string) {
 When('they click on the {string} link', async function (text: string) {
     let links = await this.page.$x(`//a[contains(., '${text}')]`);
     await Promise.all([
-        this.page.waitForNavigation({timeout: 10000}),
+        this.page.waitForNavigation({ timeout: 10000 }),
         links[0].click()
     ]);
 });
@@ -17,7 +18,7 @@ When('they click on the {string} link', async function (text: string) {
 When('they click on the {string} button-link', async function (text: string) {
     let links = await this.page.$x(`//a[contains(., '${text}') and contains(concat(" ", normalize-space(@class), " "), " govuk-button ")]`);
     await Promise.all([
-        this.page.waitForNavigation({timeout: 10000}),
+        this.page.waitForNavigation({ timeout: 10000 }),
         links[0].click()
     ]);
 });
@@ -25,7 +26,7 @@ When('they click on the {string} button-link', async function (text: string) {
 When('they select the Submit button', async function () {
     await Promise.all([
         this.page.waitForNavigation(),
-        this.page.click("#submit")
+        this.page.click('#submit')
     ]);
 });
 
@@ -59,7 +60,7 @@ Then('the error message {string} must be displayed for the {string} radios', asy
 
 Then('they should see the text {string}', async function (text) {
     let bodyText: string = await this.page.$eval('body', (element: any) => element.textContent)
-    assert.equal(bodyText.includes(text), true, `Body text does not contain "${text}"`)
+    assert.equal(bodyText.includes(text), true, `Body text does not contain '${text}'`)
 });
 
 Then('the {string} link will point to the following URL: {string}', async function (linkText, expectedUrl) {
