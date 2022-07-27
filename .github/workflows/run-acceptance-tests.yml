@@ -1,0 +1,34 @@
+name: Acceptance tests
+
+on:
+  workflow_call:
+    inputs:
+      host: { required: true, type: string }
+
+concurrency:
+  group: deploy-${{ github.head_ref || github.ref_name }}
+
+jobs:
+  run-acceptance-tests:
+    name: Acceptance
+    runs-on: ubuntu-latest
+    defaults:
+      run: { working-directory: express }
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          cache: 'npm'
+          cache-dependency-path: express/package-lock.json
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Run cucumber tests
+        env:
+          HOST: ${{ inputs.host }}
+        run: npm run cucumber

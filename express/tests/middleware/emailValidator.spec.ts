@@ -1,6 +1,6 @@
-import {assert} from "chai";
-import {isAllowedDomain} from "./emailValidator";
-import isRfc822Compliant from "../lib/rfc822-validate";
+import { assert } from "chai";
+import isRfc822Compliant from "../../src/lib/rfc822-validate";
+import { isAllowedDomain } from "../../src/middleware/emailValidator";
 
 const EMAIL_WITH_ALLOWED_DOMAIN = 'allowed@email.gov.uk';
 const EMAIL_WITH_DISALLOWED_DOMAIN = 'allowed@hackers.co.uk';

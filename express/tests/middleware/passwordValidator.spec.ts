@@ -1,5 +1,5 @@
-import {assert} from "chai";
-import {eightDigitsMinimum} from "./passwordValidator";
+import { assert } from "chai";
+import { eightDigitsMinimum } from "../../src/middleware/passwordValidator";
 
 const PASSWORD_WITH_EMPTY_VALUE = '';
 const PASSWORD_LESS_THAN_8_CHAR = '123';
@@ -20,4 +20,3 @@ describe('Checking that the user has entered a valid password', () => {
         assert.equal(eightDigitsMinimum(PASSWORD_WITH_EMPTY_VALUE), false, `Expected ${PASSWORD_WITH_EMPTY_VALUE} not to be allowed because it has empty value`);
     });
 });
-

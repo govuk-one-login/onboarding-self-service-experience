@@ -1,0 +1,37 @@
+name: Check PR
+
+on: pull_request
+
+jobs:
+  code-quality:
+    name: Code quality
+    uses: ./.github/workflows/check-code-quality.yml
+
+  build-front:
+    name: Build
+    uses: ./.github/workflows/build-front.yml
+
+  run-unit-tests:
+    name: Run tests
+    uses: ./.github/workflows/run-unit-tests.yml
+
+  deploy-preview-front:
+    name: Preview
+    needs: build-front
+    uses: ./.github/workflows/deploy-to-paas.yml
+    with:
+      environment: preview
+      cf-space-name: self-service-preview
+      app-name-prefix: di-sse-prev
+      cognito-client: StubCognitoClient
+      lambda-facade: StubLambdaFacade
+    secrets:
+      cf-username: ${{ secrets.CF_USERNAME }}
+      cf-password: ${{ secrets.CF_PASSWORD }}
+
+  run-acceptance-tests:
+    name: Run tests
+    needs: deploy-preview-front
+    uses: ./.github/workflows/run-acceptance-tests.yml
+    with:
+      host: ${{ needs.deploy-preview-front.outputs.deployment-url }}
