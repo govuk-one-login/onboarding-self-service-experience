@@ -1,9 +1,9 @@
-import {Browser} from "puppeteer";
-import {After, AfterAll, Before, BeforeAll} from "@cucumber/cucumber";
-import {IWorldOptions} from "@cucumber/cucumber/lib/support_code_library_builder/world";
+import { After, AfterAll, Before, BeforeAll } from "@cucumber/cucumber";
+import { IWorldOptions } from "@cucumber/cucumber/lib/support_code_library_builder/world";
+import { Browser } from "puppeteer";
 
 const puppeteer = require('puppeteer');
-const {setWorldConstructor, World} = require("@cucumber/cucumber");
+const { setWorldConstructor, World } = require("@cucumber/cucumber");
 
 let browser: Browser;
 
@@ -19,7 +19,7 @@ class TestContext extends World {
 
 BeforeAll(async function () {
     console.log(`Running tests against ${process.env.HOST || "local"}`)
-    browser = await puppeteer.launch({headless: true});
+    browser = await puppeteer.launch({ headless: true });
 })
 
 Before(async function () {
