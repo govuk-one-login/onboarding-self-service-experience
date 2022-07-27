@@ -3,11 +3,11 @@ name: Deploy branch
 on: workflow_dispatch
 
 jobs:
-  build:
+  build-front:
     name: Build
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/build-front.yml
 
-  deploy-preview:
+  deploy-front-preview:
     name: Preview
     needs: build
     uses: ./.github/workflows/deploy-to-paas.yml

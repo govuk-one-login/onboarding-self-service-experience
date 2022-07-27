@@ -1,0 +1,39 @@
+name: Unit tests
+
+on: workflow_call
+
+concurrency:
+  group: unit-tests-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  run-unit-tests:
+    name: Unit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+
+      - name: Install frontend Node dependencies
+        working-directory: express
+        run: npm install
+
+      - name: Run frontend unit tests
+        working-directory: express
+        run: npm run test
+
+
+      - name: Install DynamoDB API Node dependencies
+        working-directory: backend/dynamo-api
+        run: npm install
+
+      - name: Run DynamoDB API tests
+        working-directory: backend/dynamo-api
+        run: npm run test
