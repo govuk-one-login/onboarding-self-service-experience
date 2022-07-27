@@ -15,7 +15,6 @@ router.get('/client-details/:serviceId', async (req, res) => {
     const lambdaFacade = req.app.get("lambdaFacade");
     const listOfClients = await lambdaFacade.listClients(req.params.serviceId, req.session?.authenticationResult?.AccessToken as string);
     const client = unmarshall(listOfClients.data.Items[0]);
-    console.log(client);
     const selfServiceClientId = client.sk.substring("client#".length);
     const serviceId = req.params.serviceId;
     const authClientId = client.clientId;

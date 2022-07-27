@@ -16,7 +16,6 @@ export const listServices = async function(req: Request, res: Response) {
         res.redirect('/add-service-name');
         return;
     }
-    console.log(services.data.Items);
     if(services.data.Items.length === 1) {
         res.redirect(`/client-details/${services.data.Items[0].pk.S.substring("#services".length)}`);
         return;
@@ -44,7 +43,6 @@ export const processAddServiceForm = async function (req: Request, res: Response
     try {
         // @ts-ignore
         Object.keys(user).forEach(key => newUser[key] = user[key]["S"])
-        console.log(newUser)
         newServiceOutput = await lambdaFacade.newService(service, newUser, req.session.authenticationResult?.AccessToken as string)
 
     } catch (error) {
