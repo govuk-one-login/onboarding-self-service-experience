@@ -1,5 +1,5 @@
-import {assert} from "chai";
-import {atLeastOneCharacter} from "./serviceNameValidator";
+import { assert } from "chai";
+import { atLeastOneCharacter } from "../../src/middleware/serviceNameValidator";
 
 const SERVICE_NAME_WITH_EMPTY_VALUE = '';
 const SERVICE_NAME_1_CHAR = 'A';
