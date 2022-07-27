@@ -61,27 +61,24 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
         return;
     }
 
-    const any6CharacterLongPattern = /^.{6}$/;
-    const onlyNumbersPattern = /^[0-9]+$/;
+    const sixDigitsPattern = /^[0-9]{6}$/;
     const otpToTest = req.body['create-email-otp'];
 
-    if (!any6CharacterLongPattern.test(otpToTest)) {
-        console.log("No otp code entered or number of symbols does not equal to 6");
+    if (otpToTest === '') {
+        console.log("No otp code entered");
         const errorMessages = new Map<string, string>();
-        errorMessages.set('create-email-otp', "Your code should be 6 characters long");
-        const value : object = {otp: otpToTest};
+        errorMessages.set('create-email-otp', "Enter the security code");
         res.render('create-account/check-email.njk', {
             emailAddress: req.session.emailAddress,
-            errorMessages: errorMessages,
-            value: value
+            errorMessages: errorMessages
         });
         return;
     }
 
-    if (!onlyNumbersPattern.test(otpToTest)) {
-        console.log("Otp code is not only numbers");
+    if (!sixDigitsPattern.test(otpToTest)) {
+        console.log("No otp code entered or number of symbols does not equal to 6");
         const errorMessages = new Map<string, string>();
-        errorMessages.set('create-email-otp', "Your security code should only include numbers");
+        errorMessages.set('create-email-otp', "Enter the security code using only 6 digits");
         const value : object = {otp: otpToTest};
         res.render('create-account/check-email.njk', {
             emailAddress: req.session.emailAddress,
