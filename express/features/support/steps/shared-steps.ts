@@ -29,8 +29,9 @@ When('they select the Submit button', async function () {
     ]);
 });
 
-Then('they should be directed to the following page: {string}', async function (url) {
-    assert.equal(this.page.url(), this.host + url);
+Then('they should be directed to the following page: {string}', async function (path) {
+    const expectedUrl = new URL(path, this.host);
+    assert.equal(this.page.url(), expectedUrl.href);
 });
 
 Then('they should be directed to the following URL: {string}', async function (url) {
@@ -48,26 +49,12 @@ Then('their data is saved in the spreadsheet', async function () {
 
 Then('the error message {string} must be displayed for the {string} field', async function (errorMessage, field) {
     const errorLink = await this.page.$x(`//div[contains(concat(" ", normalize-space(@class), " "), " govuk-error-summary ")]//a[@href="#${field}"]`);
-    assert.notEqual(errorLink.length, 0, `Expected to find the message ${errorMessage} in the error summary.`);
-    const actualMessageInSummary = await this.page.evaluate((el: { textContent: any; }) => el.textContent, errorLink[0]);
-    assert.equal(actualMessageInSummary, errorMessage, `Expected text of the link to be ${errorMessage}`);
-
-    const messageAboveElement = await this.page.$x(`//span[contains(concat(" ", normalize-space(@class), " "), " govuk-error-message ") and @id="${field}-error" ]`);
-    assert.notEqual(messageAboveElement.length, 0, `Expected to find the message ${errorMessage} above the ${field} field.`);
-    const actualMessageAboveSummary = await this.page.evaluate((el: { textContent: any; }) => el.textContent, messageAboveElement[0]);
-    assert.equal(actualMessageAboveSummary.trim(), "Error: " + errorMessage, `Expected the message above the ${field} field to be ${errorMessage}`);
+    await checkErrorMessageDisplayedAboveElement(this.page, errorLink, errorMessage, field);
 });
 
 Then('the error message {string} must be displayed for the {string} radios', async function (errorMessage, field) {
     const errorLink = await this.page.$x(`//div[contains(concat(" ", normalize-space(@class), " "), " govuk-error-summary ")]//a[@href="#${field}-error"]`);
-    assert.notEqual(errorLink.length, 0, `Expected to find the message ${errorMessage} in the error summary.`);
-    const actualMessageInSummary = await this.page.evaluate((el: { textContent: any; }) => el.textContent, errorLink[0]);
-    assert.equal(actualMessageInSummary, errorMessage, `Expected text of the link to be ${errorMessage}`);
-
-    const messageAboveElement = await this.page.$x(`//span[contains(concat(" ", normalize-space(@class), " "), " govuk-error-message ") and @id="${field}-error" ]`);
-    assert.notEqual(messageAboveElement.length, 0, `Expected to find the message ${errorMessage} above the ${field} field.`);
-    const actualMessageAboveSummary = await this.page.evaluate((el: { textContent: any; }) => el.textContent, messageAboveElement[0]);
-    assert.equal(actualMessageAboveSummary.trim(), "Error: " + errorMessage, `Expected the message above the ${field} field to be ${errorMessage}`);
+    await checkErrorMessageDisplayedAboveElement(this.page, errorLink, errorMessage, field);
 });
 
 Then('they should see the text {string}', async function (text) {
@@ -84,3 +71,16 @@ Then('the {string} link will point to the following page: {string}', async funct
     let link = await getLink(this.page, linkText);
     await checkUrl(this.page, link, expectedPage);
 });
+
+async function checkErrorMessageDisplayedAboveElement(page: Page, errorLink: any, errorMessage: string, field: string) {
+    assert.notEqual(errorLink.length, 0, `Expected to find the message ${errorMessage} in the error summary.`);
+
+    const actualMessageInSummary = await page.evaluate((el: { textContent: any; }) => el.textContent, errorLink[0]);
+    assert.equal(actualMessageInSummary, errorMessage, `Expected text of the link to be ${errorMessage}`);
+
+    const messageAboveElement = await page.$x(`//span[contains(concat(" ", normalize-space(@class), " "), " govuk-error-message ") and @id="${field}-error" ]`);
+    assert.notEqual(messageAboveElement.length, 0, `Expected to find the message ${errorMessage} above the ${field} field.`);
+
+    const actualMessageAboveSummary = await page.evaluate((el: { textContent: any; }) => el.textContent, messageAboveElement[0]);
+    assert.equal(actualMessageAboveSummary.trim(), "Error: " + errorMessage, `Expected the message above the ${field} field to be ${errorMessage}`);
+}
