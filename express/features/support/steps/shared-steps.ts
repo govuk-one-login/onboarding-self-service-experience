@@ -1,33 +1,24 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { strict as assert } from 'assert';
 import { Page } from "puppeteer";
-import { checkUrl, getLink } from './shared-functions';
+import { checkUrl, clickLink, clickSubmitButton, getButtonLink, getLink } from './shared-functions';
 
 Given('that the user is on the {string} page', async function (route: string) {
     await this.goToPath(route);
 });
 
 When('they click on the {string} link', async function (text: string) {
-    let links = await this.page.$x(`//a[contains(., '${text}')]`);
-    await Promise.all([
-        this.page.waitForNavigation({ timeout: 10000 }),
-        links[0].click()
-    ]);
+    let link = await getLink(this.page, text);
+    await clickLink(this.page, link);
 });
 
 When('they click on the {string} button-link', async function (text: string) {
-    let links = await this.page.$x(`//a[contains(., '${text}') and contains(concat(" ", normalize-space(@class), " "), " govuk-button ")]`);
-    await Promise.all([
-        this.page.waitForNavigation({ timeout: 10000 }),
-        links[0].click()
-    ]);
+    let link = await getButtonLink(this.page, text);
+    await clickLink(this.page, link);
 });
 
 When('they select the Submit button', async function () {
-    await Promise.all([
-        this.page.waitForNavigation(),
-        this.page.click('#submit')
-    ]);
+    await clickSubmitButton(this.page);
 });
 
 Then('they should be directed to the following page: {string}', async function (path) {

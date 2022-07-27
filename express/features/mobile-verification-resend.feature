@@ -1,7 +1,7 @@
 Feature: A contact form to resend the verification code to mobile
 
   Background:
-    Given that the user is on the `Check your phone` page
+    Given that the user has arrived on the "Check your phone" page
 
   Scenario: User does not receive their code
     When they click on the "Not received a text message?" link
