@@ -94,13 +94,8 @@ class DynamoClient {
     }
 
     generateUpdateExpression(attributeNames: { [key: string]: string; }): string {
-        let expression = "";
-        let i = 0;
         let keys = Object.keys(attributeNames);
-        for (let i = 0; i < keys.length; i++) {
-            expression += ` set ${keys[i]} = :val${i},`;
-        }
-        return expression.slice(1, -1);
+        return keys.map((key, index) => ` set ${key} = :val${index}`).join(',');
     }
 
     generateExpressionAttributeValues(attributes: string[], update: object): { [key: string]: AttributeValue; } {
@@ -112,20 +107,23 @@ class DynamoClient {
         return values;
     }
 
-    generateExpressionAttributeNames(attributes: string[]): { [key: string]: string; } {
-        let attributeNames: any = {};
-        for (let i = 0; i < attributes.length; i++) {
-            if (attributes[i] in this.keyWordSubstitutes) {
-                attributeNames[`${this.keyWordSubstitutes[attributes[i]]}` as keyof typeof attributeNames] = attributes[i];
-            } else {
-                attributeNames[`#${attributes[i]}`] = attributes[i];
-            }
-        }
-        return attributeNames;
+    generateExpressionAttributeValuesNew(attributes: string[], update: object): { [key: string]: AttributeValue; } {
+        let values: any = {};
+        attributes.forEach( (attribute, index) => {values[`:val${index}`] = this.customMarshal(update[attributes[index] as keyof typeof update])});
+        return values;
+    }
+
+    generateExpressionAttributeNames(attributes: string[]) {
+        let attributeNames = attributes.map(attribute => ([this.substituteReservedKeywords(attribute), attribute]));
+        return Object.fromEntries(attributeNames);
     }
 
     private keyWordSubstitutes: { [key: string]: string; } = {
         data: "#d"
+    }
+
+    private substituteReservedKeywords(attribute: string): string {
+        return this.keyWordSubstitutes[attribute] || attribute;
     }
 
     private customMarshal(attribute: any) {
