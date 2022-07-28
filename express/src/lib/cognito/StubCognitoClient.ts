@@ -10,7 +10,8 @@ import {
     GetUserAttributeVerificationCodeCommandOutput,
     RespondToAuthChallengeCommandOutput,
     UsernameExistsException,
-    VerifyUserAttributeCommandOutput
+    VerifyUserAttributeCommandOutput,
+    ChangePasswordCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
 
 export class CognitoClient implements CognitoInterface {
@@ -98,6 +99,10 @@ export class CognitoClient implements CognitoInterface {
 
     setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
         return Promise.resolve({AuthenticationResult: {AccessToken: "let me in!"}, $metadata: {}});
+    }
+
+    changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<ChangePasswordCommandOutput> {
+        return Promise.resolve({$metadata: {}});
     }
 
     setPhoneNumber(username: string, phoneNumber: string): Promise<AdminUpdateUserAttributesCommandOutput> {

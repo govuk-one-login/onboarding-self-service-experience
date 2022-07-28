@@ -1,7 +1,5 @@
 import {
     CognitoIdentityProviderClient,
-    SignUpCommand,
-    ConfirmSignUpCommand,
     AdminInitiateAuthCommand,
     VerifyUserAttributeCommand,
     GetUserCommand,
@@ -11,7 +9,8 @@ import {
     UpdateUserAttributesCommand,
     AdminUpdateUserAttributesCommand,
     AdminGetUserCommand,
-    ConfirmSignUpCommandOutput,
+    ChangePasswordCommand,
+    ChangePasswordCommandOutput,
     AdminInitiateAuthCommandOutput,
     RespondToAuthChallengeCommandOutput,
     AdminGetUserCommandOutput,
@@ -114,6 +113,18 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         let command = new RespondToAuthChallengeCommand(params);
         return await this.cognitoClient.send(command);
     }
+
+    async changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<ChangePasswordCommandOutput> {
+        let params = {
+            AccessToken: accessToken,
+            PreviousPassword: previousPassword,
+            ProposedPassword: proposedPassword
+        }
+        let command = new ChangePasswordCommand(params);
+
+        return await this.cognitoClient.send(command);
+    }
+
 
     async getUser(username: string): Promise<AdminGetUserCommandOutput> {
         let params = {
