@@ -445,4 +445,9 @@ router.get('/private-beta-submitted', (req, res) => {
     });
 });
 
+// Testing route for 'Problem with the service' page
+router.get('/there-is-a-problem-test', (req, res) => {
+    res.render("there-is-a-problem.njk");
+});
+
 export default router;
