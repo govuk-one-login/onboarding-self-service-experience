@@ -1,5 +1,5 @@
-import {assert} from "chai";
-import {sixDigits} from "./mobileOtpValidator";
+import { assert } from "chai";
+import { sixDigits } from "../../src/middleware/mobileOtpValidator";
 
 const OTP_WITH_EMPTY_VALUE = '';
 const OTP_LESS_THAN_6_DIGITS = '123';
