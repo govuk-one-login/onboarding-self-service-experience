@@ -1,9 +1,9 @@
 Feature: A contact form to resend the verification code to mobile
 
   Background:
-    Given that the user is on the `Check your email` page
+    Given that the user has arrived on the "Check your email" page
 
-  Scenario: User doesn’t receive their code
+  Scenario: User does not receive their code
     When they click on the "Not received an email?" link
     Then they should be directed to the following page: "/create/resend-email-code"
 

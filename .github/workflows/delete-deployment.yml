@@ -1,0 +1,47 @@
+name: Delete deployment
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every weekday at 10am
+    - cron: '0 10 * * 1-5'
+  pull_request:
+    types: [ closed ]
+
+concurrency:
+  group: deploy-${{ github.head_ref || github.ref_name }}
+
+jobs:
+  delete-deployment:
+    name: Delete app preview
+    runs-on: ubuntu-latest
+    environment: preview
+    steps:
+      - name: PaaS login
+        uses: alphagov/di-github-actions/paas/log-in-to-paas@64fae1abf5a5bf6360c7560dbc6a6fa850484f11
+        with:
+          cf-org-name: gds-digital-identity-onboarding
+          cf-space-name: self-service-preview
+          cf-username: ${{ secrets.CF_USERNAME }}
+          cf-password: ${{ secrets.CF_PASSWORD }}
+
+      - name: Get app name
+        if: ${{ github.event_name != 'schedule' }}
+        uses: alphagov/di-github-actions/beautify-branch-name@64fae1abf5a5bf6360c7560dbc6a6fa850484f11
+        with:
+          downcase: true
+          length-limit: 63
+          underscores-to-hyphens: true
+          prefix: di-sse-prev
+          set-env-var: APP_NAME
+          usage: App name
+
+      - name: Delete app
+        if: ${{ github.event_name != 'schedule' }}
+        run: cf delete "$APP_NAME" -rf
+
+      - name: Clean up stale deployments
+        if: ${{ github.event_name == 'schedule' }}
+        uses: alphagov/di-github-actions/paas/delete-stale-apps@64fae1abf5a5bf6360c7560dbc6a6fa850484f11
+        with:
+          age-threshold-days: 30

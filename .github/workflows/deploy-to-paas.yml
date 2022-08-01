@@ -39,7 +39,7 @@ jobs:
 
       - name: Push to PaaS
         id: push-to-paas
-        uses: alphagov/di-github-actions/paas/deploy-app@6503ace389666495b9510daa9140d8dbd8eb4865
+        uses: alphagov/di-github-actions/paas/deploy-app@64fae1abf5a5bf6360c7560dbc6a6fa850484f11
         with:
           app-name-prefix: ${{ inputs.app-name-prefix }}
           cf-org-name: gds-digital-identity-onboarding
