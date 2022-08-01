@@ -68,7 +68,14 @@ class DynamoClient {
     }
 
     async updateClient(serviceId: string, clientId: string, updates: object): Promise<UpdateItemCommandOutput> {
+        return this.update("service", serviceId, "client", clientId, updates);
+    }
 
+    async updateUser(userId: string, cognitoUserId: string, updates: object): Promise<UpdateItemCommandOutput> {
+        return this.update("user", userId,"cognito_username", cognitoUserId,  updates);
+    }
+
+    private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: object) {
         const attributes = Object.keys(updates);
         const attributeNames = this.generateExpressionAttributeNames(attributes);
 
@@ -77,10 +84,10 @@ class DynamoClient {
                 TableName: process.env.TABLE as string,
                 Key: {
                     pk: {
-                        S: `service#${serviceId}`
+                        S: `${skPrefix}#${sk}`
                     },
                     sk: {
-                        S: `client#${clientId}`
+                        S: `${pkPrefix}#${pk}`
                     }
                 },
                 UpdateExpression: this.generateUpdateExpression(attributeNames),
