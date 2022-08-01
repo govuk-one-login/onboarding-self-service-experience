@@ -169,7 +169,6 @@ Resources:
         Variables:
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
-
       Events:
         Api:
           Type: Api
@@ -326,6 +325,33 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/handlers/put-service-user.ts
+
+  updateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/update-user.updateUserHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Updates a user in our DDB table but does not touch Cognito.
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !ImportValue
+              'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
+      Environment:
+        Variables:
+          TABLE: !ImportValue
+            'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/update-user.ts
 
   newServiceHandler:
     Type: AWS::Serverless::Function
