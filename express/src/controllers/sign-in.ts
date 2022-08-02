@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
-import {AdminInitiateAuthCommandOutput, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
+import {AdminInitiateAuthCommandOutput, NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 
 import CognitoInterface from "../lib/cognito/CognitoInterface";
 import {User} from "../../@types/User";
@@ -67,6 +67,13 @@ export const processSignInForm = async function(req: Request, res: Response) {
             res.render('sign-in-password.njk', {errorMessages: errorMessages});
             return;
         }
+
+        if (error instanceof UserNotFoundException ) {
+                req.session.emailAddress = email;
+            res.redirect('/create/get-email')
+            return;
+        }
+
         console.log(error);
         res.render('there-is-a-problem.njk');
         return;
