@@ -3,6 +3,8 @@ import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {randomUUID} from "crypto";
 import {User} from "../../@types/User";
 import {Service} from "../../@types/Service";
+import {lambdaFacadeInstance} from "../lib/lambda-facade/LambdaFacade";
+import CognitoInterface from "../lib/cognito/CognitoInterface";
 
 export const listServices = async function(req: Request, res: Response) {
     const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
@@ -56,4 +58,67 @@ export const processAddServiceForm = async function (req: Request, res: Response
     const body = JSON.parse(generatedClient.data.output).body;
     const serviceId = JSON.parse(body).pk;
     res.redirect(`/client-details/${serviceId.substring(8)}`);
+}
+
+export const showChangePasswordForm = async function (req: Request, res: Response) {
+    res.render("account/change-password.njk");
+}
+
+export const changePassword = async function (req: Request, res: Response)  {
+    let newPassword = req.body.password;
+    let currentPassword = req.body.currentPassword;
+
+    if (currentPassword ==="") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('currentPassword', 'Enter your current password');
+        res.render('account/change-password.njk', {
+            errorMessages: errorMessages,
+        });
+        return;
+    }
+
+    if (newPassword ==="") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('password', 'Enter your new password');
+        const value : object = {currentPassword: currentPassword};
+        res.render('account/change-password.njk', {
+            errorMessages: errorMessages,
+            value: value
+        });
+        return;
+    }
+
+    if (!/^.{8,}$/.test(newPassword)) {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('password', 'Your password must be 8 characters or more');
+        const value : object = {
+            currentPassword: currentPassword,
+            password: newPassword
+        };
+        res.render('account/change-password.njk', {
+            errorMessages: errorMessages,
+            value: value
+        });
+        return;
+    }
+
+    try {
+        const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
+        await cognitoClient.changePassword(req.session?.authenticationResult?.AccessToken as string, currentPassword, newPassword);
+    } catch (error) {
+        console.log(error);
+        res.render('there-is-a-problem.njk');
+        return;
+    }
+
+    try {
+        const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
+        lambdaFacade.updateUser(req.session?.selfServiceUser?.pk.S as string, req.session?.cognitoUser?.Username as string, {password: newPassword})
+    } catch (error) {
+        console.log(error);
+        res.render('there-is-a-problem.njk');
+        return;
+    }
+    req.session.updatedField = "password";
+    res.redirect('/account');
 }
