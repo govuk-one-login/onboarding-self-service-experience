@@ -5,6 +5,7 @@ import {User} from "../../@types/User";
 import {Service} from "../../@types/Service";
 import {lambdaFacadeInstance} from "../lib/lambda-facade/LambdaFacade";
 import CognitoInterface from "../lib/cognito/CognitoInterface";
+import {LimitExceededException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
 
 export const listServices = async function (req: Request, res: Response) {
     const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
@@ -20,7 +21,7 @@ export const listServices = async function (req: Request, res: Response) {
         return;
     }
     if (services.data.Items.length === 1) {
-        res.redirect(`/client-details/${services.data.Items[0].pk.S.substring("#services".length)}`);
+        res.redirect(`/client-details/${services.data.Items[0].pk.S.substring("service#".length)}`);
         return;
     }
 
@@ -109,15 +110,45 @@ export const changePassword = async function (req: Request, res: Response) {
     } catch (error) {
         console.log("ERROR CALLING COGNITO WITH NEW PASSWORD")
         console.log(error);
+
+        if(error instanceof LimitExceededException) {
+            const value: object = {
+                currentPassword: currentPassword,
+                password: newPassword
+            };
+            const errorMessages = new Map<string, string>();
+            errorMessages.set('no-control', 'You have tried to change your password too many times.  Please try again later.');
+            res.render('account/change-password.njk', {
+                errorMessages: errorMessages,
+                value: value
+            });
+            return;
+        }
+
+        if(error instanceof NotAuthorizedException) {
+            const value: object = {
+                currentPassword: "",
+                password: newPassword
+            };
+            const errorMessages = new Map<string, string>();
+            errorMessages.set('password', 'Your current password is wrong');
+            res.render('account/change-password.njk', {
+                errorMessages: errorMessages,
+                value: value
+            });
+            return;
+        }
+
         res.render('there-is-a-problem.njk');
         return;
     }
 
     try {
         const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
+        console.log(JSON.stringify(req.session))
         await lambdaFacade.updateUser(
             req.session?.selfServiceUser?.pk.S as string,
-            req.session?.cognitoUser?.Username as string,
+            req.session?.selfServiceUser?.sk.S as string,
             {password_last_updated: new Date()},
             req.session?.authenticationResult?.AccessToken as string
         )

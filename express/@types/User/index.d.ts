@@ -1,6 +1,6 @@
 export interface User {
     pk: {S: string};
-    [cognitoId | sk]: string;
+    sk: {S: string};
     data: string;
     [firstName | first_name]: string | undefined;
     [lastName | last_name]: string | undefined;
