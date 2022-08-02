@@ -6,19 +6,20 @@ import {Service} from "../../@types/Service";
 import {lambdaFacadeInstance} from "../lib/lambda-facade/LambdaFacade";
 import CognitoInterface from "../lib/cognito/CognitoInterface";
 
-export const listServices = async function(req: Request, res: Response) {
+export const listServices = async function (req: Request, res: Response) {
     const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
-    if(req.session.selfServiceUser == undefined) {
+    if (req.session.selfServiceUser == undefined) {
+        console.log("No user in session.")
         res.render('there-is-a-problem.njk');
         return;
     }
     const user: User = req.session.selfServiceUser;
     const services = await lambdaFacade.listServices(user.pk.S as string, req.session.authenticationResult?.AccessToken as string);
-    if(services.data.Items.length === 0) {
+    if (services.data.Items.length === 0) {
         res.redirect('/add-service-name');
         return;
     }
-    if(services.data.Items.length === 1) {
+    if (services.data.Items.length === 1) {
         res.redirect(`/client-details/${services.data.Items[0].pk.S.substring("#services".length)}`);
         return;
     }
@@ -64,11 +65,11 @@ export const showChangePasswordForm = async function (req: Request, res: Respons
     res.render("account/change-password.njk");
 }
 
-export const changePassword = async function (req: Request, res: Response)  {
+export const changePassword = async function (req: Request, res: Response) {
     let newPassword = req.body.password;
     let currentPassword = req.body.currentPassword;
 
-    if (currentPassword ==="") {
+    if (currentPassword === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set('currentPassword', 'Enter your current password');
         res.render('account/change-password.njk', {
@@ -77,10 +78,10 @@ export const changePassword = async function (req: Request, res: Response)  {
         return;
     }
 
-    if (newPassword ==="") {
+    if (newPassword === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set('password', 'Enter your new password');
-        const value : object = {currentPassword: currentPassword};
+        const value: object = {currentPassword: currentPassword};
         res.render('account/change-password.njk', {
             errorMessages: errorMessages,
             value: value
@@ -91,7 +92,7 @@ export const changePassword = async function (req: Request, res: Response)  {
     if (!/^.{8,}$/.test(newPassword)) {
         const errorMessages = new Map<string, string>();
         errorMessages.set('password', 'Your password must be 8 characters or more');
-        const value : object = {
+        const value: object = {
             currentPassword: currentPassword,
             password: newPassword
         };
@@ -106,6 +107,7 @@ export const changePassword = async function (req: Request, res: Response)  {
         const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
         await cognitoClient.changePassword(req.session?.authenticationResult?.AccessToken as string, currentPassword, newPassword);
     } catch (error) {
+        console.log("ERROR CALLING COGNITO WITH NEW PASSWORD")
         console.log(error);
         res.render('there-is-a-problem.njk');
         return;
@@ -113,8 +115,14 @@ export const changePassword = async function (req: Request, res: Response)  {
 
     try {
         const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
-        lambdaFacade.updateUser(req.session?.selfServiceUser?.pk.S as string, req.session?.cognitoUser?.Username as string, {password: newPassword})
+        await lambdaFacade.updateUser(
+            req.session?.selfServiceUser?.pk.S as string,
+            req.session?.cognitoUser?.Username as string,
+            {password_last_updated: new Date()},
+            req.session?.authenticationResult?.AccessToken as string
+        )
     } catch (error) {
+        console.log("ERROR CALLING LAMBDA WITH USER TO UDPDATE")
         console.log(error);
         res.render('there-is-a-problem.njk');
         return;

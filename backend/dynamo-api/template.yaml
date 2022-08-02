@@ -344,6 +344,12 @@ Resources:
         Variables:
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /update-user
+            Method: POST
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:

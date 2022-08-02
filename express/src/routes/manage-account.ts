@@ -41,7 +41,7 @@ router.get('/client-details/:serviceId', async (req, res) => {
     req.session.updatedField = undefined;
 });
 
-router.get('/account/change-password', showChangePasswordForm);
+router.get('/change-password', showChangePasswordForm);
 
 
 router.post('/change-password', changePassword);
