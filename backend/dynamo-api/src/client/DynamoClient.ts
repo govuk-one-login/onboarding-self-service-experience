@@ -95,7 +95,7 @@ class DynamoClient {
                 ExpressionAttributeValues: this.generateExpressionAttributeValues(attributes, updates),
                 ReturnValues: "ALL_NEW"
             };
-
+        console.log(JSON.stringify(params));
         const command = new UpdateItemCommand(params);
         return await this.dynamodb.send(command);
     }
@@ -130,7 +130,7 @@ class DynamoClient {
     }
 
     private substituteReservedKeywords(attribute: string): string {
-        return this.keyWordSubstitutes[attribute] || attribute;
+        return this.keyWordSubstitutes[attribute] || `#${attribute}`;
     }
 
     private customMarshal(attribute: any) {
