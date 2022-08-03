@@ -1,6 +1,6 @@
 Feature:
   Users can sign up to the sign-in self-service experience
-  
+
   Scenario: A user types everything correctly and creates an account
 
     Given that the user is on the "/" page
@@ -37,4 +37,3 @@ Feature:
     When the user submits a common password
     Then they should be directed to the following page: "/create/update-password"
     And they should see the text "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers."
-

@@ -15,20 +15,20 @@ export async function getButtonLink(page: Page, linkText: string): Promise<any> 
 
 export async function clickLink(page: Page, link: ElementHandle, timeout = DEFAULT_TIMEOUT): Promise<any> {
     await Promise.all([
-        page.waitForNavigation({ timeout: timeout }),
+        page.waitForNavigation({timeout: timeout}),
         link.click()
     ]);
 }
 
 export async function clickSubmitButton(page: Page, timeout = DEFAULT_TIMEOUT): Promise<any> {
     await Promise.all([
-        page.waitForNavigation({ timeout: timeout }),
+        page.waitForNavigation({timeout: timeout}),
         page.click('#submit')
     ]);
 }
 
 export async function checkUrl(page: Page, link: ElementHandle, expectedUrl: string): Promise<void> {
-    assert.equal(await page.evaluate((anchor: { getAttribute: (arg0: string) => any; }) => anchor.getAttribute('href'), link), expectedUrl);
+    assert.equal(await page.evaluate((anchor: {getAttribute: (arg0: string) => any;}) => anchor.getAttribute('href'), link), expectedUrl);
 }
 
 function getSingleLink(links: ElementHandle[], linkText: string): ElementHandle {
@@ -38,10 +38,11 @@ function getSingleLink(links: ElementHandle[], linkText: string): ElementHandle 
 
 export async function enterTextIntoTextInput(page: Page, text: string, inputId: string): Promise<any> {
     let inputElement = await page.$(`#${inputId}`);
-    if(!inputElement) {
+    if (!inputElement) {
         throw new Error(`Could not find element with id ${inputId}`)
     }
-    await inputElement.click({ clickCount: 3 });
+
+    await inputElement.click({clickCount: 3});
     await inputElement.press('Backspace');
     await page.type(`#${inputId}`, text);
 }

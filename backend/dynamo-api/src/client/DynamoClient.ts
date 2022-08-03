@@ -1,16 +1,16 @@
 import {
+    AttributeValue,
     DynamoDBClient,
     PutItemCommand,
     PutItemCommandOutput,
     QueryCommand,
     QueryCommandOutput,
     UpdateItemCommand,
-    UpdateItemCommandOutput,
-    AttributeValue
-} from "@aws-sdk/client-dynamodb";
-import {marshall} from "@aws-sdk/util-dynamodb";
-import {OnboardingTableItem} from "../@Types/OnboardingTableItem";
-import * as process from "process";
+    UpdateItemCommandOutput
+} from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
+import * as process from 'process';
+import { OnboardingTableItem } from '../@Types/OnboardingTableItem';
 
 class DynamoClient {
     private dynamodb: DynamoDBClient;
@@ -34,8 +34,8 @@ class DynamoClient {
         const params = {
             TableName: this.tableName,
             IndexName: 'gsi1',
-            ExpressionAttributeValues: {":sortKey": {S: sortKey}},
-            KeyConditionExpression: "sk = :sortKey"
+            ExpressionAttributeValues: {':sortKey': {S: sortKey}},
+            KeyConditionExpression: 'sk = :sortKey'
         }
         const command = new QueryCommand(params);
         return await this.dynamodb.send(command);
@@ -45,9 +45,9 @@ class DynamoClient {
         const params = {
             TableName: this.tableName,
             IndexName: 'gsi1',
-            ExpressionAttributeNames: {"#userId": "sk", "#serviceId": "pk"},
-            ExpressionAttributeValues: {":userId": {S: `user#${userId}`}, ":serviceIdPrefix": {S: "service#"}},
-            KeyConditionExpression: "#userId = :userId AND begins_with ( #serviceId, :serviceIdPrefix )"
+            ExpressionAttributeNames: {'#userId': 'sk', '#serviceId': 'pk'},
+            ExpressionAttributeValues: {':userId': {S: `user#${userId}`}, ':serviceIdPrefix': {S: 'service#'}},
+            KeyConditionExpression: '#userId = :userId AND begins_with ( #serviceId, :serviceIdPrefix )'
         }
         const command = new QueryCommand(params);
         return await this.dynamodb.send(command);
@@ -56,43 +56,37 @@ class DynamoClient {
     async getClients(serviceId: string): Promise<QueryCommandOutput> {
         const params = {
             TableName: this.tableName,
-            ExpressionAttributeNames: {"#serviceId": "pk", "#clientId": "sk"},
-            ExpressionAttributeValues: {":serviceId": {S: `service#${serviceId}`}, ":clientIdPrefix": {S: "client#"}},
-            KeyConditionExpression: "#serviceId = :serviceId AND begins_with ( #clientId, :clientIdPrefix )"
+            ExpressionAttributeNames: {'#serviceId': 'pk', '#clientId': 'sk'},
+            ExpressionAttributeValues: {':serviceId': {S: `service#${serviceId}`}, ':clientIdPrefix': {S: 'client#'}},
+            KeyConditionExpression: '#serviceId = :serviceId AND begins_with ( #clientId, :clientIdPrefix )'
         }
         const command = new QueryCommand(params);
-        const items = await this.dynamodb.send(command);
-        return items;
+        return await this.dynamodb.send(command);
     }
 
     async updateClient(serviceId: string, clientId: string, updates: object): Promise<UpdateItemCommandOutput> {
-        return this.update("service", serviceId, "client", clientId, updates);
+        return this.update('service', serviceId, 'client', clientId, updates);
     }
 
     async updateUser(userId: string, cognitoUserId: string, updates: object): Promise<UpdateItemCommandOutput> {
-        return this.update("user", userId,"cognito_username", cognitoUserId,  updates);
+        return this.update('user', userId,'cognito_username', cognitoUserId,  updates);
     }
 
     private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: object) {
         const attributes = Object.keys(updates);
         const attributeNames = this.generateExpressionAttributeNames(attributes);
 
-        const params =
-            {
-                TableName: process.env.TABLE as string,
-                Key: {
-                    pk: {
-                        S: `${pkPrefix}#${pk}`
-                    },
-                    sk: {
-                        S: `${skPrefix}#${sk}`
-                    }
-                },
-                UpdateExpression: this.generateUpdateExpression(attributeNames),
-                ExpressionAttributeNames: attributeNames,
-                ExpressionAttributeValues: this.generateExpressionAttributeValues(attributes, updates),
-                ReturnValues: "ALL_NEW"
-            };
+        const params = {
+            TableName: process.env.TABLE as string,
+            Key: {
+                pk: {S: `${pkPrefix}#${pk}`},
+                sk: {S: `${skPrefix}#${sk}`}
+            },
+            UpdateExpression: this.generateUpdateExpression(attributeNames),
+            ExpressionAttributeNames: attributeNames,
+            ExpressionAttributeValues: this.generateExpressionAttributeValues(attributes, updates),
+            ReturnValues: 'ALL_NEW'
+        };
 
         const command = new UpdateItemCommand(params);
         return await this.dynamodb.send(command);
@@ -123,8 +117,8 @@ class DynamoClient {
         return Object.fromEntries(attributeNames);
     }
 
-    private keyWordSubstitutes: { [key: string]: string; } = {
-        data: "#d"
+    private keyWordSubstitutes: {[key: string]: string;} = {
+        data: '#d'
     }
 
     private substituteReservedKeywords(attribute: string): string {
@@ -145,7 +139,7 @@ class DynamoClient {
         for (let i = 0; i < array.length; i++) {
             list.push(marshall(array[i]));
         }
-        value["L"] = list;
+        value['L'] = list;
         return value;
     }
 }

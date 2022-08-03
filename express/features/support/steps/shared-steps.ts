@@ -1,6 +1,6 @@
-import {Given, Then, When} from '@cucumber/cucumber';
-import {strict as assert} from 'assert';
-import {Page} from "puppeteer";
+import { Given, Then, When } from '@cucumber/cucumber';
+import { strict as assert } from 'assert';
+import { Page } from "puppeteer";
 import {
     checkUrl,
     clickLink,
@@ -74,13 +74,13 @@ Then('the {string} link will point to the following page: {string}', async funct
 async function checkErrorMessageDisplayedForField(page: Page, errorLink: any, errorMessage: string, field: string) {
     assert.notEqual(errorLink.length, 0, `Expected to find the message ${errorMessage} in the error summary.`);
 
-    const messageInSummary = await page.evaluate((el: { textContent: any; }) => el.textContent, errorLink[0]);
+    const messageInSummary = await page.evaluate((el: {textContent: any;}) => el.textContent, errorLink[0]);
     assert.equal(messageInSummary, errorMessage, `Expected text of the link to be ${errorMessage}`);
 
     const messagesAboveElement = await page.$x(`//span[contains(concat(" ", normalize-space(@class), " "), " govuk-error-message ") and @id="${field}-error" ]`);
     assert.notEqual(messagesAboveElement.length, 0, `Expected to find the message ${errorMessage} above the ${field} field.`);
 
-    const messageAboveElement = await page.evaluate((el: { textContent: any; }) => el.textContent, messagesAboveElement[0]);
+    const messageAboveElement = await page.evaluate((el: {textContent: any;}) => el.textContent, messagesAboveElement[0]);
     assert.equal(messageAboveElement.trim(), "Error: " + errorMessage, `Expected the message above the ${field} field to be ${errorMessage}`);
 }
 
