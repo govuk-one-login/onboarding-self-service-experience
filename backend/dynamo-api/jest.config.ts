@@ -8,7 +8,7 @@ export default {
         '^.+\\.ts?$': 'esbuild-jest',
     },
     clearMocks: true,
-    collectCoverage: true,
+    collectCoverage: false,
     coverageDirectory: 'coverage',
     coverageProvider: 'v8'
 };
