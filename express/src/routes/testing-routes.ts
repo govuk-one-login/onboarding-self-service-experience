@@ -461,5 +461,13 @@ router.get('/forgot-password', (req, res) => {
 router.get('/check-email-password-reset', (req, res) => {
     res.render("check-email-password-reset.njk");
 });
+// Create the 'Create a new password' page
+router.get('/create-new-password', (req, res) => {
+    res.render("create-new-password.njk");
+});
+
+router.post('/create-new-password', passwordValidator('create-new-password.njk', false), async (req, res) => {
+    res.redirect('/check-yourphonetestpage');
+});
 
 export default router;
