@@ -2,15 +2,13 @@ import {
     DynamoDBClient,
     PutItemCommand,
     PutItemCommandOutput,
-    GetItemCommand,
-    GetItemCommandOutput,
     QueryCommand,
     QueryCommandOutput,
     UpdateItemCommand,
     UpdateItemCommandOutput,
     AttributeValue
 } from "@aws-sdk/client-dynamodb";
-import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
+import {marshall} from "@aws-sdk/util-dynamodb";
 import {OnboardingTableItem} from "../@Types/OnboardingTableItem";
 import * as process from "process";
 
@@ -84,10 +82,10 @@ class DynamoClient {
                 TableName: process.env.TABLE as string,
                 Key: {
                     pk: {
-                        S: `${skPrefix}#${sk}`
+                        S: `${pkPrefix}#${pk}`
                     },
                     sk: {
-                        S: `${pkPrefix}#${pk}`
+                        S: `${skPrefix}#${sk}`
                     }
                 },
                 UpdateExpression: this.generateUpdateExpression(attributeNames),
