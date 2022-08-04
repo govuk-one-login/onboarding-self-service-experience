@@ -457,4 +457,9 @@ router.get('/forgot-password', (req, res) => {
     });
 });
 
+// Testing routs 'Check your email for a password reset link' page
+router.get('/check-email-password-reset', (req, res) => {
+    res.render("check-email-password-reset.njk");
+});
+
 export default router;
