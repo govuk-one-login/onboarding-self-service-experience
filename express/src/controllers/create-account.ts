@@ -215,7 +215,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
 
         const uuid = randomUUID();
         const email = req.session.cognitoUser?.UserAttributes?.filter((attribute: AttributeType) => attribute.Name === 'email')[0].Value;
-        const phone = req.session.mobileNumber;
+        const phone = req.session.enteredMobileNumber;
 
         let user = {
                 "pk": `user#${uuid}`,
@@ -224,7 +224,8 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
                 first_name: "we haven't collected this first name",
                 last_name: "we haven't collected this last name",
                 email: email,
-                phone: phone
+                phone: phone,
+                password_last_updated: new Date()
         }
 
         const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
