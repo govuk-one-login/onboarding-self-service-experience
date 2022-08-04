@@ -8,7 +8,7 @@ export const updateUserHandler = async (event: APIGatewayProxyEvent): Promise<an
     const body = JSON.parse(event.body as string);
     let response = {statusCode: 200, body: JSON.stringify("OK")};
     await client
-        .updateClient(body.userId, body.cognitoUserId, body.updates)
+        .updateUser(body.userId, body.cognitoUserId, body.updates)
         .then((updateItemCommandOutput) => {
             response.statusCode = 200;
             response.body = JSON.stringify(updateItemCommandOutput)
