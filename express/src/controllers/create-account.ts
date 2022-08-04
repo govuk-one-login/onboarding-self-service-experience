@@ -62,7 +62,7 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
     }
 
     const sixDigitsPattern = /^[0-9]{6}$/;
-    const otpToTest = req.body['create-email-otp'];
+    const otpToTest = req.body['create-email-otp'].trim();
 
     if (otpToTest === '') {
         console.log("No otp code entered");
@@ -76,7 +76,7 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
     }
 
     if (!sixDigitsPattern.test(otpToTest)) {
-        console.log("No otp code entered or number of symbols does not equal to 6");
+        console.log("Number of symbols does not equal to 6 or they are not all digits");
         const errorMessages = new Map<string, string>();
         errorMessages.set('create-email-otp', "Enter the security code using only 6 digits");
         const value : object = {otp: otpToTest};
