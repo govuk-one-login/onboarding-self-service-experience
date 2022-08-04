@@ -1,9 +1,8 @@
-import express, {Request, Response} from "express";
+import {Request, Response} from "express";
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {randomUUID} from "crypto";
 import {User} from "../../@types/User";
 import {Service} from "../../@types/Service";
-import {lambdaFacadeInstance} from "../lib/lambda-facade/LambdaFacade";
 import CognitoInterface from "../lib/cognito/CognitoInterface";
 import {LimitExceededException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
 
@@ -66,6 +65,53 @@ export const showChangePasswordForm = async function (req: Request, res: Respons
     res.render("account/change-password.njk");
 }
 
+export const showAccount = async function (req: Request, res: Response) {
+    const payload = (req.session.authenticationResult?.IdToken as string).split('.'); //duplcated code
+    const claims = Buffer.from(payload[1], 'base64').toString('utf-8');
+    const cognitoId = JSON.parse(claims)["cognito:username"];
+    req.session.mobileNumber = JSON.parse(claims)["phone_number"];
+
+    const lambdaFacade : LambdaFacadeInterface = req.app.get("lambdaFacade");
+    req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, req.session?.authenticationResult?.AccessToken as string)).data.Items[0]
+
+    let user: User = req.session?.selfServiceUser as User
+    res.render("account/account.njk", {
+        emailAddress: user.email?.S,
+        mobilePhoneNumber: user.phone?.S,
+        passwordLastChanged: lastUpdated(user.password_last_updated?.S),
+        serviceName: 'My juggling service',
+        updatedField: req.session.updatedField
+    });
+    req.session.updatedField = undefined;
+}
+
+function lastUpdated(lastUpdated: string): string {
+    console.log(lastUpdated);
+    const lastUpdateMillis: number = +new Date(lastUpdated);
+    const now = +new Date();
+
+    if ( lastUpdateMillis > fiveMinutesBefore(now) ) {
+        return "Last updated just now";
+    } else if ( wasToday(lastUpdateMillis) ) {
+        return "Last updated today";
+    } else {
+        return `Last updated ${new Date(lastUpdateMillis).toLocaleDateString('en-gb', {weekday: 'long', day: 'numeric', year: 'numeric', month: 'long'})}`
+    }
+    return lastUpdated ? lastUpdated : "Never changed";
+}
+
+function fiveMinutesBefore(someTime: number): number {
+    return someTime - 5 * 60 * 1_000;
+}
+
+function wasToday(someTime: number): boolean {
+    let today = new Date(new Date().toLocaleDateString());
+    console.log(today.toLocaleDateString())
+    console.log(today.toLocaleTimeString())
+    console.log(new Date(someTime).toLocaleTimeString())
+    return someTime > today.getTime();
+}
+
 export const changePassword = async function (req: Request, res: Response) {
     let newPassword = req.body.password;
     let currentPassword = req.body.currentPassword;
@@ -117,7 +163,7 @@ export const changePassword = async function (req: Request, res: Response) {
                 password: newPassword
             };
             const errorMessages = new Map<string, string>();
-            errorMessages.set('no-control', 'You have tried to change your password too many times.  Please try again later.');
+            errorMessages.set('no-control', 'You have tried to change your password too many times.  Try again in 15 minutes.');
             res.render('account/change-password.njk', {
                 errorMessages: errorMessages,
                 value: value
@@ -147,8 +193,8 @@ export const changePassword = async function (req: Request, res: Response) {
         const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
         console.log(JSON.stringify(req.session))
         await lambdaFacade.updateUser(
-            req.session?.selfServiceUser?.pk.S as string,
-            req.session?.selfServiceUser?.sk.S as string,
+            req.session?.selfServiceUser?.pk.S.substring('user#'.length) as string,
+            req.session?.selfServiceUser?.sk.S.substring('cognito_username#'.length) as string,
             {password_last_updated: new Date()},
             req.session?.authenticationResult?.AccessToken as string
         )

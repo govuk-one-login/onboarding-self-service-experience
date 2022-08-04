@@ -1,11 +1,14 @@
-import express, {Request, Response} from "express";
-import {changePassword, listServices, showChangePasswordForm} from "../controllers/manage-account";
+import express from "express";
+import {changePassword, listServices, showAccount, showChangePasswordForm} from "../controllers/manage-account";
 import {checkAuthorisation} from "../middleware/authoriser";
 import {showAddServiceForm, processAddServiceForm} from "../controllers/manage-account";
 import {serviceNameValidator} from "../middleware/serviceNameValidator";
-import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
+import {unmarshall} from "@aws-sdk/util-dynamodb";
 
 const router = express.Router();
+
+router.get('/account', checkAuthorisation, showAccount);
+
 router.get('/account/list-services', checkAuthorisation, listServices);
 
 router.get('/add-service-name', checkAuthorisation, showAddServiceForm);

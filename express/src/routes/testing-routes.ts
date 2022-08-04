@@ -3,7 +3,6 @@ import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {urisValidator} from "../middleware/urisValidator";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 import {emailValidator} from "../middleware/emailValidator";
-import {passwordValidator} from "../middleware/passwordValidator";
 
 const router = express.Router();
 
@@ -158,18 +157,6 @@ router.get('/redirect-placeholder', (req, res) => {
         changeRedirectURIsUrl: "/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId",
         changePublicKeyUrl: "/change-public-key/:serviceId/:selfServiceClientId/:clientId"
     });
-});
-
-// Testing route for Your account page
-router.get('/account', (req, res) => {
-    res.render("account/account.njk", {
-        emailAddress: 'your.email@digital.cabinet-office.gov.uk',
-        mobilePhoneNumber: '07123456789',
-        passwordLastChanged: 'Last changed 1 month ago',
-        serviceName: 'My juggling service',
-        updatedField: req.session.updatedField
-    });
-    req.session.updatedField = undefined;
 });
 
 // Testing routes for Change your service name page
