@@ -1,6 +1,5 @@
-import {APIGatewayProxyEvent, APIGatewayProxyResult} from 'aws-lambda';
-
-import axios, {Axios, AxiosResponse} from "axios"; // until Onboarding takes over client registry / just for now
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import axios, { Axios } from "axios"; // TODO: Until Onboarding takes over client registry / just for now
 
 let instance: Axios;
 
@@ -11,20 +10,17 @@ instance = axios.create({
     }
 });
 
-
 export const updateClientInRegistryHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-
-    let payload: any = event;
-    console.log(payload.clientId);
-    console.log(payload.serviceId);
-    console.log(payload.selfServiceClientId)
-    console.log(payload.updates);
-
+    const payload: any = event;
     const result = await (await instance).put(`/connect/register/${payload.clientId}`, payload.updates);
 
-    const response: APIGatewayProxyResult = {
+    return {
         statusCode: 200,
-        body: JSON.stringify({...result.data, ...{updates: payload.updates}, ...{serviceId: payload.serviceId}, ...{selfServiceClientId: payload.selfServiceClientId}})
-    }
-    return response;
+        body: JSON.stringify({
+            ...result.data,
+            updates: payload.updates,
+            serviceId: payload.serviceId,
+            selfServiceClientId: payload.selfServiceClientId
+        })
+    };
 }

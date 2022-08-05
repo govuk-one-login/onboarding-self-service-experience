@@ -12,7 +12,7 @@ export default function getAuthApiCompliantPublicKey(publicKey: string): string 
             .replace("\n", "")
             .replace("\r", "");
     } catch (err) {
-        console.log(`Failed to convert\n${publicKey}`)
+        console.error(`Failed to convert\n${publicKey}`)
     }
 
     let publicKeyWithHeaders = `${BEGIN}\n${publicKey}\n${END}\n`
@@ -24,8 +24,8 @@ export default function getAuthApiCompliantPublicKey(publicKey: string): string 
             .replace("\n", "")
             .replace("\r", "");
     } catch (err) {
-        console.log(`Failed to convert\n${publicKeyWithHeaders}`)
+        console.error(`Failed to convert\n${publicKeyWithHeaders}`)
     }
 
-    throw new Error(`Failed to convert\n${publicKeyWithHeaders}\n`)
+    throw new Error(`Failed to convert\n${publicKey}\n`)
 }

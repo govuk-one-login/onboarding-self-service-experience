@@ -48,8 +48,8 @@ export function urisValidator(template: string, whichUris: string): MiddlewareFu
         for (const url of urlStrings) {
             const errorMessages = new Map<string, string>();
             errorMessages.set(whichUris, "URLs must be https (except for localhost)");
+
             let newUrl = new URL(url);
-            console.log(newUrl)
             if( !isValidLocalHost(newUrl) && newUrl.protocol !== "https:" ) {
                 res.render(template, {
                     errorMessages: errorMessages,

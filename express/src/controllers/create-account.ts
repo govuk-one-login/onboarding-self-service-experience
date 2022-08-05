@@ -65,18 +65,17 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
     const otpToTest = req.body['create-email-otp'].trim();
 
     if (otpToTest === '') {
-        console.log("No otp code entered");
         const errorMessages = new Map<string, string>();
         errorMessages.set('create-email-otp', "Enter the security code");
         res.render('create-account/check-email.njk', {
             emailAddress: req.session.emailAddress,
             errorMessages: errorMessages
         });
+
         return;
     }
 
     if (!sixDigitsPattern.test(otpToTest)) {
-        console.log("Number of symbols does not equal to 6 or they are not all digits");
         const errorMessages = new Map<string, string>();
         errorMessages.set('create-email-otp', "Enter the security code using only 6 digits");
         const value : object = {otp: otpToTest};
@@ -85,6 +84,7 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
             errorMessages: errorMessages,
             value: value
         });
+
         return;
     }
 
@@ -95,8 +95,6 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
         return;
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
-            // show the form again with an error message 
-            console.log("Showing them the check-email form again")
             const errorMessages = new Map<string, string>();
             errorMessages.set('create-email-otp', "The code you entered is not correct or has expired - enter it again or request a new code");
             res.render('create-account/check-email.njk', {
@@ -109,12 +107,11 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
 }
 
 export const showNewPasswordForm = async function (req: Request, res: Response, next: NextFunction) {
-    console.log("Show new password")
     if (req.session.session !== undefined) {
         res.render('create-account/new-password.njk');
         return;
     } else {
-        // this flow needs designing
+        // TODO: This flow needs designing
         res.redirect('/sign-in');
     }
 }
@@ -127,7 +124,7 @@ export const updatePassword = async function (req: Request, res: Response, next:
     req.session.authenticationResult = response.AuthenticationResult;
 
     let user = await cognitoClient.getUser(req.session.emailAddress as string);
-    // do something better with this
+    // TODO: Do something better with this
     req.session.cognitoUser = user;
     let email: string | undefined;
 
@@ -135,7 +132,6 @@ export const updatePassword = async function (req: Request, res: Response, next:
         email = user.UserAttributes.filter((attribute: AttributeType) => attribute.Name === 'email')[0].Value;
     }
 
-    let updateResponse: AdminUpdateUserAttributesCommandOutput;
     if (email === undefined) {
         next(); // Who knows what could have gone wrong?
     } else {
@@ -199,16 +195,16 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         res.redirect('/sign-in');
         return;
     }
+
     const cognitoClient = await req.app.get('cognitoClient');
     let otp = req.body['create-sms-otp'];
     if (otp === undefined) {
         res.render('create-account/check-mobile.njk', {mobileNumber: req.session.mobileNumber});
         return;
     }
+
     try {
-        let response = await cognitoClient.verifySmsCode(req.session.authenticationResult?.AccessToken, otp);
-        console.log("Got SMS Verification code response")
-        console.log(response);
+        await cognitoClient.verifySmsCode(req.session.authenticationResult?.AccessToken, otp);
 
         const uuid = randomUUID();
         const email = req.session.cognitoUser?.UserAttributes?.filter((attribute: AttributeType) => attribute.Name === 'email')[0].Value;
@@ -226,7 +222,8 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         }
 
         const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
-        let addedUser = await lambdaFacade.putUser(user, req.session.authenticationResult?.AccessToken);
+        await lambdaFacade.putUser(user, req.session.authenticationResult?.AccessToken);
+
         req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${req.session.cognitoUser?.Username}`, req.session?.authenticationResult?.AccessToken as string)).data.Items[0]
         res.redirect('/add-service-name');
         return;

@@ -74,7 +74,7 @@ export const processSignInForm = async function(req: Request, res: Response) {
             return;
         }
 
-        console.log(error);
+        console.error(error);
         res.render('there-is-a-problem.njk');
         return;
     }
@@ -89,10 +89,8 @@ export const processSignInForm = async function(req: Request, res: Response) {
 
     const lambdaFacade : LambdaFacadeInterface = req.app.get("lambdaFacade");
     req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)).data.Items[0]
-    console.log(req.session.selfServiceUser)
     res.redirect('/sign-in-otp-mobile');
     return;
-
 }
 
 export const signOut = async function(req: Request, res: Response) {

@@ -22,7 +22,6 @@ import(`./lib/lambda-facade/${process.env.LAMBDA_FACADE||"LambdaFacade"}`).then(
     facade => {
         console.log(facade)
         app.set('lambdaFacade', facade.lambdaFacadeInstance);
-        console.log(app.get('lambdaFacade'))
     }
 );
 
@@ -69,11 +68,9 @@ app.get("/", function (req: Request, res: Response) {
 app.use(function (err: unknown, req: Request, res: Response, next: NextFunction) {
     // in async controller methods, you need to catch and next(error); to reach this.
     console.log("Error handler");
-    console.log(err)
+    console.error(err)
     res.send('This should be the something went wrong page');
 });
 
 const port = process.env.PORT || 3000
 app.listen(port, () => console.log(`Server running; listening on port ${port}`));
-
-

@@ -14,7 +14,6 @@ export const updateUserHandler = async (event: APIGatewayProxyEvent): Promise<an
             response.body = JSON.stringify(updateItemCommandOutput)
         })
         .catch((putItemOutput) => {
-            console.log(putItemOutput)
             response.statusCode = 500;
             response.body = JSON.stringify(putItemOutput)
         });

@@ -25,6 +25,6 @@ export const putServiceUserHandler = async (event: APIGatewayProxyEvent, context
             response.statusCode = 500;
             response.body = JSON.stringify(putItemOutput)
         });
-    console.log(response)
+
     return response;
 };
