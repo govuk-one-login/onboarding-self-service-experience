@@ -12,7 +12,7 @@ export function emailValidator(render: string): MiddlewareFunction<Request, Resp
         emailAddress = emailAddress.trim();
 
         if (emailAddress === "" || emailAddress === undefined || emailAddress === null) {
-            await errorResponse(render, emailAddress, res, 'emailAddress', 'Enter an email address in the correct format, like name@example.com');
+            await errorResponse(render, emailAddress, res, 'emailAddress', 'Enter your email address');
             return;
         }
 

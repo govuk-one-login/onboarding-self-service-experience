@@ -31,7 +31,7 @@
         </div>
 
         <p class="govuk-body">The email contains a 6 digit security code.</p>
-        <p class="govuk-body">Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.</p>
+        <p class="govuk-body">The email might take a few minutes to arrive. If you do not get an email, check your spam folder.</p>
         <p class="govuk-body">The code will expire after 15 minutes.</p>
 
         <form class="form" action="/create/check-email" method="post">
@@ -53,7 +53,7 @@
             } if errorMessages else false
           }) }}
 
-          <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
+          <button id="submit" type="submit" class="govuk-button" data-module="govuk-button" formnovalidate>
             Continue
          </button>
          
