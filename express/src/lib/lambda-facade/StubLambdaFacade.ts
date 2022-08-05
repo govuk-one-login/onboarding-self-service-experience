@@ -9,7 +9,6 @@ import {AxiosResponse} from "axios";
 class StubLambdaFacade implements LambdaFacadeInterface {
     constructor() {
         console.log("Creating stub lambda facade")
-
     }
 
     getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {

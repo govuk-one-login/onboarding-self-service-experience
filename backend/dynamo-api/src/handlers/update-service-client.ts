@@ -3,7 +3,6 @@ import DynamoClient from "../client/DynamoClient";
 const tableName = process.env.TABLE;
 const client = new DynamoClient(tableName as string);
 
-
 export const updateServiceClientHandler = async (event: any): Promise<any> => {
     const body = JSON.parse(event.body);
     let response = {statusCode: 200, body: JSON.stringify("OK")};
@@ -14,11 +13,9 @@ export const updateServiceClientHandler = async (event: any): Promise<any> => {
             response.body = JSON.stringify(updateItemCommandOutput)
         })
         .catch((putItemOutput) => {
-            console.log(putItemOutput)
             response.statusCode = 500;
             response.body = JSON.stringify(putItemOutput)
         });
 
     return response;
 };
-

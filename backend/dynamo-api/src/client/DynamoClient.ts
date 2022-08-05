@@ -93,7 +93,7 @@ class DynamoClient {
                 ExpressionAttributeValues: this.generateExpressionAttributeValues(attributes, updates),
                 ReturnValues: "ALL_NEW"
             };
-        console.log(JSON.stringify(params));
+
         const command = new UpdateItemCommand(params);
         return await this.dynamodb.send(command);
     }

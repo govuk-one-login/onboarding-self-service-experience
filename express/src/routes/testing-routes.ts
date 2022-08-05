@@ -28,7 +28,7 @@ router.post('/change-client-name/:serviceId/:selfServiceClientId/:clientId', asy
     try {
         await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {data: clientName}, req.session.authenticationResult?.AccessToken as string);
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.redirect('/there-is-a-problem');
         return;
     }
@@ -54,7 +54,7 @@ router.post('/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId', u
     try {
         result = await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {redirect_uris: redirectUris}, req.session.authenticationResult?.AccessToken as string);
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.redirect('/there-is-a-problem');
         return;
     }
@@ -89,12 +89,10 @@ router.post('/change-user-attributes/:serviceId/:selfServiceClientId/:clientId',
     } else if (typeof req.body.userAttributes === "string") {
         attributes.push(req.body.userAttributes);
     }
-
-    console.log(attributes)
     try {
         await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {scopes: attributes}, req.session.authenticationResult?.AccessToken as string);
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.redirect('/there-is-a-problem');
         return;
     }
@@ -118,7 +116,7 @@ router.post('/change-post-logout-URIs/:serviceId/:selfServiceClientId/:clientId'
     try {
         await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {post_logout_redirect_uris: postLogoutURIs}, req.session.authenticationResult?.AccessToken as string);
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.redirect('/there-is-a-problem');
         return;
     }
@@ -143,7 +141,7 @@ router.post('/change-public-key/:serviceId/:selfServiceClientId/:clientId', conv
     try {
         await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {public_key: publicKey}, req.session.authenticationResult?.AccessToken as string);
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.redirect('/there-is-a-problem');
         return;
     }
