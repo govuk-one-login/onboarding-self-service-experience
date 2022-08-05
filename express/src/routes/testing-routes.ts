@@ -406,4 +406,9 @@ router.get('/check-email-password-reset', (req, res) => {
     res.render("check-email-password-reset.njk");
 });
 
+// Testing routs Create an 'No account found' page
+router.get('/no-account-found', (req, res) => {
+    res.render("no-account-found.njk");
+});
+
 export default router;
