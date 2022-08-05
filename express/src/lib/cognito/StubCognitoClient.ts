@@ -1,66 +1,40 @@
-import CognitoInterface from "./CognitoInterface";
-import {ServiceException} from '@aws-sdk/smithy-client/dist-types/exceptions'
-import {promises as fs} from "fs";
-
 import {
     AdminCreateUserCommandOutput,
     AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
     AdminUpdateUserAttributesCommandOutput,
+    ChangePasswordCommandOutput,
     GetUserAttributeVerificationCodeCommandOutput,
     RespondToAuthChallengeCommandOutput,
     UsernameExistsException,
-    VerifyUserAttributeCommandOutput,
-    ChangePasswordCommandOutput
-} from "@aws-sdk/client-cognito-identity-provider";
+    VerifyUserAttributeCommandOutput
+} from '@aws-sdk/client-cognito-identity-provider';
+import { ServiceException } from '@aws-sdk/smithy-client/dist-types/exceptions'
+import { promises as fs } from 'fs';
+import CognitoInterface from './CognitoInterface';
+
+type Override = {
+    parameter: string,
+    value: string,
+    return?: any,
+    throw?: string
+}
 
 export class CognitoClient implements CognitoInterface {
     overrides: Promise<any>;
 
     constructor() {
-        this.overrides = fs.readFile("./stubs-config.json");
+        this.overrides = fs.readFile('./stubs-config.json');
     }
 
     async createUser(email: string): Promise<AdminCreateUserCommandOutput> {
-        let overrides: any = await this.getOverridesFor('createUser');
-
-        if (overrides === undefined) {
-            return Promise.resolve({$metadata: {}});
-        }
-
-        let override: any = overrides.filter(
-            (override: { value: string }) => (override.value === email))[0];
-
-        if (override === undefined) {
-            return Promise.resolve({$metadata: {}});
-        }
-
-        if (override?.throw) {
-            throw this.getException(override.throw);
-        } else {
-            return Promise.resolve(override.return); // something from the config file
-        }
+        const returnValue = await this.getOverriddenReturnValue('login', 'email', email);
+        return Promise.resolve(returnValue || {$metadata: {}});
     }
 
     async resendEmailAuthCode(email: string): Promise<AdminCreateUserCommandOutput> {
-        let overrides: any = await this.getOverridesFor('createUser');
-
-        if (overrides === undefined) {
-            return Promise.resolve({$metadata: {}});
-        }
-
-        let override: any = overrides.filter(
-            (override: { value: string }) => (override.value === email))[0];
-
-        if (override === undefined) {
-            return Promise.resolve({$metadata: {}});
-        }
-
-        if (override?.throw) {
-            throw this.getException(override.throw);
-        } else {
-            return Promise.resolve(override.return); // something from the config file
-        }
+        const returnValue = await this.getOverriddenReturnValue('login', 'email', email);
+        return Promise.resolve(returnValue || {$metadata: {}});
     }
 
     getUser(username: string): Promise<AdminGetUserCommandOutput> {
@@ -68,25 +42,8 @@ export class CognitoClient implements CognitoInterface {
     }
 
     async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
-        let overrides: any = await this.getOverridesFor('login');
-
-        if (overrides === undefined) {
-            return Promise.resolve({$metadata: {}});
-        }
-
-        let override: any = overrides.filter(
-            (override: { value: string }) => (override.value === email))[0];
-
-
-        if (override === undefined) {
-            return Promise.resolve({$metadata: {}});
-        }
-
-        if (override?.throw) {
-            throw this.getException(override.throw);
-        } else {
-            return Promise.resolve(override.return); // something from the config file
-        }
+        const returnValue = await this.getOverriddenReturnValue('login', 'email', email);
+        return Promise.resolve(returnValue || {$metadata: {}});
     }
 
     sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput> {
@@ -98,7 +55,7 @@ export class CognitoClient implements CognitoInterface {
     }
 
     setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
-        return Promise.resolve({AuthenticationResult: {AccessToken: "let me in!"}, $metadata: {}});
+        return Promise.resolve({AuthenticationResult: {AccessToken: 'let me in!'}, $metadata: {}});
     }
 
     changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<ChangePasswordCommandOutput> {
@@ -113,12 +70,33 @@ export class CognitoClient implements CognitoInterface {
         return Promise.resolve({$metadata: {}});
     }
 
-    private async getOverridesFor(method: string): Promise<any | undefined> {
-        let overrides: any = (await this.overrides);
+    private async getOverriddenReturnValue(method: string, parameter: string, value: string) {
+        let override = await this.getOverrideFor(method, parameter, value);
+        if (override === undefined) {
+            return undefined;
+        }
+
+        if (override?.throw) {
+            throw this.getException(override.throw);
+        } else {
+            return override.return; // something from the config file
+        }
+    }
+
+    private async getOverrideFor(method: string, parameter: string, value: string): Promise<Override | undefined> {
+        let overrides = await this.overrides;
         if (overrides === undefined) {
             return undefined;
         }
-        return JSON.parse(overrides)[method];
+
+        let methodOverrides: Override[] = JSON.parse(overrides)[method];
+        if (methodOverrides === undefined) {
+            return undefined;
+        }
+
+        return methodOverrides
+            .filter(override => override.parameter === parameter)
+            .filter(override => override.value === value)[0];
     }
 
     private getException(exception: string): ServiceException {
@@ -126,9 +104,9 @@ export class CognitoClient implements CognitoInterface {
             case 'UsernameExistsException' :
                 return new UsernameExistsException({$metadata: {}});
         }
+
         throw new Error('Unknown exception');
     }
-
 }
 
 module.exports = {CognitoClient}
