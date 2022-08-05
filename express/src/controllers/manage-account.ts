@@ -9,7 +9,7 @@ import {LimitExceededException, NotAuthorizedException} from "@aws-sdk/client-co
 export const listServices = async function (req: Request, res: Response) {
     const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
     if (req.session.selfServiceUser == undefined) {
-        console.log("No user in session.")
+        console.error("No user in session. contollers/manage-account/listServices(req, res)")
         res.render('there-is-a-problem.njk');
         return;
     }
@@ -86,7 +86,6 @@ export const showAccount = async function (req: Request, res: Response) {
 }
 
 function lastUpdated(lastUpdated: string): string {
-    console.log(lastUpdated);
     const lastUpdateMillis: number = +new Date(lastUpdated);
     const now = +new Date();
 
@@ -106,9 +105,6 @@ function fiveMinutesBefore(someTime: number): number {
 
 function wasToday(someTime: number): boolean {
     let today = new Date(new Date().toLocaleDateString());
-    console.log(today.toLocaleDateString())
-    console.log(today.toLocaleTimeString())
-    console.log(new Date(someTime).toLocaleTimeString())
     return someTime > today.getTime();
 }
 
@@ -136,7 +132,7 @@ export const changePassword = async function (req: Request, res: Response) {
         return;
     }
 
-    if (!/^.{8,}$/.test(newPassword)) {
+    if (newPassword.length < 8) {
         const errorMessages = new Map<string, string>();
         errorMessages.set('password', 'Your password must be 8 characters or more');
         const value: object = {
@@ -154,8 +150,8 @@ export const changePassword = async function (req: Request, res: Response) {
         const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
         await cognitoClient.changePassword(req.session?.authenticationResult?.AccessToken as string, currentPassword, newPassword);
     } catch (error) {
-        console.log("ERROR CALLING COGNITO WITH NEW PASSWORD")
-        console.log(error);
+        console.error("ERROR CALLING COGNITO WITH NEW PASSWORD")
+        console.error(error);
 
         if(error instanceof LimitExceededException) {
             const value: object = {
@@ -191,7 +187,6 @@ export const changePassword = async function (req: Request, res: Response) {
 
     try {
         const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
-        console.log(JSON.stringify(req.session))
         await lambdaFacade.updateUser(
             req.session?.selfServiceUser?.pk.S.substring('user#'.length) as string,
             req.session?.selfServiceUser?.sk.S.substring('cognito_username#'.length) as string,
@@ -199,8 +194,8 @@ export const changePassword = async function (req: Request, res: Response) {
             req.session?.authenticationResult?.AccessToken as string
         )
     } catch (error) {
-        console.log("ERROR CALLING LAMBDA WITH USER TO UDPDATE")
-        console.log(error);
+        console.error("ERROR CALLING LAMBDA WITH USER TO UDPDATE")
+        console.error(error);
         res.render('there-is-a-problem.njk');
         return;
     }

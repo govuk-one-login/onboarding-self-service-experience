@@ -89,6 +89,7 @@ export const processSignInForm = async function(req: Request, res: Response) {
 
     const lambdaFacade : LambdaFacadeInterface = req.app.get("lambdaFacade");
     req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)).data.Items[0]
+    console.log(req.session.selfServiceUser)
     res.redirect('/sign-in-otp-mobile');
     return;
 

@@ -16,9 +16,14 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         return Promise.resolve({
             data: {
                 Items: [{
-                    pk: "user#user_id",
-                    sk: "of",
-                    data: "this matters"
+                        "last_name": {"S": "we haven't collected this last name"},
+                        "data": {"S": "we haven't collected this full name"},
+                        "first_name": {"S": "we haven't collected this first name"},
+                        "password_last_updated": {"S": "2022-08-04T13:42:00.821Z"},
+                        "sk": {"S": "cognito_username#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
+                        "email": {"S": "registered@gds.gov.uk"},
+                        "pk": {"S": "user#2c677c1a-22a8-4efa-a01f-9656acbbf5ee"},
+                        "phone": {"S": "07700 987 654"}
                 }]
             }
         } as AxiosResponse);
