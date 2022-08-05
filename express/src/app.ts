@@ -43,6 +43,7 @@ declare module 'express-session' {
     interface SessionData {
         emailAddress: string;
         mobileNumber: string;
+        enteredMobileNumber: string;
         session: string;
         authenticationResult: AuthenticationResultType;
         cognitoUser: AdminGetUserCommandOutput;

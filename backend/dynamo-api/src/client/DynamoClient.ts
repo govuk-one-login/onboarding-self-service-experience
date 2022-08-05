@@ -2,15 +2,13 @@ import {
     DynamoDBClient,
     PutItemCommand,
     PutItemCommandOutput,
-    GetItemCommand,
-    GetItemCommandOutput,
     QueryCommand,
     QueryCommandOutput,
     UpdateItemCommand,
     UpdateItemCommandOutput,
     AttributeValue
 } from "@aws-sdk/client-dynamodb";
-import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
+import {marshall} from "@aws-sdk/util-dynamodb";
 import {OnboardingTableItem} from "../@Types/OnboardingTableItem";
 import * as process from "process";
 
@@ -68,7 +66,14 @@ class DynamoClient {
     }
 
     async updateClient(serviceId: string, clientId: string, updates: object): Promise<UpdateItemCommandOutput> {
+        return this.update("service", serviceId, "client", clientId, updates);
+    }
 
+    async updateUser(userId: string, cognitoUserId: string, updates: object): Promise<UpdateItemCommandOutput> {
+        return this.update("user", userId,"cognito_username", cognitoUserId,  updates);
+    }
+
+    private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: object) {
         const attributes = Object.keys(updates);
         const attributeNames = this.generateExpressionAttributeNames(attributes);
 
@@ -77,10 +82,10 @@ class DynamoClient {
                 TableName: process.env.TABLE as string,
                 Key: {
                     pk: {
-                        S: `service#${serviceId}`
+                        S: `${pkPrefix}#${pk}`
                     },
                     sk: {
-                        S: `client#${clientId}`
+                        S: `${skPrefix}#${sk}`
                     }
                 },
                 UpdateExpression: this.generateUpdateExpression(attributeNames),
@@ -88,19 +93,14 @@ class DynamoClient {
                 ExpressionAttributeValues: this.generateExpressionAttributeValues(attributes, updates),
                 ReturnValues: "ALL_NEW"
             };
-
+        console.log(JSON.stringify(params));
         const command = new UpdateItemCommand(params);
         return await this.dynamodb.send(command);
     }
 
     generateUpdateExpression(attributeNames: { [key: string]: string; }): string {
-        let expression = "";
-        let i = 0;
         let keys = Object.keys(attributeNames);
-        for (let i = 0; i < keys.length; i++) {
-            expression += ` set ${keys[i]} = :val${i},`;
-        }
-        return expression.slice(1, -1);
+        return keys.map((key, index) => ` set ${key} = :val${index}`).join(',');
     }
 
     generateExpressionAttributeValues(attributes: string[], update: object): { [key: string]: AttributeValue; } {
@@ -112,20 +112,23 @@ class DynamoClient {
         return values;
     }
 
-    generateExpressionAttributeNames(attributes: string[]): { [key: string]: string; } {
-        let attributeNames: any = {};
-        for (let i = 0; i < attributes.length; i++) {
-            if (attributes[i] in this.keyWordSubstitutes) {
-                attributeNames[`${this.keyWordSubstitutes[attributes[i]]}` as keyof typeof attributeNames] = attributes[i];
-            } else {
-                attributeNames[`#${attributes[i]}`] = attributes[i];
-            }
-        }
-        return attributeNames;
+    generateExpressionAttributeValuesNew(attributes: string[], update: object): { [key: string]: AttributeValue; } {
+        let values: any = {};
+        attributes.forEach( (attribute, index) => {values[`:val${index}`] = this.customMarshal(update[attributes[index] as keyof typeof update])});
+        return values;
+    }
+
+    generateExpressionAttributeNames(attributes: string[]) {
+        let attributeNames = attributes.map(attribute => ([this.substituteReservedKeywords(attribute), attribute]));
+        return Object.fromEntries(attributeNames);
     }
 
     private keyWordSubstitutes: { [key: string]: string; } = {
         data: "#d"
+    }
+
+    private substituteReservedKeywords(attribute: string): string {
+        return this.keyWordSubstitutes[attribute] || `#${attribute}`;
     }
 
     private customMarshal(attribute: any) {

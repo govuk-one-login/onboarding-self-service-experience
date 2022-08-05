@@ -30,6 +30,7 @@ export function mobileValidator(req: Request, res: Response, next: NextFunction)
         return;
     }
 
+    req.session.enteredMobileNumber = req.body.mobileNumber;
     req.session.mobileNumber = mobileNumber;
     next();
 

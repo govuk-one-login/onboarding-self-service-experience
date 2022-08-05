@@ -15,6 +15,10 @@ Parameters:
 Resources:
 
   putUserFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/put-user.putUserHandler
@@ -49,6 +53,10 @@ Resources:
           - src/handlers/put-user.ts
 
   getUserFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/get-user.getUserHandler
@@ -83,6 +91,10 @@ Resources:
           - src/handlers/get-user.ts
 
   putServiceFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/put-service.putServiceHandler
@@ -117,6 +129,10 @@ Resources:
           - src/handlers/put-service.ts
 
   getServicesFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/get-services.getServicesHandler
@@ -152,6 +168,10 @@ Resources:
           - src/handlers/get-services.ts
 
   getServiceClientsFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/get-service-clients.getServiceClientsHandler
@@ -169,7 +189,6 @@ Resources:
         Variables:
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
-
       Events:
         Api:
           Type: Api
@@ -187,6 +206,10 @@ Resources:
           - src/handlers/get-service-clients.ts
 
   registerClientFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/register-client.registerClientHandler
@@ -217,6 +240,10 @@ Resources:
           - src/handlers/register-client.ts
 
   updateClientInRegistryFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/update-client-in-registry.updateClientInRegistryHandler
@@ -247,6 +274,10 @@ Resources:
           - src/handlers/update-client-in-registry.ts
 
   putServiceClientFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/put-service-client.putServiceClientHandler
@@ -274,6 +305,10 @@ Resources:
           - src/handlers/put-service-client.ts
 
   updateServiceClientFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/update-service-client.updateServiceClientHandler
@@ -301,6 +336,10 @@ Resources:
           - src/handlers/update-service-client.ts
 
   putServiceUserFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/put-service-user.putServiceUserHandler
@@ -327,7 +366,48 @@ Resources:
         EntryPoints:
           - src/handlers/put-service-user.ts
 
+  updateUserFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/update-user.updateUserHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Updates a user in our DDB table but does not touch Cognito.
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !ImportValue
+              'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
+      Environment:
+        Variables:
+          TABLE: !ImportValue
+            'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /update-user
+            Method: POST
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/update-user.ts
+
   newServiceHandler:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/new-service.newServiceHandler
@@ -376,6 +456,10 @@ Resources:
           - src/handlers/new-service.ts
 
   newClientHandler:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/new-client.newClientHandler
@@ -424,6 +508,10 @@ Resources:
           - src/handlers/new-client.ts
 
   doUpdateClientHandler:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/do-update-client.doUpdateClientHandler
@@ -571,6 +659,8 @@ Resources:
         UpdateServiceClientFunctionArn: !GetAtt updateServiceClientFunction.Arn
 
   StepFunctionsLogGroup:
+    # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
+    # checkov:skip=CKV_AWS_66: "Ensure that CloudWatch Log Group specifies retention days"
     Type: AWS::Logs::LogGroup
 
 Outputs:

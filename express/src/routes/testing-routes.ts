@@ -3,7 +3,6 @@ import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {urisValidator} from "../middleware/urisValidator";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 import {emailValidator} from "../middleware/emailValidator";
-import {passwordValidator} from "../middleware/passwordValidator";
 
 const router = express.Router();
 
@@ -157,16 +156,6 @@ router.get('/redirect-placeholder', (req, res) => {
     res.render("dashboard/finish-connecting-sign-in-journey.njk", {
         changeRedirectURIsUrl: "/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId",
         changePublicKeyUrl: "/change-public-key/:serviceId/:selfServiceClientId/:clientId"
-    });
-});
-
-// Testing route for Your account page
-router.get('/account', (req, res) => {
-    res.render("account/account.njk", {
-        emailAddress: 'your.email@digital.cabinet-office.gov.uk',
-        mobilePhoneNumber: '07123456789',
-        passwordLastChanged: 'Last changed 1 month ago',
-        serviceName: 'My juggling service'
     });
 });
 
@@ -326,51 +315,6 @@ router.get('/account-success-screen-test', (req, res) => {
     });
 });
 
-// Testing routes for Change your password page
-router.get('/change-password', (req, res) => {
-    res.render("account/change-password.njk");
-});
-
-router.post('/change-password', async (req, res) => {
-    let newPassword = req.body.password;
-    let currentPassword = req.body.currentPassword;
-
-    if (currentPassword ==="") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set('currentPassword', 'Enter your current password');
-        res.render('account/change-password.njk', {
-            errorMessages: errorMessages,
-        });
-        return;
-    }
-
-    if (newPassword ==="") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set('password', 'Enter your new password');
-        const value : object = {currentPassword: currentPassword};
-        res.render('account/change-password.njk', {
-            errorMessages: errorMessages,
-            value: value
-        });
-        return;
-    }
-
-    if (!/^.{8,}$/.test(newPassword)) {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set('password', 'Your password must be 8 characters or more');
-        const value : object = {
-            currentPassword: currentPassword,
-            password: newPassword
-        };
-        res.render('account/change-password.njk', {
-            errorMessages: errorMessages,
-            value: value
-        });
-        return;
-    }
-    
-    res.redirect('/account');
-});
 
 //// Testing route 'Form submitted' page for private beta
 router.get('/private-beta-form-submitted', (req, res) => {
