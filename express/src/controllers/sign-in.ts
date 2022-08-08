@@ -1,19 +1,22 @@
+import {
+    AdminInitiateAuthCommandOutput,
+    NotAuthorizedException,
+    UserNotFoundException
+} from "@aws-sdk/client-cognito-identity-provider";
 import {Request, Response} from "express";
-import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
-import {AdminInitiateAuthCommandOutput, NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 
 import CognitoInterface from "../lib/cognito/CognitoInterface";
-import {User} from "../../@types/User";
+import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 
-export const showSignInFormEmail = async function(req: Request, res: Response) {
+export const showSignInFormEmail = async function (req: Request, res: Response) {
     if (req.session.emailAddress) {
-        res.render('sign-in.njk', { emailAddress: req.session.emailAddress });
+        res.render('sign-in.njk', {emailAddress: req.session.emailAddress});
     } else {
         res.render('sign-in.njk');
     }
 }
 
-export const showLoginOtpMobile = async function(req: Request, res: Response) {
+export const showLoginOtpMobile = async function (req: Request, res: Response) {
     if (req.session.emailAddress) {
         const mobileNumberRaw = String(req.session.mobileNumber);
         const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
@@ -28,7 +31,7 @@ export const showLoginOtpMobile = async function(req: Request, res: Response) {
     }
 }
 
-export const processLoginOtpMobile = async function(req: Request, res: Response) {
+export const processLoginOtpMobile = async function (req: Request, res: Response) {
     // TO DO add the functionality to process the login mobile otp
     if (true) { // because OTP was correct and we've implemented that
         req.session.isSignedIn = true;
@@ -43,7 +46,7 @@ export const processEmailAddress = async function (req: Request, res: Response) 
 }
 
 
-export const showSignInFormPassword = async function(req: Request, res: Response) {
+export const showSignInFormPassword = async function (req: Request, res: Response) {
     if (req.session.emailAddress) {
         res.render('sign-in-password.njk');
     } else {
@@ -51,7 +54,7 @@ export const showSignInFormPassword = async function(req: Request, res: Response
     }
 }
 
-export const processSignInForm = async function(req: Request, res: Response) {
+export const processSignInForm = async function (req: Request, res: Response) {
     let email;
     if (req.session.emailAddress) {
         email = req.session.emailAddress;
@@ -63,7 +66,7 @@ export const processSignInForm = async function(req: Request, res: Response) {
     const cognitoClient: CognitoInterface = req.app.get('cognitoClient');
     let response: AdminInitiateAuthCommandOutput;
     try {
-         response = await cognitoClient.login(email, password);
+        response = await cognitoClient.login(email, password);
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
             const errorMessages = new Map<string, string>();
@@ -72,8 +75,8 @@ export const processSignInForm = async function(req: Request, res: Response) {
             return;
         }
 
-        if (error instanceof UserNotFoundException ) {
-                req.session.emailAddress = email;
+        if (error instanceof UserNotFoundException) {
+            req.session.emailAddress = email;
             res.redirect('/create/get-email')
             return;
         }
@@ -91,12 +94,12 @@ export const processSignInForm = async function(req: Request, res: Response) {
     const cognitoId = JSON.parse(claims)["cognito:username"];
     req.session.mobileNumber = JSON.parse(claims)["phone_number"];
 
-    const lambdaFacade : LambdaFacadeInterface = req.app.get("lambdaFacade");
+    const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
     req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)).data.Items[0]
     res.redirect('/sign-in-otp-mobile');
     return;
 }
 
-export const signOut = async function(req: Request, res: Response) {
+export const signOut = async function (req: Request, res: Response) {
     req.session.destroy(() => res.redirect('/'));
 }

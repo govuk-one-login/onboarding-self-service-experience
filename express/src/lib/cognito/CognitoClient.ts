@@ -1,29 +1,25 @@
 import {
-    CognitoIdentityProviderClient,
-    AdminInitiateAuthCommand,
-    VerifyUserAttributeCommand,
-    GetUserCommand,
-    GetUserAttributeVerificationCodeCommand,
     AdminCreateUserCommand,
-    RespondToAuthChallengeCommand,
-    UpdateUserAttributesCommand,
-    AdminUpdateUserAttributesCommand,
     AdminGetUserCommand,
+    AdminGetUserCommandOutput,
+    AdminInitiateAuthCommand,
+    AdminInitiateAuthCommandOutput,
+    AdminUpdateUserAttributesCommand,
+    AdminUpdateUserAttributesCommandOutput,
     ChangePasswordCommand,
     ChangePasswordCommandOutput,
-    AdminInitiateAuthCommandOutput,
-    RespondToAuthChallengeCommandOutput,
-    AdminGetUserCommandOutput,
-    AdminUpdateUserAttributesCommandOutput,
+    CognitoIdentityProviderClient,
+    GetUserAttributeVerificationCodeCommand,
     GetUserAttributeVerificationCodeCommandOutput,
+    RespondToAuthChallengeCommand,
+    RespondToAuthChallengeCommandOutput,
+    VerifyUserAttributeCommand,
     VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
-import CognitoInterface from "./CognitoInterface";
 import {
     AdminCreateUserCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/AdminCreateUserCommand";
-import {SignUpCommandOutput} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/SignUpCommand";
-
+import CognitoInterface from "./CognitoInterface";
 
 export class CognitoClient implements CognitoInterface {
     cognitoClient;
@@ -39,7 +35,7 @@ export class CognitoClient implements CognitoInterface {
         this.userPoolId = process.env.USERPOOL_ID;
         this.clientId = process.env.CLIENT_ID;
 
-        if(this.clientId === undefined || this.userPoolId === undefined) {
+        if (this.clientId === undefined || this.userPoolId === undefined) {
             console.error(
                 `Cannot start application
                 
@@ -57,7 +53,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
 
     async createUser(email: string): Promise<AdminCreateUserCommandOutput> {
         let createUserParams = {
-            DesiredDeliveryMediums: [ "EMAIL" ],
+            DesiredDeliveryMediums: ["EMAIL"],
             Username: email,
             UserPoolId: this.userPoolId,
             TemporaryPassword: Math.floor(Math.random() * 100_000).toString().padStart(6, '0'),
@@ -72,7 +68,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
     async resendEmailAuthCode(email: string): Promise<AdminCreateUserCommandOutput> {
         console.debug(`Re-sending verification code to this adress : ${{email}}`);
         let createUserParams = {
-            DesiredDeliveryMediums: [ "EMAIL" ],
+            DesiredDeliveryMediums: ["EMAIL"],
             Username: email,
             UserPoolId: this.userPoolId,
             MessageAction: "RESEND",
@@ -148,7 +144,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             ]
         }
         let command = new AdminUpdateUserAttributesCommand(params);
-        return await  this.cognitoClient.send(command);
+        return await this.cognitoClient.send(command);
     }
 
     async setPhoneNumber(username: string, phoneNumber: string): Promise<AdminUpdateUserAttributesCommandOutput> {
@@ -163,7 +159,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             ]
         }
         let command = new AdminUpdateUserAttributesCommand(params);
-        return await  this.cognitoClient.send(command);
+        return await this.cognitoClient.send(command);
     }
 
     async sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput> {

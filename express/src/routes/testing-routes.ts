@@ -1,9 +1,9 @@
 import express from 'express';
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
-import {urisValidator} from "../middleware/urisValidator";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 import {emailValidator} from "../middleware/emailValidator";
 import {passwordValidator} from "../middleware/passwordValidator";
+import {urisValidator} from "../middleware/urisValidator";
 
 const router = express.Router();
 
@@ -49,11 +49,10 @@ router.get('/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId', (r
 
 router.post('/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId', urisValidator("dashboard/change-redirect-URIs.njk", "redirectURIs"), async (req, res) => {
     const redirectUris = req.body.redirectURIs.split(" ").filter((url: string) => url !== "");
-
     const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
-    let result;
+
     try {
-        result = await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {redirect_uris: redirectUris}, req.session.authenticationResult?.AccessToken as string);
+        await facade.updateClient(req.params.serviceId, req.params.selfServiceClientId, req.params.clientId, {redirect_uris: redirectUris}, req.session.authenticationResult?.AccessToken as string);
     } catch (error) {
         console.error(error)
         res.redirect('/there-is-a-problem');
@@ -62,7 +61,6 @@ router.post('/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId', u
     req.session.updatedField = "redirect URLs";
     res.redirect(`/client-details/${req.params.serviceId}`);
 });
-
 
 // Testing routes for Change user attributes page
 router.get('/change-user-attributes/:serviceId/:selfServiceClientId/:clientId', (req, res) => {
@@ -205,7 +203,7 @@ router.post('/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/moc
     let serviceUserPublicKeyText = req.body.serviceUserPublicKeyText;
     let serviceUserPublicKeyFile = req.body.serviceUserPublicKeyFile;
 
-    if (serviceUserPublicKey === "text" && serviceUserPublicKeyText ==="") {
+    if (serviceUserPublicKey === "text" && serviceUserPublicKeyText === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set('serviceUserPublicKeyText', 'Enter a public key');
         res.render('dashboard/change-public-key-v2.njk', {
@@ -219,7 +217,7 @@ router.post('/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/moc
         return;
     }
 
-    if (serviceUserPublicKey === "file" && serviceUserPublicKeyFile ==="") {
+    if (serviceUserPublicKey === "file" && serviceUserPublicKeyFile === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set('serviceUserPublicKeyFile', 'Upload a file');
         res.render('dashboard/change-public-key-v2.njk', {
@@ -233,7 +231,7 @@ router.post('/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/moc
         return;
     }
 
-    if (serviceUserPublicKeyText === "" && serviceUserPublicKeyFile === "" ) {
+    if (serviceUserPublicKeyText === "" && serviceUserPublicKeyFile === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set('serviceUserPublicKey', 'Choose how to change your public key');
         res.render('dashboard/change-public-key-v2.njk', {
@@ -334,11 +332,11 @@ router.post('/private-beta', async (req, res) => {
     let yourName = req.body.yourName;
     let department = req.body.department;
 
-    if (yourName ==="" && department ==="") {
+    if (yourName === "" && department === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set('yourName', 'Enter your name');
         errorMessages.set('department', 'Enter your department');
-        const value : object = {
+        const value: object = {
             yourName: yourName,
             department: department
         };
@@ -349,10 +347,10 @@ router.post('/private-beta', async (req, res) => {
         return;
     }
 
-    if (yourName ==="") {
+    if (yourName === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set('yourName', 'Enter your name');
-        const value : object = {
+        const value: object = {
             yourName: yourName,
             department: department
         };
@@ -363,10 +361,10 @@ router.post('/private-beta', async (req, res) => {
         return;
     }
 
-    if (department ==="") {
+    if (department === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set('department', 'Enter your department');
-        const value : object = {
+        const value: object = {
             yourName: yourName,
             department: department
         };

@@ -1,8 +1,5 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
-// Create clients and set shared const values outside of the handler.
-
 import DynamoClient from "../client/DynamoClient";
-import {PutItemCommandOutput} from "@aws-sdk/client-dynamodb";
 
 const client = new DynamoClient();
 
