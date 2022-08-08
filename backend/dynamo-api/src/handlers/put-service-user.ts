@@ -4,10 +4,7 @@ import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
 import DynamoClient from "../client/DynamoClient";
 import {PutItemCommandOutput} from "@aws-sdk/client-dynamodb";
 
-// Get the DynamoDB table name from environment variables
-
-const tableName = process.env.TABLE;
-const client = new DynamoClient(tableName as string);
+const client = new DynamoClient();
 
 export const putServiceUserHandler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
     const payload = event?.body ? JSON.parse(event.body as string) : event;

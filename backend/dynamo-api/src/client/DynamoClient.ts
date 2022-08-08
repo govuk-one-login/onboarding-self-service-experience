@@ -16,16 +16,20 @@ type AttributeNames = {[nameToken: string]: string}
 type AttributeValues = {[valueToken: string]: AttributeValue}
 
 class DynamoClient {
-    private readonly dynamodb: DynamoDBClient;
-    private readonly tableName: string;
-
     private static readonly KEYWORD_SUBSTITUTES: {[name: string]: string} = {
         data: '#D'
     }
 
-    constructor(tableName: string) {
+    private readonly tableName: string;
+    private readonly dynamodb: DynamoDBClient;
+
+    constructor() {
+        if (process.env.TABLE == undefined) {
+            throw new Error('Table name is not provided in the environment');
+        }
+
+        this.tableName = process.env.TABLE;
         this.dynamodb = new DynamoDBClient({region: process.env.AWS_REGION});
-        this.tableName = tableName;
     }
 
     async put(item: OnboardingTableItem): Promise<PutItemCommandOutput> {
@@ -35,7 +39,7 @@ class DynamoClient {
         };
 
         const command = new PutItemCommand(params);
-        return await this.dynamodb.send(command);
+        return this.dynamodb.send(command);
     }
 
     async queryBySortKey(sortKey: string): Promise<QueryCommandOutput> {
@@ -47,7 +51,7 @@ class DynamoClient {
         }
 
         const command = new QueryCommand(params);
-        return await this.dynamodb.send(command);
+        return this.dynamodb.send(command);
     }
 
     async getServices(userId: string): Promise<QueryCommandOutput> {
@@ -60,7 +64,7 @@ class DynamoClient {
         }
 
         const command = new QueryCommand(params);
-        return await this.dynamodb.send(command);
+        return this.dynamodb.send(command);
     }
 
     async getClients(serviceId: string): Promise<QueryCommandOutput> {
@@ -72,7 +76,7 @@ class DynamoClient {
         }
 
         const command = new QueryCommand(params);
-        return await this.dynamodb.send(command);
+        return this.dynamodb.send(command);
     }
 
     async updateClient(serviceId: string, clientId: string, updates: object): Promise<UpdateItemCommandOutput> {
@@ -83,7 +87,7 @@ class DynamoClient {
         return this.update('user', userId, 'cognito_username', cognitoUserId, updates);
     }
 
-    private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: object) {
+    private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: object): Promise<UpdateItemCommandOutput> {
         const attributeNames = Object.keys(updates);
 
         const params = {
@@ -99,7 +103,7 @@ class DynamoClient {
         };
 
         const command = new UpdateItemCommand(params);
-        return await this.dynamodb.send(command);
+        return this.dynamodb.send(command);
     }
 
     // TODO: Make methods below private whilst making testing work
