@@ -9,7 +9,7 @@ jobs:
 
   deploy-front-preview:
     name: Preview
-    needs: build
+    needs: build-front
     uses: ./.github/workflows/deploy-to-paas.yml
     with:
       environment: preview
