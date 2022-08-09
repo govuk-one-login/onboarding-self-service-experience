@@ -3,6 +3,7 @@ import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {urisValidator} from "../middleware/urisValidator";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 import {emailValidator} from "../middleware/emailValidator";
+import {passwordValidator} from "../middleware/passwordValidator";
 
 const router = express.Router();
 
@@ -410,6 +411,11 @@ router.get('/create-new-password', (req, res) => {
 
 router.post('/create-new-password', passwordValidator('create-new-password.njk', false), async (req, res) => {
     res.redirect('/check-yourphonetestpage');
+});
+
+// // Testing rout for Create the session timeout page
+router.get('/session-timeout', (req, res) => {
+    res.render("session-timeout.njk");
 });
 
 export default router;
