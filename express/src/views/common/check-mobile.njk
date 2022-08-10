@@ -2,11 +2,11 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "../macros/error-summary.njk" import errorSummary %}
 {% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-4 govuk-!-margin-bottom-6 govuk-!-padding-bottom-0 " %}
-{% block pageTitle %}Check your mobile phone{% endblock %}
+{% block pageTitle %}Check your mobile phone - GOV.UK Sign In{% endblock %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">
-    <a href="/create/enter-mobile" class="govuk-back-link">Back</a>
+    <a href="#" class="govuk-back-link" onclick="history.back()">Back</a>
   </div>
 {% endblock %}
 
@@ -18,26 +18,26 @@
         {{ errorSummary ({
           errors: errorMessages,
           hrefs: {
-            'createSmsOtp': '#create-sms-otp'
+            'smsOtp': '#sms-otp'
           }
         }) }}
 
         <h1 class="govuk-heading-l">Check your mobile phone</h1>
 
         <div class="govuk-inset-text">
-          We have sent a code to: <span class="govuk-!-font-weight-bold">{{ mobileNumber }}</span>
+          We sent a code to: <span class="govuk-!-font-weight-bold">{{ mobileNumber }}</span>
         </div>
 
         <p class="govuk-body">It might take a few minutes to arrive. The code will expire after 15 minutes.</p>
 
-        <form class="form" action="/create/verify-phone-code" method="post">
+        <form class="form" action="{{ formActionUrl }}" method="post">
 
           {{ govukInput({
             label: {
               text: "Enter the 6 digit security code"
             },
-            name: "create-sms-otp",
-            id: "create-sms-otp",
+            name: "sms-otp",
+            id: "sms-otp",
             classes: "govuk-input--width-5",
             type: "text",
             inputmode: "numeric",
@@ -45,15 +45,14 @@
             spellcheck: false,
             value: value.otp,
             errorMessage: {
-              text: errorMessages.get('createSmsOtp')
+              text: errorMessages.get('smsOtp')
             } if errorMessages else false
           }) }}
 
           {{ govukButton({
             text: "Continue",
             attributes: {
-              formnovalidate: "",
-              id: "submit"
+              formnovalidate: ""
             }
           }) }}
 

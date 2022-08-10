@@ -18,7 +18,11 @@ export const showLoginOtpMobile = async function(req: Request, res: Response) {
         const mobileNumberRaw = String(req.session.mobileNumber);
         const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
         const mobileNumber = '*******' + mobileNumberLast4Digits;
-        res.render('sign-in-otp-mobile.njk', { mobileNumber: mobileNumber });
+        res.render('common/check-mobile.njk', {
+            mobileNumber: mobileNumber,
+            formActionUrl: "/sign-in-otp-mobile"
+
+        });
     } else {
         res.redirect('/sign-in');
     }

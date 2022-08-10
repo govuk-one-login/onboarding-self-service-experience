@@ -3,6 +3,7 @@ import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {urisValidator} from "../middleware/urisValidator";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 import {emailValidator} from "../middleware/emailValidator";
+import {passwordValidator} from "../middleware/passwordValidator";
 
 const router = express.Router();
 
