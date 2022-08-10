@@ -40,4 +40,5 @@ jobs:
             express/package*.json
             express/manifest.yml
             express/valid-email-domains.txt
+            express/top-100k-common-passwords.txt
             express/stubs-config.json

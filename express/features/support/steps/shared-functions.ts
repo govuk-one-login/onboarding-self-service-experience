@@ -35,3 +35,13 @@ function getSingleLink(links: ElementHandle[], linkText: string): ElementHandle 
     assert.equal(links.length, 1, `More than one link matched ${linkText}`);
     return links[0];
 }
+
+export async function enterTextIntoTextInput(page: Page, text: string, inputId: string): Promise<any> {
+    let inputElement = await page.$(`#${inputId}`);
+    if(!inputElement) {
+        throw new Error(`Could not find element with id ${inputId}`)
+    }
+    await inputElement.click({ clickCount: 3 });
+    await inputElement.press('Backspace');
+    await page.type(`#${inputId}`, text);
+}

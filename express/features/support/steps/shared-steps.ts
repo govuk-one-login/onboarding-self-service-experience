@@ -1,7 +1,14 @@
-import { Given, Then, When } from '@cucumber/cucumber';
-import { strict as assert } from 'assert';
-import { Page } from "puppeteer";
-import { checkUrl, clickLink, clickSubmitButton, getButtonLink, getLink } from './shared-functions';
+import {Given, Then, When} from '@cucumber/cucumber';
+import {strict as assert} from 'assert';
+import {Page} from "puppeteer";
+import {
+    checkUrl,
+    clickLink,
+    clickSubmitButton,
+    enterTextIntoTextInput,
+    getButtonLink,
+    getLink
+} from './shared-functions';
 
 Given('that the user is on the {string} page', async function (route: string) {
     await this.goToPath(route);
@@ -76,3 +83,7 @@ async function checkErrorMessageDisplayedForField(page: Page, errorLink: any, er
     const messageAboveElement = await page.evaluate((el: { textContent: any; }) => el.textContent, messagesAboveElement[0]);
     assert.equal(messageAboveElement.trim(), "Error: " + errorMessage, `Expected the message above the ${field} field to be ${errorMessage}`);
 }
+
+When('they enter {string} into the text-field with the id {string}', async function (inputText: string, inputFieldId: string) {
+    await enterTextIntoTextInput(this.page, inputText, inputFieldId);
+});
