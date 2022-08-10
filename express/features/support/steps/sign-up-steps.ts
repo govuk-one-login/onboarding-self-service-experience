@@ -30,6 +30,6 @@ When('the user submits a valid mobile telephone number', async function () {
 })
 
 When('the user enters the correct sms-otp', async function () {
-    await enterTextIntoTextInput(this.page,"123123", "create-sms-otp");
+    await enterTextIntoTextInput(this.page,"123123", "sms-otp");
     await clickSubmitButton(this.page);
 })
