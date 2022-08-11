@@ -2,6 +2,8 @@ import {
     AdminCreateUserCommandOutput,
     AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
+    AdminRespondToAuthChallengeCommandOutput,
+    AdminSetUserMFAPreferenceCommandOutput,
     AdminUpdateUserAttributesCommandOutput,
     ChangePasswordCommandOutput,
     GetUserAttributeVerificationCodeCommandOutput,
@@ -106,6 +108,14 @@ export class CognitoClient implements CognitoInterface {
         }
 
         throw new Error('Unknown exception');
+    }
+
+    respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
+        return Promise.resolve({$metadata: {}});
+    }
+
+    setMfaPreference(cognitoUsername: string): Promise<AdminSetUserMFAPreferenceCommandOutput> {
+        return Promise.resolve({$metadata: {}});
     }
 }
 

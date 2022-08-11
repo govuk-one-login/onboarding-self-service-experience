@@ -14,7 +14,11 @@ import {
     RespondToAuthChallengeCommand,
     RespondToAuthChallengeCommandOutput,
     VerifyUserAttributeCommand,
-    VerifyUserAttributeCommandOutput
+    VerifyUserAttributeCommandOutput,
+    AdminSetUserMFAPreferenceCommandOutput,
+    AdminSetUserMFAPreferenceCommand,
+    AdminRespondToAuthChallengeCommandOutput,
+    AdminRespondToAuthChallengeCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {
     AdminCreateUserCommandOutput
@@ -178,6 +182,34 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             Code: code
         }
         let command = new VerifyUserAttributeCommand(params);
+        return await this.cognitoClient.send(command);
+    }
+
+    async setMfaPreference(cognitoUsername: string): Promise<AdminSetUserMFAPreferenceCommandOutput> {
+        const params = {
+            SMSMfaSettings: {
+                Enabled: true,
+                PreferredMfa: true
+            },
+            Username: cognitoUsername,
+            UserPoolId: this.userPoolId
+        }
+        let command = new AdminSetUserMFAPreferenceCommand(params);
+        return await this.cognitoClient.send(command);
+    }
+
+    async respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
+        const params = {
+            ChallengeName: 'SMS_MFA',
+            ChallengeResponses: {
+                SMS_MFA_CODE: mfaCode,
+                USERNAME: username
+            },
+            ClientId: this.clientId,
+            UserPoolId: this.userPoolId,
+            Session: session
+        }
+        let command = new AdminRespondToAuthChallengeCommand(params);
         return await this.cognitoClient.send(command);
     }
 }

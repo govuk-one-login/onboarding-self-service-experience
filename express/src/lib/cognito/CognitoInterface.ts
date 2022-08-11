@@ -3,10 +3,12 @@ import {
     AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
     AdminUpdateUserAttributesCommandOutput,
-    ChangePasswordCommandOutput,
     GetUserAttributeVerificationCodeCommandOutput,
     RespondToAuthChallengeCommandOutput,
-    VerifyUserAttributeCommandOutput
+    VerifyUserAttributeCommandOutput,
+    ChangePasswordCommandOutput,
+    AdminSetUserMFAPreferenceCommandOutput,
+    AdminRespondToAuthChallengeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
 
 export default interface CognitoInterface {
@@ -29,4 +31,8 @@ export default interface CognitoInterface {
     sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput>;
 
     verifySmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput>;
+
+    setMfaPreference(cognitoUsername: string): Promise<AdminSetUserMFAPreferenceCommandOutput>;
+
+    respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput>;
 }
