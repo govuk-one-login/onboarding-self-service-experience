@@ -10,13 +10,7 @@ import CognitoInterface from "../lib/cognito/CognitoInterface";
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
-    if (req.session.emailAddress) {
-        const values = new Map<string, string>();
-        values.set('email', req.session.emailAddress);
-        res.render('create-account/get-email.njk', {values: values});
-    } else {
-        res.render('create-account/get-email.njk');
-    }
+    res.render('create-account/get-email.njk', {values: {emailAddress: req.session.emailAddress}});
 }
 
 export const processGetEmailForm = async function (req: Request, res: Response) {
