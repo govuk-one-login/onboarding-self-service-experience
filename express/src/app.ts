@@ -10,6 +10,7 @@ import testingRoutes from "./routes/testing-routes";
 import {User} from "../@types/User";
 import {setSignedInStatus} from "./middleware/setSignedInStatus/setSignedInStatus";
 import 'express-async-errors';
+import {SelfServiceError, ErrorOptions} from "./lib/SelfServiceError";
 
 const app = express();
 import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(
