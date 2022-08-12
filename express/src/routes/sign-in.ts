@@ -17,7 +17,7 @@ import emailIsPresentInSession from "../middleware/emailIsPresentInSession/email
 const router = express.Router();
 
 router.get('/sign-in', showSignInFormEmail);
-router.post('/sign-in', emailValidator('sign-in.njk'), processEmailAddress);
+router.post('/sign-in', emailValidator({template: 'sign-in.njk'}), processEmailAddress);
 router.get('/sign-in-password',
     emailIsPresentInSession({template: 'sign-in.njk', errorMessages: {emailAddress: 'Enter your email address'}}),
     showSignInFormPassword);

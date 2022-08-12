@@ -2,44 +2,42 @@ import {NextFunction, Request, Response} from "express";
 import allowedEmailDomains from "../lib/allowedEmailDomains";
 
 import isRfc822Compliant from "../lib/rfc822-validate";
+import {ErrorOptions, SelfServiceError} from "../lib/SelfServiceError";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 
-export function emailValidator(render: string): MiddlewareFunction<Request, Response, NextFunction> {
+export function emailValidator(template: { template: string }): MiddlewareFunction<Request, Response, NextFunction> {
     return async (req: Request, res: Response, next: NextFunction) => {
         let emailAddress: string = req.body.emailAddress;
 
         emailAddress = emailAddress.trim();
 
         if (emailAddress === "" || emailAddress === undefined || emailAddress === null) {
-            await errorResponse(render, emailAddress, res, 'emailAddress', 'Enter your email address');
-            return;
+            throw new SelfServiceError("No email provided", {
+                ...template,
+                errorMessages: {emailAddress: 'Enter your email address'}
+            });
         }
 
         if (!isRfc822Compliant(emailAddress)) {
-            await errorResponse(render, emailAddress, res, 'emailAddress', 'Enter an email address in the correct format, like name@example.com');
-            return;
+            throw new SelfServiceError("Invalid email address", {
+                ...template,
+                errorMessages: {emailAddress: 'Enter an email address in the correct format, like name@example.com'}
+            });
         }
 
+
         if (!await isAllowedDomain(emailAddress)) {
-            await errorResponse(render, emailAddress, res, 'emailAddress', 'Enter a government email address');
-            return;
+            throw new SelfServiceError(`Disallowed domain: ${emailAddress}`, {
+                    ...template,
+                    errorMessages: {emailAddress: 'Enter a government email address'}
+                }
+            );
         }
 
         req.session.emailAddress = emailAddress;
         next();
     }
-}
-
-export function errorResponse(render: string, emailAddress: string, res: Response, key: string, message: string) {
-    const errorMessages = new Map<string, string>();
-    errorMessages.set(key, message);
-    let values = new Map();
-    values.set(key, emailAddress);
-    res.render(render, {
-        errorMessages: errorMessages,
-        values: values
-    });
 }
 
 export async function isAllowedDomain(emailAddress: string): Promise<boolean> {

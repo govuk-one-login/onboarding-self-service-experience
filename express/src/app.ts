@@ -66,11 +66,13 @@ app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {active: 'get-started'});
 });
 
-app.use(function (err: unknown, req: Request, res: Response, next: NextFunction) {
-    // in async controller methods, you need to catch and next(error); to reach this.
-    console.log("Error handler");
-    console.error(err)
-    res.send('This should be the something went wrong page');
+app.use(function (err: Error | SelfServiceError, req: Request, res: Response, next: NextFunction) {
+    if(err instanceof SelfServiceError && err?.options) {
+        res.render(err.options.template, {values: err.options.values, errorMessages: err.options.errorMessages});
+    } else {
+        console.error(err);
+        res.render('./there-is-a-problem.njk');
+    }
 });
 
 const port = process.env.PORT || 3000
