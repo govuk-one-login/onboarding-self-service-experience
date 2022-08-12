@@ -87,11 +87,7 @@ export const processEmailAddress = async function (req: Request, res: Response) 
 
 
 export const showSignInFormPassword = async function (req: Request, res: Response) {
-    if (req.session.emailAddress) {
-        res.render('sign-in-password.njk');
-    } else {
-        res.redirect('/sign-in');
-    }
+    res.render('sign-in-password.njk');
 }
 
 export const processSignInForm = async function (req: Request, res: Response) {

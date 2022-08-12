@@ -18,7 +18,9 @@ const router = express.Router();
 
 router.get('/sign-in', showSignInFormEmail);
 router.post('/sign-in', emailValidator('sign-in.njk'), processEmailAddress);
-router.get('/sign-in-password', showSignInFormPassword);
+router.get('/sign-in-password',
+    emailIsPresentInSession({template: 'sign-in.njk', errorMessages: {emailAddress: 'Enter your email address'}}),
+    showSignInFormPassword);
 
 router.post('/sign-in-password',
     emailIsPresentInSession({template: 'sign-in.njk', errorMessages: {emailAddress: 'Enter your email address'}}),
