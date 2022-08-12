@@ -8,12 +8,13 @@ import {
     NotAuthorizedException,
     UserNotFoundException
 } from "@aws-sdk/client-cognito-identity-provider";
-
+import 'express-async-errors';
+import {SelfServiceError} from "../lib/SelfServiceError";
 
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
     if (req.session.emailAddress) {
-        res.render('sign-in.njk', {emailAddress: req.session.emailAddress});
+        res.render('sign-in.njk', {values: {emailAddress: req.session.emailAddress}});
     } else {
         res.render('sign-in.njk');
     }
@@ -35,9 +36,9 @@ export const showLoginOtpMobile = async function (req: Request, res: Response) {
     }
 }
 
-export const processLoginOtpMobile = async function(req: Request, res: Response) {
+export const processLoginOtpMobile = async function (req: Request, res: Response) {
 
-    if(!req.session.cognitoUser?.Username || !req.body['sms-otp'] || !req.session.session) {
+    if (!req.session.cognitoUser?.Username || !req.body['sms-otp'] || !req.session.session) {
         res.render('there-is-a-problem.njk');
         return;
     }
@@ -47,7 +48,7 @@ export const processLoginOtpMobile = async function(req: Request, res: Response)
     try {
         response = await cognitoClient.respondToMfaChallenge(req.session.cognitoUser?.Username as string, req.body['sms-otp'], req.session.session as string);
     } catch (error) {
-        if(error instanceof CodeMismatchException) {
+        if (error instanceof CodeMismatchException) {
             const errorMessages: Map<string, string> = new Map<string, string>();
             errorMessages.set('smsOtp', 'The code you entered is not correct or has expired - enter it again or request a new code')
             res.render('common/check-mobile.njk', {
@@ -55,6 +56,10 @@ export const processLoginOtpMobile = async function(req: Request, res: Response)
                 formActionUrl: "/sign-in-otp-mobile",
                 errorMessages: errorMessages
             })
+            return;
+        }
+        else {
+            throw error;
         }
     }
     req.session.authenticationResult = response.AuthenticationResult;
@@ -64,12 +69,13 @@ export const processLoginOtpMobile = async function(req: Request, res: Response)
     const cognitoId = JSON.parse(claims)["cognito:username"];
     req.session.mobileNumber = JSON.parse(claims)["phone_number"];
 
-    const lambdaFacade : LambdaFacadeInterface = req.app.get("lambdaFacade");
+    const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
     req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)).data.Items[0]
 
     if (req.session.selfServiceUser) {
         req.session.isSignedIn = true;
         res.redirect('/account/list-services');
+        return;
     } else {
         res.redirect('/sign-in-otp-mobile');
     }
@@ -89,12 +95,7 @@ export const showSignInFormPassword = async function (req: Request, res: Respons
 }
 
 export const processSignInForm = async function (req: Request, res: Response) {
-    let email;
-    if (req.session.emailAddress) {
-        email = req.session.emailAddress;
-    } else {
-        email = "There is no email"
-    }
+    const email = req.session.emailAddress as string;
     let password = req.body.password;
 
     const cognitoClient: CognitoInterface = req.app.get('cognitoClient');
@@ -103,10 +104,13 @@ export const processSignInForm = async function (req: Request, res: Response) {
         response = await cognitoClient.login(email, password);
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
-            const errorMessages = new Map<string, string>();
-            errorMessages.set('password', 'Password is wrong');
-            res.render('sign-in-password.njk', {errorMessages: errorMessages});
-            return;
+            throw new SelfServiceError("Not authorized exception caught.  Password is probably wrong",
+                {
+                    template: 'sign-in-password.njk',
+                    values: {password: password},
+                    errorMessages: {password: 'Password is wrong'}
+                }
+            )
         }
 
         if (error instanceof UserNotFoundException) {
