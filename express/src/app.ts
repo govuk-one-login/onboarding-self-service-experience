@@ -2,14 +2,14 @@ import {AdminGetUserCommandOutput, AuthenticationResultType} from "@aws-sdk/clie
 import bodyParser from 'body-parser';
 import express, {NextFunction, Request, Response} from 'express';
 import sessions from 'express-session';
-import {User} from "../@types/User";
 import configureViews from './lib/configureViews';
-import {setSignedInStatus} from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
 import manageAccount from "./routes/manage-account";
 import signIn from "./routes/sign-in";
-
 import testingRoutes from "./routes/testing-routes";
+import {User} from "../@types/User";
+import {setSignedInStatus} from "./middleware/setSignedInStatus/setSignedInStatus";
+import 'express-async-errors';
 
 const app = express();
 import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(
