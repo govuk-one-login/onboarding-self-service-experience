@@ -1,12 +1,15 @@
+import {Request, Response} from "express";
+import CognitoInterface from "../lib/cognito/CognitoInterface";
+import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {
     AdminInitiateAuthCommandOutput,
+    AdminRespondToAuthChallengeCommandOutput,
+    CodeMismatchException,
     NotAuthorizedException,
     UserNotFoundException
 } from "@aws-sdk/client-cognito-identity-provider";
-import {Request, Response} from "express";
 
-import CognitoInterface from "../lib/cognito/CognitoInterface";
-import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
+
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
     if (req.session.emailAddress) {
@@ -26,16 +29,45 @@ export const showLoginOtpMobile = async function (req: Request, res: Response) {
             formActionUrl: "/sign-in-otp-mobile",
             active: "sign-in",
             textMessageNotReceivedUrl: "/resend-text-code"
-
         });
     } else {
         res.redirect('/sign-in');
     }
 }
 
-export const processLoginOtpMobile = async function (req: Request, res: Response) {
-    // TO DO add the functionality to process the login mobile otp
-    if (true) { // because OTP was correct and we've implemented that
+export const processLoginOtpMobile = async function(req: Request, res: Response) {
+
+    if(!req.session.cognitoUser?.Username || !req.body['sms-otp'] || !req.session.session) {
+        res.render('there-is-a-problem.njk');
+        return;
+    }
+
+    const cognitoClient: CognitoInterface = req.app.get('cognitoClient');
+    let response!: AdminRespondToAuthChallengeCommandOutput;
+    try {
+        response = await cognitoClient.respondToMfaChallenge(req.session.cognitoUser?.Username as string, req.body['sms-otp'], req.session.session as string);
+    } catch (error) {
+        if(error instanceof CodeMismatchException) {
+            const errorMessages: Map<string, string> = new Map<string, string>();
+            errorMessages.set('smsOtp', 'The code you entered is not correct or has expired - enter it again or request a new code')
+            res.render('common/check-mobile.njk', {
+                mobileNumber: req.session.mobileNumber,
+                formActionUrl: "/sign-in-otp-mobile",
+                errorMessages: errorMessages
+            })
+        }
+    }
+    req.session.authenticationResult = response.AuthenticationResult;
+
+    const payload = (req.session.authenticationResult?.IdToken as string).split('.');
+    const claims = Buffer.from(payload[1], 'base64').toString('utf-8');
+    const cognitoId = JSON.parse(claims)["cognito:username"];
+    req.session.mobileNumber = JSON.parse(claims)["phone_number"];
+
+    const lambdaFacade : LambdaFacadeInterface = req.app.get("lambdaFacade");
+    req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)).data.Items[0]
+
+    if (req.session.selfServiceUser) {
         req.session.isSignedIn = true;
         res.redirect('/account/list-services');
     } else {
@@ -88,16 +120,10 @@ export const processSignInForm = async function (req: Request, res: Response) {
         return;
     }
 
-    req.session.authenticationResult = response.AuthenticationResult;
-    req.session.emailAddress = email;
+    req.session.cognitoUser = {Username: response.ChallengeParameters?.USER_ID_FOR_SRP as string, $metadata: {}};
+    req.session.session = response.Session;
+    req.session.mobileNumber = response.ChallengeParameters?.CODE_DELIVERY_DESTINATION;
 
-    const payload = (req.session.authenticationResult?.IdToken as string).split('.');
-    const claims = Buffer.from(payload[1], 'base64').toString('utf-8');
-    const cognitoId = JSON.parse(claims)["cognito:username"];
-    req.session.mobileNumber = JSON.parse(claims)["phone_number"];
-
-    const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
-    req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)).data.Items[0]
     res.redirect('/sign-in-otp-mobile');
     return;
 }

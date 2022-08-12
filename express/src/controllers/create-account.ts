@@ -216,6 +216,8 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         const email = req.session.cognitoUser?.UserAttributes?.filter((attribute: AttributeType) => attribute.Name === 'email')[0].Value;
         const phone = req.session.enteredMobileNumber;
 
+        await cognitoClient.setMfaPreference(req.session.cognitoUser?.Username as string);
+
         let user = {
             "pk": `user#${uuid}`,
             "sk": `cognito_username#${req.session.cognitoUser?.Username}`,
@@ -233,9 +235,9 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${req.session.cognitoUser?.Username}`, req.session?.authenticationResult?.AccessToken as string)).data.Items[0]
         res.redirect('/add-service-name');
         return;
+
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            console.debug("Code did not match");
             const errorMessages = new Map<string, string>();
             errorMessages.set('smsOtp', 'The code you entered is not correct or has expired - enter it again or request a new code');
             res.render('common/check-mobile.njk', {
