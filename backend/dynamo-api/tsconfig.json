@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2020",
     "strict": true,
+    "noUnusedLocals": true,
     "preserveConstEnums": true,
     "noEmit": true,
     "sourceMap": true,

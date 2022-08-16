@@ -1,14 +1,13 @@
-import {NextFunction, Request, Response} from "express";
 import {
-    AdminUpdateUserAttributesCommandOutput,
-    AttributeType, CodeMismatchException,
+    AttributeType,
+    CodeMismatchException,
     NotAuthorizedException,
     UsernameExistsException
 } from "@aws-sdk/client-cognito-identity-provider";
+import {randomUUID} from "crypto";
+import {NextFunction, Request, Response} from "express";
 import CognitoInterface from "../lib/cognito/CognitoInterface";
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
-
-import {randomUUID} from "crypto";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     if (req.session.emailAddress) {
@@ -78,7 +77,7 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
     if (!sixDigitsPattern.test(otpToTest)) {
         const errorMessages = new Map<string, string>();
         errorMessages.set('create-email-otp', "Enter the security code using only 6 digits");
-        const value : object = {otp: otpToTest};
+        const value: object = {otp: otpToTest};
         res.render('create-account/check-email.njk', {
             emailAddress: req.session.emailAddress,
             errorMessages: errorMessages,
@@ -106,7 +105,7 @@ export const checkEmailOtp = async function (req: Request, res: Response) {
     }
 }
 
-export const showNewPasswordForm = async function (req: Request, res: Response, next: NextFunction) {
+export const showNewPasswordForm = async function (req: Request, res: Response) {
     if (req.session.session !== undefined) {
         res.render('create-account/new-password.njk');
         return;
@@ -144,26 +143,25 @@ export const updatePassword = async function (req: Request, res: Response, next:
 export const showEnterMobileForm = async function (req: Request, res: Response) {
     let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
-        // user must login before we can process their mobile number
+        // user must log in before we can process their mobile number
         res.redirect('/login')
         return;
     }
-    if (req.session.mobileNumber === undefined ) {
+    if (req.session.mobileNumber === undefined) {
         res.render('create-account/enter-mobile.njk');
     } else {
-        const value : object = {mobileNumber: req.session.mobileNumber};
+        const value: object = {mobileNumber: req.session.mobileNumber};
         res.render('create-account/enter-mobile.njk', {
             value: value
         });
     }
-
 }
 
 export const processEnterMobileForm = async function (req: Request, res: Response) {
     // The user needs to be logged in for this
     let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
-        // user must login before we can process their mobile number
+        // user must log in before we can process their mobile number
         res.redirect('/sign-in')
         return;
     }
@@ -173,11 +171,11 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     if (mobileNumber === undefined) {
         res.render('create-account/enter-mobile.njk');
     }
-    let response = await cognitoClient.setPhoneNumber(req.session.emailAddress, mobileNumber);
 
-    // presumably that was fine so let's try to veerify the number
+    await cognitoClient.setPhoneNumber(req.session.emailAddress, mobileNumber);
 
-    let codeSent = await cognitoClient.sendMobileNumberVerificationCode(accessToken);
+    // presumably that was fine so let's try to verify the number
+    const codeSent = await cognitoClient.sendMobileNumberVerificationCode(accessToken);
     console.debug("VERIFICATION CODE RESPONSE");
     console.debug(codeSent);
     req.session.mobileNumber = mobileNumber;
@@ -187,14 +185,14 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     });
 }
 
-export const resendMobileVerificationCode  = async function (req: Request, res: Response) {
+export const resendMobileVerificationCode = async function (req: Request, res: Response) {
     req.body.mobileNumber = req.session.mobileNumber;
     await processEnterMobileForm(req, res);
 }
 
 export const submitMobileVerificationCode = async function (req: Request, res: Response) {
     // need to check for access token in middleware
-    if(req.session.authenticationResult?.AccessToken === undefined) {
+    if (req.session.authenticationResult?.AccessToken === undefined) {
         res.redirect('/sign-in');
         return;
     }
@@ -217,14 +215,14 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         const phone = req.session.enteredMobileNumber;
 
         let user = {
-                "pk": `user#${uuid}`,
-                "sk": `cognito_username#${req.session.cognitoUser?.Username}`,
-                "data": "we haven't collected this full name",
-                first_name: "we haven't collected this first name",
-                last_name: "we haven't collected this last name",
-                email: email,
-                phone: phone,
-                password_last_updated: new Date()
+            "pk": `user#${uuid}`,
+            "sk": `cognito_username#${req.session.cognitoUser?.Username}`,
+            "data": "we haven't collected this full name",
+            first_name: "we haven't collected this first name",
+            last_name: "we haven't collected this last name",
+            email: email,
+            phone: phone,
+            password_last_updated: new Date()
         }
 
         const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
@@ -252,13 +250,13 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
 }
 
 export const showResendPhoneCodeForm = async function (req: Request, res: Response) {
-        let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
-        if (accessToken === undefined) {
-            // user must login before we can process their mobile number
-            res.redirect('/sign-in')
-            return;
-        }
-        res.render('create-account/resend-phone-code.njk');
+    let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
+    if (accessToken === undefined) {
+        // user must log in before we can process their mobile number
+        res.redirect('/sign-in')
+        return;
+    }
+    res.render('create-account/resend-phone-code.njk');
 }
 
 export const showResendEmailCodeForm = async function (req: Request, res: Response) {
@@ -266,7 +264,7 @@ export const showResendEmailCodeForm = async function (req: Request, res: Respon
 }
 
 export const resendEmailVerificationCode = async function (req: Request, res: Response) {
-    req.body.emailAddress  = req.session.emailAddress;
+    req.body.emailAddress = req.session.emailAddress;
     const emailAddress: string = req.body.emailAddress;
     const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
 

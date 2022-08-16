@@ -1,11 +1,6 @@
+import {SFNClient, StartSyncExecutionCommand} from '@aws-sdk/client-sfn'
 import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
 import * as process from "process";
-import {
-    SFNClient,
-    StartSyncExecutionCommand,
-    StartSyncExecutionCommandInput,
-    StartSyncExecutionCommandOutput
-} from '@aws-sdk/client-sfn'
 
 const stepFunctionsClient = new SFNClient({region: 'eu-west-2'});
 

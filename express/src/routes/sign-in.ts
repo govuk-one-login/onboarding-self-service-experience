@@ -1,16 +1,16 @@
-import express, {Request, Response} from "express";
+import express from "express";
 import {
     processEmailAddress,
+    processLoginOtpMobile,
     processSignInForm,
+    showLoginOtpMobile,
     showSignInFormEmail,
     showSignInFormPassword,
-    showLoginOtpMobile,
-    processLoginOtpMobile,
     signOut
 } from "../controllers/sign-in";
 import {emailValidator} from "../middleware/emailValidator";
-import {passwordValidator} from "../middleware/passwordValidator";
 import {mobileOtpValidator} from "../middleware/mobileOtpValidator";
+import {passwordValidator} from "../middleware/passwordValidator";
 
 const router = express.Router();
 

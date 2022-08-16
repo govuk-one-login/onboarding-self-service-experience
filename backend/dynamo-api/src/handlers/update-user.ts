@@ -1,4 +1,4 @@
-import {APIGatewayProxyEvent, APIGatewayProxyResult} from 'aws-lambda';
+import {APIGatewayProxyEvent} from 'aws-lambda';
 import DynamoClient from "../client/DynamoClient";
 
 const client = new DynamoClient();
