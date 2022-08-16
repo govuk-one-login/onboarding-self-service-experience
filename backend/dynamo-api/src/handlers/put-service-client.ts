@@ -2,8 +2,7 @@ import {APIGatewayProxyEvent, APIGatewayProxyResult} from 'aws-lambda';
 import DynamoClient from "../client/DynamoClient";
 import {randomUUID} from "crypto";
 
-const tableName = process.env.TABLE;
-const client = new DynamoClient(tableName as string);
+const client = new DynamoClient();
 
 export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const payload = JSON.parse(event.body as string);

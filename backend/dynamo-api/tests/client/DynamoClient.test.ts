@@ -1,25 +1,59 @@
-import '../../src/client/DynamoClient'
 import DynamoClient from "../../src/client/DynamoClient";
 
-describe('DynamoClient tests', function () {
-        it('does what Karol expects it to', function () {
-            let client = new DynamoClient("foo");
-            let attributeNames = {"foo": "foobar", "bar": "barbar"};
-            console.log(client.generateUpdateExpression(attributeNames));
+describe('DynamoDB client', () => {
+    describe('table name not set', () => {
+        it('should throw if table name not provided', () => {
+            expect(() => new DynamoClient()).toThrow('Table name');
+        });
+    });
+
+    describe('table name is set', () => {
+        let client: DynamoClient;
+
+        const updates = {
+            services: ['Juggling license', 'Unicorn registration'],
+            email: 'name@gov.uk',
+            attempts: 10,
+            verified: true,
+            data: 'Tessa Ting'
+        };
+
+        beforeAll(() => {
+            process.env.TABLE = "identities";
+            client = new DynamoClient();
         });
 
-        it('prints some output', function() {
-            let client = new DynamoClient("foo");
-            let attributes = ["foo", "bar", "data", "baz"];
-            console.log(JSON.stringify(client.generateExpressionAttributeNames(attributes)));
-        })
+        it('should generate correct expression attribute names', () => {
+            const generatedExpressionAttributeNames = client.generateExpressionAttributeNames(Object.keys(updates));
+            const expectedExpressionAttributeNames = {
+                '#services': 'services',
+                '#email': 'email',
+                '#attempts': 'attempts',
+                '#verified': 'verified',
+                '#D': 'data'
+            };
 
-        it('prints some more output', function() {
-            let update = {foo: "foobar", bar: "barbar", baz: "bazbar"}
-            let client = new DynamoClient("foo");
-            console.log(JSON.stringify(client.generateExpressionAttributeValues(Object.keys(update), update)));
-            console.log(JSON.stringify(client.generateExpressionAttributeValuesNew(Object.keys(update), update)));
+            expect(generatedExpressionAttributeNames).toStrictEqual(expectedExpressionAttributeNames);
+        });
 
-        })
-    }
-)
+        it('should generate correct update expression', () => {
+            const updateExpression = client.generateUpdateExpression(Object.keys(updates));
+            const expectedUpdateExpression = 'set #services = :services, set #email = :email, set #attempts = :attempts, set #verified = :verified, set #D = :data';
+
+            expect(updateExpression).toEqual(expectedUpdateExpression);
+        });
+
+        it('should correctly generate attribute values for an update expression', () => {
+            const attributeValues = client.generateExpressionAttributeValues(Object.keys(updates), updates);
+            const expectedAttributeValues = {
+                ':services': {L: [{S: 'Juggling license'}, {S: 'Unicorn registration'}]},
+                ':email': {S: 'name@gov.uk'},
+                ':attempts': {N: '10'},
+                ':verified': {BOOL: true},
+                ':data': {S: 'Tessa Ting'},
+            }
+
+            expect(attributeValues).toStrictEqual(expectedAttributeValues);
+        });
+    });
+});
