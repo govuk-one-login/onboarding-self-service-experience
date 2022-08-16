@@ -413,4 +413,9 @@ router.post('/create-new-password', passwordValidator('create-new-password.njk',
     res.redirect('/check-yourphonetestpage');
 });
 
+// // Testing rout for Create the session timeout page
+router.get('/session-timeout', (req, res) => {
+    res.render("session-timeout.njk");
+});
+
 export default router;
