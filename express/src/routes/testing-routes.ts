@@ -418,4 +418,9 @@ router.get('/session-timeout', (req, res) => {
     res.render("session-timeout.njk");
 });
 
+// Testing routs Create an 'No account found' page
+router.get('/no-account-found', (req, res) => {
+    res.render("no-account-found.njk");
+});
+
 export default router;
