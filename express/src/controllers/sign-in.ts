@@ -23,7 +23,9 @@ export const showLoginOtpMobile = async function (req: Request, res: Response) {
         const mobileNumber = '*******' + mobileNumberLast4Digits;
         res.render('common/check-mobile.njk', {
             mobileNumber: mobileNumber,
-            formActionUrl: "/sign-in-otp-mobile"
+            formActionUrl: "/sign-in-otp-mobile",
+            active: "sign-in",
+            textMessageNotReceivedUrl: "/resend-text-code"
 
         });
     } else {
@@ -102,4 +104,58 @@ export const processSignInForm = async function (req: Request, res: Response) {
 
 export const signOut = async function (req: Request, res: Response) {
     req.session.destroy(() => res.redirect('/'));
+}
+
+export const showResendPhoneCodeForm = async function (req: Request, res: Response) {
+    let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
+    if (accessToken === undefined) {
+        // user must login before we can process their mobile number
+        res.redirect('/sign-in')
+        return;
+    }
+    res.render('resend-phone-code-sign-in.njk');
+}
+
+export const resendMobileVerificationCode  = async function (req: Request, res: Response) {
+    req.body.mobileNumber = req.session.mobileNumber;
+    await processEnterMobileForm(req, res);
+}
+
+export const processEnterMobileForm = async function (req: Request, res: Response) {
+    // The user needs to be logged in for this
+    let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
+    if (accessToken === undefined) {
+        // user must login before we can process their mobile number
+        res.redirect('/sign-in')
+        return;
+    }
+
+    let mobileNumber: string | undefined = req.session.mobileNumber;
+    const cognitoClient = await req.app.get('cognitoClient');
+    // Not sure that we need this here ....
+    if (mobileNumber === undefined) {
+        res.render('there-is-a-problem.njk');
+    }
+
+    // @ts-ignore
+    let response = await cognitoClient.setPhoneNumber(req.session.emailAddress, mobileNumber);
+
+    // presumably that was fine so let's try to veerify the number
+
+    let codeSent = await cognitoClient.sendMobileNumberVerificationCode(accessToken);
+    console.debug("VERIFICATION CODE RESPONSE");
+    console.debug(codeSent);
+    req.session.mobileNumber = mobileNumber;
+
+
+    const mobileNumberRaw = req.body.mobileNumber;
+    const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
+    const mobileNumberFormatted = '*******' + mobileNumberLast4Digits;
+
+    res.render('common/check-mobile.njk', {
+        mobileNumber: mobileNumberFormatted,
+        formActionUrl: "/sign-in-otp-mobile",
+        textMessageNotReceivedUrl: "/resend-text-code",
+        active: "sign-in",
+    });
 }

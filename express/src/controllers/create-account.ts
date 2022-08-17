@@ -181,7 +181,8 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     req.session.mobileNumber = mobileNumber;
     res.render('common/check-mobile.njk', {
         mobileNumber: req.body.mobileNumber,
-        formActionUrl: '/create/verify-phone-code'
+        formActionUrl: '/create/verify-phone-code',
+        textMessageNotReceivedUrl: "/create/resend-phone-code"
     });
 }
 
@@ -202,7 +203,8 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
     if (otp === undefined) {
         res.render('common/check-mobile.njk', {
             mobileNumber: req.session.mobileNumber,
-            formActionUrl: '/create/verify-phone-code'
+            formActionUrl: '/create/verify-phone-code',
+            textMessageNotReceivedUrl: '/create/resend-phone-code'
         });
         return;
     }
@@ -239,7 +241,8 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
             res.render('common/check-mobile.njk', {
                 mobileNumber: req.session.mobileNumber,
                 errorMessages: errorMessages,
-                formActionUrl: '/create/verify-phone-code'
+                formActionUrl: '/create/verify-phone-code',
+                textMessageNotReceivedUrl: '/create/resend-phone-code'
             });
             return;
         }
