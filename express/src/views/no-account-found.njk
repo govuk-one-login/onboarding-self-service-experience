@@ -6,19 +6,17 @@
 {% block pageTitle %}No account found - GOV.UK Sign In {% endblock %}
 
 {% block beforeContent %}
-  <div class="govuk-width-container">
-    {{ backLink("/sign-in-password") }}
-  </div>
+  {{ backLink("/sign-in-password") }}
 {% endblock %}
 
-{%  block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">No account found</h1>
-        <p class="govuk-body">We did not find an account with those details.</p>
-        <p class="govuk-body"><a class="govuk-link" href="/sign-in">Try signing in again</a> or <a class="govuk-link" href="/create/get-email">create an account</a>.</p>
-      </div>
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">No account found</h1>
+      <p class="govuk-body">We did not find an account with those details.</p>
+      <p class="govuk-body"><a class="govuk-link" href="/sign-in">Try signing in again</a> or
+        <a class="govuk-link" href="/create/get-email">create an account</a>.
+      </p>
     </div>
   </div>
 {% endblock %}

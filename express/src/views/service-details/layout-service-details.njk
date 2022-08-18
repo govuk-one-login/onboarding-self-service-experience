@@ -4,29 +4,27 @@
 {% set baseClasses = "govuk-!-padding-top-3" %}
 
 {% block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-body govuk-!-font-weight-bold">My juggling service</div>
-    <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
-    <div class="govuk-grid-row">
+  <div class="govuk-body govuk-!-font-weight-bold">My juggling service</div>
+  <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
+  <div class="govuk-grid-row">
 
-      <div class="govuk-grid-column-one-third">
-        <nav class="side-navigation govuk-!-margin-top-3">
-          <ul class="govuk-list side-navigation__list">
-            <li class="side-navigation__item{% if active == 'client-details' %} side-navigation__item--active{% endif %}">
-              {# TODO When attached to backend to be replaced with : href="/client-details/{{serviceId}}" #}
-              <a class="govuk-link govuk-link--no-visited-state" href="/client-details-mocked">Client details</a>
-              {# <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client details</a> #}
-            </li>
-            <li class="side-navigation__item{% if active == 'private-beta' %} side-navigation__item--active{% endif %}">
-              <a class="govuk-link govuk-link--no-visited-state" href="/private-beta?serviceName={{ serviceName }}">Joining private beta</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+    <div class="govuk-grid-column-one-third">
+      <nav class="side-navigation govuk-!-margin-top-3">
+        <ul class="govuk-list side-navigation__list">
+          <li class="side-navigation__item{% if active == 'client-details' %} side-navigation__item--active{% endif %}">
+            {# TODO When attached to backend to be replaced with : href="/client-details/{{serviceId}}" #}
+            <a class="govuk-link govuk-link--no-visited-state" href="/client-details-mocked">Client details</a>
+            {# <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client details</a> #}
+          </li>
+          <li class="side-navigation__item{% if active == 'private-beta' %} side-navigation__item--active{% endif %}">
+            <a class="govuk-link govuk-link--no-visited-state" href="/private-beta?serviceName={{ serviceName }}">Joining private beta</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
 
-      <div class="govuk-grid-column-two-thirds">
-        {% block mainContent %}{% endblock %}
-      </div>
+    <div class="govuk-grid-column-two-thirds">
+      {% block mainContent %}{% endblock %}
     </div>
 
   </div>

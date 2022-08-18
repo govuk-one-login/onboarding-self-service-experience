@@ -9,40 +9,39 @@
 {% endblock %}
 
 {% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ errorSummary ({
+        errors:  errorMessages,
+        hrefs: {
+          "serviceName": "#serviceName"
+        }
+      }) }}
 
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        {{ errorSummary ({
-          errors:  errorMessages,
-          hrefs: {
-            'serviceName': '#serviceName'
-          }
+      <form class="form" action="/change-service-name" method="post">
+        {{ govukInput({
+          label: {
+            text: "Change your service name",
+            classes: "govuk-label--l",
+            isPageHeading: true
+          },
+          name: "serviceName",
+          id: "serviceName",
+          classes: "govuk-!-width-full",
+          value: serviceName,
+          errorMessage: {
+            text:  errorMessages.get("serviceName")
+          } if  errorMessages else false
         }) }}
-        <form class="form" action="/change-service-name" method="post">
-          {{ govukInput({
-            label: {
-              text: "Change your service name",
-              classes: "govuk-label--l",
-              isPageHeading: true
-            },
-            name: "serviceName",
-            id: "serviceName",
-            classes: "govuk-!-width-full",
-            value: serviceName,
-            errorMessage: {
-              text:  errorMessages.get('serviceName')
-            } if  errorMessages else false
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Confirm"
           }) }}
-          <div class="govuk-button-group">
-            {{ govukButton({
-              text: "Confirm"
-            }) }}
-            <a class="govuk-link" href="/account">Cancel</a>
-          </div>
-        </form>
-      </div>
+          <a class="govuk-link" href="/account">Cancel</a>
+        </div>
+      </form>
+
     </div>
   </div>
-
 {% endblock %}

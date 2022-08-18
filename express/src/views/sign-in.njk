@@ -6,46 +6,40 @@
 
 {% block pageTitle %}Sign in to your GOV.UK Sign In admin account{% endblock %}
 
-{%  block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ errorSummary ({
+        errors: errorMessages,
+        hrefs: {
+          'emailAddress': '#email'
+        }
+      }) }}
 
-        {{ errorSummary ({
-          errors: errorMessages,
-          hrefs: {
-            'emailAddress': '#email'
-          }
+      <h1 class="govuk-heading-l">Sign in to your GOV.UK Sign In account</h1>
+      <p class="govuk-body">If you do not have an account, you can <a class="govuk-link" href="/create/get-email">create one now</a>.</p>
+      <p class="govuk-body">Enter your email address to sign in.</p>
+
+      <form class="form" action="/sign-in" method="post">
+        {{ govukInput({
+          label: {
+            text: "Email address"
+          },
+          name: "emailAddress",
+          id: "email",
+          classes: "govuk-!-width-three-quarters",
+          errorMessage: {
+            text: errorMessages?.emailAddress
+          } if errorMessages else false,
+          value: values?.emailAddress if values
+
         }) }}
 
-        <h1 class="govuk-heading-l">Sign in to your GOV.UK Sign In account</h1>
-        <p class="govuk-body">If you do not have an account, you can <a class="govuk-link "href="/create/get-email">create one now</a>.</p>
-        <p class="govuk-body">Enter your email address to sign in.</p>
+        <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
+          Continue
+        </button>
+      </form>
 
-        <form class="form" action="/sign-in" method="post">
-
-          {{ govukInput({
-            label: {
-              text: "Email address"
-            },
-            name: "emailAddress",
-            id: "email",
-            classes: "govuk-!-width-three-quarters",
-            errorMessage: {
-              text: errorMessages?.emailAddress
-            } if errorMessages else false,
-            value: values?.emailAddress if values
-
-          }) }}
-
-          <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
-            Continue
-          </button>
-
-        </form>
-
-      </div>
     </div>
   </div>
-
 {% endblock %}

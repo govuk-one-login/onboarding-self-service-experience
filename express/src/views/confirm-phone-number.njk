@@ -6,49 +6,44 @@
 {% block pageTitle %}Confirm phone number - GOV.UK Sign In{% endblock %}
 
 {% block beforeContent %}
-  <div class="govuk-width-container">
-    {{ backLink("/security-check-change-number") }}
-  </div>
+  {{ backLink("/security-check-change-number") }}
 {% endblock %}
 
-{%  block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-        {{ errorSummary ({
-          errors: errors,
-          hrefs: {
-            'mobileNumber': '#mobileNumber'
-          }
+      {{ errorSummary ({
+        errors: errors,
+        hrefs: {
+          'mobileNumber': '#mobileNumber'
+        }
+      }) }}
+
+      <h1 class="govuk-heading-l">Confirm the phone number currently linked to your account</h1>
+
+      <form class="form" action="/confirm-phone-number" method="post">
+        {{ govukInput({
+          label: {
+            text: "Phone number"
+          },
+          name: "mobileNumber",
+          id: "mobileNumber",
+          classes: "govuk-input--width-20",
+          type: "tel",
+          autocomplete: "tel",
+          value: value.mobileNumber,
+          errorMessage: {
+            text: errors.get('mobileNumber')
+          } if errors else false
         }) }}
 
-        <h1 class="govuk-heading-l">Confirm the phone number currently linked to your account</h1>
-        <form class="form" action="/confirm-phone-number" method="post" >
+        {{ govukButton({
+          text: "Continue",
+          attributes: {"id": "submit"}
+        }) }}
+      </form>
 
-          {{ govukInput({
-            label: {
-              text: "Phone number"
-            },
-            name: "mobileNumber",
-            id: "mobileNumber",
-            classes: "govuk-input--width-20",
-            type: "tel",
-            autocomplete: "tel",
-            value: value.mobileNumber,
-            errorMessage: {
-              text: errors.get('mobileNumber')
-            } if errors else false
-          }) }}
-
-          {{ govukButton({
-            text: "Continue",
-            attributes: {"id": "submit"}
-          }) }}
-
-        </form>
-
-      </div>
     </div>
   </div>
 {% endblock %}

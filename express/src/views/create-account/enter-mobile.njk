@@ -1,50 +1,45 @@
 {% extends "../layout.njk" %}
-{% from "../macros/back-link.njk" import backLink %}
 {% from "../macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% block pageTitle %}Enter your mobile phone number{% endblock %}
 
-{%  block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ errorSummary ({
+        errors: errorMessages,
+        hrefs: {
+          'mobileNumber': '#mobileNumber'
+        }
+      }) }}
 
-        {{ errorSummary ({
-          errors: errorMessages,
-          hrefs: {
-            'mobileNumber': '#mobileNumber'
-          }
+      <h1 class="govuk-heading-l">Enter your mobile phone number</h1>
+      <p class="govuk-body">We will send a 6 digit security code to this number every time you sign in.</p>
+      <p class="govuk-body">You must use a UK mobile phone number.</p>
+
+      <form class="form" action="/create/enter-mobile" method="post">
+        {{ govukInput({
+          label: {
+            text: "UK mobile phone number"
+          },
+          name: "mobileNumber",
+          id: "mobileNumber",
+          classes: "govuk-input--width-20",
+          type: "tel",
+          autocomplete: "tel",
+          value: values.mobileNumber if values,
+          errorMessage: {
+            text: errorMessages.mobileNumber
+          } if errorMessages
         }) }}
 
-        <h1 class="govuk-heading-l">Enter your mobile phone number</h1>
-        <p class="govuk-body">We will send a 6 digit security code to this number every time you sign in.</p>
-        <p class="govuk-body">You must use a UK mobile phone number.</p>
-        <form class="form" action="/create/enter-mobile" method="post" >
+        {{ govukButton({
+          text: "Continue",
+          attributes: {"id": "submit"}
+        }) }}
+      </form>
 
-          {{ govukInput({
-            label: {
-              text: "UK mobile phone number"
-            },
-            name: "mobileNumber",
-            id: "mobileNumber",
-            classes: "govuk-input--width-20",
-            type: "tel",
-            autocomplete: "tel",
-            value: values.mobileNumber if values,
-            errorMessage: {
-              text: errorMessages.mobileNumber
-            } if errorMessages
-          }) }}
-
-          {{ govukButton({
-            text: "Continue",
-            attributes: {"id": "submit"}
-          }) }}
-
-        </form>
-
-      </div>
     </div>
   </div>
 {% endblock %}

@@ -2,37 +2,33 @@
 {% from "../macros/back-link.njk" import backLink %}
 
 {% block beforeContent %}
-  <div class="govuk-width-container">
-      {{ backLink("/create/enter-mobile") }}
-  </div>
+  {{ backLink("/create/enter-mobile") }}
 {% endblock %}
 
 {% block content %}
-    <div class="govuk-width-container">
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-                <h1 class="govuk-heading-l">
-                    Resend security code
-                </h1>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-                <p class="govuk-body">
-                    If you did not receive a code, we can send you a new one.
-                </p>
+      <h1 class="govuk-heading-l">
+        Resend security code
+      </h1>
 
-                <form method="post" action="/create/resend-phone-code">
-                    <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
-                        Resend security code
-                     </button>
-                </form>
+      <p class="govuk-body">
+        If you did not receive a code, we can send you a new one.
+      </p>
 
-                <p class="govuk-body">
-                    If you no longer have access to the phone number you used to set up your account, let us know through our
-                    <a class="govuk-link" id="support-form" href="https://www.sign-in.service.gov.uk/support">support form</a>
-                     or
-                    <a class="govuk-link" id="slack-channel" href="https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC">Slack channel</a> .
-                </p>
+      <form method="post" action="/create/resend-phone-code">
+        <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
+          Resend security code
+        </button>
+      </form>
 
-            </div>
-        </div>
+      <p class="govuk-body">
+        If you no longer have access to the phone number you used to set up your account, let us know through our
+        <a class="govuk-link" id="support-form" href="https://www.sign-in.service.gov.uk/support">support form</a> or
+        <a class="govuk-link" id="slack-channel" href="https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC">Slack channel</a>.
+      </p>
+
     </div>
+  </div>
 {% endblock %}

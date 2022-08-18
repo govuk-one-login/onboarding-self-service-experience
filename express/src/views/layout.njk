@@ -1,13 +1,10 @@
 {% extends "govuk/template.njk" %}
-{% from "govuk/components/header/macro.njk" import govukHeader %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
-{% from "govuk/components/footer/macro.njk" import govukFooter %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% set assetPath = "/dist" %}
 {% set showTopNav = showTopNav | default(true) %}
-{% set mainClasses = ["govuk-main-wrapper--auto-spacing", baseClasses | default("govuk-!-padding-top-6"), mainClasses | default("")] | join(" ") %}
+{% set mainClasses = ["govuk-main-wrapper--auto-spacing", baseClasses | default("govuk-!-padding-top-6"), mainClasses] | join(" ") %}
 
 {% block head %}
   <!--[if !IE 8]><!-->
@@ -148,9 +145,6 @@
 
     </div>
   </header>
-{% endblock %}
-
-{% block main %}
   <div class="govuk-width-container">
     {{ govukPhaseBanner({
       tag: {
@@ -159,12 +153,6 @@
       html: 'This is a new service – your <a href="https://www.sign-in.service.gov.uk/contact-us" class="govuk-link" rel="noreferrer noopener" target="_blank">feedback (opens in a new tab)</a> will help us improve it.'
     }) }}
   </div>
-  {% block beforeContent %}{% endblock %}
-  <main class="{{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
-    {% block content %}
-      <h1 class="govuk-heading-xl">Default page template</h1>
-    {% endblock %}
-  </main>
 {% endblock %}
 
 {% block footer %}

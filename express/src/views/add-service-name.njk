@@ -7,42 +7,38 @@
 {% endblock %}
 
 {% block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-        {{ errorSummary ({
-          errors:  errorMessages,
-          hrefs: {
-            'serviceName': '#create-service-name'
-          }
+      {{ errorSummary ({
+        errors:  errorMessages,
+        hrefs: {
+          'serviceName': '#create-service-name'
+        }
+      }) }}
+
+      <h1 class="govuk-heading-l">Add your service name</h1>
+      <p class="govuk-body">Add the name of the service you want to test with GOV.UK Sign In.</p>
+      <p class="govuk-body">This is only seen by you. You can change it later.</p>
+
+      <form class="form" action="/create-service-name-validation" method="post">
+        {{ govukInput({
+          label: {
+            text: "Service name"
+          },
+          name: "serviceName",
+          id: "create-service-name",
+          classes: "govuk-!-width-full",
+          errorMessage: {
+            text:  errorMessages.get('serviceName')
+          } if  errorMessages else false
         }) }}
 
-        <h1 class="govuk-heading-l">Add your service name</h1>
-        <p class="govuk-body">Add the name of the service you want to test with GOV.UK Sign In.</p>
-        <p class="govuk-body">This is only seen by you. You can change it later.</p>
+        {{ govukButton({
+          text: "Continue"
+        }) }}
+      </form>
 
-        <form class="form" action="/create-service-name-validation" method="post">
-
-            {{ govukInput({
-              label: {
-                text: "Service name"
-              },
-              name: "serviceName",
-              id: "create-service-name",
-              classes: "govuk-!-width-full",
-              errorMessage: {
-                text:  errorMessages.get('serviceName')
-              } if  errorMessages else false
-            }) }}
-
-          {{ govukButton({
-            text: "Continue"
-          }) }}
-
-        </form>
-
-      </div>
     </div>
   </div>
 {% endblock %}
