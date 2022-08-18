@@ -8,9 +8,9 @@ import manageAccount from "./routes/manage-account";
 import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing-routes";
 import {User} from "../@types/User";
-import {setSignedInStatus} from "./middleware/setSignedInStatus/setSignedInStatus";
+import setSignedInStatus from "./middleware/setSignedInStatus";
 import 'express-async-errors';
-import {SelfServiceError, ErrorOptions} from "./lib/SelfServiceError";
+import {SelfServiceError} from "./lib/SelfServiceError";
 
 const app = express();
 import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(
