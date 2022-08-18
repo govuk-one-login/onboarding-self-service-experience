@@ -1,5 +1,6 @@
-import { assert } from "chai";
-import { eightDigitsMinimum } from "../../src/middleware/passwordValidator";
+import {NextFunction, Request, Response} from 'express';
+import {passwordValidator} from "../../src/middleware/passwordValidator";
+
 
 const PASSWORD_WITH_EMPTY_VALUE = '';
 const PASSWORD_LESS_THAN_8_CHAR = '123';
@@ -7,16 +8,39 @@ const PASSWORD_8_CHAR = '12345678';
 const PASSWORD_9_CHAR = '123456789';
 
 describe('Checking that the user has entered a valid password', () => {
+    let mockRequest: Partial<Request>;
+    let mockResponse: Partial<Response>;
+    let nextFunction: NextFunction;
+
+    beforeEach(() => {
+        mockRequest = {
+            body: jest.fn()
+        };
+        mockResponse = {};
+        nextFunction = jest.fn();
+    });
+
     it('a valid "12345678" 8 character password is accepted. ', async function () {
-        assert.equal(eightDigitsMinimum(PASSWORD_8_CHAR), true, `Expected ${PASSWORD_8_CHAR} to be allowed because it has 8 or more characters`);
+        mockRequest.body.password = PASSWORD_8_CHAR;
+        passwordValidator('create-account/new-password.njk', false)(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction)
+        expect(nextFunction).toBeCalledTimes(1)
     });
+
     it('a valid "123456789" more than 8 character password is accepted. ', async function () {
-        assert.equal(eightDigitsMinimum(PASSWORD_9_CHAR), true, `Expected ${PASSWORD_9_CHAR} to be allowed because it has 8 or more characters`);
+        mockRequest.body.password = PASSWORD_9_CHAR;
+        passwordValidator('create-account/new-password.njk', false)(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction)
+        expect(nextFunction).toBeCalledTimes(1)
     });
+
     it('a password with less than 8 characters is not accepted. ', async function () {
-        assert.equal(eightDigitsMinimum(PASSWORD_LESS_THAN_8_CHAR), false, `Expected ${PASSWORD_LESS_THAN_8_CHAR} not to be allowed because it does not have 8 or more characters`);
+        mockRequest.body.password = PASSWORD_LESS_THAN_8_CHAR;
+        await expect(passwordValidator('create-account/new-password.njk', false)(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction)
+        ).rejects.toThrow("Password was too short");
     });
+
     it('a password with empty value is not accepted. ', async function () {
-        assert.equal(eightDigitsMinimum(PASSWORD_WITH_EMPTY_VALUE), false, `Expected ${PASSWORD_WITH_EMPTY_VALUE} not to be allowed because it has empty value`);
+        mockRequest.body.password = PASSWORD_WITH_EMPTY_VALUE;
+        await expect(passwordValidator('create-account/new-password.njk', false)(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction)
+        ).rejects.toThrow("No password entered");
     });
 });
