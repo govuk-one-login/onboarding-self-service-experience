@@ -149,7 +149,7 @@ const cookieBanner = function () {
     // Install Google Tag Manager
     // https://developers.google.com/tag-platform/tag-manager/web
     function initGATagManager(hasGivenConsent) {
-        if (hasGivenConsent) {
+        if (hasGivenConsent && gaTrackingCode["value"]) {
             const commentStart = document.createComment("Google Tag Manager");
             document.head.append(commentStart);
 
