@@ -138,7 +138,7 @@ export const showEnterMobileForm = async function (req: Request, res: Response) 
     let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
         // user must log in before we can process their mobile number
-        res.redirect('/login')
+        res.redirect('/sign-in')
         return;
     }
     if (req.session.mobileNumber === undefined) {
@@ -174,9 +174,11 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     console.debug(codeSent);
     req.session.mobileNumber = mobileNumber;
     res.render('common/check-mobile.njk', {
-        mobileNumber: req.body.mobileNumber,
-        formActionUrl: '/create/verify-phone-code',
-        textMessageNotReceivedUrl: "/create/resend-phone-code"
+        values: {
+            mobileNumber: req.body.mobileNumber,
+            formActionUrl: '/create/verify-phone-code',
+            textMessageNotReceivedUrl: "/create/resend-phone-code"
+        }
     });
 }
 

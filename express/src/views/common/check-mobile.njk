@@ -25,12 +25,12 @@
         <h1 class="govuk-heading-l">Check your mobile phone</h1>
 
         <div class="govuk-inset-text">
-          We sent a code to: <span class="govuk-!-font-weight-bold">{{ mobileNumber }}</span>
+          We sent a code to: <span class="govuk-!-font-weight-bold">{{ values.mobileNumber }}</span>
         </div>
 
         <p class="govuk-body">It might take a few minutes to arrive. The code will expire after 15 minutes.</p>
 
-        <form class="form" action="{{ formActionUrl }}" method="post">
+        <form class="form" action="{{ values.formActionUrl }}" method="post">
 
           {{ govukInput({
             label: {
@@ -45,7 +45,7 @@
             spellcheck: false,
             value: value.otp,
             errorMessage: {
-              text: errorMessages.get('smsOtp')
+              text: errorMessages.smsOtp
             } if errorMessages else false
           }) }}
 
@@ -59,7 +59,7 @@
 
         </form>
 
-        <p class="govuk-body"><a class="govuk-link "href="{{ textMessageNotReceivedUrl }}">Problems receiving a text message?</a></p>
+        <p class="govuk-body"><a class="govuk-link "href="{{ values.textMessageNotReceivedUrl }}">Problems receiving a text message?</a></p>
 
       </div>
     </div>

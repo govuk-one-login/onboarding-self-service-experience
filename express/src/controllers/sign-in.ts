@@ -49,16 +49,16 @@ export const processLoginOtpMobile = async function (req: Request, res: Response
         response = await cognitoClient.respondToMfaChallenge(req.session.cognitoUser?.Username as string, req.body['sms-otp'], req.session.session as string);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            const errorMessages: Map<string, string> = new Map<string, string>();
-            errorMessages.set('smsOtp', 'The code you entered is not correct or has expired - enter it again or request a new code')
-            res.render('common/check-mobile.njk', {
-                mobileNumber: req.session.mobileNumber,
-                formActionUrl: "/sign-in-otp-mobile",
-                errorMessages: errorMessages
-            })
-            return;
-        }
-        else {
+            throw new SelfServiceError("Wrong OTP entered for login",
+                {
+                    template: 'common/check-mobile.njk',
+                    errorMessages: {smsOtp: 'The code you entered is not correct or has expired - enter it again or request a new code'},
+                    values: {
+                        mobileNumber: req.session.mobileNumber as string,
+                        formActionUrl: "/sign-in-otp-mobile"
+                    }
+                })
+        } else {
             throw error;
         }
     }
@@ -142,7 +142,7 @@ export const showResendPhoneCodeForm = async function (req: Request, res: Respon
     res.render('resend-phone-code-sign-in.njk');
 }
 
-export const resendMobileVerificationCode  = async function (req: Request, res: Response) {
+export const resendMobileVerificationCode = async function (req: Request, res: Response) {
     req.body.mobileNumber = req.session.mobileNumber;
     await processEnterMobileForm(req, res);
 }
