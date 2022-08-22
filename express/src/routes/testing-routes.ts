@@ -4,6 +4,7 @@ import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 import {emailValidator} from "../middleware/emailValidator";
 import {passwordValidator} from "../middleware/passwordValidator";
 import {urisValidator} from "../middleware/urisValidator";
+import {mobileValidator} from "../middleware/mobileValidator";
 
 const router = express.Router();
 
@@ -440,7 +441,16 @@ router.post('/security-check-change-number', async (req, res) => {
         return;
     }
 
-    res.redirect('/confirm-current-phone-number');
+    res.redirect('/confirm-phone-number');
+});
+
+// Testing routes for 'Confirm the phone number' page
+router.get('/confirm-phone-number', (req, res) => {
+    res.render("confirm-phone-number.njk");
+});
+
+router.post('/confirm-phone-number', mobileValidator('confirm-phone-number.njk'), async (req, res) => {
+    res.redirect('/new-phone-number');
 });
 
 export default router;
