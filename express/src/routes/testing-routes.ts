@@ -260,7 +260,7 @@ router.get('/change-email-address', (req, res) => {
     });
 });
 
-router.post('/change-email-address', emailValidator('account/change-email-address.njk'), async (req, res) => {
+router.post('/change-email-address', emailValidator({template: 'account/change-email-address.njk'}), async (req, res) => {
     res.redirect('/account');
 });
 

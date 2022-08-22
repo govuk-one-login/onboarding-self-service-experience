@@ -33,9 +33,9 @@
             id: "email",
             classes: "govuk-!-width-three-quarters",
             errorMessage: {
-              text: errorMessages.get('emailAddress')
+              text: errorMessages?.emailAddress
             } if errorMessages else false,
-            value: values.get('emailAddress') if values
+            value: values?.emailAddress if values
 
           }) }}
 

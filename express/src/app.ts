@@ -2,14 +2,15 @@ import {AdminGetUserCommandOutput, AuthenticationResultType} from "@aws-sdk/clie
 import bodyParser from 'body-parser';
 import express, {NextFunction, Request, Response} from 'express';
 import sessions from 'express-session';
-import {User} from "../@types/User";
 import configureViews from './lib/configureViews';
-import {setSignedInStatus} from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
 import manageAccount from "./routes/manage-account";
 import signIn from "./routes/sign-in";
-
 import testingRoutes from "./routes/testing-routes";
+import {User} from "../@types/User";
+import setSignedInStatus from "./middleware/setSignedInStatus";
+import 'express-async-errors';
+import {SelfServiceError} from "./lib/SelfServiceError";
 
 const app = express();
 import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(
@@ -65,11 +66,13 @@ app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {active: 'get-started'});
 });
 
-app.use(function (err: unknown, req: Request, res: Response, next: NextFunction) {
-    // in async controller methods, you need to catch and next(error); to reach this.
-    console.log("Error handler");
-    console.error(err)
-    res.send('This should be the something went wrong page');
+app.use(function (err: Error | SelfServiceError, req: Request, res: Response, next: NextFunction) {
+    if(err instanceof SelfServiceError && err?.options) {
+        res.render(err.options.template, {values: err.options.values, errorMessages: err.options.errorMessages});
+    } else {
+        console.error(err);
+        res.render('./there-is-a-problem.njk');
+    }
 });
 
 const port = process.env.PORT || 3000

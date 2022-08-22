@@ -10,13 +10,7 @@ import CognitoInterface from "../lib/cognito/CognitoInterface";
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
-    if (req.session.emailAddress) {
-        const values = new Map<string, string>();
-        values.set('email', req.session.emailAddress);
-        res.render('create-account/get-email.njk', {values: values});
-    } else {
-        res.render('create-account/get-email.njk');
-    }
+    res.render('create-account/get-email.njk', {values: {emailAddress: req.session.emailAddress}});
 }
 
 export const processGetEmailForm = async function (req: Request, res: Response) {
@@ -144,7 +138,7 @@ export const showEnterMobileForm = async function (req: Request, res: Response) 
     let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
         // user must log in before we can process their mobile number
-        res.redirect('/login')
+        res.redirect('/sign-in')
         return;
     }
     if (req.session.mobileNumber === undefined) {
@@ -180,9 +174,11 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     console.debug(codeSent);
     req.session.mobileNumber = mobileNumber;
     res.render('common/check-mobile.njk', {
-        mobileNumber: req.body.mobileNumber,
-        formActionUrl: '/create/verify-phone-code',
-        textMessageNotReceivedUrl: "/create/resend-phone-code"
+        values: {
+            mobileNumber: req.body.mobileNumber,
+            formActionUrl: '/create/verify-phone-code',
+            textMessageNotReceivedUrl: "/create/resend-phone-code"
+        }
     });
 }
 
@@ -216,6 +212,8 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         const email = req.session.cognitoUser?.UserAttributes?.filter((attribute: AttributeType) => attribute.Name === 'email')[0].Value;
         const phone = req.session.enteredMobileNumber;
 
+        await cognitoClient.setMfaPreference(req.session.cognitoUser?.Username as string);
+
         let user = {
             "pk": `user#${uuid}`,
             "sk": `cognito_username#${req.session.cognitoUser?.Username}`,
@@ -233,9 +231,9 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${req.session.cognitoUser?.Username}`, req.session?.authenticationResult?.AccessToken as string)).data.Items[0]
         res.redirect('/add-service-name');
         return;
+
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            console.debug("Code did not match");
             const errorMessages = new Map<string, string>();
             errorMessages.set('smsOtp', 'The code you entered is not correct or has expired - enter it again or request a new code');
             res.render('common/check-mobile.njk', {

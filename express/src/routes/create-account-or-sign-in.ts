@@ -1,6 +1,3 @@
-
-
-
 import express, {Request, Response} from "express";
 import {
     processGetEmailForm,
@@ -16,13 +13,14 @@ import {
 import {emailValidator} from "../middleware/emailValidator";
 import {mobileValidator} from "../middleware/mobileValidator";
 import {mobileOtpValidator} from "../middleware/mobileOtpValidator";
-import {passwordValidator} from "../middleware/passwordValidator";
+import {passwordValidator} from "../middleware/passwordValidator"
 import notOnCommonPasswordListValidator from "../middleware/notOnCommonPasswordListValidator";
+import "express-async-errors"
 
 const router = express.Router();
 
 router.get('/create/get-email', showGetEmailForm);
-router.post('/create/get-email', emailValidator('create-account/get-email.njk'), processGetEmailForm);
+router.post('/create/get-email', emailValidator({template: 'create-account/get-email.njk'}), processGetEmailForm);
 
 router.get('/create/check-email', showCheckEmailForm);
 router.post('/create/check-email', checkEmailOtp);
