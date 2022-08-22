@@ -2,12 +2,12 @@ import { Given, Then, When } from '@cucumber/cucumber';
 import { strict as assert } from 'assert';
 import { Page } from "puppeteer";
 import {
-    checkUrl,
+    checkUrl, clickButtonWithId,
     clickLink,
     clickSubmitButton,
     enterTextIntoTextInput,
     getButtonLink,
-    getLink
+    getLink, getLinkWithHref
 } from './shared-functions';
 
 Given('that the user is on the {string} page', async function (route: string) {
@@ -19,13 +19,22 @@ When('they click on the {string} link', async function (text: string) {
     await clickLink(this.page, link);
 });
 
+When('they click on the link that points to {string}', async function (href: string) {
+    let link = await getLinkWithHref(this.page, href);
+    await clickLink(this.page, link);
+});
+
 When('they click on the {string} button-link', async function (text: string) {
     let link = await getButtonLink(this.page, text);
     await clickLink(this.page, link);
 });
 
-When('they select the Submit button', async function () {
+When('they click the Submit button', async function () {
     await clickSubmitButton(this.page);
+});
+
+When('they click the Continue button', async function () {
+    await clickButtonWithId(this.page, "continue");
 });
 
 Then('they should be directed to the following page: {string}', async function (path) {

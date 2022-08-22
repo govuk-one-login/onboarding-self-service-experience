@@ -1,6 +1,6 @@
-import { After, AfterAll, Before, BeforeAll } from '@cucumber/cucumber';
-import { IWorldOptions } from '@cucumber/cucumber/lib/support_code_library_builder/world';
-import { Browser } from 'puppeteer';
+import {After, AfterAll, Before, BeforeAll} from '@cucumber/cucumber';
+import {IWorldOptions} from '@cucumber/cucumber/lib/support_code_library_builder/world';
+import {Browser} from 'puppeteer';
 
 const puppeteer = require('puppeteer');
 const {setWorldConstructor, World} = require('@cucumber/cucumber');
@@ -19,7 +19,8 @@ class TestContext extends World {
 
 BeforeAll(async function () {
     console.log(`Running tests against ${process.env.HOST || 'local'}`)
-    browser = await puppeteer.launch({headless: true});
+    const SHOW_BROWSER = process.env.SHOW_BROWSER ? false : true;
+    browser = await puppeteer.launch({headless: SHOW_BROWSER});
 });
 
 Before(async function () {
@@ -28,11 +29,15 @@ Before(async function () {
 });
 
 After(async function () {
-    await this.page.close();
+    if(!process.env.SHOW_BROWSER ? true : false) {
+        await this.page.close();
+    }
 });
 
 AfterAll(async function () {
-    await browser.close();
+    if(!process.env.SHOW_BROWSER ? true : false) {
+        await browser.close();
+    }
 });
 
 setWorldConstructor(TestContext);

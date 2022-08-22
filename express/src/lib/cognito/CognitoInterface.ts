@@ -26,6 +26,8 @@ export default interface CognitoInterface {
 
     setEmailAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput>;
 
+    setMobilePhoneAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput>;
+
     setPhoneNumber(username: string, phoneNumber: string): Promise<AdminUpdateUserAttributesCommandOutput>;
 
     sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput>;

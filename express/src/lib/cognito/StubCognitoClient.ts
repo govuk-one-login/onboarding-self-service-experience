@@ -5,7 +5,7 @@ import {
     AdminRespondToAuthChallengeCommandOutput,
     AdminSetUserMFAPreferenceCommandOutput,
     AdminUpdateUserAttributesCommandOutput,
-    ChangePasswordCommandOutput,
+    ChangePasswordCommandOutput, CodeMismatchException,
     GetUserAttributeVerificationCodeCommandOutput,
     RespondToAuthChallengeCommandOutput,
     UsernameExistsException,
@@ -45,7 +45,7 @@ export class CognitoClient implements CognitoInterface {
     }
 
     async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
-        const returnValue = await this.getOverriddenReturnValue("login", "email", email);
+        const returnValue = await this.getOverriddenReturnValue('login', 'email', email);
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
@@ -69,19 +69,9 @@ export class CognitoClient implements CognitoInterface {
         return Promise.resolve({$metadata: {}});
     }
 
-    verifySmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput> {
-        return Promise.resolve({$metadata: {}});
-    }
-
-    respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
-        return Promise.resolve({
-            AuthenticationResult: {
-                AccessToken: "some value reuquired",
-                IdToken:
-                    "eyJraWQiOiJYWVpFRXVCT2FUSUNKeHNDOE9qRUJBeWxLd2tUTzl5MWhcL3J3MEpOVkJwRT0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJYWVpjZDQ5Yy03ODkzLTRmYTctOTJmNi00YTc0MzgwMTg4M2UiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmV1LXdlc3QtMi5hbWF6b25hd3MuY29tXC9ldS13ZXN0LTJfWFlaIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjp0cnVlLCJjb2duaXRvOnVzZXJuYW1lIjoiWFlaY2Q0OWMtQUJDMy00ZmE3LUxNTjYtT1A3NDM4MDE4ODNlIiwib3JpZ2luX2p0aSI6IlhZWjgxZDI5LTRkNmItSElKSy1hMDJkLWM0NzQxMTVhMmY0MyIsImF1ZCI6IlhZWnVqdmtya09PT3F1bGJxMjNzMXZoNWN0IiwiZXZlbnRfaWQiOiJYWVo3MTZmYi0wNjNlLTRBQmYtQ0QyYy00NzhmYjE4ZDY1WloiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTY1NTQ2MjQyNCwicGhvbmVfbnVtYmVyIjoiKzQ0NzkwMDAwMDAwMCIsImV4cCI6MTY1NTQ2NjAyNCwiaWF0IjoxNjU1NDYyNDI0LCJqdGkiOiJYWVphOGYxYS1lMDk4LTQ3M2EtOWFlZS1iYTEzOTM5OGU4MzEiLCJlbWFpbCI6InJlZ2lzdGVyZWRAZ2RzLmdvdi51ayJ9.Li6+ccrRLsc9O9wKLi5RIKwuV0MuvTguvnYuLi7XpEsuLvmhLi5acS5tV1Z9zC6r00MtcHIxrKouXlHzay9bLv2kXS5O3PIubdbqLrxMLujDLjFJLli/LnRIp+N51uFIYMwueiqrU/ulalJqTbVUsqVY4twuNynTLE0uT1lVM7u8IS5OLtq8y2kuaUBRMO8uwi7BomBgODCwv2xDqS6nxS4uLi4iLmRzOC4uM0/g4+oKVqV4LsE7RqoxcS5eLi4uLrOotO1k+cMu9PC4J+kx/S4u8zUuLkMrLtXuLi602i4nNlt7LkzNLi7rXOgtwH2yOjHjzi4uLi7B"
-            },
-            $metadata: {}
-        });
+    async verifySmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput> {
+        const returnValue = await this.getOverriddenReturnValue('verifySmsCode', 'code', code);
+        return Promise.resolve(returnValue || {$metadata: {}});
     }
 
     setMfaPreference(cognitoUsername: string): Promise<AdminSetUserMFAPreferenceCommandOutput> {
@@ -119,10 +109,20 @@ export class CognitoClient implements CognitoInterface {
         switch (exception) {
             case "UsernameExistsException":
                 return new UsernameExistsException({$metadata: {}});
+            case 'CodeMismatchException' :
+                return new CodeMismatchException({$metadata: {}});
         }
-
-        throw new Error("Unknown exception");
+        throw new Error('Unknown exception');
     }
+
+    respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
+        return Promise.resolve( this.getOverriddenReturnValue('respondToMfaChallenge', 'username', username) || {$metadata: {}});
+    }
+
+    setMobilePhoneAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput> {
+        return Promise.resolve( {$metadata: {}});
+    }
+
 }
 
 module.exports = {CognitoClient}

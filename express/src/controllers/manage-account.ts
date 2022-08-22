@@ -4,7 +4,11 @@ import {randomUUID} from "crypto";
 import {User} from "../../@types/User";
 import {Service} from "../../@types/Service";
 import CognitoInterface from "../lib/cognito/CognitoInterface";
-import {LimitExceededException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
+import {
+    CodeMismatchException,
+    LimitExceededException,
+    NotAuthorizedException
+} from "@aws-sdk/client-cognito-identity-provider";
 
 export const listServices = async function (req: Request, res: Response) {
     const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
@@ -71,7 +75,7 @@ export const showAccount = async function (req: Request, res: Response) {
     const cognitoId = JSON.parse(claims)["cognito:username"];
     req.session.mobileNumber = JSON.parse(claims)["phone_number"];
 
-    const lambdaFacade : LambdaFacadeInterface = req.app.get("lambdaFacade");
+    const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
     req.session.selfServiceUser = (await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, req.session?.authenticationResult?.AccessToken as string)).data.Items[0]
 
     let user: User = req.session?.selfServiceUser as User
@@ -89,12 +93,17 @@ function lastUpdated(lastUpdated: string): string {
     const lastUpdateMillis: number = +new Date(lastUpdated);
     const now = +new Date();
 
-    if ( lastUpdateMillis > fiveMinutesBefore(now) ) {
+    if (lastUpdateMillis > fiveMinutesBefore(now)) {
         return "Last updated just now";
-    } else if ( wasToday(lastUpdateMillis) ) {
+    } else if (wasToday(lastUpdateMillis)) {
         return "Last updated today";
     } else {
-        return `Last updated ${new Date(lastUpdateMillis).toLocaleDateString('en-gb', {weekday: 'long', day: 'numeric', year: 'numeric', month: 'long'})}`
+        return `Last updated ${new Date(lastUpdateMillis).toLocaleDateString('en-gb', {
+            weekday: 'long',
+            day: 'numeric',
+            year: 'numeric',
+            month: 'long'
+        })}`
     }
     return lastUpdated ? lastUpdated : "Never changed";
 }
@@ -153,7 +162,7 @@ export const changePassword = async function (req: Request, res: Response) {
         console.error("ERROR CALLING COGNITO WITH NEW PASSWORD")
         console.error(error);
 
-        if(error instanceof LimitExceededException) {
+        if (error instanceof LimitExceededException) {
             const value: object = {
                 currentPassword: currentPassword,
                 password: newPassword
@@ -167,7 +176,7 @@ export const changePassword = async function (req: Request, res: Response) {
             return;
         }
 
-        if(error instanceof NotAuthorizedException) {
+        if (error instanceof NotAuthorizedException) {
             const value: object = {
                 currentPassword: "",
                 password: newPassword
@@ -200,5 +209,66 @@ export const changePassword = async function (req: Request, res: Response) {
         return;
     }
     req.session.updatedField = "password";
+    res.redirect('/account');
+}
+
+export const showChangePhoneNumberForm = async function (req: Request, res: Response) {
+    res.render('account/change-phone-number.njk');
+}
+
+export const processChangePhoneNumberForm = async function (req: Request, res: Response) {
+    const mobileNumber = req.body.mobileNumber;
+    const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
+
+    await cognitoClient.setPhoneNumber(req.session.emailAddress as string, mobileNumber);
+    req.session.mobileNumber = mobileNumber;
+
+    let accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
+    if (accessToken === undefined) {
+        // user must log in before we can process their mobile number
+        res.redirect('/sign-in')
+        return;
+    }
+    await cognitoClient.sendMobileNumberVerificationCode(accessToken);
+
+    res.render('common/check-mobile.njk', {
+        values: {
+            mobileNumber: req.body.mobileNumber,
+            formActionUrl: '/verify-phone-code',
+            textMessageNotReceivedUrl: "/create/resend-phone-code"
+        }
+    });
+}
+
+export const verifySmsCode = async function (req: Request, res: Response) {
+    const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
+    const lambdaFacade: LambdaFacadeInterface = await req.app.get('lambdaFacade');
+    const accessToken = req.session.authenticationResult?.AccessToken as string;
+    try {
+        await cognitoClient.verifySmsCode(accessToken, req.body['sms-otp']);
+        await cognitoClient.setMobilePhoneAsVerified(req.session.emailAddress as string);
+        await lambdaFacade.updateUser(
+            req.session?.selfServiceUser?.pk.S.substring('user#'.length) as string,
+            req.session?.selfServiceUser?.sk.S.substring('cognito_username#'.length) as string,
+            {phone: req.session.mobileNumber},
+            accessToken as string
+        );
+    } catch (error) {
+        if (error instanceof CodeMismatchException) {
+            const errorMessages = new Map<string, string>();
+            errorMessages.set('smsOtp', 'The code you entered is not correct or has expired - enter it again or request a new code');
+            res.render('common/check-mobile.njk', {
+                mobileNumber: req.session.mobileNumber,
+                errorMessages: errorMessages,
+                formActionUrl: '/verify-phone-code',
+                textMessageNotReceivedUrl: '/resend-phone-code'
+            });
+            return;
+        }
+        console.error(error);
+        res.redirect('/there-is-a-problem');
+        return;
+    }
+    req.session.updatedField = "mobile phone number";
     res.redirect('/account');
 }

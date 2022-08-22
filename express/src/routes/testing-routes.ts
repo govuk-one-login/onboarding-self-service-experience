@@ -4,7 +4,7 @@ import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 import {emailValidator} from "../middleware/emailValidator";
 import {passwordValidator} from "../middleware/passwordValidator";
 import {urisValidator} from "../middleware/urisValidator";
-import {mobileValidator} from "../middleware/mobileValidator";
+import validateAndConvertForCognito from "../middleware/mobileValidator";
 
 const router = express.Router();
 
@@ -265,24 +265,6 @@ router.post('/change-email-address', emailValidator({template: 'account/change-e
     res.redirect('/account');
 });
 
-// Testing routes for Change your mobile number page
-router.get('/change-phone-number', (req, res) => {
-    res.render("account/change-phone-number.njk", {
-        value: '07666555555'
-    });
-});
-
-router.post('/change-phone-number', async (req, res) => {
-    let mobile = req.body.mobileNumber;
-    if (mobile === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set('mobileNumber', 'Enter your mobile number');
-        res.render('account/change-phone-number.njk', {errorMessages: errorMessages});
-        return;
-    }
-    res.redirect('/account');
-});
-
 // Testing routes for Check your email address page
 // The url needs to be updated when implementing functionality
 router.get('/check-email-visual-test', (req, res) => {
@@ -449,7 +431,7 @@ router.get('/confirm-phone-number', (req, res) => {
     res.render("confirm-phone-number.njk");
 });
 
-router.post('/confirm-phone-number', mobileValidator('confirm-phone-number.njk'), async (req, res) => {
+router.post('/confirm-phone-number', validateAndConvertForCognito('confirm-phone-number.njk'), async (req, res) => {
     res.redirect('/new-phone-number');
 });
 
@@ -467,7 +449,7 @@ router.get('/new-phone-number', (req, res) => {
     res.render("new-phone-number.njk");
 });
 
-router.post('/new-phone-number', mobileValidator('new-phone-number.njk'), async (req, res) => {
+router.post('/new-phone-number', validateAndConvertForCognito('new-phone-number.njk'), async (req, res) => {
     res.render("common/check-mobile.njk");
 });
 

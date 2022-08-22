@@ -7,11 +7,11 @@ brew install aws-sam-cli
 ```
 
 ## Install the right version of Node
-Make sure you have an appropriate version of node. 14 should work.
+Make sure you have an appropriate version of node. 14 is the current LTS version and the one we use for our applications.
 
 ```shell
 brew install nvm
-# follow the instructions about adding some commands to your shell, creating ~/.zshrc if necessary
+# follow the instructions about adding some commands to your shell, creating ~/.zshrc or whatever your shell uses if necessary
 . ~/.zshrc
 nvm install 14.20.0
 nvm use 14.20.0

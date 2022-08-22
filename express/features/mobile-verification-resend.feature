@@ -19,5 +19,5 @@ Feature: A contact form to resend the verification code to mobile
 
   Scenario: The user wants the app to resend their code
     When they click on the "Problems receiving a text message?" link
-    And they select the Submit button
+    And they click the Submit button
     Then they should be directed to the following page: "/create/resend-phone-code"
