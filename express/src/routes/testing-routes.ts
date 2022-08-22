@@ -421,4 +421,26 @@ router.get('/no-account-found', (req, res) => {
     res.render("no-account-found.njk");
 });
 
+// Testing routs for 'We need to do security checks' page
+router.get('/security-check-change-number', (req, res) => {
+    res.render("security-check-change-number.njk", {
+        emailAddress: 'your.email@digital.cabinet-office.gov.uk'
+    });
+});
+
+router.post('/security-check-change-number', async (req, res) => {
+    let emailOtp = req.body['create-email-otp'];
+    if (emailOtp === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set('create-email-otp', 'Enter the security code');
+        res.render('security-check-change-number.njk', {
+            errorMessages: errorMessages,
+            emailAddress: 'your.email@digital.cabinet-office.gov.uk'
+        });
+        return;
+    }
+
+    res.redirect('/confirm-current-phone-number');
+});
+
 export default router;
