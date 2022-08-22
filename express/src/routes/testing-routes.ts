@@ -453,4 +453,13 @@ router.post('/confirm-phone-number', mobileValidator('confirm-phone-number.njk')
     res.redirect('/new-phone-number');
 });
 
+// Testing routes for 'You’ve changed the phone number linked to your account' page
+router.get('/phone-number-changed', (req, res) => {
+    res.render("phone-number-changed.njk");
+});
+
+router.post('/phone-number-changed', async (req, res) => {
+    res.redirect('/client-details-mocked');
+});
+
 export default router;
