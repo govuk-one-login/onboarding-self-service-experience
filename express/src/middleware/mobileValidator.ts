@@ -1,39 +1,43 @@
 import {NextFunction, Request, Response} from "express";
 
-export function mobileValidator(req: Request, res: Response, next: NextFunction) {
-    let mobileNumber = req.body.mobileNumber;
-    mobileNumber = removeSpaceAndDash(mobileNumber);
+type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
+export function mobileValidator(render: string): MiddlewareFunction<Request, Response, NextFunction> {
+    return async (req: Request, res: Response, next: NextFunction) =>
+    {
+        let mobileNumber = req.body.mobileNumber;
+        mobileNumber = removeSpaceAndDash(mobileNumber);
 
-    if ( mobileNumber === "" || mobileNumber === null ){
-        errorResponse(mobileNumber, res , 'mobileNumber', 'Mobile number is required');
-        return;
+        if ( mobileNumber === "" || mobileNumber === null ){
+            errorResponse(render, mobileNumber, res , 'mobileNumber', 'Enter a mobile phone number');
+            return;
+        }
+
+        if (!onlyNumbers(mobileNumber)){
+            errorResponse(render, mobileNumber, res , 'mobileNumber', 'Enter a UK mobile phone number using numbers only');
+            return;
+        }
+
+        if(!ukNumberCheck(mobileNumber)){
+            errorResponse(render, mobileNumber, res , 'mobileNumber', 'Enter a UK mobile phone number, like 07700 900000');
+            return;
+        }
+        if (beginsWith070(mobileNumber)) {
+            errorResponse(render, mobileNumber, res , 'mobileNumber', 'We do not accept premium rate telephone numbers.');
+            return;
+        }
+
+        mobileNumber = convert07Numbers(mobileNumber);
+
+        if (!lengthCheck(mobileNumber)) {
+            errorResponse(render, mobileNumber, res , 'mobileNumber', 'Your number contains an incorrect number of digits');
+            return;
+        }
+
+        req.session.enteredMobileNumber = req.body.mobileNumber;
+        req.session.mobileNumber = mobileNumber;
+        next();
+
     }
-    
-    if (!onlyNumbers(mobileNumber)){
-        errorResponse(mobileNumber, res , 'mobileNumber', 'Make sure there are no letters in the mobile number.');
-        return;
-    }
-
-    if(!ukNumberCheck(mobileNumber)){
-        errorResponse(mobileNumber, res , 'mobileNumber', 'Make sure you have entered a correct UK phone number .');
-        return;
-    }
-    if (beginsWith070(mobileNumber)) {
-        errorResponse(mobileNumber, res , 'mobileNumber', 'We do not accept premium rate telephone numbers.');
-        return;
-    }
-
-    mobileNumber = convert07Numbers(mobileNumber);
-
-    if (!lengthCheck(mobileNumber)) {
-        errorResponse(mobileNumber, res , 'mobileNumber', 'Your number contains an incorrect number of digits');
-        return;
-    }
-
-    req.session.enteredMobileNumber = req.body.mobileNumber;
-    req.session.mobileNumber = mobileNumber;
-    next();
-
 }
 
 export function removeSpaceAndDash(mobileNumber: string) {
@@ -69,11 +73,11 @@ export function lengthCheck(mobileNumber: string) {
     return true;
 }
 
-export function errorResponse(mobileNumber: number, res: Response, key: string, message: string) {
+export function errorResponse(render: string, mobileNumber: number, res: Response, key: string, message: string) {
     let errorMessages = new Map<string, string>();
     errorMessages.set(key, message);
     const value : object = {mobileNumber: mobileNumber};
-    res.render('create-account/enter-mobile.njk', {
+    res.render(render, {
         errors: errorMessages,
         value: value
     });
