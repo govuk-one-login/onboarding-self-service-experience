@@ -453,4 +453,13 @@ router.post('/confirm-phone-number', mobileValidator('confirm-phone-number.njk')
     res.redirect('/new-phone-number');
 });
 
+// Testing routes for 'Confirm the phone number' page
+router.get('/new-phone-number', (req, res) => {
+    res.render("new-phone-number.njk");
+});
+
+router.post('/new-phone-number', mobileValidator('new-phone-number.njk'), async (req, res) => {
+    res.render("common/check-mobile.njk");
+});
+
 export default router;
