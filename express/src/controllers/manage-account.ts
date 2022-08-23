@@ -243,9 +243,14 @@ export const processChangePhoneNumberForm = async function (req: Request, res: R
 };
 
 export const verifySmsCode = async function (req: Request, res: Response) {
+    if (!req.session.mobileNumber) {
+        throw "Mobile number not found in session";
+    }
+
     const cognitoClient: CognitoInterface = await req.app.get("cognitoClient");
     const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
     const accessToken = req.session.authenticationResult?.AccessToken as string;
+
     try {
         await cognitoClient.verifySmsCode(accessToken, req.body["sms-otp"]);
         await cognitoClient.setMobilePhoneAsVerified(req.session.emailAddress as string);
@@ -267,10 +272,12 @@ export const verifySmsCode = async function (req: Request, res: Response) {
             });
             return;
         }
+
         console.error(error);
         res.redirect("/there-is-a-problem");
         return;
     }
+
     req.session.updatedField = "mobile phone number";
     res.redirect("/account");
 };

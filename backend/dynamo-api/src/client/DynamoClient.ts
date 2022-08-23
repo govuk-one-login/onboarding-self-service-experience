@@ -12,10 +12,9 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import * as process from 'process';
 import { OnboardingTableItem } from '../@Types/OnboardingTableItem';
 
-type AttributeNames = {[nameToken: string]: string}
-type AttributeValues = {[valueToken: string]: AttributeValue}
+type Updates = {[attribute: string]: number | boolean | string | string[]};
 
-class DynamoClient {
+export default class DynamoClient {
     private static readonly KEYWORD_SUBSTITUTES: {[name: string]: string} = {
         data: '#D'
     }
@@ -79,15 +78,15 @@ class DynamoClient {
         return this.dynamodb.send(command);
     }
 
-    async updateClient(serviceId: string, clientId: string, updates: object): Promise<UpdateItemCommandOutput> {
-        return this.update('service', serviceId, 'client', clientId, updates);
+    async updateClient(serviceId: string, clientId: string, updates: Updates): Promise<UpdateItemCommandOutput> {
+        return this.update("service", serviceId, "client", clientId, updates);
     }
 
-    async updateUser(userId: string, cognitoUserId: string, updates: object): Promise<UpdateItemCommandOutput> {
-        return this.update('user', userId, 'cognito_username', cognitoUserId, updates);
+    async updateUser(userId: string, cognitoUserId: string, updates: Updates): Promise<UpdateItemCommandOutput> {
+        return this.update("user", userId, "cognito_username", cognitoUserId, updates);
     }
 
-    private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: object): Promise<UpdateItemCommandOutput> {
+    private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: Updates): Promise<UpdateItemCommandOutput> {
         const attributeNames = Object.keys(updates);
 
         const params = {
@@ -98,8 +97,8 @@ class DynamoClient {
             },
             UpdateExpression: this.generateUpdateExpression(attributeNames),
             ExpressionAttributeNames: this.generateExpressionAttributeNames(attributeNames),
-            ExpressionAttributeValues: this.generateExpressionAttributeValues(attributeNames, updates),
-            ReturnValues: 'ALL_NEW'
+            ExpressionAttributeValues: this.generateExpressionAttributeValues(updates),
+            ReturnValues: "ALL_NEW"
         };
 
         const command = new UpdateItemCommand(params);
@@ -113,14 +112,13 @@ class DynamoClient {
         ).join(', ');
     }
 
-    generateExpressionAttributeNames(attributes: string[]): AttributeNames {
+    generateExpressionAttributeNames(attributes: string[]): {[nameAlias: string]: string} {
         return Object.fromEntries(attributes.map(attribute => [this.getAttributeNameAlias(attribute), attribute]));
     }
 
-    generateExpressionAttributeValues(attributes: string[], updates: {[key: string]: any}): AttributeValues {
-        return Object.fromEntries(attributes.map(attribute =>
-            [this.getAttributeValueLabel(attribute), this.marshallAttribute(updates[attribute])]
-        ));
+    generateExpressionAttributeValues(updates: Updates): {[valueToken: string]: AttributeValue} {
+        const values = Object.keys(updates).map(attribute => [this.getAttributeValueLabel(attribute), updates[attribute]]);
+        return marshall(Object.fromEntries(values));
     }
 
     private getAttributeNameAlias(attributeName: string) {
@@ -130,14 +128,4 @@ class DynamoClient {
     private getAttributeValueLabel(attributeName: string) {
         return `:${attributeName}`;
     }
-
-    private marshallAttribute(attribute: any): any {
-        if (Array.isArray(attribute)) {
-            return {L: marshall(attribute)};
-        } else {
-            return marshall(attribute);
-        }
-    }
 }
-
-export default DynamoClient;

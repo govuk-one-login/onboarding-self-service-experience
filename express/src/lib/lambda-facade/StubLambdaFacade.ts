@@ -2,11 +2,11 @@ import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {User} from "../../../@types/user";
-import LambdaFacadeInterface from "./LambdaFacadeInterface";
+import LambdaFacadeInterface, {Updates} from "./LambdaFacadeInterface";
 
 class StubLambdaFacade implements LambdaFacadeInterface {
     constructor() {
-        console.log("Creating stub lambda facade");
+        console.log("Creating stub lambda facade...");
     }
 
     getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
@@ -115,7 +115,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         } as AxiosResponse);
     }
 
-    updateUser(selfServiceUserId: string, cognitoUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
+    updateUser(selfServiceUserId: string, cognitoUserId: string, updates: Updates, accessToken: string): Promise<AxiosResponse> {
         return Promise.resolve({} as AxiosResponse);
     }
 

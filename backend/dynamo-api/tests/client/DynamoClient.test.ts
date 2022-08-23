@@ -43,8 +43,8 @@ describe('DynamoDB client', () => {
             expect(updateExpression).toEqual(expectedUpdateExpression);
         });
 
-        it('should correctly generate attribute values for an update expression', () => {
-            const attributeValues = client.generateExpressionAttributeValues(Object.keys(updates), updates);
+        it("should correctly generate attribute values for an update expression", () => {
+            const attributeValues = client.generateExpressionAttributeValues(updates);
             const expectedAttributeValues = {
                 ':services': {L: [{S: 'Juggling license'}, {S: 'Unicorn registration'}]},
                 ':email': {S: 'name@gov.uk'},

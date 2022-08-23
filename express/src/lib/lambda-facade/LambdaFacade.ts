@@ -1,8 +1,11 @@
+import Service from "@self-service/client/service";
+import User from "@self-service/client/user";
+import OnboardingTableItem from "@self-service/common/onboarding-table-item";
 import axios, {Axios, AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {User} from "../../../@types/user";
-import LambdaFacadeInterface from "./LambdaFacadeInterface";
+import LambdaFacadeInterface, {Updates} from "./LambdaFacadeInterface";
 
 class LambdaFacade implements LambdaFacadeInterface {
     private instance: Axios;
@@ -98,7 +101,7 @@ class LambdaFacade implements LambdaFacadeInterface {
         return await (await this.instance).get(`/Prod/get-service-clients/${bareServiceId}`);
     }
 
-    async updateUser(selfServiceUserId: string, cognitoUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
+    async updateUser(selfServiceUserId: string, cognitoUserId: string, updates: Updates, accessToken: string): Promise<AxiosResponse> {
         const body = {
             userId: selfServiceUserId,
             cognitoUserId: cognitoUserId,
