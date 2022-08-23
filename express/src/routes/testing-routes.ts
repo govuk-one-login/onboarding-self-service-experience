@@ -460,6 +460,7 @@ router.get('/phone-number-changed', (req, res) => {
 
 router.post('/phone-number-changed', async (req, res) => {
     res.redirect('/client-details-mocked');
+});
 
 // Testing routes for 'Confirm the phone number' page
 router.get('/new-phone-number', (req, res) => {
