@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node -r 'dotenv/config' dist/app.js",
     "local": "npm run build && node -r 'dotenv/config' dist/app.js",
-    "dev": "COGNITO_CLIENT=${COGNITO_CLIENT:-StubCognitoClient} LAMBDA_FACADE=${LAMBDA_FACADE:-StubLambdaFacade} nodemon --config nodemon.json -r 'dotenv/config' src/app.ts",
+    "dev": "COGNITO_CLIENT=${COGNITO_CLIENT:-StubCognitoClient} LAMBDA_FACADE=${LAMBDA_FACADE:-StubLambdaFacade} nodemon --config nodemon.json --inspect -r 'dotenv/config' src/app.ts",
     "buildts": "tsc -p .",
     "buildsass": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js assets/css/app.scss dist/assets/app.css",
     "buildjs": "uglifyjs --verbose node_modules/govuk-frontend/govuk/all.js -o dist/assets/govuk-all.js && uglifyjs --verbose assets/javascripts/cookies.js -o dist/assets/cookies.js && cp -v -r assets/javascripts/show-password.js ./dist/assets && cp -v -r assets/javascripts/show-password-two-fields.js ./dist/assets",
@@ -31,7 +31,7 @@
     "express-session": "^1.17.2",
     "govuk-frontend": "^3.13.1",
     "node-sass-package-importer": "^5.3.2",
-    "nodemon": "^2.0.16",
+    "nodemon": "^2.0.19",
     "nunjucks": "^3.2.3",
     "rfc822-validate": "^1.0.0"
   },
