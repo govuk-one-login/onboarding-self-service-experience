@@ -1,0 +1,28 @@
+{% extends "layout.njk" %}
+
+{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-4 govuk-!-margin-bottom-6 govuk-!-padding-bottom-0 " %}
+
+{% block pageTitle %} You’ve changed the phone number - GOV.UK Sign In{% endblock %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    <a href="#" class="govuk-back-link" onclick="history.back()">Back</a>
+  </div>
+{% endblock %}
+
+{%  block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">You’ve changed the phone number linked to your account</h1>
+        <p class="govuk-body">We will send security codes to this phone number when you sign in.</p>
+        <form class="form" action="/phone-number-changed" method="post" >
+          {{ govukButton({
+            text: "Continue",
+            attributes: {"id": "submit"}
+          }) }}
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
