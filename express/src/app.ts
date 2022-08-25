@@ -1,16 +1,17 @@
 import {AdminGetUserCommandOutput, AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
-import bodyParser from 'body-parser';
-import express, {NextFunction, Request, Response} from 'express';
-import sessions from 'express-session';
-import configureViews from './lib/configureViews';
+import bodyParser from "body-parser";
+import express, {NextFunction, Request, Response} from "express";
+import "express-async-errors";
+import sessions from "express-session";
+import path from "path";
+import {User} from "../@types/User";
+import configureViews from "./lib/configureViews";
+import {SelfServiceError} from "./lib/SelfServiceError";
+import setSignedInStatus from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
 import manageAccount from "./routes/manage-account";
 import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing-routes";
-import {User} from "../@types/User";
-import setSignedInStatus from "./middleware/setSignedInStatus";
-import 'express-async-errors';
-import {SelfServiceError} from "./lib/SelfServiceError";
 
 const app = express();
 import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(
@@ -53,7 +54,7 @@ declare module 'express-session' {
     }
 }
 
-configureViews(app);
+configureViews(app, path.join(__dirname, "../src/views"));
 
 app.use(setSignedInStatus);
 

@@ -1,24 +1,13 @@
-import * as path from 'path';
-import {Express} from 'express-serve-static-core';
-import {configure, render,} from 'nunjucks';
+import {Express} from "express-serve-static-core";
+import {configure, render} from "nunjucks";
+import path from "path";
 
-const configureViews = (
-    app: Express,
-    viewPath = '../../src/views',
-) => {
-    configure(
-        [
-            path.join(__dirname, viewPath),
-            'node_modules/govuk-frontend/',
-        ],
-        {
-            autoescape: true,
-            noCache: true,
-            express: app,
-        },
-    );
+export default function (app: Express, viewPath = "../../src/views") {
+    configure([viewPath, path.dirname(require.resolve("govuk-frontend/package.json"))], {
+        autoescape: true,
+        noCache: true,
+        express: app
+    });
 
-    app.engine('njk', render);
-};
-
-export default configureViews;
+    app.engine("njk", render);
+}
