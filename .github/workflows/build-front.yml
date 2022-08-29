@@ -18,10 +18,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           cache: 'npm'
-          cache-dependency-path: express/package-lock.json
 
       - name: Install Node dependencies
         run: npm install
@@ -30,15 +29,15 @@ jobs:
         run: npm run build
 
       - name: Archive distribution artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: self-service-front
           retention-days: 7
           path: |
             express/dist
             express/src/views
-            express/package*.json
             express/manifest.yml
+            express/package*.json
+            express/stubs-config.json
             express/valid-email-domains.txt
             express/top-100k-common-passwords.txt
-            express/stubs-config.json
