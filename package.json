@@ -1,0 +1,25 @@
+{
+  "name": "gds-di-onboarding-common",
+  "description": "DI self-service monorepo",
+  "workspaces": [
+    "express",
+    "backend/dynamo-api"
+  ],
+  "scripts": {
+    "build": "npm run build --w express",
+    "test": "npm run test --workspaces",
+    "local": "npm run local -w express",
+    "dev": "npm run dev -w express"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.36.0",
+    "@typescript-eslint/parser": "^5.36.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1",
+    "eslint": "^8.22.0",
+    "jest": "^28.0.8",
+    "ts-jest": "^28.0.8",
+    "typescript": "^4.8.2"
+  }
+}

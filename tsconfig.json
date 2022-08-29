@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "lib": ["es2020"],
+    "module": "commonjs",
+    "target": "es2020",
+    "strict": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "removeComments": true,
+    "noUnusedLocals": true,
+    "baseUrl": "./"
+  },
+  "files": [],
+  "exclude": ["node_modules"],
+  "references": [
+    {
+      "path": "express"
+    },
+    {
+      "path": "backend/dynamo-api"
+    }
+  ]
+}
