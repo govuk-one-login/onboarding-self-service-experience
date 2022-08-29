@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  // Additional paths to lint not included by other tsconfig.json files
+  "include": [
+    ".eslintrc.js",
+    "./*.js",
+    "backend/*/*.js",
+    "backend/dynamo-api/tests",
+    "express/assets",
+    "express/features",
+    "express/tests",
+    "express/*.js"
+  ]
+}
