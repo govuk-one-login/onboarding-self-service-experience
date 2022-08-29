@@ -87,7 +87,7 @@ export const processEmailAddress = async function (req: Request, res: Response) 
 
 
 export const showSignInFormPassword = async function (req: Request, res: Response) {
-    res.render('sign-in-password.njk');
+    res.render('sign-in-enter-password.njk');
 }
 
 export const processSignInForm = async function (req: Request, res: Response) {
@@ -102,7 +102,7 @@ export const processSignInForm = async function (req: Request, res: Response) {
         if (error instanceof NotAuthorizedException) {
             throw new SelfServiceError("Not authorized exception caught.  Password is probably wrong",
                 {
-                    template: 'sign-in-password.njk',
+                    template: 'sign-in-enter-password.njk',
                     values: {password: password},
                     errorMessages: {password: 'Password is wrong'}
                 }
