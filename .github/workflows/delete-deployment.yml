@@ -42,6 +42,6 @@ jobs:
 
       - name: Clean up stale deployments
         if: ${{ github.event_name == 'schedule' }}
-        uses: alphagov/di-github-actions/paas/delete-stale-apps@64fae1abf5a5bf6360c7560dbc6a6fa850484f11
+        uses: alphagov/di-github-actions/paas/delete-stale-apps@649babd65fb108760f609b7dc9ec0bc61233a2ce
         with:
           age-threshold-days: 30

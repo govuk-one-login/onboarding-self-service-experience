@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
-  dynamo-api
-Transform:
-- AWS::Serverless-2016-10-31
+Transform: AWS::Serverless-2016-10-31
+Description: dynamo-api
 
 Parameters:
   AuthRegistrationBaseUrl:
@@ -34,8 +32,9 @@ Resources:
               'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           TABLE: !ImportValue
-                   'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
+            'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Events:
         Api:
           Type: Api
@@ -47,7 +46,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/put-user.ts
@@ -72,6 +71,7 @@ Resources:
               'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Events:
@@ -85,7 +85,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/get-user.ts
@@ -110,6 +110,7 @@ Resources:
               'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Events:
@@ -123,7 +124,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/put-service.ts
@@ -148,6 +149,7 @@ Resources:
               'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
 
@@ -162,7 +164,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/get-services.ts
@@ -187,6 +189,7 @@ Resources:
               'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Events:
@@ -200,7 +203,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/get-service-clients.ts
@@ -221,6 +224,7 @@ Resources:
       Description: Assumes a cross-account role and invokes the Auth register lambda
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
 
       Events:
@@ -234,7 +238,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/register-client.ts
@@ -255,6 +259,7 @@ Resources:
       Description: Updates a client using http endpoint
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
 
       Events:
@@ -268,7 +273,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/update-client-in-registry.ts
@@ -293,13 +298,14 @@ Resources:
               'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/put-service-client.ts
@@ -324,13 +330,14 @@ Resources:
               'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/update-service-client.ts
@@ -355,13 +362,14 @@ Resources:
               'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/put-service-user.ts
@@ -386,6 +394,7 @@ Resources:
               'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           TABLE: !ImportValue
             'Fn::Sub': '${DynamoDbTableStackName}-Self-Service-table'
       Events:
@@ -398,7 +407,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/update-user.ts
@@ -419,20 +428,21 @@ Resources:
       Description: A invokes a step function and returns the output through the API Gateway.
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           STATE_MACHINE_ARN: !GetAtt NewServiceStepFunction.Arn
       Policies:
         Statement: [
           {
             Effect: Allow,
             Action: [
-                "states:StartSyncExecution"
+              "states:StartSyncExecution"
             ],
             Resource: {
               Fn::Sub: [
-                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
-                  {
-                    stateMachineName: {
-                      Fn::GetAtt: [NewServiceStepFunction, Name]
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  stateMachineName: {
+                    Fn::GetAtt: [NewServiceStepFunction, Name]
                   }
                 }
               ]
@@ -450,7 +460,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/new-service.ts
@@ -471,17 +481,18 @@ Resources:
       Description: A invokes a step function and returns the output through the API Gateway.
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           STATE_MACHINE_ARN: !GetAtt NewClientStepFunction.Arn
       Policies:
         Statement: [
           {
             Effect: Allow,
             Action: [
-                "states:StartSyncExecution"
+              "states:StartSyncExecution"
             ],
             Resource: {
               Fn::Sub: [
-                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
                 {
                   stateMachineName: {
                     Fn::GetAtt: [NewClientStepFunction, Name]
@@ -502,7 +513,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/new-client.ts
@@ -523,17 +534,18 @@ Resources:
       Description: A invokes a step function and returns the output through the API Gateway.
       Environment:
         Variables:
+          NODE_OPTIONS: --enable-source-maps
           STATE_MACHINE_ARN: !GetAtt UpdateClientStepFunction.Arn
       Policies:
         Statement: [
           {
             Effect: Allow,
             Action: [
-                "states:StartSyncExecution"
+              "states:StartSyncExecution"
             ],
             Resource: {
               Fn::Sub: [
-                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
                 {
                   stateMachineName: {
                     Fn::GetAtt: [UpdateClientStepFunction, Name]
@@ -554,7 +566,7 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: "es2020"
+        Target: es2020
         Sourcemap: true
         EntryPoints:
           - src/handlers/do-update-client.ts

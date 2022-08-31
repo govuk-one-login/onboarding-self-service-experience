@@ -1,8 +1,7 @@
 $govuk-new-link-styles: true;
-@import '../../node_modules/govuk-frontend/govuk/all';
+@import "govuk-frontend/govuk/all";
 @import "modules/responsive-embed";
 @import "modules/sub-navigation";
-
 @import "modules/borders";
 @import "modules/breadcrumbs";
 @import "modules/header";
@@ -31,31 +30,30 @@ $govuk-new-link-styles: true;
 
 div.feature-panel {
   text-align: left;
-  border: 3px solid #F3F2F1;
+  border: 3px solid #f3f2f1;
   box-sizing: border-box;
 }
 
-@media(min-width: 769px) {
+@media (min-width: 769px) {
   div.feature-panel {
     min-height: 250px;
   }
 }
 
-@media(max-width: 768px) {
+@media (max-width: 768px) {
   div.feature-panel {
-
   }
   div.hero__aside-image {
     display: none;
   }
 }
 
-
 // scss-lint:disable IdSelector
 #main-content {
   display: block;
   margin-bottom: govuk-spacing(9);
 }
+
 // scss-lint:enable IdSelector
 .hero-alternative-action {
   @include govuk-font($size: 19);
@@ -78,6 +76,7 @@ div.feature-panel {
     .govuk-button {
       margin-bottom: 12px;
     }
+
     .hero-alternative-action {
       display: block;
       margin-left: 0;
@@ -92,6 +91,7 @@ div.feature-panel {
   display: block;
   margin-bottom: govuk-spacing(9);
 }
+
 // scss-lint:enable IdSelector
 .hero-alternative-action {
   @include govuk-font($size: 19);
@@ -110,7 +110,6 @@ div.feature-panel {
 }
 
 #main-content.govuk-main-wrapper-layout-with-left-nav {
-
   .sub-navigation__item {
     font-size: 16px;
     line-height: 1.25;
@@ -147,11 +146,10 @@ div.feature-panel {
     margin-bottom: 35px;
     border-bottom: 1px $govuk-border-colour solid;
   }
-
 }
 
 @media (min-width: 640px) {
-  #main-content.govuk-main-wrapper-evaluate .govuk-grid-column-one-third  {
+  #main-content.govuk-main-wrapper-evaluate .govuk-grid-column-one-third {
     width: 25%;
   }
 }
@@ -170,8 +168,7 @@ code {
 
 @media (min-width: 920px) {
   #main-content.govuk-main-wrapper-layout-with-left-nav.main-dashboard,
-  #main-content.govuk-main-wrapper-layout-no-left-nav-account
-  {
+  #main-content.govuk-main-wrapper-layout-no-left-nav-account {
     .govuk-summary-list__key {
       width: 36%;
       padding-right: 18px;

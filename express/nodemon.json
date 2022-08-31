@@ -3,10 +3,10 @@
   "ignore": [".git", "node_modules/", "dist/", "coverage/"],
   "watch": ["src/"],
   "execMap": {
-    "ts": "node -r ts-node/register"
+      "ts": "node -r ts-node/register"
   },
   "env": {
-    "NODE_ENV": "development"
+      "NODE_ENV": "development"
   },
   "ext": "js,json,ts,njk"
 }
