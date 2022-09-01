@@ -2,7 +2,7 @@
 {% from "../macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% set active = 'client-details' %}
+{% set active = "client-details" %}
 
 {% block pageTitle %}Change redirect URIs - GOV.UK Sign In{% endblock %}
 
@@ -10,16 +10,17 @@
   {{ errorSummary ({
     errors:  errorMessages,
     hrefs: {
-      'redirectURIs': '#redirectURIs'
+      "redirectURIs": "#redirectURIs"
     }
   }) }}
 
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your redirect URIs</h1>
 
   <p class="govuk-body">Add the URI for the page you want your users to see after they sign in to your service.</p>
-  <p class="govuk-body">You can add multiple redirect URIs if you want different groups of users to see different pages once they sign in to your service. To do this, enter the URIs separated by a space.</p>
+  <p class="govuk-body">You can add multiple redirect URIs if you want different groups of users to see different pages
+    once they sign in to your service. To do this, enter the URIs separated by a space.</p>
 
-  <form class="form" action="/change-redirect-URIs/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
+  <form class="form" action="/change-redirect-uris/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
     {{ govukInput({
       label: {
         text: "Redirect URIs"
@@ -32,7 +33,7 @@
       classes: "govuk-!-width-full",
       value: value,
       errorMessage: {
-        text:  errorMessages.get('redirectURIs')
+        text:  errorMessages.get("redirectURIs")
       } if  errorMessages else false
     }) }}
 

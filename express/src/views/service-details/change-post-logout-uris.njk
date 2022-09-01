@@ -20,7 +20,7 @@
   <p class="govuk-body">You can add multiple post logout redirect URIs if you want different groups of users to see different pages once they sign out of your service. To do this, enter the URIs separated by a space.</p>
   <p class="govuk-body">If you do not specify one, your users will be redirected to the <a class="govuk-link" href="https://signin.account.gov.uk/signed-out"> default GOV.UK sign out page</a>.</p>
 
-  <form class="form" action="/change-post-logout-URIs/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
+  <form class="form" action="/change-post-logout-uris/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
     {{ govukInput({
       label: {
         text: "Post logout redirect URIs"

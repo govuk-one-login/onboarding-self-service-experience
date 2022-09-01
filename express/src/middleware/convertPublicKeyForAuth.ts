@@ -8,7 +8,7 @@ export function convertPublicKeyForAuth(req: Request, res: Response, next: NextF
         console.error(err);
         const errorMessages = new Map<string, string>();
         errorMessages.set("serviceUserPublicKey", "Enter a valid public key");
-        res.render("dashboard/change-public-key.njk", {
+        res.render("service-details/change-public-key.njk", {
             errorMessages: errorMessages,
             serviceId: req.params.serviceId,
             selfServiceClientId: req.params.selfServiceClientId,
