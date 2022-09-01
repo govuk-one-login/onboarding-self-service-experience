@@ -3,7 +3,7 @@
 {% from "../macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% block pageTitle %}Check your email{% endblock %}
+{% set pageTitle = "Check your email" %}
 
 {% block beforeContent %}
   {{ backLink("/create/get-email") }}

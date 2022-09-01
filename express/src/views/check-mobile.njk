@@ -3,7 +3,7 @@
 {% from "macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% block pageTitle %}Check your mobile phone - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Check your mobile phone" %}
 
 {% block beforeContent %}
   {{ backLink("#", {onclick: "history.back()"}) }}

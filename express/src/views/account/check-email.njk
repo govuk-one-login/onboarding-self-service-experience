@@ -4,8 +4,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set active = "your-account" %}
-
-{% block pageTitle %}Check your email address - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Check your email address" %}
 
 {% block beforeContent %}
   {{ backLink("/change-email-address") }}

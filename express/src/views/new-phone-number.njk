@@ -3,7 +3,7 @@
 {% from "macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% block pageTitle %}Enter your new mobile phone number - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Enter your new mobile phone number" %}
 
 {% block beforeContent %}
   {{ backLink("/confirm-phone-number") }}

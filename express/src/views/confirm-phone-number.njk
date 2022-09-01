@@ -3,7 +3,7 @@
 {% from "macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% block pageTitle %}Confirm phone number - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Confirm phone number" %}
 
 {% block beforeContent %}
   {{ backLink("/security-check-change-number") }}

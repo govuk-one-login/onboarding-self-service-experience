@@ -1,7 +1,7 @@
 {% extends "layout.njk" %}
 {% from "macros/back-link.njk" import backLink %}
 
-{% block pageTitle %} You’ve changed the phone number - GOV.UK Sign In{% endblock %}
+{% set pageTitle =  "You’ve changed the phone number" %}
 
 {% block beforeContent %}
   {{ backLink("#", {onclick: "history.back()"}) }}

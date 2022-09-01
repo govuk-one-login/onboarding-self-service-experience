@@ -3,7 +3,7 @@
 {% from "macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% block pageTitle %}Security check - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Security check" %}
 
 {% block beforeContent %}
   {{ backLink("/resend-text-code") }}

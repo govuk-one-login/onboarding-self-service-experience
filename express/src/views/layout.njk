@@ -6,6 +6,8 @@
 {% set showTopNav = showTopNav | default(true) %}
 {% set mainClasses = ["govuk-main-wrapper--auto-spacing", baseClasses | default("govuk-!-padding-top-6"), mainClasses] | join(" ") %}
 
+{% block pageTitle %}{{ pageTitle }} - GOV.UK Sign In{% endblock %}
+
 {% block head %}
   <!--[if !IE 8]><!-->
   <link rel="stylesheet" type="text/css" href="/dist/app.css">

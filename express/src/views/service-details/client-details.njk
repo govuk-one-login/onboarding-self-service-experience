@@ -3,9 +3,8 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
-{% set active = 'client-details' %}
-
-{% block pageTitle %}Client details - GOV.UK Sign In{% endblock %}
+{% set active = "client-details" %}
+{% set pageTitle = "Client details" %}
 
 {% block mainContent %}
   {% if updatedField %}

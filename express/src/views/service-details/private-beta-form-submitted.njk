@@ -2,8 +2,7 @@
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 
 {% set active = "private-beta" %}
-
-{% block pageTitle %}Private beta form submitted - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Private beta form submitted" %}
 
 {% block mainContent %}
   {{ govukPanel({

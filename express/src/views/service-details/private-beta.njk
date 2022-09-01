@@ -4,8 +4,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set active = "private-beta" %}
-
-{% block pageTitle %}Joining private beta - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Joining private beta" %}
 
 {% block mainContent %}
   {{ errorSummary ({
