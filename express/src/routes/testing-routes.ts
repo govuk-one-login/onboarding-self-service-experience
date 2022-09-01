@@ -487,7 +487,7 @@ router.get("/new-phone-number", (req, res) => {
 });
 
 router.post("/new-phone-number", validateAndConvertForCognito("new-phone-number.njk"), async (req, res) => {
-    res.render("common/check-mobile.njk");
+    res.render("check-mobile.njk");
 });
 
 export default router;

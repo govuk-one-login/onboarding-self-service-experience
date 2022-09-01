@@ -7,6 +7,7 @@
 
 {% set assetPath = "/dist" %}
 {% set showTopNav = showTopNav | default(true) %}
+{% set mainClasses = ["govuk-main-wrapper--auto-spacing", baseClasses | default("govuk-!-padding-top-6"), mainClasses | default("")] | join(" ") %}
 
 {% block head %}
   <!--[if !IE 8]><!-->

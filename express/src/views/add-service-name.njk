@@ -1,13 +1,10 @@
 {% extends "layout.njk" %}
+{% from "macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "./macros/error-summary.njk" import errorSummary %}
-
-{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-6" %}
 
 {% block pageTitle %}
   Add your service name GOV.UK Sign In
 {% endblock %}
-
 
 {% block content %}
   <div class="govuk-width-container">
@@ -49,4 +46,3 @@
     </div>
   </div>
 {% endblock %}
-

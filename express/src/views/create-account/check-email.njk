@@ -1,15 +1,14 @@
 {% extends "../layout.njk" %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "../macros/back-link.njk" import backLink %}
 {% from "../macros/error-summary.njk" import errorSummary %}
-
-{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-4 govuk-!-margin-bottom-6 govuk-!-padding-bottom-0 " %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% block pageTitle %}Check your email{% endblock %}
 
 {% block beforeContent %}
-    <div class="govuk-width-container">
-      <a href="/create/get-email" class="govuk-back-link">Back</a>
-    </div>
+  <div class="govuk-width-container">
+    {{ backLink("/create/get-email") }}
+  </div>
 {% endblock %}
 
 {%  block content %}

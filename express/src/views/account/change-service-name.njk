@@ -2,8 +2,7 @@
 {% from "../macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-no-left-nav-account" %}
-{% set active = 'your-account' %}
+{% set active = "your-account" %}
 
 {% block pageTitle %}
   Change service name - GOV.UK Sign In
@@ -24,7 +23,7 @@
           {{ govukInput({
             label: {
               text: "Change your service name",
-              classes: "govuk-label--l govuk-!-margin-top-4 govuk-!-margin-bottom-4",
+              classes: "govuk-label--l",
               isPageHeading: true
             },
             name: "serviceName",

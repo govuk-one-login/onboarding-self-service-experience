@@ -2,8 +2,7 @@
 {% from "../macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-no-left-nav-account" %}
-{% set active = 'your-account' %}
+{% set active = "your-account" %}
 
 {% block pageTitle %}
   Change email address - GOV.UK Sign In
@@ -20,7 +19,7 @@
             'emailAddress': '#emailAddress'
           }
         }) }}
-        <h1 class="govuk-heading-l govuk-!-margin-top-4 govuk-!-margin-bottom-4">Change your email address</h1>
+        <h1 class="govuk-heading-l">Change your email address</h1>
         <form class="form" action="/change-email-address" method="post">
           {{ govukInput({
             label: {

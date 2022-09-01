@@ -1,21 +1,19 @@
 {% extends "../layout.njk" %}
+{% from "../macros/back-link.njk" import backLink %}
 {% from "../macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-no-left-nav-account" %}
-{% set active = 'your-account' %}
+{% set active = "your-account" %}
 
-{% block pageTitle %}
-  Check your email address - GOV.UK Sign In
-{% endblock %}
+{% block pageTitle %}Check your email address - GOV.UK Sign In{% endblock %}
+
 {% block beforeContent %}
   <div class="govuk-width-container">
-    <a href="/change-email-address" class="govuk-back-link">Back</a>
+    {{ backLink("/change-email-address") }}
   </div>
 {% endblock %}
 
 {% block content %}
-
 <div class="govuk-width-container">
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -64,5 +62,6 @@
 
       </form>
     </div>
-
+  </div>
+</div>
 {% endblock %}
