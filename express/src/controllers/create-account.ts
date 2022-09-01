@@ -47,7 +47,7 @@ export const showCheckEmailForm = function (req: Request, res: Response) {
 }
 
 export const checkEmailOtp = async function (req: Request, res: Response) {
-    const cognitoClient = await req.app.get('cognitoClient');
+    const cognitoClient: CognitoInterface = await req.app.get('cognitoClient');
 
     if (!req.session.emailAddress) {
         res.redirect('get-email');

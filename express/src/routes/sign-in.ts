@@ -24,7 +24,7 @@ router.get('/sign-in-password',
 
 router.post('/sign-in-password',
     emailIsPresentInSession({template: 'sign-in.njk', errorMessages: {emailAddress: 'Enter your email address'}}),
-    passwordValidator('sign-in-password.njk', true),
+    passwordValidator('sign-in-enter-password.njk', true),
     processSignInForm);
 
 router.get('/sign-in-otp-mobile', showLoginOtpMobile);
