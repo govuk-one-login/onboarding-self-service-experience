@@ -1,222 +1,181 @@
-{% extends "../layout.njk" %}
+{% extends "./layout-service-details.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
-{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav main-dashboard" %}
+{% set active = 'client-details' %}
 
-{% block pageTitle %}
-    Client details GOV.UK Sign In
-{% endblock %}
+{% block pageTitle %}Client details - GOV.UK Sign In{% endblock %}
 
-{% block content %}
+{% block mainContent %}
+  {% if updatedField %}
+    {% set htmlNotificationBanner %}
+      <h3 class="govuk-notification-banner__heading">
+        You have changed your {{ updatedField }}
+      </h3>
+    {% endset %}
 
-    <div class="govuk-width-container">
-        <div class="govuk-body govuk-!-font-weight-bold">{{ serviceName }}</div>
-        <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-one-third">
-                <nav class="sub-navigation govuk-!-margin-top-3">
-                    <ul class="govuk-list sub_navigation_list_2">
-                        <li class="sub-navigation__item sub-navigation__item--active">
-                            <a class="govuk-link govuk-link--no-visited-state"
-                               href="/client-details/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}">Client
-                                details</a>
-                        </li>
-                        <li class="sub-navigation__item">
-                            <a class="govuk-link govuk-link--no-visited-state" href="/private-beta">Joining private beta</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-            <div class="govuk-grid-column-two-thirds">
+    {{ govukNotificationBanner({
+      classes: 'govuk-!-margin-bottom-5',
+      html: htmlNotificationBanner,
+      type: 'success'
+    }) }}
+  {% endif %}
 
-                {% if updatedField %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Client details</h1>
+  <p class="govuk-body">This page shows the information you’ll need to make calls to the GOV.UK Sign In API.</p>
+  <p class="govuk-body">You can use the client details to <a class="govuk-link"
+                                                             href="https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/integrate-with-code-flow/#make-an-authorisation-request"
+                                                             target="_blank">make an authorisation request (opens in new tab)</a> as set out in our technical documentation.</p>
 
-                    {% set htmlNotificationBanner %}
-                        <h3 class="govuk-notification-banner__heading">
-                            You have changed your {{ updatedField }}
-                        </h3>
-                    {% endset %}
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Client 1</h2>
+  {{ govukTag({
+    text: "Integration",
+    classes: "govuk-tag--yellow"
+  }) }}
 
-                    {{ govukNotificationBanner({
-                        classes: 'govuk-!-margin-bottom-5',
-                        html: htmlNotificationBanner,
-                        type: 'success'
-                    }) }}
-
-                {% endif %}
-
-                <h1 class="govuk-heading-l govuk-!-margin-top-3">Client details</h1>
-                <p class="govuk-body">This page shows the information you’ll need to make calls to the GOV.UK Sign In
-                    API.</p>
-                <p class="govuk-body">You can use the client details to <a class="govuk-link"
-                                                                           href="https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/integrate-with-code-flow/#make-an-authorisation-request"
-                                                                           target="_blank">make an authorisation request
-                        (opens in new tab)</a> as set out in our technical documentation.</p>
-
-
-                <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Client 1</h2>
-                {{ govukTag({
-                    text: "Integration",
-                    classes: "govuk-tag--yellow"
-                }) }}
-
-                {% if publicKeyAndUrlsNotUpdatedByUser %}
-                    <div class="govuk-inset-text govuk-!-margin-top-3 govuk-!-margin-bottom-0">
-                        We’ve generated these details based on the service name you gave us.
-                    </div>
-                {% endif %}
-
-                {{ govukSummaryList({
-                    classes: 'govuk-!-padding-top-3',
-                    rows: [
-                        {
-                            key: {
-                            text: "Client name"
-                        },
-                            value: {
-                            text: clientName
-                        },
-                            actions: {
-                            items: [
-                                {
-                                    href: urls.changeClientName,
-                                    text: "Change",
-                                    visuallyHiddenText: "client name"
-                                }
-                            ]
-                        }
-                        },
-                        {
-                            key: {
-                            text: "Client ID"
-                        },
-                            value: {
-                            text: clientId
-                        }
-                        },
-                        {
-                            key: {
-                            text: "Redirect URIs"
-                        },
-                            value: {
-                            text: redirectUrls
-                        },
-                            actions: {
-                            items: [
-                                {
-                                    href: urls.changeRedirectUris,
-                                    text: "Change",
-                                    visuallyHiddenText: "redirect uris"
-                                }
-                            ]
-                        }
-                        },
-                        {
-                            key: {
-                            text: "User attributes required"
-                        },
-                            value: {
-                            html: userAttributesRequired
-                        },
-                            actions: {
-                            items: [
-                                {
-                                    href: urls.changeUserAttributes,
-                                    text: "Change",
-                                    visuallyHiddenText: "user attributes required"
-                                }
-                            ]
-                        }
-                        },
-                        {
-                            key: {
-                            text: "Public key"
-                        },
-                            value: {
-                            text: userPublicKey
-                        },
-                            actions: {
-                            items: [
-                                {
-                                    href: urls.changePublicKey,
-                                    text: "Change",
-                                    visuallyHiddenText: "public key"
-                                }
-                            ]
-                        }
-                        },
-                        {
-                            key: {
-                            text: "Post logout redirect URIs"
-                        },
-                            value: {
-                            text: postLogoutRedirectUrls
-                        },
-                            actions: {
-                            items: [
-                                {
-                                    href: urls.changePostLogoutUris,
-                                    text: "Change",
-                                    visuallyHiddenText: "post logout redirect uris"
-                                }
-                            ]
-                        }
-                        }
-                    ]
-                }) }}
-
-                <details class="govuk-details" data-module="govuk-details">
-                    <summary class="govuk-details__summary">
-                        <span class="govuk-details__summary-text">What do these terms mean?</span>
-                    </summary>
-                    <div class="govuk-details__text">
-                        <span class="govuk-body govuk-!-font-weight-bold">Client name</span>
-                        <p class="govuk-body">This is shown to your users in the sign in journey. For example “You can
-                            now continue to the [client name] service.”</p>
-
-                        <span class="govuk-body govuk-!-font-weight-bold">Client ID</span>
-                        <p class="govuk-body">Our API uses this to uniquely identify your client when it makes requests.
-                            You cannot change this.</p>
-
-                        <span class="govuk-body govuk-!-font-weight-bold">Redirect URIs</span>
-                        <p class="govuk-body">The page(s) you want your users to see after they sign in to your
-                            service.</p>
-
-                        <span class="govuk-body govuk-!-font-weight-bold">User attributes required</span>
-                        <p class="govuk-body">The information about your users that we send back to your service.</p>
-
-                        <span class="govuk-body govuk-!-font-weight-bold">Public key</span>
-                        <p class="govuk-body">This lets our services securely send messages to each other. You need to
-                            <a class="govuk-link"
-                               href="https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/generate-a-key/"
-                               rel="noreferrer noopener" target="_blank">generate a key pair (opens in new tab)</a> and
-                            add the public key.</p>
-
-                        <span class="govuk-body govuk-!-font-weight-bold">Post logout redirect URIs</span>
-                        <p class="govuk-body">The page(s) you want your users to see after they sign out of your
-                            service. These are optional.</p>
-                    </div>
-                </details>
-
-                <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-7 govuk-!-margin-top-7">
-
-                <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Client 2</h2>
-                {{ govukTag({
-                    text: "Production",
-                    classes: "govuk-tag--pink"
-                }) }}
-                <p class="govuk-body govuk-!-margin-top-3">You can add a production client if you <a class="govuk-link"
-                                                                                                     href="/">join our
-                        private beta</a>.</p>
-
-            </div>
-
-        </div>
+  {% if publicKeyAndUrlsNotUpdatedByUser %}
+    <div class="govuk-inset-text govuk-!-margin-top-3 govuk-!-margin-bottom-0">
+      We’ve generated these details based on the service name you gave us.
     </div>
+  {% endif %}
 
+  {{ govukSummaryList({
+    classes: 'govuk-!-padding-top-3',
+    rows: [
+      {
+        key: {
+        text: "Client name"
+      },
+        value: {
+        text: clientName
+      },
+        actions: {
+        items: [
+          {
+            href: urls.changeClientName,
+            text: "Change",
+            visuallyHiddenText: "client name"
+          }
+        ]
+      }
+      },
+      {
+        key: {
+        text: "Client ID"
+      },
+        value: {
+        text: clientId
+      }
+      },
+      {
+        key: {
+        text: "Redirect URIs"
+      },
+        value: {
+        text: redirectUrls
+      },
+        actions: {
+        items: [
+          {
+            href: urls.changeRedirectUris,
+            text: "Change",
+            visuallyHiddenText: "redirect uris"
+          }
+        ]
+      }
+      },
+      {
+        key: {
+        text: "User attributes required"
+      },
+        value: {
+        html: userAttributesRequired
+      },
+        actions: {
+        items: [
+          {
+            href: urls.changeUserAttributes,
+            text: "Change",
+            visuallyHiddenText: "user attributes required"
+          }
+        ]
+      }
+      },
+      {
+        key: {
+        text: "Public key"
+      },
+        value: {
+        text: userPublicKey
+      },
+        actions: {
+        items: [
+          {
+            href: urls.changePublicKey,
+            text: "Change",
+            visuallyHiddenText: "public key"
+          }
+        ]
+      }
+      },
+      {
+        key: {
+        text: "Post logout redirect URIs"
+      },
+        value: {
+        text: postLogoutRedirectUrls
+      },
+        actions: {
+        items: [
+          {
+            href: urls.changePostLogoutUris,
+            text: "Change",
+            visuallyHiddenText: "post logout redirect uris"
+          }
+        ]
+      }
+      }
+    ]
+  }) }}
 
+  <details class="govuk-details" data-module="govuk-details">
+    <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">What do these terms mean?</span>
+    </summary>
+    <div class="govuk-details__text">
+      <span class="govuk-body govuk-!-font-weight-bold">Client name</span>
+      <p class="govuk-body">This is shown to your users in the sign in journey. For example “You can
+        now continue to the [client name] service.”</p>
 
+      <span class="govuk-body govuk-!-font-weight-bold">Client ID</span>
+      <p class="govuk-body">Our API uses this to uniquely identify your client when it makes requests.
+        You cannot change this.</p>
+
+      <span class="govuk-body govuk-!-font-weight-bold">Redirect URIs</span>
+      <p class="govuk-body">The page(s) you want your users to see after they sign in to your
+        service.</p>
+
+      <span class="govuk-body govuk-!-font-weight-bold">User attributes required</span>
+      <p class="govuk-body">The information about your users that we send back to your service.</p>
+
+      <span class="govuk-body govuk-!-font-weight-bold">Public key</span>
+      <p class="govuk-body">This lets our services securely send messages to each other. You need to
+        <a class="govuk-link" rel="noreferrer noopener" target="_blank"
+           href="https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/generate-a-key/">
+          generate a key pair (opens in new tab)</a>
+        and add the public key.
+      </p>
+
+      <span class="govuk-body govuk-!-font-weight-bold">Post logout redirect URIs</span>
+      <p class="govuk-body">The page(s) you want your users to see after they sign out of your
+        service. These are optional.</p>
+    </div>
+  </details>
+
+  <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-7 govuk-!-margin-top-7">
+
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Client 2</h2>
+  {{ govukTag({text: "Production", classes: "govuk-tag--pink"}) }}
+  <p class="govuk-body govuk-!-margin-top-3">You can add a production client if you <a class="govuk-link" href="/">join our private beta</a>.</p>
 {% endblock %}
-

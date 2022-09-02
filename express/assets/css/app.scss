@@ -1,7 +1,6 @@
 $govuk-new-link-styles: true;
 @import "govuk-frontend/govuk/all";
 @import "modules/responsive-embed";
-@import "modules/sub-navigation";
 @import "modules/borders";
 @import "modules/breadcrumbs";
 @import "modules/header";
@@ -12,8 +11,7 @@ $govuk-new-link-styles: true;
 @import "modules/masthead";
 @import "modules/navigation";
 @import "modules/related-items";
-@import "modules/responsive-embed";
-@import "modules/sub-navigation";
+@import "modules/side-navigation";
 @import "modules/show-password";
 
 @media (min-width: 415px) {
@@ -30,17 +28,17 @@ $govuk-new-link-styles: true;
 
 div.feature-panel {
   text-align: left;
-  border: 3px solid #f3f2f1;
+  border: 3px solid #F3F2F1;
   box-sizing: border-box;
 }
 
-@media (min-width: 769px) {
+@media(min-width: 769px) {
   div.feature-panel {
     min-height: 250px;
   }
 }
 
-@media (max-width: 768px) {
+@media(max-width: 768px) {
   div.feature-panel {
   }
   div.hero__aside-image {
@@ -86,45 +84,18 @@ div.feature-panel {
   }
 }
 
-// scss-lint:disable IdSelector
-#main-content {
-  display: block;
-  margin-bottom: govuk-spacing(9);
-}
-
-// scss-lint:enable IdSelector
-.hero-alternative-action {
-  @include govuk-font($size: 19);
-  white-space: nowrap;
-  margin-bottom: govuk-spacing(3);
-  position: relative;
-
-  @include govuk-media-query(tablet) {
-    top: govuk-spacing(2);
-    margin-left: govuk-spacing(3);
-  }
-}
-
-.hero-breadcrumb-banner {
-  background-color: $govuk-brand-colour;
-}
-
-#main-content.govuk-main-wrapper-layout-with-left-nav {
-  .sub-navigation__item {
+#main-content.left-nav-wrapper {
+  .side-navigation__item {
     font-size: 16px;
     line-height: 1.25;
     padding-bottom: 5px;
   }
 
-  .sub-navigation__item:last-child {
+  .side-navigation__item:last-child {
     border-bottom: none;
   }
 
-  .sub_navigation_list_1 .sub-navigation__item {
-    padding: 4px 0 7px 20px;
-  }
-
-  .sub_navigation_list_2 .sub-navigation__item {
+  .side-navigation__list .side-navigation__item {
     padding: 4px 0 7px 0;
   }
 
@@ -167,8 +138,8 @@ code {
 }
 
 @media (min-width: 920px) {
-  #main-content.govuk-main-wrapper-layout-with-left-nav.main-dashboard,
-  #main-content.govuk-main-wrapper-layout-no-left-nav-account {
+  #main-content.account-summary,
+  #main-content.left-nav-wrapper {
     .govuk-summary-list__key {
       width: 36%;
       padding-right: 18px;
