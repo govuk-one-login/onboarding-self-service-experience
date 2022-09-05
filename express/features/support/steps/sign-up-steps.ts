@@ -1,5 +1,5 @@
 import { When } from "@cucumber/cucumber";
-import { clickSubmitButton, enterTextIntoTextInput } from "./shared-functions";
+import {clickButtonWithId, clickSubmitButton, enterTextIntoTextInput} from "./shared-functions";
 
 When('the user submits the email {string}', async function (email: string) {
     let emailInput = await this.page.$('#emailAddress');
@@ -31,5 +31,5 @@ When('the user submits a valid mobile telephone number', async function () {
 
 When('the user enters the correct sms-otp', async function () {
     await enterTextIntoTextInput(this.page, "123123", "sms-otp");
-    await clickSubmitButton(this.page);
+    await clickButtonWithId(this.page, 'continue');
 });

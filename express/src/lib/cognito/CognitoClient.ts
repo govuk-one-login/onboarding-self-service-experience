@@ -151,6 +151,21 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
+    async setMobilePhoneAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput> {
+        let params = {
+            UserPoolId: this.userPoolId,
+            Username: username,
+            UserAttributes: [
+                {
+                    Name: "phone_number_verified",
+                    Value: "true"
+                }
+            ]
+        }
+        let command = new AdminUpdateUserAttributesCommand(params);
+        return await this.cognitoClient.send(command);
+    }
+
     async setPhoneNumber(username: string, phoneNumber: string): Promise<AdminUpdateUserAttributesCommandOutput> {
         let params = {
             UserPoolId: this.userPoolId,

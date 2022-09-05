@@ -164,6 +164,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     const cognitoClient = await req.app.get('cognitoClient');
     if (mobileNumber === undefined) {
         res.render('create-account/enter-mobile.njk');
+        return;
     }
 
     await cognitoClient.setPhoneNumber(req.session.emailAddress, mobileNumber);

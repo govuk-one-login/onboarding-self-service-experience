@@ -31,14 +31,15 @@
             name: "mobileNumber",
             id: "mobileNumber",
             classes: "govuk-!-width-one-half",
-            value: value,
+            value: values.mobileNumber if values,
             errorMessage: {
-              text:  errorMessages.get('mobileNumber')
-            } if  errorMessages else false
+              text:  errorMessages.mobileNumber
+            } if  errorMessages
           }) }}
           <div class="govuk-button-group">
             {{ govukButton({
-              text: "Confirm"
+              text: "Confirm",
+              attributes: {"id": "continue"}
             }) }}
             <a class="govuk-link" href="/account">Cancel</a>
           </div>

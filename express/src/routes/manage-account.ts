@@ -1,10 +1,18 @@
 import express from "express";
-import {changePassword, listServices, showAccount, showChangePasswordForm} from "../controllers/manage-account";
+import {
+    changePassword,
+    listServices, processChangePhoneNumberForm,
+    showAccount,
+    showChangePasswordForm,
+    showChangePhoneNumberForm, verifySmsCode
+} from "../controllers/manage-account";
 import {checkAuthorisation} from "../middleware/authoriser";
 import {showAddServiceForm, processAddServiceForm} from "../controllers/manage-account";
 import {serviceNameValidator} from "../middleware/serviceNameValidator";
 import {unmarshall} from "@aws-sdk/util-dynamodb";
 import notOnCommonPasswordListValidator from "../middleware/notOnCommonPasswordListValidator";
+import validateAndConvertForCognito from "../middleware/mobileValidator";
+import {mobileOtpValidator} from "../middleware/mobileOtpValidator";
 
 const router = express.Router();
 
@@ -50,6 +58,11 @@ router.get('/change-password', checkAuthorisation, showChangePasswordForm);
 
 router.post('/change-password', checkAuthorisation, notOnCommonPasswordListValidator('account/change-password.njk', 'password', ['currentPassword']), changePassword);
 
+router.get('/change-phone-number', showChangePhoneNumberForm);
+
+router.post('/change-phone-number', validateAndConvertForCognito('account/change-phone-number.njk'), processChangePhoneNumberForm);
+
+router.post('/verify-phone-code', mobileOtpValidator(false, '/verify-phone-code', ''), verifySmsCode)
 
 const DEFAULT_PUBLIC_KEY = 'MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=';
 

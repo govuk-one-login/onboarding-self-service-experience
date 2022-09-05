@@ -11,7 +11,7 @@ import {
     showResendEmailCodeForm, resendEmailVerificationCode
 } from "../controllers/create-account";
 import {emailValidator} from "../middleware/emailValidator";
-import {mobileValidator} from "../middleware/mobileValidator";
+import validateAndConvertForCognito from "../middleware/mobileValidator";
 import {mobileOtpValidator} from "../middleware/mobileOtpValidator";
 import {passwordValidator} from "../middleware/passwordValidator"
 import notOnCommonPasswordListValidator from "../middleware/notOnCommonPasswordListValidator";
@@ -29,7 +29,7 @@ router.get('/create/update-password', showNewPasswordForm);
 router.post('/create/update-password', passwordValidator('create-account/new-password.njk', false), notOnCommonPasswordListValidator('create-account/new-password.njk', 'password'), updatePassword);
 
 router.get('/create/enter-mobile', showEnterMobileForm);
-router.post('/create/enter-mobile', mobileValidator('create-account/enter-mobile.njk'), processEnterMobileForm);
+router.post('/create/enter-mobile', validateAndConvertForCognito('create-account/enter-mobile.njk'), processEnterMobileForm);
 
 router.post('/create/verify-phone-code', mobileOtpValidator(false, '/create/verify-phone-code', '/create/resend-phone-code'), submitMobileVerificationCode);
 
