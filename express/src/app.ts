@@ -4,23 +4,32 @@ import express, {NextFunction, Request, Response} from "express";
 import "express-async-errors";
 import sessions from "express-session";
 import path from "path";
-import {User} from "../@types/User";
+import {User} from "../@types/user";
 import configureViews from "./lib/configureViews";
-import {SelfServiceError} from "./lib/SelfServiceError";
+import {RedirectError, RenderError} from "./lib/errors";
 import setSignedInStatus from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
 import manageAccount from "./routes/manage-account";
 import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing-routes";
+import SelfServiceServicesService from "./services/self-service-services-service";
 
 const app = express();
-import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(client => {
-    app.set("cognitoClient", new client.default.CognitoClient());
+
+const cognitoPromise = import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(client => {
+    const cognito = new client.default.CognitoClient();
+    app.set("cognitoClient", cognito);
+    return cognito;
 });
 
-import(`./lib/lambda-facade/${process.env.LAMBDA_FACADE || "LambdaFacade"}`).then(facade => {
-    console.log(facade);
+const lambdaPromise = import(`./lib/lambda-facade/${process.env.LAMBDA_FACADE || "LambdaFacade"}`).then(facade => {
+    const lambda = facade.lambdaFacadeInstance;
     app.set("lambdaFacade", facade.lambdaFacadeInstance);
+    return lambda;
+});
+
+Promise.all([cognitoPromise, lambdaPromise]).then(deps => {
+    app.set("backing-service", new SelfServiceServicesService(deps[0], deps[1]));
 });
 
 app.use("/dist", express.static("./dist/assets"));
@@ -45,7 +54,7 @@ declare module "express-session" {
         emailAddress: string;
         mobileNumber: string;
         enteredMobileNumber: string;
-        session: string;
+        cognitoSession: string;
         authenticationResult: AuthenticationResultType;
         cognitoUser: AdminGetUserCommandOutput;
         selfServiceUser: User;
@@ -67,17 +76,29 @@ app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {active: "get-started"});
 });
 
+app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
+    if (err instanceof RenderError) {
+        res.render(err.template, err.options);
+    } else {
+        next(err);
+    }
+});
+
+app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
+    if (err instanceof RedirectError) {
+        res.redirect(err.route);
+    } else {
+        next(err);
+    }
+});
+
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.status(404).render("404.njk");
 });
 
-app.use((err: Error | SelfServiceError, req: Request, res: Response, next: NextFunction) => {
-    if (err instanceof SelfServiceError && err?.options) {
-        res.render(err.options.template, {values: err.options.values, errorMessages: err.options.errorMessages});
-    } else {
-        console.error(err);
-        res.status(500).render("there-is-a-problem.njk");
-    }
+app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
+    console.error(err);
+    res.render("there-is-a-problem.njk");
 });
 
 const port = process.env.PORT || 3000;

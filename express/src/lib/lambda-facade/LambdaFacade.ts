@@ -1,7 +1,7 @@
 import axios, {Axios, AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
-import {User} from "../../../@types/User";
+import {User} from "../../../@types/user";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
 
 class LambdaFacade implements LambdaFacadeInterface {
@@ -29,7 +29,7 @@ class LambdaFacade implements LambdaFacadeInterface {
     async getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
         return await (
             await this.instance
-        ).post("/Prod/get-user", cognitoId, {
+        ).post("/Prod/get-user", `cognito_username#${cognitoId}`, {
             headers: {
                 "authorised-by": accessToken
             }

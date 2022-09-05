@@ -1,19 +1,18 @@
-import {Request, Response} from "express";
-import CognitoInterface from "../lib/cognito/CognitoInterface";
-import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {
     AdminInitiateAuthCommandOutput,
-    AdminRespondToAuthChallengeCommandOutput,
-    CodeMismatchException,
+    AuthenticationResultType,
     NotAuthorizedException,
     UserNotFoundException
 } from "@aws-sdk/client-cognito-identity-provider";
+import {Request, Response} from "express";
 import "express-async-errors";
+import CognitoInterface from "../lib/cognito/CognitoInterface";
 import {SelfServiceError} from "../lib/SelfServiceError";
+import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
     if (req.session.emailAddress) {
-        res.render("sign-in.njk", {values: {emailAddress: req.session.emailAddress}});
+        res.render("sign-in.njk");
     } else {
         res.render("sign-in.njk");
     }
@@ -35,45 +34,9 @@ export const showLoginOtpMobile = async function (req: Request, res: Response) {
     }
 };
 
-export const processLoginOtpMobile = async function (req: Request, res: Response) {
-    if (!req.session.cognitoUser?.Username || !req.body["sms-otp"] || !req.session.session) {
-        res.render("there-is-a-problem.njk");
-        return;
-    }
-
-    const cognitoClient: CognitoInterface = req.app.get("cognitoClient");
-    let response!: AdminRespondToAuthChallengeCommandOutput;
-    try {
-        response = await cognitoClient.respondToMfaChallenge(
-            req.session.cognitoUser?.Username as string,
-            req.body["sms-otp"],
-            req.session.session as string
-        );
-    } catch (error) {
-        if (error instanceof CodeMismatchException) {
-            throw new SelfServiceError("Wrong OTP entered for login", {
-                template: "check-mobile.njk",
-                errorMessages: {smsOtp: "The code you entered is not correct or has expired - enter it again or request a new code"},
-                values: {
-                    mobileNumber: req.session.mobileNumber as string,
-                    formActionUrl: "/sign-in-otp-mobile"
-                }
-            });
-        } else {
-            throw error;
-        }
-    }
-    req.session.authenticationResult = response.AuthenticationResult;
-
-    const payload = (req.session.authenticationResult?.IdToken as string).split(".");
-    const claims = Buffer.from(payload[1], "base64").toString("utf-8");
-    const cognitoId = JSON.parse(claims)["cognito:username"];
-    req.session.mobileNumber = JSON.parse(claims)["phone_number"];
-
-    const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
-    req.session.selfServiceUser = (
-        await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, response?.AuthenticationResult?.AccessToken as string)
-    ).data.Items[0];
+export const finishSignIn = async function (req: Request, res: Response) {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    req.session.selfServiceUser = await s4.getSelfServiceUser(req.session.authenticationResult as AuthenticationResultType);
 
     if (req.session.selfServiceUser) {
         req.session.isSignedIn = true;
@@ -121,7 +84,7 @@ export const processSignInForm = async function (req: Request, res: Response) {
     }
 
     req.session.cognitoUser = {Username: response.ChallengeParameters?.USER_ID_FOR_SRP as string, $metadata: {}};
-    req.session.session = response.Session;
+    req.session.cognitoSession = response.Session;
     req.session.mobileNumber = response.ChallengeParameters?.CODE_DELIVERY_DESTINATION;
 
     res.redirect("/sign-in-otp-mobile");

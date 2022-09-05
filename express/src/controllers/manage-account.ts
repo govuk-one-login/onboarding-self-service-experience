@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {randomUUID} from "crypto";
-import {User} from "../../@types/User";
+import {User} from "../../@types/user";
 import {Service} from "../../@types/Service";
 import CognitoInterface from "../lib/cognito/CognitoInterface";
 import {CodeMismatchException, LimitExceededException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";

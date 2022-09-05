@@ -1,7 +1,7 @@
 import express, {Request, Response} from "express";
 import "express-async-errors";
 import {
-    checkEmailOtp,
+    submitEmailOtp,
     processEnterMobileForm,
     processGetEmailForm,
     resendEmailVerificationCode,
@@ -20,14 +20,15 @@ import {mobileOtpValidator} from "../middleware/mobileOtpValidator";
 import validateAndConvertForCognito from "../middleware/mobileValidator";
 import notOnCommonPasswordListValidator from "../middleware/notOnCommonPasswordListValidator";
 import {passwordValidator} from "../middleware/passwordValidator";
+import {emailOtpValidator} from "../middleware/emailOtpValidator";
 
 const router = express.Router();
 
 router.get("/create/get-email", showGetEmailForm);
-router.post("/create/get-email", emailValidator({template: "create-account/get-email.njk"}), processGetEmailForm);
+router.post("/create/get-email", emailValidator("create-account/get-email.njk"), processGetEmailForm);
 
 router.get("/create/check-email", showCheckEmailForm);
-router.post("/create/check-email", checkEmailOtp);
+router.post("/create/check-email", emailOtpValidator, submitEmailOtp);
 
 router.get("/create/update-password", showNewPasswordForm);
 router.post(

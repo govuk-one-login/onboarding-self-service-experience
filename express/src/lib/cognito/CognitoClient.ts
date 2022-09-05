@@ -20,9 +20,7 @@ import {
     VerifyUserAttributeCommand,
     VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
-import {
-    AdminCreateUserCommandOutput
-} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/AdminCreateUserCommand";
+import {AdminCreateUserCommandOutput} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/AdminCreateUserCommand";
 import CognitoInterface from "./CognitoInterface";
 
 export class CognitoClient implements CognitoInterface {
