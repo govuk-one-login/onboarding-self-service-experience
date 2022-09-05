@@ -9,4 +9,4 @@ class SelfServiceError extends Error {
     }
 }
 
-export {SelfServiceError}
+export {SelfServiceError};

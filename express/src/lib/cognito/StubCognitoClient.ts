@@ -5,7 +5,8 @@ import {
     AdminRespondToAuthChallengeCommandOutput,
     AdminSetUserMFAPreferenceCommandOutput,
     AdminUpdateUserAttributesCommandOutput,
-    ChangePasswordCommandOutput, CodeMismatchException,
+    ChangePasswordCommandOutput,
+    CodeMismatchException,
     GetUserAttributeVerificationCodeCommandOutput,
     RespondToAuthChallengeCommandOutput,
     UsernameExistsException,
@@ -45,7 +46,7 @@ export class CognitoClient implements CognitoInterface {
     }
 
     async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
-        const returnValue = await this.getOverriddenReturnValue('login', 'email', email);
+        const returnValue = await this.getOverriddenReturnValue("login", "email", email);
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
@@ -70,7 +71,7 @@ export class CognitoClient implements CognitoInterface {
     }
 
     async verifySmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput> {
-        const returnValue = await this.getOverriddenReturnValue('verifySmsCode', 'code', code);
+        const returnValue = await this.getOverriddenReturnValue("verifySmsCode", "code", code);
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
@@ -109,20 +110,19 @@ export class CognitoClient implements CognitoInterface {
         switch (exception) {
             case "UsernameExistsException":
                 return new UsernameExistsException({$metadata: {}});
-            case 'CodeMismatchException' :
+            case "CodeMismatchException":
                 return new CodeMismatchException({$metadata: {}});
         }
-        throw new Error('Unknown exception');
+        throw new Error("Unknown exception");
     }
 
     respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
-        return Promise.resolve( this.getOverriddenReturnValue('respondToMfaChallenge', 'username', username) || {$metadata: {}});
+        return Promise.resolve(this.getOverriddenReturnValue("respondToMfaChallenge", "username", username) || {$metadata: {}});
     }
 
     setMobilePhoneAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput> {
-        return Promise.resolve( {$metadata: {}});
+        return Promise.resolve({$metadata: {}});
     }
-
 }
 
-module.exports = {CognitoClient}
+module.exports = {CognitoClient};

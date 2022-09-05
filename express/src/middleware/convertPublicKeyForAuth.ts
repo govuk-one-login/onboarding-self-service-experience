@@ -5,11 +5,12 @@ export function convertPublicKeyForAuth(req: Request, res: Response, next: NextF
     try {
         req.body.authCompliantPublicKey = getAuthApiCompliantPublicKey(req.body.serviceUserPublicKey as string);
     } catch (err) {
-        console.error(err)
+        console.error(err);
         const errorMessages = new Map<string, string>();
-        errorMessages.set('serviceUserPublicKey', 'Enter a valid public key');
-        res.render('dashboard/change-public-key.njk', {
-            errorMessages: errorMessages, serviceId: req.params.serviceId,
+        errorMessages.set("serviceUserPublicKey", "Enter a valid public key");
+        res.render("dashboard/change-public-key.njk", {
+            errorMessages: errorMessages,
+            serviceId: req.params.serviceId,
             selfServiceClientId: req.params.selfServiceClientId,
             clientId: req.params.clientId
         });

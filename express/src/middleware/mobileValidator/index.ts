@@ -1,3 +1,3 @@
-import validateAndConvertForCognito from './validator'
+import validateAndConvertForCognito from "./validator";
 
 export default validateAndConvertForCognito;

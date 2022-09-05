@@ -2,13 +2,13 @@ import {
     AdminCreateUserCommandOutput,
     AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
+    AdminRespondToAuthChallengeCommandOutput,
+    AdminSetUserMFAPreferenceCommandOutput,
     AdminUpdateUserAttributesCommandOutput,
+    ChangePasswordCommandOutput,
     GetUserAttributeVerificationCodeCommandOutput,
     RespondToAuthChallengeCommandOutput,
-    VerifyUserAttributeCommandOutput,
-    ChangePasswordCommandOutput,
-    AdminSetUserMFAPreferenceCommandOutput,
-    AdminRespondToAuthChallengeCommandOutput
+    VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
 
 export default interface CognitoInterface {

@@ -4,4 +4,4 @@ export default interface ErrorOptions {
     errorMessages?: {[name: string]: string};
 }
 
-export {ErrorOptions}
+export {ErrorOptions};

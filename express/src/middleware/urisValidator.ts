@@ -4,10 +4,10 @@ type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) =>
 
 export function urisValidator(template: string, whichUris: string): MiddlewareFunction<Request, Response, NextFunction> {
     return async (req: Request, res: Response, next: NextFunction) => {
-        let stringOfUris = req.body[whichUris];
+        const stringOfUris = req.body[whichUris];
         if (stringOfUris === "") {
             const errorMessages = new Map<string, string>();
-            errorMessages.set(whichUris, 'Enter your redirect URIs');
+            errorMessages.set(whichUris, "Enter your redirect URIs");
             res.render(template, {
                 errorMessages: errorMessages,
                 value: req.body[whichUris],
@@ -23,14 +23,14 @@ export function urisValidator(template: string, whichUris: string): MiddlewareFu
         for (const url of urlStrings) {
             try {
                 new URL(url);
-            } catch ( error ) {
+            } catch (error) {
                 invalidUris.push(url);
             }
         }
 
-        if(invalidUris.length > 0) {
+        if (invalidUris.length > 0) {
             const errorMessages = new Map<string, string>();
-            if(invalidUris.length == 1) {
+            if (invalidUris.length == 1) {
                 errorMessages.set(whichUris, `${invalidUris[0]} is not a valid URL`);
             } else {
                 errorMessages.set(whichUris, `The following URLs are not valid: ${invalidUris.join(" ")}`);
@@ -49,8 +49,8 @@ export function urisValidator(template: string, whichUris: string): MiddlewareFu
             const errorMessages = new Map<string, string>();
             errorMessages.set(whichUris, "URLs must be https (except for localhost)");
 
-            let newUrl = new URL(url);
-            if( !isValidLocalHost(newUrl) && newUrl.protocol !== "https:" ) {
+            const newUrl = new URL(url);
+            if (!isValidLocalHost(newUrl) && newUrl.protocol !== "https:") {
                 res.render(template, {
                     errorMessages: errorMessages,
                     value: req.body[whichUris],
@@ -63,7 +63,7 @@ export function urisValidator(template: string, whichUris: string): MiddlewareFu
         }
 
         next();
-    }
+    };
 }
 
 function isValidLocalHost(url: URL): boolean {

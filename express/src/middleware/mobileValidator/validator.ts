@@ -10,5 +10,5 @@ export default function validateAndConvertForCognito(template: string): Middlewa
         req.session.enteredMobileNumber = req.body.mobileNumber;
         req.session.mobileNumber = req.body.mobileNumber;
         next();
-    }
+    };
 }
