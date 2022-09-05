@@ -4,6 +4,10 @@ import {
     AdminGetUserCommandOutput,
     AdminInitiateAuthCommand,
     AdminInitiateAuthCommandOutput,
+    AdminRespondToAuthChallengeCommand,
+    AdminRespondToAuthChallengeCommandOutput,
+    AdminSetUserMFAPreferenceCommand,
+    AdminSetUserMFAPreferenceCommandOutput,
     AdminUpdateUserAttributesCommand,
     AdminUpdateUserAttributesCommandOutput,
     ChangePasswordCommand,
@@ -14,11 +18,7 @@ import {
     RespondToAuthChallengeCommand,
     RespondToAuthChallengeCommandOutput,
     VerifyUserAttributeCommand,
-    VerifyUserAttributeCommandOutput,
-    AdminSetUserMFAPreferenceCommandOutput,
-    AdminSetUserMFAPreferenceCommand,
-    AdminRespondToAuthChallengeCommandOutput,
-    AdminRespondToAuthChallengeCommand
+    VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
 import {
     AdminCreateUserCommandOutput
@@ -33,8 +33,8 @@ export class CognitoClient implements CognitoInterface {
 
     constructor() {
         this.cognitoClient = new CognitoIdentityProviderClient({
-            region: 'eu-west-2',
-            endpoint: 'https://cognito-idp.eu-west-2.amazonaws.com'
+            region: "eu-west-2",
+            endpoint: "https://cognito-idp.eu-west-2.amazonaws.com"
         });
         this.userPoolId = process.env.USERPOOL_ID;
         this.clientId = process.env.CLIENT_ID;
@@ -50,94 +50,94 @@ Either USERPOOL_ID or CLIENT_ID has not been set.
 
 These values are set using environment variables.  If you are running the application locally the values can be taken from the file .env. You can copy .env.example, rename it and edit the values inside and re-start the application.
 
-If the app is being deployed to PaaS then you may have to update manifest.yaml or provide values in the github environment that you're deploying from.`);
-            process.kill(process.pid, 'SIGTERM');
+If the app is being deployed to PaaS then you may have to update manifest.yaml or provide values in the github environment that you're deploying from.`
+            );
+            process.kill(process.pid, "SIGTERM");
         }
     }
 
     async createUser(email: string): Promise<AdminCreateUserCommandOutput> {
-        let createUserParams = {
+        const createUserParams = {
             DesiredDeliveryMediums: ["EMAIL"],
             Username: email,
             UserPoolId: this.userPoolId,
-            TemporaryPassword: Math.floor(Math.random() * 100_000).toString().padStart(6, '0'),
-            UserAttributes: [
-                {Name: "email", Value: email}
-            ]
-        }
-        let command = new AdminCreateUserCommand(createUserParams);
+            TemporaryPassword: Math.floor(Math.random() * 100_000)
+                .toString()
+                .padStart(6, "0"),
+            UserAttributes: [{Name: "email", Value: email}]
+        };
+        const command = new AdminCreateUserCommand(createUserParams);
         return await this.cognitoClient.send(command);
     }
 
     async resendEmailAuthCode(email: string): Promise<AdminCreateUserCommandOutput> {
-        console.debug(`Re-sending verification code to this adress : ${{email}}`);
-        let createUserParams = {
+        console.debug(`Re-sending verification code to this address : ${{email}}`);
+        const createUserParams = {
             DesiredDeliveryMediums: ["EMAIL"],
             Username: email,
             UserPoolId: this.userPoolId,
             MessageAction: "RESEND",
-            TemporaryPassword: Math.floor(Math.random() * 100_000).toString().padStart(6, '0'),
-            UserAttributes: [
-                {Name: "email", Value: email}
-            ]
-        }
-        let command = new AdminCreateUserCommand(createUserParams);
+            TemporaryPassword: Math.floor(Math.random() * 100_000)
+                .toString()
+                .padStart(6, "0"),
+            UserAttributes: [{Name: "email", Value: email}]
+        };
+        const command = new AdminCreateUserCommand(createUserParams);
         return await this.cognitoClient.send(command);
     }
 
     async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
-        let params = {
+        const params = {
             UserPoolId: this.userPoolId,
             ClientId: this.clientId,
-            AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
+            AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
             AuthParameters: {
                 USERNAME: email,
                 PASSWORD: password
             }
-        }
+        };
 
-        let command = new AdminInitiateAuthCommand(params);
+        const command = new AdminInitiateAuthCommand(params);
         return await this.cognitoClient.send(command);
     }
 
     async setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
-        let params = {
+        const params = {
             ChallengeName: "NEW_PASSWORD_REQUIRED",
             ChallengeResponses: {
-                "NEW_PASSWORD": password,
-                "USERNAME": email
+                NEW_PASSWORD: password,
+                USERNAME: email
             },
             ClientId: this.clientId,
             Session: session
-        }
-        let command = new RespondToAuthChallengeCommand(params);
+        };
+        const command = new RespondToAuthChallengeCommand(params);
         return await this.cognitoClient.send(command);
     }
 
     async changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<ChangePasswordCommandOutput> {
-        let params = {
+        const params = {
             AccessToken: accessToken,
             PreviousPassword: previousPassword,
             ProposedPassword: proposedPassword
-        }
-        let command = new ChangePasswordCommand(params);
+        };
+        const command = new ChangePasswordCommand(params);
 
         return await this.cognitoClient.send(command);
     }
 
-
     async getUser(username: string): Promise<AdminGetUserCommandOutput> {
-        let params = {
+        const params = {
             Username: username,
             UserPoolId: this.userPoolId
-        }
-        let command = new AdminGetUserCommand(params);
+        };
+        const command = new AdminGetUserCommand(params);
 
         return await this.cognitoClient.send(command);
     }
 
     async setEmailAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput> {
-        let params = {
+        const params = {
             UserPoolId: this.userPoolId,
             Username: username,
             UserAttributes: [
@@ -146,13 +146,13 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
                     Value: "true"
                 }
             ]
-        }
-        let command = new AdminUpdateUserAttributesCommand(params);
+        };
+        const command = new AdminUpdateUserAttributesCommand(params);
         return await this.cognitoClient.send(command);
     }
 
     async setMobilePhoneAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput> {
-        let params = {
+        const params = {
             UserPoolId: this.userPoolId,
             Username: username,
             UserAttributes: [
@@ -161,13 +161,13 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
                     Value: "true"
                 }
             ]
-        }
-        let command = new AdminUpdateUserAttributesCommand(params);
+        };
+        const command = new AdminUpdateUserAttributesCommand(params);
         return await this.cognitoClient.send(command);
     }
 
     async setPhoneNumber(username: string, phoneNumber: string): Promise<AdminUpdateUserAttributesCommandOutput> {
-        let params = {
+        const params = {
             UserPoolId: this.userPoolId,
             Username: username,
             UserAttributes: [
@@ -176,27 +176,27 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
                     Value: phoneNumber
                 }
             ]
-        }
-        let command = new AdminUpdateUserAttributesCommand(params);
+        };
+        const command = new AdminUpdateUserAttributesCommand(params);
         return await this.cognitoClient.send(command);
     }
 
     async sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput> {
-        let params = {
+        const params = {
             AccessToken: accessToken,
             AttributeName: "phone_number"
-        }
-        let command = new GetUserAttributeVerificationCodeCommand(params);
+        };
+        const command = new GetUserAttributeVerificationCodeCommand(params);
         return await this.cognitoClient.send(command);
     }
 
     async verifySmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput> {
         const params = {
             AccessToken: accessToken,
-            AttributeName: 'phone_number',
+            AttributeName: "phone_number",
             Code: code
-        }
-        let command = new VerifyUserAttributeCommand(params);
+        };
+        const command = new VerifyUserAttributeCommand(params);
         return await this.cognitoClient.send(command);
     }
 
@@ -208,14 +208,14 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             },
             Username: cognitoUsername,
             UserPoolId: this.userPoolId
-        }
-        let command = new AdminSetUserMFAPreferenceCommand(params);
+        };
+        const command = new AdminSetUserMFAPreferenceCommand(params);
         return await this.cognitoClient.send(command);
     }
 
     async respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
         const params = {
-            ChallengeName: 'SMS_MFA',
+            ChallengeName: "SMS_MFA",
             ChallengeResponses: {
                 SMS_MFA_CODE: mfaCode,
                 USERNAME: username
@@ -223,10 +223,10 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             ClientId: this.clientId,
             UserPoolId: this.userPoolId,
             Session: session
-        }
-        let command = new AdminRespondToAuthChallengeCommand(params);
+        };
+        const command = new AdminRespondToAuthChallengeCommand(params);
         return await this.cognitoClient.send(command);
     }
 }
 
-module.exports = {CognitoClient}
+module.exports = {CognitoClient};

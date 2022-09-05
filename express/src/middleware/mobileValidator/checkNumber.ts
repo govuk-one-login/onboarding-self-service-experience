@@ -7,11 +7,10 @@ export function isValidOrThrow(number: string, template: string): void {
         notBlank(number);
     } catch (error) {
         if (error instanceof SelfServiceError) {
-            throw new SelfServiceError("No mobile number provided",
-                {
-                    template: template,
-                    errorMessages: {mobileNumber: "Enter a mobile phone number"}
-                })
+            throw new SelfServiceError("No mobile number provided", {
+                template: template,
+                errorMessages: {mobileNumber: "Enter a mobile phone number"}
+            });
         } else {
             throw error;
         }
@@ -23,12 +22,11 @@ export function isValidOrThrow(number: string, template: string): void {
         processing = getUniquePart(processing);
     } catch (error) {
         if (error instanceof SelfServiceError) {
-            throw new SelfServiceError(`Not a UK mobile number ${number} | ${processing}`,
-                {
-                    template: template,
-                    errorMessages: {mobileNumber: 'Enter a UK mobile phone number, like 07700 900000'},
-                    values: {mobileNumber: number}
-                })
+            throw new SelfServiceError(`Not a UK mobile number ${number} | ${processing}`, {
+                template: template,
+                errorMessages: {mobileNumber: "Enter a UK mobile phone number, like 07700 900000"},
+                values: {mobileNumber: number}
+            });
         } else {
             throw error;
         }
@@ -40,14 +38,13 @@ export function isValidOrThrow(number: string, template: string): void {
         ensureExactlyTenNumbersRemain(processing);
     } catch (error) {
         console.log(processing);
-        console.log(number)
+        console.log(number);
         if (error instanceof SelfServiceError) {
-            throw new SelfServiceError(`Not a valid number ${number} | ${processing}`,
-                {
-                    template: template,
-                    errorMessages: {mobileNumber: 'Enter a UK mobile phone number using numbers only'},
-                    values: {mobileNumber: number}
-                })
+            throw new SelfServiceError(`Not a valid number ${number} | ${processing}`, {
+                template: template,
+                errorMessages: {mobileNumber: "Enter a UK mobile phone number using numbers only"},
+                values: {mobileNumber: number}
+            });
         } else {
             throw error;
         }
@@ -61,12 +58,12 @@ export function notBlank(number: string) {
 }
 
 export function getUniquePart(mobileNumber: string): string {
-    if (mobileNumber.trim().startsWith('+44')) {
-        return mobileNumber.trim().substring('+44'.length);
+    if (mobileNumber.trim().startsWith("+44")) {
+        return mobileNumber.trim().substring("+44".length);
     }
 
-    if (mobileNumber.trim().startsWith('07')) {
-        return mobileNumber.trim().substring('0'.length);
+    if (mobileNumber.trim().startsWith("07")) {
+        return mobileNumber.trim().substring("0".length);
     }
 
     throw new SelfServiceError(`Not a UK mobile number ${mobileNumber}`);
@@ -87,7 +84,7 @@ export function ensureExactlyTenNumbersRemain(number: string): void {
 }
 
 export function prepareForCognito(number: string): string {
-    let processing = removeParentheses(number)
+    let processing = removeParentheses(number);
     processing = getUniquePart(processing);
     return `+44${removeSpacingCharacters(processing)}`;
 }

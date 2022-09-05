@@ -1,7 +1,7 @@
 import axios, {Axios, AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
-import {User} from "../../../@types/User";
 import {Service} from "../../../@types/Service";
+import {User} from "../../../@types/User";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
 
 class LambdaFacade implements LambdaFacadeInterface {
@@ -17,7 +17,9 @@ class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async putUser(user: OnboardingTableItem, accessToken: string): Promise<AxiosResponse> {
-        return await (await this.instance).post('/Prod/put-user', user, {
+        return await (
+            await this.instance
+        ).post("/Prod/put-user", user, {
             headers: {
                 "authorised-by": accessToken
             }
@@ -25,7 +27,9 @@ class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
-        return await (await this.instance).post('/Prod/get-user', cognitoId, {
+        return await (
+            await this.instance
+        ).post("/Prod/get-user", cognitoId, {
             headers: {
                 "authorised-by": accessToken
             }
@@ -33,11 +37,13 @@ class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async newService(service: Service, user: User, accessToken: string): Promise<AxiosResponse> {
-        let body = {
+        const body = {
             service: service,
             user: user
-        }
-        return await (await this.instance).post('/Prod/new-service', JSON.stringify(body), {
+        };
+        return await (
+            await this.instance
+        ).post("/Prod/new-service", JSON.stringify(body), {
             headers: {
                 "authorised-by": accessToken
             }
@@ -45,26 +51,37 @@ class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async generateClient(serviceId: string, service: Service, contactEmail: string, accessToken: string): Promise<AxiosResponse> {
-        let body = {
+        const body = {
             serviceId: serviceId,
             service: service,
             contactEmail: contactEmail
-        }
-        return await (await this.instance).post('/Prod/new-client', JSON.stringify(body), {
+        };
+        return await (
+            await this.instance
+        ).post("/Prod/new-client", JSON.stringify(body), {
             headers: {
                 "authorised-by": accessToken
             }
         });
     }
 
-    async updateClient(serviceId: string, selfServiceClientId: string, clientId: string, updates: object, accessToken: string): Promise<AxiosResponse> { // constrain type later
-        let body = {
+    async updateClient(
+        serviceId: string,
+        selfServiceClientId: string,
+        clientId: string,
+        updates: object,
+        accessToken: string
+    ): Promise<AxiosResponse> {
+        // constrain type later
+        const body = {
             serviceId: serviceId,
             selfServiceClientId: selfServiceClientId,
             clientId: clientId,
-            updates: updates,
-        }
-        return await (await this.instance).post(`/Prod/do-update-client`, JSON.stringify(body), {
+            updates: updates
+        };
+        return await (
+            await this.instance
+        ).post(`/Prod/do-update-client`, JSON.stringify(body), {
             headers: {
                 "authorised-by": accessToken
             }
@@ -81,18 +98,20 @@ class LambdaFacade implements LambdaFacadeInterface {
         return await (await this.instance).get(`/Prod/get-service-clients/${bareServiceId}`);
     }
 
-   async  updateUser(selfServiceUserId: string, cognitoUserId: string, updates: object, accessToken: string):  Promise<AxiosResponse> {
-       let body = {
-           userId: selfServiceUserId,
-           cognitoUserId: cognitoUserId,
-           updates: updates
-       }
+    async updateUser(selfServiceUserId: string, cognitoUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
+        const body = {
+            userId: selfServiceUserId,
+            cognitoUserId: cognitoUserId,
+            updates: updates
+        };
 
-       return await (await this.instance).post('/Prod/update-user', JSON.stringify(body), {
-           headers: {
-               "authorised-by": accessToken
-           }
-       });
+        return await (
+            await this.instance
+        ).post("/Prod/update-user", JSON.stringify(body), {
+            headers: {
+                "authorised-by": accessToken
+            }
+        });
     }
 }
 
