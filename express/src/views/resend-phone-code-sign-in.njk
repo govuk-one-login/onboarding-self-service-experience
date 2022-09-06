@@ -1,9 +1,9 @@
 {% extends "layout.njk" %}
-{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-4 govuk-!-margin-bottom-6 govuk-!-padding-bottom-0 " %}
+{% from "macros/back-link.njk" import backLink %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">
-    <a href="/sign-in-otp-mobile" class="govuk-back-link">Back</a>
+    {{ backLink("/sign-in-otp-mobile") }}
   </div>
 {% endblock %}
 

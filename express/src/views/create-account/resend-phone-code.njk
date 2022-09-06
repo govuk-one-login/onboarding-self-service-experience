@@ -1,10 +1,10 @@
 {% extends "../layout.njk" %}
-{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-4 govuk-!-margin-bottom-6 govuk-!-padding-bottom-0 " %}
+{% from "../macros/back-link.njk" import backLink %}
 
 {% block beforeContent %}
-    <div class="govuk-width-container">
-        <a href="/create/enter-mobile" class="govuk-back-link">Back</a>
-    </div>
+  <div class="govuk-width-container">
+      {{ backLink("/create/enter-mobile") }}
+  </div>
 {% endblock %}
 
 {% block content %}
@@ -28,7 +28,7 @@
                 <p class="govuk-body">
                     If you no longer have access to the phone number you used to set up your account, let us know through our
                     <a class="govuk-link" id="support-form" href="https://www.sign-in.service.gov.uk/support">support form</a>
-                     or 
+                     or
                     <a class="govuk-link" id="slack-channel" href="https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC">Slack channel</a> .
                 </p>
 

@@ -1,0 +1,9 @@
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% macro backLink(href, attributes) %}
+  {{ govukBackLink({
+    text: Back,
+    href: href,
+    attributes: attributes
+  }) }}
+{% endmacro %}

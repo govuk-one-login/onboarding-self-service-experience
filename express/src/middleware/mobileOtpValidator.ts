@@ -72,7 +72,7 @@ export function errorResponse(
     const errorMessages = new Map<string, string>();
     const value: object = {otp: otp};
     errorMessages.set(key, message);
-    res.render("common/check-mobile.njk", {
+    res.render("check-mobile.njk", {
         errorMessages: errorMessages,
         value: value,
         mobileNumber: mobileNumber,

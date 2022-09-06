@@ -2,8 +2,8 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
-{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-no-left-nav-account" %}
-{% set active = 'your-account' %}
+{% set active = "your-account" %}
+{% set mainClasses = "account-summary" %}
 
 {% block pageTitle %}
   Your account - GOV.UK Sign In
@@ -31,7 +31,7 @@
 
         {% endif %}
 
-        <h1 class="govuk-heading-l govuk-!-margin-top-4 govuk-!-margin-bottom-4">Your account</h1>
+        <h1 class="govuk-heading-l">Your account</h1>
         {{ govukSummaryList({
           rows: [
             {

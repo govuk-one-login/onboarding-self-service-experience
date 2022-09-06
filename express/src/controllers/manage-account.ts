@@ -233,7 +233,7 @@ export const processChangePhoneNumberForm = async function (req: Request, res: R
     }
     await cognitoClient.sendMobileNumberVerificationCode(accessToken);
 
-    res.render("common/check-mobile.njk", {
+    res.render("check-mobile.njk", {
         values: {
             mobileNumber: req.body.mobileNumber,
             formActionUrl: "/verify-phone-code",
@@ -259,7 +259,7 @@ export const verifySmsCode = async function (req: Request, res: Response) {
         if (error instanceof CodeMismatchException) {
             const errorMessages = new Map<string, string>();
             errorMessages.set("smsOtp", "The code you entered is not correct or has expired - enter it again or request a new code");
-            res.render("common/check-mobile.njk", {
+            res.render("check-mobile.njk", {
                 mobileNumber: req.session.mobileNumber,
                 errorMessages: errorMessages,
                 formActionUrl: "/verify-phone-code",

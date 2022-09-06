@@ -181,7 +181,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     console.debug("VERIFICATION CODE RESPONSE");
     console.debug(codeSent);
     req.session.mobileNumber = mobileNumber;
-    res.render("common/check-mobile.njk", {
+    res.render("check-mobile.njk", {
         values: {
             mobileNumber: req.body.mobileNumber,
             formActionUrl: "/create/verify-phone-code",
@@ -205,7 +205,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
     const cognitoClient = await req.app.get("cognitoClient");
     const otp = req.body["sms-otp"];
     if (otp === undefined) {
-        res.render("common/check-mobile.njk", {
+        res.render("check-mobile.njk", {
             mobileNumber: req.session.mobileNumber,
             formActionUrl: "/create/verify-phone-code",
             textMessageNotReceivedUrl: "/create/resend-phone-code"
@@ -248,7 +248,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         if (error instanceof CodeMismatchException) {
             const errorMessages = new Map<string, string>();
             errorMessages.set("smsOtp", "The code you entered is not correct or has expired - enter it again or request a new code");
-            res.render("common/check-mobile.njk", {
+            res.render("check-mobile.njk", {
                 mobileNumber: req.session.mobileNumber,
                 errorMessages: errorMessages,
                 formActionUrl: "/create/verify-phone-code",

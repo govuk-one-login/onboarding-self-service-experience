@@ -1,81 +1,44 @@
-{% extends "../layout.njk" %}
+{% extends "./layout-service-details.njk" %}
 {% from "../macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 
-{% set mainClasses = "govuk-main-wrapper govuk-main-wrapper--auto-spacing govuk-!-padding-top-3 govuk-!-margin-bottom-0 govuk-main-wrapper-layout-with-left-nav" %}
+{% set active = "client-details" %}
 
-{% block pageTitle %}
-  Change public key - GOV.UK Sign In
-{% endblock %}
+{% block pageTitle %}Change public key - GOV.UK Sign In{% endblock %}
 
-{% block beforeContent %}
+{% block mainContent %}
+  {{ errorSummary ({
+    errors:  errorMessages,
+    hrefs: {
+      "serviceUserPublicKey": "#serviceUserPublicKey"
+    }
+  }) }}
 
-{% endblock %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
 
+  <p class="govuk-body">You need to <a class="govuk-link" href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/generate-a-key/">generate a key pair (opens in new tab)</a> and add the public key. This is so our services can securely send messages to each other.</p>
 
-{% block content %}
+  <h2 class="govuk-heading-m">Paste in your public key</h2>
 
-  <div class="govuk-width-container">
-    <div class="govuk-body govuk-!-font-weight-bold">My juggling service</div>
-    <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-third">
-        <nav class="sub-navigation govuk-!-margin-top-3">
-          <ul class="govuk-list sub_navigation_list_2">
-            <li class="sub-navigation__item sub-navigation__item--active">
-              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{serviceId}}">Client details</a>
-            </li>
-            <li class="sub-navigation__item">
-              <a class="govuk-link govuk-link--no-visited-state" href="/private-beta">Joining private beta</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-      <div class="govuk-grid-column-two-thirds">
+  <form class="form" action="/change-public-key/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
+    {{ govukTextarea({
+      name: "serviceUserPublicKey",
+      id: "serviceUserPublicKey",
+      label: {
+        text: "Public key"
+      },
+      hint: {
+        text: "Paste in the entire public key in PEM format, including the headers"
+      },
+      value: value,
+      errorMessage: {
+        text:  errorMessages.get('serviceUserPublicKey')
+      } if  errorMessages else false
+    }) }}
 
-        {{ errorSummary ({
-          errors:  errorMessages,
-          hrefs: {
-            'serviceUserPublicKey': '#serviceUserPublicKey'
-          }
-        }) }}
-
-        <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
-
-        <p class="govuk-body">You need to <a class="govuk-link" href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/generate-a-key/">generate a key pair (opens in new tab)</a> and add the public key. This is so our services can securely send messages to each other.</p>
-
-        <h2 class="govuk-heading-m">Paste in your public key</h2>
-
-        <form class="form" action="/change-public-key/{{serviceId}}/{{selfServiceClientId}}/{{clientId}}" method="post">
-
-          {{ govukTextarea({
-            name: "serviceUserPublicKey",
-            id: "serviceUserPublicKey",
-            label: {
-              text: "Public key"
-            },
-            hint: {
-              text: "Paste in the entire public key in PEM format, including the headers"
-            },
-            value: value,
-            errorMessage: {
-              text:  errorMessages.get('serviceUserPublicKey')
-            } if  errorMessages else false
-          }) }}
-
-          <div class="govuk-button-group">
-            {{ govukButton({
-              text: "Confirm"
-            }) }}
-            <a class="govuk-link" href="/client-details/{{serviceId}}">Cancel</a>
-          </div>
-
-        </form>
-
-      </div>
-
+    <div class="govuk-button-group">
+      {{ govukButton({text: "Confirm"}) }}
+      <a class="govuk-link" href="/client-details/{{ serviceId }}">Cancel</a>
     </div>
-  </div>
-
+  </form>
 {% endblock %}
-

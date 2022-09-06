@@ -24,7 +24,7 @@ export const showLoginOtpMobile = async function (req: Request, res: Response) {
         const mobileNumberRaw = String(req.session.mobileNumber);
         const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
         const mobileNumber = "*******" + mobileNumberLast4Digits;
-        res.render("common/check-mobile.njk", {
+        res.render("check-mobile.njk", {
             mobileNumber: mobileNumber,
             formActionUrl: "/sign-in-otp-mobile",
             active: "sign-in",
@@ -52,7 +52,7 @@ export const processLoginOtpMobile = async function (req: Request, res: Response
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             throw new SelfServiceError("Wrong OTP entered for login", {
-                template: "common/check-mobile.njk",
+                template: "check-mobile.njk",
                 errorMessages: {smsOtp: "The code you entered is not correct or has expired - enter it again or request a new code"},
                 values: {
                     mobileNumber: req.session.mobileNumber as string,
@@ -177,7 +177,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
     const mobileNumberFormatted = "*******" + mobileNumberLast4Digits;
 
-    res.render("common/check-mobile.njk", {
+    res.render("check-mobile.njk", {
         mobileNumber: mobileNumberFormatted,
         formActionUrl: "/sign-in-otp-mobile",
         textMessageNotReceivedUrl: "/resend-text-code",
