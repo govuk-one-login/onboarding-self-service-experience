@@ -8,6 +8,7 @@ import {randomUUID} from "crypto";
 import {NextFunction, Request, Response} from "express";
 import CognitoInterface from "../lib/cognito/CognitoInterface";
 import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
+import {SelfServiceError} from "../lib/SelfServiceError";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     res.render("create-account/get-email.njk", {values: {emailAddress: req.session.emailAddress}});
@@ -133,11 +134,10 @@ export const updatePassword = async function (req: Request, res: Response, next:
     }
 
     if (email === undefined) {
-        next(); // Who knows what could have gone wrong?
-    } else {
-        await cognitoClient.setEmailAsVerified(email);
+        throw new SelfServiceError("Email not present");
     }
 
+    await cognitoClient.setEmailAsVerified(email);
     res.redirect("/create/enter-mobile");
 };
 
