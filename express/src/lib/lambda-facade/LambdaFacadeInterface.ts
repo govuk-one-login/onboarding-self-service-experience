@@ -25,4 +25,12 @@ export default interface LambdaFacadeInterface {
         updates: object,
         accessToken: string
     ): Promise<AxiosResponse>;
+
+    privateBetaRequest(
+        name: string,
+        department: string,
+        serviceName: string,
+        emailAddress: string,
+        accessToken: string
+    ): Promise<AxiosResponse>;
 }

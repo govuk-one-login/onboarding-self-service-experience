@@ -82,6 +82,9 @@
         ]
       }) }}
 
+    <input type="hidden" value="{{ serviceName }}" id="serviceName" name="serviceName">
+    <input type="hidden" value="{{ emailAddress }}" id="emailAddress" name="emailAddress">
+
       {{ govukButton({text: "Submit"}) }}
     </form>
   {% endif %}

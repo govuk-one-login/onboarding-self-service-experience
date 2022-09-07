@@ -118,6 +118,16 @@ class StubLambdaFacade implements LambdaFacadeInterface {
     updateUser(selfServiceUserId: string, cognitoUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
         return Promise.resolve({} as AxiosResponse);
     }
+
+    privateBetaRequest(
+        name: string,
+        department: string,
+        serviceName: string,
+        emailAddress: string,
+        accessToken: string
+    ): Promise<AxiosResponse> {
+        return Promise.resolve({} as AxiosResponse);
+    }
 }
 
 export const lambdaFacadeInstance = new StubLambdaFacade();

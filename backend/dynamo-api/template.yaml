@@ -9,6 +9,10 @@ Parameters:
   DynamoDbTableStackName:
     Type: String
     Description: The name of the stack exporting the table we want
+  PrivateBetaNotificationEmail:
+    Type: String
+    Description: Email address for private beta request notifications.
+
 
 Resources:
 
@@ -465,6 +469,42 @@ Resources:
         EntryPoints:
           - src/handlers/new-service.ts
 
+  privateBetaNotificationFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/send-private-beta-notification.privateBetaRequestHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Publish a message to SNS Topic then delivered as an email.
+      Environment:
+        Variables:
+          NODE_OPTIONS: --enable-source-maps
+          SNS_TOPIC_ARN: !Ref PrivateBetaSnsTopic
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt PrivateBetaSnsTopic.TopicName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /send-private-beta-request-notification
+            Method: POST
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/send-private-beta-notification.ts
+
   newClientHandler:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
     # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
@@ -674,6 +714,15 @@ Resources:
     # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
     # checkov:skip=CKV_AWS_66: "Ensure that CloudWatch Log Group specifies retention days"
     Type: AWS::Logs::LogGroup
+
+  PrivateBetaSnsTopic:
+    # checkov:skip=CKV_AWS_26: "Ensure all data stored in the SNS topic is encrypted"
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: Private beta notification topic
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref PrivateBetaNotificationEmail
 
 Outputs:
   ApiBaseUrl:
