@@ -113,6 +113,23 @@ class LambdaFacade implements LambdaFacadeInterface {
             }
         });
     }
+
+    async privateBetaRequest(
+        name: string,
+        department: string,
+        serviceName: string,
+        emailAddress: string,
+        accessToken: string
+    ): Promise<AxiosResponse> {
+        const body = {
+            name: name,
+            department: department,
+            serviceName: serviceName,
+            emailAddress: emailAddress
+        };
+
+        return await (await this.instance).post("/Prod/send-private-beta-request-notification", JSON.stringify(body));
+    }
 }
 
 export const lambdaFacadeInstance = new LambdaFacade(process.env.API_BASE_URL as string);
