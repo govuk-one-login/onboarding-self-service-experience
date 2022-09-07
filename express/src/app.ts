@@ -13,8 +13,22 @@ import manageAccount from "./routes/manage-account";
 import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing-routes";
 import SelfServiceServicesService from "./services/self-service-services-service";
+import session from "express-session";
+import connect_dynamodb from "connect-dynamodb";
+import AWS from "aws-sdk";
 
 const app = express();
+
+const dynamoDBSessionOptions = {
+    table: process.env.SESSIONS_TABLE,
+    AWSRegion: "eu-west-2",
+    client: process.env.SESSION_LOCAL === "true" ? new AWS.DynamoDB({endpoint: new AWS.Endpoint("http://localhost:8000")}) : ""
+};
+
+const DynamoDBStore = connect_dynamodb({session: session});
+if ("true" === process.env.SESSION_STORAGE_ENABLED) {
+    app.use(session({store: new DynamoDBStore(dynamoDBSessionOptions), secret: "keyboard cat"}));
+}
 
 const cognitoPromise = import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(client => {
     const cognito = new client.default.CognitoClient();
