@@ -28,12 +28,10 @@
   </p>
 
   {% if currentPublicKey %}
-    {% set currentPublicKeyBlock %}
+    {% call govukInsetText() %}
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">Current public key</p>
       <p class="govuk-body current-public-key-container">{{ currentPublicKey }}</p>
-    {% endset -%}
-
-    {{ govukInsetText({ html: currentPublicKeyBlock }) }}
+    {% endcall %}
   {% endif %}
 
   <form class="form" action="/change-public-key-v2/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">

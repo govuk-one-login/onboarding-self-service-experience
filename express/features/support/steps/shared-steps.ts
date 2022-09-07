@@ -58,16 +58,12 @@ Then("their data is saved in the spreadsheet", async function () {
 });
 
 Then("the error message {string} must be displayed for the {string} field", async function (errorMessage, field) {
-    const errorLink = await this.page.$x(
-        `//div[contains(concat(" ", normalize-space(@class), " "), " govuk-error-summary ")]//a[@href="#${field}"]`
-    );
+    const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${field}"]`);
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, field);
 });
 
 Then("the error message {string} must be displayed for the {string} radios", async function (errorMessage, field) {
-    const errorLink = await this.page.$x(
-        `//div[contains(concat(" ", normalize-space(@class), " "), " govuk-error-summary ")]//a[@href="#${field}-error"]`
-    );
+    const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${field}-error"]`);
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, field);
 });
 
@@ -92,9 +88,7 @@ async function checkErrorMessageDisplayedForField(page: Page, errorLink: any, er
     const messageInSummary = await page.evaluate((el: {textContent: any}) => el.textContent, errorLink[0]);
     assert.equal(messageInSummary, errorMessage, `Expected text of the link to be ${errorMessage}`);
 
-    const messagesAboveElement = await page.$x(
-        `//span[contains(concat(" ", normalize-space(@class), " "), " govuk-error-message ") and @id="${field}-error" ]`
-    );
+    const messagesAboveElement = await page.$x(`//p[@class="govuk-error-message"][@id="${field}-error"]`);
     assert.notEqual(messagesAboveElement.length, 0, `Expected to find the message ${errorMessage} above the ${field} field.`);
 
     const messageAboveElement = await page.evaluate((el: {textContent: any}) => el.textContent, messagesAboveElement[0]);

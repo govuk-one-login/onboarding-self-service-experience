@@ -5,7 +5,7 @@ import "express-async-errors";
 import sessions from "express-session";
 import path from "path";
 import {User} from "../@types/user";
-import configureViews from "./lib/configureViews";
+import configureViews from "./config/configure-views";
 import {RedirectError, RenderError} from "./lib/errors";
 import setSignedInStatus from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
