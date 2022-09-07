@@ -42,7 +42,7 @@ export class CognitoClient implements CognitoInterface {
     }
 
     getUser(username: string): Promise<AdminGetUserCommandOutput> {
-        return Promise.resolve({$metadata: {}, Username: username});
+        return Promise.resolve({$metadata: {}, Username: username, UserAttributes: [{Name: "email", Value: "email@mail.com"}]});
     }
 
     async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {

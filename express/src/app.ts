@@ -67,12 +67,12 @@ app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {active: "get-started"});
 });
 
-app.use(function (err: Error | SelfServiceError, req: Request, res: Response, next: NextFunction) {
+app.use((err: Error | SelfServiceError, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof SelfServiceError && err?.options) {
         res.render(err.options.template, {values: err.options.values, errorMessages: err.options.errorMessages});
     } else {
         console.error(err);
-        res.render("./there-is-a-problem.njk");
+        res.status(500).render("there-is-a-problem.njk");
     }
 });
 
