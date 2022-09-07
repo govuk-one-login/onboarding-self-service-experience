@@ -23,15 +23,13 @@
 
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Client details</h1>
   <p class="govuk-body">This page shows the information you’ll need to make calls to the GOV.UK Sign In API.</p>
-  <p class="govuk-body">You can use the client details to <a class="govuk-link"
-                                                             href="https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/integrate-with-code-flow/#make-an-authorisation-request"
-                                                             target="_blank">make an authorisation request (opens in new tab)</a> as set out in our technical documentation.</p>
+  <p class="govuk-body">You can use the client details to
+    <a href="https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/integrate-with-code-flow/#make-an-authorisation-request"
+       class="govuk-link" target="_blank">make an authorisation request (opens in new tab)</a> as set out in our technical documentation.
+  </p>
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Client 1</h2>
-  {{ govukTag({
-    text: "Integration",
-    classes: "govuk-tag--yellow"
-  }) }}
+  {{ govukTag({ text: "Integration", classes: "govuk-tag--yellow" }) }}
 
   {% if publicKeyAndUrlsNotUpdatedByUser %}
     <div class="govuk-inset-text govuk-!-margin-top-3 govuk-!-margin-bottom-0">
@@ -43,97 +41,63 @@
     classes: 'govuk-!-padding-top-3',
     rows: [
       {
-        key: {
-        text: "Client name"
-      },
-        value: {
-        text: clientName
-      },
+        key: {text: "Client name"},
+        value: {text: clientName},
         actions: {
-        items: [
-          {
+          items: [{
             href: urls.changeClientName,
             text: "Change",
             visuallyHiddenText: "client name"
-          }
-        ]
-      }
+          }]
+        }
       },
       {
-        key: {
-        text: "Client ID"
-      },
-        value: {
-        text: clientId
-      }
+        key: {text: "Client ID"},
+        value: {text: clientId}
       },
       {
-        key: {
-        text: "Redirect URIs"
-      },
-        value: {
-        text: redirectUrls
-      },
+        key: {text: "Redirect URIs"},
+        value: {text: redirectUrls},
         actions: {
-        items: [
-          {
+          items: [{
             href: urls.changeRedirectUris,
             text: "Change",
             visuallyHiddenText: "redirect uris"
-          }
-        ]
-      }
+          }]
+        }
       },
       {
-        key: {
-        text: "User attributes required"
-      },
-        value: {
-        html: userAttributesRequired
-      },
+        key: {text: "User attributes required"},
+        value: {html: userAttributesRequired},
         actions: {
-        items: [
-          {
+          items: [{
             href: urls.changeUserAttributes,
             text: "Change",
             visuallyHiddenText: "user attributes required"
-          }
-        ]
-      }
+          }]
+        }
       },
       {
-        key: {
-        text: "Public key"
-      },
-        value: {
-        text: userPublicKey
-      },
+        key: {text: "Public key"},
+        value: {text: userPublicKey},
         actions: {
-        items: [
-          {
+          items: [{
             href: urls.changePublicKey,
             text: "Change",
             visuallyHiddenText: "public key"
-          }
-        ]
-      }
+          }]
+        }
       },
       {
-        key: {
-        text: "Post logout redirect URIs"
-      },
-        value: {
-        text: postLogoutRedirectUrls
-      },
+        key: {text: "Post logout redirect URIs"},
+        value: {text: postLogoutRedirectUrls},
         actions: {
-        items: [
-          {
+          items: [{
             href: urls.changePostLogoutUris,
             text: "Change",
             visuallyHiddenText: "post logout redirect uris"
-          }
-        ]
-      }
+          }]
+        }
       }
     ]
   }) }}
@@ -172,6 +136,6 @@
   <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-7 govuk-!-margin-top-7">
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Client 2</h2>
-  {{ govukTag({text: "Production", classes: "govuk-tag--pink"}) }}
+  {{ govukTag({ text: "Production", classes: "govuk-tag--pink" }) }}
   <p class="govuk-body govuk-!-margin-top-3">You can add a production client if you <a class="govuk-link" href="/">join our private beta</a>.</p>
 {% endblock %}

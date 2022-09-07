@@ -10,8 +10,8 @@
   {{ errorSummary ({
     errors:  errorMessages,
     hrefs: {
-      "yourName": "#yourName",
-      "department": "#department"
+      yourName: "#yourName",
+      department: "#department"
     }
   }) }}
 
@@ -84,10 +84,10 @@
         ]
       }) }}
 
-    <input type="hidden" value="{{ serviceName }}" id="serviceName" name="serviceName">
-    <input type="hidden" value="{{ emailAddress }}" id="emailAddress" name="emailAddress">
+      <input type="hidden" value="{{ serviceName }}" id="serviceName" name="serviceName">
+      <input type="hidden" value="{{ emailAddress }}" id="emailAddress" name="emailAddress">
 
-      {{ govukButton({text: "Submit"}) }}
+      {{ govukButton({ text: "Submit" }) }}
     </form>
   {% endif %}
 {% endblock %}

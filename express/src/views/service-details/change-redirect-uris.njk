@@ -9,7 +9,7 @@
   {{ errorSummary ({
     errors:  errorMessages,
     hrefs: {
-      "redirectURIs": "#redirectURIs"
+      redirectURIs: "#redirectURIs"
     }
   }) }}
 
@@ -37,7 +37,7 @@
     }) }}
 
     <div class="govuk-button-group">
-      {{ govukButton({text: "Confirm"}) }}
+      {{ govukButton({ text: "Confirm" }) }}
       <a class="govuk-link" href="/client-details/{{ serviceId }}">Cancel</a>
     </div>
   </form>

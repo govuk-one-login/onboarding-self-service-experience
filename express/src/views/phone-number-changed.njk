@@ -7,17 +7,11 @@
   {{ backLink("#", {onclick: "history.back()"}) }}
 {% endblock %}
 
-{% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-l">You’ve changed the phone number linked to your account</h1>
-      <p class="govuk-body">We will send security codes to this phone number when you sign in.</p>
-      <form class="form" action="/phone-number-changed" method="post">
-        {{ govukButton({
-          text: "Continue",
-          attributes: {"id": "submit"}
-        }) }}
-      </form>
-    </div>
-  </div>
+{% block mainContent %}
+  <h1 class="govuk-heading-l">You’ve changed the phone number linked to your account</h1>
+  <p class="govuk-body">We will send security codes to this phone number when you sign in.</p>
+
+  <form class="form" action="/phone-number-changed" method="post">
+    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
+  </form>
 {% endblock %}

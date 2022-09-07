@@ -149,11 +149,17 @@
   </header>
   <div class="govuk-width-container">
     {{ govukPhaseBanner({
-      tag: {
-        text: "beta"
-      },
+      tag: {text: "beta"},
       html: 'This is a new service – your <a href="https://www.sign-in.service.gov.uk/contact-us" class="govuk-link" rel="noreferrer noopener" target="_blank">feedback (opens in a new tab)</a> will help us improve it.'
     }) }}
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% block mainContent %}{% endblock %}
+    </div>
   </div>
 {% endblock %}
 

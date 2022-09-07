@@ -3,11 +3,13 @@
 {% set mainClasses = "left-nav-wrapper" %}
 {% set baseClasses = "govuk-!-padding-top-3" %}
 
-{% block content %}
+{% block beforeContent %}
   <div class="govuk-body govuk-!-font-weight-bold">My juggling service</div>
   <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-bottom-5">
-  <div class="govuk-grid-row">
+{% endblock %}
 
+{% block content %}
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-third">
       <nav class="side-navigation govuk-!-margin-top-3">
         <ul class="govuk-list side-navigation__list">
@@ -26,6 +28,5 @@
     <div class="govuk-grid-column-two-thirds">
       {% block mainContent %}{% endblock %}
     </div>
-
   </div>
 {% endblock %}
