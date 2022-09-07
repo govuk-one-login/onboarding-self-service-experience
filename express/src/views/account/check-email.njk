@@ -5,10 +5,7 @@
 
 {% set active = "your-account" %}
 {% set pageTitle = "Check your email address" %}
-
-{% block beforeContent %}
-  {{ backLink("/change-email-address") }}
-{% endblock %}
+{% set backLink = backLink("/change-email-address") %}
 
 {% block mainContent %}
   {{ errorSummary ({

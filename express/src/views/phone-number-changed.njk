@@ -2,10 +2,7 @@
 {% from "macros/back-link.njk" import backLink %}
 
 {% set pageTitle =  "You’ve changed the phone number" %}
-
-{% block beforeContent %}
-  {{ backLink("#", {onclick: "history.back()"}) }}
-{% endblock %}
+{% set backLink = backLink("#", {onclick: "history.back()"}) %}
 
 {% block mainContent %}
   <h1 class="govuk-heading-l">You’ve changed the phone number linked to your account</h1>

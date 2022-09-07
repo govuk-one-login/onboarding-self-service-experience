@@ -3,11 +3,8 @@
 {% from "macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
+{% set backLink = backLink("/confirm-phone-number") %}
 {% set pageTitle = "Enter your new mobile phone number" %}
-
-{% block beforeContent %}
-  {{ backLink("/confirm-phone-number") }}
-{% endblock %}
 
 {% block mainContent %}
   {{ errorSummary ({

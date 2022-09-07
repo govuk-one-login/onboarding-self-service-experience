@@ -1,9 +1,8 @@
 {% extends "../layout.njk" %}
 {% from "../macros/back-link.njk" import backLink %}
 
-{% block beforeContent %}
-  {{ backLink("/create/enter-mobile") }}
-{% endblock %}
+{% set pageTitle = "Resend security code" %}
+{% set backLink = backLink("/create/enter-mobile") %}
 
 {% block mainContent %}
   <h1 class="govuk-heading-l">

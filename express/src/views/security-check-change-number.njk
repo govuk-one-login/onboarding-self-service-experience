@@ -4,10 +4,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set pageTitle = "Security check" %}
-
-{% block beforeContent %}
-  {{ backLink("/resend-text-code") }}
-{% endblock %}
+{% set backLink = backLink("/resend-text-code") %}
 
 {% block mainContent %}
   {{ errorSummary ({

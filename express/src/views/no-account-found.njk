@@ -3,10 +3,7 @@
 
 {% set active = "sign-in" %}
 {% set pageTitle = "No account found" %}
-
-{% block beforeContent %}
-  {{ backLink("/sign-in-password") }}
-{% endblock %}
+{% set backLink = backLink("/sign-in-password") %}
 
 {% block mainContent %}
   <h1 class="govuk-heading-l">No account found</h1>

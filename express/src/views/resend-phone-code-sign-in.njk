@@ -1,9 +1,7 @@
 {% extends "layout.njk" %}
 {% from "macros/back-link.njk" import backLink %}
 
-{% block beforeContent %}
-  {{ backLink("/sign-in-otp-mobile") }}
-{% endblock %}
+{% set backLink = backLink("/sign-in-otp-mobile") %}
 
 {% block mainContent %}
   <h1 class="govuk-heading-l">

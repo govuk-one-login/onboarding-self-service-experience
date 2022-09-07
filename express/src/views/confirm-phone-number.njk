@@ -4,10 +4,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set pageTitle = "Confirm phone number" %}
-
-{% block beforeContent %}
-  {{ backLink("/security-check-change-number") }}
-{% endblock %}
+{% set backLink = backLink("/security-check-change-number") %}
 
 {% block mainContent %}
   {{ errorSummary ({

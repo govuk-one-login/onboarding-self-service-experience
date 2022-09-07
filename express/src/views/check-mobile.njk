@@ -4,10 +4,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set pageTitle = "Check your mobile phone" %}
-
-{% block beforeContent %}
-  {{ backLink("#", {onclick: "history.back()"}) }}
-{% endblock %}
+{% set backLink = backLink("#", {onclick: "history.back()"}) %}
 
 {% block mainContent %}
   {{ errorSummary ({

@@ -4,10 +4,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set pageTitle = "Check your email" %}
-
-{% block beforeContent %}
-  {{ backLink("/create/get-email") }}
-{% endblock %}
+{% set backLink = backLink("/create/get-email") %}
 
 {% block mainContent %}
   {{ errorSummary ({
