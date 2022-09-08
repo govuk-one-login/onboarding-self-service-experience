@@ -15,7 +15,7 @@
     {% endcall %}
   {% endif %}
 
-  <h1 class="govuk-heading-l govuk-!-margin-top-3">Client details</h1>
+  <h1 class="govuk-heading-l">Client details</h1>
   <p class="govuk-body">This page shows the information you’ll need to make calls to the GOV.UK Sign In API.</p>
   <p class="govuk-body">You can use the client details to
     <a href="https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/integrate-with-code-flow/#make-an-authorisation-request"
@@ -26,13 +26,12 @@
   {{ govukTag({ text: "Integration", classes: "govuk-tag--yellow" }) }}
 
   {% if publicKeyAndUrlsNotUpdatedByUser %}
-    <div class="govuk-inset-text govuk-!-margin-top-3 govuk-!-margin-bottom-0">
+    <div class="govuk-inset-text govuk-!-margin-top-3 govuk-!-margin-bottom-3">
       We’ve generated these details based on the service name you gave us.
     </div>
   {% endif %}
 
   {{ govukSummaryList({
-    classes: 'govuk-!-padding-top-3',
     rows: [
       {
         key: {text: "Client name"},
