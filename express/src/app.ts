@@ -67,6 +67,11 @@ app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {active: "get-started"});
 });
 
+//This middleware function should always be at the very bottom of the stack (below all other functions related to routing).
+app.use((req, res, next) => {
+    res.status(404).render("404.njk");
+});
+
 app.use((err: Error | SelfServiceError, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof SelfServiceError && err?.options) {
         res.render(err.options.template, {values: err.options.values, errorMessages: err.options.errorMessages});
