@@ -1,5 +1,5 @@
 Feature:
-  Users can sign up to the sign-in self-service experience
+  Users can sign up to the self-service experience
 
   Scenario: A user types everything correctly and creates an account
 

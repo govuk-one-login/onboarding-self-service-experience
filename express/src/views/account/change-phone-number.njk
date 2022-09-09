@@ -3,48 +3,36 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set active = "your-account" %}
+{% set pageTitle = "Change phone number" %}
 
-{% block pageTitle %}
-  Change phone number - GOV.UK Sign In
-{% endblock %}
+{% block mainContent %}
+  {{ errorSummary ({
+    errors:  errorMessages,
+    hrefs: {
+      mobileNumber: "#mobileNumber"
+    }
+  }) }}
 
-{% block content %}
+  <h1 class="govuk-heading-l">Change your mobile phone number</h1>
+  <p class="govuk-body">We will send a 6 digit security code to this number every time you sign in.</p>
+  <p class="govuk-body">You must use a UK mobile phone number.</p>
 
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        {{ errorSummary ({
-          errors:  errorMessages,
-          hrefs: {
-            'mobileNumber': '#mobileNumber'
-          }
-        }) }}
-        <h1 class="govuk-heading-l">Change your mobile phone number</h1>
-        <p class="govuk-body">We will send a 6 digit security code to this number every time you sign in.</p>
-        <p class="govuk-body">You must use a UK mobile phone number.</p>
-        <form class="form" action="/change-phone-number" method="post">
-          {{ govukInput({
-            label: {
-              text: "UK mobile phone number"
-            },
-            name: "mobileNumber",
-            id: "mobileNumber",
-            classes: "govuk-!-width-one-half",
-            value: values.mobileNumber if values,
-            errorMessage: {
-              text:  errorMessages.mobileNumber
-            } if  errorMessages
-          }) }}
-          <div class="govuk-button-group">
-            {{ govukButton({
-              text: "Confirm",
-              attributes: {"id": "continue"}
-            }) }}
-            <a class="govuk-link" href="/account">Cancel</a>
-          </div>
-        </form>
-      </div>
+  <form class="form" action="/change-phone-number" method="post">
+    {{ govukInput({
+      label: {
+        text: "UK mobile phone number"
+      },
+      name: "mobileNumber",
+      id: "mobileNumber",
+      classes: "govuk-!-width-one-half",
+      value: values.mobileNumber if values,
+      errorMessage: {
+        text:  errorMessages.mobileNumber
+      } if  errorMessages
+    }) }}
+    <div class="govuk-button-group">
+      {{ govukButton({ text: "Confirm", attributes: {id: "continue"} }) }}
+      <a class="govuk-link" href="/account">Cancel</a>
     </div>
-  </div>
-
+  </form>
 {% endblock %}

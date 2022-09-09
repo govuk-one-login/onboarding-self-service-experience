@@ -1,27 +1,14 @@
 {% extends "layout.njk" %}
 {% from "macros/back-link.njk" import backLink %}
 
-{% block pageTitle %} You’ve changed the phone number - GOV.UK Sign In{% endblock %}
+{% set pageTitle =  "You’ve changed the phone number" %}
+{% set backLink = backLink("#", {onclick: "history.back()"}) %}
 
-{% block beforeContent %}
-  <div class="govuk-width-container">
-    {{ backLink("#", {onclick: "history.back()"}) }}
-  </div>
-{% endblock %}
+{% block mainContent %}
+  <h1 class="govuk-heading-l">You’ve changed the phone number linked to your account</h1>
+  <p class="govuk-body">We will send security codes to this phone number when you sign in.</p>
 
-{%  block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">You’ve changed the phone number linked to your account</h1>
-        <p class="govuk-body">We will send security codes to this phone number when you sign in.</p>
-        <form class="form" action="/phone-number-changed" method="post" >
-          {{ govukButton({
-            text: "Continue",
-            attributes: {"id": "submit"}
-          }) }}
-        </form>
-      </div>
-    </div>
-  </div>
+  <form class="form" action="/phone-number-changed" method="post">
+    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
+  </form>
 {% endblock %}

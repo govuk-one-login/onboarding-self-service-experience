@@ -3,23 +3,26 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set active = 'private-beta' %}
-
-{% block pageTitle %}Joining private beta - GOV.UK Sign In{% endblock %}
+{% set active = "private-beta" %}
+{% set pageTitle = "Joining private beta" %}
 
 {% block mainContent %}
   {{ errorSummary ({
     errors:  errorMessages,
     hrefs: {
-      'yourName': '#yourName',
-      'department': '#department'
+      yourName: "#yourName",
+      department: "#department"
     }
   }) }}
 
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Joining private beta</h1>
 
   <p class="govuk-body">If you want to go live with GOV.UK Sign In and offer it to your users, you need to join our private beta.</p>
-  <p class="govuk-body">Discuss our <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.sign-in.service.gov.uk/getting-started/private-beta">private beta guidance (opens in new tab)</a> with your team to see if it’s right for you.</p>
+  <p class="govuk-body">Discuss our
+    <a class="govuk-link" rel="noreferrer noopener" target="_blank"
+       href="https://www.sign-in.service.gov.uk/getting-started/private-beta">
+      private beta guidance (opens in new tab)</a> with your team to see if it's right for you.
+  </p>
 
   <h2 class="govuk-heading-m">Speak to us about joining private beta</h2>
 
@@ -31,7 +34,6 @@
       You submitted your details on {{ dateRequestSubmitted }}.
     </div>
   {% else %}
-
     <form class="form" action="/private-beta" method="post">
       {{ govukInput({
         label: {
@@ -82,10 +84,10 @@
         ]
       }) }}
 
-    <input type="hidden" value="{{ serviceName }}" id="serviceName" name="serviceName">
-    <input type="hidden" value="{{ emailAddress }}" id="emailAddress" name="emailAddress">
+      <input type="hidden" value="{{ serviceName }}" id="serviceName" name="serviceName">
+      <input type="hidden" value="{{ emailAddress }}" id="emailAddress" name="emailAddress">
 
-      {{ govukButton({text: "Submit"}) }}
+      {{ govukButton({ text: "Submit" }) }}
     </form>
   {% endif %}
 {% endblock %}

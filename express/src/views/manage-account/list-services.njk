@@ -1,20 +1,14 @@
 {% extends '../layout.njk' %}
 
-{% block content %}
-    <div class="govuk-width-container">
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
+{% block mainContent %}
+  <h1 class="govuk-heading-xl">
+    Your services
+  </h1>
 
-                <h1 class="govuk-heading-xl">
-                    Your services
-                </h1>
-                {% for service in services %}
-                    <p>
-                        <a class="govuk-body"
-                           href="/client-details/{{ service.pk.S.substring(8) }}/">{{ service.service_name.S }}</a>
-                    </p>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+  {% for service in services %}
+    <p>
+      <a class="govuk-body"
+         href="/client-details/{{ service.pk.S.substring(8) }}/">{{ service.service_name.S }}</a>
+    </p>
+  {% endfor %}
 {% endblock %}

@@ -1,22 +1,13 @@
 {% extends "layout.njk" %}
 
-{% block pageTitle %}
-  Page not found
-{% endblock %}
-
 {% set showTopNav = false %}
+{% set pageTitle = "Page not found" %}
 
-{% block content %}
-<div class="govuk-width-container">
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-l">Page not found</h1>
-      <p class="govuk-body">If you typed the web address, check it is correct.</p>
-      <p class="govuk-body">If you pasted the web address, check you copied the entire address.</p>
-      <p class="govuk-body">
-        If the web address is correct or you selected a link or button, use our <a class="govuk-link" href="https://www.sign-in.service.gov.uk/support" style="white-space: nowrap;">support form</a> to report the problem.
-      </p>
-    </div>
-  </div>
-</div>
+{% block mainContent %}
+  <h1 class="govuk-heading-l">Page not found</h1>
+  <p class="govuk-body">If you typed the web address, check it is correct.</p>
+  <p class="govuk-body">If you pasted the web address, check you copied the entire address.</p>
+  <p class="govuk-body">
+    If the web address is correct or you selected a link or button, use our <a class="govuk-link" href="https://www.sign-in.service.gov.uk/support" style="white-space: nowrap;">support form</a> to report the problem.
+  </p>
 {% endblock %}

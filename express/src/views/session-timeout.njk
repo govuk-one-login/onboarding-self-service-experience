@@ -1,15 +1,10 @@
 {% extends "layout.njk" %}
 
-{% block pageTitle %}Session timeout - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Session timeout" %}
 
-{%  block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row govuk-!-padding-bottom-7">
-      <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">You need to sign in again</h1>
-        <p class="govuk-body govuk-!-margin-bottom-6">To keep your account secure, we’ve signed you out because you did not do anything for 60 minutes.</p>
-        {{ govukButton({text: "Sign in again", href: "/sign-in"}) }}
-      </div>
-    </div>
-  </div>
+{% block mainContent %}
+  <h1 class="govuk-heading-l">You need to sign in again</h1>
+  <p class="govuk-body">To keep your account secure, we’ve signed you out because you did not do anything for 60 minutes.</p>
+
+  {{ govukButton({ text: "Sign in again", href: "/sign-in", classes: "govuk-!-margin-top-2" }) }}
 {% endblock %}

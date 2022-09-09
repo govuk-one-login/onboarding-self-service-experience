@@ -3,63 +3,51 @@
 {% from "../macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% block pageTitle %}Enter your email address{% endblock %}
+{% set backLink = backLink("/") %}
+{% set pageTitle = "Enter your email address" %}
 
-{% block beforeContent %}
-  <div class="govuk-width-container">
-    {{ backLink("/") }}
-  </div>
-{% endblock %}
+{% block mainContent %}
+  {{ errorSummary ({
+    errors: errorMessages,
+    hrefs: {
+      emailAddress: "#emailAddress"
+    }
+  }) }}
 
-{%  block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
+  <h1 class="govuk-heading-l">Enter your government email address</h1>
 
-        {{ errorSummary ({
-            errors: errorMessages,
-            hrefs: {
-                'emailAddress': '#emailAddress'
-            }
-        }) }}
+  <p class="govuk-body">You can only use this service if you have an email address that ends in:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>gov.uk</li>
+    <li>highwaysengland.co.uk</li>
+    <li>socialworkengland.org.uk</li>
+  </ul>
+  <p class="govuk-body"><a class="govuk-link" href="https://www.sign-in.service.gov.uk/contact-us">Contact us</a>
+    if you have a government email address that is not covered by this list.
+  </p>
 
-        <h1 class="govuk-heading-l">Enter your government email address</h1>
+  <form class="form" action="/create/get-email" method="post">
+    {{ govukInput({
+      label: {
+        text: "Government email address"
+      },
+      name: "emailAddress",
+      id: "emailAddress",
+      classes: "govuk-!-width-three-quarters",
+      errorMessage: {
+        text: errorMessages.emailAddress
+      } if errorMessages else false,
+      value: values.emailAddress if values
+    }) }}
 
-        <p class="govuk-body">You can only use this service if you have an email address that ends in:</p>
-        <ul class="govuk-list govuk-list--bullet">
-          <li>gov.uk</li>
-          <li>highwaysengland.co.uk</li>
-          <li>socialworkengland.org.uk</li>
-        </ul>
-        <p class="govuk-body"><a class="govuk-link" href="https://www.sign-in.service.gov.uk/contact-us">Contact us</a> if you have a government email address that is not covered by this list.</p>
-        <form class="form" action="/create/get-email" method="post">
+    <h2 class="govuk-heading-m">Read our privacy notice</h2>
+    <p class="govuk-body govuk-!-margin-bottom-6">By continuing, you confirm that you agree to our
+      <a class="govuk-link" href="https://www.sign-in.service.gov.uk/privacy-policy">privacy notice</a>.
+      It sets out how we use your personal information.
+    </p>
 
-          {{ govukInput({
-              label: {
-                  text: "Government email address"
-              },
-              name: "emailAddress",
-              id: "emailAddress",
-              classes: "govuk-!-width-three-quarters",
-              errorMessage: {
-                  text: errorMessages.emailAddress
-              } if errorMessages else false,
-              value: values.emailAddress if values
-
-          }) }}
-
-          <h2 class="govuk-heading-m">Read our privacy notice</h2>
-          <p class="govuk-body govuk-!-margin-bottom-6">By continuing, you confirm that you agree to our <a class="govuk-link" href="https://www.sign-in.service.gov.uk/privacy-policy">privacy notice</a>.
-            It sets out how we use your personal information.</p>
-
-          <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
-            Continue
-          </button>
-
-        </form>
-
-      </div>
-    </div>
-  </div>
-
+    <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
+      Continue
+    </button>
+  </form>
 {% endblock %}

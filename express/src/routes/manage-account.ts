@@ -34,7 +34,7 @@ router.get("/client-details/:serviceId", async (req, res) => {
     const serviceId = req.params.serviceId;
     const authClientId = client.clientId;
 
-    res.render("dashboard/client-details.njk", {
+    res.render("service-details/client-details.njk", {
         serviceId: req.params.serviceId,
         publicKeyAndUrlsNotUpdatedByUser: true,
         updatedField: req.session.updatedField,
@@ -49,7 +49,7 @@ router.get("/client-details/:serviceId", async (req, res) => {
             changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURI(
                 client.data
             )}`,
-            changeRedirectUris: `/change-redirect-URIs/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
+            changeRedirectUris: `/change-redirect-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
                 client.redirect_uris.join(" ")
             )}`,
             changeUserAttributes: `/change-user-attributes/${serviceId}/${selfServiceClientId}/${authClientId}?userAttributes=${encodeURI(
@@ -58,7 +58,7 @@ router.get("/client-details/:serviceId", async (req, res) => {
             changePublicKey: `/change-public-key/${serviceId}/${selfServiceClientId}/${authClientId}?publicKey=${encodeURI(
                 client.clientId
             )}`,
-            changePostLogoutUris: `/change-post-logout-URIs/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
+            changePostLogoutUris: `/change-post-logout-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
                 client.post_logout_redirect_uris.join(" ")
             )}`
         }

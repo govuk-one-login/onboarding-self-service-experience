@@ -6,16 +6,15 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set active = "client-details" %}
-
-{% block pageTitle %}Change public key - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Change public key" %}
 
 {% block mainContent %}
   {{ errorSummary ({
     errors:  errorMessages,
     hrefs: {
-      "serviceUserPublicKey": "#serviceUserPublicKey",
-      "serviceUserPublicKeyText": "#serviceUserPublicKeyText",
-      "serviceUserPublicKeyFile": "#serviceUserPublicKeyFile"
+      serviceUserPublicKey: "#serviceUserPublicKey",
+      serviceUserPublicKeyText: "#serviceUserPublicKeyText",
+      serviceUserPublicKeyFile: "#serviceUserPublicKeyFile"
     }
   }) }}
 
@@ -33,13 +32,11 @@
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">Current public key</p>
       <p class="govuk-body current-public-key-container">{{ currentPublicKey }}</p>
     {% endset -%}
-    {{ govukInsetText({
-      html: currentPublicKeyBlock
-    }) }}
+
+    {{ govukInsetText({ html: currentPublicKeyBlock }) }}
   {% endif %}
 
   <form class="form" action="/change-public-key-v2/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
-
     {% set textFieldHtml %}
       {{ govukTextarea({
         name: "serviceUserPublicKeyText",
@@ -52,7 +49,7 @@
         },
         value: value,
         errorMessage: {
-          text:  errorMessages.get('serviceUserPublicKeyText')
+          text: errorMessages.get('serviceUserPublicKeyText')
         } if errorMessages and errorMessages.has('serviceUserPublicKeyText')
       }) }}
     {% endset -%}
@@ -68,7 +65,7 @@
           accept: ".pem"
         },
         errorMessage: {
-          text:  errorMessages.get('serviceUserPublicKeyFile')
+          text: errorMessages.get('serviceUserPublicKeyFile')
         } if errorMessages and errorMessages.has('serviceUserPublicKeyFile')
       }) }}
     {% endset -%}
@@ -96,31 +93,27 @@
           value: "text",
           checked: textChecked,
           conditional: {
-          html: textFieldHtml
-        }
+            html: textFieldHtml
+          }
         },
         {
           text: "Upload your public key as a file",
           value: "file",
           checked: fileChecked,
           conditional: {
-          html: fileUploadHtml
-        }
+            html: fileUploadHtml
+          }
         }
       ],
       errorMessage: {
         text:  errorMessages.get('serviceUserPublicKey')
       } if errorMessages and errorMessages.has('serviceUserPublicKey')
-
     }) }}
 
     <div class="govuk-button-group">
-      {{ govukButton({
-        text: "Confirm"
-      }) }}
+      {{ govukButton({ text: "Confirm" }) }}
       {# TODO When attached to backend to be replaced with : href="/client-details/{{serviceId}}" #}
       <a class="govuk-link" href="/client-details-mocked">Cancel</a>
     </div>
-
   </form>
 {% endblock %}

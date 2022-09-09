@@ -10,7 +10,7 @@ const router = express.Router();
 
 // Testing routes for Change your client name page
 router.get("/change-client-name/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
-    res.render("dashboard/change-client-name.njk", {
+    res.render("service-details/change-client-name.njk", {
         value: req.query?.clientName,
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -23,7 +23,7 @@ router.post("/change-client-name/:serviceId/:selfServiceClientId/:clientId", asy
     if (clientName === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set("clientName", "Enter your client name");
-        res.render("dashboard/change-client-name.njk", {errorMessages: errorMessages, clientId: req.params.clientId});
+        res.render("service-details/change-client-name.njk", {errorMessages: errorMessages, clientId: req.params.clientId});
         return;
     }
     const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
@@ -45,8 +45,8 @@ router.post("/change-client-name/:serviceId/:selfServiceClientId/:clientId", asy
 });
 
 // Testing routes for Change your redirect URIs page
-router.get("/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
-    res.render("dashboard/change-redirect-URIs.njk", {
+router.get("/change-redirect-uris/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
+    res.render("service-details/change-redirect-uris.njk", {
         value: req.query?.redirectUris,
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -55,8 +55,8 @@ router.get("/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId", (r
 });
 
 router.post(
-    "/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId",
-    urisValidator("dashboard/change-redirect-URIs.njk", "redirectURIs"),
+    "/change-redirect-uris/:serviceId/:selfServiceClientId/:clientId",
+    urisValidator("service-details/change-redirect-uris.njk", "redirectURIs"),
     async (req, res) => {
         const redirectUris = req.body.redirectURIs.split(" ").filter((url: string) => url !== "");
         const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
@@ -86,7 +86,7 @@ router.get("/change-user-attributes/:serviceId/:selfServiceClientId/:clientId", 
     const phone: boolean = userAttributes.includes("phone");
     const offline_access: boolean = userAttributes.includes("offline_access");
 
-    res.render("dashboard/change-user-attributes.njk", {
+    res.render("service-details/change-user-attributes.njk", {
         email: email,
         phone: phone,
         offline_access: offline_access,
@@ -123,8 +123,8 @@ router.post("/change-user-attributes/:serviceId/:selfServiceClientId/:clientId",
 });
 
 // Testing routes for Change your post logout redirect URIs page
-router.get("/change-post-logout-URIs/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
-    res.render("dashboard/change-post-logout-URIs.njk", {
+router.get("/change-post-logout-uris/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
+    res.render("service-details/change-post-logout-uris.njk", {
         value: req.query?.redirectUris, // this is not clientName
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -133,17 +133,17 @@ router.get("/change-post-logout-URIs/:serviceId/:selfServiceClientId/:clientId",
 });
 
 router.post(
-    "/change-post-logout-URIs/:serviceId/:selfServiceClientId/:clientId",
-    urisValidator("dashboard/change-post-logout-URIs.njk", "postLogoutURIs"),
+    "/change-post-logout-uris/:serviceId/:selfServiceClientId/:clientId",
+    urisValidator("service-details/change-post-logout-uris.njk", "postLogoutURIs"),
     async (req, res) => {
-        const postLogoutURIs = req.body.postLogoutURIs.split(" ").filter((url: string) => url !== "");
+        const postLogoutUris = req.body.postLogoutURIs.split(" ").filter((url: string) => url !== "");
         const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
         try {
             await facade.updateClient(
                 req.params.serviceId,
                 req.params.selfServiceClientId,
                 req.params.clientId,
-                {post_logout_redirect_uris: postLogoutURIs},
+                {post_logout_redirect_uris: postLogoutUris},
                 req.session.authenticationResult?.AccessToken as string
             );
         } catch (error) {
@@ -158,7 +158,7 @@ router.post(
 
 // Testing routes for Change your public key page
 router.get("/change-public-key/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
-    res.render("dashboard/change-public-key.njk", {
+    res.render("service-details/change-public-key.njk", {
         value: "", // this is not clientName
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -188,8 +188,8 @@ router.post("/change-public-key/:serviceId/:selfServiceClientId/:clientId", conv
 
 // Testing route for "Finish connecting the sign in journey to your service" page
 router.get("/redirect-placeholder", (req, res) => {
-    res.render("dashboard/finish-connecting-sign-in-journey.njk", {
-        changeRedirectURIsUrl: "/change-redirect-URIs/:serviceId/:selfServiceClientId/:clientId",
+    res.render("service-details/finish-connecting-sign-in-journey.njk", {
+        changeRedirectUrisUrl: "/change-redirect-uris/:serviceId/:selfServiceClientId/:clientId",
         changePublicKeyUrl: "/change-public-key/:serviceId/:selfServiceClientId/:clientId"
     });
 });
@@ -218,7 +218,7 @@ router.post("/change-service-name", async (req, res) => {
 
 //// Testing route without public key - "First time change"
 router.get("/change-public-key-v2", (req, res) => {
-    res.render("dashboard/change-public-key-v2.njk", {
+    res.render("service-details/change-public-key-v2.njk", {
         serviceId: "mockedServiceId",
         selfServiceClientId: "mockedSelfServiceClientId",
         clientId: "mockedClientId",
@@ -227,7 +227,7 @@ router.get("/change-public-key-v2", (req, res) => {
 });
 //// Testing route with public key - "Returning change"
 router.get("/change-public-key-v2-returning", (req, res) => {
-    res.render("dashboard/change-public-key-v2.njk", {
+    res.render("service-details/change-public-key-v2.njk", {
         serviceId: "mockedServiceId",
         selfServiceClientId: "mockedSelfServiceClientId",
         clientId: "mockedClientId",
@@ -245,7 +245,7 @@ router.post("/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/moc
     if (serviceUserPublicKey === "text" && serviceUserPublicKeyText === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set("serviceUserPublicKeyText", "Enter a public key");
-        res.render("dashboard/change-public-key-v2.njk", {
+        res.render("service-details/change-public-key-v2.njk", {
             errorMessages: errorMessages,
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
@@ -259,7 +259,7 @@ router.post("/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/moc
     if (serviceUserPublicKey === "file" && serviceUserPublicKeyFile === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set("serviceUserPublicKeyFile", "Upload a file");
-        res.render("dashboard/change-public-key-v2.njk", {
+        res.render("service-details/change-public-key-v2.njk", {
             errorMessages: errorMessages,
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
@@ -273,7 +273,7 @@ router.post("/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/moc
     if (serviceUserPublicKeyText === "" && serviceUserPublicKeyFile === "") {
         const errorMessages = new Map<string, string>();
         errorMessages.set("serviceUserPublicKey", "Choose how to change your public key");
-        res.render("dashboard/change-public-key-v2.njk", {
+        res.render("service-details/change-public-key-v2.njk", {
             errorMessages: errorMessages,
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
@@ -287,7 +287,7 @@ router.post("/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/moc
 });
 //// Testing route to redirect to client details
 router.get("/client-details-mocked", (req, res) => {
-    res.render("dashboard/client-details.njk", {
+    res.render("service-details/client-details.njk", {
         serviceName: "My juggling service"
     });
 });
@@ -335,14 +335,14 @@ router.get("/account-success-screen-test", (req, res) => {
 
 //// Testing route 'Form submitted' page for private beta
 router.get("/private-beta-form-submitted", (req, res) => {
-    res.render("dashboard/private-beta-form-submitted.njk", {
+    res.render("service-details/private-beta-form-submitted.njk", {
         serviceName: "My juggling service"
     });
 });
 
 //// Testing routs Create 'Joining a private beta' page
 router.get("/private-beta", (req, res) => {
-    res.render("dashboard/private-beta.njk", {
+    res.render("service-details/private-beta.njk", {
         serviceName: req.query.serviceName,
         emailAddress: req.session.emailAddress
     });
@@ -362,7 +362,7 @@ router.post("/private-beta", async (req, res) => {
             yourName: yourName,
             department: department
         };
-        res.render("dashboard/private-beta.njk", {
+        res.render("service-details/private-beta.njk", {
             errorMessages: errorMessages,
             value: value
         });
@@ -376,7 +376,7 @@ router.post("/private-beta", async (req, res) => {
             yourName: yourName,
             department: department
         };
-        res.render("dashboard/private-beta.njk", {
+        res.render("service-details/private-beta.njk", {
             errorMessages: errorMessages,
             value: value
         });
@@ -390,7 +390,7 @@ router.post("/private-beta", async (req, res) => {
             yourName: yourName,
             department: department
         };
-        res.render("dashboard/private-beta.njk", {
+        res.render("service-details/private-beta.njk", {
             errorMessages: errorMessages,
             value: value
         });
@@ -417,7 +417,7 @@ router.post("/private-beta", async (req, res) => {
 
 // Testing route for testing when the private beta request has already been submitted.
 router.get("/private-beta-submitted", (req, res) => {
-    res.render("dashboard/private-beta.njk", {
+    res.render("service-details/private-beta.njk", {
         serviceName: "My juggling service",
         privateBetaRequestSubmitted: true,
         dateRequestSubmitted: "10 May 2022"

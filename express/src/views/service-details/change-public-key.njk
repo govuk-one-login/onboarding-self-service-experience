@@ -3,20 +3,22 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 
 {% set active = "client-details" %}
-
-{% block pageTitle %}Change public key - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Change public key" %}
 
 {% block mainContent %}
   {{ errorSummary ({
     errors:  errorMessages,
     hrefs: {
-      "serviceUserPublicKey": "#serviceUserPublicKey"
+      serviceUserPublicKey: "#serviceUserPublicKey"
     }
   }) }}
 
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
 
-  <p class="govuk-body">You need to <a class="govuk-link" href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/generate-a-key/">generate a key pair (opens in new tab)</a> and add the public key. This is so our services can securely send messages to each other.</p>
+  <p class="govuk-body">You need to
+    <a class="govuk-link" href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/generate-a-key/">
+      generate a key pair (opens in new tab)</a> and add the public key. This is so our services can securely send messages to each other.
+  </p>
 
   <h2 class="govuk-heading-m">Paste in your public key</h2>
 
@@ -37,7 +39,7 @@
     }) }}
 
     <div class="govuk-button-group">
-      {{ govukButton({text: "Confirm"}) }}
+      {{ govukButton({ text: "Confirm" }) }}
       <a class="govuk-link" href="/client-details/{{ serviceId }}">Cancel</a>
     </div>
   </form>

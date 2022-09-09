@@ -3,52 +3,35 @@
 {% from "macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% block pageTitle %}Confirm phone number - GOV.UK Sign In{% endblock %}
+{% set pageTitle = "Confirm phone number" %}
+{% set backLink = backLink("/security-check-change-number") %}
 
-{% block beforeContent %}
-  <div class="govuk-width-container">
-    {{ backLink("/security-check-change-number") }}
-  </div>
-{% endblock %}
+{% block mainContent %}
+  {{ errorSummary ({
+    errors: errors,
+    hrefs: {
+      mobileNumber: "#mobileNumber"
+    }
+  }) }}
 
-{%  block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
+  <h1 class="govuk-heading-l">Confirm the phone number currently linked to your account</h1>
 
-        {{ errorSummary ({
-          errors: errors,
-          hrefs: {
-            'mobileNumber': '#mobileNumber'
-          }
-        }) }}
+  <form class="form" action="/confirm-phone-number" method="post">
+    {{ govukInput({
+      label: {
+        text: "Phone number"
+      },
+      name: "mobileNumber",
+      id: "mobileNumber",
+      classes: "govuk-input--width-20",
+      type: "tel",
+      autocomplete: "tel",
+      value: value.mobileNumber,
+      errorMessage: {
+        text: errors.get("mobileNumber")
+      } if errors
+    }) }}
 
-        <h1 class="govuk-heading-l">Confirm the phone number currently linked to your account</h1>
-        <form class="form" action="/confirm-phone-number" method="post" >
-
-          {{ govukInput({
-            label: {
-              text: "Phone number"
-            },
-            name: "mobileNumber",
-            id: "mobileNumber",
-            classes: "govuk-input--width-20",
-            type: "tel",
-            autocomplete: "tel",
-            value: value.mobileNumber,
-            errorMessage: {
-              text: errors.get('mobileNumber')
-            } if errors else false
-          }) }}
-
-          {{ govukButton({
-            text: "Continue",
-            attributes: {"id": "submit"}
-          }) }}
-
-        </form>
-
-      </div>
-    </div>
-  </div>
+    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
+  </form>
 {% endblock %}
