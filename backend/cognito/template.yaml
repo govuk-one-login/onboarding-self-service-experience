@@ -322,9 +322,6 @@ Resources:
         DefaultEmailOption: CONFIRM_WITH_CODE
       SmsAuthenticationMessage: '{####} is your GOV.UK Sign In security code.'
       MfaConfiguration: OPTIONAL
-      DeviceConfiguration:
-        ChallengeRequiredOnNewDevice: false
-        DeviceOnlyRememberedOnUserPrompt: true
       EmailConfiguration:
         EmailSendingAccount: COGNITO_DEFAULT
       SmsConfiguration:

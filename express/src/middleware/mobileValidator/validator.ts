@@ -1,14 +1,15 @@
 import {NextFunction, Request, Response} from "express";
-import {isValidOrThrow, prepareForCognito} from "./checkNumber";
+import {validate} from "../../lib/mobileNumberUtils"
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 
-export default function validateAndConvertForCognito(template: string): MiddlewareFunction<Request, Response, NextFunction> {
+export default function validateMobileNumber(template: string): MiddlewareFunction<Request, Response, NextFunction> {
     return async (req: Request, res: Response, next: NextFunction) => {
-        isValidOrThrow(req.body.mobileNumber, template);
-        req.body.mobileNumber = prepareForCognito(req.body.mobileNumber);
-        req.session.enteredMobileNumber = req.body.mobileNumber;
-        req.session.mobileNumber = req.body.mobileNumber;
-        next();
+        const validationResult = validate(req.body.mobileNumber);
+        if (validationResult.isValid) {
+            next();
+        } else {
+            res.render(template, {errorMessages: {mobileNumber: validationResult.errorMessage}})
+        }
     };
 }

@@ -1,20 +1,29 @@
-import {Request, Response} from "express";
-import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
+import {NextFunction, Request, Response} from "express";
 import {randomUUID} from "crypto";
 import {User} from "../../@types/user";
 import {Service} from "../../@types/Service";
-import CognitoInterface from "../lib/cognito/CognitoInterface";
-import {CodeMismatchException, LimitExceededException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
+import {
+    AuthenticationResultType,
+    CodeMismatchException,
+    LimitExceededException,
+    NotAuthorizedException
+} from "@aws-sdk/client-cognito-identity-provider";
+import AuthenticationResultParser from "../lib/AuthenticationResultParser";
+import {SelfServiceErrors} from "../lib/errors";
+import {prepareForCognito} from "../lib/mobileNumberUtils";
+import SelfServiceServicesService from "../services/self-service-services-service";
+
+// const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
 export const listServices = async function (req: Request, res: Response) {
-    const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
     if (req.session.selfServiceUser == undefined) {
         console.error("No user in session. contollers/manage-account/listServices(req, res)");
         res.render("there-is-a-problem.njk");
         return;
     }
     const user: User = req.session.selfServiceUser;
-    const services = await lambdaFacade.listServices(user.pk.S as string, req.session.authenticationResult?.AccessToken as string);
+    const services = await s4.listServices(user.pk.S as string, req.session.authenticationResult?.AccessToken as string);
     if (services.data.Items.length === 0) {
         res.redirect("/add-service-name");
         return;
@@ -40,26 +49,17 @@ export const processAddServiceForm = async function (req: Request, res: Response
         service_name: req.body.serviceName
     };
     const user = req.session.selfServiceUser as User;
-    let newServiceOutput;
-    const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
-    const newUser: any = {};
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
     try {
-        // @ts-ignore
-        Object.keys(user).forEach(key => (newUser[key] = user[key]["S"]));
-        newServiceOutput = await lambdaFacade.newService(service, newUser, req.session.authenticationResult?.AccessToken as string);
+        await s4.newService(service, user, req.session.authenticationResult as AuthenticationResultType);
     } catch (error) {
         console.error(error);
         res.render("there-is-a-problem.njk");
         return;
     }
 
-    const newServiceData = JSON.parse(newServiceOutput?.data.output);
-    const generatedClient = await lambdaFacade.generateClient(
-        newServiceData.serviceId,
-        service,
-        newUser.email as string,
-        req.session.authenticationResult?.AccessToken as string
-    );
+    const generatedClient = await s4.generateClient(service, req.session.authenticationResult as AuthenticationResultType);
+    console.log(generatedClient.data);
     const body = JSON.parse(generatedClient.data.output).body;
     const serviceId = JSON.parse(body).pk;
     res.redirect(`/client-details/${serviceId.substring(8)}`);
@@ -69,16 +69,14 @@ export const showChangePasswordForm = async function (req: Request, res: Respons
     res.render("account/change-password.njk");
 };
 
-export const showAccount = async function (req: Request, res: Response) {
-    const payload = (req.session.authenticationResult?.IdToken as string).split("."); //duplcated code
-    const claims = Buffer.from(payload[1], "base64").toString("utf-8");
-    const cognitoId = JSON.parse(claims)["cognito:username"];
-    req.session.mobileNumber = JSON.parse(claims)["phone_number"];
+export const showAccount = async function (req: Request, res: Response, next: NextFunction) {
+    if (!req.session.authenticationResult) {
+        next(SelfServiceErrors.Redirect("sign-in.njk"));
+    }
+    req.session.mobileNumber = AuthenticationResultParser.getPhoneNumber(req.session.authenticationResult as AuthenticationResultType);
 
-    const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
-    req.session.selfServiceUser = (
-        await lambdaFacade.getUserByCognitoId(`cognito_username#${cognitoId}`, req.session?.authenticationResult?.AccessToken as string)
-    ).data.Items[0];
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    req.session.selfServiceUser = await s4.getSelfServiceUser(req.session.authenticationResult as AuthenticationResultType);
 
     const user: User = req.session?.selfServiceUser as User;
     res.render("account/account.njk", {
@@ -158,8 +156,8 @@ export const changePassword = async function (req: Request, res: Response) {
     }
 
     try {
-        const cognitoClient: CognitoInterface = await req.app.get("cognitoClient");
-        await cognitoClient.changePassword(req.session?.authenticationResult?.AccessToken as string, currentPassword, newPassword);
+        const s4: SelfServiceServicesService = await req.app.get("backing-service");
+        await s4.changePassword(req.session?.authenticationResult?.AccessToken as string, currentPassword, newPassword);
     } catch (error) {
         console.error("ERROR CALLING COGNITO WITH NEW PASSWORD");
         console.error(error);
@@ -197,15 +195,14 @@ export const changePassword = async function (req: Request, res: Response) {
     }
 
     try {
-        const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
-        await lambdaFacade.updateUser(
-            req.session?.selfServiceUser?.pk.S.substring("user#".length) as string,
-            req.session?.selfServiceUser?.sk.S.substring("cognito_username#".length) as string,
+        const s4: SelfServiceServicesService = await req.app.get("backing-service");
+        await s4.updateUser(
+            req.session?.selfServiceUser as User,
             {password_last_updated: new Date()},
             req.session?.authenticationResult?.AccessToken as string
         );
     } catch (error) {
-        console.error("ERROR CALLING LAMBDA WITH USER TO UDPDATE");
+        console.error("ERROR CALLING LAMBDA WITH USER TO UPDATE");
         console.error(error);
         res.render("there-is-a-problem.njk");
         return;
@@ -219,19 +216,19 @@ export const showChangePhoneNumberForm = async function (req: Request, res: Resp
 };
 
 export const processChangePhoneNumberForm = async function (req: Request, res: Response) {
-    const mobileNumber = req.body.mobileNumber;
-    const cognitoClient: CognitoInterface = await req.app.get("cognitoClient");
-
-    await cognitoClient.setPhoneNumber(req.session.emailAddress as string, mobileNumber);
-    req.session.mobileNumber = mobileNumber;
-
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
+    await s4.setPhoneNumber(
+        AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType),
+        prepareForCognito(req.body.mobileNumber)
+    );
+    req.session.mobileNumber = req.body.mobileNumber;
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
         // user must log in before we can process their mobile number
         res.redirect("/sign-in");
         return;
     }
-    await cognitoClient.sendMobileNumberVerificationCode(accessToken);
+    await s4.sendMobileNumberVerificationCode(accessToken);
 
     res.render("check-mobile.njk", {
         values: {
@@ -242,19 +239,15 @@ export const processChangePhoneNumberForm = async function (req: Request, res: R
     });
 };
 
-export const verifySmsCode = async function (req: Request, res: Response) {
-    const cognitoClient: CognitoInterface = await req.app.get("cognitoClient");
-    const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
+export const verifyMobileWithSmsCode = async function (req: Request, res: Response) {
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
     const accessToken = req.session.authenticationResult?.AccessToken as string;
     try {
-        await cognitoClient.verifySmsCode(accessToken, req.body["sms-otp"]);
-        await cognitoClient.setMobilePhoneAsVerified(req.session.emailAddress as string);
-        await lambdaFacade.updateUser(
-            req.session?.selfServiceUser?.pk.S.substring("user#".length) as string,
-            req.session?.selfServiceUser?.sk.S.substring("cognito_username#".length) as string,
-            {phone: req.session.mobileNumber},
-            accessToken as string
+        await s4.verifyMobileUsingSmsCode(accessToken, req.body["sms-otp"]);
+        await s4.setMobilePhoneAsVerified(
+            AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType) as string
         );
+        await s4.updateUser(req.session?.selfServiceUser as User, {phone: req.session.mobileNumber}, accessToken as string);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             const errorMessages = new Map<string, string>();

@@ -11,11 +11,11 @@ export function mobileOtpValidator(
         otp = otp.trim();
         let mobileNumber: string;
         if (isMobileHidden) {
-            const mobileNumberRaw = String(req.session.mobileNumber);
+            const mobileNumberRaw = String(req.session.enteredMobileNumber);
             const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
             mobileNumber = "*******" + mobileNumberLast4Digits;
         } else {
-            mobileNumber = String(req.session.mobileNumber);
+            mobileNumber = String(req.session.enteredMobileNumber);
         }
 
         if (otp === "") {

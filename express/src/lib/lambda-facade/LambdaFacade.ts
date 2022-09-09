@@ -3,6 +3,8 @@ import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {User} from "../../../@types/user";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
+import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import AuthenticationResultParser from "../AuthenticationResultParser";
 
 class LambdaFacade implements LambdaFacadeInterface {
     private instance: Axios;
@@ -50,17 +52,16 @@ class LambdaFacade implements LambdaFacadeInterface {
         });
     }
 
-    async generateClient(serviceId: string, service: Service, contactEmail: string, accessToken: string): Promise<AxiosResponse> {
+    async generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse> {
         const body = {
-            serviceId: serviceId,
             service: service,
-            contactEmail: contactEmail
+            contactEmail: AuthenticationResultParser.getEmail(authenticationResult)
         };
         return await (
             await this.instance
         ).post("/Prod/new-client", JSON.stringify(body), {
             headers: {
-                "authorised-by": accessToken
+                "authorised-by": authenticationResult.AccessToken as string
             }
         });
     }

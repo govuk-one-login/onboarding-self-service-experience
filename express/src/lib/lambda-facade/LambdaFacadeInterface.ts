@@ -2,6 +2,7 @@ import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {User} from "../../../@types/user";
+import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 
 export default interface LambdaFacadeInterface {
     putUser(user: OnboardingTableItem, accessToken: string): Promise<AxiosResponse>;
@@ -12,7 +13,7 @@ export default interface LambdaFacadeInterface {
 
     newService(service: Service, user: User, accessToken: string): Promise<AxiosResponse>;
 
-    generateClient(serviceId: string, service: Service, contactEmail: string, accessToken: string): Promise<AxiosResponse>;
+    generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse>;
 
     listServices(userId: string, accessToken: string): Promise<AxiosResponse>;
 

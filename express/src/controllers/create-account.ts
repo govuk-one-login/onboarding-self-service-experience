@@ -1,26 +1,21 @@
-import {
-    AttributeType,
-    CodeMismatchException,
-    NotAuthorizedException,
-    UsernameExistsException
-} from "@aws-sdk/client-cognito-identity-provider";
+import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
 import {NextFunction, Request, Response} from "express";
-import CognitoInterface from "../lib/cognito/CognitoInterface";
 import {RedirectError, SelfServiceErrors} from "../lib/errors";
-import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
-import {SelfServiceError} from "../lib/SelfServiceError";
+import SelfServiceServicesService from "../services/self-service-services-service";
+import AuthenticationResultParser from "../lib/AuthenticationResultParser";
+import {prepareForCognito} from "../lib/mobileNumberUtils";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     res.render("create-account/get-email.njk");
+    return;
 };
 
 export const processGetEmailForm = async function (req: Request, res: Response, next: NextFunction) {
     const emailAddress: string = req.body.emailAddress;
-    const cognitoClient: CognitoInterface = await req.app.get("cognitoClient");
-
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
     try {
-        await cognitoClient.createUser(emailAddress);
+        await s4.createUser(emailAddress);
     } catch (error) {
         if (error instanceof UsernameExistsException) {
             // TODO We need to handle this properly with another flow
@@ -45,10 +40,10 @@ export const submitEmailOtp = async function (req: Request, res: Response, next:
     if (!req.session.emailAddress) {
         next(SelfServiceErrors.Redirect("/create/get-email"));
     }
-    const cognitoClient: CognitoInterface = await req.app.get("cognitoClient");
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
     try {
-        const response = await cognitoClient.login(req.session.emailAddress as string, req.body["create-email-otp"]);
+        const response = await s4.submitUsernamePassword(req.session.emailAddress as string, req.body["create-email-otp"]);
         req.session.cognitoSession = response.Session;
         res.redirect("/create/update-password");
         return;
@@ -56,7 +51,7 @@ export const submitEmailOtp = async function (req: Request, res: Response, next:
         if (error instanceof NotAuthorizedException) {
             next(
                 SelfServiceErrors.Render(
-                    "create-email-otp",
+                    "create-account/check-email.njk",
                     "The code you entered is not correct or has expired - enter it again or request a new code",
                     {
                         values: {emailAddress: req.session.emailAddress as string},
@@ -83,30 +78,14 @@ export const showNewPasswordForm = async function (req: Request, res: Response) 
 };
 
 export const updatePassword = async function (req: Request, res: Response, next: NextFunction) {
-    const cognitoClient: CognitoInterface = await req.app.get("cognitoClient");
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    const response = await cognitoClient.setNewPassword(
+    req.session.authenticationResult = await s4.setNewPassword(
         req.session.emailAddress as string,
         req.body["password"],
         req.session.cognitoSession as string
     );
-    req.session.cognitoSession = response.Session;
-    req.session.authenticationResult = response.AuthenticationResult;
-
-    const user = await cognitoClient.getUser(req.session.emailAddress as string);
-    // TODO: Do something better with this
-    req.session.cognitoUser = user;
-    let email: string | undefined;
-
-    if (user.UserAttributes) {
-        email = user.UserAttributes.filter((attribute: AttributeType) => attribute.Name === "email")[0].Value;
-    }
-
-    if (email === undefined) {
-        throw new SelfServiceError("Email not present");
-    }
-
-    await cognitoClient.setEmailAsVerified(email);
+    await s4.setEmailAsVerified(req.session.emailAddress as string);
     res.redirect("/create/enter-mobile");
 };
 
@@ -120,9 +99,8 @@ export const showEnterMobileForm = async function (req: Request, res: Response) 
     if (req.session.mobileNumber === undefined) {
         res.render("create-account/enter-mobile.njk");
     } else {
-        const value: object = {mobileNumber: req.session.mobileNumber};
         res.render("create-account/enter-mobile.njk", {
-            value: value
+            value: {mobileNumber: req.session.mobileNumber}
         });
     }
 };
@@ -136,23 +114,17 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
         return;
     }
 
-    const mobileNumber: string | undefined = req.session.mobileNumber;
-    const cognitoClient = await req.app.get("cognitoClient");
-    if (mobileNumber === undefined) {
-        res.render("create-account/enter-mobile.njk");
-        return;
-    }
+    const mobileNumber = prepareForCognito(req.body.mobileNumber);
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
-    await cognitoClient.setPhoneNumber(req.session.emailAddress, mobileNumber);
+    await s4.setPhoneNumber(req.session.emailAddress as string, mobileNumber);
+    await s4.sendMobileNumberVerificationCode(accessToken);
 
-    // presumably that was fine so let's try to verify the number
-    const codeSent = await cognitoClient.sendMobileNumberVerificationCode(accessToken);
-    console.debug("VERIFICATION CODE RESPONSE");
-    console.debug(codeSent);
     req.session.mobileNumber = mobileNumber;
+    req.session.enteredMobileNumber = req.body.mobileNumber;
     res.render("check-mobile.njk", {
         values: {
-            mobileNumber: req.body.mobileNumber,
+            mobileNumber: req.session.enteredMobileNumber,
             formActionUrl: "/create/verify-phone-code",
             textMessageNotReceivedUrl: "/create/resend-phone-code"
         }
@@ -160,18 +132,18 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
 };
 
 export const resendMobileVerificationCode = async function (req: Request, res: Response) {
-    req.body.mobileNumber = req.session.mobileNumber;
+    req.body.mobileNumber = req.session.enteredMobileNumber;
     await processEnterMobileForm(req, res);
 };
 
 export const submitMobileVerificationCode = async function (req: Request, res: Response) {
+    // This is the mobile verification when creating a new user
     // need to check for access token in middleware
     if (req.session.authenticationResult?.AccessToken === undefined) {
         res.redirect("/sign-in");
         return;
     }
 
-    const cognitoClient = await req.app.get("cognitoClient");
     const otp = req.body["sms-otp"];
     if (otp === undefined) {
         res.render("check-mobile.njk", {
@@ -183,17 +155,19 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
     }
 
     try {
-        await cognitoClient.verifySmsCode(req.session.authenticationResult?.AccessToken, otp);
+        const s4: SelfServiceServicesService = req.app.get("backing-service");
+        await s4.verifyMobileUsingSmsCode(req.session.authenticationResult?.AccessToken, otp);
 
         const uuid = randomUUID();
-        const email = req.session.cognitoUser?.UserAttributes?.filter((attribute: AttributeType) => attribute.Name === "email")[0].Value;
+        const email = AuthenticationResultParser.getEmail(req.session.authenticationResult);
         const phone = req.session.enteredMobileNumber;
+        const cognitoId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult);
 
-        await cognitoClient.setMfaPreference(req.session.cognitoUser?.Username as string);
+        await s4.setMfaPreference(cognitoId);
 
         const user = {
             pk: `user#${uuid}`,
-            sk: `cognito_username#${req.session.cognitoUser?.Username}`,
+            sk: `cognito_username#${cognitoId}`,
             data: "we haven't collected this full name",
             first_name: "we haven't collected this first name",
             last_name: "we haven't collected this last name",
@@ -202,15 +176,9 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
             password_last_updated: new Date()
         };
 
-        const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
-        await lambdaFacade.putUser(user, req.session.authenticationResult?.AccessToken);
-
-        req.session.selfServiceUser = (
-            await lambdaFacade.getUserByCognitoId(
-                `cognito_username#${req.session.cognitoUser?.Username}`,
-                req.session?.authenticationResult?.AccessToken as string
-            )
-        ).data.Items[0];
+        await s4.putUser(user, req.session.authenticationResult?.AccessToken);
+        req.session.selfServiceUser = await s4.getSelfServiceUser(req.session?.authenticationResult);
+        req.session.isSignedIn = true;
         res.redirect("/add-service-name");
         return;
     } catch (error) {
@@ -218,7 +186,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
             const value: object = {otp: req.body["sms-otp"]};
             res.render("check-mobile.njk", {
                 values: {
-                    mobileNumber: req.session.mobileNumber
+                    mobileNumber: req.session.enteredMobileNumber
                 },
                 value: value,
                 errorMessages: {smsOtp: "The code you entered is not correct or has expired - enter it again or request a new code"},
@@ -250,11 +218,11 @@ export const showResendEmailCodeForm = async function (req: Request, res: Respon
 export const resendEmailVerificationCode = async function (req: Request, res: Response) {
     req.body.emailAddress = req.session.emailAddress;
     const emailAddress: string = req.body.emailAddress;
-    const cognitoClient: CognitoInterface = await req.app.get("cognitoClient");
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
     let result: any;
     try {
-        result = await cognitoClient.resendEmailAuthCode(emailAddress);
+        result = await s4.resendEmailAuthCode(emailAddress);
         console.debug(result);
     } catch (error) {
         console.error(error);

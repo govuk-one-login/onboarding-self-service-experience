@@ -3,8 +3,20 @@ import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {User} from "../../../@types/user";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
+import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 
 class StubLambdaFacade implements LambdaFacadeInterface {
+    user: User = {
+        last_name: {S: "we haven't collected this last name"},
+        data: {S: "we haven't collected this full name"},
+        first_name: {S: "we haven't collected this first name"},
+        password_last_updated: {S: "2022-08-04T13:42:00.821Z"},
+        sk: {S: "cognito_username#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
+        email: {S: "registered@gds.gov.uk"},
+        pk: {S: "user#2c677c1a-22a8-4efa-a01f-9656acbbf5ee"},
+        phone: {S: "07700 987 654"}
+    };
+
     constructor() {
         console.log("Creating stub lambda facade");
     }
@@ -12,18 +24,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
     getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
         return Promise.resolve({
             data: {
-                Items: [
-                    {
-                        last_name: {S: "we haven't collected this last name"},
-                        data: {S: "we haven't collected this full name"},
-                        first_name: {S: "we haven't collected this first name"},
-                        password_last_updated: {S: "2022-08-04T13:42:00.821Z"},
-                        sk: {S: "cognito_username#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
-                        email: {S: "registered@gds.gov.uk"},
-                        pk: {S: "user#2c677c1a-22a8-4efa-a01f-9656acbbf5ee"},
-                        phone: {S: "07700 987 654"}
-                    }
-                ]
+                Items: [this.user]
             }
         } as AxiosResponse);
     }
@@ -36,7 +37,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         return Promise.resolve({} as AxiosResponse);
     }
 
-    generateClient(serviceId: string, service: Service, contactEmail: string, accessToken: string): Promise<AxiosResponse> {
+    generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse> {
         return Promise.resolve({
             data: {
                 output: JSON.stringify({body: JSON.stringify({pk: "stub-service-id"})})
@@ -116,6 +117,9 @@ class StubLambdaFacade implements LambdaFacadeInterface {
     }
 
     updateUser(selfServiceUserId: string, cognitoUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
+        Object.keys(updates).forEach(
+            (update: string) => (this.user[update as keyof User] = {S: updates[update as keyof object] as string})
+        );
         return Promise.resolve({} as AxiosResponse);
     }
 

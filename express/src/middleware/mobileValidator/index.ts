@@ -1,3 +1,3 @@
-import validateAndConvertForCognito from "./validator";
+import validateMobileNumber from "./validator";
 
-export default validateAndConvertForCognito;
+export default validateMobileNumber;

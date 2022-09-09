@@ -1,10 +1,10 @@
 import express from "express";
-import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 import {emailValidator} from "../middleware/emailValidator";
-import validateAndConvertForCognito from "../middleware/mobileValidator";
 import {passwordValidator} from "../middleware/passwordValidator";
 import {urisValidator} from "../middleware/urisValidator";
+import validateMobileNumber from "../middleware/mobileValidator";
+import SelfServiceServicesService from "../services/self-service-services-service";
 
 const router = express.Router();
 
@@ -26,9 +26,9 @@ router.post("/change-client-name/:serviceId/:selfServiceClientId/:clientId", asy
         res.render("service-details/change-client-name.njk", {errorMessages: errorMessages, clientId: req.params.clientId});
         return;
     }
-    const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
     try {
-        await facade.updateClient(
+        await s4.updateClient(
             req.params.serviceId,
             req.params.selfServiceClientId,
             req.params.clientId,
@@ -59,10 +59,10 @@ router.post(
     urisValidator("service-details/change-redirect-uris.njk", "redirectURIs"),
     async (req, res) => {
         const redirectUris = req.body.redirectURIs.split(" ").filter((url: string) => url !== "");
-        const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+        const s4: SelfServiceServicesService = req.app.get("backing-service");
 
         try {
-            await facade.updateClient(
+            await s4.updateClient(
                 req.params.serviceId,
                 req.params.selfServiceClientId,
                 req.params.clientId,
@@ -97,7 +97,7 @@ router.get("/change-user-attributes/:serviceId/:selfServiceClientId/:clientId", 
 });
 
 router.post("/change-user-attributes/:serviceId/:selfServiceClientId/:clientId", async (req, res) => {
-    const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
     const attributes: string[] = ["openid"];
 
     if (Array.isArray(req.body.userAttributes)) {
@@ -106,7 +106,7 @@ router.post("/change-user-attributes/:serviceId/:selfServiceClientId/:clientId",
         attributes.push(req.body.userAttributes);
     }
     try {
-        await facade.updateClient(
+        await s4.updateClient(
             req.params.serviceId,
             req.params.selfServiceClientId,
             req.params.clientId,
@@ -137,9 +137,9 @@ router.post(
     urisValidator("service-details/change-post-logout-uris.njk", "postLogoutURIs"),
     async (req, res) => {
         const postLogoutUris = req.body.postLogoutURIs.split(" ").filter((url: string) => url !== "");
-        const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+        const s4: SelfServiceServicesService = req.app.get("backing-service");
         try {
-            await facade.updateClient(
+            await s4.updateClient(
                 req.params.serviceId,
                 req.params.selfServiceClientId,
                 req.params.clientId,
@@ -168,9 +168,9 @@ router.get("/change-public-key/:serviceId/:selfServiceClientId/:clientId", (req,
 
 router.post("/change-public-key/:serviceId/:selfServiceClientId/:clientId", convertPublicKeyForAuth, async (req, res) => {
     const publicKey = req.body.authCompliantPublicKey as string;
-    const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
     try {
-        await facade.updateClient(
+        await s4.updateClient(
             req.params.serviceId,
             req.params.selfServiceClientId,
             req.params.clientId,
@@ -397,9 +397,9 @@ router.post("/private-beta", async (req, res) => {
         return;
     }
 
-    const facade: LambdaFacadeInterface = req.app.get("lambdaFacade");
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
     try {
-        await facade.privateBetaRequest(
+        await s4.privateBetaRequest(
             yourName,
             department,
             serviceName,
@@ -486,7 +486,7 @@ router.get("/confirm-phone-number", (req, res) => {
     res.render("confirm-phone-number.njk");
 });
 
-router.post("/confirm-phone-number", validateAndConvertForCognito("confirm-phone-number.njk"), async (req, res) => {
+router.post("/confirm-phone-number", validateMobileNumber("confirm-phone-number.njk"), async (req, res) => {
     res.redirect("/new-phone-number");
 });
 
@@ -504,7 +504,7 @@ router.get("/new-phone-number", (req, res) => {
     res.render("new-phone-number.njk");
 });
 
-router.post("/new-phone-number", validateAndConvertForCognito("new-phone-number.njk"), async (req, res) => {
+router.post("/new-phone-number", validateMobileNumber("new-phone-number.njk"), async (req, res) => {
     res.render("check-mobile.njk");
 });
 
