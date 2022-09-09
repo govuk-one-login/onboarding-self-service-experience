@@ -66,26 +66,18 @@
       {{ govukSummaryList({
         rows: [
           {
-            key: {
-            text: "Email address"
-          },
-            value: {
-            text: emailAddress
-          }
+            key: {text: "Email address"},
+            value: {text: emailAddress}
           },
           {
-            key: {
-            text: "Service name"
-          },
-            value: {
-            text: serviceName
-          }
+            key: {text: "Service name"},
+            value: {text: serviceName}
           }
         ]
       }) }}
 
-      <input type="hidden" value="{{ serviceName }}" id="serviceName" name="serviceName">
-      <input type="hidden" value="{{ emailAddress }}" id="emailAddress" name="emailAddress">
+      {{ govukInput({ type: "hidden", value: serviceName, id: "serviceName", name: "serviceName" }) }}
+      {{ govukInput({ type: "hidden", value: emailAddress, id: "emailAddress", name: "emailAddress" }) }}
 
       {{ govukButton({ text: "Submit" }) }}
     </form>

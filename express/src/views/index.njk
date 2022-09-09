@@ -1,22 +1,9 @@
 {% extends "layout.njk" %}
+{% from "macros/breadcrumbs.njk" import breadcrumbs %}
+
+{% set breadcrumbs = breadcrumbs(currentPageName = "Register your services") %}
 
 {% block pageTitle %}Get started with GOV.UK Sign In{% endblock %}
-
-{% block beforeContent %}
-  <div class="govuk-breadcrumbs">
-    <ol class="govuk-breadcrumbs__list">
-      <li class="govuk-breadcrumbs__list-item">
-        <a class="govuk-breadcrumbs__link" href="#">GOV.UK services</a>
-      </li>
-      <li class="govuk-breadcrumbs__list-item">
-        <a class="govuk-breadcrumbs__link" href="#">GOV.UK Sign In</a>
-      </li>
-      <li class="govuk-breadcrumbs__list-item" style="font-weight: bold;">
-        Register your services
-      </li>
-    </ol>
-  </div>
-{% endblock %}
 
 {% block mainContent %}
   <h1 class="govuk-heading-l">Get started with GOV.UK Sign In</h1>

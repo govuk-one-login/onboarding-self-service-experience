@@ -13,9 +13,7 @@
   </p>
 
   <form method="post" action="/resend-text-code">
-    <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
-      Resend security code
-    </button>
+    {{ govukButton({ text: "Resend security code", attributes: {id: "submit"} }) }}
   </form>
 
   <p class="govuk-body">
