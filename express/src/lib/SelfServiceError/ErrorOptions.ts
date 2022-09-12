@@ -1,5 +1,5 @@
 export default interface ErrorOptions {
-    template: string;
+    template?: string;
     values?: {[name: string]: string};
     errorMessages?: {[name: string]: string};
 }

@@ -1,7 +1,7 @@
 import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
-import {User} from "../../../@types/User";
+import {User} from "../../../@types/user";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
 
 class StubLambdaFacade implements LambdaFacadeInterface {

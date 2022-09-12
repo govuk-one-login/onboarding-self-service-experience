@@ -4,7 +4,7 @@ import {ElementHandle, Page} from "puppeteer";
 const DEFAULT_TIMEOUT = 5000;
 
 export async function getLink(page: Page, linkText: string): Promise<ElementHandle> {
-    const links = await page.$x(`//a[contains(., '${linkText}')]`);
+    const links = await page.$x(`//a[contains(normalize-space(.), '${linkText}')]`);
     return getSingleLink(links, linkText);
 }
 
