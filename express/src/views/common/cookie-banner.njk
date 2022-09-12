@@ -1,0 +1,77 @@
+{% from "govuk/components/cookie-banner/macro.njk" import govukCookieBanner %}
+
+{% set cookiesMessageHtml %}
+  <p class="govuk-body">We’d like to use analytics cookies so we can understand how you use this website and make improvements.</p>
+{% endset %}
+
+{% set acceptMessageHtml %}
+  <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
+{% endset %}
+
+{% set rejectMessageHtml %}
+  <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
+{% endset %}
+
+{{ govukCookieBanner({
+  ariaLabel: "Cookies on GOV.UK Sign In",
+  attributes: {
+    style: "display: none"
+  },
+  messages: [
+    {
+      headingText: "Cookies on GOV.UK Sign In",
+      html: cookiesMessageHtml,
+      attributes: {
+        id: "cookies-banner-main"
+      },
+      actions: [
+        {
+          text: "Accept analytics cookies",
+          type: "button",
+          attributes: {
+            id: "cookiesAccept"
+          }
+        },
+        {
+          text: "Reject analytics cookies",
+          type: "button",
+          attributes: {
+            id: "cookiesReject"
+          }
+        },
+        {
+          text: "View cookies",
+          href: "/cookies"
+        }
+      ]
+    },
+    {
+      html: acceptMessageHtml,
+      role: "alert",
+      hidden: true,
+      attributes: {
+        id: "cookies-accepted"
+      },
+      actions: [
+        {
+          text: "Hide this message",
+          classes: "cookie-hide-button"
+        }
+      ]
+    },
+    {
+      html: rejectMessageHtml,
+      role: "alert",
+      hidden: true,
+        attributes: {
+        id: "cookies-rejected"
+      },
+      actions: [
+        {
+          text: "Hide this message",
+          classes: "cookie-hide-button"
+        }
+      ]
+    }
+  ]
+}) }}

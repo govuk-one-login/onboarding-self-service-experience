@@ -43,9 +43,7 @@
       } if errorMessages else false
     }) }}
 
-    <button id="submit" type="submit" class="govuk-button" data-module="govuk-button" formnovalidate>
-      Continue
-    </button>
+    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
 
     <p class="govuk-body">
       <a id="resend-code-page" class="govuk-link" href="/create/resend-email-code">Not received an email?</a>

@@ -4,7 +4,7 @@
 
 {% set assetPath = "/dist" %}
 {% set showTopNav = showTopNav | default(true) %}
-{% set mainClasses = ["govuk-main-wrapper--auto-spacing", baseClasses | default("govuk-!-padding-top-6"), mainClasses] | join(" ") %}
+{% set mainClasses = ["govuk-main-wrapper--auto-spacing", mainClasses] | join(" ") %}
 
 {% block pageTitle %}{{ pageTitle }} - GOV.UK Sign In{% endblock %}
 
@@ -15,61 +15,7 @@
 {% endblock %}
 
 {% block bodyStart %}
-  <div class="govuk-cookie-banner " data-nosnippet role="region" aria-label="Cookies on GOV.UK Sign In" style="display: none">
-    <div class="govuk-cookie-banner__message govuk-width-container" id="cookies-banner-main">
-
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-          <h2 class="govuk-cookie-banner__heading govuk-heading-m">Cookies on GOV.UK Sign In</h2>
-          <div class="govuk-cookie-banner__content">
-            <p class="govuk-body">We’d like to use analytics cookies so we can understand how you use this website and make improvements.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="govuk-button-group">
-        <button id="cookiesAccept" type="button" class="govuk-button" data-module="govuk-button">
-          Accept analytics cookies
-        </button>
-        <button id="cookiesReject" type="button" class="govuk-button" data-module="govuk-button">
-          Reject analytics cookies
-        </button>
-        <a class="govuk-link" href="/cookies">View cookies</a>
-      </div>
-    </div>
-
-    <div class="govuk-cookie-banner__message govuk-width-container" id="cookies-accepted" role="alert" hidden>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-          <div class="govuk-cookie-banner__content">
-            <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="govuk-button-group">
-        <button class="govuk-button cookie-hide-button" data-module="govuk-button">
-          Hide this message
-        </button>
-      </div>
-    </div>
-
-    <div class="govuk-cookie-banner__message govuk-width-container" id="cookies-rejected" role="alert" hidden>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-          <div class="govuk-cookie-banner__content">
-            <p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="govuk-button-group">
-        <button class="govuk-button cookie-hide-button" data-module="govuk-button">
-          Hide this message
-        </button>
-      </div>
-    </div>
-  </div>
+  {%  include "common/cookie-banner.njk" %}
 {% endblock %}
 
 {% block beforeContent %}
@@ -98,52 +44,36 @@
 
       {% if showTopNav %}
         <div class="govuk-header__content">
-          <button type="button" role="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation">
-            Menu
-          </button>
-          <nav>
-            <ul id="navigation" class="govuk-header__navigation" aria-label="Top Level Navigation">
+          <nav aria-label="Menu" class="govuk-header__navigation ">
+            <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu" hidden>Menu</button>
+            <ul id="navigation" class="govuk-header__navigation-list">
 
               {% if not isSignedIn %}
                 <li class="govuk-header__navigation-item{% if active == 'features' %} govuk-header__navigation-item--active{% endif %}">
-                  <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/features">
-                    Features
-                  </a>
+                  <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/features">Features</a>
                 </li>
               {% endif %}
 
               <li class="govuk-header__navigation-item{% if active == 'documentation' %} govuk-header__navigation-item--active{% endif %}">
-                <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/documentation">
-                  Documentation
-                </a>
+                <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/documentation">Documentation</a>
               </li>
               <li class="govuk-header__navigation-item{% if active == 'support' %} govuk-header__navigation-item--active{% endif %}">
-                <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/support">
-                  Support
-                </a>
+                <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/support">Support</a>
               </li>
 
               {% if isSignedIn %}
                 <li class="govuk-header__navigation-item{% if active == 'your-account' %} govuk-header__navigation-item--active{% endif %}">
-                  <a class="govuk-header__link" href="/account">
-                    Your account
-                  </a>
+                  <a class="govuk-header__link" href="/account">Your account</a>
                 </li>
                 <li class="govuk-header__navigation-item">
-                  <a class="govuk-header__link" href="/account/sign-out">
-                    Sign out
-                  </a>
+                  <a class="govuk-header__link" href="/account/sign-out">Sign out</a>
                 </li>
               {% else %}
                 <li class="govuk-header__navigation-item{% if active == 'get-started' %} govuk-header__navigation-item--active{% endif %}">
-                  <a class="govuk-header__link" href="/">
-                    Get started
-                  </a>
+                  <a class="govuk-header__link" href="/">Get started</a>
                 </li>
                 <li class="govuk-header__navigation-item{% if active == 'sign-in' %} govuk-header__navigation-item--active{% endif %}">
-                  <a class="govuk-header__link" href="/sign-in">
-                    Sign in
-                  </a>
+                  <a class="govuk-header__link" href="/sign-in">Sign in</a>
                 </li>
               {% endif %}
             </ul>

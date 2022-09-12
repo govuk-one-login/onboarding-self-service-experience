@@ -4,19 +4,17 @@ import {ElementHandle, Page} from "puppeteer";
 const DEFAULT_TIMEOUT = 5000;
 
 export async function getLink(page: Page, linkText: string): Promise<ElementHandle> {
-    const links = await page.$x(`//a[contains(normalize-space(.), '${linkText}')]`);
+    const links = await page.$x(`//a[contains(text(), "${linkText}")]`);
     return getSingleLink(links, linkText);
 }
 
 export async function getLinkWithHref(page: Page, href: string): Promise<ElementHandle> {
-    const links = await page.$x(`//a[contains(@href, '${href}')]`);
+    const links = await page.$x(`//a[contains(@href, "${href}")]`);
     return getSingleLink(links, href);
 }
 
-export async function getButtonLink(page: Page, linkText: string): Promise<any> {
-    const links = await page.$x(
-        `//a[contains(., '${linkText}') and contains(concat(" ", normalize-space(@class), " "), " govuk-button ")]`
-    );
+export async function getButtonLink(page: Page, linkText: string): Promise<ElementHandle> {
+    const links = await page.$x(`//a[contains(text(), "${linkText}")][@class="govuk-button"]`);
     return getSingleLink(links, linkText);
 }
 

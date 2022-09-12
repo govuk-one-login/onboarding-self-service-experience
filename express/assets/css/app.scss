@@ -46,12 +46,6 @@ div.feature-panel {
   }
 }
 
-// scss-lint:disable IdSelector
-#main-content {
-  display: block;
-  margin-bottom: govuk-spacing(9);
-}
-
 // scss-lint:enable IdSelector
 .hero-alternative-action {
   @include govuk-font($size: 19);

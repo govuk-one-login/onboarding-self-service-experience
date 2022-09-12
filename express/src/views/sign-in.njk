@@ -32,8 +32,6 @@
       value: values?.emailAddress if values
     }) }}
 
-    <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
-      Continue
-    </button>
+    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
   </form>
 {% endblock %}

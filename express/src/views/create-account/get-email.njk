@@ -46,8 +46,6 @@
       It sets out how we use your personal information.
     </p>
 
-    <button id="submit" type="submit" class="govuk-button" data-module="govuk-button">
-      Continue
-    </button>
+    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
   </form>
 {% endblock %}

@@ -1,0 +1,33 @@
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+
+{% macro breadcrumbs(intermediateCrumbs, currentPageName, classes) %}
+  {% set crumbs = [
+    {
+      text: "GOV.UK services",
+      href: "https://www.gov.uk/service-toolkit#gov-uk-services"
+    },
+    {
+      text: "GOV.UK Sign In",
+      href: "https://www.sign-in.service.gov.uk/"
+    }
+  ] %}
+
+  {% for crumb in intermediateCrumbs %}
+    {% set crumbs = (crumbs.push(crumb), crumbs) %}
+  {% endfor %}
+
+  {% if currentPageName %}
+    {% set crumbs = (crumbs.push({
+      text: currentPageName,
+      href: "#main-content",
+      attributes: {
+        "aria-current": "page"
+      }
+    }), crumbs) %}
+  {% endif %}
+
+  {{ govukBreadcrumbs({
+    items: crumbs,
+    classes: classes
+  }) }}
+{% endmacro %}
