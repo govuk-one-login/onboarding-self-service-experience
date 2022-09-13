@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import allowedEmailDomains from "../lib/allowedEmailDomains";
+import SelfServiceErrors from "../lib/errors";
 import isRfc822Compliant from "../lib/rfc822-validate";
-import {SelfServiceErrors} from "../lib/errors";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 

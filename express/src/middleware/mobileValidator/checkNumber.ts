@@ -1,4 +1,4 @@
-import {SelfServiceError} from "../../lib/SelfServiceError";
+import SelfServiceError from "../../lib/self-service-error";
 
 export function isValidOrThrow(number: string, template: string): void {
     let processing: string;

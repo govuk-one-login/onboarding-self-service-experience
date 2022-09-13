@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {SelfServiceErrors} from "../lib/errors";
+import SelfServiceErrors from "../lib/errors";
 
 export async function emailOtpValidator(req: Request, res: Response, next: NextFunction) {
     const sixDigitsPattern = /^[0-9]{6}$/;

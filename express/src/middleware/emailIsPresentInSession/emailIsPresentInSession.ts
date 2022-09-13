@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {ErrorOptions, SelfServiceError} from "../../lib/SelfServiceError";
+import SelfServiceError, {ErrorOptions} from "../../lib/self-service-error";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 

@@ -6,8 +6,8 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
 import {NextFunction, Request, Response} from "express";
-import {RedirectError, SelfServiceErrors} from "../lib/errors";
-import {SelfServiceError} from "../lib/SelfServiceError";
+import SelfServiceErrors from "../lib/errors";
+import SelfServiceError from "../lib/self-service-error";
 import CognitoInterface from "../services/cognito/CognitoClient.interface";
 import LambdaFacadeInterface from "../services/lambda/LambdaFacadeInterface";
 
@@ -24,7 +24,7 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
     } catch (error) {
         if (error instanceof UsernameExistsException) {
             // TODO We need to handle this properly with another flow
-            throw new RedirectError("/sign-in");
+            throw SelfServiceErrors.Redirect("/sign-in");
         }
 
         next(error);

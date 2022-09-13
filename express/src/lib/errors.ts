@@ -25,7 +25,7 @@ export class RedirectError extends Error {
     }
 }
 
-export class SelfServiceErrors {
+export default class SelfServiceErrors {
     static Render(template: string, message?: string, options?: RenderOptions): RenderError {
         return new RenderError(template, message, options);
     }

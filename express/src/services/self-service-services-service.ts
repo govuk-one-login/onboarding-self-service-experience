@@ -1,6 +1,6 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {User} from "../../@types/user";
-import {SelfServiceError} from "../lib/SelfServiceError";
+import SelfServiceError from "../lib/self-service-error";
 import CognitoInterface from "./cognito/CognitoClient.interface";
 import LambdaFacadeInterface from "./lambda/LambdaFacadeInterface";
 

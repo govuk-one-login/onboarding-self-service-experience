@@ -6,7 +6,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Request, Response} from "express";
 import "express-async-errors";
-import {SelfServiceError} from "../lib/SelfServiceError";
+import SelfServiceError from "../lib/self-service-error";
 import CognitoInterface from "../services/cognito/CognitoClient.interface";
 import SelfServiceServicesService from "../services/self-service-services-service";
 

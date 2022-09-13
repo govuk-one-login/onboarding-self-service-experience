@@ -1,8 +1,8 @@
 import {CodeMismatchException} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
-import {SelfServiceError} from "../lib/SelfServiceError";
+import SelfServiceErrors from "../lib/errors";
+import SelfServiceError from "../lib/self-service-error";
 import SelfServiceServicesService from "../services/self-service-services-service";
-import {SelfServiceErrors} from "../lib/errors";
 
 export async function processLoginOtpMobile(req: Request, res: Response, next: NextFunction) {
     console.log("checking mobile");
