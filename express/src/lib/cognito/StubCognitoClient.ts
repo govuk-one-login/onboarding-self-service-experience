@@ -12,7 +12,6 @@ import {
     UsernameExistsException,
     VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
-import {ServiceException} from "@aws-sdk/smithy-client/dist-types/exceptions";
 import {promises as fs} from "fs";
 import CognitoInterface from "./CognitoInterface";
 
@@ -106,13 +105,14 @@ export class CognitoClient implements CognitoInterface {
         return methodOverrides.filter(override => override.parameter === parameter).filter(override => override.value === value)[0];
     }
 
-    private getException(exception: string): ServiceException {
+    private getException(exception: string) {
         switch (exception) {
             case "UsernameExistsException":
                 return new UsernameExistsException({$metadata: {}});
             case "CodeMismatchException":
                 return new CodeMismatchException({$metadata: {}});
         }
+
         throw new Error("Unknown exception");
     }
 
