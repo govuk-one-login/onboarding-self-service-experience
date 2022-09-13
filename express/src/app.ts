@@ -1,10 +1,9 @@
 import {AdminGetUserCommandOutput, AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import User from "@self-service/client/user";
 import bodyParser from "body-parser";
 import express, {NextFunction, Request, Response} from "express";
 import "express-async-errors";
 import sessions from "express-session";
-import path from "path";
-import {User} from "../@types/user";
 import configureViews from "./config/configure-views";
 import {RedirectError, RenderError} from "./lib/errors";
 import setSignedInStatus from "./middleware/setSignedInStatus";
@@ -63,7 +62,7 @@ declare module "express-session" {
     }
 }
 
-configureViews(app, path.join(__dirname, "../src/views"));
+configureViews(app);
 
 app.use(setSignedInStatus);
 
@@ -74,6 +73,10 @@ app.use("/", testingRoutes);
 
 app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {active: "get-started"});
+});
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+    res.status(404).render("404.njk");
 });
 
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
@@ -90,10 +93,6 @@ app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
     } else {
         next(err);
     }
-});
-
-app.use((req: Request, res: Response, next: NextFunction) => {
-    res.status(404).render("404.njk");
 });
 
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {

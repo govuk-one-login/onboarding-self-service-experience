@@ -11,7 +11,11 @@
     "moduleResolution": "node",
     "removeComments": true,
     "noUnusedLocals": true,
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "paths": {
+      "@self-service/common/*": ["common/models/*"],
+      "@self-service/client/*": ["express/src/models/*"]
+    }
   },
   "files": [],
   "exclude": ["node_modules"],

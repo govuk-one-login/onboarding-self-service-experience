@@ -1,4 +1,4 @@
-export interface User {
+export default interface User {
     pk: {S: string};
     sk: {S: string};
     data: {S: string};

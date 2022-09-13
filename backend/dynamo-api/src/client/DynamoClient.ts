@@ -9,7 +9,7 @@ import {
     UpdateItemCommandOutput
 } from "@aws-sdk/client-dynamodb";
 import {marshall} from "@aws-sdk/util-dynamodb";
-import {OnboardingTableItem} from "../@Types/OnboardingTableItem";
+import OnboardingTableItem from "@self-service/common/onboarding-table-item";
 import * as process from "process";
 
 type Updates = {[attribute: string]: number | boolean | string | string[]};

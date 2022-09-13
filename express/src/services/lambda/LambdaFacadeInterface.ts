@@ -1,7 +1,7 @@
+import Service from "@self-service/client/service";
+import User from "@self-service/client/user";
+import OnboardingTableItem from "@self-service/common/onboarding-table-item";
 import {AxiosResponse} from "axios";
-import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
-import {Service} from "../../../@types/Service";
-import {User} from "../../../@types/user";
 
 export type Updates = {[attribute: string]: Date | string | string[]};
 
