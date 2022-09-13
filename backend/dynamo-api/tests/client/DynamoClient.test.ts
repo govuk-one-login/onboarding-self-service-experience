@@ -1,21 +1,21 @@
 import DynamoClient from "../../src/client/DynamoClient";
 
-describe('DynamoDB client', () => {
-    describe('table name not set', () => {
-        it('should throw if table name not provided', () => {
-            expect(() => new DynamoClient()).toThrow('Table name');
+describe("DynamoDB client", () => {
+    describe("table name not set", () => {
+        it("should throw if table name not provided", () => {
+            expect(() => new DynamoClient()).toThrow("Table name");
         });
     });
 
-    describe('table name is set', () => {
+    describe("table name is set", () => {
         let client: DynamoClient;
 
         const updates = {
-            services: ['Juggling license', 'Unicorn registration'],
-            email: 'name@gov.uk',
+            services: ["Juggling license", "Unicorn registration"],
+            email: "name@gov.uk",
             attempts: 10,
             verified: true,
-            data: 'Tessa Ting'
+            data: "Tessa Ting"
         };
 
         beforeAll(() => {
@@ -23,22 +23,23 @@ describe('DynamoDB client', () => {
             client = new DynamoClient();
         });
 
-        it('should generate correct expression attribute names', () => {
+        it("should generate correct expression attribute names", () => {
             const generatedExpressionAttributeNames = client.generateExpressionAttributeNames(Object.keys(updates));
             const expectedExpressionAttributeNames = {
-                '#services': 'services',
-                '#email': 'email',
-                '#attempts': 'attempts',
-                '#verified': 'verified',
-                '#D': 'data'
+                "#services": "services",
+                "#email": "email",
+                "#attempts": "attempts",
+                "#verified": "verified",
+                "#D": "data"
             };
 
             expect(generatedExpressionAttributeNames).toStrictEqual(expectedExpressionAttributeNames);
         });
 
-        it('should generate correct update expression', () => {
+        it("should generate correct update expression", () => {
             const updateExpression = client.generateUpdateExpression(Object.keys(updates));
-            const expectedUpdateExpression = 'set #services = :services, set #email = :email, set #attempts = :attempts, set #verified = :verified, set #D = :data';
+            const expectedUpdateExpression =
+                "set #services = :services, set #email = :email, set #attempts = :attempts, set #verified = :verified, set #D = :data";
 
             expect(updateExpression).toEqual(expectedUpdateExpression);
         });
@@ -46,12 +47,12 @@ describe('DynamoDB client', () => {
         it("should correctly generate attribute values for an update expression", () => {
             const attributeValues = client.generateExpressionAttributeValues(updates);
             const expectedAttributeValues = {
-                ':services': {L: [{S: 'Juggling license'}, {S: 'Unicorn registration'}]},
-                ':email': {S: 'name@gov.uk'},
-                ':attempts': {N: '10'},
-                ':verified': {BOOL: true},
-                ':data': {S: 'Tessa Ting'},
-            }
+                ":services": {L: [{S: "Juggling license"}, {S: "Unicorn registration"}]},
+                ":email": {S: "name@gov.uk"},
+                ":attempts": {N: "10"},
+                ":verified": {BOOL: true},
+                ":data": {S: "Tessa Ting"}
+            };
 
             expect(attributeValues).toStrictEqual(expectedAttributeValues);
         });

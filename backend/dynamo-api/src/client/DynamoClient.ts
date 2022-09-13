@@ -7,24 +7,24 @@ import {
     QueryCommandOutput,
     UpdateItemCommand,
     UpdateItemCommandOutput
-} from '@aws-sdk/client-dynamodb';
-import { marshall } from '@aws-sdk/util-dynamodb';
-import * as process from 'process';
-import { OnboardingTableItem } from '../@Types/OnboardingTableItem';
+} from "@aws-sdk/client-dynamodb";
+import {marshall} from "@aws-sdk/util-dynamodb";
+import {OnboardingTableItem} from "../@Types/OnboardingTableItem";
+import * as process from "process";
 
 type Updates = {[attribute: string]: number | boolean | string | string[]};
 
 export default class DynamoClient {
     private static readonly KEYWORD_SUBSTITUTES: {[name: string]: string} = {
-        data: '#D'
-    }
+        data: "#D"
+    };
 
     private readonly tableName: string;
     private readonly dynamodb: DynamoDBClient;
 
     constructor() {
         if (process.env.TABLE == undefined) {
-            throw new Error('Table name is not provided in the environment');
+            throw new Error("Table name is not provided in the environment");
         }
 
         this.tableName = process.env.TABLE;
@@ -44,10 +44,10 @@ export default class DynamoClient {
     async queryBySortKey(sortKey: string): Promise<QueryCommandOutput> {
         const params = {
             TableName: this.tableName,
-            IndexName: 'gsi1',
-            ExpressionAttributeValues: {':sortKey': {S: sortKey}},
-            KeyConditionExpression: 'sk = :sortKey'
-        }
+            IndexName: "gsi1",
+            ExpressionAttributeValues: {":sortKey": {S: sortKey}},
+            KeyConditionExpression: "sk = :sortKey"
+        };
 
         const command = new QueryCommand(params);
         return this.dynamodb.send(command);
@@ -56,11 +56,11 @@ export default class DynamoClient {
     async getServices(userId: string): Promise<QueryCommandOutput> {
         const params = {
             TableName: this.tableName,
-            IndexName: 'gsi1',
-            ExpressionAttributeNames: {'#userId': 'sk', '#serviceId': 'pk'},
-            ExpressionAttributeValues: {':userId': {S: `user#${userId}`}, ':serviceIdPrefix': {S: 'service#'}},
-            KeyConditionExpression: '#userId = :userId AND begins_with ( #serviceId, :serviceIdPrefix )'
-        }
+            IndexName: "gsi1",
+            ExpressionAttributeNames: {"#userId": "sk", "#serviceId": "pk"},
+            ExpressionAttributeValues: {":userId": {S: `user#${userId}`}, ":serviceIdPrefix": {S: "service#"}},
+            KeyConditionExpression: "#userId = :userId AND begins_with ( #serviceId, :serviceIdPrefix )"
+        };
 
         const command = new QueryCommand(params);
         return this.dynamodb.send(command);
@@ -69,10 +69,10 @@ export default class DynamoClient {
     async getClients(serviceId: string): Promise<QueryCommandOutput> {
         const params = {
             TableName: this.tableName,
-            ExpressionAttributeNames: {'#serviceId': 'pk', '#clientId': 'sk'},
-            ExpressionAttributeValues: {':serviceId': {S: `service#${serviceId}`}, ':clientIdPrefix': {S: 'client#'}},
-            KeyConditionExpression: '#serviceId = :serviceId AND begins_with ( #clientId, :clientIdPrefix )'
-        }
+            ExpressionAttributeNames: {"#serviceId": "pk", "#clientId": "sk"},
+            ExpressionAttributeValues: {":serviceId": {S: `service#${serviceId}`}, ":clientIdPrefix": {S: "client#"}},
+            KeyConditionExpression: "#serviceId = :serviceId AND begins_with ( #clientId, :clientIdPrefix )"
+        };
 
         const command = new QueryCommand(params);
         return this.dynamodb.send(command);
@@ -107,9 +107,9 @@ export default class DynamoClient {
 
     // TODO: Make methods below private whilst making testing work
     generateUpdateExpression(attributes: string[]): string {
-        return attributes.map(attribute =>
-            `set ${this.getAttributeNameAlias(attribute)} = ${this.getAttributeValueLabel(attribute)}`
-        ).join(', ');
+        return attributes
+            .map(attribute => `set ${this.getAttributeNameAlias(attribute)} = ${this.getAttributeValueLabel(attribute)}`)
+            .join(", ");
     }
 
     generateExpressionAttributeNames(attributes: string[]): {[nameAlias: string]: string} {
