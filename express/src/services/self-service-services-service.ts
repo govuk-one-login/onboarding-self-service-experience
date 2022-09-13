@@ -1,8 +1,8 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {User} from "../../@types/user";
-import CognitoInterface from "../lib/cognito/CognitoInterface";
-import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {SelfServiceError} from "../lib/SelfServiceError";
+import CognitoInterface from "./cognito/CognitoClient.interface";
+import LambdaFacadeInterface from "./lambda/LambdaFacadeInterface";
 
 // https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html
 // const HEADER_INDEX = 0;

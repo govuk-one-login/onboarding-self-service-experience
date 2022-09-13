@@ -6,10 +6,10 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
 import {NextFunction, Request, Response} from "express";
-import CognitoInterface from "../lib/cognito/CognitoInterface";
 import {RedirectError, SelfServiceErrors} from "../lib/errors";
-import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
 import {SelfServiceError} from "../lib/SelfServiceError";
+import CognitoInterface from "../services/cognito/CognitoClient.interface";
+import LambdaFacadeInterface from "../services/lambda/LambdaFacadeInterface";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     res.render("create-account/get-email.njk");
@@ -137,7 +137,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     }
 
     const mobileNumber: string | undefined = req.session.mobileNumber;
-    const cognitoClient = await req.app.get("cognitoClient");
+    const cognitoClient = req.app.get("cognitoClient");
     if (mobileNumber === undefined) {
         res.render("create-account/enter-mobile.njk");
         return;
@@ -171,7 +171,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         return;
     }
 
-    const cognitoClient = await req.app.get("cognitoClient");
+    const cognitoClient = req.app.get("cognitoClient");
     const otp = req.body["sms-otp"];
     if (otp === undefined) {
         res.render("check-mobile.njk", {
@@ -202,7 +202,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
             password_last_updated: new Date()
         };
 
-        const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
+        const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
         await lambdaFacade.putUser(user, req.session.authenticationResult?.AccessToken);
 
         req.session.selfServiceUser = (
@@ -248,7 +248,7 @@ export const showResendEmailCodeForm = async function (req: Request, res: Respon
 export const resendEmailVerificationCode = async function (req: Request, res: Response) {
     req.body.emailAddress = req.session.emailAddress;
     const emailAddress: string = req.body.emailAddress;
-    const cognitoClient: CognitoInterface = await req.app.get("cognitoClient");
+    const cognitoClient: CognitoInterface = req.app.get("cognitoClient");
 
     let result: any;
     try {

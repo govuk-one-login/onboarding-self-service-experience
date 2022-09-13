@@ -6,8 +6,8 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Request, Response} from "express";
 import "express-async-errors";
-import CognitoInterface from "../lib/cognito/CognitoInterface";
 import {SelfServiceError} from "../lib/SelfServiceError";
+import CognitoInterface from "../services/cognito/CognitoClient.interface";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
@@ -120,7 +120,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     }
 
     const mobileNumber: string | undefined = req.session.mobileNumber;
-    const cognitoClient = await req.app.get("cognitoClient");
+    const cognitoClient = req.app.get("cognitoClient");
     // Not sure that we need this here ....
     if (mobileNumber === undefined) {
         res.render("there-is-a-problem.njk");

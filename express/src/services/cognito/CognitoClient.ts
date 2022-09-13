@@ -21,7 +21,7 @@ import {
     VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
 import {AdminCreateUserCommandOutput} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/AdminCreateUserCommand";
-import CognitoInterface from "./CognitoInterface";
+import CognitoInterface from "./CognitoClient.interface";
 
 export class CognitoClient implements CognitoInterface {
     cognitoClient;
@@ -34,6 +34,7 @@ export class CognitoClient implements CognitoInterface {
             region: "eu-west-2",
             endpoint: "https://cognito-idp.eu-west-2.amazonaws.com"
         });
+
         this.userPoolId = process.env.USERPOOL_ID;
         this.clientId = process.env.CLIENT_ID;
 

@@ -1,10 +1,10 @@
 import {Request, Response} from "express";
-import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
+import {CodeMismatchException, LimitExceededException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
 import {User} from "../../@types/user";
 import {Service} from "../../@types/Service";
-import CognitoInterface from "../lib/cognito/CognitoInterface";
-import {CodeMismatchException, LimitExceededException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
+import CognitoInterface from "../services/cognito/CognitoClient.interface";
+import LambdaFacadeInterface from "../services/lambda/LambdaFacadeInterface";
 
 export const listServices = async function (req: Request, res: Response) {
     const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
@@ -70,7 +70,7 @@ export const showChangePasswordForm = async function (req: Request, res: Respons
 };
 
 export const showAccount = async function (req: Request, res: Response) {
-    const payload = (req.session.authenticationResult?.IdToken as string).split("."); //duplcated code
+    const payload = (req.session.authenticationResult?.IdToken as string).split("."); // TODO: duplicated code
     const claims = Buffer.from(payload[1], "base64").toString("utf-8");
     const cognitoId = JSON.parse(claims)["cognito:username"];
     req.session.mobileNumber = JSON.parse(claims)["phone_number"];
@@ -107,7 +107,6 @@ function lastUpdated(lastUpdated: string): string {
             month: "long"
         })}`;
     }
-    return lastUpdated ? lastUpdated : "Never changed";
 }
 
 function fiveMinutesBefore(someTime: number): number {
@@ -157,8 +156,9 @@ export const changePassword = async function (req: Request, res: Response) {
         return;
     }
 
+    const cognitoClient: CognitoInterface = req.app.get("cognitoClient");
+
     try {
-        const cognitoClient: CognitoInterface = await req.app.get("cognitoClient");
         await cognitoClient.changePassword(req.session?.authenticationResult?.AccessToken as string, currentPassword, newPassword);
     } catch (error) {
         console.error("ERROR CALLING COGNITO WITH NEW PASSWORD");
@@ -197,7 +197,7 @@ export const changePassword = async function (req: Request, res: Response) {
     }
 
     try {
-        const lambdaFacade: LambdaFacadeInterface = await req.app.get("lambdaFacade");
+        const lambdaFacade: LambdaFacadeInterface = req.app.get("lambdaFacade");
         await lambdaFacade.updateUser(
             req.session?.selfServiceUser?.pk.S.substring("user#".length) as string,
             req.session?.selfServiceUser?.sk.S.substring("cognito_username#".length) as string,

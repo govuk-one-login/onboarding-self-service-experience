@@ -16,13 +16,13 @@ import SelfServiceServicesService from "./services/self-service-services-service
 
 const app = express();
 
-const cognitoPromise = import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(client => {
+const cognitoPromise = import(`./services/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(client => {
     const cognito = new client.default.CognitoClient();
     app.set("cognitoClient", cognito);
     return cognito;
 });
 
-const lambdaPromise = import(`./lib/lambda-facade/${process.env.LAMBDA_FACADE || "LambdaFacade"}`).then(facade => {
+const lambdaPromise = import(`./services/lambda/${process.env.LAMBDA_FACADE || "LambdaFacade"}`).then(facade => {
     const lambda = facade.lambdaFacadeInstance;
     app.set("lambdaFacade", facade.lambdaFacadeInstance);
     return lambda;

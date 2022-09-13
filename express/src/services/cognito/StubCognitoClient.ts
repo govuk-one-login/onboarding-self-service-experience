@@ -13,7 +13,7 @@ import {
     VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
 import {promises as fs} from "fs";
-import CognitoInterface from "./CognitoInterface";
+import CognitoInterface from "./CognitoClient.interface";
 
 type Override = {
     parameter: string;
