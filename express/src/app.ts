@@ -76,29 +76,19 @@ app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {active: "get-started"});
 });
 
-app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
-    if (err instanceof RenderError) {
-        res.render(err.template, err.options);
-    } else {
-        next(err);
-    }
-});
-
-app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
-    if (err instanceof RedirectError) {
-        res.redirect(err.route);
-    } else {
-        next(err);
-    }
-});
-
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.status(404).render("404.njk");
 });
 
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
-    console.error(err);
-    res.render("there-is-a-problem.njk");
+    if (err instanceof RenderError) {
+        res.render(err.template, err.options);
+    } else if (err instanceof RedirectError) {
+        res.redirect(err.route);
+    } else {
+        console.error(err);
+        res.render("there-is-a-problem.njk");
+    }
 });
 
 const port = process.env.PORT || 3000;
