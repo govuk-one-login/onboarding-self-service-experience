@@ -1,4 +1,4 @@
-import {SelfServiceError} from "../../lib/SelfServiceError";
+import {RenderError} from "../../lib/errors";
 
 export function isValidOrThrow(number: string, template: string): void {
     let processing: string;
@@ -6,10 +6,14 @@ export function isValidOrThrow(number: string, template: string): void {
     try {
         notBlank(number);
     } catch (error) {
-        if (error instanceof SelfServiceError) {
-            throw new SelfServiceError("No mobile number provided", {
-                template: template,
-                errorMessages: {mobileNumber: "Enter a mobile phone number"}
+        if (error instanceof RenderError) {
+            throw new RenderError(template, "", {
+                values: {
+                    mobileNumber: number
+                },
+                errorMessages: {
+                    mobileNumber: "Enter a mobile phone number"
+                }
             });
         } else {
             throw error;
@@ -21,11 +25,14 @@ export function isValidOrThrow(number: string, template: string): void {
     try {
         processing = getUniquePart(processing);
     } catch (error) {
-        if (error instanceof SelfServiceError) {
-            throw new SelfServiceError(`Not a UK mobile number ${number} | ${processing}`, {
-                template: template,
-                errorMessages: {mobileNumber: "Enter a UK mobile phone number, like 07700 900000"},
-                values: {mobileNumber: number}
+        if (error instanceof RenderError) {
+            throw new RenderError(template, "", {
+                values: {
+                    mobileNumber: number
+                },
+                errorMessages: {
+                    mobileNumber: "Enter a UK mobile phone number, like 07700 900000"
+                }
             });
         } else {
             throw error;
@@ -39,11 +46,14 @@ export function isValidOrThrow(number: string, template: string): void {
     } catch (error) {
         console.log(processing);
         console.log(number);
-        if (error instanceof SelfServiceError) {
-            throw new SelfServiceError(`Not a valid number ${number} | ${processing}`, {
-                template: template,
-                errorMessages: {mobileNumber: "Enter a UK mobile phone number using numbers only"},
-                values: {mobileNumber: number}
+        if (error instanceof RenderError) {
+            throw new RenderError(template, "", {
+                values: {
+                    mobileNumber: number
+                },
+                errorMessages: {
+                    mobileNumber: "Enter a UK mobile phone number using numbers only"
+                }
             });
         } else {
             throw error;
@@ -53,7 +63,7 @@ export function isValidOrThrow(number: string, template: string): void {
 
 export function notBlank(number: string) {
     if (!number) {
-        throw new SelfServiceError("No mobile number provided");
+        throw new RenderError("");
     }
 }
 
@@ -66,7 +76,7 @@ export function getUniquePart(mobileNumber: string): string {
         return mobileNumber.trim().substring("0".length);
     }
 
-    throw new SelfServiceError(`Not a UK mobile number ${mobileNumber}`);
+    throw new RenderError("");
 }
 
 export function removeParentheses(number: string) {
@@ -79,7 +89,7 @@ export function removeSpacingCharacters(number: string) {
 
 export function ensureExactlyTenNumbersRemain(number: string): void {
     if (!/^[0-9]{10}$/.test(number.trim())) {
-        throw new SelfServiceError("We weren't left with exactly nine digits");
+        throw new RenderError("");
     }
 }
 

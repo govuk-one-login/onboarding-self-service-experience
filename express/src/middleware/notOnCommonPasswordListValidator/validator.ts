@@ -14,17 +14,16 @@ export default function notOnCommonPasswordListValidator(
         if ((await CommonPasswords).notOnList(req.body[passwordField])) {
             next();
         } else {
-            const errors = new Map<string, string>();
-            errors.set(passwordField, ERROR_MESSAGE);
-
             const values: {[fieldName: string]: string} = {};
             if (valuesToRender) {
                 valuesToRender.forEach(v => {
                     values[v] = req.body[v];
                 });
             }
-
-            res.render(template, {errorMessages: errors, value: values});
+            res.render(template, {
+                errorMessages: {password: ERROR_MESSAGE},
+                values: values
+            });
             return;
         }
     };

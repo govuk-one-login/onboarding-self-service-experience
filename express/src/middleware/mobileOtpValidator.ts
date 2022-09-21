@@ -69,13 +69,13 @@ export function errorResponse(
     formActionUrl: string,
     textMessageNotReceivedUrl: string
 ) {
-    const errorMessages = new Map<string, string>();
     const value: object = {otp: otp};
-    errorMessages.set(key, message);
     res.render("check-mobile.njk", {
-        errorMessages: errorMessages,
+        errorMessages: {smsOtp: message},
         value: value,
-        mobileNumber: mobileNumber,
+        values: {
+            mobileNumber: mobileNumber
+        },
         formActionUrl: formActionUrl,
         textMessageNotReceivedUrl: textMessageNotReceivedUrl
     });

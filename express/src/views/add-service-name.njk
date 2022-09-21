@@ -8,7 +8,7 @@
   {{ errorSummary ({
     errors:  errorMessages,
     hrefs: {
-      serviceName: "#create-service-name"
+      serviceName: "#serviceName"
     }
   }) }}
 
@@ -22,13 +22,13 @@
         text: "Service name"
       },
       name: "serviceName",
-      id: "create-service-name",
+      id: "serviceName",
       classes: "govuk-!-width-full",
       errorMessage: {
         text:  errorMessages.get('serviceName')
       } if  errorMessages else false
     }) }}
 
-    {{ govukButton({ text: "Continue" }) }}
+    {{ govukButton({ text: "Continue", attributes: {id: "submit", formnovalidate: ""} }) }}
   </form>
 {% endblock %}

@@ -34,7 +34,7 @@ router.get("/create/update-password", showNewPasswordForm);
 router.post(
     "/create/update-password",
     passwordValidator("create-account/new-password.njk", false),
-    notOnCommonPasswordListValidator("create-account/new-password.njk", "password"),
+    notOnCommonPasswordListValidator("create-account/new-password.njk", "password", ["password"]),
     updatePassword
 );
 

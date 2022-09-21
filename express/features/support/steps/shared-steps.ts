@@ -1,16 +1,7 @@
 import {Given, Then, When} from "@cucumber/cucumber";
 import {strict as assert} from "assert";
 import {Page} from "puppeteer";
-import {
-    checkUrl,
-    clickButtonWithId,
-    clickLink,
-    clickSubmitButton,
-    enterTextIntoTextInput,
-    getButtonLink,
-    getLink,
-    getLinkWithHref
-} from "./shared-functions";
+import {checkUrl, clickLink, clickSubmitButton, enterTextIntoTextInput, getButtonLink, getLink, getLinkWithHref} from "./shared-functions";
 
 Given("that the user is on the {string} page", async function (route: string) {
     await this.goToPath(route);
@@ -36,7 +27,7 @@ When("they click the Submit button", async function () {
 });
 
 When("they click the Continue button", async function () {
-    await clickButtonWithId(this.page, "continue");
+    await clickSubmitButton(this.page);
 });
 
 Then("they should be directed to the following page: {string}", async function (path) {
