@@ -36,6 +36,10 @@ cd ../dynamo-api
 sam build
 gds aws <your-aws-account> -- sam deploy --parameter-overrides "AuthRegistrationBaseUrl=https://oidc.integration.account.gov.uk DynamoDbTableStackName=<the-name-you-chose>" --guided
 # Choose a decent stack name (name it after yourself for example) and accept the other defaults but tell it yes about lambdas that don't have authorisation
+
+To install and run DynamoDB local for session storage.
+Download and install Docker desktop - https://www.docker.com/products/docker-desktop/.
+cd ./backend/dynamo-db/ docker-compose up - This will spin up the local dynamoDB.
 ```
 
 ## Configure and run the application

@@ -19,6 +19,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.80.0",
     "@aws-sdk/util-dynamodb": "^3.154.0",
+    "connect-dynamodb": "^2.0.5",
     "@aws-sdk/client-sns": "^3.162.0",
     "aws-jwt-verify": "^3.1.0",
     "express": "^4.17.1",
