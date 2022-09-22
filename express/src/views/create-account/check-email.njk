@@ -17,7 +17,7 @@
   <h1 class="govuk-heading-l">Check your email</h1>
 
   <div class="govuk-inset-text">
-    We have sent an email to: <span class="govuk-!-font-weight-bold">{{ emailAddress }}</span>
+    We have sent an email to: <span class="govuk-!-font-weight-bold">{{ values.emailAddress }}</span>
   </div>
 
   <p class="govuk-body">The email contains a 6 digit security code.</p>
@@ -36,13 +36,13 @@
       inputmode: "numeric",
       pattern: "[0-9]*",
       spellcheck: false,
-      value: value.otp,
+      value: values.otp,
       errorMessage: {
-        text: errorMessages.get('create-email-otp')
+        text: errorMessages['create-email-otp']
       } if errorMessages else false
     }) }}
 
-    {{ govukButton({ text: "Resend security code", attributes: {id: "submit"} }) }}
+    {{ govukButton({ text: "Continue", attributes: {id: "submit", formnovalidate: ""} }) }}
 
     <p class="govuk-body">
       <a id="resend-code-page" class="govuk-link" href="/create/resend-email-code">Not received an email?</a>

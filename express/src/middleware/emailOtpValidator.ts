@@ -9,7 +9,8 @@ export async function emailOtpValidator(req: Request, res: Response, next: NextF
         next(
             SelfServiceErrors.Render("create-account/check-email.njk", "", {
                 values: {
-                    emailAddress: req.session.emailAddress as string
+                    emailAddress: req.session.emailAddress as string,
+                    otp: otpToTest
                 },
                 errorMessages: {
                     "create-email-otp": "Enter the security code"
@@ -22,7 +23,8 @@ export async function emailOtpValidator(req: Request, res: Response, next: NextF
         next(
             SelfServiceErrors.Render("create-account/check-email.njk", "", {
                 values: {
-                    emailAddress: req.session.emailAddress as string
+                    emailAddress: req.session.emailAddress as string,
+                    otp: otpToTest
                 },
                 errorMessages: {
                     "create-email-otp": "Enter the security code using only 6 digits"
