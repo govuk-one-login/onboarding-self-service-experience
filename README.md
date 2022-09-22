@@ -39,7 +39,7 @@ gds aws <your-aws-account> -- sam deploy --parameter-overrides "AuthRegistration
 
 To install and run DynamoDB local for session storage.
 Download and install Docker desktop - https://www.docker.com/products/docker-desktop/.
-cd ./backend/dynamo-db/ docker-compose up - This will spin up the local dynamoDB and switch SESSION_LOCAL flag true in .env file to use local DDB storage
+cd ./backend/dynamo-db/ docker-compose up - This will spin up the local dynamoDB.
 ```
 
 ## Configure and run the application

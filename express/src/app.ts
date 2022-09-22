@@ -2,7 +2,6 @@ import {AdminGetUserCommandOutput, AuthenticationResultType} from "@aws-sdk/clie
 import bodyParser from "body-parser";
 import express, {NextFunction, Request, Response} from "express";
 import "express-async-errors";
-import sessions from "express-session";
 import path from "path";
 import {User} from "../@types/user";
 import configureViews from "./config/configure-views";
@@ -13,22 +12,11 @@ import manageAccount from "./routes/manage-account";
 import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing-routes";
 import SelfServiceServicesService from "./services/self-service-services-service";
-import session from "express-session";
-import connect_dynamodb from "connect-dynamodb";
-import AWS from "aws-sdk";
+import {sessionStorage} from "./lib/dynamodb/sessionStorage";
 
 const app = express();
 
-const dynamoDBSessionOptions = {
-    table: process.env.SESSIONS_TABLE,
-    AWSRegion: "eu-west-2",
-    client: process.env.SESSION_LOCAL === "true" ? new AWS.DynamoDB({endpoint: new AWS.Endpoint("http://localhost:8000")}) : ""
-};
-
-const DynamoDBStore = connect_dynamodb({session: session});
-if ("true" === process.env.SESSION_STORAGE_ENABLED) {
-    app.use(session({store: new DynamoDBStore(dynamoDBSessionOptions), secret: "keyboard cat"}));
-}
+app.use(sessionStorage());
 
 const cognitoPromise = import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(client => {
     const cognito = new client.default.CognitoClient();
@@ -51,15 +39,6 @@ app.use(express.static("./dist"));
 app.use(
     bodyParser.urlencoded({
         extended: true
-    })
-);
-
-app.use(
-    sessions({
-        secret: "setting_this_will_never_cause_problems_in_future",
-        saveUninitialized: true,
-        cookie: {maxAge: 1_000 * 60 * 60 * 24},
-        resave: false
     })
 );
 
