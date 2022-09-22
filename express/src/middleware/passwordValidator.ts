@@ -10,7 +10,7 @@ export function passwordValidator(render: string, isLogIn: boolean): MiddlewareF
 
         if (password === "") {
             next(
-                SelfServiceErrors.Render(render, "", {
+                SelfServiceErrors.Render(render, "No password entered", {
                     values: {
                         password: password
                     },
@@ -23,7 +23,7 @@ export function passwordValidator(render: string, isLogIn: boolean): MiddlewareF
 
         if (password.length < 8) {
             next(
-                SelfServiceErrors.Render(render, "", {
+                SelfServiceErrors.Render(render, "Password was too short", {
                     values: {
                         password: password
                     },
