@@ -10,7 +10,7 @@ Given('that the user has arrived on the "Check your phone" page', async function
     await enterTextIntoTextInput(this.page, "435553", "create-email-otp");
     await clickSubmitButton(this.page);
 
-    await enterTextIntoTextInput(this.page, "strongPassword", "password");
+    await enterTextIntoTextInput(this.page, "this-is-not-a-common-password", "password");
     await clickSubmitButton(this.page);
 
     await enterTextIntoTextInput(this.page, "+447700900000", "mobileNumber");

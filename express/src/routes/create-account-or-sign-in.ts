@@ -17,10 +17,10 @@ import {
 } from "../controllers/create-account";
 import {emailValidator} from "../middleware/emailValidator";
 import {mobileOtpValidator} from "../middleware/mobileOtpValidator";
-import validateAndConvertForCognito from "../middleware/mobileValidator";
 import notOnCommonPasswordListValidator from "../middleware/notOnCommonPasswordListValidator";
 import {passwordValidator} from "../middleware/passwordValidator";
 import {emailOtpValidator} from "../middleware/emailOtpValidator";
+import validateMobileNumber from "../middleware/mobileValidator";
 
 const router = express.Router();
 
@@ -39,7 +39,7 @@ router.post(
 );
 
 router.get("/create/enter-mobile", showEnterMobileForm);
-router.post("/create/enter-mobile", validateAndConvertForCognito("create-account/enter-mobile.njk"), processEnterMobileForm);
+router.post("/create/enter-mobile", validateMobileNumber("create-account/enter-mobile.njk"), processEnterMobileForm);
 
 router.post(
     "/create/verify-phone-code",

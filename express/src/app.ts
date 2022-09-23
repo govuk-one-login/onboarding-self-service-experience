@@ -1,9 +1,9 @@
-import {AdminGetUserCommandOutput, AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import bodyParser from "body-parser";
 import express, {NextFunction, Request, Response} from "express";
 import "express-async-errors";
 import path from "path";
-import {User} from "../@types/user";
+import {User, User2} from "../@types/user";
 import configureViews from "./config/configure-views";
 import {RedirectError, RenderError} from "./lib/errors";
 import setSignedInStatus from "./middleware/setSignedInStatus";
@@ -11,8 +11,8 @@ import createAccount from "./routes/create-account-or-sign-in";
 import manageAccount from "./routes/manage-account";
 import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing-routes";
-import SelfServiceServicesService from "./services/self-service-services-service";
 import {sessionStorage} from "./lib/dynamodb/sessionStorage";
+import SelfServiceServicesService, {CognitoUser, MfaResponse} from "./services/self-service-services-service";
 
 const app = express();
 
@@ -49,8 +49,10 @@ declare module "express-session" {
         enteredMobileNumber: string;
         cognitoSession: string;
         authenticationResult: AuthenticationResultType;
-        cognitoUser: AdminGetUserCommandOutput;
+        cognitoUser: CognitoUser;
         selfServiceUser: User;
+        user: User2;
+        mfaResponse: MfaResponse;
         updatedField: string;
         isSignedIn: boolean;
     }
@@ -71,6 +73,7 @@ app.get("/", function (req: Request, res: Response) {
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.status(404).render("404.njk");
+    return;
 });
 
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {

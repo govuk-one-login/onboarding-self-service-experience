@@ -19,7 +19,7 @@ Feature:
 
     When the user submits a valid mobile telephone number
     Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
     When the user enters the correct sms-otp
     Then they should be directed to the following page: "/add-service-name"
@@ -214,11 +214,11 @@ Feature:
 
     When the user submits a valid mobile telephone number
     Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
     When they click the Submit button
     Then the error message "Enter the 6 digit security code" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
   Scenario: The user enters more than 6 characters in the security code field on Check your mobile phone page
     Given that the user is on the "/" page
@@ -236,11 +236,11 @@ Feature:
 
     When the user submits a valid mobile telephone number
     Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
     When the user submits the sms otp code "1234567"
     Then the error message "Enter the security code using only 6 digits" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
   Scenario: The user enters fewer than than 6 characters in the security code field on Check your mobile phone page
     Given that the user is on the "/" page
@@ -258,11 +258,11 @@ Feature:
 
     When the user submits a valid mobile telephone number
     Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
     When the user submits the sms otp code "12345"
     Then the error message "Enter the security code using only 6 digits" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
   Scenario: The user enters any letters in the security code field on Check your mobile phone page
     Given that the user is on the "/" page
@@ -280,11 +280,11 @@ Feature:
 
     When the user submits a valid mobile telephone number
     Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
     When the user submits the sms otp code "12345A"
     Then the error message "Your security code should only include numbers" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
   Scenario: The user enters any special characters in the security code field on Check your mobile phone page
     Given that the user is on the "/" page
@@ -302,11 +302,11 @@ Feature:
 
     When the user submits a valid mobile telephone number
     Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
     When the user submits the sms otp code "12345$"
     Then the error message "Your security code should only include numbers" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
   Scenario: The user enters User enters the wrong code in the security code field on Check your mobile phone page
     Given that the user is on the "/" page
@@ -324,11 +324,11 @@ Feature:
 
     When the user submits a valid mobile telephone number
     Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
     When the user submits the sms otp code "666666"
     Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: +447700900123"
+    And they should see the text "We sent a code to: 07700 900123"
 
   Scenario: A user types everything correctly, creates an account and adds service name
     Given that the user is on the "/" page

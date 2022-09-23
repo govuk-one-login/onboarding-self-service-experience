@@ -6,11 +6,10 @@ const client = new DynamoClient();
 
 export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const payload = JSON.parse(event.body as string);
-    const clientId = payload.selfServiceClientId ? payload.selfServiceClientId : `client#${randomUUID()}`;
 
     let record = {
         pk: payload.service.pk,
-        sk: clientId,
+        sk: `client#${randomUUID()}`,
         data: payload.service.service_name,
         clientId: payload.client_id,
         type: 'integration',

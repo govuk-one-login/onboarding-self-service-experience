@@ -1,37 +1,25 @@
-import {
-    AdminInitiateAuthCommandOutput,
-    AuthenticationResultType,
-    NotAuthorizedException,
-    UserNotFoundException
-} from "@aws-sdk/client-cognito-identity-provider";
+import {AuthenticationResultType, NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import {Request, Response} from "express";
 import "express-async-errors";
-import CognitoInterface from "../lib/cognito/CognitoInterface";
-import {SelfServiceError} from "../lib/SelfServiceError";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import {SelfServiceErrors} from "../lib/errors";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
-    if (req.session.emailAddress) {
-        res.render("sign-in.njk");
-    } else {
-        res.render("sign-in.njk");
-    }
+    res.render("sign-in.njk");
 };
 
 export const showLoginOtpMobile = async function (req: Request, res: Response) {
-    if (req.session.emailAddress) {
-        const mobileNumberRaw = String(req.session.mobileNumber);
-        const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
-        const mobileNumber = "*******" + mobileNumberLast4Digits;
-        res.render("check-mobile.njk", {
-            mobileNumber: mobileNumber,
-            formActionUrl: "/sign-in-otp-mobile",
-            active: "sign-in",
-            textMessageNotReceivedUrl: "/resend-text-code"
-        });
-    } else {
+    if (!req.session.emailAddress || !req.session.mfaResponse) {
         res.redirect("/sign-in");
+        return;
     }
+
+    res.render("check-mobile.njk", {
+        mobileNumber: req.session.mfaResponse.codeSentTo,
+        formActionUrl: "/sign-in-otp-mobile",
+        active: "sign-in",
+        textMessageNotReceivedUrl: "/resend-text-code"
+    });
 };
 
 export const finishSignIn = async function (req: Request, res: Response) {
@@ -58,15 +46,13 @@ export const showSignInFormPassword = async function (req: Request, res: Respons
 export const processSignInForm = async function (req: Request, res: Response) {
     const email = req.session.emailAddress as string;
     const password = req.body.password;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    const cognitoClient: CognitoInterface = req.app.get("cognitoClient");
-    let response: AdminInitiateAuthCommandOutput;
     try {
-        response = await cognitoClient.login(email, password);
+        req.session.mfaResponse = await s4.login(email, password);
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
-            throw new SelfServiceError("Not authorized exception caught.  Password is probably wrong", {
-                template: "sign-in-enter-password.njk",
+            throw SelfServiceErrors.Render("sign-in-enter-password.njk", "", {
                 values: {password: password},
                 errorMessages: {password: "Password is wrong"}
             });
@@ -82,10 +68,6 @@ export const processSignInForm = async function (req: Request, res: Response) {
         res.render("there-is-a-problem.njk");
         return;
     }
-
-    req.session.cognitoUser = {Username: response.ChallengeParameters?.USER_ID_FOR_SRP as string, $metadata: {}};
-    req.session.cognitoSession = response.Session;
-    req.session.mobileNumber = response.ChallengeParameters?.CODE_DELIVERY_DESTINATION;
 
     res.redirect("/sign-in-otp-mobile");
     return;
@@ -120,18 +102,18 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     }
 
     const mobileNumber: string | undefined = req.session.mobileNumber;
-    const cognitoClient = await req.app.get("cognitoClient");
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
     // Not sure that we need this here ....
     if (mobileNumber === undefined) {
         res.render("there-is-a-problem.njk");
     }
 
     // @ts-ignore
-    const response = await cognitoClient.setPhoneNumber(req.session.emailAddress, mobileNumber);
+    const response = await s4.setPhoneNumber(req.session.emailAddress, mobileNumber);
 
     // presumably that was fine so let's try to veerify the number
 
-    const codeSent = await cognitoClient.sendMobileNumberVerificationCode(accessToken);
+    const codeSent = await s4.sendMobileNumberVerificationCode(accessToken);
     console.debug("VERIFICATION CODE RESPONSE");
     console.debug(codeSent);
     req.session.mobileNumber = mobileNumber;

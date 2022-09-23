@@ -8,14 +8,14 @@ Feature:
 
     When they enter "0770 9000 124" into the text-field with the id "mobileNumber"
     And they click the Continue button
-    Then they should see the text "We sent a code to: +447709000124"
+    Then they should see the text "We sent a code to: 0770 9000 124"
 
   Scenario: The user successfully changes their phone number
 
     When they enter "123456" into the text-field with the id "sms-otp"
     And they click the Continue button
     Then they should see the text "You have changed your mobile phone number"
-    #And they should see the text "+447709000124"
+    And they should see the text "0770 9000 124"
 
   Scenario: The user tries to change their phone number but enters an incorrect SMS code
 

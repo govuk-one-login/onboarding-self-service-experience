@@ -32,9 +32,11 @@ export default interface CognitoInterface {
 
     sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput>;
 
-    verifySmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput>;
+    verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput>;
 
     setMfaPreference(cognitoUsername: string): Promise<AdminSetUserMFAPreferenceCommandOutput>;
 
     respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput>;
+
+    useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput>;
 }

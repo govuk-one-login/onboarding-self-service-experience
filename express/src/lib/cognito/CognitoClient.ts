@@ -188,7 +188,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
-    async verifySmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput> {
+    async verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput> {
         const params = {
             AccessToken: accessToken,
             AttributeName: "phone_number",
@@ -223,6 +223,19 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             Session: session
         };
         const command = new AdminRespondToAuthChallengeCommand(params);
+        return await this.cognitoClient.send(command);
+    }
+
+    async useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        const params = {
+            UserPoolId: this.userPoolId,
+            ClientId: this.clientId,
+            AuthFlow: "REFRESH_TOKEN_AUTH",
+            AuthParameters: {
+                REFRESH_TOKEN: refreshToken,
+            }
+        };
+        const command = new AdminInitiateAuthCommand(params);
         return await this.cognitoClient.send(command);
     }
 }

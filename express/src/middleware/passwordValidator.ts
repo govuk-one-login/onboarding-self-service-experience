@@ -9,29 +9,16 @@ export function passwordValidator(render: string, isLogIn: boolean): MiddlewareF
         password = password.trim();
 
         if (password === "") {
-            next(
-                SelfServiceErrors.Render(render, "No password entered", {
-                    values: {
-                        password: password
-                    },
-                    errorMessages: {
-                        password: "Enter a password"
-                    }
-                })
-            );
+            throw SelfServiceErrors.Render(render, "No password entered", {
+                errorMessages: {password: "Enter a password"}
+            });
         }
 
         if (password.length < 8) {
-            next(
-                SelfServiceErrors.Render(render, "Password was too short", {
-                    values: {
-                        password: password
-                    },
-                    errorMessages: {
-                        password: "Your password must be 8 characters or more"
-                    }
-                })
-            );
+            throw SelfServiceErrors.Render(render, "Password was too short", {
+                values: {password: password},
+                errorMessages: {password: "Your password must be 8 characters or more"}
+            });
         }
         next();
     };

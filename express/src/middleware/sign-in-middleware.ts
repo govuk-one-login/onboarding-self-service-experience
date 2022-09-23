@@ -1,6 +1,5 @@
 import {CodeMismatchException} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
-import {SelfServiceError} from "../lib/SelfServiceError";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import {SelfServiceErrors} from "../lib/errors";
 
@@ -11,21 +10,21 @@ export async function processLoginOtpMobile(req: Request, res: Response, next: N
     if (!req.body["sms-otp"]) {
         console.log("OTP not provided");
         next(SelfServiceErrors.Redirect("/sign-in-otp-mobile"));
+        return;
     }
-    if (!req.session.cognitoUser || !req.session.cognitoSession) {
+    if (!req.session.mfaResponse) {
         next(SelfServiceErrors.Redirect("/sign-in"));
+        return;
     }
 
     try {
         req.session.authenticationResult = await s4.respondToMfaChallenge(
-            req.session.cognitoUser?.Username as string,
-            req.body["sms-otp"],
-            req.session.cognitoSession as string
+            req.session.mfaResponse,
+            req.body["sms-otp"]
         );
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            throw new SelfServiceError("Wrong OTP entered for login", {
-                template: "common/check-mobile.njk",
+            throw SelfServiceErrors.Render("common/check-mobile.njk", "", {
                 errorMessages: {smsOtp: "The code you entered is not correct or has expired - enter it again or request a new code"},
                 values: {
                     mobileNumber: req.session.mobileNumber as string,
