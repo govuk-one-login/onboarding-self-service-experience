@@ -12,14 +12,12 @@
       serviceName: "#serviceName"
     }
   }) }}
+  <h1 class="govuk-heading-l">Change your mobile phone number</h1>
+  <p class="govuk-body">Your service name is shown to your users in the sign in journey. For example, “Now continue to use the [service name] service.”</p>
+  <p class="govuk-body">It should be your service name as used on your service start page. </p>
 
   <form class="form" action="/change-service-name" method="post">
     {{ govukInput({
-      label: {
-        text: "Change your service name",
-        classes: "govuk-label--l",
-        isPageHeading: true
-      },
       name: "serviceName",
       id: "serviceName",
       classes: "govuk-!-width-full",
