@@ -1,6 +1,6 @@
 export interface Service {
-    "pk": string,
-    "sk": string,
-    "data": string,
-    "service_name": string
+    pk: string;
+    sk: string;
+    data: string;
+    service_name: string;
 }
