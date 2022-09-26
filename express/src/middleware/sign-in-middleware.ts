@@ -18,19 +18,17 @@ export async function processLoginOtpMobile(req: Request, res: Response, next: N
     }
 
     try {
-        req.session.authenticationResult = await s4.respondToMfaChallenge(
-            req.session.mfaResponse,
-            req.body["sms-otp"]
-        );
+        req.session.authenticationResult = await s4.respondToMfaChallenge(req.session.mfaResponse, req.body["sms-otp"]);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            throw SelfServiceErrors.Render("common/check-mobile.njk", "", {
+            res.render("common/check-mobile.njk", {
                 errorMessages: {smsOtp: "The code you entered is not correct or has expired - enter it again or request a new code"},
                 values: {
                     mobileNumber: req.session.mobileNumber as string,
                     formActionUrl: "/sign-in-otp-mobile"
                 }
             });
+            return;
         } else {
             throw error;
         }

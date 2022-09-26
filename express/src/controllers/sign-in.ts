@@ -2,7 +2,6 @@ import {AuthenticationResultType, NotAuthorizedException, UserNotFoundException}
 import {Request, Response} from "express";
 import "express-async-errors";
 import SelfServiceServicesService from "../services/self-service-services-service";
-import {SelfServiceErrors} from "../lib/errors";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
     res.render("sign-in.njk");
@@ -52,10 +51,11 @@ export const processSignInForm = async function (req: Request, res: Response) {
         req.session.mfaResponse = await s4.login(email, password);
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
-            throw SelfServiceErrors.Render("sign-in-enter-password.njk", "", {
+            res.render("sign-in-enter-password.njk", {
                 values: {password: password},
                 errorMessages: {password: "Password is wrong"}
             });
+            return;
         }
 
         if (error instanceof UserNotFoundException) {
@@ -108,6 +108,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
         res.render("there-is-a-problem.njk");
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const response = await s4.setPhoneNumber(req.session.emailAddress, mobileNumber);
 

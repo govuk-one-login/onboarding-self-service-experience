@@ -49,18 +49,13 @@ export const submitEmailOtp = async function (req: Request, res: Response, next:
         return;
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
-            next(
-                SelfServiceErrors.Render(
-                    "create-account/check-email.njk",
-                    "The code you entered is not correct or has expired - enter it again or request a new code",
-                    {
-                        values: {emailAddress: req.session.emailAddress as string},
-                        errorMessages: {
-                            "create-email-otp": "The code you entered is not correct or has expired - enter it again or request a new code"
-                        }
-                    }
-                )
-            );
+            res.render("create-account/check-email.njk", {
+                values: {emailAddress: req.session.emailAddress as string},
+                errorMessages: {
+                    "create-email-otp": "The code you entered is not correct or has expired - enter it again or request a new code"
+                }
+            });
+            return;
         } else {
             next(error);
         }

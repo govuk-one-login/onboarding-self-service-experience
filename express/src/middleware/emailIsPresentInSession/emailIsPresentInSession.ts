@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {RenderOptions, SelfServiceErrors} from "../../lib/errors";
+import {RenderOptions} from "../../lib/errors";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 
@@ -11,7 +11,8 @@ export default function emailIsPresentInSession(
         if (req.session.emailAddress) {
             next();
         } else {
-            throw SelfServiceErrors.Render(template, "", renderOptions);
+            res.render(template, renderOptions);
+            return;
         }
     };
 }
