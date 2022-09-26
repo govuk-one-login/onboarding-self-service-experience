@@ -15,7 +15,7 @@ import {
 import {ServiceException} from "@aws-sdk/smithy-client/dist-types/exceptions";
 import {promises as fs} from "fs";
 import CognitoInterface from "./CognitoInterface";
-import {prepareForCognito} from "../mobileNumberUtils";
+import {prepareForCognito} from "../../lib/mobileNumberUtils";
 import * as crypto from "crypto";
 
 type Override = {

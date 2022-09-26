@@ -4,7 +4,7 @@ import {Service} from "../../../@types/Service";
 import {User} from "../../../@types/user";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
-import AuthenticationResultParser from "../AuthenticationResultParser";
+import AuthenticationResultParser from "../../lib/AuthenticationResultParser";
 
 class LambdaFacade implements LambdaFacadeInterface {
     private instance: Axios;

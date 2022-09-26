@@ -9,8 +9,8 @@ import {
     UserStatusType
 } from "@aws-sdk/client-cognito-identity-provider";
 import {User} from "../../@types/user";
-import CognitoInterface from "../lib/cognito/CognitoInterface";
-import LambdaFacadeInterface from "../lib/lambda-facade/LambdaFacadeInterface";
+import CognitoInterface from "./cognito/CognitoInterface";
+import LambdaFacadeInterface from "./lambda-facade/LambdaFacadeInterface";
 import {SelfServiceError} from "../lib/SelfServiceError";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
