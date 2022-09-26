@@ -14,6 +14,7 @@ import {OnboardingTableItem} from "../@Types/OnboardingTableItem";
 
 type AttributeNames = {[nameToken: string]: string};
 type AttributeValues = {[valueToken: string]: AttributeValue};
+type Updates = {[attribute: string]: number | boolean | string | string[]};
 
 class DynamoClient {
     private static readonly KEYWORD_SUBSTITUTES: {[name: string]: string} = {
@@ -79,15 +80,15 @@ class DynamoClient {
         return this.dynamodb.send(command);
     }
 
-    async updateClient(serviceId: string, clientId: string, updates: object): Promise<UpdateItemCommandOutput> {
+    async updateClient(serviceId: string, clientId: string, updates: Updates): Promise<UpdateItemCommandOutput> {
         return this.update("service", serviceId, "client", clientId, updates);
     }
 
-    async updateUser(userId: string, cognitoUserId: string, updates: object): Promise<UpdateItemCommandOutput> {
+    async updateUser(userId: string, cognitoUserId: string, updates: Updates): Promise<UpdateItemCommandOutput> {
         return this.update("user", userId, "cognito_username", cognitoUserId, updates);
     }
 
-    private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: object): Promise<UpdateItemCommandOutput> {
+    private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: Updates): Promise<UpdateItemCommandOutput> {
         const attributeNames = Object.keys(updates);
 
         const params = {
@@ -117,7 +118,7 @@ class DynamoClient {
         return Object.fromEntries(attributes.map(attribute => [this.getAttributeNameAlias(attribute), attribute]));
     }
 
-    generateExpressionAttributeValues(attributes: string[], updates: {[key: string]: any}): AttributeValues {
+    generateExpressionAttributeValues(attributes: string[], updates: Updates): AttributeValues {
         return Object.fromEntries(
             attributes.map(attribute => [this.getAttributeValueLabel(attribute), this.marshallAttribute(updates[attribute])])
         );
