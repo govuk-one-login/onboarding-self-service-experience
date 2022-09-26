@@ -23,12 +23,6 @@
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Integration client</h2>
 
-  {% if publicKeyAndUrlsNotUpdatedByUser %}
-    <div class="govuk-inset-text govuk-!-margin-top-3 govuk-!-margin-bottom-3">
-      We’ve generated these details based on the service name you gave us.
-    </div>
-  {% endif %}
-
   {{ govukSummaryList({
     rows: [
       {
@@ -69,7 +63,7 @@
         }
       },
       {
-        key: {text: "Post logout redirect URIs"},
+        key: {text: "Post logout redirect URIs (optional)"},
         value: {text: postLogoutRedirectUrls},
         actions: {
           items: [{
@@ -104,8 +98,8 @@
         and add the public key.
       </p>
 
-      <span class="govuk-body govuk-!-font-weight-bold">Post logout redirect URIs</span>
-      <p class="govuk-body">The page(s) you want your users to see after they sign out of your service. These are optional.</p>
+      <span class="govuk-body govuk-!-font-weight-bold">Post logout redirect URIs (optional)</span>
+      <p class="govuk-body">The page(s) you want your users to see after they sign out of your service.</p>
     </div>
   </details>
 
