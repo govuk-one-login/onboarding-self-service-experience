@@ -22,7 +22,7 @@ export const listServices = async function (req: Request, res: Response) {
         return;
     }
     const user: User = req.session.selfServiceUser;
-    const services = await s4.listServices(user.pk.S as string, req.session.authenticationResult?.AccessToken as string);
+    const services = await s4.listServices(user.dynamoId as string, req.session.authenticationResult?.AccessToken as string);
     if (services.data.Items.length === 0) {
         res.redirect("/add-service-name");
         return;
@@ -81,9 +81,10 @@ export const showAccount = async function (req: Request, res: Response, next: Ne
 
     const user: User = req.session?.selfServiceUser as User;
     res.render("account/account.njk", {
-        emailAddress: user.email?.S,
-        mobilePhoneNumber: user.phone?.S,
-        passwordLastChanged: lastUpdated(user.password_last_updated?.S),
+        emailAddress: user.email,
+        mobilePhoneNumber: user.mobileNumber,
+        passwordLastChanged: lastUpdated(user.passwordLastUpdated),
+        serviceName: "My juggling service",
         updatedField: req.session.updatedField
     });
     req.session.updatedField = undefined;

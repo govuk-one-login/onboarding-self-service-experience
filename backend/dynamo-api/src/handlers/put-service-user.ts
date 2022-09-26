@@ -7,11 +7,11 @@ export const putServiceUserHandler = async (event: APIGatewayProxyEvent, context
     const payload = event?.body ? JSON.parse(event.body as string) : event;
     const record = {
         pk: payload.service.pk,
-        sk: payload.user.pk,
+        sk: `user#${payload.user.dynamoId}`,
         data: payload.user.email,
-        role: 'admin',
+        role: "admin",
         service_name: payload.service.service_name
-    }
+    };
     let response = {statusCode: 200, body: JSON.stringify(record)};
     await client
         .put(record)

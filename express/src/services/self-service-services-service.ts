@@ -8,14 +8,14 @@ import {
     MFAOptionType,
     UserStatusType
 } from "@aws-sdk/client-cognito-identity-provider";
-import {User} from "../../@types/user";
+import {User, DynamoUser} from "../../@types/user";
 import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface from "./lambda-facade/LambdaFacadeInterface";
 import {SelfServiceError} from "../lib/SelfServiceError";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
 import {Service} from "../../@types/Service";
-import {unmarshall} from "@aws-sdk/util-dynamodb";
+import {userToDomainUser} from "../lib/userUtils";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -53,7 +53,7 @@ export default class SelfServiceServicesService {
             AuthenticationResultParser.getCognitoId(authenticationResult),
             authenticationResult.AccessToken
         );
-        return response.data.Items[0];
+        return userToDomainUser(response.data.Items[0] as DynamoUser);
     }
 
     async login(email: string, password: string): Promise<MfaResponse> {
@@ -119,11 +119,7 @@ export default class SelfServiceServicesService {
     }
 
     async newService(service: Service, user: User, authenticationResult: AuthenticationResultType) {
-        const response = await this.lambda.newService(
-            service,
-            unmarshall(user as Record<string, any>) as User, // this should be unmarshalled when it's stored
-            authenticationResult.AccessToken as string
-        );
+        const response = await this.lambda.newService(service, user, authenticationResult.AccessToken as string);
         return JSON.parse(response.data.output);
     }
 
@@ -150,12 +146,7 @@ export default class SelfServiceServicesService {
     }
 
     async updateUser(selfServiceUser: User, updates: {[key: string]: any}, accessToken: string): Promise<void> {
-        await this.lambda.updateUser(
-            selfServiceUser?.pk.S.substring("user#".length) as string,
-            selfServiceUser?.sk.S.substring("cognito_username#".length) as string,
-            updates,
-            accessToken as string
-        );
+        await this.lambda.updateUser(selfServiceUser.dynamoId, selfServiceUser.cognitoId, updates, accessToken as string);
     }
 
     async listClients(serviceId: string, accessToken: string) {

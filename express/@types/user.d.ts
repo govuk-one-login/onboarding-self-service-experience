@@ -1,17 +1,21 @@
-export interface User {
+export interface DynamoUser {
     pk: {S: string};
     sk: {S: string};
     data: {S: string};
-    firstName?: {S: string} | undefined;
-    first_name: {S: string} | undefined;
-    lastName?: {S: string} | undefined;
-    last_name: {S: string} | undefined;
-    email: {S: string} | undefined;
-    phone: {S: string} | undefined;
+    first_name: {S: string};
+    last_name: {S: string};
+    email: {S: string};
+    phone: {S: string};
     password_last_updated: {S: string};
 }
 
-export interface User2 {
+export interface User {
+    dynamoId: string;
     cognitoId: string;
+    fullName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
     mobileNumber: string;
+    passwordLastUpdated: string;
 }

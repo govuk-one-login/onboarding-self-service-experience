@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import express, {NextFunction, Request, Response} from "express";
 import "express-async-errors";
 import path from "path";
-import {User, User2} from "../@types/user";
+import {User} from "../@types/user";
 import configureViews from "./config/configure-views";
 import setSignedInStatus from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
@@ -50,7 +50,6 @@ declare module "express-session" {
         authenticationResult: AuthenticationResultType;
         cognitoUser: CognitoUser;
         selfServiceUser: User;
-        user: User2;
         mfaResponse: MfaResponse;
         updatedField: string;
         isSignedIn: boolean;

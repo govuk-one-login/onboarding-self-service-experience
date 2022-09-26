@@ -1,12 +1,12 @@
 import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
-import {User} from "../../../@types/user";
+import {User, DynamoUser} from "../../../@types/user";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 
 class StubLambdaFacade implements LambdaFacadeInterface {
-    user: User = {
+    user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
         data: {S: "we haven't collected this full name"},
         first_name: {S: "we haven't collected this first name"},
@@ -118,7 +118,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
 
     updateUser(selfServiceUserId: string, cognitoUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
         Object.keys(updates).forEach(
-            (update: string) => (this.user[update as keyof User] = {S: updates[update as keyof object] as string})
+            (update: string) => (this.user[update as keyof DynamoUser] = {S: updates[update as keyof object] as string})
         );
         return Promise.resolve({} as AxiosResponse);
     }
