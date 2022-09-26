@@ -3,8 +3,17 @@
 {% set mainClasses = "govuk-!-padding-top-5 left-nav-wrapper" %}
 
 {% block beforeContent %}
-  <div class="govuk-body govuk-!-padding-top-3 govuk-!-font-weight-bold">My juggling service</div>
-  <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible">
+  <div class="govuk-phase-banner govuk-clearfix">
+    <div class="govuk-breadcrumbs">
+      <ol class="govuk-breadcrumbs__list navigation-service-change-list">
+          <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19">
+                <a class="govuk-breadcrumbs__link" href="#">Your services</a>
+          </li>
+          <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19 govuk-!-font-weight-bold">{{ serviceName }}</li>
+      </ol>
+      <a href="/change-service-name" class="govuk-link govuk-link--no-visited-state navigation-service-change govuk-!-font-size-19">Change service name</a>
+    </div>
+  </div>
 {% endblock %}
 
 {% block content %}
