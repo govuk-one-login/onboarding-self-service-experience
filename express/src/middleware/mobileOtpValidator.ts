@@ -74,10 +74,10 @@ export function errorResponse(
         errorMessages: {smsOtp: message},
         value: value,
         values: {
-            mobileNumber: mobileNumber
-        },
-        formActionUrl: formActionUrl,
-        textMessageNotReceivedUrl: textMessageNotReceivedUrl
+            mobileNumber: mobileNumber,
+            formActionUrl: formActionUrl,
+            textMessageNotReceivedUrl: textMessageNotReceivedUrl
+        }
     });
 }
 

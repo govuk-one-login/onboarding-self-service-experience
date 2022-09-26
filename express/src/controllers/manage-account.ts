@@ -250,13 +250,16 @@ export const verifyMobileWithSmsCode = async function (req: Request, res: Respon
         await s4.updateUser(req.session?.selfServiceUser as User, {phone: req.session.mobileNumber}, accessToken as string);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            const errorMessages = new Map<string, string>();
-            errorMessages.set("smsOtp", "The code you entered is not correct or has expired - enter it again or request a new code");
+            const message = "The code you entered is not correct or has expired - enter it again or request a new code";
+            const value: object = {otp: req.body["sms-otp"]};
             res.render("check-mobile.njk", {
-                mobileNumber: req.session.mobileNumber,
-                errorMessages: errorMessages,
-                formActionUrl: "/verify-phone-code",
-                textMessageNotReceivedUrl: "/resend-phone-code"
+                values: {
+                    mobileNumber: req.session.mobileNumber,
+                    formActionUrl: "/verify-phone-code",
+                    textMessageNotReceivedUrl: "/create/resend-phone-code"
+                },
+                value: value,
+                errorMessages: {smsOtp: message}
             });
             return;
         }

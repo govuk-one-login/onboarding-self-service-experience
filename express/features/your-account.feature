@@ -25,6 +25,21 @@ Feature:
 
   Scenario: The user tries to change their phone number but needs a new SMS code
 
+    Given the user has logged in and arrived on the your account page
+    When they click on the link that points to "/change-phone-number"
+    Then they should be directed to the following page: "/change-phone-number"
+
+    Given that the user is on the "/change-phone-number" page
+    When the user submits the mobile phone number "07700901123"
+    Then they should see the text "Check your mobile phone"
+
+    When the user submits the sms otp code "666666"
+    Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the "sms-otp" field
+    And they should see the text "We sent a code to: 07700901123"
+
+    When they click on the link that points to "/create/resend-phone-code"
+    Then they should see the text "Resend security code"
+
 
 
 
