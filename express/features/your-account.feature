@@ -40,6 +40,43 @@ Feature:
     When they click on the link that points to "/create/resend-phone-code"
     Then they should see the text "Resend security code"
 
+  Scenario: The user tries to change their current password
 
+    Given the user has logged in and arrived on the your account page
+    When they click on the link that points to "/change-password"
+    Then they should see the text "Add your new password"
 
+    When they enter "OldTestPa$$word" into the text-field with the id "currentPassword"
+    When they enter "NewTestPa$$word" into the text-field with the id "password"
+    When they click the Submit button
+    Then they should be directed to the following page: "/account"
+    And they should see the text "You have changed your password"
 
+  Scenario: The user tries to change their current password and does not enter any value into any of the two fields
+
+    Given the user has logged in and arrived on the your account page
+    When they click on the link that points to "/change-password"
+    Then they should see the text "Add your new password"
+
+    When they click the Submit button
+    Then the error message "Enter your current password" must be displayed for the "currentPassword" field
+
+  Scenario: The user tries to change their current password and does not enter any value into Enter a new password field
+
+    Given the user has logged in and arrived on the your account page
+    When they click on the link that points to "/change-password"
+    Then they should see the text "Add your new password"
+    When they enter "OldTestPa$$word" into the text-field with the id "currentPassword"
+    When they click the Submit button
+
+    Then the error message "Enter your new password" must be displayed for the "password" field
+
+  Scenario: The user tries to change their current password and does not enter any value into Current password field
+
+    Given the user has logged in and arrived on the your account page
+    When they click on the link that points to "/change-password"
+    Then they should see the text "Add your new password"
+    When they enter "NewTestPa$$word" into the text-field with the id "password"
+    When they click the Submit button
+
+    Then the error message "Enter your current password" must be displayed for the "currentPassword" field
