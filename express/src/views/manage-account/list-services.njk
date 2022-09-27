@@ -1,14 +1,18 @@
-{% extends '../layout.njk' %}
+{% extends './layout-manage-account.njk' %}
+
+{% set active = "your-account" %}
+{% set activeSidenavAccount = "your-services-sidenav" %}
+{% set pageTitle = "Your services" %}
 
 {% block mainContent %}
-  <h1 class="govuk-heading-xl">
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">
     Your services
   </h1>
 
   {% for service in services %}
     <p>
-      <a class="govuk-body"
-         href="/client-details/{{ service.pk.S.substring(8) }}/">{{ service.service_name.S }}</a>
+      <a class="govuk-link" href="/client-details/{{ service.pk.S.substring(8) }}/">{{ service.service_name.S }}</a>
     </p>
   {% endfor %}
+  <hr class="govuk-section-break govuk-section-break--visible">
 {% endblock %}

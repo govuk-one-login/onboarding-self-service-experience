@@ -117,6 +117,10 @@ div.feature-panel {
   #main-content.govuk-main-wrapper-evaluate .govuk-grid-column-one-third {
     width: 25%;
   }
+
+  #main-content .manage-account-content-container {
+    min-height: 450px;
+  }
 }
 
 code {
