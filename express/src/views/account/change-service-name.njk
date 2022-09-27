@@ -18,6 +18,9 @@
 
   <form class="form" action="/change-service-name" method="post">
     {{ govukInput({
+      label: {
+        text: "Service name"
+      },
       name: "serviceName",
       id: "serviceName",
       classes: "govuk-!-width-full",
