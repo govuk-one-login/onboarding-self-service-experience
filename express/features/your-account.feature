@@ -28,8 +28,7 @@ Feature:
     Given the user has logged in and arrived on the your account page
     When they click on the link that points to "/change-phone-number"
     Then they should be directed to the following page: "/change-phone-number"
-
-    Given that the user is on the "/change-phone-number" page
+    
     When the user submits the mobile phone number "07700901123"
     Then they should see the text "Check your mobile phone"
 
