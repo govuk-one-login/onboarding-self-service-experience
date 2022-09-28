@@ -23,11 +23,11 @@ export const showLoginOtpMobile = async function (req: Request, res: Response) {
 
 export const finishSignIn = async function (req: Request, res: Response) {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    req.session.selfServiceUser = await s4.getSelfServiceUser(req.session.authenticationResult as AuthenticationResultType);
+    const user = await s4.getSelfServiceUser(req.session.authenticationResult as AuthenticationResultType);
 
-    if (req.session.selfServiceUser) {
+    if (user) {
         req.session.isSignedIn = true;
-        res.redirect("/account/list-services");
+        res.redirect(`/account/list-services`);
         return;
     } else {
         res.redirect("/sign-in-otp-mobile");

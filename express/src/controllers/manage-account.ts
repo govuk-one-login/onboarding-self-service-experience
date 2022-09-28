@@ -12,19 +12,19 @@ import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {prepareForCognito} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
-// const s4: SelfServiceServicesService = await req.app.get("backing-service");
-
 export const listServices = async function (req: Request, res: Response) {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    if (req.session.selfServiceUser == undefined) {
-        console.error("No user in session. contollers/manage-account/listServices(req, res)");
+    const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
+    if (userId == undefined) {
+        console.log(req.query);
+        console.error("Could not get CognitoId from AuthenticationResult in session. contollers/manage-account/listServices(req, res)");
         res.render("there-is-a-problem.njk");
         return;
     }
-    const user: User = req.session.selfServiceUser;
-    const services = await s4.listServices(user.dynamoId as string, req.session.authenticationResult?.AccessToken as string);
+
+    const services = await s4.listServices(userId as string, req.session.authenticationResult?.AccessToken as string);
     if (services.length === 0) {
-        res.redirect("/add-service-name");
+        res.redirect(`/add-service-name`);
         return;
     }
     if (services.length === 1) {
@@ -36,7 +36,7 @@ export const listServices = async function (req: Request, res: Response) {
 };
 
 export const showAddServiceForm = async function (req: Request, res: Response) {
-    res.render("add-service-name.njk");
+    res.render("add-service-name.njk", );
 };
 
 export const processAddServiceForm = async function (req: Request, res: Response) {
@@ -45,10 +45,15 @@ export const processAddServiceForm = async function (req: Request, res: Response
         id: `service#${uuid}`,
         serviceName: req.body.serviceName
     };
-    const user = req.session.selfServiceUser as User;
+    const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
+    if (userId === undefined || typeof userId !== "string") {
+        console.log("Can't get CognitoId from authenticationResult in session");
+        res.render("there-is-a-problem.njk");
+        return;
+    }
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     try {
-        await s4.newService(service, user, req.session.authenticationResult as AuthenticationResultType);
+        await s4.newService(service, userId, req.session.authenticationResult as AuthenticationResultType);
     } catch (error) {
         console.error(error);
         res.render("there-is-a-problem.njk");
@@ -75,9 +80,8 @@ export const showAccount = async function (req: Request, res: Response, next: Ne
     req.session.mobileNumber = AuthenticationResultParser.getPhoneNumber(req.session.authenticationResult as AuthenticationResultType);
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    req.session.selfServiceUser = await s4.getSelfServiceUser(req.session.authenticationResult as AuthenticationResultType);
+    const user: User = await s4.getSelfServiceUser(req.session.authenticationResult as AuthenticationResultType);
 
-    const user: User = req.session?.selfServiceUser as User;
     res.render("account/account.njk", {
         emailAddress: user.email,
         mobilePhoneNumber: user.mobileNumber,
@@ -195,8 +199,9 @@ export const changePassword = async function (req: Request, res: Response) {
 
     try {
         const s4: SelfServiceServicesService = await req.app.get("backing-service");
+        console.log("UPDATING PASSWORD CHANGED DATE");
         await s4.updateUser(
-            req.session?.selfServiceUser as User,
+            AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType),
             {password_last_updated: new Date()},
             req.session?.authenticationResult?.AccessToken as string
         );
@@ -247,7 +252,11 @@ export const verifyMobileWithSmsCode = async function (req: Request, res: Respon
         await s4.setMobilePhoneAsVerified(
             AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType) as string
         );
-        await s4.updateUser(req.session?.selfServiceUser as User, {phone: req.session.mobileNumber}, accessToken as string);
+        await s4.updateUser(
+            AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType),
+            {phone: req.session.mobileNumber},
+            accessToken as string
+        );
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             const message = "The code you entered is not correct or has expired - enter it again or request a new code";

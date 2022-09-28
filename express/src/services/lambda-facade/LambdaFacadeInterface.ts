@@ -1,17 +1,16 @@
 import {AxiosResponse} from "axios";
-import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
-import {User} from "../../../@types/user";
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 
 export default interface LambdaFacadeInterface {
     putUser(user: OnboardingTableItem, accessToken: string): Promise<AxiosResponse>;
 
-    updateUser(selfServiceUserId: string, cognitoUserId: string, updates: object, accessToken: string): Promise<AxiosResponse>;
+    updateUser(selfServiceUserId: string, updates: object, accessToken: string): Promise<AxiosResponse>;
 
     getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse>;
 
-    newService(service: Service, user: User, accessToken: string): Promise<AxiosResponse>;
+    newService(service: Service, userId: string, email: string, accessToken: string): Promise<AxiosResponse>;
 
     generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse>;
 

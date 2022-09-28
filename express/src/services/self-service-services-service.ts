@@ -2,24 +2,21 @@ import {
     AdminCreateUserCommandOutput,
     AdminInitiateAuthCommandOutput,
     AdminSetUserMFAPreferenceCommandOutput,
-    AttributeType,
     AuthenticationResultType,
-    GetUserAttributeVerificationCodeCommandOutput,
-    MFAOptionType,
-    UserStatusType
+    GetUserAttributeVerificationCodeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
 import {User, DynamoUser} from "../../@types/user";
 import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface from "./lambda-facade/LambdaFacadeInterface";
 import {SelfServiceError} from "../lib/SelfServiceError";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
-import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
 import {Service} from "../../@types/Service";
 import {Client, ClientFromDynamo} from "../../@types/client";
 import {userToDomainUser} from "../lib/userUtils";
 import {dynamoServicesToDomainServices} from "../lib/serviceUtils";
 import {dynamoClientToDomainClient} from "../lib/clientUtils";
 import {unmarshall} from "@aws-sdk/util-dynamodb";
+import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -57,7 +54,7 @@ export default class SelfServiceServicesService {
             AuthenticationResultParser.getCognitoId(authenticationResult),
             authenticationResult.AccessToken
         );
-        return userToDomainUser(response.data.Items[0] as DynamoUser);
+        return userToDomainUser(response.data.Item as DynamoUser);
     }
 
     async login(email: string, password: string): Promise<MfaResponse> {
@@ -71,15 +68,12 @@ export default class SelfServiceServicesService {
 
     async putUser(user: OnboardingTableItem, accessToken: string) {
         // TODO this is somewhere we can simplify types.
+        console.log(user);
         return await this.lambda.putUser(user, accessToken);
     }
 
     async setNewPassword(emailAddress: string, password: string, cognitoSession: string): Promise<AuthenticationResultType> {
         return (await this.cognito.setNewPassword(emailAddress, password, cognitoSession)).AuthenticationResult as AuthenticationResultType;
-    }
-
-    async getUserByEmail(emailAddress: string): Promise<CognitoUser> {
-        return await this.cognito.getUser(emailAddress);
     }
 
     async setEmailAsVerified(emailAddress: string): Promise<void> {
@@ -122,8 +116,13 @@ export default class SelfServiceServicesService {
         return await this.cognito.setMobilePhoneAsVerified(emailAddress);
     }
 
-    async newService(service: Service, user: User, authenticationResult: AuthenticationResultType) {
-        const response = await this.lambda.newService(service, user, authenticationResult.AccessToken as string);
+    async newService(service: Service, userId: string, authenticationResult: AuthenticationResultType) {
+        const response = await this.lambda.newService(
+            service,
+            userId,
+            AuthenticationResultParser.getEmail(authenticationResult),
+            authenticationResult.AccessToken as string
+        );
         return JSON.parse(response.data.output);
     }
 
@@ -149,12 +148,12 @@ export default class SelfServiceServicesService {
         return dynamoServicesToDomainServices((await this.lambda.listServices(userId, accessToken)).data.Items);
     }
 
-    async updateUser(selfServiceUser: User, updates: {[key: string]: any}, accessToken: string): Promise<void> {
-        await this.lambda.updateUser(selfServiceUser.dynamoId, selfServiceUser.cognitoId, updates, accessToken as string);
+    async updateUser(userId: string, updates: {[key: string]: any}, accessToken: string): Promise<void> {
+        await this.lambda.updateUser(userId, updates, accessToken as string);
     }
 
     async listClients(serviceId: string, accessToken: string): Promise<Client[]> {
-        return (await this.lambda.listClients(serviceId, accessToken)).data.Items.map((client: Record<string, any>) =>
+        return (await this.lambda.listClients(serviceId, accessToken)).data.Items.map((client: any) =>
             dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)
         );
     }
@@ -164,16 +163,4 @@ export interface MfaResponse {
     cognitoSession: string;
     cognitoId: string;
     codeSentTo: string;
-}
-
-export interface CognitoUser {
-    Username: string | undefined;
-    UserAttributes?: AttributeType[];
-    UserCreateDate?: Date;
-    UserLastModifiedDate?: Date;
-    Enabled?: boolean;
-    UserStatus?: UserStatusType | string;
-    MFAOptions?: MFAOptionType[];
-    PreferredMfaSetting?: string;
-    UserMFASettingList?: string[];
 }

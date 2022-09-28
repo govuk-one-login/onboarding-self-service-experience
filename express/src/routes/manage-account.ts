@@ -34,7 +34,6 @@ router.get("/client-details/:serviceId", async (req, res) => {
     const selfServiceClientId = client.dynamoId;
     const serviceId = client.dynamoServiceId;
     const authClientId = client.authClientId;
-
     res.render("service-details/client-details.njk", {
         serviceId: req.params.serviceId,
         publicKeyAndUrlsNotUpdatedByUser: true,
@@ -47,19 +46,19 @@ router.get("/client-details/:serviceId", async (req, res) => {
         userPublicKey: client.publicKey == DEFAULT_PUBLIC_KEY ? "" : client.publicKey,
         postLogoutRedirectUrls: client.logoutUris.join(" "),
         urls: {
-            changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURI(
+            changeClientName: `/change-client-name/${selfServiceClientId}/${serviceId}/${authClientId}?clientName=${encodeURI(
                 client.serviceName
             )}`,
-            changeRedirectUris: `/change-redirect-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
+            changeRedirectUris: `/change-redirect-uris/${selfServiceClientId}/${serviceId}/${authClientId}?redirectUris=${encodeURI(
                 client.redirectUris.join(" ")
             )}`,
-            changeUserAttributes: `/change-user-attributes/${serviceId}/${selfServiceClientId}/${authClientId}?userAttributes=${encodeURI(
+            changeUserAttributes: `/change-user-attributes/${selfServiceClientId}/${serviceId}/${authClientId}?userAttributes=${encodeURI(
                 client.scopes.join(" ")
             )}`,
-            changePublicKey: `/change-public-key/${serviceId}/${selfServiceClientId}/${authClientId}?publicKey=${encodeURI(
+            changePublicKey: `/change-public-key/${selfServiceClientId}/${serviceId}/${authClientId}?publicKey=${encodeURI(
                 client.publicKey
             )}`,
-            changePostLogoutUris: `/change-post-logout-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
+            changePostLogoutUris: `/change-post-logout-uris/${selfServiceClientId}/${serviceId}/${authClientId}?redirectUris=${encodeURI(
                 client.logoutUris.join(" ")
             )}`
         }

@@ -1,6 +1,6 @@
 import {
     AttributeValue,
-    DynamoDBClient,
+    DynamoDBClient, GetItemCommand, GetItemCommandOutput,
     PutItemCommand,
     PutItemCommandOutput,
     QueryCommand,
@@ -31,6 +31,15 @@ class DynamoClient {
 
         this.tableName = process.env.TABLE;
         this.dynamodb = new DynamoDBClient({region: process.env.AWS_REGION});
+    }
+
+    async getUser(id: string): Promise<GetItemCommandOutput> {
+        const params = {
+            TableName: this.tableName,
+            Key: marshall({pk: id, sk: id})
+        };
+        const command = new GetItemCommand(params);
+        return this.dynamodb.send(command);
     }
 
     async put(item: OnboardingTableItem): Promise<PutItemCommandOutput> {
@@ -85,7 +94,7 @@ class DynamoClient {
     }
 
     async updateUser(userId: string, cognitoUserId: string, updates: Updates): Promise<UpdateItemCommandOutput> {
-        return this.update("user", userId, "cognito_username", cognitoUserId, updates);
+        return this.update("user", userId, "user", userId, updates);
     }
 
     private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: Updates): Promise<UpdateItemCommandOutput> {

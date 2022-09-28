@@ -10,8 +10,7 @@ export interface DynamoUser {
 }
 
 export interface User {
-    dynamoId: string;
-    cognitoId: string;
+    id: string;
     fullName: string;
     firstName: string;
     lastName: string;

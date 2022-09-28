@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 import express, {NextFunction, Request, Response} from "express";
 import "express-async-errors";
 import path from "path";
-import {User} from "../@types/user";
 import configureViews from "./config/configure-views";
 import setSignedInStatus from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
@@ -11,7 +10,7 @@ import manageAccount from "./routes/manage-account";
 import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing-routes";
 import {sessionStorage} from "./lib/dynamodb/sessionStorage";
-import SelfServiceServicesService, {CognitoUser, MfaResponse} from "./services/self-service-services-service";
+import SelfServiceServicesService, {MfaResponse} from "./services/self-service-services-service";
 
 const app = express();
 
@@ -31,6 +30,7 @@ const lambdaPromise = import(`./services/lambda-facade/${process.env.LAMBDA_FACA
 
 Promise.all([cognitoPromise, lambdaPromise]).then(deps => {
     app.set("backing-service", new SelfServiceServicesService(deps[0], deps[1]));
+    console.log("Backing service created");
 });
 
 app.use("/dist", express.static("./dist/assets"));
@@ -48,8 +48,6 @@ declare module "express-session" {
         enteredMobileNumber: string;
         cognitoSession: string;
         authenticationResult: AuthenticationResultType;
-        cognitoUser: CognitoUser;
-        selfServiceUser: User;
         mfaResponse: MfaResponse;
         updatedField: string;
         isSignedIn: boolean;

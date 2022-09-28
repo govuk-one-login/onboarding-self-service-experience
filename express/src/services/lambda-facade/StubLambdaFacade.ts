@@ -1,9 +1,9 @@
 import {AxiosResponse} from "axios";
-import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
-import {User, DynamoUser} from "../../../@types/user";
+import {DynamoUser} from "../../../@types/user";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 
 class StubLambdaFacade implements LambdaFacadeInterface {
     user: DynamoUser = {
@@ -11,9 +11,9 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         data: {S: "we haven't collected this full name"},
         first_name: {S: "we haven't collected this first name"},
         password_last_updated: {S: "2022-08-04T13:42:00.821Z"},
-        sk: {S: "cognito_username#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
+        sk: {S: "user#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
         email: {S: "registered@gds.gov.uk"},
-        pk: {S: "user#2c677c1a-22a8-4efa-a01f-9656acbbf5ee"},
+        pk: {S: "user#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
         phone: {S: "07700 987 654"}
     };
 
@@ -24,12 +24,12 @@ class StubLambdaFacade implements LambdaFacadeInterface {
     getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
         return Promise.resolve({
             data: {
-                Items: [this.user]
+                Item: this.user
             }
         } as AxiosResponse);
     }
 
-    newService(service: Service, user: User, accessToken: string): Promise<AxiosResponse> {
+    newService(service: Service, userId: string, email: string, accessToken: string): Promise<AxiosResponse> {
         return Promise.resolve({data: {output: JSON.stringify({serviceId: "stub-service-id"})}} as AxiosResponse);
     }
 
@@ -61,14 +61,14 @@ class StubLambdaFacade implements LambdaFacadeInterface {
                 Items: [
                     {
                         service_name: {S: "SAM Stacks Service"},
-                        sk: {S: "user#257d5399-1b6b-45c0-a894-8bc37b71c6c6"},
+                        sk: {S: "user#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
                         role: {S: "admin"},
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
                         data: {S: "john.watts@digital.cabinet-office.gov.uk"}
                     },
                     {
                         service_name: {S: "I doubt this flies"},
-                        sk: {S: "user#257d5399-1b6b-45c0-a894-8bc37b71c6c6"},
+                        sk: {S: "user#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
                         role: {S: "admin"},
                         pk: {S: "service#3523fd0f-90c1-4fd2-b08d-a0844b6ec396"},
                         data: {S: "john.watts@digital.cabinet-office.gov.uk"}
@@ -116,7 +116,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         } as AxiosResponse);
     }
 
-    updateUser(selfServiceUserId: string, cognitoUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
+    updateUser(selfServiceUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
         Object.keys(updates).forEach(
             (update: string) => (this.user[update as keyof DynamoUser] = {S: updates[update as keyof object] as string})
         );
