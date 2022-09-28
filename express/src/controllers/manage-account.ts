@@ -83,7 +83,6 @@ export const showAccount = async function (req: Request, res: Response, next: Ne
         emailAddress: user.email?.S,
         mobilePhoneNumber: user.phone?.S,
         passwordLastChanged: lastUpdated(user.password_last_updated?.S),
-        serviceName: "My juggling service",
         updatedField: req.session.updatedField
     });
     req.session.updatedField = undefined;
