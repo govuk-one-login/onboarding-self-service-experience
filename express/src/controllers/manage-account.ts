@@ -9,7 +9,6 @@ import {
     NotAuthorizedException
 } from "@aws-sdk/client-cognito-identity-provider";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
-import {SelfServiceErrors} from "../lib/errors";
 import {prepareForCognito} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
@@ -71,7 +70,9 @@ export const showChangePasswordForm = async function (req: Request, res: Respons
 
 export const showAccount = async function (req: Request, res: Response, next: NextFunction) {
     if (!req.session.authenticationResult) {
-        next(SelfServiceErrors.Redirect("sign-in.njk"));
+        console.error("showAccount::authenticationResult not in session, redirecting to sign-in");
+        res.redirect("sign-in.njk");
+        return;
     }
     req.session.mobileNumber = AuthenticationResultParser.getPhoneNumber(req.session.authenticationResult as AuthenticationResultType);
 

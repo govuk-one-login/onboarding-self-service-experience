@@ -1,10 +1,10 @@
 import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
 import {NextFunction, Request, Response} from "express";
-import {RedirectError, SelfServiceErrors} from "../lib/errors";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {prepareForCognito} from "../lib/mobileNumberUtils";
+import {RedirectError} from "../lib/errors";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     res.render("create-account/get-email.njk");
@@ -31,14 +31,18 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
 
 export const showCheckEmailForm = function (req: Request, res: Response, next: NextFunction) {
     if (!req.session.emailAddress) {
-        next(SelfServiceErrors.Redirect("/create/get-email"));
+        console.error("showCheckEmailForm::emailAddress not in the session, redirecting to /create/get-email");
+        res.redirect("/create/get-email");
+        return;
     }
     res.render("create-account/check-email.njk", {values: {emailAddress: req.session.emailAddress}});
 };
 
 export const submitEmailOtp = async function (req: Request, res: Response, next: NextFunction) {
     if (!req.session.emailAddress) {
-        next(SelfServiceErrors.Redirect("/create/get-email"));
+        console.error("submitEmailOtp::EmailAddress is not in the session, redirecting to submitEmailOtp");
+        res.redirect("/create/get-email");
+        return;
     }
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 

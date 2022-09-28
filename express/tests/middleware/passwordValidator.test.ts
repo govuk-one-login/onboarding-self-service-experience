@@ -16,6 +16,7 @@ describe("Checking that the user has entered a valid password", () => {
             body: jest.fn()
         };
         mockResponse = {};
+        mockResponse.render = jest.fn();
         nextFunction = jest.fn();
     });
 
@@ -41,23 +42,28 @@ describe("Checking that the user has entered a valid password", () => {
 
     it("a password with less than 8 characters is not accepted. ", async function () {
         mockRequest.body.password = PASSWORD_LESS_THAN_8_CHAR;
-        await expect(
-            passwordValidator("create-account/new-password.njk", false)(
-                mockRequest as Request,
-                mockResponse as Response,
-                nextFunction as NextFunction
-            )
-        ).rejects.toThrow("Password was too short");
+        passwordValidator("create-account/new-password.njk", false)(
+            mockRequest as Request,
+            mockResponse as Response,
+            nextFunction as NextFunction
+        );
+        expect(nextFunction).toBeCalledTimes(0);
+        expect(mockResponse.render).toHaveBeenCalledWith("create-account/new-password.njk", {
+            errorMessages: {password: "Your password must be 8 characters or more"},
+            values: {password: PASSWORD_LESS_THAN_8_CHAR}
+        });
     });
 
     it("a password with empty value is not accepted. ", async function () {
         mockRequest.body.password = PASSWORD_WITH_EMPTY_VALUE;
-        await expect(
-            passwordValidator("create-account/new-password.njk", false)(
-                mockRequest as Request,
-                mockResponse as Response,
-                nextFunction as NextFunction
-            )
-        ).rejects.toThrow("No password entered");
+        passwordValidator("create-account/new-password.njk", false)(
+            mockRequest as Request,
+            mockResponse as Response,
+            nextFunction as NextFunction
+        );
+        expect(nextFunction).toBeCalledTimes(0);
+        expect(mockResponse.render).toHaveBeenCalledWith("create-account/new-password.njk", {
+            errorMessages: {password: "Enter a password"}
+        });
     });
 });
