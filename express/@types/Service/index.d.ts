@@ -1,6 +1,11 @@
+export interface ServiceFromDynamo {
+    pk: {S: string};
+    sk: {S: string};
+    data: {S: string};
+    service_name: {S: string};
+}
+
 export interface Service {
-    pk: string;
-    sk: string;
-    data: string;
-    service_name: string;
+    id: string;
+    serviceName: string;
 }

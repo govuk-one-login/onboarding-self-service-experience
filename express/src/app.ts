@@ -59,6 +59,10 @@ declare module "express-session" {
 configureViews(app, path.join(__dirname, "../src/views"));
 
 app.use(setSignedInStatus);
+app.use(function (req: Request, res: Response, next: NextFunction) {
+    console.log(req.session);
+    next();
+});
 
 app.use("/", createAccount);
 app.use("/", signIn);

@@ -16,6 +16,7 @@ import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
 import {Service} from "../../@types/Service";
 import {userToDomainUser} from "../lib/userUtils";
+import {dynamoServicesToDomainServices} from "../lib/serviceUtils";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -141,8 +142,8 @@ export default class SelfServiceServicesService {
         await this.lambda.privateBetaRequest(yourName, department, serviceName, emailAddress, accessToken as string);
     }
 
-    async listServices(userId: string, accessToken: string) {
-        return await this.lambda.listServices(userId, accessToken);
+    async listServices(userId: string, accessToken: string): Promise<Service[]> {
+        return dynamoServicesToDomainServices((await this.lambda.listServices(userId, accessToken)).data.Items);
     }
 
     async updateUser(selfServiceUser: User, updates: {[key: string]: any}, accessToken: string): Promise<void> {
