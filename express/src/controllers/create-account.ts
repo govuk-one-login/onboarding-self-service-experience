@@ -68,6 +68,7 @@ export const submitEmailOtp = async function (req: Request, res: Response, next:
 
 export const showNewPasswordForm = async function (req: Request, res: Response) {
     if (req.session.cognitoSession !== undefined) {
+        console.error("showNewPasswordForm::cognitoSession is undefined, redirecting to create-account/new-password.njk");
         res.render("create-account/new-password.njk");
         return;
     } else {
@@ -108,6 +109,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     // The user needs to be logged in for this
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
+        console.error("processEnterMobileForm::user must log in before we can process their mobile number redirecting to /sign-in");
         // user must log in before we can process their mobile number
         res.redirect("/sign-in");
         return;
@@ -139,6 +141,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
     // This is the mobile verification when creating a new user
     // need to check for access token in middleware
     if (req.session.authenticationResult?.AccessToken === undefined) {
+        console.error("submitMobileVerificationCode::accessToken not present, redirecting to /sign-in");
         res.redirect("/sign-in");
         return;
     }
@@ -204,6 +207,7 @@ export const showResendPhoneCodeForm = async function (req: Request, res: Respon
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
         // user must log in before we can process their mobile number
+        console.error("showResendPhoneCodeForm::accessToken not present in session, redirecting to /sign-in");
         res.redirect("/sign-in");
         return;
     }

@@ -80,6 +80,7 @@ export const signOut = async function (req: Request, res: Response) {
 export const showResendPhoneCodeForm = async function (req: Request, res: Response) {
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
+        console.error("showResendPhoneCodeForm::accessToken not present in session, redirecting to /sign-in");
         // user must login before we can process their mobile number
         res.redirect("/sign-in");
         return;
@@ -97,6 +98,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
         // user must login before we can process their mobile number
+        console.error("processEnterMobileForm::accessToken not present in session, redirecting to /sign-in");
         res.redirect("/sign-in");
         return;
     }
@@ -105,6 +107,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     // Not sure that we need this here ....
     if (mobileNumber === undefined) {
+        console.error("processEnterMobileForm::mobileNumber undefined");
         res.render("there-is-a-problem.njk");
     }
 

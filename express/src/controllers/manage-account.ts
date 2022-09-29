@@ -225,6 +225,7 @@ export const processChangePhoneNumberForm = async function (req: Request, res: R
     req.session.mobileNumber = req.body.mobileNumber;
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
+        console.error("processChangePhoneNumberForm::accessToken not present in session, redirecting to /sign-in");
         // user must log in before we can process their mobile number
         res.redirect("/sign-in");
         return;
