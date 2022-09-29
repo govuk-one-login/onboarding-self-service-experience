@@ -15,8 +15,11 @@ import {SelfServiceError} from "../lib/SelfServiceError";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
 import {Service} from "../../@types/Service";
+import {Client, ClientFromDynamo} from "../../@types/client";
 import {userToDomainUser} from "../lib/userUtils";
 import {dynamoServicesToDomainServices} from "../lib/serviceUtils";
+import {dynamoClientToDomainClient} from "../lib/clientUtils";
+import {unmarshall} from "@aws-sdk/util-dynamodb";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -150,8 +153,10 @@ export default class SelfServiceServicesService {
         await this.lambda.updateUser(selfServiceUser.dynamoId, selfServiceUser.cognitoId, updates, accessToken as string);
     }
 
-    async listClients(serviceId: string, accessToken: string) {
-        return await this.lambda.listClients(serviceId, accessToken);
+    async listClients(serviceId: string, accessToken: string): Promise<Client[]> {
+        return (await this.lambda.listClients(serviceId, accessToken)).data.Items.map((client: Record<string, any>) =>
+            dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)
+        );
     }
 }
 

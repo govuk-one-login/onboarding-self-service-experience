@@ -10,7 +10,6 @@ export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Prom
     let record = {
         pk: payload.service.id,
         sk: `client#${randomUUID()}`,
-        data: payload.service.serviceName,
         clientId: payload.client_id,
         type: 'integration',
         public_key: payload.public_key,
@@ -20,7 +19,7 @@ export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Prom
         post_logout_redirect_uris: payload.post_logout_redirect_uris,
         subject_type: payload.subject_type,
         service_type: payload.service_type,
-        service_name: payload.service.serviceName,
+        client_name: payload.service.serviceName,
         default_fields: ['data', 'public_key', 'redirect_uris', 'scopes', 'post_logout_redirect_uris', 'subject_type', 'service_type']
     };
 

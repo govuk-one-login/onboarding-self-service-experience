@@ -1,4 +1,3 @@
-import {unmarshall} from "@aws-sdk/util-dynamodb";
 import express from "express";
 import {
     changePassword,
@@ -17,6 +16,7 @@ import notOnCommonPasswordListValidator from "../middleware/notOnCommonPasswordL
 import {serviceNameValidator} from "../middleware/serviceNameValidator";
 import validateMobileNumber from "../middleware/mobileValidator";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import {Client} from "../../@types/client";
 
 const router = express.Router();
 
@@ -29,38 +29,38 @@ router.post("/create-service-name-validation", checkAuthorisation, serviceNameVa
 
 router.get("/client-details/:serviceId", async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const listOfClients = await s4.listClients(req.params.serviceId, req.session?.authenticationResult?.AccessToken as string);
-    const client = unmarshall(listOfClients.data.Items[0]);
-    const selfServiceClientId = client.sk.substring("client#".length);
-    const serviceId = req.params.serviceId;
-    const authClientId = client.clientId;
+    const listOfClients: Client[] = await s4.listClients(req.params.serviceId, req.session?.authenticationResult?.AccessToken as string);
+    const client: Client = listOfClients[0];
+    const selfServiceClientId = client.dynamoId;
+    const serviceId = client.dynamoServiceId;
+    const authClientId = client.authClientId;
 
     res.render("service-details/client-details.njk", {
         serviceId: req.params.serviceId,
         publicKeyAndUrlsNotUpdatedByUser: true,
         updatedField: req.session.updatedField,
-        clientName: client.data,
-        serviceName: client.service_name,
-        clientId: client.clientId,
-        redirectUrls: client.redirect_uris.join(" "),
+        clientName: client.serviceName,
+        serviceName: client.serviceName,
+        clientId: client.authClientId,
+        redirectUrls: client.redirectUris.join(" "),
         userAttributesRequired: client.scopes.join(", "),
-        userPublicKey: client.public_key == DEFAULT_PUBLIC_KEY ? "" : client.public_key,
-        postLogoutRedirectUrls: client.post_logout_redirect_uris.join(" "),
+        userPublicKey: client.publicKey == DEFAULT_PUBLIC_KEY ? "" : client.publicKey,
+        postLogoutRedirectUrls: client.logoutUris.join(" "),
         urls: {
             changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURI(
-                client.data
+                client.serviceName
             )}`,
             changeRedirectUris: `/change-redirect-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
-                client.redirect_uris.join(" ")
+                client.redirectUris.join(" ")
             )}`,
             changeUserAttributes: `/change-user-attributes/${serviceId}/${selfServiceClientId}/${authClientId}?userAttributes=${encodeURI(
                 client.scopes.join(" ")
             )}`,
             changePublicKey: `/change-public-key/${serviceId}/${selfServiceClientId}/${authClientId}?publicKey=${encodeURI(
-                client.clientId
+                client.publicKey
             )}`,
             changePostLogoutUris: `/change-post-logout-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
-                client.post_logout_redirect_uris.join(" ")
+                client.logoutUris.join(" ")
             )}`
         }
     });
