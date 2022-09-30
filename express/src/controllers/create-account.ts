@@ -4,7 +4,6 @@ import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {prepareForCognito} from "../lib/mobileNumberUtils";
-import {RedirectError} from "../lib/errors";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     res.render("create-account/get-email.njk");
@@ -19,7 +18,8 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
     } catch (error) {
         if (error instanceof UsernameExistsException) {
             // TODO We need to handle this properly with another flow
-            throw new RedirectError("/sign-in");
+            res.render("/sign-in");
+            return;
         }
 
         next(error);
