@@ -1,7 +1,6 @@
 import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
 import {NextFunction, Request, Response} from "express";
-import {RedirectError, SelfServiceErrors} from "../lib/errors";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {prepareForCognito} from "../lib/mobileNumberUtils";
@@ -19,7 +18,8 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
     } catch (error) {
         if (error instanceof UsernameExistsException) {
             // TODO We need to handle this properly with another flow
-            throw new RedirectError("/sign-in");
+            res.render("/sign-in");
+            return;
         }
 
         next(error);
@@ -31,14 +31,18 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
 
 export const showCheckEmailForm = function (req: Request, res: Response, next: NextFunction) {
     if (!req.session.emailAddress) {
-        next(SelfServiceErrors.Redirect("/create/get-email"));
+        console.error("showCheckEmailForm::emailAddress not in the session, redirecting to /create/get-email");
+        res.redirect("/create/get-email");
+        return;
     }
     res.render("create-account/check-email.njk", {values: {emailAddress: req.session.emailAddress}});
 };
 
 export const submitEmailOtp = async function (req: Request, res: Response, next: NextFunction) {
     if (!req.session.emailAddress) {
-        next(SelfServiceErrors.Redirect("/create/get-email"));
+        console.error("submitEmailOtp::EmailAddress is not in the session, redirecting to submitEmailOtp");
+        res.redirect("/create/get-email");
+        return;
     }
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
@@ -49,18 +53,13 @@ export const submitEmailOtp = async function (req: Request, res: Response, next:
         return;
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
-            next(
-                SelfServiceErrors.Render(
-                    "create-account/check-email.njk",
-                    "The code you entered is not correct or has expired - enter it again or request a new code",
-                    {
-                        values: {emailAddress: req.session.emailAddress as string},
-                        errorMessages: {
-                            "create-email-otp": "The code you entered is not correct or has expired - enter it again or request a new code"
-                        }
-                    }
-                )
-            );
+            res.render("create-account/check-email.njk", {
+                values: {emailAddress: req.session.emailAddress as string},
+                errorMessages: {
+                    "create-email-otp": "The code you entered is not correct or has expired - enter it again or request a new code"
+                }
+            });
+            return;
         } else {
             next(error);
         }
@@ -69,6 +68,7 @@ export const submitEmailOtp = async function (req: Request, res: Response, next:
 
 export const showNewPasswordForm = async function (req: Request, res: Response) {
     if (req.session.cognitoSession !== undefined) {
+        console.error("showNewPasswordForm::cognitoSession is undefined, redirecting to create-account/new-password.njk");
         res.render("create-account/new-password.njk");
         return;
     } else {
@@ -109,6 +109,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     // The user needs to be logged in for this
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
+        console.error("processEnterMobileForm::user must log in before we can process their mobile number redirecting to /sign-in");
         // user must log in before we can process their mobile number
         res.redirect("/sign-in");
         return;
@@ -140,6 +141,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
     // This is the mobile verification when creating a new user
     // need to check for access token in middleware
     if (req.session.authenticationResult?.AccessToken === undefined) {
+        console.error("submitMobileVerificationCode::accessToken not present, redirecting to /sign-in");
         res.redirect("/sign-in");
         return;
     }
@@ -205,6 +207,7 @@ export const showResendPhoneCodeForm = async function (req: Request, res: Respon
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
         // user must log in before we can process their mobile number
+        console.error("showResendPhoneCodeForm::accessToken not present in session, redirecting to /sign-in");
         res.redirect("/sign-in");
         return;
     }

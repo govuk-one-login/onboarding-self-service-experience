@@ -5,7 +5,6 @@ import "express-async-errors";
 import path from "path";
 import {User, User2} from "../@types/user";
 import configureViews from "./config/configure-views";
-import {RedirectError, RenderError} from "./lib/errors";
 import setSignedInStatus from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
 import manageAccount from "./routes/manage-account";
@@ -77,14 +76,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
-    if (err instanceof RenderError) {
-        res.render(err.template, err.options);
-    } else if (err instanceof RedirectError) {
-        res.redirect(err.route);
-    } else {
-        console.error(err);
-        res.render("there-is-a-problem.njk");
-    }
+    console.error(err);
+    res.render("there-is-a-problem.njk");
 });
 
 const port = process.env.PORT || 3000;

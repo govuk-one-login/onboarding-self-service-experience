@@ -2,7 +2,6 @@ import {AuthenticationResultType, NotAuthorizedException, UserNotFoundException}
 import {Request, Response} from "express";
 import "express-async-errors";
 import SelfServiceServicesService from "../services/self-service-services-service";
-import {SelfServiceErrors} from "../lib/errors";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
     res.render("sign-in.njk");
@@ -52,10 +51,11 @@ export const processSignInForm = async function (req: Request, res: Response) {
         req.session.mfaResponse = await s4.login(email, password);
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
-            throw SelfServiceErrors.Render("sign-in-enter-password.njk", "", {
+            res.render("sign-in-enter-password.njk", {
                 values: {password: password},
                 errorMessages: {password: "Password is wrong"}
             });
+            return;
         }
 
         if (error instanceof UserNotFoundException) {
@@ -80,6 +80,7 @@ export const signOut = async function (req: Request, res: Response) {
 export const showResendPhoneCodeForm = async function (req: Request, res: Response) {
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
+        console.error("showResendPhoneCodeForm::accessToken not present in session, redirecting to /sign-in");
         // user must login before we can process their mobile number
         res.redirect("/sign-in");
         return;
@@ -97,6 +98,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
         // user must login before we can process their mobile number
+        console.error("processEnterMobileForm::accessToken not present in session, redirecting to /sign-in");
         res.redirect("/sign-in");
         return;
     }
@@ -105,9 +107,11 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     // Not sure that we need this here ....
     if (mobileNumber === undefined) {
+        console.error("processEnterMobileForm::mobileNumber undefined");
         res.render("there-is-a-problem.njk");
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const response = await s4.setPhoneNumber(req.session.emailAddress, mobileNumber);
 

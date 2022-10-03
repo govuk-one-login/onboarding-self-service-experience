@@ -1,7 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import allowedEmailDomains from "../lib/allowedEmailDomains";
 import isRfc822Compliant from "../lib/rfc822-validate";
-import {SelfServiceErrors} from "../lib/errors";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 
@@ -12,21 +11,22 @@ export function emailValidator(template: string): MiddlewareFunction<Request, Re
         emailAddress = emailAddress.trim();
 
         if (emailAddress === "" || emailAddress === undefined || emailAddress === null) {
-            throw SelfServiceErrors.Render(template, "", {
-                errorMessages: {emailAddress: "Enter your email address"}
-            });
+            res.render(template, {errorMessages: {emailAddress: "Enter your email address"}});
+            return;
         }
 
         if (!isRfc822Compliant(emailAddress)) {
-            throw SelfServiceErrors.Render(template, "", {
+            res.render(template, {
                 errorMessages: {emailAddress: "Enter an email address in the correct format, like name@example.com"}
             });
+            return;
         }
 
         if (!(await isAllowedDomain(emailAddress))) {
-            throw SelfServiceErrors.Render(template, `Disallowed domain: ${emailAddress}`, {
-                errorMessages: {emailAddress: "Enter a government email address"}
+            res.render(template, {
+                errorMessages: {message: `Disallowed domain: ${emailAddress}`, emailAddress: "Enter a government email address"}
             });
+            return;
         }
 
         req.session.emailAddress = emailAddress;
