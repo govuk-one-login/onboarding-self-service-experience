@@ -1,5 +1,5 @@
 import {When} from "@cucumber/cucumber";
-import {clickLink, clickSubmitButton, enterTextIntoTextInput, getLink} from "./shared-functions";
+import {clickButtonWithId, clickSubmitButton, enterTextIntoTextInput} from "./shared-functions";
 import assert = require("assert");
 
 When("the user has logged in and arrived on the your account page", async function () {
@@ -10,6 +10,6 @@ When("the user has logged in and arrived on the your account page", async functi
     await clickSubmitButton(this.page);
     await enterTextIntoTextInput(this.page, "123123", "sms-otp");
     await clickSubmitButton(this.page);
-    await clickLink(this.page, await getLink(this.page, "Your account"));
+    await clickButtonWithId(this.page, "your-account-top-nav");
     assert.equal(await (await this.page).title(), "Your account - GOV.UK Sign In", "Expected to be on the 'Your account' page");
 });
