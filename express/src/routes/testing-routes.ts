@@ -328,7 +328,6 @@ router.get("/account-success-screen-test", (req, res) => {
         emailAddress: "your.email@digital.cabinet-office.gov.uk",
         mobilePhoneNumber: "07123456789",
         passwordLastChanged: "Last changed 1 month ago",
-        serviceName: "My juggling service",
         updatedField: "email address"
     });
 });
