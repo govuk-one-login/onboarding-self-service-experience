@@ -20,7 +20,7 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v3
         with:
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Node dependencies
         run: npm install
@@ -35,9 +35,8 @@ jobs:
           retention-days: 7
           path: |
             express/dist
+            express/stub
+            express/resources
             express/src/views
             express/manifest.yml
             express/package*.json
-            express/stubs-config.json
-            express/valid-email-domains.txt
-            express/top-100k-common-passwords.txt

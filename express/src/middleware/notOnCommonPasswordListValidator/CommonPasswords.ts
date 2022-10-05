@@ -11,7 +11,7 @@ export class CommonPasswords {
     static async loadCommonPasswords(): Promise<CommonPasswords> {
         const instance: CommonPasswords = new CommonPasswords();
         const data = fs
-            .readFile("./top-100k-common-passwords.txt", {
+            .readFile("resources/common-passwords.txt", {
                 encoding: "utf8"
             })
             .catch(error => {
