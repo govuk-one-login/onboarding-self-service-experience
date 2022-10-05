@@ -60,7 +60,7 @@ describe("Validating numbers works as expected", () => {
                 session: session
             };
             mockResponse = {};
-            nextFunction = await jest.fn();
+            nextFunction = jest.fn();
 
             mockRequest.body.mobileNumber = validNumber;
             validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
@@ -69,17 +69,19 @@ describe("Validating numbers works as expected", () => {
     });
 
     it("rejects invalid numbers", async function () {
-        for (const validNumber of INVALID_NUMBERS) {
+        for (const invalidNumber of INVALID_NUMBERS) {
             mockRequest = {
                 body: jest.fn()
             };
-            mockResponse = {};
-            nextFunction = await jest.fn();
+            mockResponse = {
+                render: jest.fn()
+            };
+            nextFunction = jest.fn();
 
-            mockRequest.body.mobileNumber = validNumber;
-            await expect(
-                validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction)
-            ).rejects.toThrow(Error);
+            mockRequest.body.mobileNumber = invalidNumber;
+            validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+            expect(nextFunction).not.toBeCalled();
+            expect(mockResponse.render).toHaveBeenCalledTimes(1);
         }
     });
 });

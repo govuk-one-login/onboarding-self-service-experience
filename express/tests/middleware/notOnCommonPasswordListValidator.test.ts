@@ -1,4 +1,4 @@
-import { assert } from "chai";
+import {assert} from "chai";
 import commonPasswordsSingleton from "../../src/middleware/notOnCommonPasswordListValidator/commonPasswordsSingleton";
 
 const COMMON_PASSWORD = "Password123";
