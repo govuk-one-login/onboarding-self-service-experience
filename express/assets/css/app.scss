@@ -170,3 +170,11 @@ code {
 .navigation-service-change-list {
   float: left;
 }
+
+#client-details-integration-credentials {
+  border-top: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
+  border-right: 1px solid $govuk-border-colour;
+  border-left: 5px solid $govuk-link-colour;
+  padding: 24px 24px 0 24px;
+}
