@@ -22,10 +22,10 @@ export const registerClientHandler = async (event: APIGatewayProxyEvent): Promis
     const sector_identifier_uri = 'http://localhost/';
 
     let clientConfig = {
-        client_name: payload.service.service_name,
+        client_name: payload.service.serviceName,
         public_key: public_key,
         redirect_uris: redirect_uris,
-        contacts: [payload.contactEmail, "onboarding@digital.cabinet-office.gov.uk"],
+        contacts: [payload.contactEmail, "onboarding@digital.cabinet-office.gov.uk"], // TODO - remove second email before prod
         scopes: scopes,
         post_logout_redirect_uris: post_logout_redirect_uris,
         subject_type: subject_type,

@@ -11,7 +11,8 @@
 
   {% for service in services %}
     <p>
-      <a class="govuk-link govuk-heading-m" href="/client-details/{{ service.pk.S.substring(8) }}/">{{ service.service_name.S }}</a>
+      <a class="govuk-body"
+         href="/client-details/{{ service.id }}/">{{ service.serviceName }}</a>
     </p>
     <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--l">
   {% endfor %}

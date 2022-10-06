@@ -22,17 +22,17 @@ export const listServices = async function (req: Request, res: Response) {
         return;
     }
     const user: User = req.session.selfServiceUser;
-    const services = await s4.listServices(user.pk.S as string, req.session.authenticationResult?.AccessToken as string);
-    if (services.data.Items.length === 0) {
+    const services = await s4.listServices(user.dynamoId as string, req.session.authenticationResult?.AccessToken as string);
+    if (services.length === 0) {
         res.redirect("/add-service-name");
         return;
     }
-    if (services.data.Items.length === 1) {
-        res.redirect(`/client-details/${services.data.Items[0].pk.S.substring("service#".length)}`);
+    if (services.length === 1) {
+        res.redirect(`/client-details/${services[0].id}`);
         return;
     }
 
-    res.render("manage-account/list-services.njk", {services: services.data.Items});
+    res.render("manage-account/list-services.njk", {services: services});
 };
 
 export const showAddServiceForm = async function (req: Request, res: Response) {
@@ -42,10 +42,8 @@ export const showAddServiceForm = async function (req: Request, res: Response) {
 export const processAddServiceForm = async function (req: Request, res: Response) {
     const uuid = randomUUID();
     const service: Service = {
-        pk: `service#${uuid}`,
-        sk: `service#${uuid}`,
-        data: req.body.serviceName,
-        service_name: req.body.serviceName
+        id: `service#${uuid}`,
+        serviceName: req.body.serviceName
     };
     const user = req.session.selfServiceUser as User;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
@@ -81,9 +79,10 @@ export const showAccount = async function (req: Request, res: Response, next: Ne
 
     const user: User = req.session?.selfServiceUser as User;
     res.render("account/account.njk", {
-        emailAddress: user.email?.S,
-        mobilePhoneNumber: user.phone?.S,
-        passwordLastChanged: lastUpdated(user.password_last_updated?.S),
+        emailAddress: user.email,
+        mobilePhoneNumber: user.mobileNumber,
+        passwordLastChanged: lastUpdated(user.passwordLastUpdated),
+        serviceName: "My juggling service",
         updatedField: req.session.updatedField
     });
     req.session.updatedField = undefined;

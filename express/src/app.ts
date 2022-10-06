@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import express, {NextFunction, Request, Response} from "express";
 import "express-async-errors";
 import path from "path";
-import {User, User2} from "../@types/user";
+import {User} from "../@types/user";
 import configureViews from "./config/configure-views";
 import setSignedInStatus from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
@@ -17,13 +17,13 @@ const app = express();
 
 app.use(sessionStorage());
 
-const cognitoPromise = import(`./lib/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(client => {
+const cognitoPromise = import(`./services/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(client => {
     const cognito = new client.default.CognitoClient();
     app.set("cognitoClient", cognito);
     return cognito;
 });
 
-const lambdaPromise = import(`./lib/lambda-facade/${process.env.LAMBDA_FACADE || "LambdaFacade"}`).then(facade => {
+const lambdaPromise = import(`./services/lambda-facade/${process.env.LAMBDA_FACADE || "LambdaFacade"}`).then(facade => {
     const lambda = facade.lambdaFacadeInstance;
     app.set("lambdaFacade", facade.lambdaFacadeInstance);
     return lambda;
@@ -50,7 +50,6 @@ declare module "express-session" {
         authenticationResult: AuthenticationResultType;
         cognitoUser: CognitoUser;
         selfServiceUser: User;
-        user: User2;
         mfaResponse: MfaResponse;
         updatedField: string;
         isSignedIn: boolean;
@@ -60,6 +59,9 @@ declare module "express-session" {
 configureViews(app, path.join(__dirname, "../src/views"));
 
 app.use(setSignedInStatus);
+app.use(function (req: Request, res: Response, next: NextFunction) {
+    next();
+});
 
 app.use("/", createAccount);
 app.use("/", signIn);

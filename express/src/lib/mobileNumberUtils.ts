@@ -14,6 +14,10 @@ export function validate(number: string): {isValid: boolean; errorMessage?: stri
     processed = getUniquePart(processed);
     processed = removeSpacingCharacters(processed);
 
+    if (is070(processed)) {
+        return {isValid: false, errorMessage: "Enter a UK mobile phone number, like 07700 900000"};
+    }
+
     if (!onlyNumbersOrPlusRemain(processed)) {
         return {isValid: false, errorMessage: "Enter a UK mobile phone number using numbers only"};
     }
@@ -53,6 +57,11 @@ function getUniquePart(mobileNumber: string): string {
 
 function removeParentheses(number: string) {
     return number.trim().replace(/^\((.*)\)(.*)$/g, "$1$2");
+}
+
+function is070(number: string) {
+    // or +4470 ...
+    return /^70.*$/.test(number.trim());
 }
 
 function onlyNumbersOrPlusRemain(number: string) {
