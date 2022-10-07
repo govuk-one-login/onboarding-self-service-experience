@@ -143,7 +143,7 @@ router.post(
                 req.params.serviceId,
                 req.params.selfServiceClientId,
                 req.params.clientId,
-                {post_logout_redirect_uris: postLogoutUris},
+                {post_logout_logout_uris: postLogoutUris},
                 req.session.authenticationResult?.AccessToken as string
             );
         } catch (error) {

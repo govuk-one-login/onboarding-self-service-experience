@@ -1,7 +1,5 @@
 import {
     AdminCreateUserCommand,
-    AdminGetUserCommand,
-    AdminGetUserCommandOutput,
     AdminInitiateAuthCommand,
     AdminInitiateAuthCommandOutput,
     AdminRespondToAuthChallengeCommand,
@@ -120,16 +118,6 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             ProposedPassword: proposedPassword
         };
         const command = new ChangePasswordCommand(params);
-
-        return await this.cognitoClient.send(command);
-    }
-
-    async getUser(username: string): Promise<AdminGetUserCommandOutput> {
-        const params = {
-            Username: username,
-            UserPoolId: this.userPoolId
-        };
-        const command = new AdminGetUserCommand(params);
 
         return await this.cognitoClient.send(command);
     }

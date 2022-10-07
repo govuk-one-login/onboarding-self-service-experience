@@ -17,7 +17,7 @@
   <p class="govuk-body">Your service name is shown to your users in the sign in journey. For example “Now continue to use the [service name] service.”</p>
   <p class="govuk-body">You can change it later.</p>
 
-  <form class="form" action="/create-service-name-validation" method="post">
+  <form class="form" action="/create-service-name-validation/{{ values.userId }}" method="post">
     {{ govukInput({
       label: {
         text: "Service name"

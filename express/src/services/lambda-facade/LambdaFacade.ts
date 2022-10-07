@@ -1,10 +1,9 @@
 import axios, {Axios, AxiosResponse} from "axios";
-import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
-import {User} from "../../../@types/user";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import AuthenticationResultParser from "../../lib/AuthenticationResultParser";
+import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 
 class LambdaFacade implements LambdaFacadeInterface {
     private instance: Axios;
@@ -31,17 +30,18 @@ class LambdaFacade implements LambdaFacadeInterface {
     async getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
         return await (
             await this.instance
-        ).post("/Prod/get-user", `cognito_username#${cognitoId}`, {
+        ).post("/Prod/get-user", `user#${cognitoId}`, {
             headers: {
                 "authorised-by": accessToken
             }
         });
     }
 
-    async newService(service: Service, user: User, accessToken: string): Promise<AxiosResponse> {
+    async newService(service: Service, userId: string, email: string, accessToken: string): Promise<AxiosResponse> {
         const body = {
             service: service,
-            user: user
+            userDynamoId: userId,
+            userEmail: email
         };
         return await (
             await this.instance
@@ -98,10 +98,9 @@ class LambdaFacade implements LambdaFacadeInterface {
         return await (await this.instance).get(`/Prod/get-service-clients/${bareServiceId}`);
     }
 
-    async updateUser(selfServiceUserId: string, cognitoUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
+    async updateUser(selfServiceUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
         const body = {
             userId: selfServiceUserId,
-            cognitoUserId: cognitoUserId,
             updates: updates
         };
 

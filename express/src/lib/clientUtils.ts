@@ -1,10 +1,9 @@
 import {Client, ClientFromDynamo} from "../../@types/client";
 
 export function dynamoClientToDomainClient(client: ClientFromDynamo): Client {
-    console.log(client);
     return {
-        dynamoId: client.pk,
-        dynamoServiceId: client.sk,
+        dynamoId: client.pk.substring("service#".length),
+        dynamoServiceId: client.sk.substring("client#".length),
         authClientId: client.clientId,
         contacts: client.contacts,
         defaultFields: client.default_fields,

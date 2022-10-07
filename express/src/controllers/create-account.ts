@@ -1,9 +1,9 @@
 import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
-import {randomUUID} from "crypto";
 import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {prepareForCognito} from "../lib/mobileNumberUtils";
+import {domainUserToDynamoUser} from "../lib/userUtils";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     res.render("create-account/get-email.njk");
@@ -160,26 +160,22 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         const s4: SelfServiceServicesService = req.app.get("backing-service");
         await s4.verifyMobileUsingSmsCode(req.session.authenticationResult?.AccessToken, otp);
 
-        const uuid = randomUUID();
         const email = AuthenticationResultParser.getEmail(req.session.authenticationResult);
-        const phone = req.session.enteredMobileNumber;
+        const phone = req.session.enteredMobileNumber as string;
         const cognitoId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult);
 
         await s4.setMfaPreference(cognitoId);
 
-        const user = {
-            pk: `user#${uuid}`,
-            sk: `cognito_username#${cognitoId}`,
-            data: "we haven't collected this full name",
-            first_name: "we haven't collected this first name",
-            last_name: "we haven't collected this last name",
+        const user = domainUserToDynamoUser({
+            id: cognitoId,
+            fullName: "we haven't collected this full name",
+            firstName: "we haven't collected this first name",
+            lastName: "we haven't collected this last name",
             email: email,
-            phone: phone,
-            password_last_updated: new Date()
-        };
-
+            mobileNumber: phone,
+            passwordLastUpdated: new Date().toLocaleDateString()
+        });
         await s4.putUser(user, req.session.authenticationResult?.AccessToken);
-        req.session.selfServiceUser = await s4.getSelfServiceUser(req.session?.authenticationResult);
         req.session.isSignedIn = true;
         res.redirect("/add-service-name");
         return;

@@ -1,6 +1,5 @@
 import {
     AdminCreateUserCommandOutput,
-    AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
     AdminRespondToAuthChallengeCommandOutput,
     AdminSetUserMFAPreferenceCommandOutput,
@@ -127,14 +126,6 @@ export class CognitoClient implements CognitoInterface {
     async resendEmailAuthCode(email: string): Promise<AdminCreateUserCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("login", "email", email);
         return Promise.resolve(returnValue || {$metadata: {}});
-    }
-
-    getUser(username: string): Promise<AdminGetUserCommandOutput> {
-        return Promise.resolve({
-            $metadata: {},
-            Username: username,
-            UserAttributes: [{Name: "email", Value: "email@mail.com"}]
-        });
     }
 
     async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
