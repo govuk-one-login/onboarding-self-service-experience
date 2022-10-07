@@ -77,10 +77,9 @@ Feature:
     When the user submits the email "registering-successfully@gds.gov.uk"
     Then they should be directed to the following page: "/create/check-email"
 
-
     Given that the user is on the "/create/check-email" page
     When they click the Submit button
-    Then the error message "Enter the security code" must be displayed for the "create-email-otp" field
+    Then the error message "Enter the 6 digit security code" must be displayed for the "create-email-otp" field
     And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
 
   Scenario: The user enters anything other than 6 digits on the Check your email page
@@ -94,7 +93,7 @@ Feature:
 
     Given that the user is on the "/create/check-email" page
     When the user submits the email-otp "AA1234"
-    Then the error message "Enter the security code using only 6 digits" must be displayed for the "create-email-otp" field
+    Then the error message "Your security code should only include numbers" must be displayed for the "create-email-otp" field
     And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
 
   Scenario: The user does not enter anything in the password field on Create your password page

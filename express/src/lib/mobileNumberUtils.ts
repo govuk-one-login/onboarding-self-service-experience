@@ -1,4 +1,6 @@
-export function validate(number: string): {isValid: boolean; errorMessage?: string} {
+import {validationResult} from "./validators/validationResult";
+
+export function validate(number: string): validationResult {
     let processed: string;
 
     if (isBlank(number)) {
@@ -75,3 +77,17 @@ function removeSpacingCharacters(number: string) {
 function exactlyTenNumbersRemain(number: string): boolean {
     return /^[0-9]{10}$/.test(number.trim());
 }
+
+// number masking
+
+export function obscureNumber(number: string): string {
+    if (obscuredByCognito.test(number)) {
+        return "*" + number.substring("+44".length);
+    } else {
+        let processed = removeParentheses(number);
+        processed = getUniquePart(processed);
+        return `********${removeSpacingCharacters(processed).substring(8)}`;
+    }
+}
+
+const obscuredByCognito = /^\+\*{8}[0-9]{4}$/;

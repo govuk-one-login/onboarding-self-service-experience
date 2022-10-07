@@ -1,4 +1,4 @@
-import validateMobileNumber from "../../src/middleware/mobileValidator";
+import validateMobileNumber from "../../src/middleware/validators/mobileValidator";
 import {Request, Response, NextFunction} from "express";
 import {Session} from "express-session";
 

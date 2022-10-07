@@ -15,12 +15,12 @@ import {
     submitMobileVerificationCode,
     updatePassword
 } from "../controllers/create-account";
-import {emailValidator} from "../middleware/emailValidator";
-import {mobileOtpValidator} from "../middleware/mobileOtpValidator";
-import notOnCommonPasswordListValidator from "../middleware/notOnCommonPasswordListValidator";
-import {passwordValidator} from "../middleware/passwordValidator";
-import {emailOtpValidator} from "../middleware/emailOtpValidator";
-import validateMobileNumber from "../middleware/mobileValidator";
+import {emailValidator} from "../middleware/validators/emailValidator";
+import {mobileOtpValidator} from "../middleware/validators/mobileOtpValidator";
+import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
+import {passwordValidator} from "../middleware/validators/passwordValidator";
+import {emailOtpValidator} from "../middleware/validators/emailOtpValidator";
+import validateMobileNumber from "../middleware/validators/mobileValidator";
 
 const router = express.Router();
 
@@ -43,7 +43,7 @@ router.post("/create/enter-mobile", validateMobileNumber("create-account/enter-m
 
 router.post(
     "/create/verify-phone-code",
-    mobileOtpValidator(false, "/create/verify-phone-code", "/create/resend-phone-code"),
+    mobileOtpValidator("/create/verify-phone-code", "/create/resend-phone-code"),
     submitMobileVerificationCode
 );
 
