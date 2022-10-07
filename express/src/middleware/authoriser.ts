@@ -3,7 +3,8 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 
 export async function checkAuthorisation(req: Request, res: Response, next: NextFunction) {
     if (!req.session.authenticationResult?.AccessToken) {
-        res.render("sign-in.njk", {values: new Map<string, string>(), errorMessages: new Map<string, string>()});
+        res.redirect("/session-timeout");
+        return;
     } else {
         if (req.session.authenticationResult?.RefreshToken) {
             const s4: SelfServiceServicesService = req.app.get("backing-service");

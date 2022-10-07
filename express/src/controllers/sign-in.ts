@@ -113,8 +113,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const response = await s4.setPhoneNumber(req.session.emailAddress, mobileNumber);
-
+    await s4.setPhoneNumber(req.session.emailAddress, mobileNumber);
     // presumably that was fine so let's try to veerify the number
 
     const codeSent = await s4.sendMobileNumberVerificationCode(accessToken);
@@ -132,4 +131,8 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
         textMessageNotReceivedUrl: "/resend-text-code",
         active: "sign-in"
     });
+};
+
+export const sessionTimeout = async function (req: Request, res: Response) {
+    res.render("session-timeout.njk");
 };

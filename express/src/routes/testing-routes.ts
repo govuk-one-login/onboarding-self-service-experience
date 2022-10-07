@@ -448,11 +448,6 @@ router.post("/create-new-password", passwordValidator("create-new-password.njk",
     res.redirect("/check-yourphonetestpage");
 });
 
-// // Testing rout for Create the session timeout page
-router.get("/session-timeout", (req, res) => {
-    res.render("session-timeout.njk");
-});
-
 // Testing routs Create an 'No account found' page
 router.get("/no-account-found", (req, res) => {
     res.render("no-account-found.njk");
