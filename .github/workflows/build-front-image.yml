@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      environment: { required: true, type: string }
+    secrets:
+      aws-role-arn: { required: true }
+
+concurrency:
+  group: build-front-image-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Frontend image
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@44aea56aa4d76d27118d1485de4170cd9ac4c0f4
+        with:
+          aws-role-arn: ${{ secrets.aws-role-arn }}
+          repository: self-service/frontend
+          image-version: ${{ github.sha }}
+          image-tags: ${{ github.head_ref || github.ref_name }}
+          build-path: express

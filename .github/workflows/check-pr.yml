@@ -9,7 +9,7 @@ jobs:
 
   build-front:
     name: Build
-    uses: ./.github/workflows/build-front.yml
+    uses: ./.github/workflows/build-front-app.yml
 
   run-unit-tests:
     name: Run tests

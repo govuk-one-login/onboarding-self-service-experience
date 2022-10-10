@@ -42,6 +42,7 @@ Resources:
                   - ecr:CompleteLayerUpload
                   - ecr:UploadLayerPart
                   - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchDeleteImage
                   - ecr:BatchGetImage
                   - ecr:ListImages
                   - ecr:PutImage
