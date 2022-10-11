@@ -23,6 +23,19 @@
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Integration client</h2>
 
+  {% set publicKeyContainer %}
+    <div id="publicKeyContainer" class="govuk-body">
+      <div id="publicKeyShort">{{ userPublicKey|shortenKey }} ...</div>
+      <div id="publicKeyLong">{{ userPublicKey }}</div>
+      <button type="button" id="togglePublicKey" class="govuk-accordion__show-all">
+          <span class="govuk-accordion__section-toggle-focus">
+            <span id="toggleTextChevron" class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down"></span>
+            <span id="buttonText" class="govuk-accordion__section-toggle-text">Show the full public key</span>
+          </span>
+      </button>
+    </div>
+  {% endset %}
+
   {{ govukSummaryList({
     rows: [
       {
@@ -53,7 +66,7 @@
       },
       {
         key: {text: "Public key"},
-        value: {text: userPublicKey},
+        value: {html: publicKeyContainer},
         actions: {
           items: [{
             href: urls.changePublicKey,
@@ -115,4 +128,8 @@
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Production client</h2>
   <p class="govuk-body govuk-!-margin-top-3">You can add a production client if you <a class="govuk-link" href="/">join our private beta</a>.</p>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/dist/toggle-public-key-view.js"></script>
 {% endblock %}
