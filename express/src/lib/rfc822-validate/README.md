@@ -1,9 +1,8 @@
 Ported from the npm package rfc822-validate; original README as follows:
 
-rfc822-validate
-===============
+# rfc822-validate
 
-JavaScript function to check an email address conforms to [RFC822][1].  Compatible with Node.js and RequireJS/AMD!
+JavaScript function to check an email address conforms to [RFC822][1]. Compatible with Node.js and RequireJS/AMD!
 
 Portions copyright © 2013 William Riley-Land - http://kun.io
 
@@ -44,12 +43,12 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 http://www.gnu.org/copyleft/gpl.html
 
 [1]: http://www.ietf.org/rfc/rfc0822.txt "RFC822"
