@@ -1,0 +1,104 @@
+name: Deploy Dynamo API
+
+on: workflow_dispatch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build SAM template for Dynamo API
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      AWS_REGION: eu-west-2
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
+      - name: Build SAM application
+        uses: alphagov/di-github-actions/sam/build-application@c084177a1709c8ebb9c29816c181defcae0bc9e6
+        with:
+          disable-cache: true
+          enable-beta-features: true
+          sam-template-file: ./backend/dynamo-api/template.yaml
+          aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Archive SAM distribution artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: onboarding-self-service-dynamo-api
+          retention-days: 3
+          path: |
+            **/.aws-sam/build
+
+
+  deploy:
+    name: Deploy to AWS
+    needs: build
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      AWS_REGION: eu-west-2
+    outputs:
+      stack-name: ${{ steps.set-stack-name.outputs.pretty-branch-name }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
+      - name: Get distribution artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: onboarding-self-service-dynamo-api
+
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set stack name
+        id: set-stack-name
+        uses: alphagov/di-github-actions/beautify-branch-name@6eaee78c679ed887674be3c224e593d9d62bc666
+        with:
+          set-env-var: STACK_NAME
+          length-limit: 24
+          prefix: preview
+          tidy-dependabot-branch: 'true'
+          usage: Stack name
+
+      - name: Delete failed stack
+        uses: alphagov/di-github-actions/sam/delete-stacks@be0d9fa6688648488921bc6b98709db93e4e41ba
+        with:
+          only-if-failed: true
+          stack-names: ${{ env.STACK_NAME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy SAM Application
+        timeout-minutes: 15
+        env:
+          S3_BUCKET: ${{ secrets.SAM_DEPLOYMENT_BUCKET }}
+        run: |
+          sam deploy \
+            --stack-name "$STACK_NAME" \
+            --s3-prefix "onboarding-self-service-dynamo-api/$STACK_NAME" \
+            --s3-bucket "$S3_BUCKET" \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --tags DeploymentSource="GitHub Actions" StackType=Preview \
+            --parameter-overrides Environment=local LocalName=default VpcStackName=di-dfa-self-serve
+      - name: Report deployment
+        run: echo "Deployed stack \`$STACK_NAME\`" >> "$GITHUB_STEP_SUMMARY"
