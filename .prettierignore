@@ -1,0 +1,7 @@
+.aws-sam
+dist
+
+*.scss
+*.json
+*.yaml
+*.yml

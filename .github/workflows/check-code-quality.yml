@@ -26,3 +26,11 @@ jobs:
     steps:
       - name: Run shell checks
         uses: alphagov/di-github-actions/code-quality/check-shell-scripts@64fae1abf5a5bf6360c7560dbc6a6fa850484f11
+
+  check-linting:
+    name: Linting
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check linting and formatting
+        uses: alphagov/di-github-actions/code-quality/check-linting@bau-add-action-to-check-linting

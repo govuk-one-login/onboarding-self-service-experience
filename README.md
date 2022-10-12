@@ -1,12 +1,14 @@
 # Self-Service Experience
 
 ## Install SAM if it's not already installed
+
 ```shell
 brew tap aws/tap
 brew install aws-sam-cli
 ```
 
 ## Install the right version of Node
+
 Make sure you have an appropriate version of node. 14 is the current LTS version and the one we use for our applications.
 
 ```shell
@@ -19,6 +21,7 @@ nvm use 14.20.0
 ```
 
 ## Deploy stacks
+
 Deploy your own stacks
 
 ```shell
@@ -44,9 +47,9 @@ cd ./backend/dynamo-db/ docker-compose up - This will spin up the local dynamoDB
 
 ## Configure and run the application
 
-To experience the Self-Service Experience, copy, `.env.example`, rename it to `.env` and update the variables with appropriate values.  These values will relate to the stacks you've just created.
+To experience the Self-Service Experience, copy, `.env.example`, rename it to `.env` and update the variables with appropriate values. These values will relate to the stacks you've just created.
 
-`npm run build` the first time you need to run the application in order to build the stylesheets and assets.  If you don't do this, the page will look like it's escaped from Netscape in the late 1990s.
+`npm run build` the first time you need to run the application in order to build the stylesheets and assets. If you don't do this, the page will look like it's escaped from Netscape in the late 1990s.
 
 There are two environment variables which can be set:
 
@@ -55,6 +58,6 @@ LAMBDA_FACADE=[ LambdaFacade | StubLambdaFacade ]
 
 In general the application will use the full implementations if the environment variables have not been set to use the stubs. To use the full implementations you'll need AWS Credentials; these can be set using `gds aws <your-account> --`
 
-`gds aws <account> -- npm run dev` if you want it to restart every time you change something.  This sets the above environment variables to the stub values if they're not set explicitly (see [package.json](./express/package.json))
+`gds aws <account> -- npm run dev` if you want it to restart every time you change something. This sets the above environment variables to the stub values if they're not set explicitly (see [package.json](./express/package.json))
 
 `gds aws <account> -- npm start` if you don't want the application to restart.
