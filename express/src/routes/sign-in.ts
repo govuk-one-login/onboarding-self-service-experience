@@ -8,7 +8,8 @@ import {
     showResendPhoneCodeForm,
     showSignInFormEmail,
     showSignInFormPassword,
-    signOut
+    signOut,
+    sessionTimeout
 } from "../controllers/sign-in";
 import emailIsPresentInSession from "../middleware/emailIsPresentInSession/emailIsPresentInSession";
 import {emailValidator} from "../middleware/emailValidator";
@@ -19,6 +20,7 @@ import {processLoginOtpMobile} from "../middleware/sign-in-middleware";
 const router = express.Router();
 
 router.get("/sign-in", showSignInFormEmail);
+router.get("/session-timeout", sessionTimeout);
 router.post("/sign-in", emailValidator("sign-in.njk"), processEmailAddress);
 router.get(
     "/sign-in-password",
