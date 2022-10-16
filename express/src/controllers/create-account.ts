@@ -18,7 +18,7 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
     } catch (error) {
         if (error instanceof UsernameExistsException) {
             // TODO We need to handle this properly with another flow
-            res.render("/sign-in");
+            res.redirect("/existing-account");
             return;
         }
 
@@ -29,7 +29,7 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
     res.redirect("check-email");
 };
 
-export const showCheckEmailForm = function (req: Request, res: Response, next: NextFunction) {
+export const showCheckEmailForm = function (req: Request, res: Response) {
     if (!req.session.emailAddress) {
         console.error("showCheckEmailForm::emailAddress not in the session, redirecting to /create/get-email");
         res.redirect("/create/get-email");
@@ -77,7 +77,7 @@ export const showNewPasswordForm = async function (req: Request, res: Response) 
     }
 };
 
-export const updatePassword = async function (req: Request, res: Response, next: NextFunction) {
+export const updatePassword = async function (req: Request, res: Response) {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     req.session.authenticationResult = await s4.setNewPassword(

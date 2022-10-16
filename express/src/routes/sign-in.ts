@@ -9,7 +9,8 @@ import {
     showSignInFormEmail,
     showSignInFormPassword,
     signOut,
-    sessionTimeout
+    sessionTimeout,
+    accountExists
 } from "../controllers/sign-in";
 import emailIsPresentInSession from "../middleware/emailIsPresentInSession/emailIsPresentInSession";
 import {emailValidator} from "../middleware/emailValidator";
@@ -47,5 +48,9 @@ router.post(
 router.get("/resend-text-code", showResendPhoneCodeForm);
 router.post("/resend-text-code", resendMobileVerificationCode);
 router.get("/account/sign-out", signOut);
+router.get("/existing-account", accountExists);
+router.post("/existing-account", passwordValidator("create-account/existing-account.njk", false), async (req, res) => {
+    res.render("check-mobile.njk");
+});
 
 export default router;

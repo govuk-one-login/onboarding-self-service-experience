@@ -136,3 +136,11 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
 export const sessionTimeout = async function (req: Request, res: Response) {
     res.render("session-timeout.njk");
 };
+
+export const accountExists = async function (req: Request, res: Response) {
+    res.render("create-account/existing-account.njk", {
+        values: {
+            emailAddress: req.session.emailAddress
+        }
+    });
+};

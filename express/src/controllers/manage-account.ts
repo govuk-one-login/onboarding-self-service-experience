@@ -1,4 +1,4 @@
-import {NextFunction, Request, Response} from "express";
+import {Request, Response} from "express";
 import {randomUUID} from "crypto";
 import {User} from "../../@types/user";
 import {Service} from "../../@types/Service";
@@ -36,7 +36,7 @@ export const listServices = async function (req: Request, res: Response) {
 };
 
 export const showAddServiceForm = async function (req: Request, res: Response) {
-    res.render("add-service-name.njk", );
+    res.render("add-service-name.njk");
 };
 
 export const processAddServiceForm = async function (req: Request, res: Response) {
@@ -71,7 +71,7 @@ export const showChangePasswordForm = async function (req: Request, res: Respons
     res.render("account/change-password.njk");
 };
 
-export const showAccount = async function (req: Request, res: Response, next: NextFunction) {
+export const showAccount = async function (req: Request, res: Response) {
     if (!req.session.authenticationResult) {
         console.error("showAccount::authenticationResult not in session, redirecting to sign-in");
         res.redirect("sign-in.njk");
@@ -108,7 +108,6 @@ function lastUpdated(lastUpdated: string): string {
             month: "long"
         })}`;
     }
-    return lastUpdated ? lastUpdated : "Never changed";
 }
 
 function fiveMinutesBefore(someTime: number): number {

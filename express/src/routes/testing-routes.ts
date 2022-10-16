@@ -502,17 +502,4 @@ router.post("/new-phone-number", validateMobileNumber("new-phone-number.njk"), a
     res.render("check-mobile.njk");
 });
 
-// Testing routes for 'An account already exist' page
-router.get("/account-exists", (req, res) => {
-    res.render("create-account/account-exists.njk", {
-        values: {
-            emailAddress: "email@address.com"
-        }
-    });
-});
-
-router.post("/account-exists", passwordValidator("create-account/account-exists.njk", false), async (req, res) => {
-    res.render("check-mobile.njk");
-});
-
 export default router;
