@@ -1,4 +1,9 @@
-import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
+import {
+    AdminCreateUserCommandOutput,
+    CodeMismatchException,
+    NotAuthorizedException,
+    UsernameExistsException
+} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
@@ -219,7 +224,7 @@ export const resendEmailVerificationCode = async function (req: Request, res: Re
     const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
-    let result: any;
+    let result: AdminCreateUserCommandOutput;
     try {
         result = await s4.resendEmailAuthCode(emailAddress);
         console.debug(result);
