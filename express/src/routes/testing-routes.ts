@@ -509,9 +509,10 @@ router.post("/new-phone-number", validateMobileNumber("new-phone-number.njk"), a
 
 // Testing routes for 'An account already exist' page
 router.get("/account-exists", (req, res) => {
+    req.session.emailAddress = "email@address.com";
     res.render("create-account/account-exists.njk", {
         values: {
-            emailAddress: "email@address.com"
+            emailAddress: req.session.emailAddress
         }
     });
 });
