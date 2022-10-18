@@ -182,3 +182,27 @@ code {
 main.main-account-exists {
   padding-top: 15px;
 }
+
+#publicKeyContainer {
+  #publicKeyLong {
+    display: none;
+  }
+  #togglePublicKey {
+    border: none;
+    background: none;
+    font-weight: 400;
+    color: $govuk-link-colour;
+    cursor: pointer;
+    padding-left: 0;
+    margin-bottom: 0;
+  }
+  #togglePublicKey:hover {
+    box-shadow: none;
+  }
+  #togglePublicKey:focus {
+    color: $govuk-text-colour;
+    background-color: $govuk-focus-colour;
+    -webkit-box-shadow: 0 -2px  $govuk-focus-colour,0 4px $govuk-text-colour;
+    box-shadow: rgb(255, 221, 0) 0px -2px, rgb(11, 12, 12) 0px 4px;
+  }
+}
