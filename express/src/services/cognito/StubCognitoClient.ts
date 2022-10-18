@@ -1,7 +1,6 @@
 import {
     AdminCreateUserCommandOutput,
     AdminInitiateAuthCommandOutput,
-    AdminRespondToAuthChallengeCommandOutput,
     AdminSetUserMFAPreferenceCommandOutput,
     AdminUpdateUserAttributesCommandOutput,
     ChangePasswordCommandOutput,
@@ -20,7 +19,7 @@ import * as crypto from "crypto";
 type Override = {
     parameter: string;
     value: string;
-    return?: any;
+    return?: never;
     throw?: string;
 };
 
@@ -89,10 +88,12 @@ export class CognitoClient implements CognitoInterface {
         TokenType: "Bearer"
     };
 
-    overrides: Promise<any>;
+    overrides: Promise<never>;
 
     constructor() {
         console.log("Creating stub Cognito client...");
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         this.overrides = fs.readFile("stub/stubs-config.json");
         this.authenticationResult.IdToken = this.getIdToken();
         this.authenticationResult.AccessToken = this.getAccessToken();
@@ -119,7 +120,7 @@ export class CognitoClient implements CognitoInterface {
     }
 
     async createUser(email: string): Promise<AdminCreateUserCommandOutput> {
-        const returnValue = await this.getOverriddenReturnValue("login", "email", email);
+        const returnValue = await this.getOverriddenReturnValue("createUser", "email", email);
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
@@ -128,11 +129,13 @@ export class CognitoClient implements CognitoInterface {
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("login", "email", email);
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }
@@ -141,11 +144,13 @@ export class CognitoClient implements CognitoInterface {
         return Promise.resolve({UserAttributes: [{Name: "email", Value: username}], $metadata: {}});
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("setNewPassword", "password", password);
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<ChangePasswordCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }
@@ -160,6 +165,7 @@ export class CognitoClient implements CognitoInterface {
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setMfaPreference(cognitoUsername: string): Promise<AdminSetUserMFAPreferenceCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }
@@ -201,14 +207,19 @@ export class CognitoClient implements CognitoInterface {
         throw new Error("Unknown exception");
     }
 
-    respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-types,@typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-types,@typescript-eslint/no-unused-vars
+    respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<undefined | {$metadata: {}}> {
         return Promise.resolve(this.getOverriddenReturnValue("respondToMfaChallenge", "username", username) || {$metadata: {}});
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setMobilePhoneAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput> {
         return Promise.resolve({AuthenticationResult: this.authenticationResult, $metadata: {}});
     }

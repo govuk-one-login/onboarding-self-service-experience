@@ -22,7 +22,6 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
         await s4.createUser(emailAddress);
     } catch (error) {
         if (error instanceof UsernameExistsException) {
-            // TODO We need to handle this properly with another flow
             res.redirect("/existing-account");
             return;
         }
