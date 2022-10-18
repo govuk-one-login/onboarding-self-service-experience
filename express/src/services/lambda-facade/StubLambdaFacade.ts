@@ -18,7 +18,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
     };
 
     constructor() {
-        console.log("Creating stub lambda facade");
+        console.log("Creating stub lambda facade...");
     }
 
     getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {

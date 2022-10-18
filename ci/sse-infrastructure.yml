@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  SelfServiceFrontECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: self-service/frontend
+      ImageTagMutability: IMMUTABLE
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      EncryptionConfiguration:
+        EncryptionType: KMS
+      Tags:
+        - Key: "application"
+          Value: "di-self-service"
+      LifecyclePolicy:
+        RegistryId: !Ref AWS::AccountId
+        LifecyclePolicyText: '{
+          "rules": [
+            {
+              "rulePriority": 1,
+              "description": "Keep images pushed in the last 5 days",
+              "selection": {
+                "tagStatus": "any",
+                "countType": "sinceImagePushed",
+                "countUnit": "days",
+                "countNumber": 5
+              },
+              "action": {
+                "type": "expire"
+              }
+            }
+          ]
+        }'
+
+Outputs:
+  SSEFrontECRRepositoryARN:
+    Value: !GetAtt SelfServiceFrontECRRepository.Arn
