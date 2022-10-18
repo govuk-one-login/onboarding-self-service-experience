@@ -377,3 +377,11 @@ Feature:
     When the user submits the service name ""
     Then the error message "Enter your service name" must be displayed for the "serviceName" field
 
+  Scenario: The user tries to create account with already registered email
+    Given that the user is on the "/" page
+    When they click on the "Create account" button-link
+    Then they should be directed to the following page: "/create/get-email"
+
+    When the user submits the email "inuse@foo.gov.uk"
+    Then they should be directed to the following page: "/existing-account"
+    Then they should see the text "inuse@foo.gov.uk"
