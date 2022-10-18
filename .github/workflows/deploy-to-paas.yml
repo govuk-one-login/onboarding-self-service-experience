@@ -33,7 +33,7 @@ jobs:
       deployment-url: ${{ steps.push-to-paas.outputs.deployment-url }}
     steps:
       - name: Get distribution artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: self-service-front
 

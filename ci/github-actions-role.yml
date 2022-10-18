@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  GitHubOrg:
+    Type: String
+    Default: alphagov
+  RepositoryName:
+    Type: String
+    Default: di-onboarding-self-service-experience
+  OIDCProviderArn:
+    Description: ARN of the the GitHub OIDC provider
+    Type: String
+
+Resources:
+  GitHubRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !Ref OIDCProviderArn
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
+      Policies:
+        - PolicyName: GitHubActions
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Resource: "*"
+                Action:
+                  - ecr:GetAuthorizationToken
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/self-service/*
+                Action:
+                  - ecr:InitiateLayerUpload
+                  - ecr:CompleteLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:ListImages
+                  - ecr:PutImage
+
+Outputs:
+  GitHubRoleARN:
+    Value: !GetAtt GitHubRole.Arn
