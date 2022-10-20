@@ -1,15 +1,26 @@
-name: Deploy branch
+name: Deploy branch preview
 
 on: workflow_dispatch
 
 jobs:
-  build-front:
+  build-front-app:
     name: Build
-    uses: ./.github/workflows/build-front.yml
+    uses: ./.github/workflows/build-front-app.yml
 
-  deploy-front-preview:
+  build-front-image:
+    name: Build
+    uses: ./.github/workflows/build-front-image.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: development
+    secrets:
+      aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
+
+  deploy-front-preview-paas:
     name: Preview
-    needs: build-front
+    needs: build-front-app
     uses: ./.github/workflows/deploy-to-paas.yml
     with:
       environment: preview
