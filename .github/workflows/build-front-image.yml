@@ -1,4 +1,4 @@
-name: Build
+name: Build frontend image
 
 on:
   workflow_call:
