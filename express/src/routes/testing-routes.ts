@@ -444,7 +444,7 @@ router.get("/create-new-password", (req, res) => {
     res.render("create-new-password.njk");
 });
 
-router.post("/create-new-password", passwordValidator("create-new-password.njk", false), async (req, res) => {
+router.post("/create-new-password", passwordValidator("create-new-password.njk"), async (req, res) => {
     res.redirect("/check-yourphonetestpage");
 });
 

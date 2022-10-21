@@ -1,22 +1,18 @@
 import {Express} from "express-serve-static-core";
-import * as nunjucks from "nunjucks";
-import {render} from "nunjucks";
+import {configure, render} from "nunjucks";
+import {views} from "./resources";
 
-export default function (app: Express, viewPath = "../../src/views") {
+export default function (app: Express) {
     const govukViews = require.resolve("govuk-frontend").match(/.*govuk-frontend\//)?.[0];
 
     if (!govukViews) {
         throw "Couldn't load govuk-frontend module";
     }
 
-    const nunjucksEnv: nunjucks.Environment = nunjucks.configure([viewPath, govukViews], {
+    configure([views, govukViews], {
         autoescape: true,
-        express: app,
-        noCache: true
-    });
-
-    nunjucksEnv.addFilter("shortenKey", function (str) {
-        return str.slice(0, 24);
+        noCache: true,
+        express: app
     });
 
     app.engine("njk", render);

@@ -33,57 +33,57 @@ describe("Validating numbers works as expected", () => {
     let mockResponse: Partial<Response>;
     let nextFunction: NextFunction;
 
-    it("accepts valid numbers", async function () {
-        for (const validNumber of VALID_NUMBERS) {
-            const session: Session = {
-                id: "",
-                cookie: {originalMaxAge: 0},
-                regenerate(callback: (err: any) => void): Session {
-                    return this;
-                },
-                destroy(callback: (err: any) => void): Session {
-                    return this;
-                },
-                reload(callback: (err: any) => void): Session {
-                    return this;
-                },
-                resetMaxAge(): Session {
-                    return this;
-                },
-                save(callback?: (err: any) => void): Session {
-                    return this;
-                },
-                touch(): Session {
-                    return this;
-                }
-            };
-            mockRequest = {
-                body: jest.fn(),
-                session: session
-            };
-            mockResponse = {};
-            nextFunction = jest.fn();
+    it.each(VALID_NUMBERS)("Accepts valid number %s", validNumber => {
+        const session: Session = {
+            id: "",
+            cookie: {originalMaxAge: 0},
+            regenerate(callback: (err: any) => void): Session {
+                return this;
+            },
+            destroy(callback: (err: any) => void): Session {
+                return this;
+            },
+            reload(callback: (err: any) => void): Session {
+                return this;
+            },
+            resetMaxAge(): Session {
+                return this;
+            },
+            save(callback?: (err: any) => void): Session {
+                return this;
+            },
+            touch(): Session {
+                return this;
+            }
+        };
 
-            mockRequest.body.mobileNumber = validNumber;
-            validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
-            expect(nextFunction).toBeCalledTimes(1);
-        }
+        mockRequest = {
+            body: jest.fn(),
+            session: session
+        };
+
+        mockResponse = {};
+        nextFunction = jest.fn();
+
+        mockRequest.body.mobileNumber = validNumber;
+        validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+        expect(nextFunction).toBeCalledTimes(1);
     });
 
-    it("rejects invalid numbers", async function () {
-        for (const invalidNumber of INVALID_NUMBERS) {
-            mockRequest = {
-                body: jest.fn()
-            };
-            mockResponse = {
-                render: jest.fn()
-            };
-            nextFunction = jest.fn();
+    it.each(INVALID_NUMBERS)("Rejects invalid number %s", invalidNumber => {
+        mockRequest = {
+            body: jest.fn()
+        };
 
-            mockRequest.body.mobileNumber = invalidNumber;
-            validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
-            expect(nextFunction).not.toBeCalled();
-            expect(mockResponse.render).toHaveBeenCalledTimes(1);
-        }
+        mockResponse = {
+            render: jest.fn()
+        };
+
+        nextFunction = jest.fn();
+
+        mockRequest.body.mobileNumber = invalidNumber;
+        validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+        expect(nextFunction).not.toBeCalled();
+        expect(mockResponse.render).toHaveBeenCalledTimes(1);
     });
 });

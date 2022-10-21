@@ -6,6 +6,7 @@ describe("test authoriser", () => {
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
     let nextFunction: NextFunction;
+
     const session: Session = {
         id: "",
         cookie: {originalMaxAge: 0},
@@ -34,6 +35,7 @@ describe("test authoriser", () => {
             body: jest.fn(),
             session: session
         };
+
         mockResponse = {};
         mockResponse.render = jest.fn();
         mockResponse.redirect = jest.fn();

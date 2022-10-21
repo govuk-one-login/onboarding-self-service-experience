@@ -1,8 +1,8 @@
 import {After, AfterAll, Before, BeforeAll} from "@cucumber/cucumber";
 import {IWorldOptions} from "@cucumber/cucumber/lib/support_code_library_builder/world";
-import {Browser} from "puppeteer";
+import puppeteer, {Browser} from "puppeteer";
 
-const puppeteer = require("puppeteer");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const {setWorldConstructor, World} = require("@cucumber/cucumber");
 
 let browser: Browser;
@@ -19,8 +19,7 @@ class TestContext extends World {
 
 BeforeAll(async function () {
     console.log(`Running tests against ${process.env.HOST || "local"}`);
-    const SHOW_BROWSER = !process.env.SHOW_BROWSER;
-    browser = await puppeteer.launch({headless: SHOW_BROWSER});
+    browser = await puppeteer.launch({headless: !process.env.SHOW_BROWSER});
 });
 
 Before(async function () {

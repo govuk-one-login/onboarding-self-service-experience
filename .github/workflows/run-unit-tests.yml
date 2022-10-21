@@ -17,18 +17,10 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v3
         with:
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Node dependencies
         run: npm install
 
-
-      - name: Run frontend unit tests
-        working-directory: express
-        if: ${{ always() }}
-        run: npm run test
-
-      - name: Run DynamoDB API tests
-        working-directory: backend/dynamo-api
-        if: ${{ always() }}
+      - name: Run unit tests
         run: npm run test

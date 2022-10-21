@@ -33,7 +33,7 @@ router.post("/create/check-email", emailOtpValidator, submitEmailOtp);
 router.get("/create/update-password", showNewPasswordForm);
 router.post(
     "/create/update-password",
-    passwordValidator("create-account/new-password.njk", false),
+    passwordValidator("create-account/new-password.njk"),
     notOnCommonPasswordListValidator("create-account/new-password.njk", "password", ["password"]),
     updatePassword
 );

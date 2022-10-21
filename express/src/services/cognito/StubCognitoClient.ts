@@ -12,6 +12,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import {ServiceException} from "@aws-sdk/smithy-client/dist-types/exceptions";
 import {promises as fs} from "fs";
+import path from "path";
 import CognitoInterface from "./CognitoInterface";
 import {prepareForCognito} from "../../lib/mobileNumberUtils";
 import * as crypto from "crypto";
@@ -88,13 +89,11 @@ export class CognitoClient implements CognitoInterface {
         TokenType: "Bearer"
     };
 
-    overrides: Promise<never>;
+    overrides: Promise<string>;
 
     constructor() {
         console.log("Creating stub Cognito client...");
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        this.overrides = fs.readFile("stub/stubs-config.json");
+        this.overrides = fs.readFile(path.join(__dirname, "../../../stub/stubs-config.json")).then(buffer => buffer.toString());
         this.authenticationResult.IdToken = this.getIdToken();
         this.authenticationResult.AccessToken = this.getAccessToken();
     }
