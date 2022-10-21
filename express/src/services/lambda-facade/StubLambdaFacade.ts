@@ -83,7 +83,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
             data: {
                 Items: [
                     {
-                        service_name: {S: "SAM Stacks Service"},
+                        client_name: {S: "SAM Stacks Service"},
                         post_logoout_redirect_uris: {L: [{S: "http://localhost/"}, {S: "http://localhost/logged_out"}]},
                         post_logout_redirect_uris: {L: [{S: "http://localhost/logged_out"}]},
                         subject_type: {S: "pairwise"},
