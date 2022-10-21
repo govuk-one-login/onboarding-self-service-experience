@@ -15,6 +15,7 @@ describe("Checking that the user has entered a valid password", () => {
         mockRequest = {
             body: jest.fn()
         };
+
         mockResponse = {};
         mockResponse.render = jest.fn();
         nextFunction = jest.fn();
