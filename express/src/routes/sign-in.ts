@@ -32,7 +32,7 @@ router.get(
 router.post(
     "/sign-in-password",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
-    passwordValidator("sign-in-enter-password.njk", true),
+    passwordValidator("sign-in-enter-password.njk"),
     processSignInForm
 );
 
@@ -49,7 +49,7 @@ router.get("/resend-text-code", showResendPhoneCodeForm);
 router.post("/resend-text-code", resendMobileVerificationCode);
 router.get("/account/sign-out", signOut);
 router.get("/existing-account", accountExists);
-router.post("/existing-account", passwordValidator("create-account/existing-account.njk", false), async (req, res) => {
+router.post("/existing-account", passwordValidator("create-account/existing-account.njk"), async (req, res) => {
     res.render("check-mobile.njk");
 });
 

@@ -65,12 +65,11 @@ function is070(number: string) {
 }
 
 function onlyNumbersOrPlusRemain(number: string) {
-    console.log(number.trim() + ` :${/^[\+0-9]*$/.test(number.trim())}`);
-    return /^[\+0-9]*$/.test(number.trim());
+    return /^[+0-9]*$/.test(number.trim());
 }
 
 function removeSpacingCharacters(number: string) {
-    return number.replace(/\ |\-/g, "");
+    return number.replace(/[ \-]/g, "");
 }
 
 function exactlyTenNumbersRemain(number: string): boolean {
