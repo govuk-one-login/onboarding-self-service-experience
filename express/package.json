@@ -48,8 +48,5 @@
     "puppeteer": "^17.0.0",
     "ts-node": "^10.9.1",
     "uglify-js": "^3.17.0"
-  },
-  "jest": {
-    "preset": "ts-jest"
   }
 }

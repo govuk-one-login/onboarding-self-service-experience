@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import {resources} from "../../config/resources";
 
 export class CommonPasswords {
     private static MINIMUM_PASSWORD_LENGTH = 8;
@@ -11,7 +12,7 @@ export class CommonPasswords {
     static async loadCommonPasswords(): Promise<CommonPasswords> {
         const instance: CommonPasswords = new CommonPasswords();
         const data = fs
-            .readFile("resources/common-passwords.txt", {
+            .readFile(resources.commonPasswords, {
                 encoding: "utf8"
             })
             .catch(error => {

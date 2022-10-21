@@ -2,7 +2,6 @@ import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provide
 import bodyParser from "body-parser";
 import express, {NextFunction, Request, Response} from "express";
 import "express-async-errors";
-import path from "path";
 import configureViews from "./config/configure-views";
 import setSignedInStatus from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
@@ -54,7 +53,7 @@ declare module "express-session" {
     }
 }
 
-configureViews(app, path.join(__dirname, "../src/views"));
+configureViews(app);
 
 app.use(setSignedInStatus);
 app.use(function (req: Request, res: Response, next: NextFunction) {
