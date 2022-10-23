@@ -30,9 +30,13 @@
       } if  errorMessages else false
     }) }}
 
+   {{ govukInput({ type: "hidden", value: selfServiceClientId, id: "selfServiceClientId", name: "selfServiceClientId" }) }}
+   {{ govukInput({ type: "hidden", value: clientId, id: "clientId", name: "clientId" }) }}
+   {{ govukInput({ type: "hidden", value: clientServiceId, id: "clientServiceId", name: "clientServiceId" }) }}
+
     <div class="govuk-button-group">
       {{ govukButton({ text: "Confirm", attributes: {id: "submit"} }) }}
-      <a class="govuk-link" href="/client-details/{{ serviceId }}">Cancel</a>
+      <a class="govuk-link" href="/client-details/{{ selfServiceClientId }}">Cancel</a>
     </div>
   </form>
 {% endblock %}
