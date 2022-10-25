@@ -67,6 +67,43 @@ export const processAddServiceForm = async function (req: Request, res: Response
     res.redirect(`/client-details/${serviceId.substring(8)}`);
 };
 
+export const processUpdateServiceForm = async function (req: Request, res: Response) {
+    const serviceName = req.body.serviceName;
+    const selfServiceClientId = req.body.selfServiceClientId;
+    const clientId = req.body.clientId;
+    const clientServiceId = req.body.clientServiceId;
+
+    if (serviceName === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set("serviceName", "Enter your service name");
+        res.render("account/change-service-name.njk", {errorMessages: errorMessages});
+        return;
+    }
+
+    const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
+    if (userId === undefined || typeof userId !== "string") {
+        console.log("Can't get CognitoId from authenticationResult in session");
+        res.render("there-is-a-problem.njk");
+        return;
+    }
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    try {
+        await s4.updateClient(
+            selfServiceClientId,
+            clientServiceId,
+            clientId,
+            {client_name: serviceName},
+            req.session.authenticationResult?.AccessToken as string
+        );
+    } catch (error) {
+        console.error(error);
+        res.render("there-is-a-problem.njk");
+        return;
+    }
+    req.session.updatedField = "service name";
+    res.redirect(`/client-details/${selfServiceClientId}`);
+};
+
 export const showChangePasswordForm = async function (req: Request, res: Response) {
     res.render("account/change-password.njk");
 };

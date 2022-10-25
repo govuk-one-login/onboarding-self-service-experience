@@ -194,24 +194,6 @@ router.get("/redirect-placeholder", (req, res) => {
     });
 });
 
-// Testing routes for Change your service name page
-router.get("/change-service-name", (req, res) => {
-    res.render("account/change-service-name.njk", {
-        serviceName: "My juggling service"
-    });
-});
-
-router.post("/change-service-name", async (req, res) => {
-    const serviceName = req.body.serviceName;
-    if (serviceName === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set("serviceName", "Enter your service name");
-        res.render("account/change-service-name.njk", {errorMessages: errorMessages});
-        return;
-    }
-    res.redirect("/account");
-});
-
 ////
 // Testing routes for Change your public key page version 2
 ////

@@ -11,7 +11,7 @@
           </li>
           <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19 govuk-!-font-weight-bold">{{ serviceName }}</li>
       </ol>
-      <a href="/change-service-name" class="govuk-link govuk-link--no-visited-state navigation-service-change govuk-!-font-size-19">Change service name</a>
+      <a href="/change-service-name/{{ serviceName }}/{{ selfServiceClientId }}/{{ authClientId }}/{{ clientServiceId }}" class="govuk-link govuk-link--no-visited-state navigation-service-change govuk-!-font-size-19">Change service name</a>
     </div>
   </div>
 {% endblock %}
