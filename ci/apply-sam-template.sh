@@ -31,6 +31,9 @@ while [[ -n $1 ]]; do
       PARAMS+=("$1")
     done
     ;;
+  -y | --no-confirm)
+    NO_CONFIRM="--no-confirm-changeset"
+    ;;
   *)
     echo "Unknown option '$1'"
     exit 1
@@ -56,11 +59,11 @@ echo "  with S3 prefix '$PREFIX'"
 sam deploy \
   --stack-name "$STACK_NAME" \
   --template-file "$TEMPLATE" \
-  --confirm-changeset \
+  ${NO_CONFIRM:---confirm-changeset} \
   --disable-rollback \
   --resolve-s3 \
   --s3-prefix "$PREFIX" \
   --no-fail-on-empty-changeset \
-  --capabilities CAPABILITY_IAM \
+  --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
   ${TAGS:+--tags ${TAGS[@]}} \
   ${PARAMS:+--parameter-overrides ${PARAMS[@]}}

@@ -1,4 +1,5 @@
-AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS role to manage DI Self-Service infrastructure from GitHub Actions
+AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
@@ -11,6 +12,13 @@ Parameters:
   OIDCProviderArn:
     Description: ARN of the the GitHub OIDC provider
     Type: String
+  AppName:
+    Type: String
+    Default: self-service
+  InfrastructureStack:
+    Description: Name of the self-service infrastructure SAM stack
+    Type: String
+    Default: sse-infrastructure
 
 Resources:
   GitHubRole:
@@ -34,9 +42,19 @@ Resources:
                 Resource: "*"
                 Action:
                   - ecr:GetAuthorizationToken
+                  - ecs:DescribeTaskDefinition
+                  - ecs:RegisterTaskDefinition
 
               - Effect: Allow
-                Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/self-service/*
+                Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${InfrastructureStack}*
+                Action: iam:PassRole
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/*
+                Action: ssm:GetParameter
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${AppName}/*
                 Action:
                   - ecr:InitiateLayerUpload
                   - ecr:CompleteLayerUpload

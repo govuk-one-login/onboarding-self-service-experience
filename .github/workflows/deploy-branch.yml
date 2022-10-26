@@ -7,17 +7,6 @@ jobs:
     name: Build
     uses: ./.github/workflows/build-front-app.yml
 
-  build-front-image:
-    name: Build
-    uses: ./.github/workflows/build-front-image.yml
-    permissions:
-      id-token: write
-      contents: read
-    with:
-      environment: development
-    secrets:
-      aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
-
   deploy-front-preview-paas:
     name: Preview
     needs: build-front-app
@@ -31,3 +20,14 @@ jobs:
     secrets:
       cf-username: ${{ secrets.CF_USERNAME }}
       cf-password: ${{ secrets.CF_PASSWORD }}
+
+  deploy-front-preview-fargate:
+    name: Preview
+    uses: ./.github/workflows/deploy-to-fargate.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: development
+    secrets:
+      aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}

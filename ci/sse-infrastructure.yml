@@ -1,19 +1,25 @@
-AWSTemplateFormatVersion: '2010-09-09'
+Description: Infrastructure to run the DI Self-Service application
+AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+  AppName:
+    Type: String
+    Default: self-service
+
 Resources:
-  SelfServiceFrontECRRepository:
+  FrontendECRRepository:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: self-service/frontend
+      RepositoryName: !Sub ${AppName}/frontend
       ImageTagMutability: IMMUTABLE
       ImageScanningConfiguration:
         ScanOnPush: true
       EncryptionConfiguration:
         EncryptionType: KMS
       Tags:
-        - Key: "application"
-          Value: "di-self-service"
+        - { Key: Application, Value: SSE }
+        - { Key: Component, Value: Frontend }
       LifecyclePolicy:
         RegistryId: !Ref AWS::AccountId
         LifecyclePolicyText: '{
@@ -34,6 +40,51 @@ Resources:
           ]
         }'
 
-Outputs:
-  SSEFrontECRRepositoryARN:
-    Value: !GetAtt SelfServiceFrontECRRepository.Arn
+  FrontendECSExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Tags:
+        - { Key: Application, Value: SSE }
+        - { Key: Component, Value: Frontend }
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  FrontendECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Tags:
+        - { Key: Application, Value: SSE }
+        - { Key: Component, Value: Frontend }
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+
+  FrontendECSRoleParams:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: ARNs of the roles to use when deploying and running frontend ECS tasks
+      Name: !Sub /${AppName}/frontend/ecs-roles
+      Tags:
+        Application: SSE
+        Component: Frontend
+      Type: String
+      Value: !Sub '{
+          "taskRole": "${FrontendECSTaskRole.Arn}",
+          "executionRole": "${FrontendECSExecutionRole.Arn}"
+        }'
