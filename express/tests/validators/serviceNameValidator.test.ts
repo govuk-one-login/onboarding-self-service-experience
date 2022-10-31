@@ -1,4 +1,4 @@
-import {atLeastOneCharacter} from "../../src/middleware/serviceNameValidator";
+import {atLeastOneCharacter} from "../../src/middleware/validators/serviceNameValidator";
 
 const SERVICE_NAME_WITH_EMPTY_VALUE = "";
 const SERVICE_NAME_1_CHAR = "A";

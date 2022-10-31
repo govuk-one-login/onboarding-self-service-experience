@@ -12,10 +12,10 @@ import {
     sessionTimeout,
     accountExists
 } from "../controllers/sign-in";
-import emailIsPresentInSession from "../middleware/emailIsPresentInSession/emailIsPresentInSession";
-import {emailValidator} from "../middleware/emailValidator";
-import {mobileOtpValidator} from "../middleware/mobileOtpValidator";
-import {passwordValidator} from "../middleware/passwordValidator";
+import emailIsPresentInSession from "../middleware/validators/emailIsPresentInSession/emailIsPresentInSession";
+import {emailValidator} from "../middleware/validators/emailValidator";
+import {mobileOtpValidator} from "../middleware/validators/mobileOtpValidator";
+import {passwordValidator} from "../middleware/validators/passwordValidator";
 import {processLoginOtpMobile} from "../middleware/sign-in-middleware";
 
 const router = express.Router();
@@ -38,12 +38,7 @@ router.post(
 
 router.get("/sign-in-otp-mobile", showLoginOtpMobile);
 
-router.post(
-    "/sign-in-otp-mobile",
-    mobileOtpValidator(true, "/sign-in-otp-mobile", "/resend-text-code"),
-    processLoginOtpMobile,
-    finishSignIn
-);
+router.post("/sign-in-otp-mobile", mobileOtpValidator("/sign-in-otp-mobile", "/resend-text-code"), processLoginOtpMobile, finishSignIn);
 
 router.get("/resend-text-code", showResendPhoneCodeForm);
 router.post("/resend-text-code", resendMobileVerificationCode);

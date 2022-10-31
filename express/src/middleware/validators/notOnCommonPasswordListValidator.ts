@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import CommonPasswords from "./commonPasswordsSingleton";
+import CommonPasswords from "../../lib/commonPasswords/commonPasswordsSingleton";
 
 const ERROR_MESSAGE = "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers.";
 

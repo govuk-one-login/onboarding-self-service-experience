@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {validate} from "../../lib/mobileNumberUtils";
+import {validate} from "../../../lib/mobileNumberUtils";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 

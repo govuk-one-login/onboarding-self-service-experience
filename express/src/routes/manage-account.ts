@@ -12,10 +12,10 @@ import {
     verifyMobileWithSmsCode
 } from "../controllers/manage-account";
 import {checkAuthorisation} from "../middleware/authoriser";
-import {mobileOtpValidator} from "../middleware/mobileOtpValidator";
-import notOnCommonPasswordListValidator from "../middleware/notOnCommonPasswordListValidator";
-import {serviceNameValidator} from "../middleware/serviceNameValidator";
-import validateMobileNumber from "../middleware/mobileValidator";
+import {mobileOtpValidator} from "../middleware/validators/mobileOtpValidator";
+import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
+import {serviceNameValidator} from "../middleware/validators/serviceNameValidator";
+import validateMobileNumber from "../middleware/validators/mobileValidator";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import {Client} from "../../@types/client";
 
@@ -83,7 +83,7 @@ router.get("/change-phone-number", showChangePhoneNumberForm);
 
 router.post("/change-phone-number", validateMobileNumber("account/change-phone-number.njk"), processChangePhoneNumberForm);
 
-router.post("/verify-phone-code", mobileOtpValidator(false, "/verify-phone-code", ""), verifyMobileWithSmsCode);
+router.post("/verify-phone-code", mobileOtpValidator("/verify-phone-code", ""), verifyMobileWithSmsCode);
 
 router.get("/change-service-name/:serviceName/:selfServiceClientId/:authClientId/:clientServiceId", (req, res) => {
     res.render("account/change-service-name.njk", {

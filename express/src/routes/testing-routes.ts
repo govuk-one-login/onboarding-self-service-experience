@@ -1,9 +1,9 @@
 import express from "express";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
-import {emailValidator} from "../middleware/emailValidator";
-import {passwordValidator} from "../middleware/passwordValidator";
-import {urisValidator} from "../middleware/urisValidator";
-import validateMobileNumber from "../middleware/mobileValidator";
+import {emailValidator} from "../middleware/validators/emailValidator";
+import {passwordValidator} from "../middleware/validators/passwordValidator";
+import {urisValidator} from "../middleware/validators/urisValidator";
+import validateMobileNumber from "../middleware/validators/mobileValidator";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 const router = express.Router();
@@ -143,7 +143,7 @@ router.post(
                 req.params.serviceId,
                 req.params.selfServiceClientId,
                 req.params.clientId,
-                {post_logout_logout_uris: postLogoutUris},
+                {post_logout_redirect_uris: postLogoutUris},
                 req.session.authenticationResult?.AccessToken as string
             );
         } catch (error) {
@@ -476,6 +476,19 @@ router.get("/new-phone-number", (req, res) => {
 });
 
 router.post("/new-phone-number", validateMobileNumber("new-phone-number.njk"), async (req, res) => {
+    res.render("check-mobile.njk");
+});
+
+// Testing routes for 'An account already exist' page
+router.get("/account-exists", (req, res) => {
+    res.render("create-account/account-exists.njk", {
+        values: {
+            emailAddress: "email@address.com"
+        }
+    });
+});
+
+router.post("/account-exists", passwordValidator("create-account/account-exists.njk"), async (req, res) => {
     res.render("check-mobile.njk");
 });
 

@@ -46,7 +46,7 @@ export const processAddServiceForm = async function (req: Request, res: Response
         serviceName: req.body.serviceName
     };
     const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
-    if (userId === undefined || typeof userId !== "string") {
+    if (userId === undefined) {
         console.log("Can't get CognitoId from authenticationResult in session");
         res.render("there-is-a-problem.njk");
         return;

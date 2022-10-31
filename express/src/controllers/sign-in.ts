@@ -2,6 +2,7 @@ import {AuthenticationResultType, NotAuthorizedException, UserNotFoundException}
 import {Request, Response} from "express";
 import "express-async-errors";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import {obscureNumber} from "../lib/mobileNumberUtils";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
     res.render("sign-in.njk");
@@ -14,7 +15,9 @@ export const showLoginOtpMobile = async function (req: Request, res: Response) {
     }
 
     res.render("check-mobile.njk", {
-        mobileNumber: req.session.mfaResponse.codeSentTo,
+        values: {
+            mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo)
+        },
         formActionUrl: "/sign-in-otp-mobile",
         active: "sign-in",
         textMessageNotReceivedUrl: "/resend-text-code"
@@ -103,30 +106,20 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
         return;
     }
 
-    const mobileNumber: string | undefined = req.session.mobileNumber;
-    const s4: SelfServiceServicesService = await req.app.get("backing-service");
-    // Not sure that we need this here ....
-    if (mobileNumber === undefined) {
+    if (req.session.mobileNumber === undefined) {
         console.error("processEnterMobileForm::mobileNumber undefined");
         res.render("there-is-a-problem.njk");
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    await s4.setPhoneNumber(req.session.emailAddress, mobileNumber);
-    // presumably that was fine so let's try to veerify the number
+    const mobileNumber: string = req.session.mobileNumber as string;
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
-    const codeSent = await s4.sendMobileNumberVerificationCode(accessToken);
-    console.debug("VERIFICATION CODE RESPONSE");
-    console.debug(codeSent);
-    req.session.mobileNumber = mobileNumber;
+    await s4.setPhoneNumber(req.session.emailAddress as string, mobileNumber as string);
 
-    const mobileNumberRaw = req.body.mobileNumber;
-    const mobileNumberLast4Digits = mobileNumberRaw.slice(-4);
-    const mobileNumberFormatted = "*******" + mobileNumberLast4Digits;
+    await s4.sendMobileNumberVerificationCode(accessToken);
 
     res.render("check-mobile.njk", {
-        mobileNumber: mobileNumberFormatted,
+        mobileNumber: obscureNumber(mobileNumber),
         formActionUrl: "/sign-in-otp-mobile",
         textMessageNotReceivedUrl: "/resend-text-code",
         active: "sign-in"
