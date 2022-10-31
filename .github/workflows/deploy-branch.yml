@@ -1,6 +1,9 @@
 name: Deploy branch preview
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches: [ dfa-2213-deploy-to-fargate ]
 
 jobs:
   build-front-app:
