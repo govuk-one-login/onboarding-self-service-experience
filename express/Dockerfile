@@ -1,4 +1,5 @@
 FROM node:18-alpine
+WORKDIR /express
 
 ENV PORT=3000
 EXPOSE $PORT

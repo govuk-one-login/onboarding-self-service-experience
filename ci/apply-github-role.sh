@@ -2,7 +2,9 @@
 set -eu
 
 BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
-PROVIDER_ARN=$(aws iam list-open-id-connect-providers | jq -r '.OpenIDConnectProviderList[].Arn' | grep token.actions.githubusercontent.com || true)
+PROVIDER_ARN=$(aws iam list-open-id-connect-providers |
+  jq -r '.OpenIDConnectProviderList[].Arn' |
+  grep token.actions.githubusercontent.com || true)
 
 "$BASE_DIR"/apply-sam-template.sh \
   --stack-name github-actions-role-sse \
