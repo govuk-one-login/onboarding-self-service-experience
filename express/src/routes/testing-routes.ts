@@ -430,11 +430,6 @@ router.post("/create-new-password", passwordValidator("create-new-password.njk")
     res.redirect("/check-yourphonetestpage");
 });
 
-// Testing routs Create an 'No account found' page
-router.get("/no-account-found", (req, res) => {
-    res.render("no-account-found.njk");
-});
-
 // Testing routs for 'We need to do security checks' page
 router.get("/security-check-change-number", (req, res) => {
     res.render("security-check-change-number.njk", {
