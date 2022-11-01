@@ -38,5 +38,6 @@ jobs:
             express/stub
             express/resources
             express/src/views
+            express/assets/images
             express/manifest.yml
             express/package*.json

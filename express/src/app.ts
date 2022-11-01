@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import express, {NextFunction, Request, Response} from "express";
 import "express-async-errors";
 import configureViews from "./config/configure-views";
+import {distribution} from "./config/resources";
 import setSignedInStatus from "./middleware/setSignedInStatus";
 import createAccount from "./routes/create-account-or-sign-in";
 import manageAccount from "./routes/manage-account";
@@ -32,8 +33,9 @@ Promise.all([cognitoPromise, lambdaPromise]).then(deps => {
     console.log("Backing service created");
 });
 
-app.use("/dist", express.static("./dist/assets"));
-app.use(express.static("./dist"));
+app.use("/assets", express.static(distribution.assets));
+app.use("/assets/images", express.static(distribution.images));
+
 app.use(
     bodyParser.urlencoded({
         extended: true
