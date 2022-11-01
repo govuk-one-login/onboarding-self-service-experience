@@ -2,7 +2,7 @@
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set assetPath = "/dist" %}
+{% set assetPath = "/assets" %}
 {% set showTopNav = showTopNav | default(true) %}
 {% set mainClasses = ["govuk-main-wrapper--auto-spacing", mainClasses] | join(" ") %}
 
@@ -10,7 +10,7 @@
 
 {% block head %}
   <!--[if !IE 8]><!-->
-  <link rel="stylesheet" type="text/css" href="/dist/app.css">
+  <link rel="stylesheet" type="text/css" href="/assets/app.css">
   <!--<![endif]-->
 {% endblock %}
 
@@ -135,8 +135,8 @@
 {% block bodyEnd %}
   <input type="hidden" value="{{ googleTagId }}" id="ga-tracking">
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
-  <script src="/dist/govuk-all.js"></script>
-  <script src="/dist/cookies.js"></script>
+  <script src="/assets/javascripts/govuk-all.js"></script>
+  <script src="/assets/javascripts/cookies.js"></script>
   <script>window.GOVUKFrontend.initAll()</script>
   <script>window.GOVUKSignIn.CookieBanner.init()</script>
 

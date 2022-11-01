@@ -1,10 +1,16 @@
 import path from "path";
 
-const RESOURCES_DIR = path.join(__dirname, "../../resources");
+const baseDir = path.join(__dirname, "../..");
+const resourcesDir = path.join(baseDir, "resources");
+
+export const views = path.join(baseDir, "src/views");
 
 export const resources = {
-    commonPasswords: path.join(RESOURCES_DIR, "common-passwords.txt"),
-    validDomains: path.join(RESOURCES_DIR, "allowed-email-domains.txt")
+    commonPasswords: path.join(resourcesDir, "common-passwords.txt"),
+    validDomains: path.join(resourcesDir, "allowed-email-domains.txt")
 };
 
-export const views = path.join(__dirname, "../../src/views");
+export const distribution = {
+    assets: path.join(baseDir, "dist/assets"),
+    images: path.join(baseDir, "assets/images")
+};
