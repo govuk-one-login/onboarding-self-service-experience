@@ -48,7 +48,7 @@ router.post("/existing-account", passwordValidator("create-account/existing-acco
     res.render("check-mobile.njk");
 });
 
-router.get("/no-account", (req, res) => {
+router.get("/no-account1", (req, res) => {
     res.render("no-account-found.njk");
 });
 

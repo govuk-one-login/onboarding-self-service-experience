@@ -63,7 +63,7 @@ export const processSignInForm = async function (req: Request, res: Response) {
 
         if (error instanceof UserNotFoundException) {
             req.session.emailAddress = email;
-            res.redirect("/no-account");
+            res.redirect("/no-account1");
             return;
         }
 
