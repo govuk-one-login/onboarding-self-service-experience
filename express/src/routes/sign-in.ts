@@ -2,7 +2,6 @@ import express from "express";
 import {
     processEmailAddress,
     finishSignIn,
-    processSignInForm,
     resendMobileVerificationCode,
     showLoginOtpMobile,
     showResendPhoneCodeForm,
@@ -15,8 +14,8 @@ import {
 import emailIsPresentInSession from "../middleware/validators/emailIsPresentInSession/emailIsPresentInSession";
 import {emailValidator} from "../middleware/validators/emailValidator";
 import {mobileOtpValidator} from "../middleware/validators/mobileOtpValidator";
-import {passwordValidator} from "../middleware/validators/passwordValidator";
 import {processLoginOtpMobile} from "../middleware/sign-in-middleware";
+import processSignInForm from "../middleware/processSignInForm";
 
 const router = express.Router();
 
@@ -32,8 +31,7 @@ router.get(
 router.post(
     "/sign-in-password",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
-    passwordValidator("sign-in-enter-password.njk"),
-    processSignInForm
+    processSignInForm("sign-in-enter-password.njk")
 );
 
 router.get("/sign-in-otp-mobile", showLoginOtpMobile);
@@ -44,9 +42,7 @@ router.get("/resend-text-code", showResendPhoneCodeForm);
 router.post("/resend-text-code", resendMobileVerificationCode);
 router.get("/account/sign-out", signOut);
 router.get("/existing-account", accountExists);
-router.post("/existing-account", passwordValidator("create-account/existing-account.njk"), async (req, res) => {
-    res.render("check-mobile.njk");
-});
+router.post("/existing-account", processSignInForm("create-account/existing-account.njk"));
 
 router.get("/no-account", (req, res) => {
     res.render("no-account-found.njk");

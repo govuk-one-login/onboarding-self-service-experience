@@ -221,7 +221,7 @@ export const changePassword = async function (req: Request, res: Response) {
                 password: newPassword
             };
             const errorMessages = new Map<string, string>();
-            errorMessages.set("password", "Your current password is wrong");
+            errorMessages.set("password", "Your current password is incorrect");
             res.render("account/change-password.njk", {
                 errorMessages: errorMessages,
                 value: value
