@@ -9,7 +9,7 @@ import {
     NotAuthorizedException
 } from "@aws-sdk/client-cognito-identity-provider";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
-import {prepareForCognito} from "../lib/mobileNumberUtils";
+import {convertToCountryPrefixFormat} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const listServices = async function (req: Request, res: Response) {
@@ -259,7 +259,7 @@ export const processChangePhoneNumberForm = async function (req: Request, res: R
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     await s4.setPhoneNumber(
         AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType),
-        prepareForCognito(req.body.mobileNumber)
+        convertToCountryPrefixFormat(req.body.mobileNumber)
     );
     req.session.mobileNumber = req.body.mobileNumber;
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;

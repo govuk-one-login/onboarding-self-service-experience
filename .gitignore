@@ -107,4 +107,3 @@ dist
 **/*.iml
 **/.aws-sam
 **/*samconfig.toml
-/backend/dynamo-db/docker/dynamodb/shared-local-instance.db

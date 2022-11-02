@@ -11,8 +11,9 @@
     "buildjs": "cp -vr assets/javascripts dist/assets/",
     "buildgovuk": "govuk=$(npm ls -p govuk-frontend)/govuk; cp -vr $govuk/assets/* dist/assets/ && cp -v $govuk/all.js dist/assets/javascripts/govuk-all.js",
     "build": "npm run buildts && npm run buildsass && npm run buildjs && npm run buildgovuk && npm run minifyjs",
+    "coverage": "jest --coverage --coverageDirectory coverage --silent",
     "test": "jest --silent",
-    "cucumber": "cucumber-js --require-module ts-node/register --require jsdom-global/register --require features/support/test-setup.ts --require features/support/steps/**/*.ts --publish-quiet --tags 'not @wip'",
+    "cucumber": "cucumber-js --require-module ts-node/register --require features/support/test-setup.ts --require features/support/steps/**/*.ts --publish-quiet --tags 'not @wip'",
     "cucumber-report": "npm run cucumber -- --format html:test-report.html"
   },
   "dependencies": {

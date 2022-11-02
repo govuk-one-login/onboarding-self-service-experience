@@ -1,93 +1,92 @@
 import {validationResult} from "./validators/validationResult";
 
-export function validate(number: string): validationResult {
-    let processed: string;
+const obscuredNumberRegex = /^\+\*{8}[0-9]{4}$/;
+const invalidFormatMessage = "Enter a UK mobile phone number, like 07700 900000";
 
+export function validate(number: string): validationResult {
     if (isBlank(number)) {
         return {isValid: false, errorMessage: "Enter a mobile phone number"};
     }
 
-    processed = removeParentheses(number);
+    const sanitisedNumber = sanitiseNumber(number);
 
-    if (!prefixIsCorrect(processed)) {
-        return {isValid: false, errorMessage: "Enter a UK mobile phone number, like 07700 900000"};
+    if (!prefixIsCorrect(sanitisedNumber)) {
+        return {isValid: false, errorMessage: invalidFormatMessage};
     }
 
-    processed = getUniquePart(processed);
-    processed = removeSpacingCharacters(processed);
+    const uniquePart = getUniquePart(sanitisedNumber);
 
-    if (is070(processed)) {
-        return {isValid: false, errorMessage: "Enter a UK mobile phone number, like 07700 900000"};
-    }
-
-    if (!onlyNumbersOrPlusRemain(processed)) {
+    if (!containsOnlyDigits(uniquePart)) {
         return {isValid: false, errorMessage: "Enter a UK mobile phone number using numbers only"};
     }
 
-    if (!exactlyTenNumbersRemain(processed)) {
-        return {isValid: false, errorMessage: "Enter a UK mobile phone number, like 07700 900000"};
+    if (!containsExactlyTenDigits(uniquePart)) {
+        return {isValid: false, errorMessage: invalidFormatMessage};
+    }
+
+    if (is070(uniquePart)) {
+        return {isValid: false, errorMessage: invalidFormatMessage};
     }
 
     return {isValid: true};
 }
 
-export function prepareForCognito(number: string): string {
-    let processed = removeParentheses(number);
-    processed = getUniquePart(processed);
-    return `+44${removeSpacingCharacters(processed)}`;
+export function convertToCountryPrefixFormat(number: string): string {
+    number = sanitiseNumber(number);
+    return `+44${getUniquePart(number)}`;
 }
 
-function isBlank(number: string): boolean {
-    return !number;
-}
+export function obscureNumber(number: string): string {
+    if (obscuredNumberRegex.test(number)) {
+        return "*" + number.substring("+44".length);
+    }
 
-function prefixIsCorrect(number: string): boolean {
-    return number.trim().startsWith("+44") || number.trim().startsWith("07");
+    number = sanitiseNumber(number);
+    return `*******${getUniquePart(number).substring(6)}`;
 }
 
 function getUniquePart(mobileNumber: string): string {
-    if (mobileNumber.trim().startsWith("+44")) {
-        return mobileNumber.trim().substring("+44".length);
+    if (mobileNumber.startsWith("+44")) {
+        return mobileNumber.substring("+44".length);
     }
 
-    if (mobileNumber.trim().startsWith("07")) {
-        return mobileNumber.trim().substring("0".length);
+    if (mobileNumber.startsWith("07")) {
+        return mobileNumber.substring("0".length);
     }
 
-    return mobileNumber.trim();
+    throw `Unexpected mobile number prefix: '${mobileNumber.substring(0, 3)}'`;
+}
+
+function sanitiseNumber(number: string) {
+    number = removeSpacingCharacters(number);
+    return removeParentheses(number);
+}
+
+function removeSpacingCharacters(number: string) {
+    return number.trim().replace(/[ \-]/g, "");
 }
 
 function removeParentheses(number: string) {
-    return number.trim().replace(/^\((.*)\)(.*)$/g, "$1$2");
+    return number.replace(/\(([^)]*)\)/g, "$1");
+}
+
+function isBlank(number: string): boolean {
+    return number.trim().length == 0;
+}
+
+function prefixIsCorrect(number: string): boolean {
+    return number.startsWith("+44") || number.startsWith("07");
+}
+
+function containsOnlyDigits(number: string) {
+    return /^[0-9]*$/.test(number);
+}
+
+function containsExactlyTenDigits(number: string): boolean {
+    return /^[0-9]{10}$/.test(number);
 }
 
 function is070(number: string) {
     // or +4470 ...
-    return /^70.*$/.test(number.trim());
+    return /^70.*$/.test(number);
 }
-
-function onlyNumbersOrPlusRemain(number: string) {
-    return /^[+0-9]*$/.test(number.trim());
-}
-
-function removeSpacingCharacters(number: string) {
-    return number.replace(/[ \-]/g, "");
-}
-
-function exactlyTenNumbersRemain(number: string): boolean {
-    return /^[0-9]{10}$/.test(number.trim());
-}
-
-// number masking
-
-export function obscureNumber(number: string): string {
-    if (obscuredByCognito.test(number)) {
-        return "*" + number.substring("+44".length);
-    } else {
-        let processed = removeParentheses(number);
-        processed = getUniquePart(processed);
-        return `********${removeSpacingCharacters(processed).substring(8)}`;
-    }
-}
-
-const obscuredByCognito = /^\+\*{8}[0-9]{4}$/;
