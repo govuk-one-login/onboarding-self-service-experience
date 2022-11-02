@@ -6,6 +6,7 @@ import {
     ChangePasswordCommandOutput,
     CodeMismatchException,
     GetUserAttributeVerificationCodeCommandOutput,
+    NotAuthorizedException,
     RespondToAuthChallengeCommandOutput,
     UsernameExistsException,
     VerifyUserAttributeCommandOutput
@@ -202,6 +203,8 @@ export class CognitoClient implements CognitoInterface {
                 return new UsernameExistsException({$metadata: {}});
             case "CodeMismatchException":
                 return new CodeMismatchException({$metadata: {}});
+            case "NotAuthorizedException":
+                return new NotAuthorizedException({$metadata: {}});
         }
         throw new Error("Unknown exception");
     }

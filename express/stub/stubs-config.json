@@ -44,6 +44,11 @@
       "return": {
         "Session": "Some or other arbitrary non-null value"
       }
+    },
+    {
+      "parameter": "email",
+      "value": "password-will-be-wrong@stub.gov.uk",
+      "throw": "NotAuthorizedException"
     }
   ],
   "respondToMfaChallenge": [
