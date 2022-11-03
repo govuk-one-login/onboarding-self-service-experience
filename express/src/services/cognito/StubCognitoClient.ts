@@ -9,6 +9,7 @@ import {
     NotAuthorizedException,
     RespondToAuthChallengeCommandOutput,
     UsernameExistsException,
+    UserNotFoundException,
     VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
 import {ServiceException} from "@aws-sdk/smithy-client/dist-types/exceptions";
@@ -205,6 +206,8 @@ export class CognitoClient implements CognitoInterface {
                 return new CodeMismatchException({$metadata: {}});
             case "NotAuthorizedException":
                 return new NotAuthorizedException({$metadata: {}});
+            case "UserNotFoundException":
+                return new UserNotFoundException({$metadata: {}});
         }
         throw new Error("Unknown exception");
     }
