@@ -84,3 +84,8 @@ jobs:
           
           echo "$message" | tee "$GITHUB_STEP_SUMMARY"
           echo "task-definition-arn=$arn" >> "$GITHUB_OUTPUT"
+
+#      - name: Deploy ECS task definition
+#        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+#        with:
+#          task-definition: ${{ steps.render-task-definition.outputs.task-definition }}
