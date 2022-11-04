@@ -49,6 +49,11 @@
       "parameter": "email",
       "value": "password-will-be-wrong@stub.gov.uk",
       "throw": "NotAuthorizedException"
+    },
+    {
+      "parameter": "email",
+      "value": "not-registered@gds.gov.uk",
+      "throw": "UserNotFoundException"
     }
   ],
   "respondToMfaChallenge": [
