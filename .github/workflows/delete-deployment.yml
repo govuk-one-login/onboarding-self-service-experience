@@ -12,7 +12,7 @@ concurrency:
   group: deploy-${{ github.head_ref || github.ref_name }}
 
 jobs:
-  delete-deployment:
+  delete-paas-deployment:
     name: Delete app preview
     runs-on: ubuntu-latest
     environment: preview
@@ -45,3 +45,30 @@ jobs:
         uses: alphagov/di-github-actions/paas/delete-stale-apps@6313465e0c640aff9e5f7631dc1e6f70d253dce2
         with:
           age-threshold-days: 30
+
+  delete-fargate-deployment:
+    name: Delete Fargate deployment
+    runs-on: ubuntu-latest
+    environment: development
+    if: ${{ github.event_name == 'schedule' }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.GHA_AWS_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Clean up stale task definitions
+        uses: alphagov/di-github-actions/aws/ecs/deregister-stale-task-definitions@f678b164969e156ef894a4bb7e7cd052df01e607
+        with:
+          family: self-service-frontend
+          container: self-service-frontend
