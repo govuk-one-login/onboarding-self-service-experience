@@ -36,7 +36,7 @@ jobs:
 
       - name: Push Docker image
         id: push-docker-image
-        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@7642b66bdd782ec91106c2b6b699b5a244a2c41e
+        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@f678b164969e156ef894a4bb7e7cd052df01e607
         with:
           registry: ${{ steps.login-ecr.outputs.registry }}
           repository: self-service/frontend
