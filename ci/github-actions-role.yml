@@ -42,8 +42,10 @@ Resources:
                 Resource: "*"
                 Action:
                   - ecr:GetAuthorizationToken
+                  - ecs:ListTaskDefinitions
                   - ecs:DescribeTaskDefinition
                   - ecs:RegisterTaskDefinition
+                  - ecs:DeregisterTaskDefinition
 
               - Effect: Allow
                 Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${InfrastructureStack}*
@@ -61,6 +63,7 @@ Resources:
                   - ecr:UploadLayerPart
                   - ecr:BatchCheckLayerAvailability
                   - ecr:BatchDeleteImage
+                  - ecr:DescribeImages
                   - ecr:BatchGetImage
                   - ecr:ListImages
                   - ecr:PutImage
