@@ -492,4 +492,35 @@ router.post("/account-exists", passwordValidator("create-account/account-exists.
     res.render("check-mobile.njk");
 });
 
+//// Testing routes for 'You entered the wrong mobile security code too many times' page
+//// The code below is for frontend/visual testing purposes only
+
+router.get("/wrong-text-code", (req, res) => {
+    res.render("wrong-otp-too-many-times.njk", {
+        values: {
+            pageTitle: "Wrong text message code entered too many times",
+            formActionUrl: "/wrong-text-code"
+        }
+    });
+});
+
+// When implementing the backend, depending on journey we should request new code and after that redirect (/create/enter-mobile or /sign-in-otp-mobile) or render the appropriate template - depending on implementation
+router.post("/wrong-text-code", async (req, res) => {
+    res.render("check-mobile.njk");
+});
+
+//// Testing routes for 'You entered the wrong email security code too many times' page
+router.get("/wrong-email-code", (req, res) => {
+    res.render("wrong-otp-too-many-times.njk", {
+        values: {
+            pageTitle: "Wrong email code entered too many times",
+            formActionUrl: "/wrong-email-code"
+        }
+    });
+});
+// When implementing the backend, depending on journey we should request new code and after that redirect or render the appropriate template - depending on implementation
+router.post("/wrong-email-code", async (req, res) => {
+    res.render("account/check-email.njk");
+});
+
 export default router;
