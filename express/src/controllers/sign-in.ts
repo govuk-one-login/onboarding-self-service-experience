@@ -1,4 +1,4 @@
-import {AuthenticationResultType, NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
+import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {Request, Response} from "express";
 import "express-async-errors";
 import SelfServiceServicesService from "../services/self-service-services-service";
@@ -43,37 +43,6 @@ export const processEmailAddress = async function (req: Request, res: Response) 
 
 export const showSignInFormPassword = async function (req: Request, res: Response) {
     res.render("sign-in-enter-password.njk");
-};
-
-export const processSignInForm = async function (req: Request, res: Response) {
-    const email = req.session.emailAddress as string;
-    const password = req.body.password;
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
-
-    try {
-        req.session.mfaResponse = await s4.login(email, password);
-    } catch (error) {
-        if (error instanceof NotAuthorizedException) {
-            res.render("sign-in-enter-password.njk", {
-                values: {password: password},
-                errorMessages: {password: "Password is wrong"}
-            });
-            return;
-        }
-
-        if (error instanceof UserNotFoundException) {
-            req.session.emailAddress = email;
-            res.redirect("/no-account");
-            return;
-        }
-
-        console.error(error);
-        res.render("there-is-a-problem.njk");
-        return;
-    }
-
-    res.redirect("/sign-in-otp-mobile");
-    return;
 };
 
 export const signOut = async function (req: Request, res: Response) {

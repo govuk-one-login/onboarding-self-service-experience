@@ -1,7 +1,7 @@
 import {Given, Then, When} from "@cucumber/cucumber";
 import {strict as assert} from "assert";
 import {Page} from "puppeteer";
-import {checkUrl, clickLink, clickSubmitButton, enterTextIntoTextInput, getButtonLink, getLink, getLinkWithHref} from "./shared-functions";
+import {checkUrl, clickLink, clickSubmitButton, getButtonLink, getLink, getLinkWithHref} from "./shared-functions";
 
 Given("that the user is on the {string} page", async function (route: string) {
     await this.goToPath(route);
@@ -89,7 +89,3 @@ async function checkErrorMessageDisplayedForField(page: Page, errorLink: any, er
         `Expected the message above the ${field} field to be ${errorMessage}`
     );
 }
-
-When("they enter {string} into the text-field with the id {string}", async function (inputText: string, inputFieldId: string) {
-    await enterTextIntoTextInput(this.page, inputText, inputFieldId);
-});
