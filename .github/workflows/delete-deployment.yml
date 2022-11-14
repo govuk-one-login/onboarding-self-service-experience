@@ -11,6 +11,8 @@ on:
 concurrency:
   group: deploy-${{ github.head_ref || github.ref_name }}
 
+permissions: read-all
+
 jobs:
   delete-paas-deployment:
     name: Delete app preview
@@ -50,7 +52,6 @@ jobs:
     name: Delete Fargate deployment
     runs-on: ubuntu-latest
     environment: development
-    if: ${{ github.event_name == 'schedule' }}
 
     permissions:
       id-token: write
@@ -67,7 +68,18 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Delete docker image
+        if: ${{ github.event_name != 'schedule' }}
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        run: |
+          aws ecr batch-delete-image \
+            --repository-name self-service/frontend \
+            --image-ids imageTag="$BRANCH_NAME" \
+            --output text          
+
       - name: Clean up stale task definitions
+        if: ${{ github.event_name == 'schedule' }}
         uses: alphagov/di-github-actions/aws/ecs/deregister-stale-task-definitions@e0e43b4ca78aca47971596806a8f4693e6a84dc7
         with:
           family: self-service-frontend
