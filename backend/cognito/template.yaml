@@ -5,6 +5,36 @@ Transform:
   - AWS::Serverless-2016-10-31
 
 Resources:
+  passwordResetCustomMessage:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/password-reset-custom-message.handler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Customised email message on forgot password.
+      Events:
+        Cognito:
+          Type: Cognito
+          Properties:
+            Trigger: CustomMessage
+            UserPool: !Ref UserPool
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/password-reset-custom-message.ts
+
   UserPool:
     Type: AWS::Cognito::UserPool
     DependsOn: SmsRole

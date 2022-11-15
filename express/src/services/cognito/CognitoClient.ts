@@ -16,7 +16,9 @@ import {
     RespondToAuthChallengeCommand,
     RespondToAuthChallengeCommandOutput,
     VerifyUserAttributeCommand,
-    VerifyUserAttributeCommandOutput
+    VerifyUserAttributeCommandOutput,
+    ForgotPasswordCommandOutput,
+    ForgotPasswordCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {AdminCreateUserCommandOutput} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/AdminCreateUserCommand";
 import CognitoInterface from "./CognitoInterface";
@@ -122,6 +124,15 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
+    async forgotPassword(email: string): Promise<ForgotPasswordCommandOutput> {
+        const params = {
+            ClientId: this.clientId,
+            Username: email
+        };
+        const command = new ForgotPasswordCommand(params);
+        return await this.cognitoClient.send(command);
+    }
+
     async setEmailAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput> {
         const params = {
             UserPoolId: this.userPoolId,
@@ -220,7 +231,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             ClientId: this.clientId,
             AuthFlow: "REFRESH_TOKEN_AUTH",
             AuthParameters: {
-                REFRESH_TOKEN: refreshToken,
+                REFRESH_TOKEN: refreshToken
             }
         };
         const command = new AdminInitiateAuthCommand(params);
