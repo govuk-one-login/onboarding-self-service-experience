@@ -6,3 +6,4 @@ applications:
     env:
       COGNITO_CLIENT: ((cognito-client))
       LAMBDA_FACADE: ((lambda-facade))
+      GOOGLE_TAG_ID: ((google-tag-id))
