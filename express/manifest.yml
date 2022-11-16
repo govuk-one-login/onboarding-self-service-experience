@@ -1,6 +1,6 @@
 ---
 applications:
-  - name: onboarding-self-service-experience
+  - name: onboarding-self-service
     memory: 512M
     disk_quota: 512M
     env:
