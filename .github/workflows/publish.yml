@@ -1,0 +1,35 @@
+name: Publish
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-front:
+    name: Build
+    uses: ./.github/workflows/build-front-app.yml
+
+  run-unit-tests:
+    name: Run tests
+    uses: ./.github/workflows/run-unit-tests.yml
+
+  deploy-test-front:
+    name: Test
+    needs: [ build-front, run-unit-tests ]
+    uses: ./.github/workflows/deploy-to-paas.yml
+    with:
+      environment: test
+      cf-space-name: self-service-test
+      cognito-client: StubCognitoClient
+      lambda-facade: StubLambdaFacade
+      url: https://di-self-service-test.london.cloudapps.digital
+    secrets:
+      cf-username: ${{ secrets.CF_USERNAME }}
+      cf-password: ${{ secrets.CF_PASSWORD }}
+
+  run-acceptance-tests:
+    name: Run tests
+    needs: deploy-test-front
+    uses: ./.github/workflows/run-acceptance-tests.yml
+    with:
+      host: ${{ needs.deploy-test-front.outputs.deployment-url }}
