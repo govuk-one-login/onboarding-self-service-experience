@@ -1,44 +1,18 @@
-{% extends "./layout-service-details.njk" %}
-{% from "../macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% extends "./base-form-service-details.njk" %}
 
-{% set active = "client-details" %}
 {% set pageTitle = "Change redirect URIs" %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors:  errorMessages,
-    hrefs: {
-      redirectURIs: "#redirectURIs"
-    }
-  }) }}
+{% set formAction %}
+  /change-redirect-uris/{{ values.serviceId }}/{{  values.selfServiceClientId }}/{{  values.clientId }}
+{% endset %}
 
+{% block beforeForm %}
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your redirect URIs</h1>
-
   <p class="govuk-body">Add the URI for the page you want your users to see after they sign in to your service.</p>
   <p class="govuk-body">You can add multiple redirect URIs if you want different groups of users to see different pages
     once they sign in to your service. To do this, enter the URIs separated by a space.</p>
+{% endblock %}
 
-  <form class="form" action="/change-redirect-uris/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
-    {{ govukInput({
-      label: {
-        text: "Redirect URIs"
-      },
-      hint: {
-        text: "Enter URIs starting with https://"
-      },
-      name: "redirectURIs",
-      id: "redirectURIs",
-      classes: "govuk-!-width-full",
-      value: value,
-      errorMessage: {
-        text:  errorMessages.redirectURIs
-      } if  errorMessages else false
-    }) }}
-
-    <div class="govuk-button-group">
-      {{ govukButton({ text: "Confirm" }) }}
-      <a class="govuk-link" href="/client-details/{{ serviceId }}">Cancel</a>
-    </div>
-  </form>
+{% block formInputs %}
+  {{ form.urlInput("Redirect URIs", "redirectURIs") }}
 {% endblock %}

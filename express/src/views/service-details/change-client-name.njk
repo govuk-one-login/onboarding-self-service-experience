@@ -1,19 +1,13 @@
-{% extends "./layout-service-details.njk" %}
-{% from "../macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% extends "./base-form-service-details.njk" %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
-{% set active = "client-details" %}
 {% set pageTitle = "Change client name" %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors:  errorMessages,
-    hrefs: {
-      clientName: "#clientName"
-    }
-  }) }}
+{% set formAction %}
+  /change-client-name/{{ values.serviceId }}/{{ values.selfServiceClientId }}/{{ values.clientId }}
+{% endset %}
 
+{% block beforeForm %}
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your client name</h1>
 
   {{ govukWarningText({
@@ -23,24 +17,8 @@
 
   <p class="govuk-body">It should usually be your service name as written on your service start page.</p>
   <p class="govuk-body">It needs to fit into a sentence like “You can now continue to the [client name] service.”</p>
+{% endblock %}
 
-  <form class="form" action="/change-client-name/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
-    {{ govukInput({
-      label: {
-        text: "Client name"
-      },
-      name: "clientName",
-      id: "clientName",
-      classes: "govuk-!-width-full",
-      value: value,
-      errorMessage: {
-        text:  errorMessages.get('clientName')
-      } if  errorMessages else false
-    }) }}
-
-    <div class="govuk-button-group">
-      {{ govukButton({ text: "Confirm" }) }}
-      <a class="govuk-link" href="/client-details/{{ serviceId }}">Cancel</a>
-    </div>
-  </form>
+{% block formInputs %}
+  {{ form.textInput("Client name", "clientName") }}
 {% endblock %}

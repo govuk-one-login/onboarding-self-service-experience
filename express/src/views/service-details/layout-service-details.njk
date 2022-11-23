@@ -1,15 +1,16 @@
 {% extends "layout/base.njk" %}
 
+{% set active = active | default("client-details") %}
 {% set mainClasses = "govuk-!-padding-top-5 left-nav-wrapper" %}
 
 {% block beforeContent %}
   <div class="govuk-phase-banner govuk-clearfix">
     <div class="govuk-breadcrumbs">
       <ol class="govuk-breadcrumbs__list navigation-service-change-list">
-          <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19">
-                <a class="govuk-breadcrumbs__link" href="#">Your services</a>
-          </li>
-          <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19 govuk-!-font-weight-bold">{{ serviceName }}</li>
+        <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19">
+          <a class="govuk-breadcrumbs__link" href="#">Your services</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19 govuk-!-font-weight-bold">{{ serviceName }}</li>
       </ol>
       <a href="/change-service-name/{{ serviceName }}/{{ selfServiceClientId }}/{{ authClientId }}/{{ clientServiceId }}" class="govuk-link govuk-link--no-visited-state navigation-service-change govuk-!-font-size-19">Change service name</a>
     </div>
