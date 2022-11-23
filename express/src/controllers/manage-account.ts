@@ -81,7 +81,7 @@ export const processUpdateServiceForm = async function (req: Request, res: Respo
     }
 
     const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
-    if (userId === undefined || typeof userId !== "string") {
+    if (userId === undefined) {
         console.log("Can't get CognitoId from authenticationResult in session");
         res.render("there-is-a-problem.njk");
         return;
@@ -314,4 +314,71 @@ export const verifyMobileWithSmsCode = async function (req: Request, res: Respon
     }
     req.session.updatedField = "mobile phone number";
     res.redirect("/account");
+};
+
+export const privateBetaPostForm = async function (req: Request, res: Response) {
+    const yourName = req.body.yourName;
+    const department = req.body.department;
+    const emailAddress = req.body.emailAddress;
+    const serviceName = req.body.serviceName;
+
+    if (yourName === "" && department === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set("yourName", "Enter your name");
+        errorMessages.set("department", "Enter your department");
+        const value: object = {
+            yourName: yourName,
+            department: department
+        };
+        res.render("service-details/private-beta.njk", {
+            errorMessages: errorMessages,
+            value: value
+        });
+        return;
+    }
+
+    if (yourName === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set("yourName", "Enter your name");
+        const value: object = {
+            yourName: yourName,
+            department: department
+        };
+        res.render("service-details/private-beta.njk", {
+            errorMessages: errorMessages,
+            value: value
+        });
+        return;
+    }
+
+    if (department === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set("department", "Enter your department");
+        const value: object = {
+            yourName: yourName,
+            department: department
+        };
+        res.render("service-details/private-beta.njk", {
+            errorMessages: errorMessages,
+            value: value
+        });
+        return;
+    }
+
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    try {
+        await s4.privateBetaRequest(
+            yourName,
+            department,
+            serviceName,
+            emailAddress,
+            req.session.authenticationResult?.AccessToken as string
+        );
+    } catch (error) {
+        console.error(error);
+        res.redirect("/there-is-a-problem");
+        return;
+    }
+
+    res.redirect("/private-beta-form-submitted");
 };
