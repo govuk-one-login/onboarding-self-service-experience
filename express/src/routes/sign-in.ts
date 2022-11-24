@@ -9,7 +9,9 @@ import {
     showSignInFormPassword,
     signOut,
     sessionTimeout,
-    accountExists
+    accountExists,
+    forgotPasswordForm,
+    checkEmailPasswordReset
 } from "../controllers/sign-in";
 import emailIsPresentInSession from "../middleware/validators/emailIsPresentInSession/emailIsPresentInSession";
 import {emailValidator} from "../middleware/validators/emailValidator";
@@ -47,5 +49,8 @@ router.post("/existing-account", processSignInForm("create-account/existing-acco
 router.get("/no-account", (req, res) => {
     res.render("no-account-found.njk");
 });
+
+router.get("/forgot-password", forgotPasswordForm);
+router.get("/check-email-password-reset", checkEmailPasswordReset);
 
 export default router;

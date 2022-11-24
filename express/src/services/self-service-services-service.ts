@@ -31,6 +31,10 @@ export default class SelfServiceServicesService {
         await this.cognito.changePassword(accessToken, previousPassword, proposedPassword);
     }
 
+    async forgotPassword(email: string) {
+        await this.cognito.forgotPassword(email);
+    }
+
     async respondToMfaChallenge(mfaResponsse: MfaResponse, mfaCode: string): Promise<AuthenticationResultType> {
         const response = await this.cognito.respondToMfaChallenge(mfaResponsse.cognitoId, mfaCode, mfaResponsse.cognitoSession);
 
@@ -126,7 +130,7 @@ export default class SelfServiceServicesService {
         return JSON.parse(response.data.output);
     }
 
-    async generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<any> {
+    async generateClient(service: Service, authenticationResult: AuthenticationResultType) {
         return await this.lambda.generateClient(service, authenticationResult);
     }
 
@@ -134,7 +138,7 @@ export default class SelfServiceServicesService {
         serviceId: string,
         selfServiceClientId: string,
         clientId: string,
-        updates: {[key: string]: any},
+        updates: {[key: string]: unknown},
         accessToken: string
     ): Promise<void> {
         await this.lambda.updateClient(serviceId, selfServiceClientId, clientId, updates, accessToken);
@@ -148,12 +152,12 @@ export default class SelfServiceServicesService {
         return dynamoServicesToDomainServices((await this.lambda.listServices(userId, accessToken)).data.Items);
     }
 
-    async updateUser(userId: string, updates: {[key: string]: any}, accessToken: string): Promise<void> {
+    async updateUser(userId: string, updates: {[key: string]: unknown}, accessToken: string): Promise<void> {
         await this.lambda.updateUser(userId, updates, accessToken as string);
     }
 
     async listClients(serviceId: string, accessToken: string): Promise<Client[]> {
-        return (await this.lambda.listClients(serviceId, accessToken)).data.Items.map((client: any) =>
+        return (await this.lambda.listClients(serviceId, accessToken)).data.Items.map((client: never) =>
             dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)
         );
     }

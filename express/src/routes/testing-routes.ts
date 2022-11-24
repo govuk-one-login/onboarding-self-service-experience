@@ -410,17 +410,6 @@ router.get("/there-is-a-problem-test", (req, res) => {
     res.render("there-is-a-problem.njk");
 });
 
-// Testing routs Create the 'forgot your password' page
-router.get("/forgot-password", (req, res) => {
-    res.render("forgot-password.njk", {
-        emailAddress: "your.email@digital.cabinet-office.gov.uk"
-    });
-});
-
-// Testing routs 'Check your email for a password reset link' page
-router.get("/check-email-password-reset", (req, res) => {
-    res.render("check-email-password-reset.njk");
-});
 // Create the 'Create a new password' page
 router.get("/create-new-password", (req, res) => {
     res.render("create-new-password.njk");

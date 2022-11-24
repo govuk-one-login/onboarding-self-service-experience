@@ -8,3 +8,9 @@ When("the user enters {string} email", async function (email: string) {
     await enterTextIntoTextInput(this.page, "you-can-type-any-old-password-for-this-stub", "password");
     await clickSubmitButton(this.page);
 });
+
+When("the user enters {string} email and click continue", async function (email: string) {
+    await this.goToPath("/sign-in");
+    await enterTextIntoTextInput(this.page, email, "email");
+    await clickSubmitButton(this.page);
+});
