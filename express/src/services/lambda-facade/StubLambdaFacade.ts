@@ -20,6 +20,8 @@ class StubLambdaFacade implements LambdaFacadeInterface {
     publicKey =
         "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
 
+    serviceName = "";
+
     constructor() {
         console.log("Creating stub lambda facade...");
     }
@@ -33,6 +35,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
     }
 
     newService(service: Service, userId: string, email: string, accessToken: string): Promise<AxiosResponse> {
+        this.serviceName = service.serviceName;
         return Promise.resolve({data: {output: JSON.stringify({serviceId: "stub-service-id"})}} as AxiosResponse);
     }
 
@@ -66,17 +69,10 @@ class StubLambdaFacade implements LambdaFacadeInterface {
             data: {
                 Items: [
                     {
-                        service_name: {S: "SAM Stacks Service"},
+                        service_name: {S: this.serviceName},
                         sk: {S: "user#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
                         role: {S: "admin"},
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
-                        data: {S: "john.watts@digital.cabinet-office.gov.uk"}
-                    },
-                    {
-                        service_name: {S: "I doubt this flies"},
-                        sk: {S: "user#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
-                        role: {S: "admin"},
-                        pk: {S: "service#3523fd0f-90c1-4fd2-b08d-a0844b6ec396"},
                         data: {S: "john.watts@digital.cabinet-office.gov.uk"}
                     }
                 ]
@@ -89,7 +85,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
             data: {
                 Items: [
                     {
-                        client_name: {S: "SAM Stacks Service"},
+                        client_name: {S: this.serviceName},
                         post_logoout_redirect_uris: {L: [{S: "http://localhost/"}, {S: "http://localhost/logged_out"}]},
                         post_logout_redirect_uris: {L: [{S: "http://localhost/logged_out"}]},
                         subject_type: {S: "pairwise"},
