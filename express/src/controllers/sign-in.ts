@@ -116,16 +116,21 @@ export const forgotPasswordForm = async function (req: Request, res: Response) {
 };
 
 export const checkEmailPasswordReset = async function (req: Request, res: Response) {
+    await forgotPassword(req);
+    res.render("check-email-password-reset.njk");
+};
+
+export const resendForgotPassword = async function (req: Request, res: Response) {
+    await forgotPassword(req);
+    res.redirect("/create-new-password");
+};
+
+const forgotPassword = async function (req: Request) {
     const emailAddress = req.session.emailAddress;
-    if (emailAddress === "") {
-        res.render("there-is-a-problem.njk");
-        return;
-    }
     try {
         const s4: SelfServiceServicesService = await req.app.get("backing-service");
         await s4.forgotPassword(emailAddress as string);
     } catch (error) {
         console.error("ERROR CALLING COGNITO - FORGOT PASSWORD WITH EMAIL", error);
     }
-    res.render("check-email-password-reset.njk");
 };

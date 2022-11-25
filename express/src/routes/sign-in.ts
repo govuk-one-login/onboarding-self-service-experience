@@ -11,6 +11,7 @@ import {
     sessionTimeout,
     accountExists,
     forgotPasswordForm,
+    resendForgotPassword,
     checkEmailPasswordReset
 } from "../controllers/sign-in";
 import emailIsPresentInSession from "../middleware/validators/emailIsPresentInSession/emailIsPresentInSession";
@@ -50,7 +51,20 @@ router.get("/no-account", (req, res) => {
     res.render("no-account-found.njk");
 });
 
-router.get("/forgot-password", forgotPasswordForm);
-router.get("/check-email-password-reset", checkEmailPasswordReset);
+router.get(
+    "/forgot-password",
+    emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+    forgotPasswordForm
+);
+router.get(
+    "/check-email-password-reset",
+    emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+    checkEmailPasswordReset
+);
+router.post(
+    "/check-email-password-reset",
+    emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+    resendForgotPassword
+);
 
 export default router;
