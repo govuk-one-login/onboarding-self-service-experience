@@ -13,3 +13,13 @@ Feature:
     Then they should be directed to the following page: "/forgot-password"
     Then they click on the "Continue" button-link
     Then they should be directed to the following page: "/check-email-password-reset"
+
+  Scenario: The user clicks resend the email on check email password reset page
+    Given that the user is on the "/" page
+    When the user enters "registered@gds.gov.uk" email and click continue
+    Then they click on the "Forgot your password?" link
+    Then they should be directed to the following page: "/forgot-password"
+    Then they click on the "Continue" button-link
+    Then they should be directed to the following page: "/check-email-password-reset"
+    Then they click the Submit button
+    Then they should be directed to the following page: "/create-new-password"
