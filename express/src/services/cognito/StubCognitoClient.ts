@@ -16,7 +16,7 @@ import {ServiceException} from "@aws-sdk/smithy-client/dist-types/exceptions";
 import {promises as fs} from "fs";
 import path from "path";
 import CognitoInterface from "./CognitoInterface";
-import {prepareForCognito} from "../../lib/mobileNumberUtils";
+import {convertToCountryPrefixFormat} from "../../lib/mobileNumberUtils";
 import * as crypto from "crypto";
 
 type Override = {
@@ -157,7 +157,7 @@ export class CognitoClient implements CognitoInterface {
     }
 
     setPhoneNumber(username: string, phoneNumber: string): Promise<AdminUpdateUserAttributesCommandOutput> {
-        this.loggedInIdTokenPayload.phone_number = prepareForCognito(phoneNumber);
+        this.loggedInIdTokenPayload.phone_number = convertToCountryPrefixFormat(phoneNumber);
         return Promise.resolve({$metadata: {}});
     }
 
@@ -201,13 +201,13 @@ export class CognitoClient implements CognitoInterface {
     private getException(exception: string): ServiceException {
         switch (exception) {
             case "UsernameExistsException":
-                return new UsernameExistsException({$metadata: {}});
+                return new UsernameExistsException({message: "", $metadata: {}});
             case "CodeMismatchException":
-                return new CodeMismatchException({$metadata: {}});
+                return new CodeMismatchException({message: "", $metadata: {}});
             case "NotAuthorizedException":
-                return new NotAuthorizedException({$metadata: {}});
+                return new NotAuthorizedException({message: "", $metadata: {}});
             case "UserNotFoundException":
-                return new UserNotFoundException({$metadata: {}});
+                return new UserNotFoundException({message: "", $metadata: {}});
         }
         throw new Error("Unknown exception");
     }

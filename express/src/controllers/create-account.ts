@@ -5,10 +5,10 @@ import {
     UsernameExistsException
 } from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
-import SelfServiceServicesService from "../services/self-service-services-service";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
-import {prepareForCognito} from "../lib/mobileNumberUtils";
+import {convertToCountryPrefixFormat} from "../lib/mobileNumberUtils";
 import {domainUserToDynamoUser} from "../lib/userUtils";
+import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     res.render("create-account/get-email.njk");
@@ -119,7 +119,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
         return;
     }
 
-    const mobileNumber = prepareForCognito(req.body.mobileNumber);
+    const mobileNumber = convertToCountryPrefixFormat(req.body.mobileNumber);
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
     await s4.setPhoneNumber(req.session.emailAddress as string, mobileNumber);

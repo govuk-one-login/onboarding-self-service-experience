@@ -65,9 +65,21 @@ export const resendMobileVerificationCode = async function (req: Request, res: R
     await processEnterMobileForm(req, res);
 };
 
-export const processEnterMobileForm = async function (req: Request, res: Response) {
+export const sessionTimeout = async function (req: Request, res: Response) {
+    res.render("session-timeout.njk");
+};
+
+export const accountExists = async function (req: Request, res: Response) {
+    res.render("create-account/existing-account.njk", {
+        values: {
+            emailAddress: req.session.emailAddress
+        }
+    });
+};
+
+const processEnterMobileForm = async function (req: Request, res: Response) {
     // The user needs to be logged in for this
-    const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
+    const accessToken = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
         // user must login before we can process their mobile number
         console.error("processEnterMobileForm::accessToken not present in session, redirecting to /sign-in");
@@ -92,18 +104,6 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
         formActionUrl: "/sign-in-otp-mobile",
         textMessageNotReceivedUrl: "/resend-text-code",
         active: "sign-in"
-    });
-};
-
-export const sessionTimeout = async function (req: Request, res: Response) {
-    res.render("session-timeout.njk");
-};
-
-export const accountExists = async function (req: Request, res: Response) {
-    res.render("create-account/existing-account.njk", {
-        values: {
-            emailAddress: req.session.emailAddress
-        }
     });
 };
 

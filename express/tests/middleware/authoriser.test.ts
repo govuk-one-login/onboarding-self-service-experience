@@ -1,39 +1,18 @@
 import {NextFunction, Request, Response} from "express";
+import {Session, SessionData} from "express-session";
 import {checkAuthorisation} from "../../src/middleware/authoriser";
-import {Session} from "express-session";
 
 describe("test authoriser", () => {
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
     let nextFunction: NextFunction;
 
-    const session: Session = {
-        id: "",
-        cookie: {originalMaxAge: 0},
-        regenerate(callback: (err: any) => void): Session {
-            return this;
-        },
-        destroy(callback: (err: any) => void): Session {
-            return this;
-        },
-        reload(callback: (err: any) => void): Session {
-            return this;
-        },
-        resetMaxAge(): Session {
-            return this;
-        },
-        save(callback?: (err: any) => void): Session {
-            return this;
-        },
-        touch(): Session {
-            return this;
-        }
-    };
+    const mockSession: Partial<Session & Partial<SessionData>> = {};
 
     beforeEach(() => {
         mockRequest = {
             body: jest.fn(),
-            session: session
+            session: mockSession as Session
         };
 
         mockResponse = {};
