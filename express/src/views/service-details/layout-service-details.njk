@@ -26,6 +26,9 @@
             <a class="govuk-link govuk-link--no-visited-state" href="/client-details-mocked">Client details</a>
             {# <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client details</a> #}
           </li>
+          <li class="side-navigation__item{% if active == 'team-members' %} side-navigation__item--active{% endif %}">
+            <a class="govuk-link govuk-link--no-visited-state" href="/team-members">Team Members</a>
+          </li>
           <li class="side-navigation__item{% if active == 'private-beta' %} side-navigation__item--active{% endif %}">
             <a class="govuk-link govuk-link--no-visited-state" href="/private-beta?serviceName={{ serviceName }}">Joining private beta</a>
           </li>
@@ -33,7 +36,7 @@
       </nav>
     </div>
 
-    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-two-thirds left-nav-service-details">
       {% block mainContent %}{% endblock %}
     </div>
   </div>
