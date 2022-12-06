@@ -48,10 +48,13 @@ describe("It checks whether an mobile OTP is valid and behaves accordingly", () 
         };
 
         mobileOtpValidator("/sms", "/get-another-message", false)(mockRequest as Request, mockResponse as Response, nextFunction);
+
         expect(mockResponse.render).toHaveBeenCalledWith("check-mobile.njk", {
-            errorMessages: {smsOtp: "Enter the security code using only 6 digits"},
-            value: {otp: "123"},
+            errorMessages: {
+                "sms-otp": "Enter the security code using only 6 digits"
+            },
             values: {
+                "sms-otp": "123",
                 mobileNumber: "07000000000",
                 formActionUrl: "/sms",
                 textMessageNotReceivedUrl: "/get-another-message"

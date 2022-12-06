@@ -1,23 +1,17 @@
 import {NextFunction, Request, Response} from "express";
 
 export async function serviceNameValidator(req: Request, res: Response, next: NextFunction) {
-    let serviceName: string = req.body["serviceName"];
-    serviceName = serviceName.trim();
-    if (!atLeastOneCharacter(serviceName)) {
-        await errorResponse(serviceName, res, "serviceName", "Enter your service name");
+    const serviceName: string = req.body.serviceName.trim();
+
+    if (serviceName.length == 0) {
+        res.render("add-service-name.njk", {
+            errorMessages: {
+                serviceName: "Enter your service name"
+            }
+        });
+
         return;
     }
+
     next();
-}
-
-export function errorResponse(serviceName: string, res: Response, key: string, message: string) {
-    const errorMessages = new Map<string, string>();
-    errorMessages.set(key, message);
-    res.render("add-service-name.njk", {
-        errorMessages: errorMessages
-    });
-}
-
-export function atLeastOneCharacter(serviceName: string) {
-    return /^.+$/.test(serviceName);
 }

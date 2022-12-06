@@ -46,9 +46,14 @@ describe("It checks whether an email OTP is valid and behaves accordingly", () =
         mockResponse = {
             render: jest.fn()
         };
+
         emailOtpValidator(mockRequest as Request, mockResponse as Response, nextFunction);
+
         expect(mockResponse.render).toHaveBeenCalledWith("create-account/check-email.njk", {
-            values: {emailAddress: "render-this@test.gov.uk", otp: "123"},
+            values: {
+                emailAddress: "render-this@test.gov.uk",
+                "create-email-otp": "123"
+            },
             errorMessages: {
                 "create-email-otp": "Enter the security code using only 6 digits"
             }

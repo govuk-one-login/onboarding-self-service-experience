@@ -14,10 +14,13 @@ export function urisValidator(template: string, whichUris: string): MiddlewareFu
         } else {
             res.render(template, {
                 errorMessages: whichUris === "redirectUris" ? {redirectUris: result.errorMessage} : {postLogoutUris: result.errorMessage},
-                value: req.body[whichUris],
-                serviceId: req.params.serviceId,
-                selfServiceClientId: req.params.selfServiceClientId,
-                clientId: req.params.clientId
+                values: {
+                    redirectURIs: req.body[whichUris],
+                    postLogoutURIs: req.body[whichUris],
+                    serviceId: req.params.serviceId,
+                    selfServiceClientId: req.params.selfServiceClientId,
+                    clientId: req.params.clientId
+                }
             });
         }
     };

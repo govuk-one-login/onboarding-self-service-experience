@@ -11,9 +11,14 @@ export function passwordValidator(render: string): MiddlewareFunction<Request, R
             next();
         } else {
             res.render(render, {
-                values: {password: req.body["password"]},
-                errorMessages: {password: result.errorMessage}
+                values: {
+                    password: req.body["password"]
+                },
+                errorMessages: {
+                    password: result.errorMessage
+                }
             });
+
             return;
         }
     };

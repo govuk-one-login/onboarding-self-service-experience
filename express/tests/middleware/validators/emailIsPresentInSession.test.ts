@@ -44,6 +44,7 @@ describe("It checks whether an email is present in the session and behaves accor
         mockResponse = {
             render: jest.fn()
         };
+
         emailIsPresentInSession("sign-in.njk", {})(mockRequest as Request, mockResponse as Response, nextFunction);
         expect(mockResponse.render).toHaveBeenCalledWith("sign-in.njk", {});
     });

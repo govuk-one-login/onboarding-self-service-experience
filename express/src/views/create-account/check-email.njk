@@ -1,51 +1,26 @@
-{% extends "layout/base.njk" %}
+{% extends "layout/form.njk" %}
 {% from "macros/back-link.njk" import backLink %}
-{% from "macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set pageTitle = "Check your email" %}
 {% set backLink = backLink("/create/get-email") %}
+{% set formAction = "/create/check-email" %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors: errorMessages,
-    hrefs: {
-      "create-email-otp": "#create-email-otp"
-    }
-  }) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l">Check your email</h1>
-
   <div class="govuk-inset-text">
     We have sent an email to: <span class="govuk-!-font-weight-bold">{{ values.emailAddress }}</span>
   </div>
-
   <p class="govuk-body">The email contains a 6 digit security code.</p>
   <p class="govuk-body">The email might take a few minutes to arrive. If you do not get an email, check your spam folder.</p>
   <p class="govuk-body">The code will expire after 15 minutes.</p>
+{% endblock %}
 
-  <form class="form" action="/create/check-email" method="post">
-    {{ govukInput({
-      label: {
-        text: "Enter the 6 digit security code"
-      },
-      name: "create-email-otp",
-      id: "create-email-otp",
-      classes: "govuk-input--width-5",
-      type: "text",
-      inputmode: "numeric",
-      pattern: "[0-9]*",
-      spellcheck: false,
-      value: values.otp,
-      errorMessage: {
-        text: errorMessages['create-email-otp']
-      } if errorMessages else false
-    }) }}
+{% block formInputs %}
+  {{ form.securityCodeInput("create-email-otp") }}
+{% endblock %}
 
-    {{ govukButton({ text: "Continue", attributes: {id: "submit", formnovalidate: ""} }) }}
-
-    <p class="govuk-body">
-      <a id="resend-code-page" class="govuk-link" href="/create/resend-email-code">Not received an email?</a>
-    </p>
-  </form>
+{% block afterForm %}
+  <p class="govuk-body">
+    <a id="resend-code-page" class="govuk-link" href="/create/resend-email-code">Not received an email?</a>
+  </p>
 {% endblock %}

@@ -87,10 +87,12 @@ router.post("/verify-phone-code", mobileOtpValidator("/verify-phone-code", ""), 
 
 router.get("/change-service-name/:serviceName/:selfServiceClientId/:authClientId/:clientServiceId", (req, res) => {
     res.render("account/change-service-name.njk", {
-        serviceName: req.params.serviceName,
-        clientServiceId: req.params.clientServiceId,
-        selfServiceClientId: req.params.selfServiceClientId,
-        clientId: req.params.authClientId
+        values: {
+            serviceName: req.params.serviceName,
+            clientServiceId: req.params.clientServiceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.authClientId
+        }
     });
 });
 

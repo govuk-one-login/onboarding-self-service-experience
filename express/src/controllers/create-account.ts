@@ -153,9 +153,11 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
     const otp = req.body["sms-otp"];
     if (otp === undefined) {
         res.render("check-mobile.njk", {
-            mobileNumber: req.session.mobileNumber,
-            formActionUrl: "/create/verify-phone-code",
-            textMessageNotReceivedUrl: "/create/resend-phone-code"
+            values: {
+                mobileNumber: req.session.mobileNumber,
+                formActionUrl: "/create/verify-phone-code",
+                textMessageNotReceivedUrl: "/create/resend-phone-code"
+            }
         });
         return;
     }
@@ -185,15 +187,17 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         return;
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            const value: object = {otp: req.body["sms-otp"]};
+            const value = req.body["sms-otp"];
             res.render("check-mobile.njk", {
                 values: {
-                    mobileNumber: req.session.enteredMobileNumber
+                    mobileNumber: req.session.enteredMobileNumber,
+                    "sms-otp": value,
+                    formActionUrl: "/create/verify-phone-code",
+                    textMessageNotReceivedUrl: "/create/resend-phone-code"
                 },
-                value: value,
-                errorMessages: {smsOtp: "The code you entered is not correct or has expired - enter it again or request a new code"},
-                formActionUrl: "/create/verify-phone-code",
-                textMessageNotReceivedUrl: "/create/resend-phone-code"
+                errorMessages: {
+                    "sms-otp": "The code you entered is not correct or has expired - enter it again or request a new code"
+                }
             });
             return;
         }
@@ -207,7 +211,7 @@ export const showResendPhoneCodeForm = async function (req: Request, res: Respon
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
     if (accessToken === undefined) {
         // user must log in before we can process their mobile number
-        console.error("showResendPhoneCodeForm::accessToken not present in session, redirecting to /sign-in");
+        console.error("showResendPhoneCodePage::accessToken not present in session, redirecting to /sign-in");
         res.redirect("/sign-in");
         return;
     }

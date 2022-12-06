@@ -1,11 +1,11 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
-{% macro errorSummary(params) %}
+{% macro errorSummary(errorMessages) %}
   {% set errorList = [] %}
-  {% for key, message in params.errors %}
+  {% for field, message in errorMessages %}
     {% set errorList = (errorList.push({
       text: message | safe,
-      href: params.hrefs[key]
+      href: "#" + field
     }), errorList) %}
   {% endfor %}
 

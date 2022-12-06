@@ -1,37 +1,16 @@
-{% extends "layout/base.njk" %}
-{% from "macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% extends "layout/form.njk" %}
 
 {% set active = "sign-in" %}
+{% set pageTitle = "Sign in to your GOV.UK Sign In admin account" %}
+{% set formAction = "/sign-in" %}
 
-{% block pageTitle %}Sign in to your GOV.UK Sign In admin account{% endblock %}
-
-{% block mainContent %}
-  {{ errorSummary ({
-    errors: errorMessages,
-    hrefs: {
-      emailAddress: "#emailAddress"
-    }
-  }) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l">Sign in to your GOV.UK Sign In account</h1>
-  <p class="govuk-body">If you do not have an account, you can <a class="govuk-link" href="/create/get-email">create one now</a>.</p>
+  <p class="govuk-body">If you do not have an account, you can
+    <a class="govuk-link" href="/create/get-email">create one now</a>.</p>
   <p class="govuk-body">Enter your email address to sign in.</p>
+{% endblock %}
 
-  <form class="form" action="/sign-in" method="post">
-    {{ govukInput({
-      label: {
-        text: "Email address"
-      },
-      name: "emailAddress",
-      id: "emailAddress",
-      classes: "govuk-!-width-three-quarters",
-      errorMessage: {
-        text: errorMessages?.emailAddress
-      } if errorMessages,
-      value: values?.emailAddress if values
-    }) }}
-
-    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
-  </form>
+{% block formInputs %}
+  {{ form.emailInput() }}
 {% endblock %}

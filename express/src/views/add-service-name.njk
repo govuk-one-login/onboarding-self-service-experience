@@ -1,35 +1,15 @@
-{% extends "layout/base.njk" %}
-{% from "macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% extends "layout/form.njk" %}
 
 {% set pageTitle = "Add your service name" %}
+{% set formAction = "/create-service-name-validation" %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors:  errorMessages,
-    hrefs: {
-      serviceName: "#serviceName"
-    }
-  }) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l">Add your service name</h1>
   <p class="govuk-body">Add your service name as used on your service start page.</p>
   <p class="govuk-body">Your service name is shown to your users in the sign in journey. For example “Now continue to use the [service name] service.”</p>
   <p class="govuk-body">You can change it later.</p>
+{% endblock %}
 
-  <form class="form" action="/create-service-name-validation/{{ values.userId }}" method="post">
-    {{ govukInput({
-      label: {
-        text: "Service name"
-      },
-      name: "serviceName",
-      id: "serviceName",
-      classes: "govuk-!-width-full",
-      errorMessage: {
-        text:  errorMessages.get('serviceName')
-      } if  errorMessages else false
-    }) }}
-
-    {{ govukButton({ text: "Continue", attributes: {id: "submit", formnovalidate: ""} }) }}
-  </form>
+{% block formInputs %}
+  {{ form.textInput("Service name", "serviceName") }}
 {% endblock %}

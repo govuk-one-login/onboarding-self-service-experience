@@ -1,0 +1,69 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% macro generate(action, buttonText, buttonClasses, cancelUrl) %}
+  <form class="form" method="post"{% if action %} action="{{ action }}"{% endif %} novalidate="novalidate">
+    {{ caller() }}
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: buttonText | default("Continue"),
+        classes: buttonClasses if buttonClasses,
+        attributes: {
+          id: "submit"
+        }
+      }) }}
+
+      {% if cancelUrl %}<a class="govuk-link" href="{{ cancelUrl }}">Cancel</a>{% endif %}
+    </div>
+  </form>
+{% endmacro %}
+
+{% macro textInput(label, id, classes, hint, type, autocomplete, inputmode, value) %}
+  {{ govukInput({
+    label: {
+      text: label
+    } if label,
+    hint: {
+      text: hint
+    } if hint,
+    id: id,
+    name: id,
+    type: type if type,
+    spellcheck: false,
+    classes: classes | default("govuk-!-width-full"),
+    autocomplete: autocomplete if autocomplete,
+    inputmode: inputmode if inputmode,
+    value: value | default(values[id] if values and values.hasOwnProperty(id)),
+    errorMessage: {
+      text: errorMessages[id]
+    } if errorMessages and errorMessages.hasOwnProperty(id)
+  }) }}
+{% endmacro %}
+
+{% macro emailInput(label, id, hint, classes = "govuk-!-width-three-quarters") %}
+  {{ textInput(label | default("Email address"), id | default("emailAddress"), classes, hint, "email", "email") }}
+{% endmacro %}
+
+{% macro passwordInput(label, id, hint, autocomplete = "new-password") %}
+  <div class="gem-c-show-password" data-module="show-password" data-disable-form-submit-check="false"
+       data-show-text="Show" data-hide-text="Hide" data-show-full-text="Show password"
+       data-hide-full-text="Hide password" data-announce-show="Your password is shown"
+       data-announce-hide="Your password is hidden">
+    {{ textInput(label | default("Enter a password"), id | default("password"), "gem-c-input govuk-input--width-20",
+      hint, "password", autocomplete
+    ) }}
+  </div>
+{% endmacro %}
+
+{% macro securityCodeInput(id) %}
+  {{ textInput("Enter the 6 digit security code", id, "govuk-input--width-5", inputmode = "numeric") }}
+{% endmacro %}
+
+{% macro mobileNumberInput(label = "UK mobile phone number", id = "mobileNumber") %}
+  {{ textInput(label, id, "govuk-!-width-one-half", type = "tel", autocomplete = "tel") }}
+{% endmacro %}
+
+{% macro urlInput(label, id) %}
+  {{ textInput(label, id, "govuk-!-width-full", "Enter URIs starting with https://", "url", "url") }}
+{% endmacro %}

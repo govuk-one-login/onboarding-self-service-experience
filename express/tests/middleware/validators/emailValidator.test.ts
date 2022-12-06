@@ -45,8 +45,13 @@ describe("It checks whether an email is valid and behaves accordingly", () => {
         mockResponse = {
             render: jest.fn()
         };
+
         await emailValidator("sign-in.njk")(mockRequest as Request, mockResponse as Response, nextFunction);
+
         expect(mockResponse.render).toHaveBeenCalledWith("sign-in.njk", {
+            values: {
+                emailAddress: mockRequest.body.emailAddress
+            },
             errorMessages: {
                 emailAddress: "Enter a government email address"
             }

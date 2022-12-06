@@ -1,54 +1,23 @@
-{% extends "layout/base.njk" %}
+{% extends "layout/form.njk" %}
 {% from "macros/back-link.njk" import backLink %}
-{% from "macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set pageTitle = "Check your mobile phone" %}
 {% set backLink = backLink("#", {onclick: "history.back()"}) %}
+{% set formAction = values.formActionUrl %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors: errorMessages,
-    hrefs: {
-      smsOtp: "#sms-otp"
-    }
-  }) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l">Check your mobile phone</h1>
-
   <div class="govuk-inset-text">
     We sent a code to: <span class="govuk-!-font-weight-bold">{{ values.mobileNumber }}</span>
   </div>
-
   <p class="govuk-body">It might take a few minutes to arrive. The code will expire after 15 minutes.</p>
+{% endblock %}
 
-  <form class="form" action="{{ values.formActionUrl }}" method="post">
-    {{ govukInput({
-      label: {
-        text: "Enter the 6 digit security code"
-      },
-      name: "sms-otp",
-      id: "sms-otp",
-      classes: "govuk-input--width-5",
-      type: "text",
-      inputmode: "numeric",
-      pattern: "[0-9]*",
-      spellcheck: false,
-      value: value.otp,
-      errorMessage: {
-        text: errorMessages.smsOtp
-      } if errorMessages else false
-    }) }}
+{% block formInputs %}
+  {{ form.securityCodeInput("sms-otp") }}
+{% endblock %}
 
-    {{ govukButton({
-      text: "Continue",
-      attributes: {
-        formnovalidate: "",
-        id: "submit"
-      }
-    }) }}
-  </form>
-
+{% block afterForm %}
   <p class="govuk-body">
     <a class="govuk-link " href="{{ values.textMessageNotReceivedUrl }}">Problems receiving a text message?</a>
   </p>

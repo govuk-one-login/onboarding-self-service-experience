@@ -20,6 +20,7 @@ describe("Validating numbers works as expected", () => {
 
         mockRequest.body.mobileNumber = validNumber;
         validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+
         expect(nextFunction).toBeCalledTimes(1);
     });
 
@@ -36,6 +37,7 @@ describe("Validating numbers works as expected", () => {
 
         mockRequest.body.mobileNumber = invalidNumber;
         validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+
         expect(nextFunction).not.toBeCalled();
         expect(mockResponse.render).toHaveBeenCalledTimes(1);
     });

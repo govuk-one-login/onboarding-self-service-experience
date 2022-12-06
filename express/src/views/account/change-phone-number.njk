@@ -1,39 +1,17 @@
-{% extends "layout/base.njk" %}
-{% from "macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% extends "layout/form.njk" %}
 
 {% set active = "your-account" %}
 {% set pageTitle = "Change phone number" %}
+{% set formAction = "/change-phone-number" %}
+{% set formButtonText = "Confirm" %}
+{% set formCancelUrl = "/account" %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors:  errorMessages,
-    hrefs: {
-      mobileNumber: "#mobileNumber"
-    }
-  }) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l">Change your mobile phone number</h1>
   <p class="govuk-body">We will send a 6 digit security code to this number every time you sign in.</p>
   <p class="govuk-body">You must use a UK mobile phone number.</p>
+{% endblock %}
 
-  <form class="form" action="/change-phone-number" method="post">
-    {{ govukInput({
-      label: {
-        text: "UK mobile phone number"
-      },
-      name: "mobileNumber",
-      id: "mobileNumber",
-      classes: "govuk-!-width-one-half",
-      value: values.mobileNumber if values,
-      errorMessage: {
-        text:  errorMessages.mobileNumber
-      } if  errorMessages
-    }) }}
-
-    <div class="govuk-button-group">
-      {{ govukButton({ text: "Confirm", attributes: {id: "submit"} }) }}
-      <a class="govuk-link" href="/account">Cancel</a>
-    </div>
-  </form>
+{% block formInputs %}
+  {{ form.mobileNumberInput() }}
 {% endblock %}

@@ -1,24 +1,23 @@
 import express from "express";
 import {
-    processEmailAddress,
+    accountExists,
+    checkEmailPasswordReset,
     finishSignIn,
-    resendMobileVerificationCode,
+    forgotPasswordForm,
+    processEmailAddress,
+    resendForgotPassword,
+    sessionTimeout,
     showLoginOtpMobile,
-    showResendPhoneCodeForm,
+    showResendPhoneCodePage,
     showSignInFormEmail,
     showSignInFormPassword,
-    signOut,
-    sessionTimeout,
-    accountExists,
-    forgotPasswordForm,
-    resendForgotPassword,
-    checkEmailPasswordReset
+    signOut
 } from "../controllers/sign-in";
+import processSignInForm from "../middleware/processSignInForm";
+import {processLoginOtpMobile} from "../middleware/sign-in-middleware";
 import emailIsPresentInSession from "../middleware/validators/emailIsPresentInSession/emailIsPresentInSession";
 import {emailValidator} from "../middleware/validators/emailValidator";
 import {mobileOtpValidator} from "../middleware/validators/mobileOtpValidator";
-import {processLoginOtpMobile} from "../middleware/sign-in-middleware";
-import processSignInForm from "../middleware/processSignInForm";
 
 const router = express.Router();
 
@@ -38,11 +37,13 @@ router.post(
 );
 
 router.get("/sign-in-otp-mobile", showLoginOtpMobile);
-
 router.post("/sign-in-otp-mobile", mobileOtpValidator("/sign-in-otp-mobile", "/resend-text-code"), processLoginOtpMobile, finishSignIn);
 
-router.get("/resend-text-code", showResendPhoneCodeForm);
-router.post("/resend-text-code", resendMobileVerificationCode);
+router.get("/resend-text-code", showResendPhoneCodePage);
+
+// TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
+router.post("/resend-text-code", showLoginOtpMobile);
+
 router.get("/account/sign-out", signOut);
 router.get("/existing-account", accountExists);
 router.post("/existing-account", processSignInForm("create-account/existing-account.njk"));
@@ -56,11 +57,13 @@ router.get(
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
     forgotPasswordForm
 );
+
 router.get(
     "/check-email-password-reset",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
     checkEmailPasswordReset
 );
+
 router.post(
     "/check-email-password-reset",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
