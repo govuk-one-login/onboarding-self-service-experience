@@ -1,0 +1,78 @@
+{% extends "./layout-service-details.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "../macros/error-summary.njk" import errorSummary %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+
+{% set active = "team-members" %}
+{% set pageTitle = "Invite a team member" %}
+
+{% block mainContent %}
+
+  {{ errorSummary ({
+    errors: errorMessages,
+    hrefs: {
+      emailAddress: "#emailAddress"
+    }
+  }) }}
+
+  <h1 class="govuk-heading-l">Invite a team member</h1>
+  <p class="govuk-body">We will email them an invitation link to join the [service name] service.</p>
+  <p class="govuk-body">They must have an email address that ends in:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>gov.uk</li>
+    <li>highwaysengland.co.uk</li>
+    <li>socialworkengland.org.uk</li>
+  </ul>
+  <form class="form" action="/invite-team-member" method="post" novalidate>
+
+    {{ govukInput({
+      label: {
+        text: "Government email address"
+      },
+      id: "emailAddress",
+      name: "emailAddress",
+      spellcheck: false,
+      classes: "govuk-!-width-three-quarters",
+      type: "email",
+      autocomplete: "email",
+      errorMessage: {
+        text: errorMessages.get('emailAddress')
+      } if errorMessages else false
+    }) }}
+
+    {{ govukCheckboxes({
+      name: "permissions",
+      fieldset: {
+        legend: {
+          text: "Choose their permissions"
+        }
+      },
+      items: [
+        {
+          value: "manageTeamMembers",
+          text: "Manage team members"
+        },
+        {
+          value: "changeIntegrationClientDetails",
+          text: "Change integration client details"
+        },
+        {
+          value: "changeServiceName",
+          text: "Change service name"
+        },
+        {
+          value: "requestToJoinPrivateBeta",
+          text: "Request to join private beta"
+        }
+      ]
+    }) }}
+
+    <div class="govuk-button-group">
+      {{ govukButton({ text: "Confirm", attributes: {id: "submit"} }) }}
+      <a class="govuk-link" href="/team-members">Cancel</a>
+    </div>
+
+  </form>
+
+{% endblock %}
+

@@ -512,4 +512,24 @@ router.post("/wrong-email-code", async (req, res) => {
     res.render("account/check-email.njk");
 });
 
+//// Testing routes for Create 'invite team member' page
+router.get("/invite-team-member", (req, res) => {
+    res.render("service-details/invite-team-member.njk", {
+        serviceName: "Frontend Test Service"
+    });
+});
+
+router.post("/invite-team-member", async (req, res) => {
+    const emailAddress = req.body["emailAddress"];
+    if (emailAddress === "") {
+        const errorMessages = new Map<string, string>();
+        errorMessages.set("emailAddress", "Enter an email address");
+        res.render("service-details/invite-team-member.njk", {
+            errorMessages: errorMessages
+        });
+        return;
+    }
+    res.redirect("/invitation-sent");
+});
+
 export default router;
