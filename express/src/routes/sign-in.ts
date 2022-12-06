@@ -5,7 +5,6 @@ import {
     finishSignIn,
     forgotPasswordForm,
     processEmailAddress,
-    resendForgotPassword,
     sessionTimeout,
     showLoginOtpMobile,
     showResendPhoneCodePage,
@@ -67,7 +66,7 @@ router.get(
 router.post(
     "/check-email-password-reset",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
-    resendForgotPassword
+    checkEmailPasswordReset
 );
 
 export default router;
