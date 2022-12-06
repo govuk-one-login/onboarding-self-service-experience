@@ -9,6 +9,7 @@ export interface ClientFromDynamo {
     redirect_uris: string[];
     scopes: string[];
     client_name: string;
+    service_name: string;
     service_type: string;
     subject_type: string;
     type: string;
@@ -18,6 +19,7 @@ export interface Client {
     dynamoId: string;
     dynamoServiceId: string;
     authClientId: string;
+    clientName: string;
     contacts: string[];
     defaultFields: string[];
     logoutUris: string[];
