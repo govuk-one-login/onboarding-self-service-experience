@@ -12,6 +12,9 @@ import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {convertToCountryPrefixFormat} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
+const defaultPublicKey =
+    "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
+
 export const listServices = async function (req: Request, res: Response) {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
@@ -32,7 +35,52 @@ export const listServices = async function (req: Request, res: Response) {
         return;
     }
 
+    req.session.serviceName = undefined;
     res.render("manage-account/list-services.njk", {services: services});
+};
+
+export const showClient = async function (req: Request, res: Response) {
+    // TODO make S4 instances static in all controllers
+    const serviceId = req.params.serviceId;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const client = (await s4.listClients(serviceId, req.session.authenticationResult?.AccessToken as string))[0];
+    const selfServiceClientId = client.dynamoId;
+    const authClientId = client.authClientId;
+    const serviceName = client.serviceName;
+
+    res.render("service-details/client-details.njk", {
+        clientId: authClientId,
+        selfServiceClientId: selfServiceClientId,
+        serviceId: serviceId,
+        serviceName: serviceName,
+        updatedField: req.session.updatedField,
+        redirectUrls: client.redirectUris.join(" "),
+        userAttributesRequired: client.scopes.join(", "),
+        userPublicKey: client.publicKey == defaultPublicKey ? "" : client.publicKey,
+        postLogoutRedirectUrls: client.logoutUris.join(" "),
+        urls: {
+            // TODO changeClientName is currently not used
+            changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURI(
+                client.clientName
+            )}`,
+            changeRedirectUris: `/change-redirect-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
+                client.redirectUris.join(" ")
+            )}`,
+            changeUserAttributes: `/change-user-attributes/${serviceId}/${selfServiceClientId}/${authClientId}?userAttributes=${encodeURI(
+                client.scopes.join(" ")
+            )}`,
+            changePublicKey: `/change-public-key/${serviceId}/${selfServiceClientId}/${authClientId}?publicKey=${encodeURI(
+                client.publicKey
+            )}`,
+            changePostLogoutUris: `/change-post-logout-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
+                client.logoutUris.join(" ")
+            )}`
+        }
+    });
+
+    // TODO we need to use a flash message package for Express
+    req.session.serviceName = serviceName;
+    req.session.updatedField = undefined;
 };
 
 export const showAddServiceForm = async function (req: Request, res: Response) {

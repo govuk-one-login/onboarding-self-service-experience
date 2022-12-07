@@ -5,18 +5,18 @@ import {
     AuthenticationResultType,
     GetUserAttributeVerificationCodeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
-import {User, DynamoUser} from "../../@types/user";
+import {unmarshall} from "@aws-sdk/util-dynamodb";
+import {Client, ClientFromDynamo} from "../../@types/client";
+import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
+import {Service} from "../../@types/Service";
+import {DynamoUser, User} from "../../@types/user";
+import AuthenticationResultParser from "../lib/AuthenticationResultParser";
+import {dynamoClientToDomainClient} from "../lib/clientUtils";
+import {SelfServiceError} from "../lib/SelfServiceError";
+import {dynamoServicesToDomainServices} from "../lib/serviceUtils";
+import {userToDomainUser} from "../lib/userUtils";
 import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface from "./lambda-facade/LambdaFacadeInterface";
-import {SelfServiceError} from "../lib/SelfServiceError";
-import AuthenticationResultParser from "../lib/AuthenticationResultParser";
-import {Service} from "../../@types/Service";
-import {Client, ClientFromDynamo} from "../../@types/client";
-import {userToDomainUser} from "../lib/userUtils";
-import {dynamoServicesToDomainServices} from "../lib/serviceUtils";
-import {dynamoClientToDomainClient} from "../lib/clientUtils";
-import {unmarshall} from "@aws-sdk/util-dynamodb";
-import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -157,9 +157,9 @@ export default class SelfServiceServicesService {
     }
 
     async listClients(serviceId: string, accessToken: string): Promise<Client[]> {
-        return (await this.lambda.listClients(serviceId, accessToken)).data.Items.map((client: never) =>
-            dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)
-        );
+        return this.lambda
+            .listClients(serviceId, accessToken)
+            .then(results => results.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) || []);
     }
 }
 

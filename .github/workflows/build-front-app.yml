@@ -23,7 +23,7 @@ jobs:
           cache: "npm"
 
       - name: Install Node dependencies
-        run: npm install
+        run: npm install --include-workspace-root
 
       - name: Build app
         run: npm run build
