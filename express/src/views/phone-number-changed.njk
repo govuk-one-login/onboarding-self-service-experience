@@ -1,14 +1,11 @@
-{% extends "layout/base.njk" %}
+{% extends "layout/form.njk" %}
 {% from "macros/back-link.njk" import backLink %}
 
 {% set pageTitle =  "You’ve changed the phone number" %}
 {% set backLink = backLink("#", {onclick: "history.back()"}) %}
+{% set formAction = "/phone-number-changed" %}
 
-{% block mainContent %}
+{% block beforeForm %}
   <h1 class="govuk-heading-l">You’ve changed the phone number linked to your account</h1>
   <p class="govuk-body">We will send security codes to this phone number when you sign in.</p>
-
-  <form class="form" action="/phone-number-changed" method="post">
-    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
-  </form>
 {% endblock %}
