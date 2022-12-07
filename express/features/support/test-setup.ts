@@ -1,19 +1,33 @@
 import {After, AfterAll, Before, BeforeAll} from "@cucumber/cucumber";
 import {IWorldOptions} from "@cucumber/cucumber/lib/support_code_library_builder/world";
-import puppeteer, {Browser} from "puppeteer";
+import puppeteer, {Browser, Page} from "puppeteer";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const {setWorldConstructor, World} = require("@cucumber/cucumber");
 
 let browser: Browser;
 
-class TestContext extends World {
+export class TestContext extends World {
+    private browserPage: Page | undefined;
+
     constructor(options: IWorldOptions) {
         super(options);
     }
 
     async goToPath(path: string) {
-        await this.page.goto(new URL(path, this.host).toString());
+        await this.page?.goto(new URL(path, this.host).toString());
+    }
+
+    get page(): Page {
+        if (this.browserPage == undefined) {
+            throw "Browser page is not present";
+        }
+
+        return this.browserPage;
+    }
+
+    set page(page: Page) {
+        this.browserPage = page;
     }
 }
 
