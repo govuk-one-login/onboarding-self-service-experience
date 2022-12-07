@@ -28,12 +28,12 @@
       <nav class="side-navigation govuk-!-margin-top-3">
         <ul class="govuk-list side-navigation__list">
           <li class="side-navigation__item{% if active == 'client-details' %} side-navigation__item--active{% endif %}">
-            {# TODO When attached to backend to be replaced with : href="/client-details/{{serviceId}}" #}
-            <a class="govuk-link govuk-link--no-visited-state" href="/client-details-mocked">Client details</a>
-            {# <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client details</a> #}
+            <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client details</a>
           </li>
           <li class="side-navigation__item{% if active == 'private-beta' %} side-navigation__item--active{% endif %}">
-            <a class="govuk-link govuk-link--no-visited-state" href="/private-beta?serviceName={{ serviceName }}">Joining private beta</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="/private-beta/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}">
+              Joining private beta
+            </a>
           </li>
         </ul>
       </nav>

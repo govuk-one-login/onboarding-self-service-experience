@@ -323,60 +323,12 @@ router.get("/account-success-screen-test", (req, res) => {
     });
 });
 
-//// Testing route 'Form submitted' page for private beta
-router.get("/private-beta-form-submitted", (req, res) => {
-    res.render("service-details/private-beta-form-submitted.njk", {
-        serviceName: "My juggling service"
-    });
-});
-
-//// Testing routs Create 'Joining a private beta' page
-router.get("/private-beta", (req, res) => {
-    res.render("service-details/private-beta.njk", {
-        serviceName: req.query.serviceName,
-        emailAddress: req.session.emailAddress
-    });
-});
-
-router.post("/private-beta", async (req, res) => {
-    const yourName = req.body.yourName;
-    const department = req.body.department;
-    const emailAddress = req.body.emailAddress;
-    const serviceName = req.body.serviceName;
-    const errorMessages = new Map<string, string>();
-
-    if (yourName === "") {
-        errorMessages.set("yourName", "Enter your name");
-    }
-
-    if (department === "") {
-        errorMessages.set("department", "Enter your department");
-    }
-
-    if (errorMessages.size > 0) {
-        res.render("service-details/private-beta.njk", {
-            errorMessages: errorMessages,
-            values: {
-                yourName: yourName,
-                department: department
-            }
-        });
-
-        return;
-    }
-
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
-    await s4.privateBetaRequest(yourName, department, serviceName, emailAddress, req.session.authenticationResult?.AccessToken as string);
-
-    res.redirect("/private-beta-form-submitted");
-});
-
 // Testing route for testing when the private beta request has already been submitted.
 router.get("/private-beta-submitted", (req, res) => {
     res.render("service-details/private-beta.njk", {
-        serviceName: "My juggling service",
         privateBetaRequestSubmitted: true,
-        dateRequestSubmitted: "10 May 2022"
+        dateRequestSubmitted: "10 May 2022",
+        serviceName: "My juggling license"
     });
 });
 

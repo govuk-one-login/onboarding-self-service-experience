@@ -1,14 +1,14 @@
-{% extends "./layout-service-details.njk" %}
-{% from "macros/error-summary.njk" import errorSummary %}
+{% extends "./base-form-service-details.njk" %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set active = "private-beta" %}
 {% set pageTitle = "Joining private beta" %}
+{% set formButtonText = "Submit" %}
+{% set formCancelUrl = "" %}
+{% set hideForm = true if privateBetaRequestSubmitted %}
 
-{% block mainContent %}
-  {{ errorSummary(errorMessages) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Joining private beta</h1>
 
   <p class="govuk-body">If you want to go live with GOV.UK Sign In and offer it to your users, you need to join our private beta.</p>
@@ -27,53 +27,30 @@
     <div class="govuk-inset-text">
       You submitted your details on {{ dateRequestSubmitted }}.
     </div>
-  {% else %}
-    <form class="form" action="/private-beta" method="post">
-      {{ govukInput({
-        label: {
-          text: "Your name"
-        },
-        name: "yourName",
-        id: "yourName",
-        classes: "govuk-!-width-full",
-        value: value.yourName,
-        errorMessage: {
-          text: errorMessages.get('yourName')
-        } if errorMessages and errorMessages.has('yourName')
-      }) }}
-
-      {{ govukInput({
-        label: {
-          text: "Department"
-        },
-        name: "department",
-        id: "department",
-        classes: "govuk-!-width-full",
-        value: value.department,
-        errorMessage: {
-          text: errorMessages.get('department')
-        } if errorMessages and errorMessages.has('department')
-      }) }}
-
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">Information we already have</p>
-
-      {{ govukSummaryList({
-        rows: [
-          {
-            key: {text: "Email address"},
-            value: {text: emailAddress}
-          },
-          {
-            key: {text: "Service name"},
-            value: {text: serviceName}
-          }
-        ]
-      }) }}
-
-      {{ govukInput({ type: "hidden", value: serviceName, id: "serviceName", name: "serviceName" }) }}
-      {{ govukInput({ type: "hidden", value: emailAddress, id: "emailAddress", name: "emailAddress" }) }}
-
-      {{ govukButton({ text: "Submit" }) }}
-    </form>
   {% endif %}
 {% endblock %}
+
+{% if not privateBetaRequestSubmitted %}
+  {% block formInputs %}
+    {{ form.textInput("Your name", "yourName") }}
+    {{ form.textInput("Department", "department") }}
+    {{ form.hiddenInput("serviceName", serviceName) }}
+  {% endblock %}
+
+  {% block afterformInputs %}
+    <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">Information we already have</p>
+
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: {text: "Email address"},
+          value: {text: emailAddress}
+        },
+        {
+          key: {text: "Service name"},
+          value: {text: serviceName}
+        }
+      ]
+    }) }}
+  {% endblock %}
+{% endif %}

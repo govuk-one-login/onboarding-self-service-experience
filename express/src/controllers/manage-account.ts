@@ -83,6 +83,71 @@ export const showClient = async function (req: Request, res: Response) {
     req.session.updatedField = undefined;
 };
 
+export const showPrivateBetaForm = async function (req: Request, res: Response) {
+    res.render("service-details/private-beta.njk", {
+        serviceId: req.params.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        serviceName: req.session.serviceName,
+        emailAddress: req.session.emailAddress
+    });
+};
+
+export const processPrivateBetaForm = async function (req: Request, res: Response) {
+    const yourName = req.body.yourName;
+    const department = req.body.department;
+    const serviceName = req.body.serviceName;
+    const emailAddress = req.session.emailAddress;
+    const serviceId = req.params.serviceId;
+    const selfServiceClientId = req.params.selfServiceClientId;
+    const clientId = req.params.clientId;
+    const errorMessages = new Map<string, string>();
+
+    if (yourName === "") {
+        errorMessages.set("yourName", "Enter your name");
+    }
+
+    if (department === "") {
+        errorMessages.set("department", "Enter your department");
+    }
+
+    if (errorMessages.size > 0) {
+        res.render("service-details/private-beta.njk", {
+            serviceId: serviceId,
+            selfServiceClientId: selfServiceClientId,
+            clientId: clientId,
+            serviceName: serviceName,
+            emailAddress: emailAddress,
+            errorMessages: Object.fromEntries(errorMessages),
+            values: {
+                yourName: yourName,
+                department: department
+            }
+        });
+
+        return;
+    }
+
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    await s4.privateBetaRequest(
+        yourName,
+        department,
+        serviceName,
+        emailAddress as string,
+        req.session.authenticationResult?.AccessToken as string
+    );
+
+    res.redirect(`/private-beta-form-submitted/${serviceId}/${selfServiceClientId}/${clientId}`);
+};
+
+export const showPrivateBetaFormSubmitted = async function (req: Request, res: Response) {
+    res.render("service-details/private-beta-form-submitted.njk", {
+        serviceId: req.params.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId
+    });
+};
+
 export const showAddServiceForm = async function (req: Request, res: Response) {
     res.render("add-service-name.njk");
 };

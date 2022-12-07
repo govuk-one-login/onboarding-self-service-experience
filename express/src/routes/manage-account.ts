@@ -5,11 +5,14 @@ import {
     processAddServiceForm,
     processChangePhoneNumberForm,
     processChangeServiceNameForm,
+    processPrivateBetaForm,
     showAccount,
     showAddServiceForm,
     showChangePasswordForm,
     showChangePhoneNumberForm,
     showClient,
+    showPrivateBetaForm,
+    showPrivateBetaFormSubmitted,
     verifyMobileWithSmsCode
 } from "../controllers/manage-account";
 import {checkAuthorisation} from "../middleware/authoriser";
@@ -29,6 +32,10 @@ router.post("/create-service-name-validation", checkAuthorisation, serviceNameVa
 
 // TODO This should have params :serviceId/:clientId but at the moment we're abusing the fact that each service only has one client
 router.get("/client-details/:serviceId", checkAuthorisation, showClient);
+
+router.get("/private-beta/:serviceId/:selfServiceClientId/:clientId", checkAuthorisation, showPrivateBetaForm);
+router.post("/private-beta/:serviceId/:selfServiceClientId/:clientId", checkAuthorisation, processPrivateBetaForm);
+router.get("/private-beta-form-submitted/:serviceId/:selfServiceClientId/:clientId", checkAuthorisation, showPrivateBetaFormSubmitted);
 
 router.get("/change-password", checkAuthorisation, showChangePasswordForm);
 
