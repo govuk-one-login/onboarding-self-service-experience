@@ -1,15 +1,9 @@
-{% extends "./layout-service-details.njk" %}
-{% from "macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
-{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% extends "./base-form-service-details.njk" %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set pageTitle = "Change public key" %}
 
-{% block mainContent %}
-  {{ errorSummary(errorMessages) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
 
   <p class="govuk-body">You need to
@@ -25,85 +19,32 @@
       <p class="govuk-body current-public-key-container">{{ currentPublicKey }}</p>
     {% endcall %}
   {% endif %}
+{% endblock %}
 
-  <form class="form" action="/change-public-key-v2/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
-    {% set textFieldHtml %}
-      {{ govukTextarea({
-        name: "serviceUserPublicKeyText",
-        id: "serviceUserPublicKeyText",
-        label: {
-          text: "Public key"
-        },
-        hint: {
-          text: "Paste in the entire public key in PEM format, including the headers"
-        },
-        value: value,
-        errorMessage: {
-          text: errorMessages.get('serviceUserPublicKeyText')
-        } if errorMessages and errorMessages.has('serviceUserPublicKeyText')
-      }) }}
-    {% endset -%}
+{% block formInputs %}
+  {% set textFieldHtml %}
+    {{ form.textAreaInput("Public key", "serviceUserPublicKeyText",
+      "Paste in the entire public key in PEM format, including the headers"
+    ) }}
+  {% endset %}
 
-    {% set fileUploadHtml %}
-      {{ govukFileUpload({
-        id: "serviceUserPublicKeyFile",
-        name: "serviceUserPublicKeyFile",
-        label: {
-          text: "Upload a file in .PEM format"
-        },
-        attributes: {
-          accept: ".pem"
-        },
-        errorMessage: {
-          text: errorMessages.get('serviceUserPublicKeyFile')
-        } if errorMessages and errorMessages.has('serviceUserPublicKeyFile')
-      }) }}
-    {% endset -%}
+  {% set fileUploadHtml %}
+    {{ form.fileUploadInput("serviceUserPublicKeyFile", ".pem", "Upload a file in .PEM format") }}
+  {% endset %}
 
-    {% if serviceUserPublicKey === 'text' %}
-      {% set textChecked = true %}
-    {% endif %}
-
-    {% if serviceUserPublicKey === 'file' %}
-      {% set fileChecked = true %}
-    {% endif %}
-
-    {{ govukRadios({
-      name: "serviceUserPublicKey",
-      id: "serviceUserPublicKey",
-      fieldset: {
-        legend: {
-          text: "Choose how to change your public key",
-          classes: "govuk-fieldset__legend--m"
+  {{ form.radiosInput("Choose how to change your public key", "govuk-fieldset__legend--m", "serviceUserPublicKey",
+    items = [
+      {
+        text: "Paste in your public key", value: "text", checked: serviceUserPublicKey == "text",
+        conditional: {
+          html: textFieldHtml
         }
       },
-      items: [
-        {
-          text: "Paste in your public key",
-          value: "text",
-          checked: textChecked,
-          conditional: {
-            html: textFieldHtml
-          }
-        },
-        {
-          text: "Upload your public key as a file",
-          value: "file",
-          checked: fileChecked,
-          conditional: {
-            html: fileUploadHtml
-          }
+      {
+        text: "Upload your public key as a file", value: "file", checked: serviceUserPublicKey == "file",
+        conditional: {
+          html: fileUploadHtml
         }
-      ],
-      errorMessage: {
-        text:  errorMessages.get('serviceUserPublicKey')
-      } if errorMessages and errorMessages.has('serviceUserPublicKey')
-    }) }}
-
-    <div class="govuk-button-group">
-      {{ govukButton({ text: "Confirm" }) }}
-      {# TODO When attached to backend to be replaced with : href="/client-details/{{serviceId}}" #}
-      <a class="govuk-link" href="/client-details-mocked">Cancel</a>
-    </div>
-  </form>
+      }
+    ]) }}
 {% endblock %}

@@ -2,10 +2,6 @@
 
 {% set pageTitle = "Change post logout redirect URIs" %}
 
-{% set formAction %}
-  /change-post-logout-uris/{{ values.serviceId }}/{{ values.selfServiceClientId }}/{{ values.clientId }}
-{% endset %}
-
 {% block beforeForm %}
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your post logout redirect URIs</h1>
   <p class="govuk-body">Add the URI for the page you want your users to see after they sign out of your service.</p>

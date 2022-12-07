@@ -1,12 +1,8 @@
-{% extends "./layout-service-details.njk" %}
-{% from "macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% extends "./base-form-service-details.njk" %}
 
 {% set pageTitle = "Change public key" %}
 
-{% block mainContent %}
-  {{ errorSummary(errorMessages) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
 
   <p class="govuk-body">You need to
@@ -15,26 +11,10 @@
   </p>
 
   <h2 class="govuk-heading-m">Paste in your public key</h2>
+{% endblock %}
 
-  <form class="form" action="/change-public-key/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
-    {{ govukTextarea({
-      name: "serviceUserPublicKey",
-      id: "serviceUserPublicKey",
-      label: {
-        text: "Public key"
-      },
-      hint: {
-        text: "Paste in the entire public key in PEM format, including the headers"
-      },
-      value: value,
-      errorMessage: {
-        text:  errorMessages.get('serviceUserPublicKey')
-      } if  errorMessages else false
-    }) }}
-
-    <div class="govuk-button-group">
-      {{ govukButton({ text: "Confirm" }) }}
-      <a class="govuk-link" href="/client-details/{{ serviceId }}">Cancel</a>
-    </div>
-  </form>
+{% block formInputs %}
+  {{ form.textAreaInput("Public key", "serviceUserPublicKey",
+    "Paste in the entire public key in PEM format, including the headers"
+  ) }}
 {% endblock %}

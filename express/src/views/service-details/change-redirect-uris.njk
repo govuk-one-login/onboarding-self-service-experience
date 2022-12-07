@@ -2,10 +2,6 @@
 
 {% set pageTitle = "Change redirect URIs" %}
 
-{% set formAction %}
-  /change-redirect-uris/{{ values.serviceId }}/{{  values.selfServiceClientId }}/{{  values.clientId }}
-{% endset %}
-
 {% block beforeForm %}
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your redirect URIs</h1>
   <p class="govuk-body">Add the URI for the page you want your users to see after they sign in to your service.</p>
