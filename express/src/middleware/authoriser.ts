@@ -1,6 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
+// TODO This only checks the user is signed in but doesn't check the user's permissions to view objects or do actions
 export async function checkAuthorisation(req: Request, res: Response, next: NextFunction) {
     if (!req.session.authenticationResult?.AccessToken) {
         res.redirect("/session-timeout");

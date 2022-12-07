@@ -13,7 +13,6 @@ Parameters:
     Type: String
     Description: Email address for private beta request notifications.
 
-
 Resources:
 
   putUserFunction:
@@ -433,7 +432,7 @@ Resources:
       Environment:
         Variables:
           NODE_OPTIONS: --enable-source-maps
-          STATE_MACHINE_ARN: !GetAtt NewServiceStepFunction.Arn
+          STATE_MACHINE_ARN: !Ref NewServiceStepFunction
       Policies:
         Statement: [
           {
@@ -522,7 +521,7 @@ Resources:
       Environment:
         Variables:
           NODE_OPTIONS: --enable-source-maps
-          STATE_MACHINE_ARN: !GetAtt NewClientStepFunction.Arn
+          STATE_MACHINE_ARN: !Ref NewClientStepFunction
       Policies:
         Statement: [
           {
@@ -575,7 +574,7 @@ Resources:
       Environment:
         Variables:
           NODE_OPTIONS: --enable-source-maps
-          STATE_MACHINE_ARN: !GetAtt UpdateClientStepFunction.Arn
+          STATE_MACHINE_ARN: !Ref UpdateClientStepFunction
       Policies:
         Statement: [
           {
