@@ -1,8 +1,7 @@
 {% extends "layout/form.njk" %}
-{% from "macros/back-link.njk" import backLink %}
 
-{% set backLink = backLink("/create/get-email") %}
 {% set pageTitle = "An account already exists" %}
+{% set backLinkPath = "/create/get-email" %}
 {% set formAction = "/existing-account" %}
 
 {% block beforeForm %}

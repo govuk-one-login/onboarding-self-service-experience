@@ -1,9 +1,8 @@
 {% extends "layout/form.njk" %}
-{% from "macros/back-link.njk" import backLink %}
 
 {% set headerActiveItem = "your-account" %}
 {% set pageTitle = "Check your email address" %}
-{% set backLink = backLink("/change-email-address") %}
+{% set backLinkPath = "/change-email-address" %}
 {% set formAction = "/check-email-visual-test" %}
 
 {% block beforeForm %}

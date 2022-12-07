@@ -1,8 +1,7 @@
 {% extends "layout/form.njk" %}
-{% from "macros/back-link.njk" import backLink %}
 
 {% set pageTitle = "Confirm phone number" %}
-{% set backLink = backLink("/security-check-change-number") %}
+{% set backLinkPath = "/security-check-change-number" %}
 {% set formAction = "/confirm-phone-number" %}
 
 {% block beforeForm %}

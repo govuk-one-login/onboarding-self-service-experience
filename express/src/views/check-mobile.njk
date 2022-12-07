@@ -2,7 +2,7 @@
 {% from "macros/back-link.njk" import backLink %}
 
 {% set pageTitle = "Check your mobile phone" %}
-{% set backLink = backLink("#", {onclick: "history.back()"}) %}
+{% set backLinkHtml = backLink("#", {onclick: "history.back()"}) %}
 {% set formAction = values.formActionUrl %}
 
 {% block beforeForm %}

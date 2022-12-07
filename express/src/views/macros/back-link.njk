@@ -4,6 +4,6 @@
   {{ govukBackLink({
     text: Back,
     href: href,
-    attributes: attributes
-  }) }}
+    attributes: attributes if attributes
+  }) if href }}
 {% endmacro %}

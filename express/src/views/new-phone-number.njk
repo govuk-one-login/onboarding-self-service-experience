@@ -1,8 +1,7 @@
 {% extends "layout/form.njk" %}
-{% from "macros/back-link.njk" import backLink %}
 
-{% set backLink = backLink("/confirm-phone-number") %}
 {% set pageTitle = "Enter your new mobile phone number" %}
+{% set backLinkPath = "/confirm-phone-number" %}
 {% set formAction = "/new-phone-number" %}
 
 {% block beforeForm %}

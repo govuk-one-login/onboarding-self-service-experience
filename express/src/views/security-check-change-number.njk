@@ -1,8 +1,7 @@
 {% extends "layout/form.njk" %}
-{% from "macros/back-link.njk" import backLink %}
 
 {% set pageTitle = "Security check" %}
-{% set backLink = backLink("/resend-text-code") %}
+{% set backLinkPath = "/resend-text-code" %}
 {% set formAction = "/security-check-change-number" %}
 {% set formButtonText = "Resend security code" %}
 

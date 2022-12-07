@@ -1,8 +1,7 @@
 {% extends "layout/form.njk" %}
-{% from "macros/back-link.njk" import backLink %}
 
 {% set pageTitle = "Enter your email address" %}
-{% set backLink = backLink("/") %}
+{% set backLinkPath = "/" %}
 {% set formAction = "/create/get-email" %}
 
 {% block beforeForm %}
