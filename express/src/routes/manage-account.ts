@@ -4,7 +4,7 @@ import {
     listServices,
     processAddServiceForm,
     processChangePhoneNumberForm,
-    processUpdateServiceForm,
+    processChangeServiceNameForm,
     showAccount,
     showAddServiceForm,
     showChangePasswordForm,
@@ -39,23 +39,26 @@ router.post(
     changePassword
 );
 
-router.get("/change-phone-number", showChangePhoneNumberForm);
+router.get("/change-phone-number", checkAuthorisation, showChangePhoneNumberForm);
 
-router.post("/change-phone-number", validateMobileNumber("account/change-phone-number.njk"), processChangePhoneNumberForm);
+router.post(
+    "/change-phone-number",
+    checkAuthorisation,
+    validateMobileNumber("account/change-phone-number.njk"),
+    processChangePhoneNumberForm
+);
 
-router.post("/verify-phone-code", mobileOtpValidator("/verify-phone-code", ""), verifyMobileWithSmsCode);
+router.post("/verify-phone-code", checkAuthorisation, mobileOtpValidator("/verify-phone-code", ""), verifyMobileWithSmsCode);
 
-router.get("/change-service-name/:serviceName/:selfServiceClientId/:authClientId/:clientServiceId", (req, res) => {
+router.get("/change-service-name/:serviceId/:selfServiceClientId/:clientId", checkAuthorisation, (req, res) => {
     res.render("account/change-service-name.njk", {
+        serviceId: req.params.serviceId,
         values: {
-            serviceName: req.params.serviceName,
-            clientServiceId: req.params.clientServiceId,
-            selfServiceClientId: req.params.selfServiceClientId,
-            clientId: req.params.authClientId
+            serviceName: req.query.serviceName
         }
     });
 });
 
-router.post("/change-service-name", processUpdateServiceForm);
+router.post("/change-service-name/:serviceId/:selfServiceClientId/:clientId", checkAuthorisation, processChangeServiceNameForm);
 
 export default router;

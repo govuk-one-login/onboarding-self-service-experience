@@ -31,7 +31,7 @@ export function mobileOtpValidator(
                     textMessageNotReceivedUrl: textMessageNotReceivedUrl
                 },
                 errorMessages: {
-                    "sms-otp": validationResponse.errorMessage as string
+                    "sms-otp": validationResponse.errorMessage
                 }
             });
         }

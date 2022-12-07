@@ -12,6 +12,7 @@ export function validateOtp(otp: string): validationResult {
     if (notJustDigits(otp)) {
         return {isValid: false, errorMessage: "Your security code should only include numbers"};
     }
+
     return {isValid: true};
 }
 

@@ -116,14 +116,13 @@ export const processAddServiceForm = async function (req: Request, res: Response
     res.redirect(`/client-details/${serviceId.substring(8)}`);
 };
 
-export const processUpdateServiceForm = async function (req: Request, res: Response) {
-    const serviceName = req.body.serviceName;
-    const selfServiceClientId = req.body.selfServiceClientId;
-    const clientId = req.body.clientId;
-    const clientServiceId = req.body.clientServiceId;
+export const processChangeServiceNameForm = async function (req: Request, res: Response) {
+    const newServiceName = req.body.serviceName;
+    const serviceId = req.params.serviceId;
 
-    if (serviceName === "") {
+    if (newServiceName === "") {
         res.render("account/change-service-name.njk", {
+            serviceId: serviceId,
             errorMessages: {
                 serviceName: "Enter your service name"
             }
@@ -132,24 +131,22 @@ export const processUpdateServiceForm = async function (req: Request, res: Respo
         return;
     }
 
-    const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
-    if (userId === undefined) {
-        console.log("Can't get CognitoId from authenticationResult in session");
-        res.render("there-is-a-problem.njk");
-        return;
-    }
-
+    const selfServiceClientId = req.params.selfServiceClientId;
+    const clientId = req.params.clientId;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    // TODO service_name is the db layer leaking into the domain
+    // TODO is this correct? Don't we also need to update the pk:service sk:service entry? We need an updateService call
     await s4.updateClient(
+        serviceId,
         selfServiceClientId,
-        clientServiceId,
         clientId,
-        {client_name: serviceName},
+        {service_name: newServiceName},
         req.session.authenticationResult?.AccessToken as string
     );
 
     req.session.updatedField = "service name";
-    res.redirect(`/client-details/${selfServiceClientId}`);
+    res.redirect(`/client-details/${serviceId}`);
 };
 
 export const showChangePasswordForm = async function (req: Request, res: Response) {

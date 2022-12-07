@@ -8,11 +8,16 @@
     <div class="govuk-breadcrumbs">
       <ol class="govuk-breadcrumbs__list navigation-service-change-list">
         <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19">
-          <a class="govuk-breadcrumbs__link" href="#">Your services</a>
+          <a class="govuk-breadcrumbs__link" href="/account/list-services">Your services</a>
         </li>
-        <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19 govuk-!-font-weight-bold">{{ serviceName }}</li>
+        {% if serviceName %}
+          <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19 govuk-!-font-weight-bold">{{ serviceName }}</li>
+        {% endif %}
       </ol>
-      <a href="/change-service-name/{{ serviceName }}/{{ selfServiceClientId }}/{{ authClientId }}/{{ clientServiceId }}" class="govuk-link govuk-link--no-visited-state navigation-service-change govuk-!-font-size-19">Change service name</a>
+      <a href="/change-service-name/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}?serviceName={{ serviceName }}"
+         class="govuk-link govuk-link--no-visited-state navigation-service-change govuk-!-font-size-19">
+        Change service name
+      </a>
     </div>
   </div>
 {% endblock %}
