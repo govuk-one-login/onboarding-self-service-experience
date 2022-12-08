@@ -1,0 +1,32 @@
+{% extends "layout/form.njk" %}
+
+{% set pageTitle = "Resend security code" %}
+{% set formButtonText = "Resend security code" %}
+
+{% if securityCodeMethod == "phone" %}
+  {% set securityCodeDestination = "mobile phone" %}
+  {% set contactMethod = "phone number" %}
+{% endif %}
+
+{% if securityCodeMethod == "email" %}
+  {% set securityCodeDestination = "email" %}
+  {% set contactMethod = "email address" %}
+{% endif %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l">
+    Resend security code to your {{ securityCodeDestination }}
+  </h1>
+
+  <p class="govuk-body">
+    If you did not receive a code, we can send you a new one.
+  </p>
+{% endblock %}
+
+{% block afterForm %}
+  <p class="govuk-body">
+    If you no longer have access to the {{ contactMethod }} you used to set up your account, let us know through our
+    <a class="govuk-link" id="support-form" href="https://www.sign-in.service.gov.uk/support">support form</a> or
+    <a class="govuk-link" id="slack-channel" href="https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC">Slack channel</a>.
+  </p>
+{% endblock %}

@@ -308,8 +308,10 @@ router.post("/check-email-visual-test", async (req, res) => {
                 "change-email-otp": "Your code should be 6 characters long"
             }
         });
+
         return;
     }
+
     res.redirect("/account");
 });
 
@@ -444,6 +446,17 @@ router.get("/wrong-email-code", (req, res) => {
 // When implementing the backend, depending on journey we should request new code and after that redirect or render the appropriate template - depending on implementation
 router.post("/wrong-email-code", async (req, res) => {
     res.render("account/check-email.njk");
+});
+
+router.get("/resend-email-code", async (req, res) => {
+    res.render("common/resend-security-code.njk", {
+        securityCodeMethod: "email",
+        backLinkPath: "/security-check-change-number"
+    });
+});
+
+router.post("/resend-email-code", async (req, res) => {
+    res.redirect("/security-check-change-number");
 });
 
 // Testing route for 'Team members' page

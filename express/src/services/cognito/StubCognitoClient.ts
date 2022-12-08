@@ -22,7 +22,7 @@ import * as crypto from "crypto";
 type Override = {
     parameter: string;
     value: string;
-    return?: never;
+    return?: any;
     throw?: string;
 };
 
