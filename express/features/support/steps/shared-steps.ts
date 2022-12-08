@@ -1,25 +1,39 @@
 import {Given, Then, When} from "@cucumber/cucumber";
 import {strict as assert} from "assert";
-import {Page} from "puppeteer";
-import {checkUrl, clickLink, clickSubmitButton, getButtonLink, getLink, getLinkWithHref} from "./shared-functions";
+import {TestContext} from "../test-setup";
+import {
+    checkErrorMessageDisplayedForField,
+    checkUrl,
+    clickElement,
+    clickSubmitButton,
+    enterTextIntoTextInput,
+    getButtonLink,
+    getButtonWithText,
+    getLink,
+    getLinkWithHref
+} from "./shared-functions";
 
-Given("that the user is on the {string} page", async function (route: string) {
-    await this.goToPath(route);
+Given("that the user is on the home page", async function () {
+    await this.goToPath("/");
+});
+
+Given("that the user is on the {string} page", async function (path: string) {
+    await this.goToPath(path);
 });
 
 When("they click on the {string} link", async function (text: string) {
     const link = await getLink(this.page, text);
-    await clickLink(this.page, link);
+    await clickElement(this.page, link);
 });
 
 When("they click on the link that points to {string}", async function (href: string) {
     const link = await getLinkWithHref(this.page, href);
-    await clickLink(this.page, link);
+    await clickElement(this.page, link);
 });
 
 When("they click on the {string} button-link", async function (text: string) {
     const link = await getButtonLink(this.page, text);
-    await clickLink(this.page, link);
+    await clickElement(this.page, link);
 });
 
 When("they click the Submit button", async function () {
@@ -30,16 +44,30 @@ When("they click the Continue button", async function () {
     await clickSubmitButton(this.page);
 });
 
-Then("they should be directed to the following page: {string}", async function (path) {
-    const expectedUrl = new URL(path, this.host);
-    assert.equal(this.page.url(), expectedUrl.href);
+When("they click the Confirm button", async function () {
+    await clickSubmitButton(this.page);
 });
 
-Then("they should be directed to the following URL: {string}", async function (url) {
+When("they click the {string} button", async function (text: string) {
+    const button = await getButtonWithText(this.page, text);
+    await clickElement(this.page, button);
+});
+
+Then("they should be redirected to the {string} page", async function (this: TestContext, path: string) {
+    const expectedUrl = new URL(path, this.host);
+    assert.equal(this.page.url().replace(/\/$/, ""), expectedUrl.href);
+});
+
+Then("they should be redirected to a page with path starting with {string}", async function (this: TestContext, path: string) {
+    const expectedUrl = new URL(path, this.host);
+    assert.equal(this.page.url().startsWith(expectedUrl.href), true);
+});
+
+Then("they should be directed to the URL {string}", async function (url) {
     assert.equal(this.page.url(), url);
 });
 
-Then("they should be directed to a page with the title {string}", async function (title: string) {
+Then("they should be redirected to a page with the title {string}", async function (title: string) {
     const actualTitle = await this.page.title();
     assert.equal(actualTitle, title, `Page title was ${actualTitle}`);
 });
@@ -58,8 +86,8 @@ Then("the error message {string} must be displayed for the {string} radios", asy
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, field);
 });
 
-Then("they should see the text {string}", async function (text) {
-    const bodyText: string = await this.page.$eval("body", (element: any) => element.textContent);
+Then("they should see the text {string}", async function (this: TestContext, text) {
+    const bodyText: string = await this.page.$eval("body", element => element.textContent);
     assert.equal(bodyText.includes(text), true, `Body text does not contain '${text}'`);
 });
 
@@ -73,19 +101,26 @@ Then("the {string} link will point to the following page: {string}", async funct
     await checkUrl(this.page, link, expectedPage);
 });
 
-async function checkErrorMessageDisplayedForField(page: Page, errorLink: any, errorMessage: string, field: string) {
-    assert.notEqual(errorLink.length, 0, `Expected to find the message ${errorMessage} in the error summary.`);
+When("they enter {string} into the {string} field", async function (text: string, field: string) {
+    await enterTextIntoTextInput(this.page, text, field);
+});
 
-    const messageInSummary = await page.evaluate((el: {textContent: any}) => el.textContent, errorLink[0]);
-    assert.equal(messageInSummary, errorMessage, `Expected text of the link to be ${errorMessage}`);
+When("the user submits the email {string}", async function (email: string) {
+    await enterTextIntoTextInput(this.page, email, "emailAddress");
+    await clickSubmitButton(this.page);
+});
 
-    const messagesAboveElement = await page.$x(`//p[@class="govuk-error-message"][@id="${field}-error"]`);
-    assert.notEqual(messagesAboveElement.length, 0, `Expected to find the message ${errorMessage} above the ${field} field.`);
+When("the user submits the email OTP {string}", async function (emailOtp: string) {
+    await enterTextIntoTextInput(this.page, emailOtp, "create-email-otp");
+    await clickSubmitButton(this.page);
+});
 
-    const messageAboveElement = await page.evaluate((el: {textContent: any}) => el.textContent, messagesAboveElement[0]);
-    assert.equal(
-        messageAboveElement.trim(),
-        "Error: " + errorMessage,
-        `Expected the message above the ${field} field to be ${errorMessage}`
-    );
-}
+When("the user submits the password {string}", async function (password: string) {
+    await enterTextIntoTextInput(this.page, password, "password");
+    await clickSubmitButton(this.page);
+});
+
+When("the user submits the mobile phone number {string}", async function (mobileNumber: string) {
+    await enterTextIntoTextInput(this.page, mobileNumber, "mobileNumber");
+    await clickSubmitButton(this.page);
+});

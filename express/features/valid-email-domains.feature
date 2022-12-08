@@ -4,7 +4,7 @@ Feature: Users can only register with email addresses from certain domains
 
     Given that the user is on the "/create/get-email" page
     When the user submits the email <email>
-    Then they should be directed to the following page: "/create/check-email"
+    Then they should be redirected to the "/create/check-email" page
 
     Examples:
       | email                                     |

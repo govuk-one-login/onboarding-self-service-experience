@@ -1,386 +1,163 @@
-Feature:
-  Users can sign up to the self-service experience
+Feature: Users can sign up to the self-service experience
 
-  Scenario: A user types everything correctly and creates an account
-
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-    And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user submits a valid mobile telephone number
-    Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: 07700 900123"
-
-    When the user enters the correct sms-otp
-    Then they should be directed to the following page: "/add-service-name"
-
-  Scenario: A user tries to use a password on the list of common passwords
-
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a common password
-    Then they should be directed to the following page: "/create/update-password"
-    And they should see the text "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers."
-
-  Scenario: The user doesn't complete the Government email address
-
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
+  Background:
     Given that the user is on the "/create/get-email" page
-    When they click the Submit button
-    Then the error message "Enter your email address" must be displayed for the "emailAddress" field
 
-  Scenario: The user enters an email address that is not on the passlist
-
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@yahoo.com"
-    Then the error message "Enter a government email address" must be displayed for the "emailAddress" field
-
-  Scenario: The user enters an email address in an incorrect format
-
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfullyyahoo.com"
-    Then the error message "Enter an email address in the correct format, like name@example.com" must be displayed for the "emailAddress" field
-
-  Scenario: The user doesn't complete the Check your email page
-
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    Given that the user is on the "/create/check-email" page
-    When they click the Submit button
-    Then the error message "Enter the 6 digit security code" must be displayed for the "create-email-otp" field
-    And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
-
-  Scenario: The user enters anything other than 6 digits on the Check your email page
-
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    Given that the user is on the "/create/check-email" page
-    When the user submits the email-otp "AA1234"
-    Then the error message "Your security code should only include numbers" must be displayed for the "create-email-otp" field
-    And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
-
-  Scenario: The user does not enter anything in the password field on Create your password page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    Given that the user is on the "/create/update-password" page
-    When they click the Submit button
-    Then the error message "Enter a password" must be displayed for the "password" field
-
-  Scenario: The user enters a password that is fewer than 8 characters in the password field on Create your password page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    Given that the user is on the "/create/update-password" page
-    When the user submits the password "Pa$1GOv"
-    Then the error message "Your password must be 8 characters or more" must be displayed for the "password" field
-
-  Scenario: The user enters common password in the password field on Create your password page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    Given that the user is on the "/create/update-password" page
-    When the user submits the password "123456789"
-    Then the error message "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers." must be displayed for the "password" field
-
-  Scenario: The user does not enter anything in the UK mobile phone number field on Enter your mobile phone number page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    Given that the user is on the "/create/enter-mobile" page
-    When they click the Submit button
-    Then the error message "Enter a mobile phone number" must be displayed for the "mobileNumber" field
-
-  Scenario: The user enters characters other than numbers or + - () in the UK mobile phone number field on Enter your mobile phone number page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    Given that the user is on the "/create/enter-mobile" page
-    When the user submits the mobile phone number "075ABC"
-    Then the error message "Enter a UK mobile phone number using numbers only" must be displayed for the "mobileNumber" field
-
-
-  Scenario: The user an invalid number - which means a number that is international, less than 11 characters, or does not start with 07, 44, +44 or (+44)) in the UK mobile phone number field on Enter your mobile phone number page
-
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    Given that the user is on the "/create/enter-mobile" page
-    When the user submits the mobile phone number "+17564319555"
-    Then the error message "Enter a UK mobile phone number, like 07700 900000" must be displayed for the "mobileNumber" field
-
-  Scenario: The user does not enter anything in the security code field on Check your mobile phone page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user submits a valid mobile telephone number
-    Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: 07700 900123"
-
-    When they click the Submit button
-    Then the error message "Enter the 6 digit security code" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: 07700 900123"
-
-  Scenario: The user enters more than 6 characters in the security code field on Check your mobile phone page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user submits a valid mobile telephone number
-    Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: 07700 900123"
-
-    When the user submits the sms otp code "1234567"
-    Then the error message "Enter the security code using only 6 digits" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: 07700 900123"
-
-  Scenario: The user enters fewer than than 6 characters in the security code field on Check your mobile phone page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user submits a valid mobile telephone number
-    Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: 07700 900123"
-
-    When the user submits the sms otp code "12345"
-    Then the error message "Enter the security code using only 6 digits" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: 07700 900123"
-
-  Scenario: The user enters any letters in the security code field on Check your mobile phone page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user submits a valid mobile telephone number
-    Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: 07700 900123"
-
-    When the user submits the sms otp code "12345A"
-    Then the error message "Your security code should only include numbers" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: 07700 900123"
-
-  Scenario: The user enters any special characters in the security code field on Check your mobile phone page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user submits a valid mobile telephone number
-    Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: 07700 900123"
-
-    When the user submits the sms otp code "12345$"
-    Then the error message "Your security code should only include numbers" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: 07700 900123"
-
-  Scenario: The user enters User enters the wrong code in the security code field on Check your mobile phone page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user submits a valid mobile telephone number
-    Then they should be directed to the following page: "/create/enter-mobile"
-    And they should see the text "We sent a code to: 07700 900123"
-
-    When the user submits the sms otp code "666666"
-    Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the "sms-otp" field
-    And they should see the text "We sent a code to: 07700 900123"
-
-  Scenario: A user types everything correctly, creates an account and adds service name
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user submits a valid mobile telephone number
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user enters the correct sms-otp
-    Then they should be directed to the following page: "/add-service-name"
-
-    When the user enters the correct service name
-    Then they should be directed to the following page: "/client-details/vice-id"
-
-  Scenario: The user does not enter anything in the service name field on Add your service name page
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "registering-successfully@gds.gov.uk"
-    Then they should be directed to the following page: "/create/check-email"
-
-    When the user submits the correct email-otp
-    Then they should be directed to the following page: "/create/update-password"
-
-    When the user submits a valid password
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user submits a valid mobile telephone number
-    Then they should be directed to the following page: "/create/enter-mobile"
-
-    When the user enters the correct sms-otp
-    Then they should be directed to the following page: "/add-service-name"
-
-    Given that the user is on the "/add-service-name" page
-    When the user submits the service name ""
-    Then the error message "Enter your service name" must be displayed for the "serviceName" field
-
-  Scenario: The user tries to create account with already registered email
-    Given that the user is on the "/" page
-    When they click on the "Create account" button-link
-    Then they should be directed to the following page: "/create/get-email"
-
-    When the user submits the email "inuse@foo.gov.uk"
-    Then they should be directed to the following page: "/existing-account"
-    Then they should see the text "inuse@foo.gov.uk"
+  Rule: The user tries to submit an email address when creating an account
+
+    Scenario: The user submits an empty email address
+      When they enter "" into the "emailAddress" field
+      When they click the Submit button
+      Then the error message "Enter your email address" must be displayed for the "emailAddress" field
+
+    Scenario: The user enters an email address that is not on the allowed list
+      When the user submits the email "registering-successfully@yahoo.com"
+      Then the error message "Enter a government email address" must be displayed for the "emailAddress" field
+
+    Scenario: The user enters an email address in an incorrect format
+      When the user submits the email "registering-successfullyyahoo.com"
+      Then the error message "Enter an email address in the correct format, like name@example.com" must be displayed for the "emailAddress" field
+
+  Rule: The user tries to verify email OTP when creating an account
+    Background:
+      Given the user submits the email "registering-successfully@gds.gov.uk"
+      Then they should be redirected to the "/create/check-email" page
+
+    Scenario: The user submits an empty OTP
+      When they click the Submit button
+      Then the error message "Enter the 6 digit security code" must be displayed for the "create-email-otp" field
+      And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
+
+    Scenario: The user enters an OTP in an incorrect format
+      When the user submits the email OTP "AA1234"
+      Then the error message "Your security code should only include numbers" must be displayed for the "create-email-otp" field
+      And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
+
+  Rule: The user tries to sign up with an email that is already registered
+
+    Scenario: The user signs in instead
+      When the user submits the email "inuse@foo.gov.uk"
+      Then they should be redirected to the "/existing-account" page
+      And they should see the text "An account already exists with the email address inuse@foo.gov.uk"
+
+      When the user submits the password "this-is-not-a-common-password"
+      And the user submits the SMS OTP "123456"
+      Then they should be redirected to a page with path starting with "/client-details"
+      And they should see the text "Your services"
+
+    Scenario: The user tries to sign in and enters an empty password
+      When the user submits the email "inuse@foo.gov.uk"
+      Then they should be redirected to the "/existing-account" page
+      Then they should see the text "An account already exists with the email address inuse@foo.gov.uk"
+      When the user submits the password ""
+      Then the error message "Enter your password" must be displayed for the "password" field
+
+    Scenario: The user tries to sign in and enters the wrong password
+      When the user submits the email "inuse-password-will-be-wrong@foo.gov.uk"
+      Then they should be redirected to the "/existing-account" page
+      Then they should see the text "An account already exists with the email address inuse-password-will-be-wrong@foo.gov.uk"
+      When the user submits the password "WrongPa$$word"
+      Then the error message "Incorrect password" must be displayed for the "password" field
+
+  Rule: The user tries to set a password when creating an account
+    Background:
+      Given the user submits the email "registering-successfully@gds.gov.uk"
+      And the user submits a correct email OTP
+      Then they should be redirected to the "/create/update-password" page
+
+    Scenario: The user tries to use a password on the list of common passwords
+      When the user submits the password "Password123"
+      Then they should be redirected to the "/create/update-password" page
+      And they should see the text "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers."
+
+    Scenario: The user submits an empty password
+      When the user submits the password ""
+      Then they should be redirected to the "/create/update-password" page
+      And the error message "Enter a password" must be displayed for the "password" field
+
+    Scenario: The user enters a password that is fewer than 8 characters
+      When the user submits the password "Pa$1GOv"
+      Then they should be redirected to the "/create/update-password" page
+      And the error message "Your password must be 8 characters or more" must be displayed for the "password" field
+
+  Rule: The user tries to add a phone number when creating an account
+    Background:
+      Given the user submits the email "registering-successfully@gds.gov.uk"
+      And the user submits a correct email OTP
+      And the user submits a valid password
+      Then they should be redirected to the "/create/enter-mobile" page
+
+    Scenario: The user submits an empty phone number
+      When the user submits the mobile phone number ""
+      Then the error message "Enter a mobile phone number" must be displayed for the "mobileNumber" field
+
+    Scenario: The user submits a phone number with non-numeric characters
+      When the user submits the mobile phone number "075ABC54378"
+      Then the error message "Enter a UK mobile phone number using numbers only" must be displayed for the "mobileNumber" field
+
+    Scenario: The user submits a non-UK mobile number
+      When the user submits the mobile phone number "+17564319555"
+      Then the error message "Enter a UK mobile phone number, like 07700 900000" must be displayed for the "mobileNumber" field
+
+  Rule: The user tries to verify the SMS OTP when creating an account
+    Background:
+      Given the user submits the email "registering-successfully@gds.gov.uk"
+      And the user submits a correct email OTP
+      And the user submits a valid password
+      And the user submits a valid mobile phone number
+      Then they should be redirected to the "/create/enter-mobile" page
+      And they should see the text "We sent a code to: 07700 900123"
+
+    Scenario: The user submits an empty code
+      When the user submits the SMS OTP ""
+      Then they should be redirected to the "/create/verify-phone-code" page
+      And the error message "Enter the 6 digit security code" must be displayed for the "sms-otp" field
+      And they should see the text "We sent a code to: 07700 900123"
+
+    Scenario: The user submits a code with more than 6 digits
+      When the user submits the SMS OTP "1234567"
+      Then they should be redirected to the "/create/verify-phone-code" page
+      And the error message "Enter the security code using only 6 digits" must be displayed for the "sms-otp" field
+      And they should see the text "We sent a code to: 07700 900123"
+
+    Scenario: The user submits a code with fewer than 6 digits
+      When the user submits the SMS OTP "12345"
+      Then they should be redirected to the "/create/verify-phone-code" page
+      And the error message "Enter the security code using only 6 digits" must be displayed for the "sms-otp" field
+      And they should see the text "We sent a code to: 07700 900123"
+
+    Scenario: The user submits a code with letters
+      When the user submits the SMS OTP "12345A"
+      Then they should be redirected to the "/create/verify-phone-code" page
+      And the error message "Your security code should only include numbers" must be displayed for the "sms-otp" field
+      And they should see the text "We sent a code to: 07700 900123"
+
+    Scenario: The user submits a code with special characters
+      When the user submits the SMS OTP "12345$"
+      Then they should be redirected to the "/create/verify-phone-code" page
+      And the error message "Your security code should only include numbers" must be displayed for the "sms-otp" field
+      And they should see the text "We sent a code to: 07700 900123"
+
+    Scenario: The user submits an incorrect code
+      When the user submits the SMS OTP "666666"
+      Then they should be redirected to the "/create/verify-phone-code" page
+      And the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the "sms-otp" field
+      And they should see the text "We sent a code to: 07700 900123"
+
+  Rule: The user tries to add a service when creating an account
+    Background:
+      Given the user submits the email "registering-successfully@gds.gov.uk"
+      And the user submits a correct email OTP
+      And the user submits a valid password
+      And the user submits a valid mobile phone number
+      And the user submits a correct SMS OTP
+      Then they should be redirected to the "/add-service-name" page
+
+    Scenario: The user types everything correctly, creates an account and adds a service
+      When the user submits a correct service name
+      Then they should be redirected to the "/client-details/vice-id" page
+
+    Scenario: The user submits an empty service name
+      When the user submits the service name ""
+      Then they should be redirected to the "/create-service-name-validation" page
+      And the error message "Enter your service name" must be displayed for the "serviceName" field
