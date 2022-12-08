@@ -1,0 +1,13 @@
+{% extends "layout/form.njk" %}
+
+{% set formButtonText = "Confirm" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+  <p class="govuk-body">We will send a 6 digit security code to this number every time you sign in.</p>
+  <p class="govuk-body">You must use a UK mobile phone number.</p>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.mobileNumberInput() }}
+{% endblock %}
