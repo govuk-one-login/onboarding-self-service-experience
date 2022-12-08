@@ -86,7 +86,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
             data: {
                 Items: [
                     {
-                        service_name: {S: this.serviceName},
+                        service_name: {S: this.serviceName || "Test service"},
                         post_logout_redirect_uris: {L: [{S: "http://localhost/"}, {S: "http://localhost/logged_out"}]},
                         subject_type: {S: "pairwise"},
                         contacts: {L: [{S: "john.watts@digital.cabinet-office.gov.uk"}, {S: "onboarding@digital.cabinet-office.gov.uk"}]},
@@ -122,6 +122,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         Object.keys(updates).forEach(
             (update: string) => (this.user[update as keyof DynamoUser] = {S: updates[update as keyof object] as string})
         );
+
         return Promise.resolve({} as AxiosResponse);
     }
 
