@@ -1,6 +1,7 @@
 {% extends "layout/base.njk" %}
 
-{% set active = active | default("client-details") %}
+{% set headerActiveItem = "your-account" %}
+{% set sidebarActiveItem = sidebarActiveItem | default("client-details") %}
 {% set mainClasses = "govuk-!-padding-top-5 left-nav-wrapper" %}
 
 {% block beforeContent %}
@@ -27,10 +28,10 @@
     <div class="govuk-grid-column-one-third">
       <nav class="side-navigation govuk-!-margin-top-3">
         <ul class="govuk-list side-navigation__list">
-          <li class="side-navigation__item{% if active == 'client-details' %} side-navigation__item--active{% endif %}">
+          <li class="side-navigation__item{% if sidebarActiveItem == 'client-details' %} side-navigation__item--active{% endif %}">
             <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client details</a>
           </li>
-          <li class="side-navigation__item{% if active == 'private-beta' %} side-navigation__item--active{% endif %}">
+          <li class="side-navigation__item{% if sidebarActiveItem == 'private-beta' %} side-navigation__item--active{% endif %}">
             <a class="govuk-link govuk-link--no-visited-state" href="/private-beta/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}">
               Joining private beta
             </a>
