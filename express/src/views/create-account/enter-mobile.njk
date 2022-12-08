@@ -1,37 +1,14 @@
-{% extends "../layout.njk" %}
-{% from "../macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% extends "layout/form.njk" %}
 
 {% set pageTitle = "Enter your mobile phone number" %}
+{% set formAction = "/create/enter-mobile" %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors: errorMessages,
-    hrefs: {
-      mobileNumber: "#mobileNumber"
-    }
-  }) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l">Enter your mobile phone number</h1>
   <p class="govuk-body">We will send a 6 digit security code to this number every time you sign in.</p>
   <p class="govuk-body">You must use a UK mobile phone number.</p>
+{% endblock %}
 
-  <form class="form" action="/create/enter-mobile" method="post">
-    {{ govukInput({
-      label: {
-        text: "UK mobile phone number"
-      },
-      name: "mobileNumber",
-      id: "mobileNumber",
-      classes: "govuk-input--width-20",
-      type: "tel",
-      autocomplete: "tel",
-      value: values.mobileNumber if values,
-      errorMessage: {
-        text: errorMessages.mobileNumber
-      } if errorMessages
-    }) }}
-
-    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
-  </form>
+{% block formInputs %}
+  {{ form.mobileNumberInput() }}
 {% endblock %}

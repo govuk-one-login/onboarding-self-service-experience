@@ -12,7 +12,14 @@ export function emailValidator(template: string): MiddlewareFunction<Request, Re
             req.session.emailAddress = emailAddress;
             next();
         } else {
-            res.render(template, {errorMessages: {emailAddress: result.errorMessage}});
+            res.render(template, {
+                values: {
+                    emailAddress: emailAddress
+                },
+                errorMessages: {
+                    emailAddress: result.errorMessage
+                }
+            });
         }
     };
 }

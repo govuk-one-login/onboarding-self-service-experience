@@ -20,10 +20,14 @@ export default function notOnCommonPasswordListValidator(
                     values[v] = req.body[v];
                 });
             }
+
             res.render(template, {
-                errorMessages: {password: ERROR_MESSAGE},
-                values: values
+                values: values,
+                errorMessages: {
+                    password: ERROR_MESSAGE
+                }
             });
+
             return;
         }
     };

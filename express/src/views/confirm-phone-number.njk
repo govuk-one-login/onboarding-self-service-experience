@@ -1,37 +1,14 @@
-{% extends "layout.njk" %}
+{% extends "layout/form.njk" %}
 {% from "macros/back-link.njk" import backLink %}
-{% from "macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set pageTitle = "Confirm phone number" %}
 {% set backLink = backLink("/security-check-change-number") %}
+{% set formAction = "/confirm-phone-number" %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors: errors,
-    hrefs: {
-      mobileNumber: "#mobileNumber"
-    }
-  }) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l">Confirm the phone number currently linked to your account</h1>
+{% endblock %}
 
-  <form class="form" action="/confirm-phone-number" method="post">
-    {{ govukInput({
-      label: {
-        text: "Phone number"
-      },
-      name: "mobileNumber",
-      id: "mobileNumber",
-      classes: "govuk-input--width-20",
-      type: "tel",
-      autocomplete: "tel",
-      value: value.mobileNumber,
-      errorMessage: {
-        text: errors.get("mobileNumber")
-      } if errors
-    }) }}
-
-    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
-  </form>
+{% block formInputs %}
+  {{ form.mobileNumberInput("Phone number") }}
 {% endblock %}

@@ -1,48 +1,22 @@
-{% extends "../layout.njk" %}
-{% from "../macros/back-link.njk" import backLink %}
-{% from "../macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% extends "layout/form.njk" %}
+{% from "macros/back-link.njk" import backLink %}
 
 {% set backLink = backLink("/create/get-email") %}
 {% set pageTitle = "An account already exists" %}
+{% set formAction = "/existing-account" %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors: errorMessages,
-    hrefs: {
-      password: "#password"
-    }
-  }) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l">An account already exists</h1>
   <div class="govuk-inset-text">
     An account already exists with the email address <span class="govuk-!-font-weight-bold">{{ values.emailAddress }}</span>
   </div>
+{% endblock %}
 
-  <form class="form" action="" method="post">
-    <div class="gem-c-show-password" data-module="show-password" data-disable-form-submit-check="false"
-         data-show-text="Show" data-hide-text="Hide" data-show-full-text="Show password"
-         data-hide-full-text="Hide password" data-announce-show="Your password is shown"
-         data-announce-hide="Your password is hidden">
+{% block formInputs %}
+  {{ form.passwordInput("Enter your password", autocomplete = "current-password") }}
+{% endblock %}
 
-      {{ govukInput({
-        label: {
-          text: "Enter your password"
-        },
-        name: "password",
-        id: "password",
-        type: "password",
-        autocomplete: "new-password",
-        classes: "govuk-!-width-two-thirds gem-c-input",
-        value: values.password if values,
-        errorMessage: {
-          text:  errorMessages.password
-        } if  errorMessages
-      }) }}
-    </div>
-
-    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
-  </form>
+{% block afterForm %}
   <p class="govuk-body">If this is your email address and you did not register for an account, please <a class="govuk-link" href="https://www.sign-in.service.gov.uk/contact-us">contact us</a>.</p>
 {% endblock %}
 

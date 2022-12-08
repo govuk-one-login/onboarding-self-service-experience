@@ -1,20 +1,13 @@
-{% extends "./layout-service-details.njk" %}
-{% from "../macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% extends "./base-form-service-details.njk" %}
 
-{% set active = "client-details" %}
 {% set pageTitle = "Change post logout redirect URIs" %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors:  errorMessages,
-    hrefs: {
-      postLogoutURIs: "#postLogoutURIs"
-    }
-  }) }}
+{% set formAction %}
+  /change-post-logout-uris/{{ values.serviceId }}/{{ values.selfServiceClientId }}/{{ values.clientId }}
+{% endset %}
 
+{% block beforeForm %}
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your post logout redirect URIs</h1>
-
   <p class="govuk-body">Add the URI for the page you want your users to see after they sign out of your service.</p>
   <p class="govuk-body">
     You can add multiple post logout redirect URIs if you want different groups of users to see different pages once
@@ -23,27 +16,8 @@
   <p class="govuk-body">If you do not specify one, your users will be redirected to the
     <a class="govuk-link" href="https://signin.account.gov.uk/signed-out">default GOV.UK sign out page</a>.
   </p>
+{% endblock %}
 
-  <form class="form" action="/change-post-logout-uris/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}" method="post">
-    {{ govukInput({
-      label: {
-        text: "Post logout redirect URIs"
-      },
-      hint: {
-        text: "Enter URIs starting with https://"
-      },
-      name: "postLogoutURIs",
-      id: "postLogoutURIs",
-      classes: "govuk-!-width-full",
-      value: value,
-      errorMessage: {
-        text:  errorMessages.postLogoutURIs
-      } if  errorMessages else false
-    }) }}
-
-    <div class="govuk-button-group">
-      {{ govukButton({ text: "Confirm" }) }}
-      <a class="govuk-link" href="/client-details/{{ serviceId }}">Cancel</a>
-    </div>
-  </form>
+{% block formInputs %}
+  {{ form.urlInput("Post logout redirect URIs", "postLogoutURIs") }}
 {% endblock %}

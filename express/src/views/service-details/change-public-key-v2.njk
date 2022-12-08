@@ -1,22 +1,14 @@
 {% extends "./layout-service-details.njk" %}
-{% from "../macros/error-summary.njk" import errorSummary %}
+{% from "macros/error-summary.njk" import errorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
-{% set active = "client-details" %}
 {% set pageTitle = "Change public key" %}
 
 {% block mainContent %}
-  {{ errorSummary ({
-    errors:  errorMessages,
-    hrefs: {
-      serviceUserPublicKey: "#serviceUserPublicKey",
-      serviceUserPublicKeyText: "#serviceUserPublicKeyText",
-      serviceUserPublicKeyFile: "#serviceUserPublicKeyFile"
-    }
-  }) }}
+  {{ errorSummary(errorMessages) }}
 
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
 

@@ -9,7 +9,14 @@ export default function validateMobileNumber(template: string): MiddlewareFuncti
         if (validationResult.isValid) {
             next();
         } else {
-            res.render(template, {errorMessages: {mobileNumber: validationResult.errorMessage}});
+            res.render(template, {
+                values: {
+                    mobileNumber: req.body.mobileNumber
+                },
+                errorMessages: {
+                    mobileNumber: validationResult.errorMessage
+                }
+            });
         }
     };
 }

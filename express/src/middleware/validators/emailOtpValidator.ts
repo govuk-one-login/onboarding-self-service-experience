@@ -13,7 +13,7 @@ export async function emailOtpValidator(req: Request, res: Response, next: NextF
         res.render("create-account/check-email.njk", {
             values: {
                 emailAddress: req.session.emailAddress as string,
-                otp: otpToTest
+                "create-email-otp": otpToTest
             },
             errorMessages: {
                 "create-email-otp": result.errorMessage

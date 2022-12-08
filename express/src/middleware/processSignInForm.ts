@@ -16,8 +16,11 @@ export default function processSignInForm(template: string): MiddlewareFunction<
                     password: password,
                     emailAddress: email
                 },
-                errorMessages: {password: "Enter your password"}
+                errorMessages: {
+                    password: "Enter your password"
+                }
             });
+
             return;
         }
 
@@ -30,8 +33,11 @@ export default function processSignInForm(template: string): MiddlewareFunction<
                         password: password,
                         emailAddress: email
                     },
-                    errorMessages: {password: "Incorrect password"}
+                    errorMessages: {
+                        password: "Incorrect password"
+                    }
                 });
+
                 return;
             }
 
@@ -41,9 +47,7 @@ export default function processSignInForm(template: string): MiddlewareFunction<
                 return;
             }
 
-            console.error(error);
-            res.render("there-is-a-problem.njk");
-            return;
+            throw error;
         }
 
         res.redirect("/sign-in-otp-mobile");

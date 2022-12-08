@@ -1,0 +1,5 @@
+{% extends "layout/form.njk" %}
+
+{% set formBaseLayout = "service-details/layout-service-details.njk" %}
+{% set formCancelUrl = formCancelUrl | default("/client-details/" + serviceId) %}
+{% set formButtonText = formButtonText | default("Confirm") %}

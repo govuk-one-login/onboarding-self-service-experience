@@ -10,9 +10,9 @@ export function mobileOtpValidator(
     hideNumber = false
 ): MiddlewareFunction<Request, Response, NextFunction> {
     return async (req: Request, res: Response, next: NextFunction) => {
-        let otp: string = req.body["sms-otp"];
-        otp = otp.trim();
+        const otp: string = req.body["sms-otp"].trim();
         let mobileNumber;
+
         if (hideNumber) {
             mobileNumber = obscureNumber(getMobileNumber(req));
         } else {
@@ -24,12 +24,14 @@ export function mobileOtpValidator(
             next();
         } else {
             res.render("check-mobile.njk", {
-                errorMessages: {smsOtp: validationResponse.errorMessage as string},
-                value: {otp: otp},
                 values: {
+                    "sms-otp": otp,
                     mobileNumber: mobileNumber,
                     formActionUrl: formActionUrl,
                     textMessageNotReceivedUrl: textMessageNotReceivedUrl
+                },
+                errorMessages: {
+                    "sms-otp": validationResponse.errorMessage as string
                 }
             });
         }

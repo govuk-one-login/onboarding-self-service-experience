@@ -1,6 +1,6 @@
-import {validationResult} from "./validationResult";
-import isRfc822Compliant from "../rfc822-validate";
 import allowedEmailDomains from "../allowedEmailDomains";
+import isRfc822Compliant from "../rfc822-validate";
+import {validationResult} from "./validationResult";
 
 export async function validateEmail(emailAddress: string): Promise<validationResult> {
     if (emailAddress === "") {
@@ -19,5 +19,5 @@ export async function validateEmail(emailAddress: string): Promise<validationRes
 }
 
 async function isAllowedDomain(emailAddress: string): Promise<boolean> {
-    return (await allowedEmailDomains).filter((domain: string) => emailAddress.endsWith(`${domain}`)).length > 0;
+    return (await allowedEmailDomains).some(domain => emailAddress.endsWith(domain));
 }

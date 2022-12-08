@@ -11,19 +11,26 @@ const router = express.Router();
 // Testing routes for Change your client name page
 router.get("/change-client-name/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
     res.render("service-details/change-client-name.njk", {
-        value: req.query?.clientName,
-        serviceId: req.params.serviceId,
-        selfServiceClientId: req.params.selfServiceClientId,
-        clientId: req.params.clientId
+        values: {
+            clientName: req.query?.clientName,
+            serviceId: req.params.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId
+        }
     });
 });
 
 router.post("/change-client-name/:serviceId/:selfServiceClientId/:clientId", async (req, res) => {
     const clientName = req.body.clientName;
     if (clientName === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set("clientName", "Enter your client name");
-        res.render("service-details/change-client-name.njk", {errorMessages: errorMessages, clientId: req.params.clientId});
+        res.render("service-details/change-client-name.njk", {
+            errorMessages: {
+                clientName: "Enter your client name"
+            },
+            values: {
+                clientId: req.params.clientId
+            }
+        });
         return;
     }
     const s4: SelfServiceServicesService = req.app.get("backing-service");
@@ -47,10 +54,12 @@ router.post("/change-client-name/:serviceId/:selfServiceClientId/:clientId", asy
 // Testing routes for Change your redirect URIs page
 router.get("/change-redirect-uris/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
     res.render("service-details/change-redirect-uris.njk", {
-        value: req.query?.redirectUris,
-        serviceId: req.params.serviceId,
-        selfServiceClientId: req.params.selfServiceClientId,
-        clientId: req.params.clientId
+        values: {
+            redirectURIs: req.query?.redirectUris,
+            serviceId: req.params.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId
+        }
     });
 });
 
@@ -125,10 +134,12 @@ router.post("/change-user-attributes/:serviceId/:selfServiceClientId/:clientId",
 // Testing routes for Change your post logout redirect URIs page
 router.get("/change-post-logout-uris/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
     res.render("service-details/change-post-logout-uris.njk", {
-        value: req.query?.redirectUris, // this is not clientName
-        serviceId: req.params.serviceId,
-        selfServiceClientId: req.params.selfServiceClientId,
-        clientId: req.params.clientId
+        values: {
+            postLogoutURIs: req.query?.redirectUris, // this is not clientName
+            serviceId: req.params.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId
+        }
     });
 });
 
@@ -207,6 +218,7 @@ router.get("/change-public-key-v2", (req, res) => {
         serviceName: "My juggling service"
     });
 });
+
 //// Testing route with public key - "Returning change"
 router.get("/change-public-key-v2-returning", (req, res) => {
     res.render("service-details/change-public-key-v2.njk", {
@@ -218,6 +230,7 @@ router.get("/change-public-key-v2-returning", (req, res) => {
             "gkqhkiG9w0BAQEFBBCCCQ8AMIIBCgKCAQEAozeSawLorZgEDia67XkRn61xmh/NyaI+lXxEDpip713csnGBWPGRdePw7/a/nGoLbOFC37rmEA05e7pKaklLTuceDaeTe/KPDorZcdnn8HO8HBVe8bgpsuNnf6QpWERPKHn78WNeA50apBkkB2GafqFn7tVr4HxwTwCaPuAtBhb+MBWz02OzA1g4XBPApXS+CZs7j3aUpSOYBUMshIAbQAlqwp+TfXDnnBS73w+IrbOhWhnPnZ7zVz8QqKt00FAqhvUInDQQFpNS9a0O2aHND2X3Nw7717yZdthjXWiMTj5DSJF4kd6QD6WITUqqhmarhO1qyM9uxKr7W9mteU+7wIDAQABMIIBIjANB"
     });
 });
+
 //// Testing post route to test error messages
 router.post("/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/mockedClientId", async (req, res) => {
     const serviceUserPublicKey = req.body.serviceUserPublicKey;
@@ -225,48 +238,52 @@ router.post("/change-public-key-v2/mockedServiceId/mockedSelfServiceClientId/moc
     const serviceUserPublicKeyFile = req.body.serviceUserPublicKeyFile;
 
     if (serviceUserPublicKey === "text" && serviceUserPublicKeyText === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set("serviceUserPublicKeyText", "Enter a public key");
         res.render("service-details/change-public-key-v2.njk", {
-            errorMessages: errorMessages,
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
             clientId: "mockedClientId",
             serviceName: "My juggling service",
-            serviceUserPublicKey: "text"
+            serviceUserPublicKey: "text",
+            errorMessages: {
+                serviceUserPublicKeyText: "Enter a public key"
+            }
         });
+
         return;
     }
 
     if (serviceUserPublicKey === "file" && serviceUserPublicKeyFile === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set("serviceUserPublicKeyFile", "Upload a file");
         res.render("service-details/change-public-key-v2.njk", {
-            errorMessages: errorMessages,
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
             clientId: "mockedClientId",
             serviceName: "My juggling service",
-            serviceUserPublicKey: "file"
+            serviceUserPublicKey: "file".trim(),
+            errorMessages: {
+                serviceUserPublicKeyFile: "Upload a file"
+            }
         });
+
         return;
     }
 
     if (serviceUserPublicKeyText === "" && serviceUserPublicKeyFile === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set("serviceUserPublicKey", "Choose how to change your public key");
         res.render("service-details/change-public-key-v2.njk", {
-            errorMessages: errorMessages,
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
             clientId: "mockedClientId",
-            serviceName: "My juggling service"
+            serviceName: "My juggling service",
+            errorMessages: {
+                serviceUserPublicKey: "Choose how to change your public key"
+            }
         });
+
         return;
     }
 
     res.redirect("/client-details-mocked");
 });
+
 //// Testing route to redirect to client details
 router.get("/client-details-mocked", (req, res) => {
     res.render("service-details/client-details.njk", {
@@ -277,7 +294,9 @@ router.get("/client-details-mocked", (req, res) => {
 // Testing routes for Change your email address page
 router.get("/change-email-address", (req, res) => {
     res.render("account/change-email-address.njk", {
-        emailAddress: "your.email@digital.cabinet-office.gov.uk"
+        values: {
+            emailAddress: "your.email@digital.cabinet-office.gov.uk"
+        }
     });
 });
 
@@ -289,16 +308,20 @@ router.post("/change-email-address", emailValidator("account/change-email-addres
 // The url needs to be updated when implementing functionality
 router.get("/check-email-visual-test", (req, res) => {
     res.render("account/check-email.njk", {
-        emailAddress: "email@address.com"
+        values: {
+            emailAddress: "email@address.com"
+        }
     });
 });
 
 router.post("/check-email-visual-test", async (req, res) => {
     const otp = req.body["change-email-otp"];
     if (otp === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set("change-email-otp", "Your code should be 6 characters long");
-        res.render("account/check-email.njk", {errorMessages: errorMessages});
+        res.render("account/check-email.njk", {
+            errorMessages: {
+                "change-email-otp": "Your code should be 6 characters long"
+            }
+        });
         return;
     }
     res.redirect("/account");
@@ -334,64 +357,30 @@ router.post("/private-beta", async (req, res) => {
     const department = req.body.department;
     const emailAddress = req.body.emailAddress;
     const serviceName = req.body.serviceName;
-
-    if (yourName === "" && department === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set("yourName", "Enter your name");
-        errorMessages.set("department", "Enter your department");
-        const value: object = {
-            yourName: yourName,
-            department: department
-        };
-        res.render("service-details/private-beta.njk", {
-            errorMessages: errorMessages,
-            value: value
-        });
-        return;
-    }
+    const errorMessages = new Map<string, string>();
 
     if (yourName === "") {
-        const errorMessages = new Map<string, string>();
         errorMessages.set("yourName", "Enter your name");
-        const value: object = {
-            yourName: yourName,
-            department: department
-        };
-        res.render("service-details/private-beta.njk", {
-            errorMessages: errorMessages,
-            value: value
-        });
-        return;
     }
 
     if (department === "") {
-        const errorMessages = new Map<string, string>();
         errorMessages.set("department", "Enter your department");
-        const value: object = {
-            yourName: yourName,
-            department: department
-        };
+    }
+
+    if (errorMessages.size > 0) {
         res.render("service-details/private-beta.njk", {
             errorMessages: errorMessages,
-            value: value
+            values: {
+                yourName: yourName,
+                department: department
+            }
         });
+
         return;
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    try {
-        await s4.privateBetaRequest(
-            yourName,
-            department,
-            serviceName,
-            emailAddress,
-            req.session.authenticationResult?.AccessToken as string
-        );
-    } catch (error) {
-        console.error(error);
-        res.redirect("/there-is-a-problem");
-        return;
-    }
+    await s4.privateBetaRequest(yourName, department, serviceName, emailAddress, req.session.authenticationResult?.AccessToken as string);
 
     res.redirect("/private-beta-form-submitted");
 });
@@ -422,19 +411,24 @@ router.post("/create-new-password", passwordValidator("create-new-password.njk")
 // Testing routs for 'We need to do security checks' page
 router.get("/security-check-change-number", (req, res) => {
     res.render("security-check-change-number.njk", {
-        emailAddress: "your.email@digital.cabinet-office.gov.uk"
+        values: {
+            emailAddress: "your.email@digital.cabinet-office.gov.uk"
+        }
     });
 });
 
 router.post("/security-check-change-number", async (req, res) => {
     const emailOtp = req.body["create-email-otp"];
     if (emailOtp === "") {
-        const errorMessages = new Map<string, string>();
-        errorMessages.set("create-email-otp", "Enter the security code");
         res.render("security-check-change-number.njk", {
-            errorMessages: errorMessages,
-            emailAddress: "your.email@digital.cabinet-office.gov.uk"
+            values: {
+                emailAddress: "your.email@digital.cabinet-office.gov.uk"
+            },
+            errorMessages: {
+                "create-email-otp": "Enter the security code"
+            }
         });
+
         return;
     }
 
@@ -446,6 +440,7 @@ router.get("/confirm-phone-number", (req, res) => {
     res.render("confirm-phone-number.njk");
 });
 
+// TODO this validates the string but it needs to check the given number matches what's in Cognito
 router.post("/confirm-phone-number", validateMobileNumber("confirm-phone-number.njk"), async (req, res) => {
     res.redirect("/new-phone-number");
 });

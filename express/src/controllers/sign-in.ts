@@ -1,14 +1,15 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {Request, Response} from "express";
 import "express-async-errors";
-import SelfServiceServicesService from "../services/self-service-services-service";
 import {obscureNumber} from "../lib/mobileNumberUtils";
+import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
     res.render("sign-in.njk");
 };
 
 export const showLoginOtpMobile = async function (req: Request, res: Response) {
+    // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
         res.redirect("/sign-in");
         return;
@@ -16,11 +17,11 @@ export const showLoginOtpMobile = async function (req: Request, res: Response) {
 
     res.render("check-mobile.njk", {
         values: {
-            mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo)
+            mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo),
+            formActionUrl: "/sign-in-otp-mobile",
+            textMessageNotReceivedUrl: "/resend-text-code"
         },
-        formActionUrl: "/sign-in-otp-mobile",
-        active: "sign-in",
-        textMessageNotReceivedUrl: "/resend-text-code"
+        active: "sign-in"
     });
 };
 
@@ -49,20 +50,8 @@ export const signOut = async function (req: Request, res: Response) {
     req.session.destroy(() => res.redirect("/"));
 };
 
-export const showResendPhoneCodeForm = async function (req: Request, res: Response) {
-    const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
-    if (accessToken === undefined) {
-        console.error("showResendPhoneCodeForm::accessToken not present in session, redirecting to /sign-in");
-        // user must login before we can process their mobile number
-        res.redirect("/sign-in");
-        return;
-    }
+export const showResendPhoneCodePage = async function (req: Request, res: Response) {
     res.render("resend-phone-code-sign-in.njk");
-};
-
-export const resendMobileVerificationCode = async function (req: Request, res: Response) {
-    req.body.mobileNumber = req.session.mobileNumber;
-    await processEnterMobileForm(req, res);
 };
 
 export const sessionTimeout = async function (req: Request, res: Response) {
@@ -74,36 +63,6 @@ export const accountExists = async function (req: Request, res: Response) {
         values: {
             emailAddress: req.session.emailAddress
         }
-    });
-};
-
-const processEnterMobileForm = async function (req: Request, res: Response) {
-    // The user needs to be logged in for this
-    const accessToken = req.session.authenticationResult?.AccessToken;
-    if (accessToken === undefined) {
-        // user must login before we can process their mobile number
-        console.error("processEnterMobileForm::accessToken not present in session, redirecting to /sign-in");
-        res.redirect("/sign-in");
-        return;
-    }
-
-    if (req.session.mobileNumber === undefined) {
-        console.error("processEnterMobileForm::mobileNumber undefined");
-        res.render("there-is-a-problem.njk");
-    }
-
-    const mobileNumber: string = req.session.mobileNumber as string;
-    const s4: SelfServiceServicesService = await req.app.get("backing-service");
-
-    await s4.setPhoneNumber(req.session.emailAddress as string, mobileNumber as string);
-
-    await s4.sendMobileNumberVerificationCode(accessToken);
-
-    res.render("check-mobile.njk", {
-        mobileNumber: obscureNumber(mobileNumber),
-        formActionUrl: "/sign-in-otp-mobile",
-        textMessageNotReceivedUrl: "/resend-text-code",
-        active: "sign-in"
     });
 };
 

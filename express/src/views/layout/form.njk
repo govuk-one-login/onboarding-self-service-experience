@@ -1,0 +1,18 @@
+{% extends formBaseLayout | default("./base.njk") %}
+{% import "macros/form-inputs.njk" as form with context %}
+{% from "macros/error-summary.njk" import errorSummary %}
+
+{% block mainContent %}
+  {{ errorSummary(errorMessages) }}
+
+  {% block beforeForm %}{% endblock %}
+
+  {% if not hideForm %}
+    {% call form.generate(formAction, formButtonText, formButtonClasses, formCancelUrl) %}
+      {% block formInputs %}{% endblock %}
+      {% block afterformInputs %}{% endblock %}
+    {% endcall %}
+  {% endif %}
+
+  {% block afterForm %}{% endblock %}
+{% endblock %}

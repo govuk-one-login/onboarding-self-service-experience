@@ -1,52 +1,27 @@
-{% extends "../layout.njk" %}
-{% from "../macros/back-link.njk" import backLink %}
-{% from "../macros/error-summary.njk" import errorSummary %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% extends "layout/form.njk" %}
+{% from "macros/back-link.njk" import backLink %}
 
 {% set active = "your-account" %}
 {% set pageTitle = "Check your email address" %}
 {% set backLink = backLink("/change-email-address") %}
+{% set formAction = "/check-email-visual-test" %}
 
-{% block mainContent %}
-  {{ errorSummary ({
-    errors: errorMessages,
-    hrefs: {
-      "change-email-otp": "#change-email-otp"
-    }
-  }) }}
-
+{% block beforeForm %}
   <h1 class="govuk-heading-l">Check your email</h1>
-
   <div class="govuk-inset-text">
-    We have sent an email to: <span class="govuk-!-font-weight-bold">{{ emailAddress }}</span>
+    We have sent an email to: <span class="govuk-!-font-weight-bold">{{ values.emailAddress }}</span>
   </div>
-
   <p class="govuk-body">The email contains a 6 digit security code.</p>
   <p class="govuk-body">The email might take a few minutes to arrive. If you do not get an email, check your spam folder.</p>
   <p class="govuk-body">The code will expire after 15 minutes.</p>
+{% endblock %}
 
-  <form class="form" action="/check-email-visual-test" method="post">
-    {{ govukInput({
-      label: {
-        text: "Enter the 6 digit security code"
-      },
-      name: "change-email-otp",
-      id: "change-email-otp",
-      classes: "govuk-input--width-5",
-      type: "text",
-      inputmode: "numeric",
-      pattern: "[0-9]*",
-      spellcheck: false,
-      value: value.otp,
-      errorMessage: {
-        text: errorMessages.get('change-email-otp')
-      } if errorMessages else false
-    }) }}
+{% block formInputs %}
+  {{ form.securityCodeInput("change-email-otp") }}
+{% endblock %}
 
-    {{ govukButton({ text: "Continue", attributes: {id: "submit"} }) }}
-
-    <p class="govuk-body">
-      <a id="resend-code-page" class="govuk-link" href="/create/resend-email-code">Not received an email?</a>
-    </p>
-  </form>
+{% block afterForm %}
+  <p class="govuk-body">
+    <a id="resend-code-page" class="govuk-link" href="/create/resend-email-code">Not received an email?</a>
+  </p>
 {% endblock %}
