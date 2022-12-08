@@ -35,7 +35,6 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
 
 export const showCheckEmailForm = function (req: Request, res: Response) {
     if (!req.session.emailAddress) {
-        console.error("showCheckEmailForm::emailAddress not in the session, redirecting to /create/get-email");
         res.redirect("/create/get-email");
         return;
     }
@@ -63,6 +62,7 @@ export const submitEmailOtp = async function (req: Request, res: Response, next:
                     "create-email-otp": "The code you entered is not correct or has expired - enter it again or request a new code"
                 }
             });
+
             return;
         } else {
             next(error);

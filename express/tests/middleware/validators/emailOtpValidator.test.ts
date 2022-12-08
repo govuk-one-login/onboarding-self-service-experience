@@ -40,7 +40,7 @@ describe("It checks whether an email OTP is valid and behaves accordingly", () =
         expect(nextFunction).toHaveBeenCalled();
     });
 
-    it("renders create-account/check-email.njk with the correct values if the OTP is not valid", () => {
+    it("renders check your email page with the correct values if the OTP is not valid", () => {
         mockSession.emailAddress = "render-this@test.gov.uk";
         mockRequest.body["create-email-otp"] = "123";
         mockResponse = {

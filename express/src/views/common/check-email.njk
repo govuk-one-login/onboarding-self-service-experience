@@ -1,0 +1,23 @@
+{% extends "layout/form.njk" %}
+
+{% set pageTitle = "Check your email" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l">Check your email</h1>
+  <div class="govuk-inset-text">
+    We have sent an email to: <span class="govuk-!-font-weight-bold">{{ values.emailAddress }}</span>
+  </div>
+  <p class="govuk-body">The email contains a 6 digit security code.</p>
+  <p class="govuk-body">The email might take a few minutes to arrive. If you do not get an email, check your spam folder.</p>
+  <p class="govuk-body">The code will expire after 15 minutes.</p>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.securityCodeInput("create-email-otp") }}
+{% endblock %}
+
+{% block afterForm %}
+  <p class="govuk-body">
+    <a id="resend-code-page" class="govuk-link" href="/create/resend-email-code">Not received an email?</a>
+  </p>
+{% endblock %}
