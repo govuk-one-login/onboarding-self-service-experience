@@ -26,7 +26,7 @@ Feature: Unhappy paths for the self-service sign-in flow
     Then they click on the "Continue" button-link
     Then they should be redirected to the "/check-email-password-reset" page
     Then they click the "Resend the email" button
-    Then they should be redirected to the "/create-new-password" page
+    Then they should be redirected to the "/check-email-password-reset" page
 
   Scenario: The user tries to log in and submits registered email but enters no value into the password field
     When they enter "password-will-be-wrong@stub.gov.uk" into the "emailAddress" field

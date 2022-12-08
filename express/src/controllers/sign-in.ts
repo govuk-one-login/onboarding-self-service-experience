@@ -79,11 +79,6 @@ export const checkEmailPasswordReset = async function (req: Request, res: Respon
     res.render("check-email-password-reset.njk");
 };
 
-export const resendForgotPassword = async function (req: Request, res: Response) {
-    await forgotPassword(req);
-    res.redirect("/create-new-password");
-};
-
 const forgotPassword = async function (req: Request) {
     const emailAddress = req.session.emailAddress;
     try {
