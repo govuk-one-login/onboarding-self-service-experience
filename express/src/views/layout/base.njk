@@ -49,30 +49,30 @@
             <ul id="navigation" class="govuk-header__navigation-list">
 
               {% if not isSignedIn %}
-                <li class="govuk-header__navigation-item{% if active == 'features' %} govuk-header__navigation-item--active{% endif %}">
+                <li class="govuk-header__navigation-item{% if headerActiveItem == "features" %} govuk-header__navigation-item--active{% endif %}">
                   <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/features">Features</a>
                 </li>
               {% endif %}
 
-              <li class="govuk-header__navigation-item{% if active == 'documentation' %} govuk-header__navigation-item--active{% endif %}">
+              <li class="govuk-header__navigation-item{% if headerActiveItem == "documentation" %} govuk-header__navigation-item--active{% endif %}">
                 <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/documentation">Documentation</a>
               </li>
-              <li class="govuk-header__navigation-item{% if active == 'support' %} govuk-header__navigation-item--active{% endif %}">
+              <li class="govuk-header__navigation-item{% if headerActiveItem == "support" %} govuk-header__navigation-item--active{% endif %}">
                 <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/support">Support</a>
               </li>
 
               {% if isSignedIn %}
-                <li class="govuk-header__navigation-item{% if active == 'your-account' %} govuk-header__navigation-item--active{% endif %}">
+                <li class="govuk-header__navigation-item{% if headerActiveItem == "your-account" %} govuk-header__navigation-item--active{% endif %}">
                   <a class="govuk-header__link" href="/account" id="your-account-top-nav">Your account</a>
                 </li>
                 <li class="govuk-header__navigation-item">
                   <a class="govuk-header__link" href="/account/sign-out">Sign out</a>
                 </li>
               {% else %}
-                <li class="govuk-header__navigation-item{% if active == 'get-started' %} govuk-header__navigation-item--active{% endif %}">
+                <li class="govuk-header__navigation-item{% if headerActiveItem == "get-started" %} govuk-header__navigation-item--active{% endif %}">
                   <a class="govuk-header__link" href="/">Get started</a>
                 </li>
-                <li class="govuk-header__navigation-item{% if active == 'sign-in' %} govuk-header__navigation-item--active{% endif %}">
+                <li class="govuk-header__navigation-item{% if headerActiveItem == "sign-in" %} govuk-header__navigation-item--active{% endif %}">
                   <a class="govuk-header__link" href="/sign-in">Sign in</a>
                 </li>
               {% endif %}

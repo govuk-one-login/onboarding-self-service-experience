@@ -1,5 +1,9 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
 
 {% macro generate(action, buttonText, buttonClasses, cancelUrl) %}
   <form class="form" method="post"{% if action %} action="{{ action }}"{% endif %} novalidate="novalidate">
@@ -66,4 +70,79 @@
 
 {% macro urlInput(label, id) %}
   {{ textInput(label, id, "govuk-!-width-full", "Enter URIs starting with https://", "url", "url") }}
+{% endmacro %}
+
+{% macro hiddenInput(id, value) %}
+  {{ textInput(id = id, type = "hidden", value = value) }}
+{% endmacro %}
+
+{% macro textAreaInput(label, id, hint, rows = 5) %}
+  {{ govukTextarea({
+    label: {
+      text: label
+    } if label,
+    hint: {
+      text: hint
+    } if hint,
+    id: id,
+    name: id,
+    rows: rows,
+    value: values[id] if values and values.hasOwnProperty(id),
+    errorMessage: {
+      text: errorMessages[id]
+    } if errorMessages and errorMessages.hasOwnProperty(id)
+  }) }}
+{% endmacro %}
+
+{% macro checkboxesInput(label, id, items) %}
+  {{ govukCheckboxes({
+    fieldset: {
+      legend: {
+        text: label
+      }
+    } if label,
+    id: id,
+    name: id,
+    items: items
+  }) }}
+{% endmacro %}
+
+{% macro radiosInput(label, labelClasses, name, hint, items) %}
+  {{ govukRadios({
+    name: name,
+    idPrefix: name,
+    attributes: {
+      id: name + "-options"
+    },
+    fieldset: {
+      legend: {
+        text: label,
+        classes: labelClasses if labelClasses
+      }
+    },
+    hint: {
+      text: hint
+    } if hint,
+    value: values[id] if values and values.hasOwnProperty(id),
+    items: items,
+    errorMessage: {
+      text: errorMessages[id]
+    } if errorMessages and errorMessages.hasOwnProperty(id)
+  }) }}
+{% endmacro %}
+
+{% macro fileUploadInput(id, filetypes, label) %}
+  {{ govukFileUpload({
+    id: id,
+    name: id,
+    label: {
+      text: label
+    } if label,
+    attributes: {
+      accept: filetypes
+    } if filetypes,
+    errorMessage: {
+      text: errorMessages[id]
+    } if errorMessages and errorMessages.hasOwnProperty(id)
+  }) }}
 {% endmacro %}

@@ -1,11 +1,10 @@
 {% extends "layout/form.njk" %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% set active = "your-account" %}
+{% set headerActiveItem = "your-account" %}
 {% set pageTitle = "Change service name" %}
-{% set formAction = "/change-service-name" %}
 {% set formButtonText = "Confirm" %}
-{% set formCancelUrl = "/client-details/" + values.selfServiceClientId %}
+{% set formCancelUrl = "/client-details/" + serviceId %}
 
 {% block beforeForm %}
   <h1 class="govuk-heading-l">Change your service name</h1>
@@ -15,10 +14,4 @@
 
 {% block formInputs %}
   {{ form.textInput("Service name", "serviceName") }}
-{% endblock %}
-
-{% block afterformInputs %}
-  {{ govukInput({ type: "hidden", value: values.selfServiceClientId, id: "selfServiceClientId", name: "selfServiceClientId" }) }}
-  {{ govukInput({ type: "hidden", value: values.clientId, id: "clientId", name: "clientId" }) }}
-  {{ govukInput({ type: "hidden", value: values.clientServiceId, id: "clientServiceId", name: "clientServiceId" }) }}
 {% endblock %}

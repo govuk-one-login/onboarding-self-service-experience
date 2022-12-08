@@ -12,6 +12,9 @@ import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {convertToCountryPrefixFormat} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
+const defaultPublicKey =
+    "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
+
 export const listServices = async function (req: Request, res: Response) {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
@@ -32,7 +35,117 @@ export const listServices = async function (req: Request, res: Response) {
         return;
     }
 
+    req.session.serviceName = undefined;
     res.render("manage-account/list-services.njk", {services: services});
+};
+
+export const showClient = async function (req: Request, res: Response) {
+    // TODO make S4 instances static in all controllers
+    const serviceId = req.params.serviceId;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const client = (await s4.listClients(serviceId, req.session.authenticationResult?.AccessToken as string))[0];
+    const selfServiceClientId = client.dynamoId;
+    const authClientId = client.authClientId;
+    const serviceName = client.serviceName;
+
+    res.render("service-details/client-details.njk", {
+        clientId: authClientId,
+        selfServiceClientId: selfServiceClientId,
+        serviceId: serviceId,
+        serviceName: serviceName,
+        updatedField: req.session.updatedField,
+        redirectUrls: client.redirectUris.join(" "),
+        userAttributesRequired: client.scopes.join(", "),
+        userPublicKey: client.publicKey == defaultPublicKey ? "" : client.publicKey,
+        postLogoutRedirectUrls: client.logoutUris.join(" "),
+        urls: {
+            // TODO changeClientName is currently not used
+            changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURI(
+                client.clientName
+            )}`,
+            changeRedirectUris: `/change-redirect-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
+                client.redirectUris.join(" ")
+            )}`,
+            changeUserAttributes: `/change-user-attributes/${serviceId}/${selfServiceClientId}/${authClientId}?userAttributes=${encodeURI(
+                client.scopes.join(" ")
+            )}`,
+            changePublicKey: `/change-public-key/${serviceId}/${selfServiceClientId}/${authClientId}?publicKey=${encodeURI(
+                client.publicKey
+            )}`,
+            changePostLogoutUris: `/change-post-logout-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
+                client.logoutUris.join(" ")
+            )}`
+        }
+    });
+
+    // TODO we need to use a flash message package for Express
+    req.session.serviceName = serviceName;
+    req.session.updatedField = undefined;
+};
+
+export const showPrivateBetaForm = async function (req: Request, res: Response) {
+    res.render("service-details/private-beta.njk", {
+        serviceId: req.params.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        serviceName: req.session.serviceName,
+        emailAddress: req.session.emailAddress
+    });
+};
+
+export const processPrivateBetaForm = async function (req: Request, res: Response) {
+    const yourName = req.body.yourName;
+    const department = req.body.department;
+    const serviceName = req.body.serviceName;
+    const emailAddress = req.session.emailAddress;
+    const serviceId = req.params.serviceId;
+    const selfServiceClientId = req.params.selfServiceClientId;
+    const clientId = req.params.clientId;
+    const errorMessages = new Map<string, string>();
+
+    if (yourName === "") {
+        errorMessages.set("yourName", "Enter your name");
+    }
+
+    if (department === "") {
+        errorMessages.set("department", "Enter your department");
+    }
+
+    if (errorMessages.size > 0) {
+        res.render("service-details/private-beta.njk", {
+            serviceId: serviceId,
+            selfServiceClientId: selfServiceClientId,
+            clientId: clientId,
+            serviceName: serviceName,
+            emailAddress: emailAddress,
+            errorMessages: Object.fromEntries(errorMessages),
+            values: {
+                yourName: yourName,
+                department: department
+            }
+        });
+
+        return;
+    }
+
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    await s4.privateBetaRequest(
+        yourName,
+        department,
+        serviceName,
+        emailAddress as string,
+        req.session.authenticationResult?.AccessToken as string
+    );
+
+    res.redirect(`/private-beta-form-submitted/${serviceId}/${selfServiceClientId}/${clientId}`);
+};
+
+export const showPrivateBetaFormSubmitted = async function (req: Request, res: Response) {
+    res.render("service-details/private-beta-form-submitted.njk", {
+        serviceId: req.params.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId
+    });
 };
 
 export const showAddServiceForm = async function (req: Request, res: Response) {
@@ -68,14 +181,13 @@ export const processAddServiceForm = async function (req: Request, res: Response
     res.redirect(`/client-details/${serviceId.substring(8)}`);
 };
 
-export const processUpdateServiceForm = async function (req: Request, res: Response) {
-    const serviceName = req.body.serviceName;
-    const selfServiceClientId = req.body.selfServiceClientId;
-    const clientId = req.body.clientId;
-    const clientServiceId = req.body.clientServiceId;
+export const processChangeServiceNameForm = async function (req: Request, res: Response) {
+    const newServiceName = req.body.serviceName;
+    const serviceId = req.params.serviceId;
 
-    if (serviceName === "") {
+    if (newServiceName === "") {
         res.render("account/change-service-name.njk", {
+            serviceId: serviceId,
             errorMessages: {
                 serviceName: "Enter your service name"
             }
@@ -84,24 +196,22 @@ export const processUpdateServiceForm = async function (req: Request, res: Respo
         return;
     }
 
-    const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
-    if (userId === undefined) {
-        console.log("Can't get CognitoId from authenticationResult in session");
-        res.render("there-is-a-problem.njk");
-        return;
-    }
-
+    const selfServiceClientId = req.params.selfServiceClientId;
+    const clientId = req.params.clientId;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    // TODO service_name is the db layer leaking into the domain
+    // TODO is this correct? Don't we also need to update the pk:service sk:service entry? We need an updateService call
     await s4.updateClient(
+        serviceId,
         selfServiceClientId,
-        clientServiceId,
         clientId,
-        {client_name: serviceName},
+        {service_name: newServiceName},
         req.session.authenticationResult?.AccessToken as string
     );
 
     req.session.updatedField = "service name";
-    res.redirect(`/client-details/${selfServiceClientId}`);
+    res.redirect(`/client-details/${serviceId}`);
 };
 
 export const showChangePasswordForm = async function (req: Request, res: Response) {

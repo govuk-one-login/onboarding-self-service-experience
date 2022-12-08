@@ -1,7 +1,8 @@
-import {AxiosResponse} from "axios";
-import {Service} from "../../../@types/Service";
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
+import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
+import {Service} from "../../../@types/Service";
 
 export default interface LambdaFacadeInterface {
     putUser(user: OnboardingTableItem, accessToken: string): Promise<AxiosResponse>;
@@ -16,7 +17,8 @@ export default interface LambdaFacadeInterface {
 
     listServices(userId: string, accessToken: string): Promise<AxiosResponse>;
 
-    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse>;
+    // TODO The QueryCommandOutput type should be replaced by a class shared between the frontend and the API (contract)
+    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse<QueryCommandOutput>>;
 
     updateClient(
         serviceId: string,
@@ -24,7 +26,7 @@ export default interface LambdaFacadeInterface {
         clientId: string,
         updates: object,
         accessToken: string
-    ): Promise<AxiosResponse>;
+    ): Promise<AxiosResponse<QueryCommandOutput>>;
 
     privateBetaRequest(
         name: string,

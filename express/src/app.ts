@@ -46,21 +46,19 @@ declare module "express-session" {
     interface SessionData {
         emailAddress: string;
         mobileNumber: string;
-        enteredMobileNumber: string;
         cognitoSession: string;
+        isSignedIn: boolean;
         authenticationResult: AuthenticationResultType;
+        enteredMobileNumber: string;
         mfaResponse: MfaResponse;
         updatedField: string;
-        isSignedIn: boolean;
+        serviceName: string;
     }
 }
 
 configureViews(app);
 
 app.use(setSignedInStatus);
-app.use(function (req: Request, res: Response, next: NextFunction) {
-    next();
-});
 
 app.use("/", createAccount);
 app.use("/", signIn);

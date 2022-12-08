@@ -1,9 +1,10 @@
+import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import {AxiosResponse} from "axios";
+import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {DynamoUser} from "../../../@types/user";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
-import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
-import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 
 class StubLambdaFacade implements LambdaFacadeInterface {
     user: DynamoUser = {
@@ -80,14 +81,13 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         } as AxiosResponse);
     }
 
-    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse> {
+    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse<QueryCommandOutput>> {
         return Promise.resolve({
             data: {
                 Items: [
                     {
-                        client_name: {S: this.serviceName},
-                        post_logoout_redirect_uris: {L: [{S: "http://localhost/"}, {S: "http://localhost/logged_out"}]},
-                        post_logout_redirect_uris: {L: [{S: "http://localhost/logged_out"}]},
+                        service_name: {S: this.serviceName},
+                        post_logout_redirect_uris: {L: [{S: "http://localhost/"}, {S: "http://localhost/logged_out"}]},
                         subject_type: {S: "pairwise"},
                         contacts: {L: [{S: "john.watts@digital.cabinet-office.gov.uk"}, {S: "onboarding@digital.cabinet-office.gov.uk"}]},
                         public_key: {

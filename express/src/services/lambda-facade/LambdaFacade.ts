@@ -1,9 +1,10 @@
-import axios, {Axios, AxiosResponse} from "axios";
-import {Service} from "../../../@types/Service";
-import LambdaFacadeInterface from "./LambdaFacadeInterface";
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
-import AuthenticationResultParser from "../../lib/AuthenticationResultParser";
+import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
+import axios, {Axios, AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
+import {Service} from "../../../@types/Service";
+import AuthenticationResultParser from "../../lib/AuthenticationResultParser";
+import LambdaFacadeInterface from "./LambdaFacadeInterface";
 
 class LambdaFacade implements LambdaFacadeInterface {
     private instance: Axios;
@@ -72,17 +73,16 @@ class LambdaFacade implements LambdaFacadeInterface {
         clientId: string,
         updates: object,
         accessToken: string
-    ): Promise<AxiosResponse> {
-        // constrain type later
+    ): Promise<AxiosResponse<QueryCommandOutput>> {
+        // TODO constrain type later
         const body = {
             serviceId: serviceId,
             selfServiceClientId: selfServiceClientId,
             clientId: clientId,
             updates: updates
         };
-        return await (
-            await this.instance
-        ).post(`/Prod/do-update-client`, JSON.stringify(body), {
+
+        return this.instance.post(`/Prod/do-update-client`, JSON.stringify(body), {
             headers: {
                 "authorised-by": accessToken
             }
@@ -93,9 +93,10 @@ class LambdaFacade implements LambdaFacadeInterface {
         return await (await this.instance).get(`/Prod/get-services/${userId}`);
     }
 
-    async listClients(serviceId: string, accessToken: string): Promise<AxiosResponse> {
+    // TODO Don't we need to use the token to authorise when making the call to the database? Seems odd it's not used
+    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse<QueryCommandOutput>> {
         const bareServiceId = serviceId.startsWith("service#") ? serviceId.substring(8) : serviceId;
-        return await (await this.instance).get(`/Prod/get-service-clients/${bareServiceId}`);
+        return this.instance.get(`/Prod/get-service-clients/${bareServiceId}`);
     }
 
     async updateUser(selfServiceUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
