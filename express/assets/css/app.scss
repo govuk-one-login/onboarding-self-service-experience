@@ -13,6 +13,7 @@ $govuk-new-link-styles: true;
 @import "modules/related-items";
 @import "modules/side-navigation";
 @import "modules/show-password";
+@import "modules/tick-cross";
 
 @media (min-width: 415px) {
   div.feature-row {
@@ -205,3 +206,46 @@ code {
     box-shadow: rgb(255, 221, 0) 0px -2px, rgb(11, 12, 12) 0px 4px;
   }
 }
+
+.user-list-item {
+  border-bottom: 1px solid $govuk-border-colour;
+  padding-bottom: 6px;
+  margin-bottom: 30px;
+
+  .current-team-member-hint {
+    font-weight: normal;
+  }
+  h2 {
+    margin-bottom: 10px;
+  }
+  p.govuk-body {
+    margin-bottom: 8px;
+  }
+  h3 {
+    margin-bottom: 6px;
+  }
+  li {
+    margin-bottom: 0;
+  }
+  p.user-list-item-remove {
+    margin-bottom: 25px;
+    a {
+      color: $govuk-error-colour;
+    }
+  }
+}
+
+.user-list-last-item {
+  margin-bottom: 50px;
+}
+
+.team-members-pending-invitations {
+  p.govuk-body {
+    margin-bottom: 12px;
+  }
+}
+
+.left-nav-service-details h1 {
+  margin-top: 15px;
+}
+
