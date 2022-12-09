@@ -99,7 +99,7 @@ class LambdaFacade implements LambdaFacadeInterface {
         return this.instance.get(`/Prod/get-service-clients/${bareServiceId}`);
     }
 
-    async updateUser(selfServiceUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
+    async updateUser(selfServiceUserId: string, updates: Record<string, string | Date>, accessToken: string): Promise<AxiosResponse> {
         const body = {
             userId: selfServiceUserId,
             updates: updates

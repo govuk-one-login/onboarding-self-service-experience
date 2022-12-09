@@ -271,6 +271,7 @@ export const changePassword = async function (req: Request, res: Response) {
     const newPassword = req.body.password;
     const currentPassword = req.body.currentPassword;
 
+    // TODO Use a password validator
     if (currentPassword === "") {
         res.render("account/change-password.njk", {
             errorMessages: {
@@ -364,21 +365,19 @@ export const processChangePhoneNumberForm = async function (req: Request, res: R
         AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType),
         convertToCountryPrefixFormat(req.body.mobileNumber)
     );
-    req.session.mobileNumber = req.body.mobileNumber;
-    const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
-    if (accessToken === undefined) {
-        console.error("processChangePhoneNumberForm::accessToken not present in session, redirecting to /sign-in");
-        // user must log in before we can process their mobile number
-        res.redirect("/sign-in");
-        return;
-    }
-    await s4.sendMobileNumberVerificationCode(accessToken);
 
-    res.render("check-mobile.njk", {
+    req.session.enteredMobileNumber = req.body.mobileNumber;
+    await s4.sendMobileNumberVerificationCode(req.session.authenticationResult?.AccessToken as string);
+
+    res.redirect("/account/verify-phone-code");
+};
+
+export const showVerifyMobileWithSmsCode = async function (req: Request, res: Response) {
+    res.render("common/check-mobile.njk", {
+        headerActiveItem: "your-account",
         values: {
-            mobileNumber: req.body.mobileNumber,
-            formActionUrl: "/verify-phone-code",
-            textMessageNotReceivedUrl: "/create/resend-phone-code"
+            mobileNumber: req.session.enteredMobileNumber,
+            textMessageNotReceivedUrl: "/account/resend-phone-code"
         }
     });
 };
@@ -386,24 +385,29 @@ export const processChangePhoneNumberForm = async function (req: Request, res: R
 export const verifyMobileWithSmsCode = async function (req: Request, res: Response) {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     const accessToken = req.session.authenticationResult?.AccessToken as string;
+
     try {
         await s4.verifyMobileUsingSmsCode(accessToken, req.body.securityCode);
         await s4.setMobilePhoneAsVerified(
             AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType) as string
         );
+
         await s4.updateUser(
             AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType),
-            {phone: req.session.mobileNumber},
+            {phone: req.session.enteredMobileNumber as string},
             accessToken as string
         );
+
+        req.session.mobileNumber = req.session.enteredMobileNumber;
+        req.session.enteredMobileNumber = undefined;
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            res.render("check-mobile.njk", {
+            res.render("common/check-mobile.njk", {
+                headerActiveItem: "your-account",
                 values: {
                     securityCode: req.body.securityCode,
-                    mobileNumber: req.session.mobileNumber,
-                    formActionUrl: "/verify-phone-code",
-                    textMessageNotReceivedUrl: "/create/resend-phone-code"
+                    mobileNumber: req.session.enteredMobileNumber,
+                    textMessageNotReceivedUrl: "/account/resend-phone-code"
                 },
                 errorMessages: {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"

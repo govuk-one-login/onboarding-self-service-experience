@@ -18,6 +18,8 @@ import {userToDomainUser} from "../lib/userUtils";
 import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface from "./lambda-facade/LambdaFacadeInterface";
 
+export type Updates = Record<string, string | Date>;
+
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
     private lambda: LambdaFacadeInterface;
@@ -35,8 +37,8 @@ export default class SelfServiceServicesService {
         await this.cognito.forgotPassword(email);
     }
 
-    async respondToMfaChallenge(mfaResponsse: MfaResponse, mfaCode: string): Promise<AuthenticationResultType> {
-        const response = await this.cognito.respondToMfaChallenge(mfaResponsse.cognitoId, mfaCode, mfaResponsse.cognitoSession);
+    async respondToMfaChallenge(mfaResponse: MfaResponse, mfaCode: string): Promise<AuthenticationResultType> {
+        const response = await this.cognito.respondToMfaChallenge(mfaResponse.cognitoId, mfaCode, mfaResponse.cognitoSession);
 
         if (!response.AuthenticationResult) {
             throw new SelfServiceError("Did not get AuthenticationResult from Cognito");
@@ -58,6 +60,7 @@ export default class SelfServiceServicesService {
             AuthenticationResultParser.getCognitoId(authenticationResult),
             authenticationResult.AccessToken
         );
+
         return userToDomainUser(response.data.Item as DynamoUser);
     }
 
@@ -71,8 +74,6 @@ export default class SelfServiceServicesService {
     }
 
     async putUser(user: OnboardingTableItem, accessToken: string) {
-        // TODO this is somewhere we can simplify types.
-        console.log(user);
         return await this.lambda.putUser(user, accessToken);
     }
 
@@ -152,7 +153,7 @@ export default class SelfServiceServicesService {
         return dynamoServicesToDomainServices((await this.lambda.listServices(userId, accessToken)).data.Items);
     }
 
-    async updateUser(userId: string, updates: {[key: string]: unknown}, accessToken: string): Promise<void> {
+    async updateUser(userId: string, updates: Updates, accessToken: string): Promise<void> {
         await this.lambda.updateUser(userId, updates, accessToken as string);
     }
 

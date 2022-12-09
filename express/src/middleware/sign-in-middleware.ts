@@ -15,14 +15,14 @@ export async function processSecurityCode(req: Request, res: Response, next: Nex
         req.session.authenticationResult = await s4.respondToMfaChallenge(req.session.mfaResponse, req.body.securityCode);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            res.render("check-mobile.njk", {
+            res.render("common/check-mobile.njk", {
+                headerActiveItem: "sign-in",
                 errorMessages: {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
                 },
                 values: {
                     securityCode: req.body.securityCode,
-                    mobileNumber: req.session.mobileNumber as string,
-                    formActionUrl: "/sign-in-otp-mobile"
+                    mobileNumber: req.session.mobileNumber
                 }
             });
 

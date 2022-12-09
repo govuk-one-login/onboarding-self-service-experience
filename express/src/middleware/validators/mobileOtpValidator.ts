@@ -5,9 +5,8 @@ import {validateSecurityCode} from "../../lib/validators/checkOtp";
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 
 export function mobileSecurityCodeValidator(
-    formActionUrl: string,
     textMessageNotReceivedUrl: string,
-    hideNumber = false
+    hideNumber = true
 ): MiddlewareFunction<Request, Response, NextFunction> {
     return async (req: Request, res: Response, next: NextFunction) => {
         const securityCode: string = req.body.securityCode.trim();
@@ -23,11 +22,10 @@ export function mobileSecurityCodeValidator(
         if (validationResponse.isValid) {
             next();
         } else {
-            res.render("check-mobile.njk", {
+            res.render("common/check-mobile.njk", {
                 values: {
                     securityCode: securityCode,
                     mobileNumber: mobileNumber,
-                    formActionUrl: formActionUrl,
                     textMessageNotReceivedUrl: textMessageNotReceivedUrl
                 },
                 errorMessages: {

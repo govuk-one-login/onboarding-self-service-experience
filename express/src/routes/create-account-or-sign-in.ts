@@ -11,10 +11,12 @@ import {
     showNewPasswordForm,
     showResendEmailCodeForm,
     showResendPhoneCodeForm,
+    showSubmitMobileVerificationCode,
     submitEmailSecurityCode,
     submitMobileVerificationCode,
     updatePassword
 } from "../controllers/create-account";
+import {checkAuthorisation} from "../middleware/authoriser";
 import {emailSecurityCodeValidator} from "../middleware/validators/emailOtpValidator";
 import {emailValidator} from "../middleware/validators/emailValidator";
 import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpValidator";
@@ -39,12 +41,14 @@ router.post(
     updatePassword
 );
 
-router.get("/create/enter-mobile", showEnterMobileForm);
-router.post("/create/enter-mobile", validateMobileNumber("create-account/enter-mobile.njk"), processEnterMobileForm);
+router.get("/create/enter-mobile", checkAuthorisation, showEnterMobileForm);
+router.post("/create/enter-mobile", checkAuthorisation, validateMobileNumber("create-account/enter-mobile.njk"), processEnterMobileForm);
 
+router.get("/create/verify-phone-code", checkAuthorisation, showSubmitMobileVerificationCode);
 router.post(
     "/create/verify-phone-code",
-    mobileSecurityCodeValidator("/create/verify-phone-code", "/create/resend-phone-code"),
+    checkAuthorisation,
+    mobileSecurityCodeValidator("/create/resend-phone-code", false),
     submitMobileVerificationCode
 );
 
@@ -52,8 +56,8 @@ router.get("/there-is-a-problem", (req: Request, res: Response) => {
     res.render("there-is-a-problem.njk");
 });
 
-router.get("/create/resend-phone-code", showResendPhoneCodeForm);
-router.post("/create/resend-phone-code", resendMobileVerificationCode);
+router.get("/create/resend-phone-code", checkAuthorisation, showResendPhoneCodeForm);
+router.post("/create/resend-phone-code", checkAuthorisation, resendMobileVerificationCode);
 
 router.get("/create/resend-email-code", showResendEmailCodeForm);
 router.post("/create/resend-email-code", resendEmailVerificationCode);

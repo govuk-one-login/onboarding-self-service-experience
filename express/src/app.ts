@@ -66,7 +66,7 @@ app.use("/", manageAccount);
 app.use("/", testingRoutes);
 
 app.get("/", function (req: Request, res: Response) {
-    res.render("index.njk", {active: "get-started"});
+    res.render("index.njk", {headerActiveItem: "get-started"});
 });
 
 app.locals.googleTagId = process.env.GOOGLE_TAG_ID;

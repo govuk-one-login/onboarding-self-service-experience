@@ -5,6 +5,7 @@ import {
     AdminUpdateUserAttributesCommandOutput,
     ChangePasswordCommandOutput,
     CodeMismatchException,
+    ForgotPasswordCommandOutput,
     GetUserAttributeVerificationCodeCommandOutput,
     NotAuthorizedException,
     RespondToAuthChallengeCommandOutput,
@@ -138,6 +139,10 @@ export class CognitoClient implements CognitoInterface {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput> {
+        return Promise.resolve({$metadata: {}});
+    }
+
+    forgotPassword(email: string): Promise<ForgotPasswordCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }
 

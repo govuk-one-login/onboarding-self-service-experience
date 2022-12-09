@@ -13,6 +13,7 @@ import {
     showClient,
     showPrivateBetaForm,
     showPrivateBetaFormSubmitted,
+    showVerifyMobileWithSmsCode,
     verifyMobileWithSmsCode
 } from "../controllers/manage-account";
 import {checkAuthorisation} from "../middleware/authoriser";
@@ -28,7 +29,7 @@ router.get("/account", checkAuthorisation, showAccount);
 router.get("/account/list-services", checkAuthorisation, listServices);
 
 router.get("/add-service-name", checkAuthorisation, showAddServiceForm);
-router.post("/create-service-name-validation", checkAuthorisation, serviceNameValidator, processAddServiceForm);
+router.post("/add-service-name", checkAuthorisation, serviceNameValidator, processAddServiceForm);
 
 // TODO This should have params :serviceId/:clientId but at the moment we're abusing the fact that each service only has one client
 router.get("/client-details/:serviceId", checkAuthorisation, showClient);
@@ -55,7 +56,19 @@ router.post(
     processChangePhoneNumberForm
 );
 
-router.post("/verify-phone-code", checkAuthorisation, mobileSecurityCodeValidator("/verify-phone-code", ""), verifyMobileWithSmsCode);
+router.get("/account/verify-phone-code", checkAuthorisation, showVerifyMobileWithSmsCode);
+
+router.post(
+    "/account/verify-phone-code",
+    checkAuthorisation,
+    // TODO refactor routers
+    (req, res, next) => {
+        res.locals.headerActiveItem = "your-account";
+        next();
+    },
+    mobileSecurityCodeValidator("/verify-phone-code", false),
+    verifyMobileWithSmsCode
+);
 
 router.get("/change-service-name/:serviceId/:selfServiceClientId/:clientId", checkAuthorisation, (req, res) => {
     res.render("account/change-service-name.njk", {
@@ -67,5 +80,15 @@ router.get("/change-service-name/:serviceId/:selfServiceClientId/:clientId", che
 });
 
 router.post("/change-service-name/:serviceId/:selfServiceClientId/:clientId", checkAuthorisation, processChangeServiceNameForm);
+
+router.get("/account/resend-phone-code", checkAuthorisation, (req, res) => {
+    res.render("common/resend-security-code.njk", {
+        securityCodeMethod: "phone"
+    });
+});
+
+router.post("/account/resend-phone-code", (req, res) => {
+    res.redirect("/account/verify-phone-code");
+});
 
 export default router;

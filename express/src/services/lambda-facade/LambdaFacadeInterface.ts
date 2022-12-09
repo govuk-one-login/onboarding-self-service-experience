@@ -3,11 +3,12 @@ import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
+import {Updates} from "../self-service-services-service";
 
 export default interface LambdaFacadeInterface {
     putUser(user: OnboardingTableItem, accessToken: string): Promise<AxiosResponse>;
 
-    updateUser(selfServiceUserId: string, updates: object, accessToken: string): Promise<AxiosResponse>;
+    updateUser(selfServiceUserId: string, updates: Updates, accessToken: string): Promise<AxiosResponse>;
 
     getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse>;
 

@@ -105,7 +105,7 @@ Feature: Users can sign up to the self-service experience
       And the user submits a correct security code
       And the user submits a valid password
       And the user submits a valid mobile phone number
-      Then they should be redirected to the "/create/enter-mobile" page
+      Then they should be redirected to the "/create/verify-phone-code" page
       And they should see the text "We sent a code to: 07700 900123"
 
     Scenario: The user submits an empty code
@@ -159,5 +159,5 @@ Feature: Users can sign up to the self-service experience
 
     Scenario: The user submits an empty service name
       When the user submits the service name ""
-      Then they should be redirected to the "/create-service-name-validation" page
+      Then they should be redirected to the "/add-service-name" page
       And the error message "Enter your service name" must be displayed for the "serviceName" field

@@ -20,9 +20,11 @@ import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpVal
 
 const router = express.Router();
 
-router.get("/sign-in", showSignInFormEmail);
 router.get("/session-timeout", sessionTimeout);
+
+router.get("/sign-in", showSignInFormEmail);
 router.post("/sign-in", emailValidator("sign-in.njk"), processEmailAddress);
+
 router.get(
     "/sign-in-password",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
@@ -36,9 +38,14 @@ router.post(
 );
 
 router.get("/sign-in-otp-mobile", showCheckPhonePage);
+
 router.post(
     "/sign-in-otp-mobile",
-    mobileSecurityCodeValidator("/sign-in-otp-mobile", "/resend-text-code"),
+    (req, res, next) => {
+        res.locals.headerActiveItem = "sign-in";
+        next();
+    },
+    mobileSecurityCodeValidator("/resend-text-code"),
     processSecurityCode,
     finishSignIn
 );

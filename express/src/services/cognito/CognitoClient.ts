@@ -23,6 +23,10 @@ import {
 import {AdminCreateUserCommandOutput} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/AdminCreateUserCommand";
 import CognitoInterface from "./CognitoInterface";
 
+/**
+ * Uses the [Amazon Cognito API]{@link https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/Welcome.html} to manage users
+ * @see [Amazon Cognito documentation]{@link https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html}
+ */
 export class CognitoClient implements CognitoInterface {
     cognitoClient;
     userPoolId: string | undefined;
@@ -187,6 +191,9 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
+    /**
+     * {@link https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_VerifyUserAttribute.html VerifyUserAttribute}
+     */
     async verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput> {
         const params = {
             AccessToken: accessToken,
