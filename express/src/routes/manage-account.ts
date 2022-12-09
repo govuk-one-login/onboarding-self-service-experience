@@ -83,6 +83,7 @@ router.post("/change-service-name/:serviceId/:selfServiceClientId/:clientId", ch
 
 router.get("/account/resend-phone-code", checkAuthorisation, (req, res) => {
     res.render("common/resend-security-code.njk", {
+        backLinkPath: "/account/verify-phone-code",
         securityCodeMethod: "phone"
     });
 });
