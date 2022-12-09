@@ -6,17 +6,17 @@ import {
     forgotPasswordForm,
     processEmailAddress,
     sessionTimeout,
-    showLoginOtpMobile,
+    showCheckPhonePage,
     showResendPhoneCodePage,
     showSignInFormEmail,
     showSignInFormPassword,
     signOut
 } from "../controllers/sign-in";
 import processSignInForm from "../middleware/processSignInForm";
-import {processLoginOtpMobile} from "../middleware/sign-in-middleware";
+import {processSecurityCode} from "../middleware/sign-in-middleware";
 import emailIsPresentInSession from "../middleware/validators/emailIsPresentInSession/emailIsPresentInSession";
 import {emailValidator} from "../middleware/validators/emailValidator";
-import {mobileOtpValidator} from "../middleware/validators/mobileOtpValidator";
+import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpValidator";
 
 const router = express.Router();
 
@@ -35,13 +35,18 @@ router.post(
     processSignInForm("sign-in-enter-password.njk")
 );
 
-router.get("/sign-in-otp-mobile", showLoginOtpMobile);
-router.post("/sign-in-otp-mobile", mobileOtpValidator("/sign-in-otp-mobile", "/resend-text-code"), processLoginOtpMobile, finishSignIn);
+router.get("/sign-in-otp-mobile", showCheckPhonePage);
+router.post(
+    "/sign-in-otp-mobile",
+    mobileSecurityCodeValidator("/sign-in-otp-mobile", "/resend-text-code"),
+    processSecurityCode,
+    finishSignIn
+);
 
 router.get("/resend-text-code", showResendPhoneCodePage);
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
-router.post("/resend-text-code", showLoginOtpMobile);
+router.post("/resend-text-code", showCheckPhonePage);
 
 router.get("/account/sign-out", signOut);
 router.get("/existing-account", accountExists);

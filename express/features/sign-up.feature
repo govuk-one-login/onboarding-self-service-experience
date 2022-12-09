@@ -18,19 +18,19 @@ Feature: Users can sign up to the self-service experience
       When the user submits the email "registering-successfullyyahoo.com"
       Then the error message "Enter an email address in the correct format, like name@example.com" must be displayed for the "emailAddress" field
 
-  Rule: The user tries to verify email OTP when creating an account
+  Rule: The user tries to verify email security code when creating an account
     Background:
       Given the user submits the email "registering-successfully@gds.gov.uk"
       Then they should be redirected to the "/create/check-email" page
 
-    Scenario: The user submits an empty OTP
+    Scenario: The user submits an empty security code
       When they click the Submit button
-      Then the error message "Enter the 6 digit security code" must be displayed for the "create-email-otp" field
+      Then the error message "Enter the 6 digit security code" must be displayed for the "securityCode" field
       And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
 
-    Scenario: The user enters an OTP in an incorrect format
-      When the user submits the email OTP "AA1234"
-      Then the error message "Your security code should only include numbers" must be displayed for the "create-email-otp" field
+    Scenario: The user enters a security code in an incorrect format
+      When the user submits the security code "AA1234"
+      Then the error message "Your security code should only include numbers" must be displayed for the "securityCode" field
       And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
 
   Rule: The user tries to sign up with an email that is already registered
@@ -41,7 +41,7 @@ Feature: Users can sign up to the self-service experience
       And they should see the text "An account already exists with the email address inuse@foo.gov.uk"
 
       When the user submits the password "this-is-not-a-common-password"
-      And the user submits the SMS OTP "123456"
+      And the user submits the security code "123456"
       Then they should be redirected to a page with path starting with "/client-details"
       And they should see the text "Your services"
 
@@ -62,7 +62,7 @@ Feature: Users can sign up to the self-service experience
   Rule: The user tries to set a password when creating an account
     Background:
       Given the user submits the email "registering-successfully@gds.gov.uk"
-      And the user submits a correct email OTP
+      And the user submits a correct security code
       Then they should be redirected to the "/create/update-password" page
 
     Scenario: The user tries to use a password on the list of common passwords
@@ -83,7 +83,7 @@ Feature: Users can sign up to the self-service experience
   Rule: The user tries to add a phone number when creating an account
     Background:
       Given the user submits the email "registering-successfully@gds.gov.uk"
-      And the user submits a correct email OTP
+      And the user submits a correct security code
       And the user submits a valid password
       Then they should be redirected to the "/create/enter-mobile" page
 
@@ -99,58 +99,58 @@ Feature: Users can sign up to the self-service experience
       When the user submits the mobile phone number "+17564319555"
       Then the error message "Enter a UK mobile phone number, like 07700 900000" must be displayed for the "mobileNumber" field
 
-  Rule: The user tries to verify the SMS OTP when creating an account
+  Rule: The user tries to verify the SMS security code when creating an account
     Background:
       Given the user submits the email "registering-successfully@gds.gov.uk"
-      And the user submits a correct email OTP
+      And the user submits a correct security code
       And the user submits a valid password
       And the user submits a valid mobile phone number
       Then they should be redirected to the "/create/enter-mobile" page
       And they should see the text "We sent a code to: 07700 900123"
 
     Scenario: The user submits an empty code
-      When the user submits the SMS OTP ""
+      When the user submits the security code ""
       Then they should be redirected to the "/create/verify-phone-code" page
-      And the error message "Enter the 6 digit security code" must be displayed for the "sms-otp" field
+      And the error message "Enter the 6 digit security code" must be displayed for the "securityCode" field
       And they should see the text "We sent a code to: 07700 900123"
 
     Scenario: The user submits a code with more than 6 digits
-      When the user submits the SMS OTP "1234567"
+      When the user submits the security code "1234567"
       Then they should be redirected to the "/create/verify-phone-code" page
-      And the error message "Enter the security code using only 6 digits" must be displayed for the "sms-otp" field
+      And the error message "Enter the security code using only 6 digits" must be displayed for the "securityCode" field
       And they should see the text "We sent a code to: 07700 900123"
 
     Scenario: The user submits a code with fewer than 6 digits
-      When the user submits the SMS OTP "12345"
+      When the user submits the security code "12345"
       Then they should be redirected to the "/create/verify-phone-code" page
-      And the error message "Enter the security code using only 6 digits" must be displayed for the "sms-otp" field
+      And the error message "Enter the security code using only 6 digits" must be displayed for the "securityCode" field
       And they should see the text "We sent a code to: 07700 900123"
 
     Scenario: The user submits a code with letters
-      When the user submits the SMS OTP "12345A"
+      When the user submits the security code "12345A"
       Then they should be redirected to the "/create/verify-phone-code" page
-      And the error message "Your security code should only include numbers" must be displayed for the "sms-otp" field
+      And the error message "Your security code should only include numbers" must be displayed for the "securityCode" field
       And they should see the text "We sent a code to: 07700 900123"
 
     Scenario: The user submits a code with special characters
-      When the user submits the SMS OTP "12345$"
+      When the user submits the security code "12345$"
       Then they should be redirected to the "/create/verify-phone-code" page
-      And the error message "Your security code should only include numbers" must be displayed for the "sms-otp" field
+      And the error message "Your security code should only include numbers" must be displayed for the "securityCode" field
       And they should see the text "We sent a code to: 07700 900123"
 
     Scenario: The user submits an incorrect code
-      When the user submits the SMS OTP "666666"
+      When the user submits the security code "666666"
       Then they should be redirected to the "/create/verify-phone-code" page
-      And the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the "sms-otp" field
+      And the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the "securityCode" field
       And they should see the text "We sent a code to: 07700 900123"
 
   Rule: The user tries to add a service when creating an account
     Background:
       Given the user submits the email "registering-successfully@gds.gov.uk"
-      And the user submits a correct email OTP
+      And the user submits a correct security code
       And the user submits a valid password
       And the user submits a valid mobile phone number
-      And the user submits a correct SMS OTP
+      And the user submits a correct security code
       Then they should be redirected to the "/add-service-name" page
 
     Scenario: The user types everything correctly, creates an account and adds a service

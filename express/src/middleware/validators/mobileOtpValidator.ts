@@ -1,16 +1,16 @@
 import {NextFunction, Request, Response} from "express";
 import {obscureNumber} from "../../lib/mobileNumberUtils";
-import {validateOtp} from "../../lib/validators/checkOtp";
+import {validateSecurityCode} from "../../lib/validators/checkOtp";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 
-export function mobileOtpValidator(
+export function mobileSecurityCodeValidator(
     formActionUrl: string,
     textMessageNotReceivedUrl: string,
     hideNumber = false
 ): MiddlewareFunction<Request, Response, NextFunction> {
     return async (req: Request, res: Response, next: NextFunction) => {
-        const otp: string = req.body["sms-otp"].trim();
+        const securityCode: string = req.body.securityCode.trim();
         let mobileNumber;
 
         if (hideNumber) {
@@ -19,19 +19,19 @@ export function mobileOtpValidator(
             mobileNumber = String(req.session.enteredMobileNumber);
         }
 
-        const validationResponse = validateOtp(otp);
+        const validationResponse = validateSecurityCode(securityCode);
         if (validationResponse.isValid) {
             next();
         } else {
             res.render("check-mobile.njk", {
                 values: {
-                    "sms-otp": otp,
+                    securityCode: securityCode,
                     mobileNumber: mobileNumber,
                     formActionUrl: formActionUrl,
                     textMessageNotReceivedUrl: textMessageNotReceivedUrl
                 },
                 errorMessages: {
-                    "sms-otp": validationResponse.errorMessage
+                    securityCode: validationResponse.errorMessage
                 }
             });
         }

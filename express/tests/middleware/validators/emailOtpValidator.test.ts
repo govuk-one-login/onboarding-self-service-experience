@@ -1,7 +1,7 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
-import {emailOtpValidator} from "../../../src/middleware/validators/emailOtpValidator";
+import {emailSecurityCodeValidator} from "../../../src/middleware/validators/emailOtpValidator";
 import {MfaResponse} from "../../../src/services/self-service-services-service";
 
 declare module "express-session" {
@@ -17,7 +17,7 @@ declare module "express-session" {
     }
 }
 
-describe("It checks whether an email OTP is valid and behaves accordingly", () => {
+describe("It checks whether an email security code is valid and behaves accordingly", () => {
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
     let nextFunction: NextFunction;
@@ -34,28 +34,28 @@ describe("It checks whether an email OTP is valid and behaves accordingly", () =
         mockResponse = {render: jest.fn()};
     });
 
-    it("calls the NextFunction if the OTP is valid", () => {
-        mockRequest.body["create-email-otp"] = "123456";
-        emailOtpValidator(mockRequest as Request, mockResponse as Response, nextFunction);
+    it("calls the NextFunction if the security code is valid", () => {
+        mockRequest.body.securityCode = "123456";
+        emailSecurityCodeValidator(mockRequest as Request, mockResponse as Response, nextFunction);
         expect(nextFunction).toHaveBeenCalled();
     });
 
-    it("renders check your email page with the correct values if the OTP is not valid", () => {
+    it("renders check your email page with the correct values if the security code is not valid", () => {
         mockSession.emailAddress = "render-this@test.gov.uk";
-        mockRequest.body["create-email-otp"] = "123";
+        mockRequest.body.securityCode = "123";
         mockResponse = {
             render: jest.fn()
         };
 
-        emailOtpValidator(mockRequest as Request, mockResponse as Response, nextFunction);
+        emailSecurityCodeValidator(mockRequest as Request, mockResponse as Response, nextFunction);
 
         expect(mockResponse.render).toHaveBeenCalledWith("create-account/check-email.njk", {
             values: {
                 emailAddress: "render-this@test.gov.uk",
-                "create-email-otp": "123"
+                securityCode: "123"
             },
             errorMessages: {
-                "create-email-otp": "Enter the security code using only 6 digits"
+                securityCode: "Enter the security code using only 6 digits"
             }
         });
     });

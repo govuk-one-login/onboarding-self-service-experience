@@ -301,11 +301,10 @@ router.get("/check-email-visual-test", (req, res) => {
 });
 
 router.post("/check-email-visual-test", async (req, res) => {
-    const otp = req.body["change-email-otp"];
-    if (otp === "") {
+    if (req.body.securityCode === "") {
         res.render("account/check-email.njk", {
             errorMessages: {
-                "change-email-otp": "Your code should be 6 characters long"
+                securityCode: "Your code should be 6 characters long"
             }
         });
 
@@ -358,14 +357,13 @@ router.get("/security-check-change-number", (req, res) => {
 });
 
 router.post("/security-check-change-number", async (req, res) => {
-    const emailOtp = req.body["create-email-otp"];
-    if (emailOtp === "") {
+    if (req.body.securityCode === "") {
         res.render("security-check-change-number.njk", {
             values: {
                 emailAddress: "your.email@digital.cabinet-office.gov.uk"
             },
             errorMessages: {
-                "create-email-otp": "Enter the security code"
+                securityCode: "Enter the security code"
             }
         });
 

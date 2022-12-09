@@ -16,7 +16,7 @@ import {
     verifyMobileWithSmsCode
 } from "../controllers/manage-account";
 import {checkAuthorisation} from "../middleware/authoriser";
-import {mobileOtpValidator} from "../middleware/validators/mobileOtpValidator";
+import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpValidator";
 import validateMobileNumber from "../middleware/validators/mobileValidator";
 import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
 import {serviceNameValidator} from "../middleware/validators/serviceNameValidator";
@@ -55,7 +55,7 @@ router.post(
     processChangePhoneNumberForm
 );
 
-router.post("/verify-phone-code", checkAuthorisation, mobileOtpValidator("/verify-phone-code", ""), verifyMobileWithSmsCode);
+router.post("/verify-phone-code", checkAuthorisation, mobileSecurityCodeValidator("/verify-phone-code", ""), verifyMobileWithSmsCode);
 
 router.get("/change-service-name/:serviceId/:selfServiceClientId/:clientId", checkAuthorisation, (req, res) => {
     res.render("account/change-service-name.njk", {
