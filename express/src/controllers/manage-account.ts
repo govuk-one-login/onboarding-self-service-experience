@@ -57,7 +57,7 @@ export const showClient = async function (req: Request, res: Response) {
         redirectUrls: client.redirectUris.join(" "),
         userAttributesRequired: client.scopes.join(", "),
         userPublicKey: client.publicKey == defaultPublicKey ? "" : client.publicKey,
-        postLogoutRedirectUrls: client.logoutUris.join(" "),
+        postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURI(
@@ -73,7 +73,7 @@ export const showClient = async function (req: Request, res: Response) {
                 client.publicKey
             )}`,
             changePostLogoutUris: `/change-post-logout-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
-                client.logoutUris.join(" ")
+                client.postLogoutUris.join(" ")
             )}`
         }
     });

@@ -22,7 +22,7 @@ export interface Client {
     clientName: string;
     contacts: string[];
     defaultFields: string[];
-    logoutUris: string[];
+    postLogoutUris: string[];
     publicKey: string;
     redirectUris: string[];
     scopes: string[];

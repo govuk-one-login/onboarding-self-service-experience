@@ -62,16 +62,16 @@ router.get("/change-redirect-uris/:serviceId/:selfServiceClientId/:clientId", (r
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
         values: {
-            redirectURIs: req.query.redirectUris
+            redirectUris: req.query.redirectUris
         }
     });
 });
 
 router.post(
     "/change-redirect-uris/:serviceId/:selfServiceClientId/:clientId",
-    urisValidator("service-details/change-redirect-uris.njk", "redirectURIs"),
+    urisValidator("service-details/change-redirect-uris.njk"),
     async (req, res) => {
-        const redirectUris = req.body.redirectURIs.split(" ").filter((url: string) => url !== "");
+        const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
         const s4: SelfServiceServicesService = req.app.get("backing-service");
 
         await s4.updateClient(
@@ -133,16 +133,16 @@ router.get("/change-post-logout-uris/:serviceId/:selfServiceClientId/:clientId",
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
         values: {
-            postLogoutURIs: req.query.redirectUris
+            redirectUris: req.query.redirectUris
         }
     });
 });
 
 router.post(
     "/change-post-logout-uris/:serviceId/:selfServiceClientId/:clientId",
-    urisValidator("service-details/change-post-logout-uris.njk", "postLogoutURIs"),
+    urisValidator("service-details/change-post-logout-uris.njk"),
     async (req, res) => {
-        const postLogoutUris = req.body.postLogoutURIs.split(" ").filter((url: string) => url !== "");
+        const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
         const s4: SelfServiceServicesService = req.app.get("backing-service");
 
         await s4.updateClient(

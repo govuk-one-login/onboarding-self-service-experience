@@ -24,15 +24,15 @@ describe("it calls the NextFunction if the URIs are valid or renders an error pa
     });
 
     it("works calls the next function with valid URLs", () => {
-        mockRequest.body.theseUris = "https://valid.gov.uk/ https://also-valid.gov.uk";
-        urisValidator("some-template.njk", "theseUris")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+        mockRequest.body.redirectUris = "https://valid.gov.uk/ https://also-valid.gov.uk";
+        urisValidator("some-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
         expect(nextFunction).toHaveBeenCalledTimes(1);
         expect(mockResponse.render).toHaveBeenCalledTimes(0);
     });
 
     it("works calls the render function with invalid URLs", () => {
-        mockRequest.body.theseUris = "http://invalid.gov.uk/ http://also-invalid.gov.uk";
-        urisValidator("some-template.njk", "theseUris")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+        mockRequest.body.redirectUris = "http://invalid.gov.uk/ http://also-invalid.gov.uk";
+        urisValidator("some-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
         expect(nextFunction).toHaveBeenCalledTimes(0);
         expect(mockResponse.render).toHaveBeenCalledTimes(1);
     });
