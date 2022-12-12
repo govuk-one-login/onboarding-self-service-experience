@@ -1,0 +1,19 @@
+%tick-cross {
+  @include govuk-font(19);
+  display: inline-block;
+  background-size: 19px 19px;
+  background-repeat: no-repeat;
+  background-position: 0 5px;
+  padding: 2px 0 2px 25px;
+}
+
+.tick-cross {
+  &-tick {
+    @extend %tick-cross;
+    background-image: url('images/tick.svg');
+  }
+  &-cross {
+    @extend %tick-cross;
+    background-image: url('images/cross-grey.svg');
+  }
+}

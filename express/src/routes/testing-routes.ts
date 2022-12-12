@@ -446,4 +446,99 @@ router.post("/wrong-email-code", async (req, res) => {
     res.render("account/check-email.njk");
 });
 
+// Testing route for 'Team members' page
+router.get("/team-members", (req, res) => {
+    res.render("service-details/team-members.njk", {
+        serviceName: "Frontend Test Service",
+        users: [
+            {
+                userPersonalName: "Courtney Toth",
+                isCurrentUser: true,
+                userEmail: "courtney.toth@gov.uk.cabinet-office.gov.uk",
+                permissions: {
+                    "Manage team members": true,
+                    "Change integration client details": true,
+                    "Change service name": true,
+                    "Request to join private beta": true
+                }
+            },
+            {
+                userPersonalName: "Beth Walton",
+                isCurrentUser: false,
+                userEmail: "beth.walton@gov.cabinet-office.gov.uk",
+                permissions: {
+                    "Manage team members": true,
+                    "Change integration client details": false,
+                    "Change service name": false,
+                    "Request to join private beta": true
+                }
+            },
+            {
+                userPersonalName: "Onyebuchi Hathway",
+                isCurrentUser: false,
+                userEmail: "onyebuchi.hathwayk@gov.cabinet-office.gov.uk",
+                permissions: {
+                    "Manage team members": false,
+                    "Change integration client details": true,
+                    "Change service name": true,
+                    "Request to join private beta": false
+                }
+            },
+            {
+                userPersonalName: "Robin Jöllenbeck",
+                isCurrentUser: false,
+                userEmail: "robin.jöllenbeck@gov.cabinet-office.gov.uk",
+                permissions: {
+                    "Manage team members": false,
+                    "Change integration client details": true,
+                    "Change service name": true,
+                    "Request to join private beta": false
+                }
+            },
+            {
+                userPersonalName: "Wallace Martinez",
+                isCurrentUser: false,
+                userEmail: "wallace.martinez@gov.cabinet-office.gov.uk",
+                permissions: {
+                    "Manage team members": false,
+                    "Change integration client details": false,
+                    "Change service name": false,
+                    "Request to join private beta": false
+                }
+            },
+            {
+                userPersonalName: "Zawadi Cameron",
+                isCurrentUser: false,
+                userEmail: "zawadi.cameron@gov.cabinet-office.gov.uk",
+                permissions: {
+                    "Manage team members": false,
+                    "Change integration client details": true,
+                    "Change service name": false,
+                    "Request to join private beta": false
+                }
+            }
+        ],
+        pendingInvitations: [
+            {
+                userEmail: "james.pirot@gov.cabinet-office.gov.uk",
+                permissions: {
+                    "Manage team members": false,
+                    "Change integration client details": false,
+                    "Change service name": true,
+                    "Request to join private beta": false
+                }
+            },
+            {
+                userEmail: "leighton.brey@gov.cabinet-office.gov.uk",
+                permissions: {
+                    "Manage team members": true,
+                    "Change integration client details": true,
+                    "Change service name": true,
+                    "Request to join private beta": true
+                }
+            }
+        ]
+    });
+});
+
 export default router;
