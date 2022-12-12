@@ -8,7 +8,7 @@ export const showSignInFormEmail = async function (req: Request, res: Response) 
     res.render("sign-in.njk");
 };
 
-export const showLoginOtpMobile = async function (req: Request, res: Response) {
+export const showCheckPhonePage = async function (req: Request, res: Response) {
     // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
         res.redirect("/sign-in");

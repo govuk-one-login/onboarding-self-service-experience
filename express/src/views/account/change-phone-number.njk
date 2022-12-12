@@ -1,17 +1,8 @@
-{% extends "layout/form.njk" %}
+{% extends "common/change-phone-number.njk" %}
 
 {% set headerActiveItem = "your-account" %}
 {% set pageTitle = "Change phone number" %}
 {% set formAction = "/change-phone-number" %}
-{% set formButtonText = "Confirm" %}
 {% set formCancelUrl = "/account" %}
 
-{% block beforeForm %}
-  <h1 class="govuk-heading-l">Change your mobile phone number</h1>
-  <p class="govuk-body">We will send a 6 digit security code to this number every time you sign in.</p>
-  <p class="govuk-body">You must use a UK mobile phone number.</p>
-{% endblock %}
-
-{% block formInputs %}
-  {{ form.mobileNumberInput() }}
-{% endblock %}
+{% set heading = "Change your mobile phone number" %}

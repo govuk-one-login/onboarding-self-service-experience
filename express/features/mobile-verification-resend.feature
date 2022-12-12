@@ -3,7 +3,7 @@ Feature: A contact form to resend the verification code to mobile
   Background:
     Given that the user is on the "/create/get-email" page
     And the user submits the email "registering-successfully@gds.gov.uk"
-    And the user submits the email OTP "435553"
+    And the user submits the security code "435553"
     And the user submits the password "this-is-not-a-common-password"
     And the user submits the mobile phone number "+447700900000"
     Then they should be redirected to the "/create/enter-mobile" page

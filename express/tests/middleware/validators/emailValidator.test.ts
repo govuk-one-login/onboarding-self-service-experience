@@ -34,7 +34,7 @@ describe("It checks whether an email is valid and behaves accordingly", () => {
         mockResponse = {render: jest.fn()};
     });
 
-    it("calls the NextFunction if the OTP is valid", async () => {
+    it("calls the NextFunction if the security code is valid", async () => {
         mockRequest.body.emailAddress = "valid@test.gov.uk";
         await emailValidator("sign-in.njk")(mockRequest as Request, mockResponse as Response, nextFunction);
         expect(nextFunction).toHaveBeenCalled();

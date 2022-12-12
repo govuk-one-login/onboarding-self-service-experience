@@ -35,23 +35,24 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
 
 export const showCheckEmailForm = function (req: Request, res: Response) {
     if (!req.session.emailAddress) {
-        console.error("showCheckEmailForm::emailAddress not in the session, redirecting to /create/get-email");
         res.redirect("/create/get-email");
         return;
     }
+
     res.render("create-account/check-email.njk", {values: {emailAddress: req.session.emailAddress}});
 };
 
-export const submitEmailOtp = async function (req: Request, res: Response, next: NextFunction) {
+export const submitEmailSecurityCode = async function (req: Request, res: Response, next: NextFunction) {
     if (!req.session.emailAddress) {
         console.error("submitEmailOtp::EmailAddress is not in the session, redirecting to submitEmailOtp");
         res.redirect("/create/get-email");
         return;
     }
+
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
     try {
-        const response = await s4.submitUsernamePassword(req.session.emailAddress as string, req.body["create-email-otp"]);
+        const response = await s4.submitUsernamePassword(req.session.emailAddress as string, req.body.securityCode);
         req.session.cognitoSession = response.Session;
         res.redirect("/create/update-password");
         return;
@@ -60,9 +61,10 @@ export const submitEmailOtp = async function (req: Request, res: Response, next:
             res.render("create-account/check-email.njk", {
                 values: {emailAddress: req.session.emailAddress as string},
                 errorMessages: {
-                    "create-email-otp": "The code you entered is not correct or has expired - enter it again or request a new code"
+                    securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
                 }
             });
+
             return;
         } else {
             next(error);
@@ -150,8 +152,8 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         return;
     }
 
-    const otp = req.body["sms-otp"];
-    if (otp === undefined) {
+    const securityCode = req.body.securityCode;
+    if (securityCode === undefined) {
         res.render("check-mobile.njk", {
             values: {
                 mobileNumber: req.session.mobileNumber,
@@ -159,12 +161,13 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
                 textMessageNotReceivedUrl: "/create/resend-phone-code"
             }
         });
+
         return;
     }
 
     try {
         const s4: SelfServiceServicesService = req.app.get("backing-service");
-        await s4.verifyMobileUsingSmsCode(req.session.authenticationResult?.AccessToken, otp);
+        await s4.verifyMobileUsingSmsCode(req.session.authenticationResult?.AccessToken, securityCode);
 
         const email = AuthenticationResultParser.getEmail(req.session.authenticationResult);
         const phone = req.session.enteredMobileNumber as string;
@@ -187,20 +190,21 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         return;
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            const value = req.body["sms-otp"];
             res.render("check-mobile.njk", {
                 values: {
                     mobileNumber: req.session.enteredMobileNumber,
-                    "sms-otp": value,
+                    securityCode: req.body.securityCode,
                     formActionUrl: "/create/verify-phone-code",
                     textMessageNotReceivedUrl: "/create/resend-phone-code"
                 },
                 errorMessages: {
-                    "sms-otp": "The code you entered is not correct or has expired - enter it again or request a new code"
+                    securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
                 }
             });
+
             return;
         }
+
         console.error(error);
         res.redirect("/there-is-a-problem");
         return;

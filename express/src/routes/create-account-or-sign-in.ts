@@ -1,7 +1,6 @@
 import express, {Request, Response} from "express";
 import "express-async-errors";
 import {
-    submitEmailOtp,
     processEnterMobileForm,
     processGetEmailForm,
     resendEmailVerificationCode,
@@ -12,15 +11,16 @@ import {
     showNewPasswordForm,
     showResendEmailCodeForm,
     showResendPhoneCodeForm,
+    submitEmailSecurityCode,
     submitMobileVerificationCode,
     updatePassword
 } from "../controllers/create-account";
+import {emailSecurityCodeValidator} from "../middleware/validators/emailOtpValidator";
 import {emailValidator} from "../middleware/validators/emailValidator";
-import {mobileOtpValidator} from "../middleware/validators/mobileOtpValidator";
+import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpValidator";
+import validateMobileNumber from "../middleware/validators/mobileValidator";
 import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
 import {passwordValidator} from "../middleware/validators/passwordValidator";
-import {emailOtpValidator} from "../middleware/validators/emailOtpValidator";
-import validateMobileNumber from "../middleware/validators/mobileValidator";
 
 const router = express.Router();
 
@@ -28,9 +28,10 @@ router.get("/create/get-email", showGetEmailForm);
 router.post("/create/get-email", emailValidator("create-account/get-email.njk"), processGetEmailForm);
 
 router.get("/create/check-email", showCheckEmailForm);
-router.post("/create/check-email", emailOtpValidator, submitEmailOtp);
+router.post("/create/check-email", emailSecurityCodeValidator, submitEmailSecurityCode);
 
 router.get("/create/update-password", showNewPasswordForm);
+
 router.post(
     "/create/update-password",
     passwordValidator("create-account/new-password.njk"),
@@ -43,7 +44,7 @@ router.post("/create/enter-mobile", validateMobileNumber("create-account/enter-m
 
 router.post(
     "/create/verify-phone-code",
-    mobileOtpValidator("/create/verify-phone-code", "/create/resend-phone-code"),
+    mobileSecurityCodeValidator("/create/verify-phone-code", "/create/resend-phone-code"),
     submitMobileVerificationCode
 );
 

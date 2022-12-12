@@ -110,8 +110,8 @@ When("the user submits the email {string}", async function (email: string) {
     await clickSubmitButton(this.page);
 });
 
-When("the user submits the email OTP {string}", async function (emailOtp: string) {
-    await enterTextIntoTextInput(this.page, emailOtp, "create-email-otp");
+When("the user submits the security code {string}", async function (securityCode: string) {
+    await enterTextIntoTextInput(this.page, securityCode, "securityCode");
     await clickSubmitButton(this.page);
 });
 

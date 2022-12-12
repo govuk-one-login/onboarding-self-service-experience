@@ -4,7 +4,7 @@ Feature: A page where users can view and change the details associated with thei
     Given that the user is on the "/sign-in" page
     And the user submits the email "registered@gds.gov.uk"
     And the user submits the password "this-is-not-a-common-password"
-    And the user submits the SMS OTP "123123"
+    And the user submits the security code "123123"
     Then they should be redirected to a page with path starting with "/client-details"
 
     When they click on the "Your account" link
@@ -18,20 +18,20 @@ Feature: A page where users can view and change the details associated with thei
       Then the user submits the mobile phone number "0770 9000 124"
 
     Scenario: The user successfully changes their phone number
-      When the user submits the SMS OTP "123456"
+      When the user submits the security code "123456"
       Then they should be redirected to the "/account" page
       And they should see the text "You have changed your mobile phone number"
       And they should see the text "0770 9000 124"
 
     Scenario: The user tries to change their phone number but enters an incorrect SMS code
-      When the user submits the SMS OTP "666666"
+      When the user submits the security code "666666"
       Then they should be redirected to the "/verify-phone-code" page
       And they should see the text "The code you entered is not correct or has expired - enter it again or request a new code"
 
     # TODO this test doesn't check the resending of the phone code
     Scenario: The user tries to change their phone number but needs a new SMS code
-      When the user submits the SMS OTP "666666"
-      Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the "sms-otp" field
+      When the user submits the security code "666666"
+      Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the "securityCode" field
       And they should see the text "We sent a code to: 0770 9000 124"
 
       When they click on the "Problems receiving a text message?" link

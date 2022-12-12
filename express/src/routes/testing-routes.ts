@@ -62,16 +62,16 @@ router.get("/change-redirect-uris/:serviceId/:selfServiceClientId/:clientId", (r
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
         values: {
-            redirectURIs: req.query.redirectUris
+            redirectUris: req.query.redirectUris
         }
     });
 });
 
 router.post(
     "/change-redirect-uris/:serviceId/:selfServiceClientId/:clientId",
-    urisValidator("service-details/change-redirect-uris.njk", "redirectURIs"),
+    urisValidator("service-details/change-redirect-uris.njk"),
     async (req, res) => {
-        const redirectUris = req.body.redirectURIs.split(" ").filter((url: string) => url !== "");
+        const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
         const s4: SelfServiceServicesService = req.app.get("backing-service");
 
         await s4.updateClient(
@@ -133,16 +133,16 @@ router.get("/change-post-logout-uris/:serviceId/:selfServiceClientId/:clientId",
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
         values: {
-            postLogoutURIs: req.query.redirectUris
+            redirectUris: req.query.redirectUris
         }
     });
 });
 
 router.post(
     "/change-post-logout-uris/:serviceId/:selfServiceClientId/:clientId",
-    urisValidator("service-details/change-post-logout-uris.njk", "postLogoutURIs"),
+    urisValidator("service-details/change-post-logout-uris.njk"),
     async (req, res) => {
-        const postLogoutUris = req.body.postLogoutURIs.split(" ").filter((url: string) => url !== "");
+        const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
         const s4: SelfServiceServicesService = req.app.get("backing-service");
 
         await s4.updateClient(
@@ -301,15 +301,16 @@ router.get("/check-email-visual-test", (req, res) => {
 });
 
 router.post("/check-email-visual-test", async (req, res) => {
-    const otp = req.body["change-email-otp"];
-    if (otp === "") {
+    if (req.body.securityCode === "") {
         res.render("account/check-email.njk", {
             errorMessages: {
-                "change-email-otp": "Your code should be 6 characters long"
+                securityCode: "Your code should be 6 characters long"
             }
         });
+
         return;
     }
+
     res.redirect("/account");
 });
 
@@ -356,14 +357,13 @@ router.get("/security-check-change-number", (req, res) => {
 });
 
 router.post("/security-check-change-number", async (req, res) => {
-    const emailOtp = req.body["create-email-otp"];
-    if (emailOtp === "") {
+    if (req.body.securityCode === "") {
         res.render("security-check-change-number.njk", {
             values: {
                 emailAddress: "your.email@digital.cabinet-office.gov.uk"
             },
             errorMessages: {
-                "create-email-otp": "Enter the security code"
+                securityCode: "Enter the security code"
             }
         });
 
@@ -444,6 +444,17 @@ router.get("/wrong-email-code", (req, res) => {
 // When implementing the backend, depending on journey we should request new code and after that redirect or render the appropriate template - depending on implementation
 router.post("/wrong-email-code", async (req, res) => {
     res.render("account/check-email.njk");
+});
+
+router.get("/resend-email-code", async (req, res) => {
+    res.render("common/resend-security-code.njk", {
+        securityCodeMethod: "email",
+        backLinkPath: "/security-check-change-number"
+    });
+});
+
+router.post("/resend-email-code", async (req, res) => {
+    res.redirect("/security-check-change-number");
 });
 
 // Testing route for 'Team members' page

@@ -1,25 +1,4 @@
-{% extends "layout/base.njk" %}
-{% from "macros/back-link.njk" import backLink %}
+{% extends "common/resend-security-code.njk" %}
 
-{% set pageTitle = "Resend security code" %}
-{% set backLink = backLink("/create/enter-mobile") %}
-
-{% block mainContent %}
-  <h1 class="govuk-heading-l">
-    Resend security code
-  </h1>
-
-  <p class="govuk-body">
-    If you did not receive a code, we can send you a new one.
-  </p>
-
-  <form method="post" action="/create/resend-email-code">
-    {{ govukButton({ text: "Resend security code", attributes: {id: "submit"} }) }}
-  </form>
-
-  <p class="govuk-body">
-    If you no longer have access to the email address you used to set up your account, let us know through our
-    <a class="govuk-link" id="support-form" href="https://www.sign-in.service.gov.uk/support">support form</a> or
-    <a class="govuk-link" id="slack-channel" href="https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC">Slack channel</a>.
-  </p>
-{% endblock %}
+{% set backLinkPath = "/create/enter-mobile" %}
+{% set securityCodeMethod = "email" %}

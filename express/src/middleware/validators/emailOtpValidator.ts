@@ -1,11 +1,11 @@
 import {NextFunction, Request, Response} from "express";
-import {validateOtp} from "../../lib/validators/checkOtp";
+import {validateSecurityCode} from "../../lib/validators/checkOtp";
 import {validationResult} from "../../lib/validators/validationResult";
 
-export async function emailOtpValidator(req: Request, res: Response, next: NextFunction) {
-    const otpToTest = req.body["create-email-otp"].trim();
+export async function emailSecurityCodeValidator(req: Request, res: Response, next: NextFunction) {
+    const securityCode = req.body.securityCode.trim();
 
-    const result: validationResult = validateOtp(otpToTest);
+    const result: validationResult = validateSecurityCode(securityCode);
 
     if (result.isValid) {
         next();
@@ -13,10 +13,10 @@ export async function emailOtpValidator(req: Request, res: Response, next: NextF
         res.render("create-account/check-email.njk", {
             values: {
                 emailAddress: req.session.emailAddress as string,
-                "create-email-otp": otpToTest
+                securityCode: securityCode
             },
             errorMessages: {
-                "create-email-otp": result.errorMessage
+                securityCode: result.errorMessage
             }
         });
     }

@@ -1,21 +1,10 @@
-{% extends "layout/base.njk" %}
-{% from "macros/back-link.njk" import backLink %}
+{% extends "common/resend-security-code.njk" %}
 
-{% set backLink = backLink("/sign-in-otp-mobile") %}
+{% set backLinkPath = "/sign-in-otp-mobile" %}
+{% set formAction = "/resend-text-code" %}
+{% set securityCodeMethod = "phone" %}
 
-{% block mainContent %}
-  <h1 class="govuk-heading-l">
-    Resend security code to your mobile phone
-  </h1>
-
-  <p class="govuk-body">
-    If you did not receive a code, we can send you a new one.
-  </p>
-
-  <form method="post" action="/resend-text-code">
-    {{ govukButton({ text: "Resend security code", attributes: {id: "submit"} }) }}
-  </form>
-
+{% block afterForm %}
   <p class="govuk-body">
     If you no longer have access to the phone number linked to your account, you can
     <a class="govuk-link" href="/security-check-change-number">change your phone number</a>.

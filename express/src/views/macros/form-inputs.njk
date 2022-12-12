@@ -45,8 +45,8 @@
   }) }}
 {% endmacro %}
 
-{% macro emailInput(label, id, hint, classes = "govuk-!-width-three-quarters") %}
-  {{ textInput(label | default("Email address"), id | default("emailAddress"), classes, hint, "email", "email") }}
+{% macro emailInput(label, hint, classes = "govuk-!-width-three-quarters") %}
+  {{ textInput(label | default("Email address"), "emailAddress", classes, hint, "email", "email") }}
 {% endmacro %}
 
 {% macro passwordInput(label, id, hint, autocomplete = "new-password") %}
@@ -60,16 +60,16 @@
   </div>
 {% endmacro %}
 
-{% macro securityCodeInput(id) %}
-  {{ textInput("Enter the 6 digit security code", id, "govuk-input--width-5", inputmode = "numeric") }}
+{% macro securityCodeInput() %}
+  {{ textInput("Enter the 6 digit security code", "securityCode", "govuk-input--width-5", inputmode = "numeric") }}
 {% endmacro %}
 
-{% macro mobileNumberInput(label = "UK mobile phone number", id = "mobileNumber") %}
-  {{ textInput(label, id, "govuk-!-width-one-half", type = "tel", autocomplete = "tel") }}
+{% macro mobileNumberInput(label = "UK mobile phone number") %}
+  {{ textInput(label, "mobileNumber", "govuk-!-width-one-half", type = "tel", autocomplete = "tel") }}
 {% endmacro %}
 
-{% macro urlInput(label, id) %}
-  {{ textInput(label, id, "govuk-!-width-full", "Enter URIs starting with https://", "url", "url") }}
+{% macro urlInput(label) %}
+  {{ textInput(label, "redirectUris", "govuk-!-width-full", "Enter URIs starting with https://", "url", "url") }}
 {% endmacro %}
 
 {% macro hiddenInput(id, value) %}

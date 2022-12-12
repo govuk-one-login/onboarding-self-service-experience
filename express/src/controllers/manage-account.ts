@@ -57,7 +57,7 @@ export const showClient = async function (req: Request, res: Response) {
         redirectUrls: client.redirectUris.join(" "),
         userAttributesRequired: client.scopes.join(", "),
         userPublicKey: client.publicKey == defaultPublicKey ? "" : client.publicKey,
-        postLogoutRedirectUrls: client.logoutUris.join(" "),
+        postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURI(
@@ -73,7 +73,7 @@ export const showClient = async function (req: Request, res: Response) {
                 client.publicKey
             )}`,
             changePostLogoutUris: `/change-post-logout-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
-                client.logoutUris.join(" ")
+                client.postLogoutUris.join(" ")
             )}`
         }
     });
@@ -387,7 +387,7 @@ export const verifyMobileWithSmsCode = async function (req: Request, res: Respon
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     const accessToken = req.session.authenticationResult?.AccessToken as string;
     try {
-        await s4.verifyMobileUsingSmsCode(accessToken, req.body["sms-otp"]);
+        await s4.verifyMobileUsingSmsCode(accessToken, req.body.securityCode);
         await s4.setMobilePhoneAsVerified(
             AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType) as string
         );
@@ -398,17 +398,15 @@ export const verifyMobileWithSmsCode = async function (req: Request, res: Respon
         );
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            const message = "The code you entered is not correct or has expired - enter it again or request a new code";
-            const value = req.body["sms-otp"];
             res.render("check-mobile.njk", {
                 values: {
-                    "sms-otp": value,
+                    securityCode: req.body.securityCode,
                     mobileNumber: req.session.mobileNumber,
                     formActionUrl: "/verify-phone-code",
                     textMessageNotReceivedUrl: "/create/resend-phone-code"
                 },
                 errorMessages: {
-                    "sms-otp": message
+                    securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
                 }
             });
 

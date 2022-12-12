@@ -1,17 +1,13 @@
-{% extends "layout/base.njk" %}
+{% extends "layout/form.njk" %}
 
 {% set pageTitle = values.pageTitle %}
+{% set formAction = values.formActionUrl %}
+{% set formButtonText = "Get a new code" %}
 
-{% block mainContent %}
+{% block beforeForm %}
   <h1 class="govuk-heading-l">
     You entered the wrong security code too many times
   </h1>
 
   <p class="govuk-body">You need to get a new code and try again.</p>
-
-  <form method="post" action={{ values.formActionUrl }}>
-    {{ govukButton({ text: "Get a new code", attributes: {id: "submit"} }) }}
-  </form>
-
 {% endblock %}
-
