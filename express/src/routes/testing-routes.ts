@@ -552,4 +552,15 @@ router.get("/team-members", (req, res) => {
     });
 });
 
+//// Testing routes for Create 'invite team member' page
+router.get("/invite-team-member", (req, res) => {
+    res.render("service-details/invite-team-member.njk", {
+        serviceName: "Frontend Test Service"
+    });
+});
+
+router.post("/invite-team-member", emailValidator("service-details/invite-team-member.njk"), async (req, res) => {
+    res.redirect("/invitation-sent");
+});
+
 export default router;
