@@ -24,24 +24,26 @@
 
 {% block content %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-third">
-      <nav class="side-navigation govuk-!-margin-top-3">
-        <ul class="govuk-list side-navigation__list">
-          <li class="side-navigation__item{% if sidebarActiveItem == 'client-details' %} side-navigation__item--active{% endif %}">
-            <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client details</a>
-          </li>
-          <li class="side-navigation__item{% if sidebarActiveItem == 'team-members' %} side-navigation__item--active{% endif %}">
-            <a class="govuk-link govuk-link--no-visited-state" href="/team-members">Team members</a>
-          </li>
-          <li class="side-navigation__item{% if sidebarActiveItem == 'private-beta' %} side-navigation__item--active{% endif %}">
-            <a class="govuk-link govuk-link--no-visited-state" href="/private-beta/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}">
-              Joining private beta
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-
+    {% if sidebarNavigationState === "disabled" %}
+    {% else %}
+      <div class="govuk-grid-column-one-third">
+        <nav class="side-navigation govuk-!-margin-top-3">
+          <ul class="govuk-list side-navigation__list">
+            <li class="side-navigation__item{% if sidebarActiveItem == 'client-details' %} side-navigation__item--active{% endif %}">
+              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client details</a>
+            </li>
+            <li class="side-navigation__item{% if sidebarActiveItem == 'team-members' %} side-navigation__item--active{% endif %}">
+              <a class="govuk-link govuk-link--no-visited-state" href="/team-members">Team members</a>
+            </li>
+            <li class="side-navigation__item{% if sidebarActiveItem == 'private-beta' %} side-navigation__item--active{% endif %}">
+              <a class="govuk-link govuk-link--no-visited-state" href="/private-beta/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}">
+                Joining private beta
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
     <div class="govuk-grid-column-two-thirds left-nav-service-details">
       {% block mainContent %}{% endblock %}
     </div>
