@@ -7,6 +7,7 @@ import {
     clickElement,
     clickSubmitButton,
     enterTextIntoTextInput,
+    getButtonAnchor,
     getButtonLink,
     getButtonWithText,
     getLink,
@@ -32,8 +33,26 @@ When("they click on the link that points to {string}", async function (href: str
 });
 
 When("they click on the {string} button-link", async function (text: string) {
-    const link = await getButtonLink(this.page, text);
+    const link = await getButtonAnchor(this.page, text);
     await clickElement(this.page, link);
+});
+
+When("they toggle the {string} link", async function (text: string) {
+    const link = await getButtonLink(this.page, text, "gem-c-show-password__toggle", "password");
+    await link.click();
+});
+
+Then("they see the toggle {string} link", async function (text: string) {
+    await getButtonLink(this.page, text, "gem-c-show-password__toggle", "password");
+});
+
+When("they toggle {string} link on field {string}", async function (text: string, fieldName: string) {
+    const link = await getButtonLink(this.page, text, "gem-c-show-password__toggle", fieldName);
+    await link.click();
+});
+
+Then("they see the toggle {string} link on field {string}", async function (text: string, fieldName: string) {
+    await getButtonLink(this.page, text, "gem-c-show-password__toggle", fieldName);
 });
 
 When("they click the Submit button", async function () {

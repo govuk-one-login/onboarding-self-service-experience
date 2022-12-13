@@ -18,8 +18,13 @@ export async function getButtonWithText(page: Page, buttonText: string): Promise
     return getSingleElement(buttons, buttonText);
 }
 
-export async function getButtonLink(page: Page, linkText: string): Promise<ElementHandle> {
+export async function getButtonAnchor(page: Page, linkText: string): Promise<ElementHandle> {
     const links = await page.$x(`//a[contains(text(), "${linkText}")][@class="govuk-button"]`);
+    return getSingleElement(links, linkText);
+}
+
+export async function getButtonLink(page: Page, linkText: string, buttonClass = "govuk-button", fieldName: string): Promise<ElementHandle> {
+    const links = await page.$x(`//button[contains(text(), "${linkText}")][@class="${buttonClass}"][@aria-controls="${fieldName}"]`);
     return getSingleElement(links, linkText);
 }
 

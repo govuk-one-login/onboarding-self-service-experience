@@ -3,6 +3,30 @@ Feature: Unhappy paths for the self-service sign-in flow
   Background:
     Given that the user is on the "/sign-in" page
 
+  Scenario: User does not enter a valid email address
+    When the user submits the email "invalid-email.com"
+    Then the error message "Enter an email address in the correct format, like name@example.com" must be displayed for the "emailAddress" field
+
+  Scenario: The user does not enter any characters into the free text field
+    When the user submits the email ""
+    Then the error message "Enter your email address" must be displayed for the "emailAddress" field
+
+  Scenario: User doesn’t enter any characters into the password field
+    When they enter "registered@gds.gov.uk" into the "emailAddress" field
+    When they click the Continue button
+    Then they should be redirected to the "/sign-in-password" page
+    When they enter "" into the "password" field
+    When they click the Continue button
+    Then the error message "Enter your password" must be displayed for the "password" field
+
+  Scenario: User enters an invalid password
+    When they enter "password-will-be-wrong@stub.gov.uk" into the "emailAddress" field
+    When they click the Submit button
+    Then they should see the text "Enter your password"
+    When they enter "Invalid-Password" into the "password" field
+    When they click the Submit button
+    Then the error message "Incorrect password" must be displayed for the "password" field
+
   Scenario: The user tries to sign in with account which is not registered
     When they enter "not-registered@gds.gov.uk" into the "emailAddress" field
     When they click the Submit button
