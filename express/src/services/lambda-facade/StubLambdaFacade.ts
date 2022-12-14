@@ -4,8 +4,12 @@ import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {DynamoUser} from "../../../@types/user";
+import {Updates} from "../self-service-services-service";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
 
+/* eslint-disable @typescript-eslint/no-unused-vars --
+ * Ignore unused vars in stubs
+ */
 class StubLambdaFacade implements LambdaFacadeInterface {
     user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
@@ -118,11 +122,8 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         } as AxiosResponse);
     }
 
-    updateUser(selfServiceUserId: string, updates: object, accessToken: string): Promise<AxiosResponse> {
-        Object.keys(updates).forEach(
-            (update: string) => (this.user[update as keyof DynamoUser] = {S: updates[update as keyof object] as string})
-        );
-
+    updateUser(selfServiceUserId: string, updates: Updates, accessToken: string): Promise<AxiosResponse> {
+        Object.keys(updates).forEach(key => (this.user[key as keyof DynamoUser] = {S: updates[key] as string}));
         return Promise.resolve({} as AxiosResponse);
     }
 

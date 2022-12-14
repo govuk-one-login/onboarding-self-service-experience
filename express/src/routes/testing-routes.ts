@@ -398,7 +398,7 @@ router.get("/new-phone-number", (req, res) => {
 });
 
 router.post("/new-phone-number", validateMobileNumber("new-phone-number.njk"), async (req, res) => {
-    res.render("check-mobile.njk");
+    res.render("common/check-mobile.njk");
 });
 
 // Testing routes for 'An account already exist' page
@@ -411,7 +411,7 @@ router.get("/account-exists", (req, res) => {
 });
 
 router.post("/account-exists", passwordValidator("create-account/account-exists.njk"), async (req, res) => {
-    res.render("check-mobile.njk");
+    res.render("common/check-mobile.njk");
 });
 
 //// Testing routes for 'You entered the wrong mobile security code too many times' page
@@ -419,25 +419,19 @@ router.post("/account-exists", passwordValidator("create-account/account-exists.
 
 router.get("/wrong-text-code", (req, res) => {
     res.render("wrong-otp-too-many-times.njk", {
-        values: {
-            pageTitle: "Wrong text message code entered too many times",
-            formActionUrl: "/wrong-text-code"
-        }
+        pageTitle: "Wrong text message code entered too many times"
     });
 });
 
 // When implementing the backend, depending on journey we should request new code and after that redirect (/create/enter-mobile or /sign-in-otp-mobile) or render the appropriate template - depending on implementation
 router.post("/wrong-text-code", async (req, res) => {
-    res.render("check-mobile.njk");
+    res.render("common/check-mobile.njk");
 });
 
 //// Testing routes for 'You entered the wrong email security code too many times' page
 router.get("/wrong-email-code", (req, res) => {
     res.render("wrong-otp-too-many-times.njk", {
-        values: {
-            pageTitle: "Wrong email code entered too many times",
-            formActionUrl: "/wrong-email-code"
-        }
+        pageTitle: "Wrong email code entered too many times"
     });
 });
 

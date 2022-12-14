@@ -1,12 +1,11 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 
+// https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html
+// const HEADER_INDEX = 0;
+const PAYLOAD_INDEX = 1;
+// const SIGNATURE = 2;
+
 export default class AuthenticationResultParser {
-    // https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html
-    // const HEADER_INDEX = 0;
-    static readonly PAYLOAD_INDEX = 1;
-
-    // const SIGNATURE = 2;
-
     static getRefreshToken(authenticationResult: AuthenticationResultType): string {
         return authenticationResult.RefreshToken as string;
     }
@@ -30,6 +29,6 @@ export default class AuthenticationResultParser {
 
     private static getIdClaims(authenticationResult: AuthenticationResultType): {[key: string]: string} {
         const payload = authenticationResult.IdToken?.split(".") as string[];
-        return JSON.parse(Buffer.from(payload[this.PAYLOAD_INDEX], "base64").toString("utf-8"));
+        return JSON.parse(Buffer.from(payload[PAYLOAD_INDEX], "base64").toString("utf-8"));
     }
 }

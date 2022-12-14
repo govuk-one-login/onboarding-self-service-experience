@@ -36,32 +36,26 @@ describe("It checks whether a mobile security code is valid and behaves accordin
 
     it("calls the NextFunction if the security code is valid", () => {
         mockRequest.body.securityCode = "123456";
-        mobileSecurityCodeValidator("template.njk", "/get-another-message", false)(
-            mockRequest as Request,
-            mockResponse as Response,
-            nextFunction
-        );
-
+        mobileSecurityCodeValidator("/get-another-message")(mockRequest as Request, mockResponse as Response, nextFunction);
         expect(nextFunction).toHaveBeenCalled();
     });
 
-    it("renders check your phone page with the correct parameters if the security code is not valid", () => {
+    it("renders check your phone page with the correct values if the security code is not valid", () => {
         mockSession.emailAddress = "render-this@test.gov.uk";
         mockRequest.body.securityCode = "123";
         mockResponse = {
             render: jest.fn()
         };
 
-        mobileSecurityCodeValidator("/sms", "/get-another-message", false)(mockRequest as Request, mockResponse as Response, nextFunction);
+        mobileSecurityCodeValidator("/get-another-message", false)(mockRequest as Request, mockResponse as Response, nextFunction);
 
-        expect(mockResponse.render).toHaveBeenCalledWith("check-mobile.njk", {
+        expect(mockResponse.render).toHaveBeenCalledWith("common/check-mobile.njk", {
             errorMessages: {
                 securityCode: "Enter the security code using only 6 digits"
             },
             values: {
                 securityCode: "123",
                 mobileNumber: "07000000000",
-                formActionUrl: "/sms",
                 textMessageNotReceivedUrl: "/get-another-message"
             }
         });

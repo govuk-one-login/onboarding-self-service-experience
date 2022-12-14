@@ -1,5 +1,5 @@
 import {
-    AdminCreateUserCommandOutput,
+    AuthenticationResultType,
     CodeMismatchException,
     NotAuthorizedException,
     UsernameExistsException
@@ -12,7 +12,6 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 
 export const showGetEmailForm = function (req: Request, res: Response) {
     res.render("create-account/get-email.njk");
-    return;
 };
 
 export const processGetEmailForm = async function (req: Request, res: Response, next: NextFunction) {
@@ -73,12 +72,11 @@ export const submitEmailSecurityCode = async function (req: Request, res: Respon
 };
 
 export const showNewPasswordForm = async function (req: Request, res: Response) {
+    // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
-        console.error("showNewPasswordForm::cognitoSession is undefined, redirecting to create-account/new-password.njk");
         res.render("create-account/new-password.njk");
         return;
     } else {
-        // TODO: This flow needs designing
         res.redirect("/sign-in");
     }
 };
@@ -96,19 +94,9 @@ export const updatePassword = async function (req: Request, res: Response) {
 };
 
 export const showEnterMobileForm = async function (req: Request, res: Response) {
-    const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
-    if (accessToken === undefined) {
-        // user must log in before we can process their mobile number
-        res.redirect("/sign-in");
-        return;
-    }
-    if (req.session.mobileNumber === undefined) {
-        res.render("create-account/enter-mobile.njk");
-    } else {
-        res.render("create-account/enter-mobile.njk", {
-            value: {mobileNumber: req.session.mobileNumber}
-        });
-    }
+    res.render("create-account/enter-mobile.njk", {
+        value: {mobileNumber: req.session.mobileNumber}
+    });
 };
 
 export const processEnterMobileForm = async function (req: Request, res: Response) {
@@ -129,13 +117,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
 
     req.session.mobileNumber = mobileNumber;
     req.session.enteredMobileNumber = req.body.mobileNumber;
-    res.render("check-mobile.njk", {
-        values: {
-            mobileNumber: req.session.enteredMobileNumber,
-            formActionUrl: "/create/verify-phone-code",
-            textMessageNotReceivedUrl: "/create/resend-phone-code"
-        }
-    });
+    res.redirect("/create/verify-phone-code");
 };
 
 export const resendMobileVerificationCode = async function (req: Request, res: Response) {
@@ -143,21 +125,22 @@ export const resendMobileVerificationCode = async function (req: Request, res: R
     await processEnterMobileForm(req, res);
 };
 
-export const submitMobileVerificationCode = async function (req: Request, res: Response) {
-    // This is the mobile verification when creating a new user
-    // need to check for access token in middleware
-    if (req.session.authenticationResult?.AccessToken === undefined) {
-        console.error("submitMobileVerificationCode::accessToken not present, redirecting to /sign-in");
-        res.redirect("/sign-in");
-        return;
-    }
+export const showSubmitMobileVerificationCode = async function (req: Request, res: Response) {
+    res.render("common/check-mobile.njk", {
+        values: {
+            mobileNumber: req.session.enteredMobileNumber,
+            textMessageNotReceivedUrl: "/create/resend-phone-code"
+        }
+    });
+};
 
+export const submitMobileVerificationCode = async function (req: Request, res: Response) {
     const securityCode = req.body.securityCode;
+
     if (securityCode === undefined) {
-        res.render("check-mobile.njk", {
+        res.render("common/check-mobile.njk", {
             values: {
                 mobileNumber: req.session.mobileNumber,
-                formActionUrl: "/create/verify-phone-code",
                 textMessageNotReceivedUrl: "/create/resend-phone-code"
             }
         });
@@ -165,36 +148,16 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         return;
     }
 
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
     try {
-        const s4: SelfServiceServicesService = req.app.get("backing-service");
-        await s4.verifyMobileUsingSmsCode(req.session.authenticationResult?.AccessToken, securityCode);
-
-        const email = AuthenticationResultParser.getEmail(req.session.authenticationResult);
-        const phone = req.session.enteredMobileNumber as string;
-        const cognitoId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult);
-
-        await s4.setMfaPreference(cognitoId);
-
-        const user = domainUserToDynamoUser({
-            id: cognitoId,
-            fullName: "we haven't collected this full name",
-            firstName: "we haven't collected this first name",
-            lastName: "we haven't collected this last name",
-            email: email,
-            mobileNumber: phone,
-            passwordLastUpdated: new Date().toLocaleDateString()
-        });
-        await s4.putUser(user, req.session.authenticationResult?.AccessToken);
-        req.session.isSignedIn = true;
-        res.redirect("/add-service-name");
-        return;
+        await s4.verifyMobileUsingSmsCode(req.session.authenticationResult?.AccessToken as string, securityCode);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            res.render("check-mobile.njk", {
+            res.render("common/check-mobile.njk", {
                 values: {
-                    mobileNumber: req.session.enteredMobileNumber,
                     securityCode: req.body.securityCode,
-                    formActionUrl: "/create/verify-phone-code",
+                    mobileNumber: req.session.enteredMobileNumber,
                     textMessageNotReceivedUrl: "/create/resend-phone-code"
                 },
                 errorMessages: {
@@ -205,20 +168,32 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
             return;
         }
 
-        console.error(error);
-        res.redirect("/there-is-a-problem");
-        return;
+        throw error;
     }
+
+    const cognitoId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
+    await s4.setMfaPreference(cognitoId);
+
+    const email = AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType);
+    const phone = req.session.enteredMobileNumber as string;
+
+    const user = domainUserToDynamoUser({
+        id: cognitoId,
+        fullName: "we haven't collected this full name",
+        firstName: "we haven't collected this first name",
+        lastName: "we haven't collected this last name",
+        email: email,
+        mobileNumber: phone,
+        passwordLastUpdated: new Date().toLocaleDateString()
+    });
+
+    await s4.putUser(user, req.session.authenticationResult?.AccessToken as string);
+
+    req.session.isSignedIn = true;
+    res.redirect("/add-service-name");
 };
 
 export const showResendPhoneCodeForm = async function (req: Request, res: Response) {
-    const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
-    if (accessToken === undefined) {
-        // user must log in before we can process their mobile number
-        console.error("showResendPhoneCodePage::accessToken not present in session, redirecting to /sign-in");
-        res.redirect("/sign-in");
-        return;
-    }
     res.render("create-account/resend-phone-code.njk");
 };
 
@@ -227,18 +202,7 @@ export const showResendEmailCodeForm = async function (req: Request, res: Respon
 };
 
 export const resendEmailVerificationCode = async function (req: Request, res: Response) {
-    req.body.emailAddress = req.session.emailAddress;
-    const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
-
-    let result: AdminCreateUserCommandOutput;
-    try {
-        result = await s4.resendEmailAuthCode(emailAddress);
-        console.debug(result);
-    } catch (error) {
-        console.error(error);
-        res.redirect("/there-is-a-problem");
-        return;
-    }
+    await s4.resendEmailAuthCode(req.session.emailAddress as string);
     res.redirect("check-email");
 };

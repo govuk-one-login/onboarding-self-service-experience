@@ -66,16 +66,17 @@ app.use("/", manageAccount);
 app.use("/", testingRoutes);
 
 app.get("/", function (req: Request, res: Response) {
-    res.render("index.njk", {active: "get-started"});
+    res.render("index.njk", {headerActiveItem: "get-started"});
 });
 
 app.locals.googleTagId = process.env.GOOGLE_TAG_ID;
 
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((req: Request, res: Response) => {
     res.status(404).render("404.njk");
     return;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
     console.error(err);
     res.render("there-is-a-problem.njk");

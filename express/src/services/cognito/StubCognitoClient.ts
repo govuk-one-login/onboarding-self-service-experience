@@ -1,10 +1,12 @@
 import {
     AdminCreateUserCommandOutput,
     AdminInitiateAuthCommandOutput,
+    AdminRespondToAuthChallengeCommandOutput,
     AdminSetUserMFAPreferenceCommandOutput,
     AdminUpdateUserAttributesCommandOutput,
     ChangePasswordCommandOutput,
     CodeMismatchException,
+    ForgotPasswordCommandOutput,
     GetUserAttributeVerificationCodeCommandOutput,
     NotAuthorizedException,
     RespondToAuthChallengeCommandOutput,
@@ -13,19 +15,25 @@ import {
     VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
 import {ServiceException} from "@aws-sdk/smithy-client/dist-types/exceptions";
+import {MetadataBearer} from "@aws-sdk/types";
+import * as crypto from "crypto";
 import {promises as fs} from "fs";
 import path from "path";
-import CognitoInterface from "./CognitoInterface";
 import {convertToCountryPrefixFormat} from "../../lib/mobileNumberUtils";
-import * as crypto from "crypto";
+import CognitoInterface from "./CognitoInterface";
+
+type CognitoResponse = MetadataBearer;
 
 type Override = {
     parameter: string;
     value: string;
-    return?: any;
+    return?: Partial<MetadataBearer>;
     throw?: string;
 };
 
+/* eslint-disable @typescript-eslint/no-unused-vars --
+ * Ignore unused vars in stubs
+ */
 export class CognitoClient implements CognitoInterface {
     kid = {kid: "bIXchwnF2Iyc/lFMKTHBvG+R6x1ea9ZN3sEegxjnL/k=", alg: "RS256"};
 
@@ -130,14 +138,16 @@ export class CognitoClient implements CognitoInterface {
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("login", "email", email);
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput> {
+        return Promise.resolve({$metadata: {}});
+    }
+
+    forgotPassword(email: string): Promise<ForgotPasswordCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }
 
@@ -145,13 +155,11 @@ export class CognitoClient implements CognitoInterface {
         return Promise.resolve({UserAttributes: [{Name: "email", Value: username}], $metadata: {}});
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("setNewPassword", "password", password);
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<ChangePasswordCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }
@@ -166,22 +174,22 @@ export class CognitoClient implements CognitoInterface {
         return Promise.resolve(returnValue || {$metadata: {}});
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setMfaPreference(cognitoUsername: string): Promise<AdminSetUserMFAPreferenceCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }
 
-    private async getOverriddenReturnValue(method: string, parameter: string, value: string) {
+    private async getOverriddenReturnValue(method: string, parameter: string, value: string): Promise<CognitoResponse | undefined> {
         const override = await this.getOverrideFor(method, parameter, value);
+
         if (override === undefined) {
             return undefined;
         }
 
-        if (override?.throw) {
+        if (override.throw) {
             throw this.getException(override.throw);
-        } else {
-            return override.return; // something from the config file
         }
+
+        return {...override.return, $metadata: override.return?.$metadata || {}};
     }
 
     private async getOverrideFor(method: string, parameter: string, value: string): Promise<Override | undefined> {
@@ -190,7 +198,9 @@ export class CognitoClient implements CognitoInterface {
             return undefined;
         }
 
-        const methodOverrides: Override[] = JSON.parse(overrides)[method];
+        const parsedOverrides: Record<string, Override[]> = JSON.parse(overrides);
+        const methodOverrides = parsedOverrides[method];
+
         if (methodOverrides === undefined) {
             return undefined;
         }
@@ -209,22 +219,19 @@ export class CognitoClient implements CognitoInterface {
             case "UserNotFoundException":
                 return new UserNotFoundException({message: "", $metadata: {}});
         }
+
         throw new Error("Unknown exception");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-types,@typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/ban-types,@typescript-eslint/no-unused-vars
-    respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<undefined | {$metadata: {}}> {
-        return Promise.resolve(this.getOverriddenReturnValue("respondToMfaChallenge", "username", username) || {$metadata: {}});
+    async respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
+        const returnValue = await this.getOverriddenReturnValue("respondToMfaChallenge", "username", username);
+        return Promise.resolve(returnValue || {$metadata: {}});
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setMobilePhoneAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput> {
         return Promise.resolve({AuthenticationResult: this.authenticationResult, $metadata: {}});
     }

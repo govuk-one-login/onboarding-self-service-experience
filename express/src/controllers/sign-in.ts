@@ -15,13 +15,12 @@ export const showCheckPhonePage = async function (req: Request, res: Response) {
         return;
     }
 
-    res.render("check-mobile.njk", {
+    res.render("common/check-mobile.njk", {
+        headerActiveItem: "sign-in",
         values: {
             mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo),
-            formActionUrl: "/sign-in-otp-mobile",
             textMessageNotReceivedUrl: "/resend-text-code"
-        },
-        active: "sign-in"
+        }
     });
 };
 
@@ -80,11 +79,6 @@ export const checkEmailPasswordReset = async function (req: Request, res: Respon
 };
 
 const forgotPassword = async function (req: Request) {
-    const emailAddress = req.session.emailAddress;
-    try {
-        const s4: SelfServiceServicesService = await req.app.get("backing-service");
-        await s4.forgotPassword(emailAddress as string);
-    } catch (error) {
-        console.error("ERROR CALLING COGNITO - FORGOT PASSWORD WITH EMAIL", error);
-    }
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
+    await s4.forgotPassword(req.session.emailAddress as string);
 };
