@@ -1,0 +1,11 @@
+{% extends "layout/form.njk" %}
+
+{% set pageTitle = "Enter your name" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l">Enter your name</h1>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.textInput("Name", "yourName","", "We use this to create your account and assign you permissions") }}
+{% endblock %}

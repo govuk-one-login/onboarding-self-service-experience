@@ -565,4 +565,21 @@ router.get("/invitation-sent", (req, res) => {
     });
 });
 
+//// Testing routes for Create the 'Add a name' page
+router.get("/name-content-info", (req, res) => {
+    res.render("name-content-info.njk");
+});
+
+router.post("/name-content-info", async (req, res) => {
+    if (req.body.yourName === "") {
+        res.render("name-content-info.njk", {
+            errorMessages: {
+                yourName: "Enter your name"
+            }
+        });
+        return;
+    }
+    res.redirect("/add-service-name");
+});
+
 export default router;
