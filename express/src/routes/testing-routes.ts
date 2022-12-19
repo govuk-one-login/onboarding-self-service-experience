@@ -557,4 +557,12 @@ router.post("/invite-team-member", emailValidator("service-details/invite-team-m
     res.redirect("/invitation-sent");
 });
 
+//// Testing routes for 'Email invite sent' page
+router.get("/invitation-sent", (req, res) => {
+    res.render("service-details/invitation-sent.njk", {
+        serviceName: "Frontend Test Service",
+        userEmail: "james.pirot@digital.cabinet-office.gov.uk"
+    });
+});
+
 export default router;
