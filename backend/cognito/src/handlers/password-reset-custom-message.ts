@@ -142,8 +142,8 @@ const generate_email_body = (emailBody: string) => `
 
 export const forgot_password = async (event: CustomMessageForgotPasswordTriggerEvent): Promise<CustomMessageForgotPasswordTriggerEvent> => {
     const code = event.request.codeParameter;
-    const userPoolId = event.userPoolId;
-    const link = `https://${userPoolId}/create-new-password?client_id=${event.callerContext.clientId}&user_name=${event.userName}&confirmation_code=${code}`;
+    const username = encodeURIComponent(event.request.clientMetadata.username);
+    const link = `${event.request.clientMetadata.uri}/create-new-password?userName=${username}&confirmationCode=${code}`;
     event.response = {
         smsMessage: "",
         emailSubject: "Reset your password for GOV.UK Sign In",

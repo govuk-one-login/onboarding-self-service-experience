@@ -18,7 +18,9 @@ import {
     VerifyUserAttributeCommand,
     VerifyUserAttributeCommandOutput,
     ForgotPasswordCommandOutput,
-    ForgotPasswordCommand
+    ForgotPasswordCommand,
+    ConfirmForgotPasswordCommandOutput,
+    ConfirmForgotPasswordCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {AdminCreateUserCommandOutput} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/AdminCreateUserCommand";
 import CognitoInterface from "./CognitoInterface";
@@ -128,12 +130,27 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
-    async forgotPassword(email: string): Promise<ForgotPasswordCommandOutput> {
+    async forgotPassword(email: string, uri: string): Promise<ForgotPasswordCommandOutput> {
         const params = {
             ClientId: this.clientId,
-            Username: email
+            Username: email,
+            ClientMetadata: {
+                uri: uri,
+                username: email
+            }
         };
         const command = new ForgotPasswordCommand(params);
+        return await this.cognitoClient.send(command);
+    }
+
+    async confirmForgotPassword(username: string, password: string, confirmationCode: string): Promise<ConfirmForgotPasswordCommandOutput> {
+        const params = {
+            ClientId: this.clientId,
+            Username: username,
+            Password: password,
+            ConfirmationCode: confirmationCode
+        };
+        const command = new ConfirmForgotPasswordCommand(params);
         return await this.cognitoClient.send(command);
     }
 

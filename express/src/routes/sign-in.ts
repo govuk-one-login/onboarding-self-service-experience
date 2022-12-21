@@ -2,6 +2,8 @@ import express from "express";
 import {
     accountExists,
     checkEmailPasswordReset,
+    confirmForgotPassword,
+    confirmForgotPasswordForm,
     finishSignIn,
     forgotPasswordForm,
     processEmailAddress,
@@ -17,6 +19,7 @@ import {processSecurityCode} from "../middleware/sign-in-middleware";
 import emailIsPresentInSession from "../middleware/validators/emailIsPresentInSession/emailIsPresentInSession";
 import {emailValidator} from "../middleware/validators/emailValidator";
 import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpValidator";
+import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
 
 const router = express.Router();
 
@@ -79,6 +82,21 @@ router.post(
     "/check-email-password-reset",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
     checkEmailPasswordReset
+);
+
+router.post(
+    "/check-email-password-reset",
+    emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+    checkEmailPasswordReset
+);
+
+router.get("/create-new-password", confirmForgotPasswordForm);
+
+router.post(
+    "/create-new-password",
+    notOnCommonPasswordListValidator("create-new-password.njk", "password", ["password"]),
+    confirmForgotPassword,
+    processSignInForm("create-new-password.njk")
 );
 
 export default router;

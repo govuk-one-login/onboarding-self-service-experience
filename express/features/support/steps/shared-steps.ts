@@ -124,3 +124,10 @@ When("the user submits the mobile phone number {string}", async function (mobile
     await enterTextIntoTextInput(this.page, mobileNumber, "mobileNumber");
     await clickSubmitButton(this.page);
 });
+
+When("they click on the forgot password link in their email", async function () {
+    const path = "/create-new-password?userName=registered@gds.gov.uk&confirmationCode=123456";
+    await this.goToPath(path);
+    const expectedUrl = new URL(path, this.host);
+    assert.equal(this.page.url().replace(/\/$/, ""), expectedUrl.href);
+});

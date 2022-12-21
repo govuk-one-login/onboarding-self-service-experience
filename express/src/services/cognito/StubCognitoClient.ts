@@ -147,7 +147,11 @@ export class CognitoClient implements CognitoInterface {
         return Promise.resolve({$metadata: {}});
     }
 
-    forgotPassword(email: string): Promise<ForgotPasswordCommandOutput> {
+    forgotPassword(email: string, uri: string): Promise<ForgotPasswordCommandOutput> {
+        return Promise.resolve({$metadata: {}});
+    }
+
+    confirmForgotPassword(username: string, password: string, confirmationCode: string): Promise<ForgotPasswordCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }
 
