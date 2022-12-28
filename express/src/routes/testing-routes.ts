@@ -82,7 +82,7 @@ router.post(
             req.session.authenticationResult?.AccessToken as string
         );
 
-        req.session.updatedField = "redirect URLs";
+        req.session.updatedField = "redirect URIs";
         res.redirect(`/client-details/${req.params.serviceId}`);
     }
 );
@@ -153,7 +153,7 @@ router.post(
             req.session.authenticationResult?.AccessToken as string
         );
 
-        req.session.updatedField = "post-logout redirect URLs";
+        req.session.updatedField = "post-logout redirect URIs";
         res.redirect(`/client-details/${req.params.serviceId}`);
     }
 );
