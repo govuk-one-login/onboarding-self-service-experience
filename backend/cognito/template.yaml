@@ -76,13 +76,13 @@ Resources:
         - email
       UsernameAttributes:
         - email
-      SmsVerificationMessage: '{####} is your GOV.UK Sign In security code.'
+      SmsVerificationMessage: '{####} is your GOV.UK One Login security code.'
       EmailVerificationMessage: |-
         <html>
           <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-            <title>Your security code for GOV.UK Sign In</title>
+            <title>Your security code for the GOV.UK One Login admin tool</title>
             <style>
               body {
                 -webkit-font-smoothing: antialiased;
@@ -162,7 +162,7 @@ Resources:
                           font-size: 24px;
                           line-height: 32px;
                           color: white;
-                          "> Sign In <strong style="display: inline-block;
+                          "> One Login admin tool <strong style="display: inline-block;
                               outline: 2px solid transparent;
                               outline-offset: -2px;
                               color: #ffffff;
@@ -201,7 +201,7 @@ Resources:
                         <p class="norrmal-text">Your security code is: </p>
                         <p class="bold-text">{####}</p>
                         <p class="norrmal-text">The code will expire after 15 minutes.</p>
-                        <p class="norrmal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> Sign In account: </p>
+                        <p class="norrmal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> One Login account: </p>
                         <p class="norrmal-text">If you did not use this email address to create an account, you can ignore this email.</p>
                       </td>
                     </tr>
@@ -211,15 +211,15 @@ Resources:
             </table>
           </body>
         </html>
-      EmailVerificationSubject: Your security code for GOV.UK Sign In
+      EmailVerificationSubject: Your security code for the GOV.UK One Login admin tool
       VerificationMessageTemplate:
-        SmsMessage: '{####} is your GOV.UK Sign In security code.'
+        SmsMessage: '{####} is your GOV.UK One Login security code.'
         EmailMessage: |-
           <html>
             <head>
               <meta name="viewport" content="width=device-width, initial-scale=1.0" />
               <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-              <title>Your security code for GOV.UK Sign In</title>
+              <title>Your security code for the GOV.UK One Login admin tool</title>
               <style>
                 body {
                   -webkit-font-smoothing: antialiased;
@@ -299,7 +299,7 @@ Resources:
                             font-size: 24px;
                             line-height: 32px;
                             color: white;
-                            "> Sign In <strong style="display: inline-block;
+                            "> One Login admin tool <strong style="display: inline-block;
                                 outline: 2px solid transparent;
                                 outline-offset: -2px;
                                 color: #ffffff;
@@ -338,7 +338,7 @@ Resources:
                           <p class="norrmal-text">Your security code is: </p>
                           <p class="bold-text">{####}</p>
                           <p class="norrmal-text">The code will expire after 15 minutes.</p>
-                          <p class="norrmal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> Sign In account: </p>
+                          <p class="norrmal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> One Login account: </p>
                           <p class="norrmal-text">If you did not use this email address to create an account, you can ignore this email.</p>
                         </td>
                       </tr>
@@ -348,9 +348,9 @@ Resources:
               </table>
             </body>
           </html>
-        EmailSubject: Your security code for GOV.UK Sign In
+        EmailSubject: Your security code for the GOV.UK One Login admin tool
         DefaultEmailOption: CONFIRM_WITH_CODE
-      SmsAuthenticationMessage: '{####} is your GOV.UK Sign In security code.'
+      SmsAuthenticationMessage: '{####} is your GOV.UK One Login security code.'
       MfaConfiguration: OPTIONAL
       EmailConfiguration:
         EmailSendingAccount: COGNITO_DEFAULT
@@ -362,7 +362,7 @@ Resources:
         AllowAdminCreateUserOnly: false
         InviteMessageTemplate:
           SMSMessage: |-
-            {####} is your GOV.UK Sign In security code.
+            {####} is your GOV.UK One Login security code.
 
             {username}
           EmailMessage: |-
@@ -370,7 +370,7 @@ Resources:
               <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-                <title>Your security code for GOV.UK Sign In</title>
+                <title>Your security code for the GOV.UK One Login admin tool</title>
                 <style>
                   body {
                     -webkit-font-smoothing: antialiased;
@@ -450,7 +450,7 @@ Resources:
                               font-size: 24px;
                               line-height: 32px;
                               color: white;
-                              "> Sign In <strong style="display: inline-block;
+                              "> One Login admin tool <strong style="display: inline-block;
                                   outline: 2px solid transparent;
                                   outline-offset: -2px;
                                   color: #ffffff;
@@ -489,7 +489,7 @@ Resources:
                             <p class="norrmal-text">Your security code is: </p>
                             <p class="bold-text">{####}</p>
                             <p class="norrmal-text">The code will expire after 15 minutes.</p>
-                            <p class="norrmal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> Sign In account: </p>
+                            <p class="norrmal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> One Login account: </p>
                             <p class="norrmal-text"> <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">{username} </a></p>
                             <p class="norrmal-text">If you did not use this email address to create an account, you can ignore this email.</p>
                           </span>
@@ -500,7 +500,7 @@ Resources:
                       </table>
               </body>
             </html>
-          EmailSubject: Your security code for GOV.UK Sign In
+          EmailSubject: Your security code for the GOV.UK One Login admin tool
       UsernameConfiguration:
         CaseSensitive: false
       AccountRecoverySetting:

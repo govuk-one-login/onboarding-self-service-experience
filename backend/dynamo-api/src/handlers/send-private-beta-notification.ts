@@ -7,14 +7,14 @@ export const privateBetaRequestHandler = async (event: APIGatewayProxyEvent): Pr
     const payload = event?.body ? JSON.parse(event.body as string) : event;
 
     const emailContent =
-        "Request to join GOV.UK Sign In private beta form submitted\n\n" +
+        "Request to join GOV.UK One Login private beta form submitted\n\n" +
         `Name: ${payload.name}\n` +
         `Email address: ${payload.emailAddress} \n` +
         `Service name: ${payload.serviceName} \n` +
         `Department: ${payload.department}  \n`;
 
     const params = {
-        Subject: "GOV.UK Sign In private beta request form",
+        Subject: "GOV.UK One Login private beta request form",
         Message: emailContent,
         TopicArn: process.env.SNS_TOPIC_ARN
     };
