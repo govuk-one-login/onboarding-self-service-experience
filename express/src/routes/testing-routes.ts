@@ -338,15 +338,6 @@ router.get("/there-is-a-problem-test", (req, res) => {
     res.render("there-is-a-problem.njk");
 });
 
-// Create the 'Create a new password' page
-router.get("/create-new-password", (req, res) => {
-    res.render("create-new-password.njk");
-});
-
-router.post("/create-new-password", passwordValidator("create-new-password.njk"), async (req, res) => {
-    res.redirect("/check-yourphonetestpage");
-});
-
 // Testing routs for 'We need to do security checks' page
 router.get("/security-check-change-number", (req, res) => {
     res.render("security-check-change-number.njk", {

@@ -33,8 +33,12 @@ export default class SelfServiceServicesService {
         await this.cognito.changePassword(accessToken, previousPassword, proposedPassword);
     }
 
-    async forgotPassword(email: string) {
-        await this.cognito.forgotPassword(email);
+    async forgotPassword(email: string, uri: string) {
+        await this.cognito.forgotPassword(email, uri);
+    }
+
+    async confirmForgotPassword(username: string, password: string, confirmationCode: string) {
+        await this.cognito.confirmForgotPassword(username, password, confirmationCode);
     }
 
     async respondToMfaChallenge(mfaResponse: MfaResponse, mfaCode: string): Promise<AuthenticationResultType> {

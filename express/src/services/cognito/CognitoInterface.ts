@@ -5,6 +5,7 @@ import {
     AdminSetUserMFAPreferenceCommandOutput,
     AdminUpdateUserAttributesCommandOutput,
     ChangePasswordCommandOutput,
+    ConfirmForgotPasswordCommandOutput,
     ForgotPasswordCommandOutput,
     GetUserAttributeVerificationCodeCommandOutput,
     RespondToAuthChallengeCommandOutput,
@@ -22,7 +23,9 @@ export default interface CognitoInterface {
 
     changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<ChangePasswordCommandOutput>;
 
-    forgotPassword(email: string): Promise<ForgotPasswordCommandOutput>;
+    forgotPassword(email: string, uri: string): Promise<ForgotPasswordCommandOutput>;
+
+    confirmForgotPassword(username: string, password: string, confirmationCode: string): Promise<ConfirmForgotPasswordCommandOutput>;
 
     setEmailAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput>;
 

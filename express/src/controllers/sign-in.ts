@@ -1,5 +1,5 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
-import {Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 import "express-async-errors";
 import {obscureNumber} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
@@ -80,5 +80,20 @@ export const checkEmailPasswordReset = async function (req: Request, res: Respon
 
 const forgotPassword = async function (req: Request) {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
-    await s4.forgotPassword(req.session.emailAddress as string);
+    const uri = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
+    await s4.forgotPassword(req.session.emailAddress as string, uri as string);
+};
+
+export const confirmForgotPasswordForm = async function (req: Request, res: Response) {
+    res.render("create-new-password.njk", {
+        userName: req.query.userName,
+        confirmationCode: req.query.confirmationCode
+    });
+};
+
+export const confirmForgotPassword = async function (req: Request, res: Response, next: NextFunction) {
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
+    await s4.confirmForgotPassword(req.body.userName as string, req.body.password as string, req.body.confirmationCode as string);
+    req.session.emailAddress = req.body.userName;
+    next();
 };
