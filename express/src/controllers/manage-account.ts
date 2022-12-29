@@ -48,6 +48,7 @@ export const showClient = async function (req: Request, res: Response) {
     const selfServiceClientId = client.dynamoServiceId;
     const authClientId = client.authClientId;
     const serviceName = client.serviceName;
+    const redirectUrls = String(client.redirectUris).split(",");
     const userPublicKey = client.publicKey == defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);
 
     res.render("service-details/client-details.njk", {
@@ -56,7 +57,7 @@ export const showClient = async function (req: Request, res: Response) {
         serviceId: serviceId,
         serviceName: serviceName,
         updatedField: req.session.updatedField,
-        redirectUrls: client.redirectUris.join(" "),
+        redirectUrls: redirectUrls,
         userAttributesRequired: client.scopes.join(", "),
         userPublicKey: userPublicKey,
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),

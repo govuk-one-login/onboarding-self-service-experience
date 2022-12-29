@@ -61,7 +61,7 @@
 {% endmacro %}
 
 {% macro securityCodeInput() %}
-  {{ textInput("Enter the 6 digit security code", "securityCode", "govuk-input--width-5", inputmode = "numeric") }}
+  {{ textInput("Enter the 6 digit security code", "securityCode", "govuk-input--width-5", type = "text", autocomplete = "one-time-code", inputmode = "numeric") }}
 {% endmacro %}
 
 {% macro mobileNumberInput(label = "UK mobile phone number") %}
