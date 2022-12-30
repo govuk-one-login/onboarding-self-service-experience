@@ -17,6 +17,30 @@ Feature: A page where users can view and change the details associated with thei
       Then they should see the text "Change your mobile phone number"
       Then the user submits the mobile phone number "0770 9000 124"
 
+    Scenario: The user does not enter any characters when changing the phone number
+      Given that the user is on the "/change-phone-number" page
+      Then they should see the text "Change your mobile phone number"
+      Then the user submits the mobile phone number ""
+      Then the error message "Enter a mobile phone number" must be displayed for the "mobileNumber" field
+
+    Scenario: User enters an international phone number when changing phone number
+      Given that the user is on the "/change-phone-number" page
+      Then they should see the text "Change your mobile phone number"
+      Then the user submits the mobile phone number "+919465245634"
+      Then the error message "Enter a UK mobile phone number, like 07700 900000" must be displayed for the "mobileNumber" field
+
+    Scenario: User enters invalid characters when changing phone number
+      Given that the user is on the "/change-phone-number" page
+      Then they should see the text "Change your mobile phone number"
+      Then the user submits the mobile phone number "077$$ 900000"
+      Then the error message "Enter a UK mobile phone number using numbers only" must be displayed for the "mobileNumber" field
+
+    Scenario: User enters an invalid number when changing phone number
+      Given that the user is on the "/change-phone-number" page
+      Then they should see the text "Change your mobile phone number"
+      Then the user submits the mobile phone number "08723900"
+      Then the error message "Enter a UK mobile phone number, like 07700 900000" must be displayed for the "mobileNumber" field
+
     Scenario: The user successfully changes their phone number
       When the user submits the security code "123456"
       Then they should be redirected to the "/account" page
@@ -44,11 +68,24 @@ Feature: A page where users can view and change the details associated with thei
       Then they should be redirected to the "/change-password" page
       And they should see the text "Add your new password"
 
-    Scenario: The user tries to change their current password
+    Scenario: User enters less than 8 characters for their new password
+      When they enter "TestPa$$word" into the "currentPassword" field
+      When they enter "NewTest" into the "password" field
+      When they click the Confirm button
+      Then the error message "Your password must be 8 characters or more" must be displayed for the "password" field
+
+    Scenario: User selects the Show toggle for the current password field
+      When they toggle "Show" link on field "currentPassword"
+      Then they see the toggle "Hide" link on field "currentPassword"
+
+    Scenario: User selects Show for the new password field
+      When they toggle "Show" link on field "password"
+      Then they see the toggle "Hide" link on field "password"
+
+    Scenario: User successfully changes their password
       When they enter "OldTestPa$$word" into the "currentPassword" field
       When they enter "NewTestPa$$word" into the "password" field
       When they click the Confirm button
-
       Then they should be redirected to the "/account" page
       And they should see the text "You have changed your password"
 
