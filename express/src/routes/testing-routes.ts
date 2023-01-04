@@ -572,4 +572,9 @@ router.post("/name-content-info", async (req, res) => {
     res.redirect("/add-service-name");
 });
 
+//// Testing routes for 'Service unavailable' page
+router.get("/service-unavailable", (req, res) => {
+    res.render("service-unavailable.njk");
+});
+
 export default router;
