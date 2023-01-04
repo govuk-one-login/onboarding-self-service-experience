@@ -11,6 +11,7 @@ import {User} from "../../@types/user";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {convertToCountryPrefixFormat} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import getAuthApiCompliantPublicKey from "../lib/publicKeyUtils";
 
 const defaultPublicKey =
     "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
@@ -47,6 +48,7 @@ export const showClient = async function (req: Request, res: Response) {
     const selfServiceClientId = client.dynamoId;
     const authClientId = client.authClientId;
     const serviceName = client.serviceName;
+    const userPublicKey = client.publicKey == defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);
 
     res.render("service-details/client-details.njk", {
         clientId: authClientId,
@@ -56,7 +58,7 @@ export const showClient = async function (req: Request, res: Response) {
         updatedField: req.session.updatedField,
         redirectUrls: client.redirectUris.join(" "),
         userAttributesRequired: client.scopes.join(", "),
-        userPublicKey: client.publicKey == defaultPublicKey ? "" : client.publicKey,
+        userPublicKey: userPublicKey,
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         urls: {
             // TODO changeClientName is currently not used

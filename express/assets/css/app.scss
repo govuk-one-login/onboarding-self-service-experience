@@ -140,17 +140,17 @@ code {
   #main-content.account-summary,
   #main-content.left-nav-wrapper {
     .govuk-summary-list__key {
-      width: 36%;
+      width: 50%;
       padding-right: 18px;
     }
 
     .govuk-summary-list__value {
-      width: 52%;
+      width: 72%;
       padding-right: 10px;
     }
 
-    .govuk-summary-list__actions {
-      width: 12%;
+    .govuk-summary-list__row--no-actions::after {
+      width: 16%;
     }
   }
 }
