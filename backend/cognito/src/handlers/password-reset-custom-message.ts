@@ -87,7 +87,7 @@ const generate_email_body = (emailBody: string) => `
                           font-size: 24px;
                           line-height: 32px;
                           color: white;
-                          "> Sign In <strong style="display: inline-block;
+                          "> One Login admin tool <strong style="display: inline-block;
                               outline: 2px solid transparent;
                               outline-offset: -2px;
                               color: #ffffff;
@@ -123,13 +123,13 @@ const generate_email_body = (emailBody: string) => `
                             </tbody>
                         </table>
                         <div style="margin-top: 40px;"></div>
-                        <p class="norrmal-text">We received a request to reset your password for GOV.UK Sign In.</p>
+                        <p class="norrmal-text">We received a request to reset your password for GOV.UK One Login.</p>
                         <p class="norrmal-text">Reset your password at</p>
                         <p class="bold-text"><a style="word-wrap:break-word;color:#1d70b8" href=${emailBody} target="_blank" data-saferedirecturl="GOV.UK">${emailBody}</a></p>
                         <p class="norrmal-text">The link will expire after 15 minutes.</p>
                         <p class="norrmal-text">If you did not use this email you can ignore it - your password has not been changed.</p>
                         <p class="norrmal-text">Thanks,</p>
-                        <p class="norrmal-text">The GOV.UK Sign In team</p>
+                        <p class="norrmal-text">The GOV.UK One Login team</p>
                     </td>
                 </tr>
             </table>
@@ -146,7 +146,7 @@ export const forgot_password = async (event: CustomMessageForgotPasswordTriggerE
     const link = `${event.request.clientMetadata.uri}/create-new-password?userName=${username}&confirmationCode=${code}`;
     event.response = {
         smsMessage: "",
-        emailSubject: "Reset your password for GOV.UK Sign In",
+        emailSubject: "Reset your password for GOV.UK One Login",
         emailMessage: generate_email_body(link)
     };
     return event;
