@@ -22,6 +22,10 @@
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Integration client</h2>
 
+  {% set clientIdContainer %}
+    <code>{{ clientId }}</code>
+  {% endset %}
+
   {% set publicKeyLabel %}
     <span id="public-key">Public key</span>
   {% endset %}
@@ -29,8 +33,8 @@
   {% set publicKeyContainer %}
     <div id="publicKeyContainer" class="govuk-body">
       {% if userPublicKey %}
-        <div id="publicKeyShort" aria-labelledby="public-key">{{ userPublicKey.slice(0, 24) }} ...</div>
-        <div id="publicKeyLong">{{ userPublicKey }}</div>
+        <div id="publicKeyShort" aria-labelledby="public-key"><code>{{ userPublicKey.slice(0, 24) }} ...</code></div>
+        <div id="publicKeyLong"><code>{{ userPublicKey }}</code></div>
         <button type="button" id="togglePublicKey" class="govuk-accordion__show-all" aria-expanded="false">
             <span class="govuk-accordion__section-toggle-focus">
               <span id="toggleTextChevron" class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down"></span>
@@ -47,7 +51,7 @@
     rows: [
       {
         key: {text: "Client ID"},
-        value: {text: clientId}
+        value: {html: clientIdContainer}
       },
       {
         key: {text: "Redirect URIs"},
