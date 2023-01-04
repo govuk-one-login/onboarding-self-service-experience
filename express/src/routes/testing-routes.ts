@@ -433,8 +433,7 @@ router.post("/wrong-email-code", async (req, res) => {
 
 router.get("/resend-email-code", async (req, res) => {
     res.render("common/resend-security-code.njk", {
-        securityCodeMethod: "email",
-        backLinkPath: "/security-check-change-number"
+        securityCodeMethod: "email"
     });
 });
 
