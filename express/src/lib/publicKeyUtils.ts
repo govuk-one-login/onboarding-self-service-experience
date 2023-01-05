@@ -3,6 +3,7 @@ import {createPublicKey} from "crypto";
 const BEGIN = "-----BEGIN PUBLIC KEY-----";
 const END = "-----END PUBLIC KEY-----";
 export default function getAuthApiCompliantPublicKey(publicKey: string): string {
+    publicKey = publicKey.trim();
     // assume PEM with headers
     try {
         createPublicKey({key: publicKey, format: "pem"});

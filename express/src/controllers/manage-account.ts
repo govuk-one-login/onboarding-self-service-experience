@@ -45,7 +45,7 @@ export const showClient = async function (req: Request, res: Response) {
     const serviceId = req.params.serviceId;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const client = (await s4.listClients(serviceId, req.session.authenticationResult?.AccessToken as string))[0];
-    const selfServiceClientId = client.dynamoId;
+    const selfServiceClientId = client.dynamoServiceId;
     const authClientId = client.authClientId;
     const serviceName = client.serviceName;
     const userPublicKey = client.publicKey == defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);

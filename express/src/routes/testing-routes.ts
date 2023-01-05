@@ -168,7 +168,7 @@ router.get("/change-public-key/:serviceId/:selfServiceClientId/:clientId", (req,
 });
 
 router.post("/change-public-key/:serviceId/:selfServiceClientId/:clientId", convertPublicKeyForAuth, async (req, res) => {
-    const publicKey = req.body.serviceUserPublicKey as string;
+    const publicKey = req.body.authCompliantPublicKey as string;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     await s4.updateClient(

@@ -11,6 +11,7 @@ import {
     getButtonLink,
     getButtonWithText,
     getLink,
+    getLinkWithHrefStarting,
     getLinkWithHref
 } from "./shared-functions";
 
@@ -24,6 +25,11 @@ Given("that the user is on the {string} page", async function (path: string) {
 
 When("they click on the {string} link", async function (text: string) {
     const link = await getLink(this.page, text);
+    await clickElement(this.page, link);
+});
+
+When("they click on the link with the url that starts with {string}", async function (text: string) {
+    const link = await getLinkWithHrefStarting(this.page, text);
     await clickElement(this.page, link);
 });
 

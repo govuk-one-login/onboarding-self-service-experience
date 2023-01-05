@@ -13,6 +13,11 @@ export async function getLinkWithHref(page: Page, href: string): Promise<Element
     return getSingleElement(links, href);
 }
 
+export async function getLinkWithHrefStarting(page: Page, hrefStarting: string): Promise<ElementHandle> {
+    const links = await page.$x(`//a[starts-with(@href, "${hrefStarting}")]`);
+    return getSingleElement(links, hrefStarting);
+}
+
 export async function getButtonWithText(page: Page, buttonText: string): Promise<ElementHandle> {
     const buttons = await page.$x(`//button[contains(text(), '${buttonText}')]`);
     return getSingleElement(buttons, buttonText);
