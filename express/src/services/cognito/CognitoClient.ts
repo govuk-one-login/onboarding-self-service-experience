@@ -148,7 +148,10 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             ClientId: this.clientId,
             Username: username,
             Password: password,
-            ConfirmationCode: confirmationCode
+            ConfirmationCode: confirmationCode,
+            ClientMetadata: {
+                email: username
+            }
         };
         const command = new ConfirmForgotPasswordCommand(params);
         return await this.cognitoClient.send(command);

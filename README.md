@@ -27,7 +27,7 @@ Deploy your own stacks
 ```shell
 cd backend/cognito
 sam build
-gds aws <your-aws-account> -- sam deploy --guided
+gds aws <your-aws-account> -- sam deploy --parameter-overrides "DomainOrEmailIdentityToVerify=development.sign-in.service.gov.uk SignInHostedZone=SignInServiceDevelopmentHostedZone"
 # Go with the defaults except the stack name; choose something like your-name-cognito
 
 cd ../dynamo-db

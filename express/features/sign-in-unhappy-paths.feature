@@ -46,6 +46,9 @@ Feature: Unhappy paths for the self-service sign-in flow
     And the user submits the security code "123456"
     Then they should be redirected to a page with path starting with "/client-details"
     And they should see the text "Your services"
+    When they click on the "Your account" link
+    Then they should be redirected to the "/account" page
+    And they should see the text "Last updated just now"
 
   Scenario: The user tries to use a password on the list of common passwords during password reset
     When they enter "registered@gds.gov.uk" into the "emailAddress" field
