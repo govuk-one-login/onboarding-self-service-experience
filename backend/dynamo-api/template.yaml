@@ -438,11 +438,11 @@ Resources:
           {
             Effect: Allow,
             Action: [
-              "states:StartSyncExecution"
+                "states:StartSyncExecution"
             ],
             Resource: {
               Fn::Sub: [
-                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
                 {
                   stateMachineName: {
                     Fn::GetAtt: [NewServiceStepFunction, Name]
@@ -527,11 +527,11 @@ Resources:
           {
             Effect: Allow,
             Action: [
-              "states:StartSyncExecution"
+                "states:StartSyncExecution"
             ],
             Resource: {
               Fn::Sub: [
-                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
                 {
                   stateMachineName: {
                     Fn::GetAtt: [NewClientStepFunction, Name]
@@ -580,11 +580,11 @@ Resources:
           {
             Effect: Allow,
             Action: [
-              "states:StartSyncExecution"
+                "states:StartSyncExecution"
             ],
             Resource: {
               Fn::Sub: [
-                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
                 {
                   stateMachineName: {
                     Fn::GetAtt: [UpdateClientStepFunction, Name]
