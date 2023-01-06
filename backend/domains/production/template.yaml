@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  DNS configuration for self-service
+
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+  SignInServiceHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: Hosted zone for sign-in.service.gov.uk
+      Name: sign-in.service.gov.uk.
+
+  SignInServiceSubDomains:
+    Type: AWS::Route53::RecordSetGroup
+    DependsOn: SignInServiceHostedZone
+    Properties:
+      Comment: Records for the subdomains of sign-in.service.gov.uk many records point to cloudfront
+      HostedZoneId: !Ref SignInServiceHostedZone
+      RecordSets:
+        - Name: sign-in.service.gov.uk.
+          Type: A
+          AliasTarget:
+            # Z2FDTNDATAQYW2 is the hosted zone for CloudFront.
+            # See: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html under CloudFront distribution
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName: dbd28k6th0aos.cloudfront.net.
+            EvaluateTargetHealth: false
+        - Name: _24e1305586ee4f8a0227e3ca0a7ae6bf.sign-in.service.gov.uk.
+          Type: CNAME
+          TTL: 86400
+          ResourceRecords:
+            - _0dcb3493c1b4007e839f668957af9b81.nhsllhhtvj.acm-validations.aws
+        - Name: www.sign-in.service.gov.uk.
+          Type: CNAME
+          TTL: 3600
+          ResourceRecords:
+            - dbd28k6th0aos.cloudfront.net
+        - Name: _e323beb1b0f2d7f9f443eb019da43e76.www.sign-in.service.gov.uk.
+          Type: CNAME
+          TTL: 86400
+          ResourceRecords:
+            - _9f87c85959df2679f28fa044293bef2f.lblqlwmygg.acm-validations.aws
+
+        - Name: docs.sign-in.service.gov.uk.
+          Type: CNAME
+          TTL: 3600
+          ResourceRecords:
+            - d308hhopufamea.cloudfront.net
+        - Name: _ea1fbf73402e0d458573ae1eacf1ced2.docs.sign-in.service.gov.uk.
+          Type: CNAME
+          TTL: 86400
+          ResourceRecords:
+            - _9711df122153a4efd1b7d26b7853eecf.fpkndhgbpx.acm-validations.aws
+
+        - Name: test-admin.sign-in.service.gov.uk.
+          Type: NS
+          TTL: 60
+          ResourceRecords:
+            - ns-858.awsdns-43.net.
+            - ns-1951.awsdns-51.co.uk.
+            - ns-1494.awsdns-58.org.
+            - ns-152.awsdns-19.com.
+
+Outputs:
+  HostedZone:
+    Description: Hosted Zone for sign-in.service.gov.uk
+    Value: !Ref SignInServiceHostedZone
+    Export:
+      Name: SignInServiceHostedZone
