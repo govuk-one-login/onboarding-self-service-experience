@@ -64,6 +64,23 @@ Resources:
             - ns-1494.awsdns-58.org.
             - ns-152.awsdns-19.com.
 
+        - Name: development.sign-in.service.gov.uk.
+          Type: NS
+          TTL: 60
+          ResourceRecords:
+            - ns-1673.awsdns-17.co.uk.
+            - ns-1520.awsdns-62.org.
+            - ns-456.awsdns-57.com.
+            - ns-760.awsdns-31.net.
+
+        - Name: preview.sign-in.service.gov.uk.
+          Type: NS
+          TTL: 60
+          ResourceRecords:
+            - ns-586.awsdns-09.net.
+            - ns-372.awsdns-46.com.
+            - ns-1074.awsdns-06.org.
+            - ns-1987.awsdns-56.co.uk.
 Outputs:
   HostedZone:
     Description: Hosted Zone for sign-in.service.gov.uk
