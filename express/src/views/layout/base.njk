@@ -7,7 +7,7 @@
 {% set showTopNav = showTopNav | default(true) %}
 {% set mainClasses = ["govuk-main-wrapper--auto-spacing", mainClasses] | join(" ") %}
 
-{% block pageTitle %}{{ pageTitle }} - GOV.UK One Login{% endblock %}
+{% block pageTitle %}{% if errorMessages %}Error: {% endif %}{{ pageTitle }} - GOV.UK One Login{% endblock %}
 
 {% block head %}
   <!--[if !IE 8]><!-->

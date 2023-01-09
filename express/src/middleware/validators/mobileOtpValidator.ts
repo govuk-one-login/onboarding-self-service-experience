@@ -9,7 +9,7 @@ export function mobileSecurityCodeValidator(
     hideNumber = true
 ): MiddlewareFunction<Request, Response, NextFunction> {
     return async (req: Request, res: Response, next: NextFunction) => {
-        const securityCode: string = req.body.securityCode.trim();
+        const securityCode: string = req.body.securityCode.replace(/\s+/g, "");
         let mobileNumber;
 
         if (hideNumber) {

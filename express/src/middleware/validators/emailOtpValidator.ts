@@ -3,7 +3,7 @@ import {validateSecurityCode} from "../../lib/validators/checkOtp";
 import {validationResult} from "../../lib/validators/validationResult";
 
 export async function emailSecurityCodeValidator(req: Request, res: Response, next: NextFunction) {
-    const securityCode = req.body.securityCode.trim();
+    const securityCode = req.body.securityCode.replace(/\s+/g, "");
 
     const result: validationResult = validateSecurityCode(securityCode);
 

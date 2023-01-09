@@ -47,6 +47,14 @@
     </div>
   {% endset %}
 
+  {% set redirectUrlsContainer %}
+      <ul class="govuk-list">
+        {% for item in redirectUrls %}
+          <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+  {% endset %}
+
   {{ govukSummaryList({
     rows: [
       {
@@ -55,7 +63,7 @@
       },
       {
         key: {text: "Redirect URIs"},
-        value: {text: redirectUrls},
+        value: {html: redirectUrlsContainer},
         actions: {
           items: [{
             href: urls.changeRedirectUris,
