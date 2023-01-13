@@ -16,11 +16,14 @@ export const VALID_PUBLIC_KEY_WITH_HEADERS =
     "yUsDFW32iN5s4jnawIRZQUSM77t9McHS7QOTLFkUDNxHAgMBAAE=\n" +
     "-----END PUBLIC KEY-----\n";
 
-// These seem to actually work in the app so it probably has something to do with the \n at the end of some lines.
 describe("public keys are properly prepared for the auth API call", () => {
-    it.skip("accepts a valid public key with no headers and no line breaks", () => {
+    it("accepts a valid public key with no headers and no line breaks", () => {
         expect(getAuthApiCompliantPublicKey(VALID_PUBLIC_KEY_NO_HEADERS_OR_LINE_BREAKS)).toEqual(
-            VALID_PUBLIC_KEY_NO_HEADERS_OR_LINE_BREAKS + "\n"
+            VALID_PUBLIC_KEY_NO_HEADERS_OR_LINE_BREAKS
         );
+    });
+
+    it("accepts a valid public key with headers and line breaks", () => {
+        expect(getAuthApiCompliantPublicKey(VALID_PUBLIC_KEY_WITH_HEADERS)).toEqual(VALID_PUBLIC_KEY_NO_HEADERS_OR_LINE_BREAKS);
     });
 });
