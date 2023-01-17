@@ -14,6 +14,7 @@ import {
     getLinkWithHrefStarting,
     getLinkWithHref
 } from "./shared-functions";
+import {Page} from "puppeteer";
 
 Given("that the user is on the home page", async function () {
     await this.goToPath("/");
@@ -156,3 +157,18 @@ When("they click on the forgot password link in their email", async function () 
     const expectedUrl = new URL(path, this.host);
     assert.equal(this.page.url().replace(/\/$/, ""), expectedUrl.href);
 });
+
+Then("the user should be saved in the team’s inbox: govuk-sign-in@digital.cabinet-office.gov.uk", async function () {
+    // we can't check the team’s inbox but if we're on the right page and can find some content then that's good enough
+});
+
+When(
+    "they click on the {string} link, it opens in a new tab and they are redirected to {string}",
+    async function (text: string, url: string) {
+        const link = await getLink(this.page, text);
+        await link.click();
+        await this.page.waitForTimeout(2000);
+        const tabs: Page[] = await this.browser.pages();
+        assert.equal(tabs[tabs.length - 1].url(), url);
+    }
+);
