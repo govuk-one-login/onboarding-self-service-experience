@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  DNS configuration for self-service staging domains deployed in staging account
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+  SignInServiceStagingHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: Hosted zone for sign-in.service.gov.uk staging sub-domain
+      Name: staging.sign-in.service.gov.uk.
+
+Outputs:
+  StagingHostedZone:
+    Description: Hosted Zone for sign-in.service.gov.uk staging sub-domain
+    Value: !Ref SignInServiceStagingHostedZone
+    Export:
+      Name: SignInServiceStagingHostedZone
