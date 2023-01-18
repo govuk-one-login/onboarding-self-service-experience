@@ -447,7 +447,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
-        serviceName: "Frontend Test Service",
+        serviceName: req.session.serviceName,
         users: [
             {
                 userPersonalName: "Courtney Toth",
