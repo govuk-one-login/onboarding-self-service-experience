@@ -4,7 +4,94 @@ Description: >-
 Transform:
   - AWS::Serverless-2016-10-31
 
+Parameters:
+  DomainOrEmailIdentityToVerify:
+    Type: String
+    Description: Domain or email that will be created as verified identity.
+  SignInHostedZone:
+    Type: String
+    Description: Deployment specific SignInHostedZone
+
 Resources:
+  DomainIdentityForSES:
+    Type: AWS::SES::EmailIdentity
+    Properties:
+      EmailIdentity: !Ref DomainOrEmailIdentityToVerify
+
+  DevelopmentEmailIdentityRoute53Records:
+    DependsOn:
+      - DomainIdentityForSES
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      Comment: "Records created to verify domain ownership with SES"
+      HostedZoneId: !ImportValue
+       'Fn::Sub': '${SignInHostedZone}'
+      RecordSets:
+        - Name: !GetAtt DomainIdentityForSES.DkimDNSTokenName1
+          Type: CNAME
+          TTL: 86400
+          ResourceRecords:
+            - !GetAtt DomainIdentityForSES.DkimDNSTokenValue1
+
+        - Name: !GetAtt DomainIdentityForSES.DkimDNSTokenName2
+          Type: CNAME
+          TTL: 86400
+          ResourceRecords:
+            - !GetAtt DomainIdentityForSES.DkimDNSTokenValue2
+
+        - Name: !GetAtt DomainIdentityForSES.DkimDNSTokenName3
+          Type: CNAME
+          TTL: 86400
+          ResourceRecords:
+            - !GetAtt DomainIdentityForSES.DkimDNSTokenValue3
+
+  confirmForgotPasswordCustomMessage:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            Sid: 'AuthorizeFromAddress'
+            Effect: Allow
+            Action:
+              - 'ses:SendEmail'
+              - 'ses:SendRawEmail'
+            Resource: !Sub arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${DomainOrEmailIdentityToVerify}
+            Condition:
+              StringEquals:
+                "ses:FromAddress": !Sub 'sign-in@${DomainOrEmailIdentityToVerify}'
+      Environment:
+        Variables:
+          FROM_EMAIL_ADDRESS: !Sub 'sign-in@${DomainOrEmailIdentityToVerify}'
+
+
+      Handler: src/handlers/confirm-forgot-password-message.handler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Sending confirmation email on confirm forgot password.
+      Events:
+        Cognito:
+          Type: Cognito
+          Properties:
+            Trigger: PostConfirmation
+            UserPool: !Ref UserPool
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/confirm-forgot-password-message.ts
+
   passwordResetCustomMessage:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
     # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
@@ -533,8 +620,7 @@ Resources:
             Version: "2012-10-17"
             Statement:
               Effect: "Allow"
-              Action:
-                "sns:publish"
+              Action: "sns:publish"
               Resource:
                 "*"
 
