@@ -67,6 +67,9 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         if (updates.public_key) {
             this.publicKey = updates.public_key;
         }
+        if (updates.service_name) {
+            this.serviceName = updates.service_name;
+        }
         return Promise.resolve({} as AxiosResponse);
     }
 

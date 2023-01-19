@@ -442,9 +442,12 @@ router.post("/resend-email-code", async (req, res) => {
 });
 
 // Testing route for 'Team members' page
-router.get("/team-members", (req, res) => {
+router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
     res.render("service-details/team-members.njk", {
-        serviceName: "Frontend Test Service",
+        serviceId: req.params.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        serviceName: req.session.serviceName,
         users: [
             {
                 userPersonalName: "Courtney Toth",
