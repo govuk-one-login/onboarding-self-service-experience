@@ -4,8 +4,12 @@ Description: >-
 Transform:
   - AWS::Serverless-2016-10-31
 
+Conditions:
+  isDevelopmentAccount: !Equals [ !Ref AWS::AccountId, "494650018671" ]
+
 Resources:
   SignInServiceDevelopmentHostedZone:
+    Condition: isDevelopmentAccount
     Type: AWS::Route53::HostedZone
     Properties:
       HostedZoneConfig:
@@ -14,6 +18,7 @@ Resources:
 
 
   SignInServicePreviewHostedZone:
+    Condition: isDevelopmentAccount
     Type: AWS::Route53::HostedZone
     Properties:
       HostedZoneConfig:
