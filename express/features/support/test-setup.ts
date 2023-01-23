@@ -18,6 +18,10 @@ export class TestContext extends World {
         await this.page?.goto(new URL(path, this.host).toString());
     }
 
+    get browser(): Browser {
+        return browser;
+    }
+
     get page(): Page {
         if (this.browserPage == undefined) {
             throw "Browser page is not present";
