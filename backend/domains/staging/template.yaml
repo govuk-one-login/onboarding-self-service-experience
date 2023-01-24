@@ -4,8 +4,12 @@ Description: >-
 Transform:
   - AWS::Serverless-2016-10-31
 
+Conditions:
+  isStagingAccount: !Equals [ !Ref AWS::AccountId, "325730373996" ]
+
 Resources:
   SignInServiceStagingHostedZone:
+    Condition: isStagingAccount
     Type: AWS::Route53::HostedZone
     Properties:
       HostedZoneConfig:

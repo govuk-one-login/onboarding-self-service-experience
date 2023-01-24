@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  DNS configuration for self-service integration domains deployed in integration account
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Conditions:
+  isIntegrationAccount: !Equals [ !Ref AWS::AccountId, "663985455444" ]
+
+Resources:
+  SignInServiceIntegrationHostedZone:
+    Condition: isIntegrationAccount
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: Hosted zone for sign-in.service.gov.uk integration sub-domain
+      Name: integration.sign-in.service.gov.uk.
+
+Outputs:
+  IntegrationHostedZone:
+    Description: Hosted Zone for sign-in.service.gov.uk integration sub-domain
+    Value: !Ref SignInServiceIntegrationHostedZone
+    Export:
+      Name: SignInServiceIntegrationHostedZone
+

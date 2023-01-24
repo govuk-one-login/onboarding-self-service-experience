@@ -5,8 +5,12 @@ Description: >-
 Transform:
   - AWS::Serverless-2016-10-31
 
+Conditions:
+  isProductionAccount: !Equals [ !Ref AWS::AccountId, "389946456390" ]
+
 Resources:
   SignInServiceHostedZone:
+    Condition: isProductionAccount
     Type: AWS::Route53::HostedZone
     Properties:
       HostedZoneConfig:
@@ -14,6 +18,7 @@ Resources:
       Name: sign-in.service.gov.uk.
 
   SignInServiceSubDomains:
+    Condition: isProductionAccount
     Type: AWS::Route53::RecordSetGroup
     DependsOn: SignInServiceHostedZone
     Properties:
@@ -90,6 +95,15 @@ Resources:
             - ns-1531.awsdns-63.org.
             - ns-548.awsdns-04.net.
             - ns-410.awsdns-51.com.
+
+        - Name: integration.sign-in.service.gov.uk.
+          Type: NS
+          TTL: 60
+          ResourceRecords:
+            - ns-833.awsdns-40.net.
+            - ns-1067.awsdns-05.org.
+            - ns-171.awsdns-21.com.
+            - ns-2026.awsdns-61.co.uk.
 Outputs:
   HostedZone:
     Description: Hosted Zone for sign-in.service.gov.uk
