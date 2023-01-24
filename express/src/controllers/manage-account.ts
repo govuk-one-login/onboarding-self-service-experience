@@ -63,19 +63,19 @@ export const showClient = async function (req: Request, res: Response) {
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         urls: {
             // TODO changeClientName is currently not used
-            changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURI(
+            changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURIComponent(
                 client.clientName
             )}`,
-            changeRedirectUris: `/change-redirect-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
+            changeRedirectUris: `/change-redirect-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURIComponent(
                 client.redirectUris.join(" ")
             )}`,
-            changeUserAttributes: `/change-user-attributes/${serviceId}/${selfServiceClientId}/${authClientId}?userAttributes=${encodeURI(
+            changeUserAttributes: `/change-user-attributes/${serviceId}/${selfServiceClientId}/${authClientId}?userAttributes=${encodeURIComponent(
                 client.scopes.join(" ")
             )}`,
-            changePublicKey: `/change-public-key/${serviceId}/${selfServiceClientId}/${authClientId}?publicKey=${encodeURI(
-                client.publicKey
+            changePublicKey: `/change-public-key/${serviceId}/${selfServiceClientId}/${authClientId}?publicKey=${encodeURIComponent(
+                userPublicKey
             )}`,
-            changePostLogoutUris: `/change-post-logout-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURI(
+            changePostLogoutUris: `/change-post-logout-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURIComponent(
                 client.postLogoutUris.join(" ")
             )}`
         }
