@@ -1,16 +1,15 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
-  DNS configuration for self-service
-
-Transform:
-  - AWS::Serverless-2016-10-31
+Transform: AWS::Serverless-2016-10-31
+Description: DNS configuration for self-service production
 
 Conditions:
-  isProductionAccount: !Equals [ !Ref AWS::AccountId, "389946456390" ]
+  IsProductionAccount: !Equals [ !Ref AWS::AccountId, "389946456390" ]
 
 Resources:
+  # The production nameservers are used by GOV.UK to direct traffic for sign-in and all subdomains to our hosted zone
+  # https://github.com/alphagov/govuk-dns-config/blob/main/service.gov.uk.yaml
   SignInServiceHostedZone:
-    Condition: isProductionAccount
+    Condition: IsProductionAccount
     Type: AWS::Route53::HostedZone
     Properties:
       HostedZoneConfig:
@@ -18,7 +17,7 @@ Resources:
       Name: sign-in.service.gov.uk.
 
   SignInServiceSubDomains:
-    Condition: isProductionAccount
+    Condition: IsProductionAccount
     Type: AWS::Route53::RecordSetGroup
     DependsOn: SignInServiceHostedZone
     Properties:
@@ -104,8 +103,10 @@ Resources:
             - ns-1067.awsdns-05.org.
             - ns-171.awsdns-21.com.
             - ns-2026.awsdns-61.co.uk.
+
 Outputs:
-  HostedZone:
+  SignInServiceHostedZone:
+    Condition: IsProductionAccount
     Description: Hosted Zone for sign-in.service.gov.uk
     Value: !Ref SignInServiceHostedZone
     Export:

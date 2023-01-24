@@ -1,15 +1,13 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
-  DNS configuration for self-service development and preview sub domains deployed in development account
-Transform:
-  - AWS::Serverless-2016-10-31
+Transform: AWS::Serverless-2016-10-31
+Description: DNS configuration for self-service development and preview sub domains deployed in the development account
 
 Conditions:
-  isDevelopmentAccount: !Equals [ !Ref AWS::AccountId, "494650018671" ]
+  IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, "494650018671" ]
 
 Resources:
   SignInServiceDevelopmentHostedZone:
-    Condition: isDevelopmentAccount
+    Condition: IsDevelopmentAccount
     Type: AWS::Route53::HostedZone
     Properties:
       HostedZoneConfig:
@@ -18,22 +16,23 @@ Resources:
 
 
   SignInServicePreviewHostedZone:
-    Condition: isDevelopmentAccount
+    Condition: IsDevelopmentAccount
     Type: AWS::Route53::HostedZone
     Properties:
       HostedZoneConfig:
         Comment: Hosted zone for sign-in.service.gov.uk preview sub-domain
       Name: preview.sign-in.service.gov.uk.
 
-
 Outputs:
   DevelopmentHostedZone:
+    Condition: IsDevelopmentAccount
     Description: Hosted Zone for sign-in.service.gov.uk development sub-domain
     Value: !Ref SignInServiceDevelopmentHostedZone
     Export:
       Name: SignInServiceDevelopmentHostedZone
 
   PreviewHostedZone:
+    Condition: IsDevelopmentAccount
     Description: Hosted Zone for sign-in.service.gov.uk preview sub-domain
     Value: !Ref SignInServicePreviewHostedZone
     Export:

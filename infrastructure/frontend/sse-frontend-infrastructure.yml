@@ -1,14 +1,18 @@
-Description: Infrastructure to run the DI Self-Service application
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
+Description: Infrastructure to deploy the DI self-service frontend
 
 Parameters:
   AppName:
     Type: String
     Default: self-service
 
+Conditions:
+  IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, "494650018671" ]
+
 Resources:
   FrontendECRRepository:
+    Condition: IsDevelopmentAccount
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: !Sub ${AppName}/frontend
@@ -41,6 +45,7 @@ Resources:
         }'
 
   FrontendECSExecutionRole:
+    Condition: IsDevelopmentAccount
     Type: AWS::IAM::Role
     Properties:
       Tags:
@@ -57,6 +62,7 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
 
   FrontendECSTaskRole:
+    Condition: IsDevelopmentAccount
     Type: AWS::IAM::Role
     Properties:
       Tags:
@@ -76,6 +82,7 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
 
   FrontendECSRoleParams:
+    Condition: IsDevelopmentAccount
     Type: AWS::SSM::Parameter
     Properties:
       Description: ARNs of the roles to use when deploying and running frontend ECS tasks
