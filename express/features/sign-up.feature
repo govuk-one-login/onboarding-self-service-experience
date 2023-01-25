@@ -42,7 +42,7 @@ Feature: Users can sign up to the self-service experience
 
       When the user submits the password "this-is-not-a-common-password"
       And the user submits the security code "123456"
-      Then they should be redirected to a page with path starting with "/client-details"
+      Then they should be redirected to a page with the path starting with "/client-details"
       And they should see the text "Your services"
 
     Scenario: The user tries to sign in and enters an empty password

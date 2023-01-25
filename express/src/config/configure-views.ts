@@ -6,7 +6,7 @@ export default function (app: Express) {
     const govukViews = require.resolve("govuk-frontend").match(/.*govuk-frontend\//)?.[0];
 
     if (!govukViews) {
-        throw "Couldn't load govuk-frontend module";
+        throw new Error("Couldn't load govuk-frontend module");
     }
 
     configure([views, govukViews], {

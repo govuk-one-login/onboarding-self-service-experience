@@ -39,12 +39,12 @@ Feature: Unhappy paths for the self-service sign-in flow
     When they click the Submit button
     Then they click on the "Forgot your password?" link
     Then they should be redirected to the "/forgot-password" page
-    Then they click on the "Continue" button-link
+    Then they click the Continue button
     Then they should be redirected to the "/check-email-password-reset" page
     When they click on the forgot password link in their email
     When the user submits the password "this-is-not-a-common-password"
     And the user submits the security code "123456"
-    Then they should be redirected to a page with path starting with "/client-details"
+    Then they should be redirected to a page with the path starting with "/client-details"
     And they should see the text "Your services"
     When they click on the "Your account" link
     Then they should be redirected to the "/account" page
@@ -55,7 +55,7 @@ Feature: Unhappy paths for the self-service sign-in flow
     When they click the Submit button
     Then they click on the "Forgot your password?" link
     Then they should be redirected to the "/forgot-password" page
-    Then they click on the "Continue" button-link
+    Then they click the Continue button
     Then they should be redirected to the "/check-email-password-reset" page
     When they click on the forgot password link in their email
     When the user submits the password "Password123"
@@ -66,7 +66,7 @@ Feature: Unhappy paths for the self-service sign-in flow
     When they click the Submit button
     Then they click on the "Forgot your password?" link
     Then they should be redirected to the "/forgot-password" page
-    Then they click on the "Continue" button-link
+    Then they click the Continue button
     Then they should be redirected to the "/check-email-password-reset" page
     Then they click the "Resend the email" button
     Then they should be redirected to the "/check-email-password-reset" page

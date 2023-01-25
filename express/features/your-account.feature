@@ -5,7 +5,7 @@ Feature: A page where users can view and change the details associated with thei
     And the user submits the email "registered@gds.gov.uk"
     And the user submits the password "this-is-not-a-common-password"
     And the user submits the security code "123123"
-    Then they should be redirected to a page with path starting with "/client-details"
+    Then they should be redirected to a page with the path starting with "/client-details"
 
     When they click on the "Your account" link
     Then they should be redirected to the "/account" page
@@ -75,12 +75,12 @@ Feature: A page where users can view and change the details associated with thei
       Then the error message "Your password must be 8 characters or more" must be displayed for the "password" field
 
     Scenario: User selects the Show toggle for the current password field
-      When they toggle "Show" link on field "currentPassword"
-      Then they see the toggle "Hide" link on field "currentPassword"
+      When they toggle the "Show" link on the field "currentPassword"
+      Then they see the toggle link "Hide" on the field "currentPassword"
 
     Scenario: User selects Show for the new password field
-      When they toggle "Show" link on field "password"
-      Then they see the toggle "Hide" link on field "password"
+      When they toggle the "Show" link on the field "password"
+      Then they see the toggle link "Hide" on the field "password"
 
     Scenario: User successfully changes their password
       When they enter "OldTestPa$$word" into the "currentPassword" field

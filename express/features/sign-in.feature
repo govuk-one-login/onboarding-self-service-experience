@@ -20,6 +20,6 @@ Feature: Happy paths for the self-service sign-in flow
     When they enter "registered@gds.gov.uk" into the "emailAddress" field
     When they click the Submit button
     Then they should see the text "Enter your password"
-    When they toggle the "Show" link
+    When they toggle the "Show" link on the field "password"
     When they enter "PasswordIsShown" into the "password" field
-    Then they see the toggle "Hide" link
+    Then they see the toggle link "Hide" on the field "password"
