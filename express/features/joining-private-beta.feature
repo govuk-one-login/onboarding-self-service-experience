@@ -1,7 +1,7 @@
 Feature: Joining private beta
 
   Background:
-    And that the user is on the "/sign-in" page
+    Given that the user is on the "/sign-in" page
     And the user submits the email "registered@gds.gov.uk"
     And the user submits the password "this-is-not-a-common-password"
     And the user submits the security code "123456"
@@ -10,7 +10,9 @@ Feature: Joining private beta
     Then they should be redirected to a page with the title "Joining private beta - GOV.UK One Login"
 
   Scenario: The user wants to find out more about private beta
-    When they click on the "private beta guidance (opens in new tab)" link, it opens in a new tab and they are redirected to "https://www.sign-in.service.gov.uk/getting-started/private-beta"
+    When they click on the "private beta guidance (opens in new tab)" link that opens in a new tab
+    Then they should be directed to the URL "https://www.sign-in.service.gov.uk/getting-started/private-beta"
+    And they should see the text "Find out more about private beta"
 
   Scenario: The user does not enter any characters into the Your name field
     When they enter "" into the "yourName" field
@@ -30,14 +32,12 @@ Feature: Joining private beta
     When they enter "Test User" into the "yourName" field
     When they enter "Test Department" into the "department" field
     When they click the Submit button
-    Then the user should be saved in the team’s inbox: govuk-sign-in@digital.cabinet-office.gov.uk
     Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
 
   Scenario: The user wants to contact the team via slack
     When they enter "Test User" into the "yourName" field
     When they enter "Test Department" into the "department" field
     When they click the Submit button
-    Then the user should be saved in the team’s inbox: govuk-sign-in@digital.cabinet-office.gov.uk
     Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
     When they click on the "Slack channel" link
     Then they should be directed to the URL "https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC"
@@ -46,7 +46,6 @@ Feature: Joining private beta
     When they enter "Test User" into the "yourName" field
     When they enter "Test Department" into the "department" field
     When they click the Submit button
-    Then the user should be saved in the team’s inbox: govuk-sign-in@digital.cabinet-office.gov.uk
     Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
     When they click on the "support form" link
     Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us"

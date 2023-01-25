@@ -37,6 +37,19 @@ export async function clickElement(page: Page, element: ElementHandle, timeout =
     await Promise.all([page.waitForNavigation({timeout: timeout}), element.click()]);
 }
 
+export async function clickLinkThatOpensInNewTab(page: Page, link: ElementHandle, timeout = defaultTimeout): Promise<Page> {
+    const newTab = page.browser().waitForTarget(target => target.opener() === page.target(), {timeout: timeout});
+    await Promise.all([newTab, link.click()]);
+
+    const newPage = await newTab.then(tab => tab.page());
+    if (newPage === null) {
+        throw new Error("Could not open link in a new tab");
+    }
+
+    await newPage.reload({timeout: timeout});
+    return newPage;
+}
+
 export async function clickSubmitButton(page: Page, timeout = defaultTimeout) {
     await clickButtonWithId(page, "submit", timeout);
 }

@@ -5,16 +5,16 @@ import {
     checkErrorMessageDisplayedForField,
     checkUrl,
     clickElement,
+    clickLinkThatOpensInNewTab,
     clickSubmitButton,
     enterTextIntoTextInput,
     getButtonAnchor,
     getButtonLink,
     getButtonWithText,
     getLink,
-    getLinkWithHrefStarting,
-    getLinkWithHref
+    getLinkWithHref,
+    getLinkWithHrefStarting
 } from "./shared-functions";
-import {Page} from "puppeteer";
 
 Given("that the user is on the home page", async function () {
     await this.goToPath("/");
@@ -27,6 +27,12 @@ Given("that the user is on the {string} page", async function (path: string) {
 When("they click on the {string} link", async function (text: string) {
     const link = await getLink(this.page, text);
     await clickElement(this.page, link);
+});
+
+When("they click on the {string} link that opens in a new tab", async function (this: TestContext, linkText: string) {
+    const link = await getLink(this.page, linkText);
+    this.page = await clickLinkThatOpensInNewTab(this.page, link);
+    await this.page.bringToFront();
 });
 
 When("they click on the link with the url that starts with {string}", async function (text: string) {
@@ -89,7 +95,7 @@ Then("they should be redirected to a page with path starting with {string}", asy
     assert.equal(this.page.url().startsWith(expectedUrl.href), true);
 });
 
-Then("they should be directed to the URL {string}", async function (url) {
+Then("they should be directed to the URL {string}", async function (this: TestContext, url: string) {
     assert.equal(this.page.url(), url);
 });
 
@@ -157,18 +163,3 @@ When("they click on the forgot password link in their email", async function () 
     const expectedUrl = new URL(path, this.host);
     assert.equal(this.page.url().replace(/\/$/, ""), expectedUrl.href);
 });
-
-Then("the user should be saved in the team’s inbox: govuk-sign-in@digital.cabinet-office.gov.uk", async function () {
-    // we can't check the team’s inbox but if we're on the right page and can find some content then that's good enough
-});
-
-When(
-    "they click on the {string} link, it opens in a new tab and they are redirected to {string}",
-    async function (text: string, url: string) {
-        const link = await getLink(this.page, text);
-        await link.click();
-        await this.page.waitForTimeout(2000);
-        const tabs: Page[] = await this.browser.pages();
-        assert.equal(tabs[tabs.length - 1].url(), url);
-    }
-);
