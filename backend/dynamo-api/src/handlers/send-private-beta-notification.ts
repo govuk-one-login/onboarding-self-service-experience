@@ -26,12 +26,11 @@ export const privateBetaRequestHandler = async (event: APIGatewayProxyEvent): Pr
         .then(sendOutput => {
             response.statusCode = 200;
             response.body = JSON.stringify(sendOutput);
-            console.log("PRIVATE_BETA_REQUEST:", emailContent);
         })
         .catch(sendOutput => {
             response.statusCode = 500;
             response.body = JSON.stringify(sendOutput);
-            console.error("Error occurred in sending message to request to join private beta topic:" + response);
+            console.error("Error occurred in sending message to request to join private beta topic: " + response);
         });
 
     return response;

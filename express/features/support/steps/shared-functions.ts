@@ -18,23 +18,36 @@ export async function getLinkWithHrefStarting(page: Page, hrefStarting: string):
     return getSingleElement(links, hrefStarting);
 }
 
-export async function getButtonWithText(page: Page, buttonText: string): Promise<ElementHandle> {
-    const buttons = await page.$x(`//button[contains(text(), '${buttonText}')]`);
+export async function getButton(page: Page, buttonText: string, buttonClass?: string, linkedFieldName?: string): Promise<ElementHandle> {
+    const classSelector = buttonClass ? `[@class="${buttonClass}"]` : "";
+    const ariaSelector = linkedFieldName ? `[@aria-controls="${linkedFieldName}"]` : "";
+    const buttons = await page.$x(`//button[contains(text(), "${buttonText}")]${classSelector}${ariaSelector}`);
     return getSingleElement(buttons, buttonText);
 }
 
-export async function getButtonAnchor(page: Page, linkText: string): Promise<ElementHandle> {
-    const links = await page.$x(`//a[contains(text(), "${linkText}")][@class="govuk-button"]`);
-    return getSingleElement(links, linkText);
-}
+export async function getButtonLink(page: Page, buttonText: string): Promise<ElementHandle | undefined> {
+    const buttons = await page.$x(`//a[contains(text(), "${buttonText}")][@role="button"][@class="govuk-button"]`);
 
-export async function getButtonLink(page: Page, linkText: string, buttonClass = "govuk-button", fieldName: string): Promise<ElementHandle> {
-    const links = await page.$x(`//button[contains(text(), "${linkText}")][@class="${buttonClass}"][@aria-controls="${fieldName}"]`);
-    return getSingleElement(links, linkText);
+    if (buttons.length == 1) {
+        return buttons[0];
+    }
 }
 
 export async function clickElement(page: Page, element: ElementHandle, timeout = defaultTimeout) {
     await Promise.all([page.waitForNavigation({timeout: timeout}), element.click()]);
+}
+
+export async function clickLinkThatOpensInNewTab(page: Page, link: ElementHandle, timeout = defaultTimeout): Promise<Page> {
+    const newTab = page.browser().waitForTarget(target => target.opener() === page.target(), {timeout: timeout});
+    await Promise.all([newTab, link.click()]);
+
+    const newPage = await newTab.then(tab => tab.page());
+    if (newPage === null) {
+        throw new Error("Could not open link in a new tab");
+    }
+
+    await newPage.reload({timeout: timeout});
+    return newPage;
 }
 
 export async function clickSubmitButton(page: Page, timeout = defaultTimeout) {
@@ -48,11 +61,6 @@ export async function clickButtonWithId(page: Page, id: string, timeout = defaul
 export async function checkUrl(page: Page, link: ElementHandle, expectedUrl: string) {
     const actualUrl = await page.evaluate(element => element.getAttribute("href"), link);
     assert.equal(actualUrl, expectedUrl);
-}
-
-function getSingleElement(elements: ElementHandle[], match: string): ElementHandle {
-    assert.equal(elements.length, 1, `Not exactly one element matched ${match} (matches: ${elements.length})`);
-    return elements[0];
 }
 
 export async function enterTextIntoTextInput(page: Page, text: string, inputId: string) {
@@ -81,4 +89,9 @@ export async function checkErrorMessageDisplayedForField(page: Page, errorLink: 
         "Error: " + errorMessage,
         `Expected the message above the ${field} field to be ${errorMessage}`
     );
+}
+
+function getSingleElement(elements: ElementHandle[], match: string): ElementHandle {
+    assert.equal(elements.length, 1, `Not exactly one element matched ${match} (matches: ${elements.length})`);
+    return elements[0];
 }

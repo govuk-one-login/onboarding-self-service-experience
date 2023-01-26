@@ -5,16 +5,15 @@ import {
     checkErrorMessageDisplayedForField,
     checkUrl,
     clickElement,
+    clickLinkThatOpensInNewTab,
     clickSubmitButton,
     enterTextIntoTextInput,
-    getButtonAnchor,
+    getButton,
     getButtonLink,
-    getButtonWithText,
     getLink,
-    getLinkWithHrefStarting,
-    getLinkWithHref
+    getLinkWithHref,
+    getLinkWithHrefStarting
 } from "./shared-functions";
-import {Page} from "puppeteer";
 
 Given("that the user is on the home page", async function () {
     await this.goToPath("/");
@@ -29,7 +28,13 @@ When("they click on the {string} link", async function (text: string) {
     await clickElement(this.page, link);
 });
 
-When("they click on the link with the url that starts with {string}", async function (text: string) {
+When("they click on the {string} link that opens in a new tab", async function (this: TestContext, linkText: string) {
+    const link = await getLink(this.page, linkText);
+    this.page = await clickLinkThatOpensInNewTab(this.page, link);
+    await this.page.bringToFront();
+});
+
+When("they click on the link with the URL starting with {string}", async function (text: string) {
     const link = await getLinkWithHrefStarting(this.page, text);
     await clickElement(this.page, link);
 });
@@ -39,34 +44,16 @@ When("they click on the link that points to {string}", async function (href: str
     await clickElement(this.page, link);
 });
 
-When("they click on the {string} button-link", async function (text: string) {
-    const link = await getButtonAnchor(this.page, text);
-    await clickElement(this.page, link);
+Then("they see the toggle link {string} on the field {string}", async function (text: string, fieldName: string) {
+    await getButton(this.page, text, "gem-c-show-password__toggle", fieldName);
 });
 
-When("they toggle the {string} link", async function (text: string) {
-    const link = await getButtonLink(this.page, text, "gem-c-show-password__toggle", "password");
+When("they toggle the {string} link on the field {string}", async function (text: string, fieldName: string) {
+    const link = await getButton(this.page, text, "gem-c-show-password__toggle", fieldName);
     await link.click();
-});
-
-Then("they see the toggle {string} link", async function (text: string) {
-    await getButtonLink(this.page, text, "gem-c-show-password__toggle", "password");
-});
-
-When("they toggle {string} link on field {string}", async function (text: string, fieldName: string) {
-    const link = await getButtonLink(this.page, text, "gem-c-show-password__toggle", fieldName);
-    await link.click();
-});
-
-Then("they see the toggle {string} link on field {string}", async function (text: string, fieldName: string) {
-    await getButtonLink(this.page, text, "gem-c-show-password__toggle", fieldName);
 });
 
 When("they click the Submit button", async function () {
-    await clickSubmitButton(this.page);
-});
-
-When("they click the Continue button", async function () {
     await clickSubmitButton(this.page);
 });
 
@@ -74,22 +61,31 @@ When("they click the Confirm button", async function () {
     await clickSubmitButton(this.page);
 });
 
+When("they click the Continue button", async function () {
+    const button = await getButtonLink(this.page, "Continue");
+
+    if (button) {
+        await clickElement(this.page, button);
+        return;
+    }
+
+    await clickSubmitButton(this.page);
+});
+
 When("they click the {string} button", async function (text: string) {
-    const button = await getButtonWithText(this.page, text);
+    const button = await getButton(this.page, text);
     await clickElement(this.page, button);
 });
 
-Then("they should be redirected to the {string} page", async function (this: TestContext, path: string) {
-    const expectedUrl = new URL(path, this.host);
-    assert.equal(this.page.url().replace(/\/$/, ""), expectedUrl.href);
+Then("they should be redirected to the {string} page", async function (this: TestContext, expectedPath: string) {
+    assert.equal(new URL(this.page.url()).pathname, expectedPath);
 });
 
-Then("they should be redirected to a page with path starting with {string}", async function (this: TestContext, path: string) {
-    const expectedUrl = new URL(path, this.host);
-    assert.equal(this.page.url().startsWith(expectedUrl.href), true);
+Then("they should be redirected to a page with the path starting with {string}", async function (this: TestContext, expectedPath: string) {
+    assert.ok(new URL(this.page.url()).pathname.startsWith(expectedPath));
 });
 
-Then("they should be directed to the URL {string}", async function (url) {
+Then("they should be directed to the URL {string}", async function (this: TestContext, url: string) {
     assert.equal(this.page.url(), url);
 });
 
@@ -154,21 +150,4 @@ When("the user submits the mobile phone number {string}", async function (mobile
 When("they click on the forgot password link in their email", async function () {
     const path = "/create-new-password?userName=registered@gds.gov.uk&confirmationCode=123456";
     await this.goToPath(path);
-    const expectedUrl = new URL(path, this.host);
-    assert.equal(this.page.url().replace(/\/$/, ""), expectedUrl.href);
 });
-
-Then("the user should be saved in the team’s inbox: govuk-sign-in@digital.cabinet-office.gov.uk", async function () {
-    // we can't check the team’s inbox but if we're on the right page and can find some content then that's good enough
-});
-
-When(
-    "they click on the {string} link, it opens in a new tab and they are redirected to {string}",
-    async function (text: string, url: string) {
-        const link = await getLink(this.page, text);
-        await link.click();
-        await this.page.waitForTimeout(2000);
-        const tabs: Page[] = await this.browser.pages();
-        assert.equal(tabs[tabs.length - 1].url(), url);
-    }
-);
