@@ -1,6 +1,7 @@
 name: Check PR
 
 on: pull_request
+permissions: read-all
 
 jobs:
   code-quality:

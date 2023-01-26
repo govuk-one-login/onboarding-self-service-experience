@@ -1,6 +1,7 @@
 name: Check code quality
 
 on: workflow_call
+permissions: read-all
 
 concurrency:
   group: code-quality-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
@@ -36,3 +37,11 @@ jobs:
     steps:
       - name: Check linting and formatting
         uses: alphagov/di-github-actions/code-quality/check-linting@e0e43b4ca78aca47971596806a8f4693e6a84dc7
+
+  check-vulnerabilities:
+    name: Vulnerabilities
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run security audit
+        uses: alphagov/di-github-actions/code-quality/run-security-audit@f7757df1f626d0c47a92a92328e1d02b6c597bff
