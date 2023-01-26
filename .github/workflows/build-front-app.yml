@@ -35,7 +35,7 @@ jobs:
           retention-days: 7
           path: |
             express/dist
-            express/stub
+            express/stubs
             express/resources
             express/src/views
             express/assets/images

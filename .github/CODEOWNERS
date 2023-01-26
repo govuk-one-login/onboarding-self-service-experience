@@ -1,1 +1,14 @@
-*		@alphagov/digital-identity-onboarding-tech-leads
+# Global
+*   @alphagov/digital-identity-self-service-approvers
+
+# Infrastructure
+/.github/             @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
+/backend/             @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
+/infrastructure/      @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
+
+# Frontend
+/express/assets/      @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers
+/express/features/    @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers
+/express/src/routes/  @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers
+/express/src/views/   @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers
+/express/stubs/       @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers

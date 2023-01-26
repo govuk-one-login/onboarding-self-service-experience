@@ -103,7 +103,7 @@ export class CognitoClient implements CognitoInterface {
 
     constructor() {
         console.log("Creating stub Cognito client...");
-        this.overrides = fs.readFile(path.join(__dirname, "../../../stub/stubs-config.json")).then(buffer => buffer.toString());
+        this.overrides = fs.readFile(path.join(__dirname, "../../../stubs/stubs-config.json")).then(buffer => buffer.toString());
         this.authenticationResult.IdToken = this.getIdToken();
         this.authenticationResult.AccessToken = this.getAccessToken();
     }
