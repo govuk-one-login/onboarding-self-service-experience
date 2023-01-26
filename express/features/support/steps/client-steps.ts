@@ -1,5 +1,7 @@
-import {Given} from "@cucumber/cucumber";
+import {Given, Then} from "@cucumber/cucumber";
 import {clickSubmitButton, enterTextIntoTextInput} from "./shared-functions";
+import {strict as assert} from "assert";
+import {TestContext} from "../test-setup";
 
 const VALID_PUBLIC_KEY =
     "-----BEGIN PUBLIC KEY-----\n" +
@@ -29,4 +31,10 @@ Given("the user submits a valid public key with headers", async function () {
 Given("the user submits a valid public key without headers", async function () {
     await enterTextIntoTextInput(this.page, VALID_PUBLIC_KEY_WITHOUT_HEADERS, "serviceUserPublicKey");
     await clickSubmitButton(this.page);
+});
+
+Then("they should see the public key they just entered in the textarea", async function (this: TestContext) {
+    const textArea = await this.page.$("#serviceUserPublicKey");
+    const textAreaContent = await this.page.evaluate(element => element.textContent, textArea);
+    assert.equal(textAreaContent, VALID_PUBLIC_KEY_WITHOUT_HEADERS.replace(/\n/g, ""));
 });

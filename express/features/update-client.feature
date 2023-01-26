@@ -19,3 +19,11 @@ Feature: Users can update clients
       And the user submits a valid public key without headers
       Then they should be redirected to a page with path starting with "client-details"
       And they should see the text "You have changed your public key"
+
+    Scenario: the user submits a valid public key and then thinks maybe they need to edit it by hand
+      Given they click on the link with the url that starts with "/change-public-key/"
+      And the user submits a valid public key without headers
+      Then they should be redirected to a page with path starting with "client-details"
+      And they should see the text "You have changed your public key"
+      And they click on the link with the url that starts with "/change-public-key/"
+      Then they should see the public key they just entered in the textarea
