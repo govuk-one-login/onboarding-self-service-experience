@@ -7,8 +7,10 @@ Conditions:
 
 Resources:
   SignInServiceStagingHostedZone:
-    Condition: IsStagingAccount
     Type: AWS::Route53::HostedZone
+    Condition: IsStagingAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       HostedZoneConfig:
         Comment: Hosted zone for sign-in.service.gov.uk staging sub-domain

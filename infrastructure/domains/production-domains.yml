@@ -9,17 +9,21 @@ Resources:
   # The production nameservers are used by GOV.UK to direct traffic for sign-in and all subdomains to our hosted zone
   # https://github.com/alphagov/govuk-dns-config/blob/main/service.gov.uk.yaml
   SignInServiceHostedZone:
-    Condition: IsProductionAccount
     Type: AWS::Route53::HostedZone
+    Condition: IsProductionAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       HostedZoneConfig:
         Comment: Hosted zone for sign-in.service.gov.uk
       Name: sign-in.service.gov.uk.
 
   SignInServiceSubDomains:
-    Condition: IsProductionAccount
     Type: AWS::Route53::RecordSetGroup
+    Condition: IsProductionAccount
     DependsOn: SignInServiceHostedZone
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       Comment: Records for the subdomains of sign-in.service.gov.uk many records point to cloudfront
       HostedZoneId: !Ref SignInServiceHostedZone

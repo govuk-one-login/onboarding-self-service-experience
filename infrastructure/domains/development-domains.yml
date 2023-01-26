@@ -7,17 +7,20 @@ Conditions:
 
 Resources:
   SignInServiceDevelopmentHostedZone:
-    Condition: IsDevelopmentAccount
     Type: AWS::Route53::HostedZone
+    Condition: IsDevelopmentAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       HostedZoneConfig:
         Comment: Hosted zone for sign-in.service.gov.uk development sub-domain
       Name: development.sign-in.service.gov.uk.
 
-
   SignInServicePreviewHostedZone:
-    Condition: IsDevelopmentAccount
     Type: AWS::Route53::HostedZone
+    Condition: IsDevelopmentAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       HostedZoneConfig:
         Comment: Hosted zone for sign-in.service.gov.uk preview sub-domain

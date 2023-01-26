@@ -7,8 +7,10 @@ Conditions:
 
 Resources:
   SignInServiceIntegrationHostedZone:
-    Condition: IsIntegrationAccount
     Type: AWS::Route53::HostedZone
+    Condition: IsIntegrationAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       HostedZoneConfig:
         Comment: Hosted zone for sign-in.service.gov.uk integration sub-domain
