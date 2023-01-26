@@ -1,6 +1,8 @@
 import {
     AttributeValue,
-    DynamoDBClient, GetItemCommand, GetItemCommandOutput,
+    DynamoDBClient,
+    GetItemCommand,
+    GetItemCommandOutput,
     PutItemCommand,
     PutItemCommandOutput,
     QueryCommand,
@@ -12,9 +14,10 @@ import {marshall} from "@aws-sdk/util-dynamodb";
 import * as process from "process";
 import {OnboardingTableItem} from "../@Types/OnboardingTableItem";
 
+type AttributeData = number | boolean | string | string[];
 type AttributeNames = {[nameToken: string]: string};
 type AttributeValues = {[valueToken: string]: AttributeValue};
-type Updates = {[attribute: string]: number | boolean | string | string[]};
+type Updates = {[attributeName: string]: AttributeData};
 
 class DynamoClient {
     private static readonly KEYWORD_SUBSTITUTES: {[name: string]: string} = {
@@ -141,11 +144,11 @@ class DynamoClient {
         return `:${attributeName}`;
     }
 
-    private marshallAttribute(attribute: any): any {
+    private marshallAttribute(attribute: AttributeData): AttributeValue {
         if (Array.isArray(attribute)) {
-            return {L: marshall(attribute)};
+            return {L: marshall(attribute)} as unknown as AttributeValue.LMember;
         } else {
-            return marshall(attribute);
+            return marshall(attribute) as unknown as AttributeValue;
         }
     }
 }
