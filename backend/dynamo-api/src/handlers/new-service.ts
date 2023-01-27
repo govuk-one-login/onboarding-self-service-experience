@@ -1,8 +1,8 @@
-import {SFNClient, StartSyncExecutionCommand} from '@aws-sdk/client-sfn'
-import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
+import {SFNClient, StartSyncExecutionCommand} from "@aws-sdk/client-sfn";
+import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from "aws-lambda";
 import * as process from "process";
 
-const stepFunctionsClient = new SFNClient({region: 'eu-west-2'});
+const stepFunctionsClient = new SFNClient({region: "eu-west-2"});
 
 export const newServiceHandler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
     const payload = event?.body ? JSON.parse(event.body as string) : event;
@@ -11,10 +11,9 @@ export const newServiceHandler = async (event: APIGatewayProxyEvent, context: Co
     const params = {
         stateMachineArn,
         input
-    }
+    };
+
     const invokeCommand = new StartSyncExecutionCommand(params);
     const result = await stepFunctionsClient.send(invokeCommand);
-    let response = {statusCode: 200, body: JSON.stringify(result)};
-
-    return response;
+    return {statusCode: 200, body: JSON.stringify(result)};
 };

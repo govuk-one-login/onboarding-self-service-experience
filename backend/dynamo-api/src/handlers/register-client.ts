@@ -9,6 +9,7 @@ const instance: Axios = axios.create({
 });
 
 export const registerClientHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    // TODO remove explicit any
     const payload: any = event;
 
     const public_key =

@@ -6,7 +6,7 @@ const client = new DynamoClient();
 export const putServiceHandler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
     const payload = event?.body ? JSON.parse(event.body as string) : event;
 
-    let response = {statusCode: 200, body: JSON.stringify("OK")};
+    const response = {statusCode: 200, body: JSON.stringify("OK")};
     await client
         .put({
             pk: payload.service.id,

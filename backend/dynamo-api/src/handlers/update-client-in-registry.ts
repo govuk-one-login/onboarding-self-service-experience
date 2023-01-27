@@ -1,16 +1,15 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import axios, { Axios } from "axios"; // TODO: Until Onboarding takes over client registry / just for now
+import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
+import axios, {Axios} from "axios";
 
-let instance: Axios;
-
-instance = axios.create({
+// TODO: Until Onboarding takes over client registry / just for now
+const instance: Axios = axios.create({
     baseURL: process.env.AUTH_REGISTRATION_BASE_URL,
     headers: {
         "Content-Type": "application/json"
     }
 });
-
 export const updateClientInRegistryHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    // TODO remove explicit any
     const payload: any = event;
     const result = await (await instance).put(`/connect/register/${payload.clientId}`, payload.updates);
 
@@ -23,4 +22,4 @@ export const updateClientInRegistryHandler = async (event: APIGatewayProxyEvent)
             selfServiceClientId: payload.selfServiceClientId
         })
     };
-}
+};
