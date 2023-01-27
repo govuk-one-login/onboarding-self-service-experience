@@ -1,6 +1,6 @@
-Description: AWS role to manage DI Self-Service infrastructure from GitHub Actions
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
+Description: AWS role to manage DI self-service infrastructure from GitHub Actions
 
 Parameters:
   GitHubOrg:

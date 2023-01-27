@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
-  DNS configuration for self-service staging domains deployed in staging account
-Transform:
-  - AWS::Serverless-2016-10-31
+Transform: AWS::Serverless-2016-10-31
+Description: DNS configuration for self-service staging domains deployed in the staging account
 
 Conditions:
-  isStagingAccount: !Equals [ !Ref AWS::AccountId, "325730373996" ]
+  IsStagingAccount: !Equals [ !Ref AWS::AccountId, "325730373996" ]
 
 Resources:
   SignInServiceStagingHostedZone:
-    Condition: isStagingAccount
     Type: AWS::Route53::HostedZone
+    Condition: IsStagingAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       HostedZoneConfig:
         Comment: Hosted zone for sign-in.service.gov.uk staging sub-domain
@@ -18,6 +18,7 @@ Resources:
 
 Outputs:
   StagingHostedZone:
+    Condition: IsStagingAccount
     Description: Hosted Zone for sign-in.service.gov.uk staging sub-domain
     Value: !Ref SignInServiceStagingHostedZone
     Export:
