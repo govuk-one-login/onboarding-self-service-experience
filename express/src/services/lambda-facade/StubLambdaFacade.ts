@@ -6,6 +6,7 @@ import {Service} from "../../../@types/Service";
 import {DynamoUser} from "../../../@types/user";
 import {Updates} from "../self-service-services-service";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
+import {marshall} from "@aws-sdk/util-dynamodb";
 
 /* eslint-disable @typescript-eslint/no-unused-vars --
  * Ignore unused vars in stubs
@@ -24,9 +25,15 @@ class StubLambdaFacade implements LambdaFacadeInterface {
 
     private readonly defaultPublicKey =
         "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
-
     publicKey = this.defaultPublicKey;
+
     serviceName = "";
+
+    redirectUris = ["http://localhost/"];
+
+    postLogoutRedirectUris = ["http://localhost/", "http://localhost/logged_out"];
+
+    scopes = ["openid"];
 
     constructor() {
         console.log("Creating stub lambda facade...");
@@ -61,14 +68,23 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         serviceId: string,
         selfServiceClientId: string,
         clientId: string,
-        updates: Record<string, string>,
+        updates: Record<string, unknown>,
         accessToken: string
     ): Promise<AxiosResponse> {
         if (updates.public_key) {
-            this.publicKey = updates.public_key;
+            this.publicKey = updates.public_key as string;
         }
         if (updates.service_name) {
-            this.serviceName = updates.service_name;
+            this.serviceName = updates.service_name as string;
+        }
+        if (updates.redirect_uris) {
+            this.redirectUris = updates.redirect_uris as [];
+        }
+        if (updates.post_logout_redirect_uris) {
+            this.postLogoutRedirectUris = updates.post_logout_redirect_uris as [];
+        }
+        if (updates.scopes) {
+            this.scopes = updates.scopes as [];
         }
         return Promise.resolve({} as AxiosResponse);
     }
@@ -95,13 +111,13 @@ class StubLambdaFacade implements LambdaFacadeInterface {
                 Items: [
                     {
                         service_name: {S: this.serviceName || "Test Service"},
-                        post_logout_redirect_uris: {L: [{S: "http://localhost/"}, {S: "http://localhost/logged_out"}]},
+                        post_logout_redirect_uris: this.marshallArray(this.postLogoutRedirectUris),
                         subject_type: {S: "pairwise"},
                         contacts: {L: [{S: "john.watts@digital.cabinet-office.gov.uk"}, {S: "onboarding@digital.cabinet-office.gov.uk"}]},
                         public_key: {
                             S: this.publicKey
                         },
-                        scopes: {L: [{S: "openid"}]},
+                        scopes: this.marshallArray(this.scopes),
                         clientId: {S: "P0_ZdXojEGDlaZEU8Q9Zlv-fo1s"},
                         default_fields: {
                             L: [
@@ -115,7 +131,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
                             ]
                         },
                         data: {S: "SAM Service as a Service Service"},
-                        redirect_uris: {L: [{S: "http:/localhost/"}, {S: "http:/localhost/logged-in"}]},
+                        redirect_uris: this.marshallArray(this.redirectUris),
                         sk: {S: "client#d61db4f3-7403-431d-9ead-14cc96476ce4"},
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
                         service_type: {S: "MANDATORY"},
@@ -139,6 +155,10 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         accessToken: string
     ): Promise<AxiosResponse> {
         return Promise.resolve({} as AxiosResponse);
+    }
+
+    marshallArray(uris: string[]): Record<string, unknown> {
+        return {L: marshall(uris)};
     }
 }
 

@@ -151,3 +151,25 @@ When("they click on the forgot password link in their email", async function () 
     const path = "/create-new-password?userName=registered@gds.gov.uk&confirmationCode=123456";
     await this.goToPath(path);
 });
+
+When("they enter their public key:", async function (text: string) {
+    await enterTextIntoTextInput(this.page, text, "serviceUserPublicKey");
+});
+
+When("they click the element with the id {string}", async function (elementId: string) {
+    const element = await this.page.$(`#${elementId}`);
+    await element.click();
+});
+
+Then("the hidden content of the element with id {string} is displayed", async function (this: TestContext, elementId: string) {
+    const elementIsOpen = await this.page.$eval(`#${elementId}`, element => element.hasAttribute("open"));
+    assert.equal(elementIsOpen, true);
+});
+
+Then(
+    "the value of the text field with the id {string} should be {string}",
+    async function (this: TestContext, elementId: string, attributeValueToCheck: string) {
+        const elementAttributeValue = await this.page.$eval(`#${elementId}`, element => element.getAttribute("value"));
+        assert.equal(elementAttributeValue, attributeValueToCheck);
+    }
+);

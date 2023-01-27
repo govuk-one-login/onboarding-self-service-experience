@@ -55,6 +55,10 @@
       </ul>
   {% endset %}
 
+  {% set userAttributesContainer %}
+    <span id="userAttributesContainer">{{ userAttributesRequired }}</span>
+  {% endset %}
+
   {{ govukSummaryList({
     rows: [
       {
@@ -74,7 +78,7 @@
       },
       {
         key: {text: "User attributes required"},
-        value: {html: userAttributesRequired},
+        value: {html: userAttributesContainer},
         actions: {
           items: [{
             href: urls.changeUserAttributes,
@@ -108,8 +112,8 @@
     ]
   }) }}
 
-  <details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary">
+  <details class="govuk-details" data-module="govuk-details" id="client-details-summary">
+    <summary class="govuk-details__summary" id="client-details-summary-toggle">
       <span class="govuk-details__summary-text">What do these terms mean?</span>
     </summary>
     <div class="govuk-details__text">

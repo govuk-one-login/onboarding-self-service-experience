@@ -1,4 +1,4 @@
-import {Given, Then} from "@cucumber/cucumber";
+import {Given, Then, When} from "@cucumber/cucumber";
 import {clickSubmitButton, enterTextIntoTextInput} from "./shared-functions";
 import {strict as assert} from "assert";
 import {TestContext} from "../test-setup";
@@ -54,4 +54,37 @@ Then("they should see the public key they just entered in an inset text componen
     const publicKeySpan = await this.page.$("p#current-public-key");
     const publicKey = await this.page.evaluate(element => element.textContent, publicKeySpan);
     assert.equal(publicKey.replace(/\n/g, "").trim(), VALID_PUBLIC_KEY_WITHOUT_HEADERS.replace(/\n/g, ""));
+});
+
+Then("they should only see the first 24 characters of the public key for their service", async function (this: TestContext) {
+    const keyContainerContent: string = await this.page.$eval("#publicKeyShort", element => element.textContent);
+    assert.equal(keyContainerContent.length, 28);
+});
+
+When("they click 'email' checkbox", async function () {
+    const emailCheckboxInput = await this.page.$("#userAttributes");
+    if (!emailCheckboxInput) {
+        throw new Error(`Could not find element with id userAttributes`);
+    }
+    await emailCheckboxInput.click();
+});
+
+Then("the attribute with the name 'email' is displayed in the 'User attributes required' field", async function (this: TestContext) {
+    const attributeContainerContent: string = await this.page.$eval("#userAttributesContainer", element => element.textContent);
+    assert.equal(attributeContainerContent, "openid, email");
+});
+
+Then("the updated user attribute with name 'email' should not be displayed", async function (this: TestContext) {
+    const attributeContainerContent: string = await this.page.$eval("#userAttributesContainer", element => element.textContent);
+    assert.equal(attributeContainerContent, "openid");
+});
+
+Given("the 'email' user attribute is not selected", async function (this: TestContext) {
+    const attributeContainerContent: string = await this.page.$eval("#userAttributesContainer", element => element.textContent);
+    assert.notEqual(attributeContainerContent, "openid, email");
+});
+
+Given("only one attribute with the name 'openid' is displayed in the 'User attributes required' field", async function (this: TestContext) {
+    const attributeContainerContent: string = await this.page.$eval("#userAttributesContainer", element => element.textContent);
+    assert.equal(attributeContainerContent, "openid");
 });
