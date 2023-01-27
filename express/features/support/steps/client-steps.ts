@@ -33,8 +33,8 @@ Given("the user submits a valid public key without headers", async function () {
     await clickSubmitButton(this.page);
 });
 
-Then("they should see the public key they just entered in the textarea", async function (this: TestContext) {
-    const textArea = await this.page.$("#serviceUserPublicKey");
-    const textAreaContent = await this.page.evaluate(element => element.textContent, textArea);
-    assert.equal(textAreaContent, VALID_PUBLIC_KEY_WITHOUT_HEADERS.replace(/\n/g, ""));
+Then("they should see the public key they just entered in an inset text component", async function (this: TestContext) {
+    const publicKeyDiv = await this.page.$("div.govuk-inset-text");
+    const publicKey = await this.page.evaluate(element => element.textContent, publicKeyDiv);
+    assert.equal(publicKey.replace(/\n/g, "").trim(), VALID_PUBLIC_KEY_WITHOUT_HEADERS.replace(/\n/g, ""));
 });

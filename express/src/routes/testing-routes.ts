@@ -164,7 +164,7 @@ router.get("/change-public-key/:serviceId/:selfServiceClientId/:clientId", (req,
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
-        values: {serviceUserPublicKey: req.query.publicKey}
+        serviceUserPublicKey: req.query.publicKey
     });
 });
 
