@@ -6,6 +6,8 @@ on:
       environment: { required: true, type: string }
     secrets:
       aws-role-arn: { required: true }
+      ecs-task-role-arn: { required: false }
+      ecs-execution-role-arn: { required: false }
 
 concurrency: deploy-fargate-${{ github.head_ref || github.ref_name }}
 
@@ -29,57 +31,24 @@ jobs:
           role-to-assume: ${{ secrets.aws-role-arn }}
           aws-region: eu-west-2
 
-      - name: Login to ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
       - name: Push Docker image
         id: push-docker-image
-        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@f7757df1f626d0c47a92a92328e1d02b6c597bff
+        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@73e10d75ac678988b8bd444ffc07b0fcb0cc39d0
         with:
-          registry: ${{ steps.login-ecr.outputs.registry }}
           repository: self-service/frontend
           image-version: ${{ github.sha }}
           image-tags: ${{ github.head_ref || github.ref_name }}
           build-path: express
 
-      - name: Get image URI
-        id: get-image-uri
-        env:
-          REGISTRY: ${{ steps.push-docker-image.outputs.registry }}
-          REPOSITORY: ${{ steps.push-docker-image.outputs.repository }}
-          IMAGE_VERSION: ${{ steps.push-docker-image.outputs.image-version }}
-        run: echo "image-uri=$REGISTRY/$REPOSITORY:$IMAGE_VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Render task definition
-        id: render-task-definition
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
+      - name: Register task definition
+        id: register-task-definition
+        uses: alphagov/di-github-actions/aws/ecs/register-task-definition@73e10d75ac678988b8bd444ffc07b0fcb0cc39d0
         with:
           task-definition: express/task-definition.json
-          container-name: self-service-frontend
-          image: ${{ steps.get-image-uri.outputs.image-uri }}
-
-      - name: Register task definition
-        env:
-          TASK_DEFINITION_TEMPLATE: ${{ steps.render-task-definition.outputs.task-definition }}
-          BRANCH_NAME: ${{ steps.push-docker-image.outputs.image-tags }}
-          IMAGE_VERSION: ${{ steps.push-docker-image.outputs.image-version }}
-        run: |
-          ecs_roles=$(aws ssm get-parameter \
-            --name /self-service/frontend/ecs-roles \
-            --query "Parameter.Value" \
-            --output text)
-          
-          registered_task_definition=$(aws ecs register-task-definition \
-            --cli-input-json "$(cat "$TASK_DEFINITION_TEMPLATE")" \
-            --task-role-arn "$(jq -r '.taskRole' <<< "$ecs_roles")" \
-            --execution-role-arn "$(jq -r '.executionRole' <<< "$ecs_roles")" \
-            --tags key=Branch,value="$BRANCH_NAME" key=Version,value="$IMAGE_VERSION" \
-            --query "taskDefinition.[taskDefinitionArn, family, revision]" \
-            --output text)
-          
-          read -r arn family revision <<< "$registered_task_definition"
-          message="Registered task definition \`$family:$revision\` for image version \`$IMAGE_VERSION\`"
-          
-          echo "$message" | tee "$GITHUB_STEP_SUMMARY"
-          echo "task-definition-arn=$arn" >> "$GITHUB_OUTPUT"
+          container: self-service-frontend
+          image-uri: ${{ steps.push-docker-image.outputs.image-uri }}
+          execution-role-arn: ${{ secrets.ecs-execution-role-arn }}
+          task-role-arn: ${{ secrets.ecs-task-role-arn }}
+          task-definition-tags: |
+            Branch=${{ github.head_ref || github.ref_name }}
+            Version=${{ steps.push-docker-image.outputs.image-version }}

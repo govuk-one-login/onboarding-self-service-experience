@@ -79,7 +79,8 @@ jobs:
 
       - name: Clean up stale task definitions
         if: ${{ github.event_name == 'schedule' }}
-        uses: alphagov/di-github-actions/aws/ecs/deregister-stale-task-definitions@f7757df1f626d0c47a92a92328e1d02b6c597bff
+        uses: alphagov/di-github-actions/aws/ecs/deregister-stale-task-definitions@73e10d75ac678988b8bd444ffc07b0fcb0cc39d0
         with:
           family: self-service-frontend
           container: self-service-frontend
+          registry: ${{ steps.login-ecr.outputs.registry }}

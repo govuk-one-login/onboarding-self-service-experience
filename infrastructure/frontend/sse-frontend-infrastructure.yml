@@ -95,3 +95,11 @@ Resources:
           "taskRole": "${FrontendECSTaskRole.Arn}",
           "executionRole": "${FrontendECSExecutionRole.Arn}"
         }'
+
+Outputs:
+  ECSTaskRoleARN:
+    Condition: IsDevelopmentAccount
+    Value: !GetAtt FrontendECSTaskRole.Arn
+  ECSExecutionRoleARN:
+    Condition: IsDevelopmentAccount
+    Value: !GetAtt FrontendECSExecutionRole.Arn
