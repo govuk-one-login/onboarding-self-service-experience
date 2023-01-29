@@ -8,9 +8,6 @@ on:
   pull_request:
     types: [ closed ]
 
-concurrency:
-  group: deploy-${{ github.head_ref || github.ref_name }}
-
 permissions: read-all
 
 jobs:
@@ -18,6 +15,7 @@ jobs:
     name: Delete app preview
     runs-on: ubuntu-latest
     environment: preview
+    concurrency: deploy-paas-${{ github.head_ref || github.ref_name }}
     steps:
       - name: PaaS login
         uses: alphagov/di-github-actions/paas/log-in-to-paas@f7757df1f626d0c47a92a92328e1d02b6c597bff
@@ -52,6 +50,7 @@ jobs:
     name: Delete Fargate deployment
     runs-on: ubuntu-latest
     environment: development
+    concurrency: deploy-fargate-${{ github.head_ref || github.ref_name }}
 
     permissions:
       id-token: write

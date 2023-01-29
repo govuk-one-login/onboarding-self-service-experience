@@ -4,6 +4,8 @@ on:
   push:
     branches: [ main ]
 
+permissions: read-all
+
 jobs:
   build-front:
     name: Build

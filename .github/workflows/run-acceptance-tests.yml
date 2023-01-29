@@ -5,8 +5,8 @@ on:
     inputs:
       host: { required: true, type: string }
 
-concurrency:
-  group: deploy-${{ github.head_ref || github.ref_name }}
+permissions: read-all
+concurrency: deploy-paas-${{ github.head_ref || github.ref_name }}
 
 jobs:
   run-acceptance-tests:
