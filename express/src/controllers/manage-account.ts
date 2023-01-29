@@ -82,7 +82,7 @@ export const showClient = async function (req: Request, res: Response) {
     });
 
     // TODO we need to use a flash message package for Express
-    req.session.serviceName = serviceName;
+    req.session.serviceName = client.serviceName ? client.serviceName : client.clientName;
     req.session.updatedField = undefined;
 };
 
@@ -181,6 +181,7 @@ export const processAddServiceForm = async function (req: Request, res: Response
     console.log(generatedClient.data);
     const body = JSON.parse(generatedClient.data.output).body;
     const serviceId = JSON.parse(body).pk;
+    req.session.serviceName = req.body.serviceName;
     res.redirect(`/client-details/${serviceId.substring(8)}`);
 };
 
@@ -212,8 +213,8 @@ export const processChangeServiceNameForm = async function (req: Request, res: R
         {service_name: newServiceName},
         req.session.authenticationResult?.AccessToken as string
     );
-
     req.session.updatedField = "service name";
+    req.session.serviceName = newServiceName;
     res.redirect(`/client-details/${serviceId}`);
 };
 
