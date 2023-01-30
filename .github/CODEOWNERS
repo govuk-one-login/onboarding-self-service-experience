@@ -5,6 +5,7 @@
 /.github/             @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
 /backend/             @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
 /infrastructure/      @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
+package*.json         @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
 
 # Frontend
 /express/assets/      @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers
