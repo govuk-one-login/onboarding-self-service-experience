@@ -20,10 +20,10 @@ Feature: Users can update clients
       Then they should be redirected to a page with the path starting with "/client-details"
       And they should see the text "You have changed your public key"
 
-    Scenario: the user submits a valid public key and then thinks maybe they need to edit it by hand
+    Scenario: the user submits a valid public key and it is displayed on the update public key screen
       Given they click on the link with the URL starting with "/change-public-key/"
       And the user submits a valid public key without headers
       Then they should be redirected to a page with the path starting with "/client-details"
       And they should see the text "You have changed your public key"
       And they click on the link with the URL starting with "/change-public-key/"
-      Then they should see the public key they just entered in the textarea
+      Then they should see the public key they just entered in an inset text component

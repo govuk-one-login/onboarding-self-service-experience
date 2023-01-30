@@ -1,4 +1,5 @@
 {% extends "./base-form-service-details.njk" %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set pageTitle = "Change public key" %}
 
@@ -9,7 +10,9 @@
     <a href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/generate-a-key/" class="govuk-link" rel="noreferrer noopener" target="_blank">
       generate a key pair (opens in new tab)</a> and add the public key. This is so our services can securely send messages to each other.
   </p>
-
+  {{ govukInsetText({
+    text: serviceUserPublicKey
+  }) if serviceUserPublicKey }}
 {% endblock %}
 
 {% block formInputs %}
