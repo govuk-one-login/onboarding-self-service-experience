@@ -1,6 +1,7 @@
 name: Deploy branch preview
 
 on: workflow_dispatch
+permissions: read-all
 
 jobs:
   build-front-app:
@@ -31,3 +32,5 @@ jobs:
       environment: development
     secrets:
       aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
+      ecs-task-role-arn: ${{ secrets.AWS_ECS_TASK_ROLE_ARN }}
+      ecs-execution-role-arn: ${{ secrets.AWS_ECS_EXECUTION_ROLE_ARN }}

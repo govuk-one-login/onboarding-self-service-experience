@@ -8,9 +8,6 @@ on:
   pull_request:
     types: [ closed ]
 
-concurrency:
-  group: deploy-${{ github.head_ref || github.ref_name }}
-
 permissions: read-all
 
 jobs:
@@ -18,9 +15,10 @@ jobs:
     name: Delete app preview
     runs-on: ubuntu-latest
     environment: preview
+    concurrency: deploy-paas-${{ github.head_ref || github.ref_name }}
     steps:
       - name: PaaS login
-        uses: alphagov/di-github-actions/paas/log-in-to-paas@f7757df1f626d0c47a92a92328e1d02b6c597bff
+        uses: alphagov/di-github-actions/paas/log-in-to-paas@73e10d75ac678988b8bd444ffc07b0fcb0cc39d0
         with:
           cf-org-name: gds-digital-identity-onboarding
           cf-space-name: self-service-preview
@@ -29,7 +27,7 @@ jobs:
 
       - name: Get app name
         if: ${{ github.event_name != 'schedule' }}
-        uses: alphagov/di-github-actions/beautify-branch-name@f7757df1f626d0c47a92a92328e1d02b6c597bff
+        uses: alphagov/di-github-actions/beautify-branch-name@73e10d75ac678988b8bd444ffc07b0fcb0cc39d0
         with:
           downcase: true
           length-limit: 63
@@ -44,7 +42,7 @@ jobs:
 
       - name: Clean up stale deployments
         if: ${{ github.event_name == 'schedule' }}
-        uses: alphagov/di-github-actions/paas/delete-stale-apps@f7757df1f626d0c47a92a92328e1d02b6c597bff
+        uses: alphagov/di-github-actions/paas/delete-stale-apps@73e10d75ac678988b8bd444ffc07b0fcb0cc39d0
         with:
           age-threshold-days: 30
 
@@ -52,6 +50,7 @@ jobs:
     name: Delete Fargate deployment
     runs-on: ubuntu-latest
     environment: development
+    concurrency: deploy-fargate-${{ github.head_ref || github.ref_name }}
 
     permissions:
       id-token: write
@@ -73,14 +72,21 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
+          imageDigest=$(aws ecr list-images \
+            --repository-name self-service/frontend \
+            --filter tagStatus=TAGGED \
+            --query "imageIds[?imageTag=='$BRANCH_NAME'].imageDigest" \
+            --output text)
+          
           aws ecr batch-delete-image \
             --repository-name self-service/frontend \
-            --image-ids imageTag="$BRANCH_NAME" \
-            --output text          
+            --image-ids imageDigest="'$imageDigest'" \
+            --output text         
 
       - name: Clean up stale task definitions
         if: ${{ github.event_name == 'schedule' }}
-        uses: alphagov/di-github-actions/aws/ecs/deregister-stale-task-definitions@f7757df1f626d0c47a92a92328e1d02b6c597bff
+        uses: alphagov/di-github-actions/aws/ecs/deregister-stale-task-definitions@73e10d75ac678988b8bd444ffc07b0fcb0cc39d0
         with:
           family: self-service-frontend
           container: self-service-frontend
+          registry: ${{ steps.login-ecr.outputs.registry }}

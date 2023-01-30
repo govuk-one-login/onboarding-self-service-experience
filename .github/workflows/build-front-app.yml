@@ -1,6 +1,7 @@
 name: Build frontend app
 
 on: workflow_call
+permissions: read-all
 
 concurrency:
   group: build-front-app-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}

@@ -20,8 +20,8 @@ on:
         description: "The PaaS deployment URL"
         value: ${{ jobs.deploy.outputs.deployment-url }}
 
-concurrency:
-  group: deploy-paas-${{ github.head_ref || github.ref_name }}
+permissions: read-all
+concurrency: deploy-paas-${{ github.head_ref || github.ref_name }}
 
 jobs:
   deploy:
@@ -40,7 +40,7 @@ jobs:
 
       - name: Push to PaaS
         id: push-to-paas
-        uses: alphagov/di-github-actions/paas/deploy-app@f7757df1f626d0c47a92a92328e1d02b6c597bff
+        uses: alphagov/di-github-actions/paas/deploy-app@73e10d75ac678988b8bd444ffc07b0fcb0cc39d0
         with:
           url: ${{ inputs.url }}
           app-name-prefix: ${{ inputs.app-name-prefix }}
