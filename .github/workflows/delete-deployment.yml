@@ -72,10 +72,16 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
+          imageDigest=$(aws ecr list-images \
+            --repository-name self-service/frontend \
+            --filter tagStatus=TAGGED \
+            --query "imageIds[?imageTag=='$BRANCH_NAME'].imageDigest" \
+            --output text)
+          
           aws ecr batch-delete-image \
             --repository-name self-service/frontend \
-            --image-ids imageTag="$BRANCH_NAME" \
-            --output text          
+            --image-ids imageDigest="'$imageDigest'" \
+            --output text         
 
       - name: Clean up stale task definitions
         if: ${{ github.event_name == 'schedule' }}
