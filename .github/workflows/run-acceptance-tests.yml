@@ -50,7 +50,7 @@ jobs:
 
       - name: Report test results
         if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
-        uses: alphagov/di-github-actions/report-step-result/print-file@ad7ff02640e256ecc3f677bc876ac0a22ed25964
+        uses: alphagov/di-github-actions/report-step-result/print-file@0296e8125a9293d4dfd393ebc83785147f5f5927
         with:
           title: Acceptance tests
           language: shell

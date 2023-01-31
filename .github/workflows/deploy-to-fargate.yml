@@ -33,7 +33,7 @@ jobs:
 
       - name: Push Docker image
         id: push-docker-image
-        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@ad7ff02640e256ecc3f677bc876ac0a22ed25964
+        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@0296e8125a9293d4dfd393ebc83785147f5f5927
         with:
           repository: self-service/frontend
           image-version: ${{ github.sha }}
@@ -42,7 +42,7 @@ jobs:
 
       - name: Register task definition
         id: register-task-definition
-        uses: alphagov/di-github-actions/aws/ecs/register-task-definition@ad7ff02640e256ecc3f677bc876ac0a22ed25964
+        uses: alphagov/di-github-actions/aws/ecs/register-task-definition@0296e8125a9293d4dfd393ebc83785147f5f5927
         with:
           task-definition: express/task-definition.json
           container: self-service-frontend
