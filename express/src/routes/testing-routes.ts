@@ -261,7 +261,7 @@ router.post("/change-public-key-v2", async (req, res) => {
             clientId: "mockedClientId",
             serviceName: "My juggling service",
             errorMessages: {
-                serviceUserPublicKey: "Choose how to change your public key"
+                "serviceUserPublicKey-options": "Choose how to change your public key"
             }
         });
 
@@ -596,6 +596,30 @@ router.post("/enter-app-code", (req, res) => {
         return;
     }
     res.redirect("/client-details-testonly-url");
+});
+
+//// Testing routes for 'Choose how to get your security code' page
+router.get("/choose-security-codes", (req, res) => {
+    res.render("create-account/choose-security-codes.njk");
+});
+
+router.post("/choose-security-codes", (req, res) => {
+    if (!req.body.chooseSecurityCodes) {
+        res.render("create-account/choose-security-codes.njk", {
+            errorMessages: {
+                "chooseSecurityCodes-options": "Select how to get security codes"
+            }
+        });
+        return;
+    }
+    if (req.body.chooseSecurityCodes === "authenticator") {
+        res.redirect("/set-up-auth-app");
+        return;
+    }
+    if (req.body.chooseSecurityCodes === "textMessage") {
+        res.redirect("/create/enter-mobile-test-url");
+        return;
+    }
 });
 
 export default router;

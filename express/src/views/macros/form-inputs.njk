@@ -118,16 +118,17 @@
   }) }}
 {% endmacro %}
 
-{% macro radiosInput(label, labelClasses, name, hint, items) %}
+{% macro radiosInput(label, labelClasses, name, hint, items, id = name + "-options", isPageHeading) %}
   {{ govukRadios({
     name: name,
     idPrefix: name,
     attributes: {
-      id: name + "-options"
+      id: id
     },
     fieldset: {
       legend: {
         text: label,
+        isPageHeading: isPageHeading if isPageHeading,
         classes: labelClasses if labelClasses
       }
     },
