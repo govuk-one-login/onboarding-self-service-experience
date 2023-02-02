@@ -12,9 +12,9 @@ export function convertPublicKeyForAuth(req: Request, res: Response, next: NextF
             clientId: req.params.clientId,
             errorMessages: {
                 serviceUserPublicKey: "Enter a valid public key"
-            }
+            },
+            serviceUserPublicKey: req.query.publicKey
         });
-
         return;
     }
 

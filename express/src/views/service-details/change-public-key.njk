@@ -3,6 +3,11 @@
 
 {% set pageTitle = "Change public key" %}
 
+{% set publicKeyBlock %}
+  <p class="govuk-body govuk-!-static-margin-bottom-0 govuk-!-font-weight-bold">Current public key</p>
+  <p class="govuk-body govuk-!-static-margin-bottom-0" id="current-public-key">{{ serviceUserPublicKey }}</p>
+{% endset %}
+
 {% block beforeForm %}
   <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
 
@@ -11,7 +16,7 @@
       generate a key pair (opens in new tab)</a> and add the public key. This is so our services can securely send messages to each other.
   </p>
   {{ govukInsetText({
-    text: serviceUserPublicKey
+    html: publicKeyBlock
   }) if serviceUserPublicKey }}
 {% endblock %}
 
