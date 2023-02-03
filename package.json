@@ -1,5 +1,5 @@
 {
-  "name": "gds-di-onboarding-common",
+  "name": "gds-di-self-service-common",
   "description": "DI self-service monorepo",
   "workspaces": [
     "express",

@@ -1,5 +1,5 @@
 {
-  "name": "gds-di-onboarding-frontend",
+  "name": "gds-di-self-service-frontend",
   "description": "DI self-service frontend",
   "scripts": {
     "start": "node dist/app.js",

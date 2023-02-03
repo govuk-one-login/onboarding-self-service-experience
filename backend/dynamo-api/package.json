@@ -1,5 +1,5 @@
 {
-  "name": "gds-di-onboarding-dynamo-api",
+  "name": "gds-di-self-service-api",
   "description": "DI self-service DynamoDB API",
   "scripts": {
     "build": "sam build --beta-features",
