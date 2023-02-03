@@ -43,6 +43,8 @@ jobs:
         uses: alphagov/di-github-actions/paas/deploy-app@0296e8125a9293d4dfd393ebc83785147f5f5927
         with:
           url: ${{ inputs.url }}
+          manifest: express/manifest.yml
+          start-command: npm run start --workspace=express
           app-name-prefix: ${{ inputs.app-name-prefix }}
           cf-org-name: gds-digital-identity-onboarding
           cf-space-name: ${{ inputs.cf-space-name }}

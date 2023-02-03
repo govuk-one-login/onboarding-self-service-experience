@@ -1,6 +1,7 @@
 name: Unit tests
 
 on: workflow_call
+permissions: read-all
 
 concurrency:
   group: unit-tests-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
@@ -21,7 +22,7 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v3
         with:
-          cache: "npm"
+          cache: npm
 
       - name: Install Node dependencies
         run: npm install

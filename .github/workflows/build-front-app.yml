@@ -21,7 +21,7 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v3
         with:
-          cache: "npm"
+          cache: npm
 
       - name: Install Node dependencies
         run: npm install --include-workspace-root
@@ -42,3 +42,4 @@ jobs:
             express/assets/images
             express/manifest.yml
             express/package*.json
+            package*.json
