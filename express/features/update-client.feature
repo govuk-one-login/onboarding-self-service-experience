@@ -14,6 +14,12 @@ Feature: Users can update clients
       Then they should be redirected to a page with the path starting with "/client-details"
       And they should see the text "You have changed your public key"
 
+    Scenario: the user submits a valid public key with headers and junk after the key
+      Given they click on the link with the URL starting with "/change-public-key/"
+      And the user submits a valid public key with headers and junk after the key
+      Then they should be redirected to a page with the path starting with "/client-details"
+      And they should see the text "You have changed your public key"
+
     Scenario: the user submits a valid public key without headers
       Given they click on the link with the URL starting with "/change-public-key/"
       And the user submits a valid public key without headers
