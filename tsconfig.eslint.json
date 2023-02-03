@@ -5,8 +5,8 @@
   },
   // Additional paths to lint not included by other tsconfig.json files
   "include": [
-    "./**/.*.js",
-    "./**/*.js",
-    "./**/*.ts"
+    "**/**/.*.js",
+    "**/**/*.js",
+    "**/**/*.ts"
   ]
 }

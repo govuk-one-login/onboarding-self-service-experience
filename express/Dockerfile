@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:current-alpine
 WORKDIR /express
 
 ENV PORT=3000
