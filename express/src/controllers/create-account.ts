@@ -2,7 +2,8 @@ import {
     AuthenticationResultType,
     CodeMismatchException,
     NotAuthorizedException,
-    UsernameExistsException
+    UsernameExistsException,
+    UnsupportedUserStateException
 } from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
@@ -21,7 +22,7 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
         await s4.createUser(emailAddress);
     } catch (error) {
         if (error instanceof UsernameExistsException) {
-            res.redirect("/existing-account");
+            res.redirect("/create/resend-email-code");
             return;
         }
 
@@ -201,8 +202,16 @@ export const showResendEmailCodeForm = async function (req: Request, res: Respon
     res.render("create-account/resend-email-code.njk");
 };
 
-export const resendEmailVerificationCode = async function (req: Request, res: Response) {
+export const resendEmailVerificationCode = async function (req: Request, res: Response, next: NextFunction) {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
-    await s4.resendEmailAuthCode(req.session.emailAddress as string);
+    try {
+        await s4.resendEmailAuthCode(req.session.emailAddress as string);
+    } catch (error) {
+        if (error instanceof UnsupportedUserStateException) {
+            console.log(error);
+            return res.redirect("/existing-account");
+        }
+        next(error);
+    }
     res.redirect("check-email");
 };
