@@ -18,7 +18,7 @@ jobs:
     concurrency: deploy-paas-${{ github.head_ref || github.ref_name }}
     steps:
       - name: PaaS login
-        uses: alphagov/di-github-actions/paas/log-in-to-paas@ad7ff02640e256ecc3f677bc876ac0a22ed25964
+        uses: alphagov/di-github-actions/paas/log-in-to-paas@0296e8125a9293d4dfd393ebc83785147f5f5927
         with:
           cf-org-name: gds-digital-identity-onboarding
           cf-space-name: self-service-preview
@@ -27,7 +27,7 @@ jobs:
 
       - name: Get app name
         if: ${{ github.event_name != 'schedule' }}
-        uses: alphagov/di-github-actions/beautify-branch-name@ad7ff02640e256ecc3f677bc876ac0a22ed25964
+        uses: alphagov/di-github-actions/beautify-branch-name@0296e8125a9293d4dfd393ebc83785147f5f5927
         with:
           downcase: true
           length-limit: 63
@@ -42,7 +42,7 @@ jobs:
 
       - name: Clean up stale deployments
         if: ${{ github.event_name == 'schedule' }}
-        uses: alphagov/di-github-actions/paas/delete-stale-apps@ad7ff02640e256ecc3f677bc876ac0a22ed25964
+        uses: alphagov/di-github-actions/paas/delete-stale-apps@0296e8125a9293d4dfd393ebc83785147f5f5927
         with:
           age-threshold-days: 30
 
@@ -57,36 +57,18 @@ jobs:
       contents: read
 
     steps:
-      - name: Assume AWS Role
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          role-to-assume: ${{ secrets.GHA_AWS_ROLE_ARN }}
-          aws-region: eu-west-2
-
-      - name: Login to ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
       - name: Delete docker image
         if: ${{ github.event_name != 'schedule' }}
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        run: |
-          imageDigest=$(aws ecr list-images \
-            --repository-name self-service/frontend \
-            --filter tagStatus=TAGGED \
-            --query "imageIds[?imageTag=='$BRANCH_NAME'].imageDigest" \
-            --output text)
-          
-          aws ecr batch-delete-image \
-            --repository-name self-service/frontend \
-            --image-ids imageDigest="'$imageDigest'" \
-            --output text         
+        uses: alphagov/di-github-actions/aws/ecr/delete-docker-images@0296e8125a9293d4dfd393ebc83785147f5f5927
+        with:
+          aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
+          repository: self-service/frontend
+          image-tags: ${{ github.head_ref || github.ref_name }}
 
       - name: Clean up stale task definitions
         if: ${{ github.event_name == 'schedule' }}
-        uses: alphagov/di-github-actions/aws/ecs/deregister-stale-task-definitions@ad7ff02640e256ecc3f677bc876ac0a22ed25964
+        uses: alphagov/di-github-actions/aws/ecs/deregister-stale-task-definitions@0296e8125a9293d4dfd393ebc83785147f5f5927
         with:
+          aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
           family: self-service-frontend
           container: self-service-frontend
-          registry: ${{ steps.login-ecr.outputs.registry }}
