@@ -35,7 +35,7 @@ sam build
 gds aws <your-aws-account> -- sam deploy --guided
 # Go with the defaults except the stack name; choose something like your-name-ddb (remember what you used)
 
-cd ../dynamo-api
+cd ../api
 sam build
 gds aws <your-aws-account> -- sam deploy --parameter-overrides "AuthRegistrationBaseUrl=https://oidc.integration.account.gov.uk DynamoDbTableStackName=<the-name-you-chose>" --guided
 # Choose a decent stack name (name it after yourself for example) and accept the other defaults but tell it yes about lambdas that don't have authorisation

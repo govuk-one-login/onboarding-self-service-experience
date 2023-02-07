@@ -3,7 +3,7 @@
   "description": "DI self-service monorepo",
   "workspaces": [
     "express",
-    "backend/dynamo-api"
+    "backend/api"
   ],
   "scripts": {
     "build": "npm run build --w express",

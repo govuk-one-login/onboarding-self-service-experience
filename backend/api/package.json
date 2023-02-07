@@ -1,6 +1,6 @@
 {
   "name": "gds-di-self-service-api",
-  "description": "DI self-service DynamoDB API",
+  "description": "DI self-service API",
   "scripts": {
     "build": "sam build --beta-features",
     "lint": "eslint '*.ts' --quiet --fix",

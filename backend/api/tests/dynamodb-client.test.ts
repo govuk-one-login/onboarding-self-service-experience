@@ -1,14 +1,14 @@
-import DynamoClient from "../../src/client/DynamoClient";
+import DynamoDbClient from "../src/dynamodb-client";
 
 describe("DynamoDB client", () => {
     describe("table name not set", () => {
         it("should throw if table name not provided", () => {
-            expect(() => new DynamoClient()).toThrow("Table name");
+            expect(() => new DynamoDbClient()).toThrow("Table name");
         });
     });
 
     describe("table name is set", () => {
-        let client: DynamoClient;
+        let client: DynamoDbClient;
 
         const updates = {
             services: ["Juggling license", "Unicorn registration"],
@@ -20,7 +20,7 @@ describe("DynamoDB client", () => {
 
         beforeAll(() => {
             process.env.TABLE = "identities";
-            client = new DynamoClient();
+            client = new DynamoDbClient();
         });
 
         it("should generate correct expression attribute names", () => {
