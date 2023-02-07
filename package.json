@@ -12,9 +12,15 @@
     "dev": "npm run dev -w express",
     "cucumber": "npm run cucumber -w express"
   },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.266.0",
+    "@aws-sdk/util-dynamodb": "^3.266.0",
+    "axios": "^0.27.2"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
+    "@types/jest": "^29.4.0",
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -22,10 +28,5 @@
     "prettier": "^2.8.3",
     "ts-jest": "^29.0.5",
     "typescript": "^4.9.4"
-  },
-  "dependencies": {
-    "@aws-sdk/client-cognito-identity": "^3.213.0",
-    "@aws-sdk/client-dynamodb": "^3.160.0",
-    "@aws-sdk/client-ses": "^3.245.0"
   }
 }
