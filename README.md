@@ -20,9 +20,9 @@ nvm use 14.20.0
 # if it's not already the default
 ```
 
-## Deploy stacks
+## Deploy dev stacks
 
-Deploy your own stacks
+Deploy your own stacks to the AWS development account
 
 ```shell
 cd backend/cognito
@@ -35,14 +35,17 @@ sam build
 gds aws <your-aws-account> -- sam deploy --guided
 # Go with the defaults except the stack name; choose something like your-name-ddb (remember what you used)
 
-cd ../api
-sam build
-gds aws <your-aws-account> -- sam deploy --parameter-overrides "AuthRegistrationBaseUrl=https://oidc.integration.account.gov.uk DynamoDbTableStackName=<the-name-you-chose>" --guided
-# Choose a decent stack name (name it after yourself for example) and accept the other defaults but tell it yes about lambdas that don't have authorisation
-
-To install and run DynamoDB local for session storage.
-Download and install Docker desktop - https://www.docker.com/products/docker-desktop/.
+# To install and run DynamoDB local for session storage.
+# Download and install Docker desktop - https://www.docker.com/products/docker-desktop/.
 cd ./backend/dynamo-db/ docker-compose up - This will spin up the local dynamoDB.
+```
+
+**API**
+
+Choose a decent stack name (name it after yourself for example) and accept the other defaults but tell it yes about lambdas that don't have authorisation.
+
+```shell
+gds aws di-onboarding-development -- npm run deploy-api -- --parameter-overrides "DynamoDbTableStackName=<the-name-you-chose>" --guided
 ```
 
 ## Configure and run the application

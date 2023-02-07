@@ -6,7 +6,9 @@
     "backend/api"
   ],
   "scripts": {
-    "build": "npm run build --w express",
+    "build": "npm run build -w express",
+    "build-api": "npm run build -w backend/api --",
+    "deploy-api": "npm run deploy -w backend/api --",
     "test": "jest --silent",
     "local": "npm run local -w express",
     "dev": "npm run dev -w express",
