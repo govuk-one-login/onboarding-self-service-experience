@@ -13,8 +13,11 @@ development | staging | integration | production)
 esac
 
 BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
+pushd "$BASE_DIR" > /dev/null
 
-"$BASE_DIR"/../apply-sam-template.sh "$@" \
+../deploy-sam-stack.sh "$@" \
   --stack-name "$ACCOUNT"-hosted-zone \
-  --template "$BASE_DIR"/"$ACCOUNT"-domains.yml \
-  --tags DeploymentSource=Manual StackType=DNS
+  --template "$ACCOUNT"-domains.yml \
+  --tags StackType=DNS
+
+popd > /dev/null
