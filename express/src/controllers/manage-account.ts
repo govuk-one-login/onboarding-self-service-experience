@@ -60,7 +60,7 @@ export const showClient = async function (req: Request, res: Response) {
         redirectUrls: redirectUrls,
         userAttributesRequired: client.scopes.join(", "),
         userPublicKey: userPublicKey,
-        postLogoutRedirectUrls: client.postLogoutUris.join(" "),
+        postLogoutRedirectUrls: client.postLogoutUris ? client.postLogoutUris.join(" ") : [],
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURIComponent(

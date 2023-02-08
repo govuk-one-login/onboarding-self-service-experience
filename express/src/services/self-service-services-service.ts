@@ -1,5 +1,6 @@
 import {
     AdminCreateUserCommandOutput,
+    AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
     AdminSetUserMFAPreferenceCommandOutput,
     AuthenticationResultType,
@@ -91,6 +92,10 @@ export default class SelfServiceServicesService {
 
     async createUser(emailAddress: string): Promise<AdminCreateUserCommandOutput> {
         return await this.cognito.createUser(emailAddress);
+    }
+
+    async adminGetUser(username: string): Promise<AdminGetUserCommandOutput> {
+        return await this.cognito.adminGetUser(username);
     }
 
     async resendEmailAuthCode(emailAddress: string) {

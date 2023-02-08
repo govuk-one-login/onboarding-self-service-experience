@@ -2,6 +2,7 @@ import {
     AdminCreateUserCommand,
     AdminInitiateAuthCommand,
     AdminInitiateAuthCommandOutput,
+    AdminGetUserCommandOutput,
     AdminRespondToAuthChallengeCommand,
     AdminRespondToAuthChallengeCommandOutput,
     AdminSetUserMFAPreferenceCommand,
@@ -20,7 +21,7 @@ import {
     ForgotPasswordCommandOutput,
     ForgotPasswordCommand,
     ConfirmForgotPasswordCommandOutput,
-    ConfirmForgotPasswordCommand
+    ConfirmForgotPasswordCommand, AdminGetUserCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import {AdminCreateUserCommandOutput} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/AdminCreateUserCommand";
 import CognitoInterface from "./CognitoInterface";
@@ -71,6 +72,15 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
             UserAttributes: [{Name: "email", Value: email}]
         };
         const command = new AdminCreateUserCommand(createUserParams);
+        return await this.cognitoClient.send(command);
+    }
+
+    async adminGetUser(email: string): Promise<AdminGetUserCommandOutput> {
+        const params = {
+            Username: email,
+            UserPoolId: this.userPoolId
+        };
+        const command = new AdminGetUserCommand(params);
         return await this.cognitoClient.send(command);
     }
 

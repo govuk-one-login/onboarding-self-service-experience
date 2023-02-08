@@ -17,12 +17,16 @@ export const showGetEmailForm = function (req: Request, res: Response) {
 
 export const processGetEmailForm = async function (req: Request, res: Response, next: NextFunction) {
     const emailAddress: string = req.body.emailAddress;
+    const username: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
+    const isEmailVerified = s4.adminGetUser(username);
     try {
         await s4.createUser(emailAddress);
     } catch (error) {
         if (error instanceof UsernameExistsException) {
-            res.redirect("/create/resend-email-code");
+            return console.log(isEmailVerified);
+            // console.log({values: {email_verified: req.session.email_verified}});
+            res.redirect("/existing-account");
             return;
         }
 
