@@ -5,7 +5,7 @@ OPTION_REGEX="^--?.*"
 
 while [[ -n $1 ]]; do
   case $1 in
-  -t | --template | --template-file)
+  -f | --template | --template-file)
     shift
     TEMPLATE=$1
     ;;
@@ -18,7 +18,7 @@ while [[ -n $1 ]]; do
     shift
     PREFIX=$1
     ;;
-  -g | --tags)
+  -t | --tags)
     TAGS=()
     while [[ $2 ]] && ! [[ $2 =~ $OPTION_REGEX ]]; do
       shift
@@ -38,6 +38,9 @@ while [[ -n $1 ]]; do
   -d | --no-build)
     SKIP_BUILD=true
     ;;
+  -x | --no-deploy)
+    DEPLOY=false
+    ;;
   -s | --base-dir)
     shift
     BASE_DIR=$1
@@ -51,6 +54,17 @@ while [[ -n $1 ]]; do
   -y | --no-confirm)
     NO_CONFIRM="--no-confirm-changeset"
     ;;
+  -g | --guided)
+    GUIDED=true
+    ;;
+  --config-file)
+    shift
+    CONFIG_FILE=$1
+    ;;
+  --config-env)
+    shift
+    CONFIG_ENV=$1
+    ;;
   *)
     echo "Unknown option '$1'"
     exit 1
@@ -60,7 +74,7 @@ while [[ -n $1 ]]; do
 done
 
 [[ $TEMPLATE ]] && ! [[ -f $TEMPLATE ]] && echo "File '$TEMPLATE' does not exist" && exit 1
-[[ -z $STACK_NAME ]] && echo "Stack name not provided - not deploying (use the --stack-name|-n option)" && DEPLOY=false
+[[ -f samconfig.toml || -f $CONFIG_FILE ]] && CONFIG=true
 ${SKIP_BUILD:-false} && BUILD=false
 TAGS+=(DeploymentSource=Manual)
 
@@ -76,10 +90,14 @@ else
 fi
 
 if $DEPLOY; then
-  echo "Deploying stack '$STACK_NAME'${TEMPLATE:+" from template '$TEMPLATE'"}"
-  echo "  with S3 prefix '$PREFIX'"
-  [[ ${#TAGS[@]} -gt 0 ]] && echo "  with tags '${TAGS[*]}'"
-  [[ ${#PARAMS[@]} -gt 0 ]] && echo "  with params '${PARAMS[*]}'"
+  if [[ $STACK_NAME || $CONFIG || $GUIDED ]]; then
+    echo "Deploying${STACK_NAME:+" stack '$STACK_NAME'"}${TEMPLATE:+" from template '$TEMPLATE'"}"
+    [[ $PREFIX ]] && echo "  with S3 prefix '$PREFIX'"
+    [[ ${#TAGS[@]} -gt 0 ]] && echo "  with tags '${TAGS[*]}'"
+    [[ ${#PARAMS[@]} -gt 0 ]] && echo "  with params '${PARAMS[*]}'"
+  else
+    echo "Stack name not provided - not deploying (use the --stack-name|-n or --guided option)" && DEPLOY=false
+  fi
 fi
 
 export AWS_DEFAULT_REGION=eu-west-2
@@ -103,13 +121,16 @@ $DEPLOY || exit 0
 $BUILD || [[ -e .aws-sam/build/template.yaml ]] && unset TEMPLATE
 
 sam deploy \
-  --stack-name "$STACK_NAME" \
+  ${STACK_NAME:+--stack-name "$STACK_NAME"} \
+  ${PREFIX:+--s3-prefix "$PREFIX"} \
+  ${CONFIG:---resolve-s3} \
   --disable-rollback \
-  --resolve-s3 \
-  --s3-prefix "$PREFIX" \
   --no-fail-on-empty-changeset \
   --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
   ${TEMPLATE:+--template "$TEMPLATE"} \
   ${NO_CONFIRM:---confirm-changeset} \
   ${TAGS:+--tags "${TAGS[@]}"} \
-  ${PARAMS:+--parameter-overrides "${PARAMS[@]}"}
+  ${PARAMS:+--parameter-overrides "${PARAMS[@]}"} \
+  ${CONFIG_FILE:+--config-file "$CONFIG_FILE"} \
+  ${CONFIG_ENV:+--config-env "$CONFIG_ENV"} \
+  ${GUIDED:+--guided}
