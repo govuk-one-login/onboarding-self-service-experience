@@ -3,5 +3,5 @@ import baseConfig from "../../jest.config.base";
 
 export default {
     ...baseConfig,
-    displayName: "dynamo-api"
+    displayName: "sse-api"
 } as Config;

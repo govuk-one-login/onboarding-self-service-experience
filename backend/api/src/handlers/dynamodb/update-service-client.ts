@@ -1,6 +1,6 @@
-import DynamoClient from "../client/DynamoClient";
+import DynamoDbClient from "../../dynamodb-client";
 
-const client = new DynamoClient();
+const client = new DynamoDbClient();
 
 // TODO remove explicit any
 export const updateServiceClientHandler = async (event: any): Promise<any> => {

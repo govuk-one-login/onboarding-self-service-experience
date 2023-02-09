@@ -12,14 +12,14 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import {marshall} from "@aws-sdk/util-dynamodb";
 import * as process from "process";
-import {OnboardingTableItem} from "../@Types/OnboardingTableItem";
+import {OnboardingTableItem} from "./onboarding-table-item";
 
 type AttributeData = number | boolean | string | string[];
 type AttributeNames = {[nameToken: string]: string};
 type AttributeValues = {[valueToken: string]: AttributeValue};
 type Updates = {[attributeName: string]: AttributeData};
 
-class DynamoClient {
+class DynamoDbClient {
     private static readonly KEYWORD_SUBSTITUTES: {[name: string]: string} = {
         data: "#D"
     };
@@ -137,7 +137,7 @@ class DynamoClient {
     }
 
     private getAttributeNameAlias(attributeName: string) {
-        return DynamoClient.KEYWORD_SUBSTITUTES[attributeName] || `#${attributeName}`;
+        return DynamoDbClient.KEYWORD_SUBSTITUTES[attributeName] || `#${attributeName}`;
     }
 
     private getAttributeValueLabel(attributeName: string) {
@@ -153,4 +153,4 @@ class DynamoClient {
     }
 }
 
-export default DynamoClient;
+export default DynamoDbClient;

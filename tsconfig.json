@@ -20,7 +20,7 @@
       "path": "express"
     },
     {
-      "path": "backend/dynamo-api"
+      "path": "backend/api"
     }
   ]
 }

@@ -1,9 +1,9 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
-import DynamoClient from "../client/DynamoClient";
+import DynamoDbClient from "../../dynamodb-client";
 import {randomUUID} from "crypto";
-import {OnboardingTableItem} from "../@Types/OnboardingTableItem";
+import {OnboardingTableItem} from "../../onboarding-table-item";
 
-const client = new DynamoClient();
+const client = new DynamoDbClient();
 
 export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const payload = JSON.parse(event.body as string);

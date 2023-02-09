@@ -1,7 +1,7 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
-import DynamoClient from "../client/DynamoClient";
+import DynamoDbClient from "../../dynamodb-client";
 
-const client = new DynamoClient();
+const client = new DynamoDbClient();
 
 export const putUserHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const user = JSON.parse(event.body as string);

@@ -1,7 +1,7 @@
 import {APIGatewayProxyEvent} from "aws-lambda";
-import DynamoClient from "../client/DynamoClient";
+import DynamoDbClient from "../../dynamodb-client";
 
-const client = new DynamoClient();
+const client = new DynamoDbClient();
 
 // TODO remove explicit any
 export const updateUserHandler = async (event: APIGatewayProxyEvent): Promise<any> => {

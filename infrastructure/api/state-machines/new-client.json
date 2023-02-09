@@ -2,7 +2,6 @@
   "Comment": "Register a client with Auth, store the details in DDB and create the service-client link into DDB",
   "StartAt": "Register client",
   "States": {
-
     "Register client": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
@@ -26,8 +25,6 @@
       "Next": "Put service client",
       "Comment": "Registers client with Auth"
     },
-
-
     "Put service client": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
