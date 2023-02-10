@@ -581,4 +581,21 @@ router.get("/service-unavailable", (req, res) => {
     res.render("service-unavailable.njk");
 });
 
+//// Testing routes for 'Enter the 6 digit security code from your authenticator app' page
+router.get("/enter-app-code", (req, res) => {
+    res.render("common/enter-app-code.njk");
+});
+
+router.post("/enter-app-code", (req, res) => {
+    if (!req.body.securityCode) {
+        res.render("common/enter-app-code.njk", {
+            errorMessages: {
+                securityCode: "Enter the 6 digit code from your authenticator app"
+            }
+        });
+        return;
+    }
+    res.redirect("/client-details-testonly-url");
+});
+
 export default router;

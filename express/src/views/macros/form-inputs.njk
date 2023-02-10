@@ -23,10 +23,12 @@
   </form>
 {% endmacro %}
 
-{% macro textInput(label, id, classes, hint, type, autocomplete, inputmode, value) %}
+{% macro textInput(label, id, classes, hint, type, autocomplete, inputmode, value, labelClasses, isPageHeading) %}
   {{ govukInput({
     label: {
-      text: label
+      text: label,
+      classes: labelClasses if labelClasses,
+      isPageHeading: isPageHeading if isPageHeading
     } if label,
     hint: {
       text: hint
@@ -60,8 +62,17 @@
   </div>
 {% endmacro %}
 
-{% macro securityCodeInput() %}
-  {{ textInput("Enter the 6 digit security code", "securityCode", "govuk-input--width-5", type = "text", autocomplete = "one-time-code", inputmode = "numeric") }}
+{% macro securityCodeInput(label, labelClasses, isPageHeading) %}
+  {{ textInput(
+    label | default("Enter the 6 digit security code"),
+    "securityCode",
+    "govuk-input--width-5",
+    type = "text",
+    autocomplete = "one-time-code",
+    inputmode = "numeric",
+    labelClasses = labelClasses,
+    isPageHeading = isPageHeading
+  ) }}
 {% endmacro %}
 
 {% macro mobileNumberInput(label = "UK mobile phone number") %}
