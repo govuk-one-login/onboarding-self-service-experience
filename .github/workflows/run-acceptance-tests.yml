@@ -4,9 +4,10 @@ on:
   workflow_call:
     inputs:
       host: { required: true, type: string }
+      environment: { required: true, type: string }
 
 permissions: read-all
-concurrency: deploy-paas-${{ github.head_ref || github.ref_name }}
+concurrency: deploy-paas-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
 
 defaults:
   run:

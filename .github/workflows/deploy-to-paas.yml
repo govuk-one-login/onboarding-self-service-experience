@@ -21,7 +21,7 @@ on:
         value: ${{ jobs.deploy.outputs.deployment-url }}
 
 permissions: read-all
-concurrency: deploy-paas-${{ github.head_ref || github.ref_name }}
+concurrency: deploy-paas-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
 
 jobs:
   deploy:

@@ -9,7 +9,7 @@ on:
       ecs-task-role-arn: { required: false }
       ecs-execution-role-arn: { required: false }
 
-concurrency: deploy-fargate-${{ github.head_ref || github.ref_name }}
+concurrency: deploy-fargate-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
 
 permissions:
   id-token: write
