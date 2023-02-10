@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: DNS configuration for self-service production
 
 Conditions:
-  IsProductionAccount: !Equals [ !Ref AWS::AccountId, "389946456390" ]
+  IsProductionAccount: !Equals [ !Ref AWS::AccountId, 389946456390 ]
 
 Resources:
   # The production nameservers are used by GOV.UK to direct traffic for sign-in and all subdomains to our hosted zone

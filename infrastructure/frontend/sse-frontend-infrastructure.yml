@@ -8,7 +8,7 @@ Parameters:
     Default: self-service
 
 Conditions:
-  IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, "494650018671" ]
+  IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, 494650018671 ]
 
 Resources:
   FrontendECRRepository:

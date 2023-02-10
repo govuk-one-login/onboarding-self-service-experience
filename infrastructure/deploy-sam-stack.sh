@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
+BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
 OPTION_REGEX="^--?.*"
 
 while [[ -n $1 ]]; do
@@ -32,6 +33,10 @@ while [[ -n $1 ]]; do
       PARAMS+=("$1")
     done
     ;;
+  -a | --account)
+    shift
+    ACCOUNT=$1
+    ;;
   -b | --build)
     BUILD=true
     ;;
@@ -43,16 +48,16 @@ while [[ -n $1 ]]; do
     ;;
   -s | --base-dir)
     shift
-    BASE_DIR=$1
+    BUILD_BASE_DIR=$1
     ;;
   -c | --cached)
-    CACHED="--cached"
+    CACHED=true
     ;;
   -p | --parallel)
     PARALLEL=true
     ;;
   -y | --no-confirm)
-    NO_CONFIRM="--no-confirm-changeset"
+    NO_CONFIRM=true
     ;;
   -g | --guided)
     GUIDED=true
@@ -73,21 +78,18 @@ while [[ -n $1 ]]; do
   shift
 done
 
+"$BASE_DIR"/check-aws-account.sh "${ACCOUNT:-}" 2> /dev/null && CREDS=true || CREDS=false
 [[ $TEMPLATE ]] && ! [[ -f $TEMPLATE ]] && echo "File '$TEMPLATE' does not exist" && exit 1
 [[ -f samconfig.toml || -f $CONFIG_FILE ]] && CONFIG=true
 ${SKIP_BUILD:-false} && BUILD=false
 TAGS+=(DeploymentSource=Manual)
 
-: ${DEPLOY:=true}
 : ${BUILD:=false}
+: ${DEPLOY:=true}
 : "${PREFIX:=$STACK_NAME}"
 
-if ! aws sts get-caller-identity > /dev/null 2>&1; then
-  echo "Valid AWS credentials not found in the environment. Authenticate to AWS before deploying a stack."
-  $DEPLOY && exit 1 || CREDS=false
-else
-  CREDS=true
-fi
+$DEPLOY && ! $CREDS && echo "Authenticate to${ACCOUNT:+" the '$ACCOUNT' account in"} AWS before deploying the stack" && exit 1
+export AWS_DEFAULT_REGION=eu-west-2
 
 if $DEPLOY; then
   if [[ $STACK_NAME || $CONFIG || $GUIDED ]]; then
@@ -100,8 +102,6 @@ if $DEPLOY; then
   fi
 fi
 
-export AWS_DEFAULT_REGION=eu-west-2
-
 if $BUILD && $CREDS; then
   echo "Validating template..."
   sam validate ${TEMPLATE:+--template "$TEMPLATE"}
@@ -112,13 +112,14 @@ if $BUILD; then
   echo "Building${TEMPLATE:+" template '$TEMPLATE'"}..."
   sam build \
     ${TEMPLATE:+--template "$TEMPLATE"} \
-    ${BASE_DIR:+--base-dir "$BASE_DIR"} \
+    ${BUILD_BASE_DIR:+--base-dir "$BUILD_BASE_DIR"} \
     ${PARALLEL:+--parallel} \
-    ${CACHED:---no-cached}
+    ${CACHED:+--cached}
 fi
 
 $DEPLOY || exit 0
 $BUILD || [[ -e .aws-sam/build/template.yaml ]] && unset TEMPLATE
+${NO_CONFIRM:-false} && CONFIRM_OPTION="--no-confirm-changeset"
 
 sam deploy \
   ${STACK_NAME:+--stack-name "$STACK_NAME"} \
@@ -127,8 +128,8 @@ sam deploy \
   --disable-rollback \
   --no-fail-on-empty-changeset \
   --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+  ${CONFIRM_OPTION:---confirm-changeset} \
   ${TEMPLATE:+--template "$TEMPLATE"} \
-  ${NO_CONFIRM:---confirm-changeset} \
   ${TAGS:+--tags "${TAGS[@]}"} \
   ${PARAMS:+--parameter-overrides "${PARAMS[@]}"} \
   ${CONFIG_FILE:+--config-file "$CONFIG_FILE"} \

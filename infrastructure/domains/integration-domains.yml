@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: DNS configuration for self-service integration domains deployed in the integration account
 
 Conditions:
-  IsIntegrationAccount: !Equals [ !Ref AWS::AccountId, "663985455444" ]
+  IsIntegrationAccount: !Equals [ !Ref AWS::AccountId, 663985455444 ]
 
 Resources:
   SignInServiceIntegrationHostedZone:
