@@ -1,4 +1,5 @@
 name: Deploy branch preview
+run-name: Deploy preview [${{ github.head_ref || github.ref_name }}]
 
 on: workflow_dispatch
 permissions: read-all

@@ -9,7 +9,7 @@ on:
       ecs-task-role-arn: { required: false }
       ecs-execution-role-arn: { required: false }
 
-concurrency: deploy-fargate-${{ github.head_ref || github.ref_name }}
+concurrency: deploy-fargate-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
 
 permissions:
   id-token: write
@@ -33,7 +33,7 @@ jobs:
 
       - name: Push Docker image
         id: push-docker-image
-        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@0296e8125a9293d4dfd393ebc83785147f5f5927
+        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@57518aaab7352ff25b417b61016e3063cbdd19d4
         with:
           repository: self-service/frontend
           image-version: ${{ github.sha }}
@@ -42,7 +42,7 @@ jobs:
 
       - name: Register task definition
         id: register-task-definition
-        uses: alphagov/di-github-actions/aws/ecs/register-task-definition@0296e8125a9293d4dfd393ebc83785147f5f5927
+        uses: alphagov/di-github-actions/aws/ecs/register-task-definition@57518aaab7352ff25b417b61016e3063cbdd19d4
         with:
           task-definition: express/task-definition.json
           container: self-service-frontend

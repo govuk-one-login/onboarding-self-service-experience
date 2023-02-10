@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: AWS role to manage DI self-service infrastructure from GitHub Actions
+Description: AWS role and bucket to deploy and manage DI self-service infrastructure from GitHub Actions
 
 Parameters:
   GitHubOrg:
@@ -15,10 +15,18 @@ Parameters:
   AppName:
     Type: String
     Default: self-service
-  InfrastructureStack:
-    Description: Name of the self-service infrastructure SAM stack
+  FrontendInfrastructureStack:
+    Description: Name of the self-service frontend infrastructure stack
     Type: String
-    Default: sse-infrastructure
+  CreateDeploymentArtifactsBucket:
+    Description: Whether to create an S3 bucket for SAM deployments
+    Type: String
+    Default: "false"
+
+Conditions:
+  HasFrontendInfrastructureStack: !Not [ !Equals [ !Ref FrontendInfrastructureStack, "" ] ]
+  CreateDeploymentArtifactsBucket: !Equals [ !Ref CreateDeploymentArtifactsBucket, true ]
+  CreateOIDCProvider: !Equals [ !Ref OIDCProviderArn, "" ]
 
 Resources:
   GitHubRole:
@@ -36,20 +44,17 @@ Resources:
       Policies:
         - PolicyName: GitHubActions
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Resource: "*"
                 Action:
+                  - iam:ListPolicies
                   - ecr:GetAuthorizationToken
                   - ecs:ListTaskDefinitions
                   - ecs:DescribeTaskDefinition
                   - ecs:RegisterTaskDefinition
                   - ecs:DeregisterTaskDefinition
-
-              - Effect: Allow
-                Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${InfrastructureStack}*
-                Action: iam:PassRole
 
               - Effect: Allow
                 Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/*
@@ -68,6 +73,34 @@ Resources:
                   - ecr:ListImages
                   - ecr:PutImage
 
+              - !If
+                - HasFrontendInfrastructureStack
+                - Effect: Allow
+                  Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${FrontendInfrastructureStack}*
+                  Action: iam:PassRole
+                - !Ref AWS::NoValue
+
+  GithubOIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateOIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: [ sts.amazonaws.com ]
+      ThumbprintList: [ 6938fd4d98bab03faadb97b34396831e3780aea1 ]
+
+  DeploymentArtifactsBucket:
+    # checkov:skip=CKV_AWS_18: "Ensure the S3 bucket has access logging enabled"
+    # checkov:skip=CKV_AWS_21: "Ensure the S3 bucket has versioning enabled"
+    # checkov:skip=CKV_AWS_53: "Ensure S3 bucket has block public ACLS enabled"
+    # checkov:skip=CKV_AWS_54: "Ensure S3 bucket has block public policy enabled"
+    # checkov:skip=CKV_AWS_55: "Ensure S3 bucket has ignore public ACLs enabled"
+    # checkov:skip=CKV_AWS_56: "Ensure S3 bucket has 'restrict_public_bucket' enabled"
+    Type: AWS::S3::Bucket
+    Condition: CreateDeploymentArtifactsBucket
+
 Outputs:
   GitHubRoleARN:
     Value: !GetAtt GitHubRole.Arn
+  DeploymentArtifactsBucket:
+    Condition: CreateDeploymentArtifactsBucket
+    Value: !Ref DeploymentArtifactsBucket

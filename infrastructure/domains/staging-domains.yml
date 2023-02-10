@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: DNS configuration for self-service staging domains deployed in the staging account
 
 Conditions:
-  IsStagingAccount: !Equals [ !Ref AWS::AccountId, "325730373996" ]
+  IsStagingAccount: !Equals [ !Ref AWS::AccountId, 325730373996 ]
 
 Resources:
   SignInServiceStagingHostedZone:
