@@ -1,0 +1,48 @@
+name: Clean up deployments
+run-name: Delete stale deployments
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every weekday at 10am
+    - cron: '0 10 * * 1-5'
+
+permissions: read-all
+
+jobs:
+  delete-paas-deployments:
+    name: Clean up PaaS apps
+    runs-on: ubuntu-latest
+    environment: preview
+    concurrency: deploy-paas-preview-${{ github.head_ref || github.ref_name }}
+    steps:
+      - name: PaaS login
+        uses: alphagov/di-github-actions/paas/log-in-to-paas@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
+        with:
+          cf-org-name: gds-digital-identity-onboarding
+          cf-space-name: self-service-preview
+          cf-username: ${{ secrets.CF_USERNAME }}
+          cf-password: ${{ secrets.CF_PASSWORD }}
+
+      - name: Delete stale apps
+        uses: alphagov/di-github-actions/paas/delete-stale-apps@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
+        with:
+          age-threshold-days: 30
+
+  delete-fargate-deployments:
+    name: Clean up Fargate deployments
+    runs-on: ubuntu-latest
+    environment: development
+    concurrency: deploy-fargate-development-${{ github.head_ref || github.ref_name }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Deregister stale task definitions
+        uses: alphagov/di-github-actions/aws/ecs/deregister-stale-task-definitions@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
+        with:
+          aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
+          family: self-service-frontend
+          container: self-service-frontend

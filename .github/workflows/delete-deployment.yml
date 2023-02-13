@@ -1,10 +1,8 @@
 name: Delete deployment
+run-name: ${{ github.event.pull_request.title || format('Delete deployment [{0}]', github.head_ref || github.ref_name) }}
 
 on:
   workflow_dispatch:
-  schedule:
-    # Every weekday at 10am
-    - cron: '0 10 * * 1-5'
   pull_request:
     types: [ closed ]
 
@@ -26,7 +24,6 @@ jobs:
           cf-password: ${{ secrets.CF_PASSWORD }}
 
       - name: Get app name
-        if: ${{ github.event_name != 'schedule' }}
         uses: alphagov/di-github-actions/beautify-branch-name@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
         with:
           downcase: true
@@ -37,20 +34,13 @@ jobs:
           usage: App name
 
       - name: Delete app
-        if: ${{ github.event_name != 'schedule' }}
         run: cf delete "$APP_NAME" -rf
 
-      - name: Clean up stale deployments
-        if: ${{ github.event_name == 'schedule' }}
-        uses: alphagov/di-github-actions/paas/delete-stale-apps@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
-        with:
-          age-threshold-days: 30
-
-  delete-fargate-deployment:
-    name: Delete Fargate deployment
+  delete-front-image:
+    name: Delete frontend image
     runs-on: ubuntu-latest
     environment: development
-    concurrency: deploy-fargate-development-${{ github.head_ref || github.ref_name }}
+    concurrency: build-front-image-development-${{ github.head_ref || github.ref_name }}
 
     permissions:
       id-token: write
@@ -58,17 +48,8 @@ jobs:
 
     steps:
       - name: Delete docker image
-        if: ${{ github.event_name != 'schedule' }}
         uses: alphagov/di-github-actions/aws/ecr/delete-docker-images@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
         with:
           aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
           repository: self-service/frontend
           image-tags: ${{ github.head_ref || github.ref_name }}
-
-      - name: Clean up stale task definitions
-        if: ${{ github.event_name == 'schedule' }}
-        uses: alphagov/di-github-actions/aws/ecs/deregister-stale-task-definitions@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
-        with:
-          aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
-          family: self-service-frontend
-          container: self-service-frontend

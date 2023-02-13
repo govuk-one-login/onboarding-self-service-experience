@@ -16,6 +16,9 @@ on:
       cf-username: { required: true }
       cf-password: { required: true }
     outputs:
+      environment:
+        description: "The environment name the app was deployed to"
+        value: ${{ inputs.environment }}
       deployment-url:
         description: "The PaaS deployment URL"
         value: ${{ jobs.deploy.outputs.deployment-url }}
