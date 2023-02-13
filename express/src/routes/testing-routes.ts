@@ -622,4 +622,24 @@ router.post("/choose-security-codes", (req, res) => {
     }
 });
 
+////// Testing routes for 'Set up authenticator app' page
+router.get("/set-up-auth-app", (req, res) => {
+    res.render("create-account/set-up-auth-app.njk", {
+        qrCodeUrl: "/assets/images/test-qr-code.png"
+    });
+});
+
+router.post("/set-up-auth-app", (req, res) => {
+    if (!req.body.securityCode) {
+        res.render("create-account/set-up-auth-app.njk", {
+            qrCodeUrl: "/assets/images/test-qr-code.png",
+            errorMessages: {
+                securityCode: "Enter the 6 digit code"
+            }
+        });
+        return;
+    }
+    res.redirect("/add-service-name-testing");
+});
+
 export default router;
