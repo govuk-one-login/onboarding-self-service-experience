@@ -1,0 +1,47 @@
+{% extends "layout/form.njk" %}
+
+{% set pageTitle = "What do you want to change?" %}
+{% set formCancelUrl = "/account" %}
+
+{% if current2FA === "authenticator" %}
+  {% set radioInputItems = [
+    {
+      text: "Change the authenticator app you use to get security codes",
+      value: "authenticator",
+      checked: update2FA == "authenticator"
+    },
+    {
+      text: "Get security codes by text message instead",
+      value: "textMessage",
+      checked: update2FA == "textMessage",
+      hint: {
+        text: "You must use a UK mobile phone number"
+      }
+    }
+  ] %}
+{% endif %}
+
+{% if current2FA === "textMessage" %}
+  {% set radioInputItems = [
+    {
+      text: "Change the mobile phone number your security codes are sent to",
+      value: "textMessage",
+      checked: update2FA == "textMessage",
+      hint: {
+      text: "You must use a UK mobile phone number"
+    }
+    },
+    {
+      text: "Use an authenticator app to get security codes instead",
+      value: "authenticator",
+      checked: update2FA == "authenticator",
+      hint: {
+        text: "This will remove your phone number from your account"
+      }
+    }
+  ] %}
+{% endif %}
+
+{% block formInputs %}
+  {{ form.radiosInput("What do you want to change?", "govuk-fieldset__legend--l", "update2FA", items = radioInputItems, isPageHeading = true) }}
+{% endblock %}

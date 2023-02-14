@@ -6,6 +6,26 @@
 {% set pageTitle = "Your account" %}
 {% set mainClasses = "account-summary" %}
 
+{% if current2FA === "authenticator" %}
+  {% set current2FAValue = "Authenticator app" %}
+{% endif %}
+
+{% if current2FA === "textMessage" %}
+  {% set current2FAValue = "Text message to " + mobilePhoneNumber %}
+{% endif %}
+
+{% set current2FAFRow = {
+  key: {text: "How you get security codes"},
+  value: {text: current2FAValue},
+  actions: {
+    items: [{
+      href: '/change-from-app',
+      text: "Change",
+      visuallyHiddenText: "2FA method"
+    }]
+  }
+} %}
+
 {% block mainContent %}
   {% if updatedField %}
     {% call govukNotificationBanner({type: "success"}) %}
@@ -22,6 +42,7 @@
         key: {text: "Email address"},
         value: {text: emailAddress}
       },
+      current2FAFRow,
       {
         key: {text: "Mobile phone number"},
         value: {text: mobilePhoneNumber},

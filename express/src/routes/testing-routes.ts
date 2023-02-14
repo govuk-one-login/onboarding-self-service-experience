@@ -642,4 +642,57 @@ router.post("/set-up-auth-app", (req, res) => {
     res.redirect("/add-service-name-testing");
 });
 
+////// Testing routes for 'What do you want to change' page
+router.get("/change-from-app", (req, res) => {
+    res.render("account/change-from-app.njk", {
+        current2FA: "authenticator"
+    });
+});
+
+router.get("/change-from-app-test-text-message", (req, res) => {
+    res.render("account/change-from-app.njk", {
+        current2FA: "textMessage"
+    });
+});
+
+router.post("/change-from-app", (req, res) => {
+    if (!req.body.update2FA) {
+        res.render("account/change-from-app.njk", {
+            current2FA: "authenticator",
+            errorMessages: {
+                "update2FA-options": "Select what you want to change"
+            }
+        });
+        return;
+    }
+    if (req.body.update2FA === "authenticator") {
+        res.redirect("/set-up-auth-app");
+        return;
+    }
+    if (req.body.update2FA === "textMessage") {
+        res.redirect("/create/enter-mobile-test-url");
+        return;
+    }
+});
+
+router.post("/change-from-app-test-text-message", (req, res) => {
+    if (!req.body.update2FA) {
+        res.render("account/change-from-app.njk", {
+            current2FA: "textMessage",
+            errorMessages: {
+                "update2FA-options": "Select what you want to change"
+            }
+        });
+        return;
+    }
+    if (req.body.update2FA === "authenticator") {
+        res.redirect("/set-up-auth-app");
+        return;
+    }
+    if (req.body.update2FA === "textMessage") {
+        res.redirect("/create/enter-mobile-test-url");
+        return;
+    }
+});
+
 export default router;
