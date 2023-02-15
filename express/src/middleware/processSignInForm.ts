@@ -1,6 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import {NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
+import _ from "lodash";
 
 type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 
@@ -26,6 +27,21 @@ export default function processSignInForm(template: string): MiddlewareFunction<
 
         try {
             req.session.mfaResponse = await s4.login(email, password);
+            if (!req.session.mfaResponse.codeSentTo) {
+                const submitUserPassRes = Promise.resolve(await s4.submitUsernamePassword(email, password)).then(value => {
+                    req.session.authenticationResult = value.AuthenticationResult;
+                    return value.AuthenticationResult;
+                });
+                req.session.authenticationResult = await submitUserPassRes;
+                const username = await s4.getUserByEmail(email);
+                const isPhoneVerified = _.find(username.UserAttributes, {Name: "phone_number_verified", Value: "true"});
+                if (!isPhoneVerified) {
+                    res.redirect("/create/enter-mobile");
+                    return;
+                }
+                res.redirect("/sign-in-otp-mobile");
+                return;
+            }
         } catch (error) {
             if (error instanceof NotAuthorizedException) {
                 res.render(template, {
@@ -49,7 +65,6 @@ export default function processSignInForm(template: string): MiddlewareFunction<
 
             throw error;
         }
-
         res.redirect("/sign-in-otp-mobile");
         return;
     };

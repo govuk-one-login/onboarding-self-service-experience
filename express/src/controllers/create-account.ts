@@ -6,6 +6,7 @@ import {
     UnsupportedUserStateException
 } from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
+import _ from "lodash";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {convertToCountryPrefixFormat} from "../lib/mobileNumberUtils";
 import {domainUserToDynamoUser} from "../lib/userUtils";
@@ -17,19 +18,21 @@ export const showGetEmailForm = function (req: Request, res: Response) {
 
 export const processGetEmailForm = async function (req: Request, res: Response, next: NextFunction) {
     const emailAddress: string = req.body.emailAddress;
-    const username: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
-    const isEmailVerified = s4.adminGetUser(username);
     try {
         await s4.createUser(emailAddress);
     } catch (error) {
         if (error instanceof UsernameExistsException) {
-            return console.log(isEmailVerified);
-            // console.log({values: {email_verified: req.session.email_verified}});
-            res.redirect("/existing-account");
-            return;
+            const username = await s4.getUserByEmail(emailAddress);
+            const isEmailVerified = _.find(username.UserAttributes, {Name: "email_verified", Value: "true"});
+            if (isEmailVerified) {
+                res.redirect("/existing-account");
+                return;
+            } else {
+                res.redirect("check-email");
+                return;
+            }
         }
-
         next(error);
     }
 
@@ -68,7 +71,6 @@ export const submitEmailSecurityCode = async function (req: Request, res: Respon
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
                 }
             });
-
             return;
         } else {
             next(error);
@@ -88,7 +90,7 @@ export const showNewPasswordForm = async function (req: Request, res: Response) 
 
 export const updatePassword = async function (req: Request, res: Response) {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-
+    console.log(req.session);
     req.session.authenticationResult = await s4.setNewPassword(
         req.session.emailAddress as string,
         req.body["password"],
@@ -113,7 +115,6 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
         res.redirect("/sign-in");
         return;
     }
-
     const mobileNumber = convertToCountryPrefixFormat(req.body.mobileNumber);
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
@@ -141,7 +142,6 @@ export const showSubmitMobileVerificationCode = async function (req: Request, re
 
 export const submitMobileVerificationCode = async function (req: Request, res: Response) {
     const securityCode = req.body.securityCode;
-
     if (securityCode === undefined) {
         res.render("common/check-mobile.njk", {
             values: {

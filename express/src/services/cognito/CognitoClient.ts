@@ -21,7 +21,8 @@ import {
     ForgotPasswordCommandOutput,
     ForgotPasswordCommand,
     ConfirmForgotPasswordCommandOutput,
-    ConfirmForgotPasswordCommand, AdminGetUserCommand,
+    ConfirmForgotPasswordCommand,
+    AdminGetUserCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {AdminCreateUserCommandOutput} from "@aws-sdk/client-cognito-identity-provider/dist-types/commands/AdminCreateUserCommand";
 import CognitoInterface from "./CognitoInterface";
@@ -75,7 +76,7 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         return await this.cognitoClient.send(command);
     }
 
-    async adminGetUser(email: string): Promise<AdminGetUserCommandOutput> {
+    async getUserByEmail(email: string): Promise<AdminGetUserCommandOutput> {
         const params = {
             Username: email,
             UserPoolId: this.userPoolId
@@ -246,7 +247,6 @@ If the app is being deployed to PaaS then you may have to update manifest.yaml o
         const command = new AdminSetUserMFAPreferenceCommand(params);
         return await this.cognitoClient.send(command);
     }
-
     async respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
         const params = {
             ChallengeName: "SMS_MFA",

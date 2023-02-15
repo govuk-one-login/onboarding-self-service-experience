@@ -85,7 +85,6 @@ export default class SelfServiceServicesService {
     async setNewPassword(emailAddress: string, password: string, cognitoSession: string): Promise<AuthenticationResultType> {
         return (await this.cognito.setNewPassword(emailAddress, password, cognitoSession)).AuthenticationResult as AuthenticationResultType;
     }
-
     async setEmailAsVerified(emailAddress: string): Promise<void> {
         await this.cognito.setEmailAsVerified(emailAddress);
     }
@@ -94,8 +93,8 @@ export default class SelfServiceServicesService {
         return await this.cognito.createUser(emailAddress);
     }
 
-    async adminGetUser(username: string): Promise<AdminGetUserCommandOutput> {
-        return await this.cognito.adminGetUser(username);
+    async getUserByEmail(username: string): Promise<AdminGetUserCommandOutput> {
+        return await this.cognito.getUserByEmail(username);
     }
 
     async resendEmailAuthCode(emailAddress: string) {

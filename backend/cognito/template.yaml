@@ -440,7 +440,9 @@ Resources:
       SmsAuthenticationMessage: '{####} is your GOV.UK One Login security code.'
       MfaConfiguration: OPTIONAL
       EmailConfiguration:
-        EmailSendingAccount: COGNITO_DEFAULT
+        EmailSendingAccount: DEVELOPER
+        SourceArn: !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${DomainOrEmailIdentityToVerify}"
+        From: !Sub "no-reply@${DomainOrEmailIdentityToVerify}"
       SmsConfiguration:
         SnsCallerArn: !GetAtt SmsRole.Arn
         SnsRegion: eu-west-2

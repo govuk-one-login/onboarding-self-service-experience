@@ -121,10 +121,6 @@ export class CognitoClient implements CognitoInterface {
         return `${this.base64EncodeToken(this.kid)}.${this.base64EncodeToken(this.idTokenPayload)}.${this.fakeSignature()}`;
     }
 
-    getLoggedInIdToken(): string {
-        return `${this.base64EncodeToken(this.kid)}.${this.base64EncodeToken(this.loggedInIdTokenPayload)}.${this.fakeSignature()}`;
-    }
-
     getAccessToken(): string {
         return `${this.base64EncodeToken(this.kid)}.${this.base64EncodeToken(this.accessTokenPayload)}.${this.fakeSignature()}`;
     }
@@ -133,11 +129,9 @@ export class CognitoClient implements CognitoInterface {
         const returnValue = await this.getOverriddenReturnValue("createUser", "email", email);
         return Promise.resolve(returnValue || {$metadata: {}});
     }
-    async adminGetUser(value: string): Promise<AdminGetUserCommandOutput> {
-        const returnValue = await this.adminGetUser("email_verified");
-        return returnValue || {$UserAttributes: {}, UserAttributes: []};
+    async getUserByEmail(email: string): Promise<AdminGetUserCommandOutput> {
+        return Promise.resolve({$metadata: {}, Username: email, UserAttributes: []});
     }
-
     async resendEmailAuthCode(email: string): Promise<AdminCreateUserCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("login", "email", email);
         return Promise.resolve(returnValue || {$metadata: {}});
@@ -168,7 +162,6 @@ export class CognitoClient implements CognitoInterface {
         const returnValue = await this.getOverriddenReturnValue("setNewPassword", "password", password);
         return Promise.resolve(returnValue || {$metadata: {}});
     }
-
     changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<ChangePasswordCommandOutput> {
         return Promise.resolve({$metadata: {}});
     }

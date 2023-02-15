@@ -16,7 +16,7 @@ import {
 export default interface CognitoInterface {
     createUser(email: string): Promise<AdminCreateUserCommandOutput>;
 
-    adminGetUser(username: string): Promise<AdminGetUserCommandOutput>;
+    getUserByEmail(username: string): Promise<AdminGetUserCommandOutput>;
 
     resendEmailAuthCode(email: string): Promise<AdminCreateUserCommandOutput>;
 
