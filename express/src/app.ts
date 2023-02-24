@@ -5,7 +5,7 @@ import "express-async-errors";
 import configureViews from "./config/configure-views";
 import {distribution} from "./config/resources";
 import setSignedInStatus from "./middleware/setSignedInStatus";
-import createAccount from "./routes/create-account-or-sign-in";
+import createAccount from "./routes/register";
 import manageAccount from "./routes/manage-account";
 import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing-routes";

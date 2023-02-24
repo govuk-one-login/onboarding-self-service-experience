@@ -1,7 +1,7 @@
 Feature: Unhappy paths for the self-service sign-in flow
 
   Background:
-    Given that the user is on the "/sign-in" page
+    Given that the user is on the "/sign-in/enter-email-address" page
 
   Scenario: User does not enter a valid email address
     When the user submits the email "invalid-email.com"
@@ -14,7 +14,7 @@ Feature: Unhappy paths for the self-service sign-in flow
   Scenario: User doesn’t enter any characters into the password field
     When they enter "registered@gds.gov.uk" into the "emailAddress" field
     When they click the Continue button
-    Then they should be redirected to the "/sign-in-password" page
+    Then they should be redirected to the "/sign-in/enter-password" page
     When they enter "" into the "password" field
     When they click the Continue button
     Then the error message "Enter your password" must be displayed for the "password" field
@@ -32,19 +32,19 @@ Feature: Unhappy paths for the self-service sign-in flow
     When they click the Submit button
     When they enter "notEmptyPassword" into the "password" field
     When they click the Submit button
-    Then they should be redirected to the "/no-account" page
+    Then they should be redirected to the "/sign-in/account-not-found" page
 
   Scenario: The user tries to reset their password during sign-in
     When they enter "registered@gds.gov.uk" into the "emailAddress" field
     When they click the Submit button
     Then they click on the "Forgot your password?" link
-    Then they should be redirected to the "/forgot-password" page
+    Then they should be redirected to the "/sign-in/forgot-password" page
     Then they click the Continue button
-    Then they should be redirected to the "/check-email-password-reset" page
+    Then they should be redirected to the "/sign-in/forgot-password/enter-email-code" page
     When they click on the forgot password link in their email
     When the user submits the password "this-is-not-a-common-password"
     And the user submits the security code "123456"
-    Then they should be redirected to a page with the path starting with "/client-details"
+    Then they should be redirected to a page with the path starting with "/services"
     And they should see the text "Your services"
     When they click on the "Your account" link
     Then they should be redirected to the "/account" page
@@ -54,9 +54,9 @@ Feature: Unhappy paths for the self-service sign-in flow
     When they enter "registered@gds.gov.uk" into the "emailAddress" field
     When they click the Submit button
     Then they click on the "Forgot your password?" link
-    Then they should be redirected to the "/forgot-password" page
+    Then they should be redirected to the "/sign-in/forgot-password" page
     Then they click the Continue button
-    Then they should be redirected to the "/check-email-password-reset" page
+    Then they should be redirected to the "/sign-in/forgot-password/enter-email-code" page
     When they click on the forgot password link in their email
     When the user submits the password "Password123"
     And they should see the text "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers."
@@ -65,11 +65,11 @@ Feature: Unhappy paths for the self-service sign-in flow
     When they enter "registered@gds.gov.uk" into the "emailAddress" field
     When they click the Submit button
     Then they click on the "Forgot your password?" link
-    Then they should be redirected to the "/forgot-password" page
+    Then they should be redirected to the "/sign-in/forgot-password" page
     Then they click the Continue button
-    Then they should be redirected to the "/check-email-password-reset" page
+    Then they should be redirected to the "/sign-in/forgot-password/enter-email-code" page
     Then they click the "Resend the email" button
-    Then they should be redirected to the "/check-email-password-reset" page
+    Then they should be redirected to the "/sign-in/forgot-password/enter-email-code" page
 
   Scenario: The user tries to log in and submits registered email but enters no value into the password field
     When they enter "password-will-be-wrong@stub.gov.uk" into the "emailAddress" field

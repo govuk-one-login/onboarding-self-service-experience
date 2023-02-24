@@ -7,7 +7,7 @@ export async function processSecurityCode(req: Request, res: Response, next: Nex
 
     // TODO figure out error handling, maybe throw?
     if (!req.session.mfaResponse) {
-        res.redirect("/sign-in");
+        res.redirect("/sign-in/enter-email-address");
         return;
     }
 

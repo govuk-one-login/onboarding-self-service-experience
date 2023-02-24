@@ -21,7 +21,7 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
         await s4.createUser(emailAddress);
     } catch (error) {
         if (error instanceof UsernameExistsException) {
-            res.redirect("/existing-account");
+            res.redirect("/register/account-exists");
             return;
         }
 
@@ -29,12 +29,12 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
     }
 
     req.session.emailAddress = emailAddress;
-    res.redirect("check-email");
+    res.redirect("/register/enter-email-code");
 };
 
 export const showCheckEmailForm = function (req: Request, res: Response) {
     if (!req.session.emailAddress) {
-        res.redirect("/create/get-email");
+        res.redirect("/register/enter-email-address");
         return;
     }
 
@@ -44,7 +44,7 @@ export const showCheckEmailForm = function (req: Request, res: Response) {
 export const submitEmailSecurityCode = async function (req: Request, res: Response, next: NextFunction) {
     if (!req.session.emailAddress) {
         console.error("submitEmailOtp::EmailAddress is not in the session, redirecting to submitEmailOtp");
-        res.redirect("/create/get-email");
+        res.redirect("/register/enter-email-address");
         return;
     }
 
@@ -53,7 +53,7 @@ export const submitEmailSecurityCode = async function (req: Request, res: Respon
     try {
         const response = await s4.submitUsernamePassword(req.session.emailAddress as string, req.body.securityCode);
         req.session.cognitoSession = response.Session;
-        res.redirect("/create/update-password");
+        res.redirect("/register/create-password");
         return;
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
@@ -90,7 +90,7 @@ export const updatePassword = async function (req: Request, res: Response) {
         req.session.cognitoSession as string
     );
     await s4.setEmailAsVerified(req.session.emailAddress as string);
-    res.redirect("/create/enter-mobile");
+    res.redirect("/register/enter-phone-number");
 };
 
 export const showEnterMobileForm = async function (req: Request, res: Response) {
@@ -117,7 +117,7 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
 
     req.session.mobileNumber = mobileNumber;
     req.session.enteredMobileNumber = req.body.mobileNumber;
-    res.redirect("/create/verify-phone-code");
+    res.redirect("/register/enter-text-code");
 };
 
 export const resendMobileVerificationCode = async function (req: Request, res: Response) {
@@ -129,7 +129,7 @@ export const showSubmitMobileVerificationCode = async function (req: Request, re
     res.render("common/check-mobile.njk", {
         values: {
             mobileNumber: req.session.enteredMobileNumber,
-            textMessageNotReceivedUrl: "/create/resend-phone-code"
+            textMessageNotReceivedUrl: "/register/resend-text-code"
         }
     });
 };
@@ -141,7 +141,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         res.render("common/check-mobile.njk", {
             values: {
                 mobileNumber: req.session.mobileNumber,
-                textMessageNotReceivedUrl: "/create/resend-phone-code"
+                textMessageNotReceivedUrl: "/register/resend-text-code"
             }
         });
 
@@ -158,7 +158,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
                 values: {
                     securityCode: req.body.securityCode,
                     mobileNumber: req.session.enteredMobileNumber,
-                    textMessageNotReceivedUrl: "/create/resend-phone-code"
+                    textMessageNotReceivedUrl: "/register/resend-text-code"
                 },
                 errorMessages: {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
@@ -190,7 +190,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
     await s4.putUser(user, req.session.authenticationResult?.AccessToken as string);
 
     req.session.isSignedIn = true;
-    res.redirect("/add-service-name");
+    res.redirect("/register/create-service");
 };
 
 export const showResendPhoneCodeForm = async function (req: Request, res: Response) {
@@ -204,5 +204,5 @@ export const showResendEmailCodeForm = async function (req: Request, res: Respon
 export const resendEmailVerificationCode = async function (req: Request, res: Response) {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
-    res.redirect("check-email");
+    res.redirect("/register/enter-email-code");
 };
