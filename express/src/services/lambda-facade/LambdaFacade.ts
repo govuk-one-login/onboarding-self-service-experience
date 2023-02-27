@@ -82,7 +82,7 @@ class LambdaFacade implements LambdaFacadeInterface {
             updates: updates
         };
 
-        return this.instance.post(`/Prod/do-update-client`, JSON.stringify(body), {
+        return this.instance.post(`/Prod/update-client`, JSON.stringify(body), {
             headers: {
                 "authorised-by": accessToken
             }
