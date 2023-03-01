@@ -15,6 +15,9 @@ Parameters:
     Type: String
     Default: ""
     Description: Email address to send internal notifications
+  LogGroupNamePrefix:
+    Type: String
+    Default: /aws/vendedlogs
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -432,10 +435,11 @@ Resources:
                   - logs:UpdateLogDelivery
                   - logs:DeleteLogDelivery
                   - logs:ListLogDeliveries
-                  - logs:PutResourcePolicy
                   - logs:DescribeResourcePolicies
-                  - logs:DescribeLogGroups
                 Resource: "*"
+              - Effect: Allow
+                Action: logs:DescribeLogGroups
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${StepFunctionsLogGroup}
               - Effect: Allow
                 Action: lambda:InvokeFunction
                 Resource:
@@ -498,6 +502,8 @@ Resources:
     # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
     # checkov:skip=CKV_AWS_66: "Ensure that CloudWatch Log Group specifies retention days"
     Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupNamePrefix}/states/${AWS::StackName}
 
   #--- Notifications ---#
 
