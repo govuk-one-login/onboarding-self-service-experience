@@ -21,7 +21,7 @@ class LambdaFacade implements LambdaFacadeInterface {
     async putUser(user: OnboardingTableItem, accessToken: string): Promise<AxiosResponse> {
         return await (
             await this.instance
-        ).post("/Prod/put-user", user, {
+        ).post("/put-user", user, {
             headers: {
                 "authorised-by": accessToken
             }
@@ -31,7 +31,7 @@ class LambdaFacade implements LambdaFacadeInterface {
     async getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
         return await (
             await this.instance
-        ).post("/Prod/get-user", `user#${cognitoId}`, {
+        ).post("/get-user", `user#${cognitoId}`, {
             headers: {
                 "authorised-by": accessToken
             }
@@ -46,7 +46,7 @@ class LambdaFacade implements LambdaFacadeInterface {
         };
         return await (
             await this.instance
-        ).post("/Prod/new-service", JSON.stringify(body), {
+        ).post("/new-service", JSON.stringify(body), {
             headers: {
                 "authorised-by": accessToken
             }
@@ -60,7 +60,7 @@ class LambdaFacade implements LambdaFacadeInterface {
         };
         return await (
             await this.instance
-        ).post("/Prod/new-client", JSON.stringify(body), {
+        ).post("/new-client", JSON.stringify(body), {
             headers: {
                 "authorised-by": authenticationResult.AccessToken as string
             }
@@ -82,7 +82,7 @@ class LambdaFacade implements LambdaFacadeInterface {
             updates: updates
         };
 
-        return this.instance.post(`/Prod/update-client`, JSON.stringify(body), {
+        return this.instance.post(`/update-client`, JSON.stringify(body), {
             headers: {
                 "authorised-by": accessToken
             }
@@ -90,13 +90,13 @@ class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async listServices(userId: string, accessToken: string): Promise<AxiosResponse> {
-        return await (await this.instance).get(`/Prod/get-services/${userId}`);
+        return await (await this.instance).get(`/get-services/${userId}`);
     }
 
     // TODO Don't we need to use the token to authorise when making the call to the database? Seems odd it's not used
     listClients(serviceId: string, accessToken: string): Promise<AxiosResponse<QueryCommandOutput>> {
         const bareServiceId = serviceId.startsWith("service#") ? serviceId.substring(8) : serviceId;
-        return this.instance.get(`/Prod/get-service-clients/${bareServiceId}`);
+        return this.instance.get(`/get-service-clients/${bareServiceId}`);
     }
 
     async updateUser(selfServiceUserId: string, updates: Record<string, string | Date>, accessToken: string): Promise<AxiosResponse> {
@@ -107,7 +107,7 @@ class LambdaFacade implements LambdaFacadeInterface {
 
         return await (
             await this.instance
-        ).post("/Prod/update-user", JSON.stringify(body), {
+        ).post("/update-user", JSON.stringify(body), {
             headers: {
                 "authorised-by": accessToken
             }
@@ -128,7 +128,7 @@ class LambdaFacade implements LambdaFacadeInterface {
             emailAddress: emailAddress
         };
 
-        return await (await this.instance).post("/Prod/send-private-beta-request-notification", JSON.stringify(body));
+        return await (await this.instance).post("/send-private-beta-request-notification", JSON.stringify(body));
     }
 }
 

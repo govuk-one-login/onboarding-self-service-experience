@@ -44,6 +44,13 @@ Globals:
 
 Resources:
 
+  SelfServiceApi:
+    # checkov:skip=CKV_AWS_95: "Ensure API Gateway V2 has Access Logging enabled"
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      FailOnWarnings: true
+      StageName: self-service-api
+
   #--- Users ---#
 
   GetUserFunction:
@@ -70,8 +77,9 @@ Resources:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /get-user
             Method: POST
 
@@ -99,8 +107,9 @@ Resources:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /put-user
             Method: POST
 
@@ -129,8 +138,9 @@ Resources:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /update-user
             Method: POST
 
@@ -160,8 +170,9 @@ Resources:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /get-services/{userId}
             Method: GET
 
@@ -214,8 +225,9 @@ Resources:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /get-service-clients/{serviceId}
             Method: GET
 
@@ -351,8 +363,9 @@ Resources:
             Resource: !Ref NewServiceStepFunction
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /new-service
             Method: POST
 
@@ -379,8 +392,9 @@ Resources:
             Resource: !Ref NewClientStepFunction
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /new-client
             Method: POST
 
@@ -407,8 +421,9 @@ Resources:
             Resource: !Ref UpdateClientStepFunction
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /update-client
             Method: POST
 
@@ -529,8 +544,9 @@ Resources:
             TopicName: !GetAtt NotificationsSnsTopic.TopicName
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /send-private-beta-request-notification
             Method: POST
 
@@ -547,6 +563,6 @@ Resources:
 Outputs:
   # SAM Serverless Function implicit API resources
   # https://github.com/aws/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  ApiBaseUrl:
+  SelfServiceApiBaseUrl:
     Description: API Gateway base URL of the self-service backend endpoints
-    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com
+    Value: !Sub ${SelfServiceApi.ApiEndpoint}/${SelfServiceApi.Stage}
