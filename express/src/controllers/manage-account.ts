@@ -239,7 +239,8 @@ export const showAccount = async function (req: Request, res: Response) {
         mobilePhoneNumber: user.mobileNumber,
         passwordLastChanged: lastUpdated(user.passwordLastUpdated),
         serviceName: "My juggling service",
-        updatedField: req.session.updatedField
+        updatedField: req.session.updatedField,
+        current2FA: "textMessage"
     });
     req.session.updatedField = undefined;
 };
