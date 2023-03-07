@@ -12,5 +12,5 @@ You can get the values needed for the GHA Secrets from running `./secrets-for-gh
 
 ## Build stack
 
-This has been clicked into life as per the dev team docs. The template and parameters can be found through
-the web console and the stack can be updated with \_Stack actions > Create change set for current stack
+The parameters used to create this stack can be written to the parameter store using `shared/save-parameters-to-parameter-store.sh`.
+These will then be used by [./create-deployment-pipeline-stack.sh](./deploy-deployment-pipeline-stack.sh) (which invokes [../shared/create-deployment-pipeline-stack.sh](../shared/deploy-deployment-pipeline-stack.sh)) to create or update the stack.
