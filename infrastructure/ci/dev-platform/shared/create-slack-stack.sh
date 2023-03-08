@@ -26,4 +26,3 @@ aws cloudformation create-stack --stack-name sse-slack-notify \
   Key=System,Value="Onboarding Self-Service" \
   Key=Environment,Value="$ACCOUNT" \
   Key=Owner,Value="DI self-service team"
-  

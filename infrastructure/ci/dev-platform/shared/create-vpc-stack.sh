@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 set -eu
 
-
 echo Creating stack for VPC
-
 
 if [[ "$1" == "" ]]; then
   echo "Usage: $0 <development | build | staging | integration | production>"
@@ -15,7 +13,6 @@ pushd "$BASE_DIR" > /dev/null
 
 ACCOUNT="$1"
 ../../../check-aws-account.sh "$ACCOUNT" || exit
-
 
 aws cloudformation create-stack --stack-name vpc-stack \
   --template-url https://template-storage-templatebucket-1upzyw6v9cs42.s3.amazonaws.com/vpc/template.yaml \

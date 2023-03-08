@@ -12,11 +12,6 @@ CONTAINER_SIGNER_ARN="arn:aws:kms:eu-west-2:494650018671:key/ef26b15b-c04d-4c62-
 SIGNER_PROFILE_ARN="arn:aws:signer:eu-west-2:494650018671:/signing-profiles/SigningProfile_8a0gUKtixxVk"
 SIGNER_PROFILE_VERSION_ARN="arn:aws:signer:eu-west-2:494650018671:/signing-profiles/SigningProfile_8a0gUKtixxVk/8Ht683ClNM"
 
-../shared/create-sse-frontend-pipeline.sh "$ACCOUNT" "$PIPELINE_ENV" \
-"$ALLOWED_ACCOUNTS" \
-"$CONTAINER_SIGNER_ARN" \
-"$SIGNER_PROFILE_ARN" \
-"$SIGNER_PROFILE_VERSION_ARN" \
-
+../shared/create-sse-frontend-pipeline.sh "$ACCOUNT" "$PIPELINE_ENV" "$ALLOWED_ACCOUNTS" "$CONTAINER_SIGNER_ARN" "$SIGNER_PROFILE_ARN" "$SIGNER_PROFILE_VERSION_ARN"
 
 popd > /dev/null
