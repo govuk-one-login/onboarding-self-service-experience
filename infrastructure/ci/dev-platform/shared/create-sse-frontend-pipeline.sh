@@ -25,19 +25,19 @@ aws cloudformation create-stack --stack-name sse-frontend-pipeline \
   --region eu-west-2 \
   --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND\
   --parameters ParameterKey="Environment",ParameterValue="$PIPELINE_ENV" \
-  ParameterKey="SAMStackName",ParameterValue="sse-frontend-app" \
-  ParameterKey="VpcStackName",ParameterValue="sse-vpc-stack" \
-  ParameterKey="IncludePromotion",ParameterValue="No" \
-  ParameterKey="AWSOrganizationId",ParameterValue='o-pjzf8d99ys\,o-dpp53lco28' \
-  ParameterKey="AllowedAccounts",ParameterValue="$ALLOWED_ACCOUNTS" \
-  ParameterKey="ContainerSignerKmsKeyArn",ParameterValue="$CONTAINER_SIGNER_ARN" \
-  ParameterKey="SigningProfileArn",ParameterValue="$SIGNER_PROFILE_ARN" \
-  ParameterKey="SigningProfileVersionArn",ParameterValue="$SIGNER_PROFILE_VERSION_ARN" \
-  ParameterKey="GitHubRepositoryName",ParameterValue="di-onboarding-self-service-experience" \
-  ParameterKey="ProgrammaticPermissionsBoundary",ParameterValue="True" \
-  ParameterKey="AllowedServiceOne",ParameterValue="ECR & ECS" \
-  ParameterKey="SlackNotificationType",ParameterValue="All" \
-  ParameterKey="BuildNotificationStackName",ParameterValue="sse-slack-notify" \
+  ParameterKey=SAMStackName,ParameterValue="sse-frontend-app" \
+  ParameterKey=VpcStackName,ParameterValue="sse-vpc-stack" \
+  ParameterKey=IncludePromotion,ParameterValue="No" \
+  ParameterKey=AWSOrganizationId,ParameterValue='o-pjzf8d99ys\,o-dpp53lco28' \
+  ParameterKey=AllowedAccounts,ParameterValue="$ALLOWED_ACCOUNTS" \
+  ParameterKey=ContainerSignerKmsKeyArn,ParameterValue="$CONTAINER_SIGNER_ARN" \
+  ParameterKey=SigningProfileArn,ParameterValue="$SIGNER_PROFILE_ARN" \
+  ParameterKey=SigningProfileVersionArn,ParameterValue="$SIGNER_PROFILE_VERSION_ARN" \
+  ParameterKey=GitHubRepositoryName,ParameterValue="di-onboarding-self-service-experience" \
+  ParameterKey=ProgrammaticPermissionsBoundary,ParameterValue="True" \
+  ParameterKey=AllowedServiceOne,ParameterValue="ECR & ECS" \
+  ParameterKey=SlackNotificationType,ParameterValue="All" \
+  ParameterKey=BuildNotificationStackName,ParameterValue="sse-slack-notify" \
   --tags Key=Product,Value="GOV.UK Sign In" \
   Key=System,Value="Onboarding Self-Service" \
   Key=Environment,Value="$ACCOUNT" \
