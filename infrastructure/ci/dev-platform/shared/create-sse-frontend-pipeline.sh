@@ -23,8 +23,7 @@ SIGNER_PROFILE_VERSION_ARN="$6"
 aws cloudformation create-stack --stack-name sse-frontend-pipeline \
   --template-url https://template-storage-templatebucket-1upzyw6v9cs42.s3.amazonaws.com/sam-deploy-pipeline/template.yaml \
   --region eu-west-2 \
-  --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND\
-  --parameters ParameterKey=Environment,ParameterValue="$PIPELINE_ENV" \
+  --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --parameters ParameterKey=Environment,ParameterValue="$PIPELINE_ENV" \
   ParameterKey=SAMStackName,ParameterValue="sse-frontend-app" \
   ParameterKey=VpcStackName,ParameterValue="sse-vpc-stack" \
   ParameterKey=IncludePromotion,ParameterValue="No" \
