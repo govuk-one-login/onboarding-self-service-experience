@@ -35,3 +35,28 @@ jobs:
       aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
       ecs-task-role-arn: ${{ secrets.AWS_ECS_TASK_ROLE_ARN }}
       ecs-execution-role-arn: ${{ secrets.AWS_ECS_EXECUTION_ROLE_ARN }}
+
+  build-api-lambdas:
+    name: Build
+    uses: ./.github/workflows/build-api-lambdas.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: development
+    secrets:
+      aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
+
+  deploy-api-preview-aws:
+    name: Preview
+    needs: build-api-lambdas
+    uses: ./.github/workflows/deploy-api-lambdas.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: development
+      log-group-name-prefix: /self-service/preview
+    secrets:
+      aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
+      sam-deployment-bucket: ${{ secrets.GHA_SAM_DEPLOYMENT_BUCKET }}

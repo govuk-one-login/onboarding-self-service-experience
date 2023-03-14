@@ -1,0 +1,61 @@
+name: Deploy API
+
+on:
+  workflow_call:
+    inputs:
+      environment: { required: true, type: string }
+      log-group-name-prefix: { required: false, type: string }
+    secrets:
+      aws-role-arn: { required: true }
+      sam-deployment-bucket: { required: true }
+    outputs:
+      stack-name:
+        description: "The deployed stack name"
+        value: ${{ jobs.deploy.outputs.stack-name }}
+
+concurrency: deploy-api-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy API
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ steps.deploy-api-stack.outputs.stack-url }}
+    outputs:
+      stack-name: ${{ steps.deploy-api-stack.outputs.stack-name }}
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
+      - name: Get distribution artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: self-service-api
+
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.aws-role-arn }}
+          aws-region: eu-west-2
+
+      - name: Deploy API stack
+        id: deploy-api-stack
+        uses: alphagov/di-github-actions/sam/deploy-stack@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
+        with:
+          sam-deployment-bucket: ${{ secrets.sam-deployment-bucket }}
+          stack-name-prefix: preview-api
+          s3-prefix: sse-preview
+          delete-failed-stack: true
+          tags: |
+            sse:component=api
+            sse:stack-type=preview
+            sse:application=self-service
+            sse:deployment-source=github-actions
+          parameters: |
+            LogGroupNamePrefix=${{ inputs.log-group-name-prefix }}
