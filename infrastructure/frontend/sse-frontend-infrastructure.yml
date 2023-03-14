@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Transform: AWS::Serverless-2016-10-31
 Description: Infrastructure to deploy the DI self-service frontend to Fargate
+Transform: AWS::LanguageExtensions
 
 Conditions:
   IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, 494650018671 ]
@@ -18,23 +18,18 @@ Resources:
         EncryptionType: KMS
       LifecyclePolicy:
         RegistryId: !Ref AWS::AccountId
-        LifecyclePolicyText: '{
-          "rules": [
-            {
-              "rulePriority": 1,
-              "description": "Keep images pushed in the last 5 days",
-              "selection": {
-                "tagStatus": "any",
-                "countType": "sinceImagePushed",
-                "countUnit": "days",
-                "countNumber": 5
-              },
-              "action": {
-                "type": "expire"
-              }
-            }
-          ]
-        }'
+        LifecyclePolicyText:
+          Fn::ToJsonString:
+            rules:
+              - rulePriority: 1
+                description: Keep images pushed in the last 5 days
+                selection:
+                  tagStatus: any
+                  countType: sinceImagePushed
+                  countUnit: days
+                  countNumber: 5
+                action:
+                  type: expire
 
   FrontendECSTaskRole:
     Type: AWS::IAM::Role
