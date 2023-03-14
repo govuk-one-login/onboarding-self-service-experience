@@ -12,8 +12,8 @@ Parameters:
     Default: dynamo-db-stack
     Description: The name of the stack exporting the self-service table
   NotificationEmail:
-    Type: String
-    Default: ""
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/config/api/notification-email
     Description: Email address to send internal notifications
   LogGroupNamePrefix:
     Type: String
@@ -30,7 +30,6 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  SendNotifications: !Not [ !Equals [ !Ref NotificationEmail, "" ] ]
 
 Globals:
   Function:
@@ -528,7 +527,6 @@ Resources:
     # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
     # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
-    Condition: SendNotifications
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -553,7 +551,6 @@ Resources:
   NotificationsSnsTopic:
     # checkov:skip=CKV_AWS_26: "Ensure all data stored in the SNS topic is encrypted"
     Type: AWS::SNS::Topic
-    Condition: SendNotifications
     Properties:
       DisplayName: DI Admin Tool
       Subscription:

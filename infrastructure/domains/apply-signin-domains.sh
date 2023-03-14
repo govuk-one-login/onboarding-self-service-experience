@@ -4,15 +4,14 @@ set -eu
 BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
 pushd "$BASE_DIR" > /dev/null
 
-if ! [[ ${ACCOUNT:=${1:-}} ]]; then
-  echo "Specify environment ($(../check-aws-account.sh --print-accounts))"
-  exit 1
-fi
+ACCOUNT=$(../check-aws-account.sh --get-account-name) || exit $?
 
-../deploy-sam-stack.sh "${@:2}" \
-  --account "$ACCOUNT" \
+[[ $ACCOUNT == build ]] && echo "Cannot deploy this stack to '$ACCOUNT'" && exit 1
+
+../deploy-sam-stack.sh "$@" \
+  --validate \
   --stack-name "$ACCOUNT"-hosted-zone \
   --template "$ACCOUNT"-domains.yml \
-  --tags StackType=DNS
+  --tags sse:stack-type=dns
 
 popd > /dev/null

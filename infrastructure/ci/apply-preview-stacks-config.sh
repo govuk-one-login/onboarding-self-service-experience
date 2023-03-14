@@ -16,9 +16,9 @@ FRONTEND_STACK=$(aws cloudformation describe-stacks \
 
 ../deploy-sam-stack.sh "$@" \
   --account development \
-  --stack-name github-actions-role-sse \
-  --template github-actions-role.yml \
-  --tags StackType=GitHubActionsRole \
+  --stack-name github-actions-preview-stacks-config \
+  --template github-actions-preview-stacks.yml \
+  --tags sse:stack-type=config sse:stack-role=deployment \
   --params \
   OIDCProviderArn="$PROVIDER_ARN" \
   CreateDeploymentArtifactsBucket=true \

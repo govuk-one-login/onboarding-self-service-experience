@@ -12,10 +12,11 @@ declare -A accounts=(
 
 account_names=$(IFS="|" && echo "${accounts[*]}")
 [[ ${1:-} == "--print-accounts" ]] && echo "${account_names//|/ | }" && exit
+[[ ${1:-} == "--get-account-name" ]] && info=true && shift || info=false
 
 target_account="${1:-}"
 if ! actual_account_number=$(aws sts get-caller-identity --query "Account" --output text 2> /dev/null); then
-  echo "Valid AWS credentials were not found in the environment"
+  echo "Valid AWS credentials were not found in the environment" >&2
   echo "Authenticate to${target_account:+" the '$target_account' account in"} AWS and try again" >&2
   exit 255
 fi
@@ -24,7 +25,7 @@ actual_account=${accounts[$actual_account_number]:-}
 [[ $actual_account ]] || (echo "Unknown account number: $actual_account_number" >&2 && exit 1)
 
 if ! [[ $target_account ]]; then
-  echo "You're in the '$actual_account' account"
+  $info && echo "$actual_account" || echo "» You're in the '$actual_account' account"
   exit
 fi
 

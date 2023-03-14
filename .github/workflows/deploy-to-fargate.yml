@@ -6,8 +6,8 @@ on:
       environment: { required: true, type: string }
     secrets:
       aws-role-arn: { required: true }
-      ecs-task-role-arn: { required: false }
-      ecs-execution-role-arn: { required: false }
+      ecs-task-role-arn: { required: true }
+      ecs-execution-role-arn: { required: true }
 
 concurrency: deploy-fargate-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
 
