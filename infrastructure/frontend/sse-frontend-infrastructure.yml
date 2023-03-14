@@ -16,9 +16,6 @@ Resources:
         ScanOnPush: true
       EncryptionConfiguration:
         EncryptionType: KMS
-      Tags:
-        - { Key: Application, Value: SSE }
-        - { Key: Component, Value: Frontend }
       LifecyclePolicy:
         RegistryId: !Ref AWS::AccountId
         LifecyclePolicyText: '{
@@ -44,9 +41,6 @@ Resources:
     Condition: IsDevelopmentAccount
     Properties:
       Description: The role assumed by the frontend application containers
-      Tags:
-        - { Key: Application, Value: SSE }
-        - { Key: Component, Value: Frontend }
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -64,9 +58,6 @@ Resources:
     Condition: IsDevelopmentAccount
     Properties:
       Description: The role granting the Fargate and ECS container agents permissions to make AWS API calls
-      Tags:
-        - { Key: Application, Value: SSE }
-        - { Key: Component, Value: Frontend }
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -81,9 +72,6 @@ Resources:
     Condition: IsDevelopmentAccount
     Properties:
       Name: /self-service/config/frontend/ecs/task-role-arn
-      Tags:
-        Application: SSE
-        Component: Frontend
       Value: !GetAtt FrontendECSTaskRole.Arn
       Type: String
 
@@ -92,9 +80,6 @@ Resources:
     Condition: IsDevelopmentAccount
     Properties:
       Name: /self-service/config/frontend/ecs/execution-role-arn
-      Tags:
-        Application: SSE
-        Component: Frontend
       Value: !GetAtt FrontendECSExecutionRole.Arn
       Type: String
 

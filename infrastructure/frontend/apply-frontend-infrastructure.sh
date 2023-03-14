@@ -8,4 +8,4 @@ BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
   --account development \
   --stack-name self-service-frontend-infrastructure \
   --template "$BASE_DIR"/sse-frontend-infrastructure.yml \
-  --tags StackType=FrontendInfrastructure
+  --tags sse:stack-type=infrastructure sse:application=self-service sse:component=frontend sse:role=deployment
