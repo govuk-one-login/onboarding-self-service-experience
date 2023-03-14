@@ -1,14 +1,14 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Infrastructure to deploy the DI self-service frontend
+Description: Infrastructure to deploy the DI self-service frontend to Fargate
 
 Conditions:
   IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, 494650018671 ]
 
 Resources:
   FrontendECRRepository:
-    Condition: IsDevelopmentAccount
     Type: AWS::ECR::Repository
+    Condition: IsDevelopmentAccount
     Properties:
       RepositoryName: self-service/frontend
       ImageTagMutability: IMMUTABLE
@@ -39,57 +39,64 @@ Resources:
           ]
         }'
 
-  FrontendECSExecutionRole:
-    Condition: IsDevelopmentAccount
-    Type: AWS::IAM::Role
-    Properties:
-      Tags:
-        - { Key: Application, Value: SSE }
-        - { Key: Component, Value: Frontend }
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service:
-                - ecs-tasks.amazonaws.com
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-
   FrontendECSTaskRole:
-    Condition: IsDevelopmentAccount
     Type: AWS::IAM::Role
+    Condition: IsDevelopmentAccount
     Properties:
+      Description: The role assumed by the frontend application containers
       Tags:
         - { Key: Application, Value: SSE }
         - { Key: Component, Value: Frontend }
       AssumeRolePolicyDocument:
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Action: sts:AssumeRole
             Principal:
-              Service:
-                - ecs-tasks.amazonaws.com
+              Service: ecs-tasks.amazonaws.com
             Condition:
               ArnLike:
                 aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+      ManagedPolicyArns: [ arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role ]
 
-  FrontendECSRoleParams:
+  FrontendECSExecutionRole:
+    Type: AWS::IAM::Role
     Condition: IsDevelopmentAccount
-    Type: AWS::SSM::Parameter
     Properties:
-      Description: ARNs of the roles to use when deploying and running frontend ECS tasks
-      Name: !Sub /self-service/config/frontend/ecs-roles
+      Description: The role granting the Fargate and ECS container agents permissions to make AWS API calls
+      Tags:
+        - { Key: Application, Value: SSE }
+        - { Key: Component, Value: Frontend }
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+      ManagedPolicyArns: [ arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy ]
+
+  FrontendECSTaskRoleParam:
+    Type: AWS::SSM::Parameter
+    Condition: IsDevelopmentAccount
+    Properties:
+      Name: /self-service/config/frontend/ecs/task-role-arn
       Tags:
         Application: SSE
         Component: Frontend
+      Value: !GetAtt FrontendECSTaskRole.Arn
       Type: String
-      Value: !Sub '{
-          "taskRole": "${FrontendECSTaskRole.Arn}",
-          "executionRole": "${FrontendECSExecutionRole.Arn}"
-        }'
+
+  FrontendECSExecutionRoleArnParam:
+    Type: AWS::SSM::Parameter
+    Condition: IsDevelopmentAccount
+    Properties:
+      Name: /self-service/config/frontend/ecs/execution-role-arn
+      Tags:
+        Application: SSE
+        Component: Frontend
+      Value: !GetAtt FrontendECSExecutionRole.Arn
+      Type: String
 
 Outputs:
   ECSTaskRoleARN:

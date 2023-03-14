@@ -1,4 +1,4 @@
-name: Deploy to Fargate
+name: Build frontend image
 
 on:
   workflow_call:
@@ -6,20 +6,20 @@ on:
       environment: { required: true, type: string }
     secrets:
       aws-role-arn: { required: true }
-      ecs-task-role-arn: { required: true }
-      ecs-execution-role-arn: { required: true }
 
-concurrency: deploy-fargate-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
+concurrency: build-front-image-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  deploy:
-    name: Deploy to Fargate
+  build:
+    name: Frontend image
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ steps.push-docker-image.outputs.image-url }}
 
     steps:
       - name: Pull repository
@@ -41,6 +41,13 @@ jobs:
           image-tags: ${{ github.head_ref || github.ref_name }}
           build-path: express
 
+      - name: Get ECS roles
+        id: get-ecs-roles
+        uses: alphagov/di-github-actions/aws/ssm/get-parameters@f9d4fd5fb5f5a92151bc522925fe2ba7cb1c05fc
+        with:
+          parameter-path: /self-service/config/frontend/ecs
+          trim-path: true
+
       - name: Register task definition
         id: register-task-definition
         uses: alphagov/di-github-actions/aws/ecs/register-task-definition@f9d4fd5fb5f5a92151bc522925fe2ba7cb1c05fc
@@ -48,8 +55,8 @@ jobs:
           task-definition: express/task-definition.json
           container: self-service-frontend
           image-uri: ${{ steps.push-docker-image.outputs.image-uri }}
-          execution-role-arn: ${{ secrets.ecs-execution-role-arn }}
-          task-role-arn: ${{ secrets.ecs-task-role-arn }}
+          task-role-arn: ${{ fromJSON(steps.get-ecs-roles.outputs.parameters).task-role-arn }}
+          execution-role-arn: ${{ fromJSON(steps.get-ecs-roles.outputs.parameters).execution-role-arn }}
           task-definition-tags: |
             Branch=${{ github.head_ref || github.ref_name }}
             Version=${{ steps.push-docker-image.outputs.image-version }}
