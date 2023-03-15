@@ -3,8 +3,8 @@ set -eu
 
 echo Creating stack for Slack Notification
 
-if [[ "$1" == "" ]]; then
-  echo "Usage: $0 <development | build | staging | integration | production>"
+if [[ "$#" -ne 3 || ! "development  build  staging  integration production" =~ ( |^)$1( |$) ]]; then
+  echo "Usage: $0 <development | build | staging | integration | production> <slack-workspace-id> <slack-channel-id>"
   exit 1
 fi
 

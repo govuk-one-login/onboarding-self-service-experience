@@ -3,8 +3,8 @@ set -eu
 
 echo Creating stack for ECR
 
-if [[ "$1" == "" ]]; then
-  echo "Usage: $0 <development | build | staging | integration | production>"
+if [[ "$#" -ne 2 || ! "development  build  staging  integration production" =~ ( |^)$1( |$) ]]; then
+  echo "Usage: $0 <development | build | staging | integration | production> <pipeline-stack-name>"
   exit 1
 fi
 

@@ -3,7 +3,7 @@ set -eu
 
 echo Creating stack for VPC
 
-if [[ "$1" == "" ]]; then
+if [[ "$#" -ne 1 || ! "development  build  staging  integration production" =~ ( |^)$1( |$) ]]; then
   echo "Usage: $0 <development | build | staging | integration | production>"
   exit 1
 fi
