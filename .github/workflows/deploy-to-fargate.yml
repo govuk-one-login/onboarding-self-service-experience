@@ -26,14 +26,15 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Assume AWS Role
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.aws-role-arn }}
+          mask-aws-account-id: false
           aws-region: eu-west-2
 
       - name: Push Docker image
         id: push-docker-image
-        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@57518aaab7352ff25b417b61016e3063cbdd19d4
+        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
         with:
           repository: self-service/frontend
           image-version: ${{ github.sha }}
@@ -42,7 +43,7 @@ jobs:
 
       - name: Register task definition
         id: register-task-definition
-        uses: alphagov/di-github-actions/aws/ecs/register-task-definition@57518aaab7352ff25b417b61016e3063cbdd19d4
+        uses: alphagov/di-github-actions/aws/ecs/register-task-definition@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
         with:
           task-definition: express/task-definition.json
           container: self-service-frontend
