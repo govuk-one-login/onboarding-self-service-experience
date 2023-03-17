@@ -51,7 +51,7 @@
   {{ textInput(label | default("Email address"), "emailAddress", classes, hint, "email", "email") }}
 {% endmacro %}
 
-{% macro passwordInput(label, id, hint, autocomplete = "new-password") %}
+{% macro passwordInput(label, id, hint, autocomplete = "current-password") %}
   <div class="gem-c-show-password" data-module="show-password" data-disable-form-submit-check="false"
        data-show-text="Show" data-hide-text="Hide" data-show-full-text="Show password"
        data-hide-full-text="Hide password" data-announce-show="Your password is shown"
