@@ -2,13 +2,9 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Infrastructure to deploy the DI self-service frontend to Fargate
 Transform: AWS::LanguageExtensions
 
-Conditions:
-  IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, 494650018671 ]
-
 Resources:
   FrontendECRRepository:
     Type: AWS::ECR::Repository
-    Condition: IsDevelopmentAccount
     Properties:
       RepositoryName: self-service/frontend
       ImageTagMutability: IMMUTABLE
@@ -33,7 +29,6 @@ Resources:
 
   FrontendECSTaskRole:
     Type: AWS::IAM::Role
-    Condition: IsDevelopmentAccount
     Properties:
       Description: The role assumed by the frontend application containers
       AssumeRolePolicyDocument:
@@ -50,7 +45,6 @@ Resources:
 
   FrontendECSExecutionRole:
     Type: AWS::IAM::Role
-    Condition: IsDevelopmentAccount
     Properties:
       Description: The role granting the Fargate and ECS container agents permissions to make AWS API calls
       AssumeRolePolicyDocument:
@@ -64,7 +58,6 @@ Resources:
 
   FrontendECSTaskRoleParam:
     Type: AWS::SSM::Parameter
-    Condition: IsDevelopmentAccount
     Properties:
       Name: /self-service/config/frontend/ecs/task-role-arn
       Value: !GetAtt FrontendECSTaskRole.Arn
@@ -72,7 +65,6 @@ Resources:
 
   FrontendECSExecutionRoleArnParam:
     Type: AWS::SSM::Parameter
-    Condition: IsDevelopmentAccount
     Properties:
       Name: /self-service/config/frontend/ecs/execution-role-arn
       Value: !GetAtt FrontendECSExecutionRole.Arn
@@ -80,8 +72,6 @@ Resources:
 
 Outputs:
   ECSTaskRoleARN:
-    Condition: IsDevelopmentAccount
     Value: !GetAtt FrontendECSTaskRole.Arn
   ECSExecutionRoleARN:
-    Condition: IsDevelopmentAccount
     Value: !GetAtt FrontendECSExecutionRole.Arn
