@@ -1,46 +1,43 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Transform: AWS::Serverless-2016-10-31
-Description: AWS role and bucket to deploy and manage DI self-service infrastructure from GitHub Actions
+Description: AWS infrastructure to deploy self-service local stacks from dev machines and preview stacks from GitHub Actions
+Transform: AWS::LanguageExtensions
 
 Parameters:
   GitHubOrg:
     Type: String
     Default: alphagov
-  RepositoryName:
+  GitHubRepo:
     Type: String
     Default: di-onboarding-self-service-experience
-  OIDCProviderArn:
-    Description: ARN of the the GitHub OIDC provider
+  CreateOIDCProvider:
     Type: String
-  AppName:
+    Default: true
+  PreviewStacksPrefix:
     Type: String
-    Default: self-service
-  FrontendInfrastructureStack:
-    Description: Name of the self-service frontend infrastructure stack
+    Default: preview
+  DevNotificationEmail:
     Type: String
-  CreateDeploymentArtifactsBucket:
-    Description: Whether to create an S3 bucket for SAM deployments
-    Type: String
-    Default: "false"
 
 Conditions:
-  HasFrontendInfrastructureStack: !Not [ !Equals [ !Ref FrontendInfrastructureStack, "" ] ]
-  CreateDeploymentArtifactsBucket: !Equals [ !Ref CreateDeploymentArtifactsBucket, true ]
-  CreateOIDCProvider: !Equals [ !Ref OIDCProviderArn, "" ]
+  CreateOIDCProvider: !Equals [ !Ref CreateOIDCProvider, "true" ]
 
 Resources:
-  GitHubRole:
+  GitHubActionsRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Action: sts:AssumeRoleWithWebIdentity
             Principal:
-              Federated: !Ref OIDCProviderArn
+              Federated: !If
+                - CreateOIDCProvider
+                - !Ref GithubOIDCProvider
+                - !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
             Condition:
               StringLike:
-                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${GitHubRepo}:*
       Policies:
         - PolicyName: GitHubActions
           PolicyDocument:
@@ -48,37 +45,203 @@ Resources:
             Statement:
               - Effect: Allow
                 Resource: "*"
-                Action:
-                  - iam:ListPolicies
-                  - ecr:GetAuthorizationToken
-                  - ecs:ListTaskDefinitions
-                  - ecs:DescribeTaskDefinition
-                  - ecs:RegisterTaskDefinition
-                  - ecs:DeregisterTaskDefinition
+                Action: iam:ListPolicies
 
               - Effect: Allow
-                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/*
-                Action: ssm:GetParameter
+                Resource: !GetAtt GitHubDeploymentArtifactsBucket.Arn
+                Action: s3:ListBucket
 
               - Effect: Allow
-                Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${AppName}/*
+                Resource: !Sub ${GitHubDeploymentArtifactsBucket.Arn}/sse-preview/*
                 Action:
-                  - ecr:InitiateLayerUpload
-                  - ecr:CompleteLayerUpload
-                  - ecr:UploadLayerPart
-                  - ecr:BatchCheckLayerAvailability
-                  - ecr:BatchDeleteImage
-                  - ecr:DescribeImages
-                  - ecr:BatchGetImage
-                  - ecr:ListImages
-                  - ecr:PutImage
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
 
-              - !If
-                - HasFrontendInfrastructureStack
-                - Effect: Allow
-                  Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${FrontendInfrastructureStack}*
-                  Action: iam:PassRole
-                - !Ref AWS::NoValue
+              - Effect: Allow
+                Resource: !Sub arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-*
+                Action: cloudformation:CreateChangeSet
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${PreviewStacksPrefix}-*
+                Action:
+                  - cloudformation:DescribeStacks
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DescribeStackEvents
+                  - cloudformation:GetTemplateSummary
+                  - cloudformation:GetTemplate
+                  - cloudformation:DeleteStack
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/self-service/config/*
+                Action: ssm:GetParameters
+
+  DeployFrontendPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !Ref GitHubActionsRole ]
+      PolicyName: DeployFrontend
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: "*"
+            Action:
+              - ecr:DescribeRegistry
+              - ecr:GetAuthorizationToken
+              - ecs:ListTaskDefinitions
+              - ecs:DescribeTaskDefinition
+              - ecs:RegisterTaskDefinition
+              - ecs:DeregisterTaskDefinition
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/self-service/frontend
+            Action:
+              - ecr:InitiateLayerUpload
+              - ecr:CompleteLayerUpload
+              - ecr:UploadLayerPart
+              - ecr:BatchCheckLayerAvailability
+              - ecr:BatchDeleteImage
+              - ecr:DescribeImages
+              - ecr:BatchGetImage
+              - ecr:ListImages
+              - ecr:PutImage
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/self-service-frontend-*FrontendECS*Role*
+            Action: iam:PassRole
+
+  DeployApiPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !Ref GitHubActionsRole ]
+      PolicyName: DeployAPI
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: "*"
+            Action: logs:DescribeLogGroups
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${PreviewStacksPrefix}-api-*
+            Action:
+              - iam:CreateRole
+              - iam:DeleteRole
+              - iam:GetRole
+              - iam:TagRole
+              - iam:UntagRole
+              - iam:PassRole
+              - iam:GetRolePolicy
+              - iam:AttachRolePolicy
+              - iam:DetachRolePolicy
+              - iam:PutRolePolicy
+              - iam:DeleteRolePolicy
+            Condition:
+              StringEqualsIfExists:
+                iam:PassedToService:
+                  - lambda.amazonaws.com
+                  - states.amazonaws.com
+              ArnLikeIfExists:
+                iam:AssociatedResourceARN:
+                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${PreviewStacksPrefix}-api-*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine*
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${PreviewStacksPrefix}-api-*
+            Action:
+              - sns:ListSubscriptionsByTopic
+              - sns:GetTopicAttributes
+              - sns:CreateTopic
+              - sns:DeleteTopic
+              - sns:TagResource
+              - sns:UntagResource
+              - sns:Subscribe
+            Condition:
+              StringEqualsIfExists:
+                Endpoint: !Ref DevNotificationEmail
+                Protocol: email
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${PreviewStacksPrefix}-api-*
+            Action:
+              - lambda:CreateFunction
+              - lambda:DeleteFunction
+              - lambda:GetFunction
+              - lambda:TagResource
+              - lambda:UntagResource
+              - lambda:AddPermission
+              - lambda:RemovePermission
+              - lambda:UpdateFunctionCode
+              - lambda:ListTags
+            Condition:
+              StringEqualsIfExists:
+                lambda:Principal: apigateway.amazonaws.com
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/preview/states/${PreviewStacksPrefix}-api-*:log-stream:*
+            Action:
+              - logs:CreateLogGroup
+              - logs:DeleteLogGroup
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*
+            Action: states:DescribeStateMachine
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*
+            Action:
+              - states:TagResource
+              - states:UntagResource
+              - states:CreateStateMachine
+              - states:DeleteStateMachine
+              - states:UpdateStateMachine
+            Condition:
+              StringLike:
+                aws:ResourceTag/aws:cloudformation:stack-name: !Sub ${PreviewStacksPrefix}-api-*
+
+          - Effect: Allow
+            Resource:
+              - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
+              - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
+            Action: apigateway:GET
+
+          - Effect: Allow
+            Resource:
+              - !Sub arn:aws:apigateway:${AWS::Region}::/apis
+              - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
+            Action: apigateway:PUT
+            Condition:
+              StringLike:
+                apigateway:Request/ApiName: !Sub ${PreviewStacksPrefix}-api-*
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
+            Action: apigateway:DELETE
+            Condition:
+              StringLike:
+                apigateway:Resource/ApiName: !Sub ${PreviewStacksPrefix}-api-*
+
+          - Effect: Allow
+            Resource:
+              - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
+              - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*/stages
+            Action:
+              - apigateway:POST
+              - apigateway:DELETE
+              - apigateway:TagResource
+              - apigateway:UntagResource
+            Condition:
+              StringLike:
+                aws:RequestTag/aws:cloudformation:stack-name: !Sub ${PreviewStacksPrefix}-api-*
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:apigateway:${AWS::Region}::/apis/*/stages/self-service-api
+            Action:
+              - apigateway:PATCH
+              - apigateway:DELETE
 
   GithubOIDCProvider:
     Type: AWS::IAM::OIDCProvider
@@ -88,7 +251,7 @@ Resources:
       ClientIdList: [ sts.amazonaws.com ]
       ThumbprintList: [ 6938fd4d98bab03faadb97b34396831e3780aea1 ]
 
-  DeploymentArtifactsBucket:
+  GitHubDeploymentArtifactsBucket:
     # checkov:skip=CKV_AWS_18: "Ensure the S3 bucket has access logging enabled"
     # checkov:skip=CKV_AWS_21: "Ensure the S3 bucket has versioning enabled"
     # checkov:skip=CKV_AWS_53: "Ensure S3 bucket has block public ACLS enabled"
@@ -96,11 +259,40 @@ Resources:
     # checkov:skip=CKV_AWS_55: "Ensure S3 bucket has ignore public ACLs enabled"
     # checkov:skip=CKV_AWS_56: "Ensure S3 bucket has 'restrict_public_bucket' enabled"
     Type: AWS::S3::Bucket
-    Condition: CreateDeploymentArtifactsBucket
+
+  DevNotificationEmailParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: Email address used by the dev API Lambdas to send internal notifications
+      Name: /self-service/config/api/notification-email
+      Value: !Ref DevNotificationEmail
+      Type: String
+
+  CloudWatchLogsResourcePolicy:
+    Type: AWS::Logs::ResourcePolicy
+    Properties:
+      PolicyName: PreviewStacksLogDelivery
+      PolicyDocument:
+        Fn::ToJsonString:
+          Version: "2012-10-17"
+          Statement:
+            Effect: Allow
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/preview/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/dev/*
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Principal:
+              Service: delivery.logs.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
 
 Outputs:
-  GitHubRoleARN:
-    Value: !GetAtt GitHubRole.Arn
-  DeploymentArtifactsBucket:
-    Condition: CreateDeploymentArtifactsBucket
-    Value: !Ref DeploymentArtifactsBucket
+  GitHubActionsRoleARN:
+    Value: !GetAtt GitHubActionsRole.Arn
+  GitHubDeploymentArtifactsBucket:
+    Value: !Ref GitHubDeploymentArtifactsBucket
