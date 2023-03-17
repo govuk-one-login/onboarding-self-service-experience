@@ -1,20 +1,63 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: DNS configuration for self-service production
+Description: DNS configuration for the self-service domains in different AWS accounts
 
 Conditions:
+  IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, 494650018671 ]
+  IsStagingAccount: !Equals [ !Ref AWS::AccountId, 325730373996 ]
+  IsIntegrationAccount: !Equals [ !Ref AWS::AccountId, 663985455444 ]
   IsProductionAccount: !Equals [ !Ref AWS::AccountId, 389946456390 ]
 
 Resources:
-  # The production nameservers are used by GOV.UK to direct traffic for sign-in and all subdomains to our hosted zone
-  # https://github.com/alphagov/govuk-dns-config/blob/main/service.gov.uk.yaml
+
+  #--- Development ---#
+
+  SignInServiceDevelopmentHostedZone:
+    Type: AWS::Route53::HostedZone
+    Condition: IsDevelopmentAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name: development.sign-in.service.gov.uk.
+
+  SignInServicePreviewHostedZone:
+    Type: AWS::Route53::HostedZone
+    Condition: IsDevelopmentAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name: preview.sign-in.service.gov.uk.
+
+  #--- Staging ---#
+
+  SignInServiceStagingHostedZone:
+    Type: AWS::Route53::HostedZone
+    Condition: IsStagingAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name: staging.sign-in.service.gov.uk.
+
+  #--- Integration ---#
+
+  SignInServiceIntegrationHostedZone:
+    Type: AWS::Route53::HostedZone
+    Condition: IsIntegrationAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name: integration.sign-in.service.gov.uk.
+
+  #--- Production ---#
+
+  # The production nameservers are used by GOV.UK to direct traffic for
+  # sign-in.service.gov.uk and all subdomains to our hosted zones
+  # See https://github.com/alphagov/govuk-dns-config/blob/main/service.gov.uk.yaml
   SignInServiceHostedZone:
     Type: AWS::Route53::HostedZone
     Condition: IsProductionAccount
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      HostedZoneConfig:
-        Comment: Hosted zone for sign-in.service.gov.uk
       Name: sign-in.service.gov.uk.
 
   SignInServiceSubDomains:
@@ -23,14 +66,14 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      Comment: Records for the subdomains of sign-in.service.gov.uk many records point to cloudfront
+      Comment: Records for the subdomains of sign-in.service.gov.uk many records point to CloudFront
       HostedZoneId: !Ref SignInServiceHostedZone
       RecordSets:
         - Name: sign-in.service.gov.uk.
           Type: A
           AliasTarget:
-            # Z2FDTNDATAQYW2 is the hosted zone for CloudFront.
-            # See: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html under CloudFront distribution
+            # Z2FDTNDATAQYW2 is the hosted zone for CloudFront
+            # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
             HostedZoneId: Z2FDTNDATAQYW2
             DNSName: dbd28k6th0aos.cloudfront.net.
             EvaluateTargetHealth: false
@@ -107,9 +150,32 @@ Resources:
             - ns-2026.awsdns-61.co.uk.
 
 Outputs:
+  DevelopmentHostedZone:
+    Condition: IsDevelopmentAccount
+    Value: !Ref SignInServiceDevelopmentHostedZone
+    Export:
+      Name: SignInServiceDevelopmentHostedZone
+
+  PreviewHostedZone:
+    Condition: IsDevelopmentAccount
+    Value: !Ref SignInServicePreviewHostedZone
+    Export:
+      Name: SignInServicePreviewHostedZone
+
+  StagingHostedZone:
+    Condition: IsStagingAccount
+    Value: !Ref SignInServiceStagingHostedZone
+    Export:
+      Name: SignInServiceStagingHostedZone
+
+  IntegrationHostedZone:
+    Condition: IsIntegrationAccount
+    Value: !Ref SignInServiceIntegrationHostedZone
+    Export:
+      Name: SignInServiceIntegrationHostedZone
+
   SignInServiceHostedZone:
     Condition: IsProductionAccount
-    Description: Hosted Zone for sign-in.service.gov.uk
     Value: !Ref SignInServiceHostedZone
     Export:
       Name: SignInServiceHostedZone
