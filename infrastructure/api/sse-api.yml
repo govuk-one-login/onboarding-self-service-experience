@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Transform: AWS::Serverless-2016-10-31
 Description: DI self-service API
+Transform: AWS::Serverless-2016-10-31
 
 Parameters:
   AuthRegistrationBaseUrl:
@@ -10,80 +10,48 @@ Parameters:
   DynamoDbTableStackName:
     Type: String
     Default: dynamo-db-stack
-    Description: The name of the stack exporting the table we want
-  PrivateBetaNotificationEmail:
+    Description: The name of the stack exporting the self-service table
+  NotificationEmail:
     Type: String
-    Default: not-a-real-email-address@fake.com
-    Description: Email address for private beta request notifications.
+    Default: ""
+    Description: Email address to send internal notifications
+  LogGroupNamePrefix:
+    Type: String
+    Default: /aws/vendedlogs
   PermissionsBoundary:
-    Description: "The ARN of the permissions boundary to apply when creating IAM roles"
     Type: String
-    Default: "none"
+    Default: ""
+    Description: The ARN of the permissions boundary to apply when creating IAM roles [Secure Pipeline]
   CodeSigningConfigArn:
     Type: String
-    Description: >
-      The ARN of the Code Signing Config to use, provided by the deployment pipeline
-    Default: "none"
+    Default: ""
+    Description: The ARN of the code signing configuration resource to use [Secure Pipeline]
 
 Conditions:
-  UsePermissionsBoundary:
-    Fn::Not:
-      - Fn::Equals:
-          - !Ref PermissionsBoundary
-          - "none"
-  UseCodeSigning:
-    Fn::Not:
-      - Fn::Equals:
-          - !Ref CodeSigningConfigArn
-          - "none"
+  UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
+  UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+  SendNotifications: !Not [ !Equals [ !Ref NotificationEmail, "" ] ]
 
 Globals:
   Function:
-    CodeSigningConfigArn: !If
-      - UseCodeSigning
-      - !Ref CodeSigningConfigArn
-      - !Ref AWS::NoValue
-    PermissionsBoundary: !If
-      - UsePermissionsBoundary
-      - !Ref PermissionsBoundary
-      - !Ref AWS::NoValue
-
+    Timeout: 100
+    Runtime: nodejs18.x
+    CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+    PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
+    Environment:
+      Variables:
+        NODE_OPTIONS: --enable-source-maps
 
 Resources:
 
-  #--- Dynamo DB ---#
-
-  PutUserFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
-    Type: AWS::Serverless::Function
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Sourcemap: true
+  SelfServiceApi:
+    # checkov:skip=CKV_AWS_95: "Ensure API Gateway V2 has Access Logging enabled"
+    Type: AWS::Serverless::HttpApi
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/put-user.putUserHandler
-      Runtime: nodejs18.x
-      Timeout: 100
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
-      Environment:
-        Variables:
-          NODE_OPTIONS: --enable-source-maps
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /put-user
-            Method: POST
+      FailOnWarnings: true
+      StageName: self-service-api
+
+  #--- Users ---#
 
   GetUserFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
@@ -97,8 +65,6 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-user.getUserHandler
-      Runtime: nodejs18.x
-      Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
@@ -106,18 +72,18 @@ Resources:
                 !Sub ${DynamoDbTableStackName}-Self-Service-table
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           TABLE:
             Fn::ImportValue:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /get-user
             Method: POST
 
-  PutServiceFunction:
+  PutUserFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
     # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
     # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
@@ -128,9 +94,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/put-service.putServiceHandler
-      Runtime: nodejs18.x
-      Timeout: 100
+      Handler: backend/api/src/handlers/dynamodb/put-user.putUserHandler
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
@@ -138,16 +102,49 @@ Resources:
                 !Sub ${DynamoDbTableStackName}-Self-Service-table
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           TABLE:
             Fn::ImportValue:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
-            Path: /put-service
+            ApiId: !Ref SelfServiceApi
+            Path: /put-user
             Method: POST
+
+  UpdateUserFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+    Properties:
+      Handler: backend/api/src/handlers/dynamodb/update-user.updateUserHandler
+      Description: Updates user data in DynamoDB (without touching Cognito)
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName:
+              Fn::ImportValue:
+                !Sub ${DynamoDbTableStackName}-Self-Service-table
+      Environment:
+        Variables:
+          TABLE:
+            Fn::ImportValue:
+              !Sub ${DynamoDbTableStackName}-Self-Service-table
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref SelfServiceApi
+            Path: /update-user
+            Method: POST
+
+  #--- Services ---#
 
   GetServicesFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
@@ -161,8 +158,6 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-services.getServicesHandler
-      Runtime: nodejs18.x
-      Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
@@ -170,16 +165,41 @@ Resources:
                 !Sub ${DynamoDbTableStackName}-Self-Service-table
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           TABLE:
             Fn::ImportValue:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /get-services/{userId}
             Method: GET
+
+  PutServiceFunction:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+    Properties:
+      Handler: backend/api/src/handlers/dynamodb/put-service.putServiceHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName:
+              Fn::ImportValue:
+                !Sub ${DynamoDbTableStackName}-Self-Service-table
+      Environment:
+        Variables:
+          TABLE:
+            Fn::ImportValue:
+              !Sub ${DynamoDbTableStackName}-Self-Service-table
+
+  #--- Service clients ---#
 
   GetServiceClientsFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
@@ -193,8 +213,6 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-service-clients.getServiceClientsHandler
-      Runtime: nodejs18.x
-      Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
@@ -202,14 +220,14 @@ Resources:
                 !Sub ${DynamoDbTableStackName}-Self-Service-table
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           TABLE:
             Fn::ImportValue:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /get-service-clients/{serviceId}
             Method: GET
 
@@ -225,8 +243,6 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service-client.putServiceClientHandler
-      Runtime: nodejs18.x
-      Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
@@ -234,7 +250,6 @@ Resources:
                 !Sub ${DynamoDbTableStackName}-Self-Service-table
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           TABLE:
             Fn::ImportValue:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
@@ -251,8 +266,6 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/update-service-client.updateServiceClientHandler
-      Runtime: nodejs18.x
-      Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
@@ -260,10 +273,11 @@ Resources:
                 !Sub ${DynamoDbTableStackName}-Self-Service-table
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           TABLE:
             Fn::ImportValue:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
+
+  #--- Service users ---#
 
   PutServiceUserFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
@@ -277,8 +291,6 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service-user.putServiceUserHandler
-      Runtime: nodejs18.x
-      Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
@@ -286,47 +298,13 @@ Resources:
                 !Sub ${DynamoDbTableStackName}-Self-Service-table
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           TABLE:
             Fn::ImportValue:
               !Sub ${DynamoDbTableStackName}-Self-Service-table
 
-  UpdateUserFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
-    Type: AWS::Serverless::Function
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Sourcemap: true
-    Properties:
-      Handler: backend/api/src/handlers/dynamodb/update-user.updateUserHandler
-      Runtime: nodejs18.x
-      Timeout: 100
-      Description: Updates user data in DynamoDB (without touching Cognito)
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
-      Environment:
-        Variables:
-          NODE_OPTIONS: --enable-source-maps
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /update-user
-            Method: POST
+  #--- Auth clients ---#
 
-  #--- Auth --- #
-
-  RegisterClientFunction:
+  RegisterAuthClientFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
     # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
     # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
@@ -338,21 +316,12 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
-      Runtime: nodejs18.x
-      Timeout: 100
       Description: Assumes a cross-account role and invokes the Auth register lambda
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /register-client
-            Method: POST
 
-  UpdateClientInRegistryFunction:
+  UpdateAuthClientFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
     # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
     # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
@@ -363,20 +332,11 @@ Resources:
       BuildProperties:
         Sourcemap: true
     Properties:
-      Handler: backend/api/src/handlers/auth/update-client-in-registry.updateClientInRegistryHandler
-      Runtime: nodejs18.x
-      Timeout: 100
+      Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
       Description: Updates a client using an HTTP endpoint
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /update-client
-            Method: POST
 
   #--- Step Functions ---#
 
@@ -392,11 +352,8 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/step-functions/new-service.newServiceHandler
-      Runtime: nodejs18.x
-      Timeout: 100
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           STATE_MACHINE_ARN: !Ref NewServiceStepFunction
       Policies:
         Version: 2012-10-17
@@ -406,8 +363,9 @@ Resources:
             Resource: !Ref NewServiceStepFunction
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /new-service
             Method: POST
 
@@ -423,11 +381,8 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/step-functions/new-client.newClientHandler
-      Runtime: nodejs18.x
-      Timeout: 100
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           STATE_MACHINE_ARN: !Ref NewClientStepFunction
       Policies:
         Version: 2012-10-17
@@ -437,12 +392,13 @@ Resources:
             Resource: !Ref NewClientStepFunction
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /new-client
             Method: POST
 
-  DoUpdateClientHandler:
+  UpdateClientHandler:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
     # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
     # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
@@ -453,12 +409,9 @@ Resources:
       BuildProperties:
         Sourcemap: true
     Properties:
-      Handler: backend/api/src/handlers/step-functions/do-update-client.doUpdateClientHandler
-      Runtime: nodejs18.x
-      Timeout: 100
+      Handler: backend/api/src/handlers/step-functions/update-client.doUpdateClientHandler
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
           STATE_MACHINE_ARN: !Ref UpdateClientStepFunction
       Policies:
         Version: 2012-10-17
@@ -468,18 +421,16 @@ Resources:
             Resource: !Ref UpdateClientStepFunction
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
-            Path: /do-update-client
+            ApiId: !Ref SelfServiceApi
+            Path: /update-client
             Method: POST
 
   StepFunctionExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      PermissionsBoundary: !If
-        - UsePermissionsBoundary
-        - !Ref PermissionsBoundary
-        - !Ref AWS::NoValue
+      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -499,19 +450,20 @@ Resources:
                   - logs:UpdateLogDelivery
                   - logs:DeleteLogDelivery
                   - logs:ListLogDeliveries
-                  - logs:PutResourcePolicy
                   - logs:DescribeResourcePolicies
-                  - logs:DescribeLogGroups
                 Resource: "*"
+              - Effect: Allow
+                Action: logs:DescribeLogGroups
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${StepFunctionsLogGroup}
               - Effect: Allow
                 Action: lambda:InvokeFunction
                 Resource:
                   - !GetAtt PutServiceFunction.Arn
                   - !GetAtt PutServiceUserFunction.Arn
-                  - !GetAtt RegisterClientFunction.Arn
                   - !GetAtt PutServiceClientFunction.Arn
                   - !GetAtt UpdateServiceClientFunction.Arn
-                  - !GetAtt UpdateClientInRegistryFunction.Arn
+                  - !GetAtt RegisterAuthClientFunction.Arn
+                  - !GetAtt UpdateAuthClientFunction.Arn
 
   NewServiceStepFunction:
     Type: AWS::Serverless::StateMachine
@@ -542,7 +494,7 @@ Resources:
               LogGroupArn: !GetAtt StepFunctionsLogGroup.Arn
       DefinitionUri: state-machines/new-client.json
       DefinitionSubstitutions:
-        RegisterClientFunctionArn: !GetAtt RegisterClientFunction.Arn
+        RegisterClientFunctionArn: !GetAtt RegisterAuthClientFunction.Arn
         PutServiceClientFunctionArn: !GetAtt PutServiceClientFunction.Arn
 
   UpdateClientStepFunction:
@@ -558,13 +510,15 @@ Resources:
               LogGroupArn: !GetAtt StepFunctionsLogGroup.Arn
       DefinitionUri: state-machines/update-client.json
       DefinitionSubstitutions:
-        UpdateClientInRegistryFunctionArn: !GetAtt UpdateClientInRegistryFunction.Arn
+        UpdateClientInRegistryFunctionArn: !GetAtt UpdateAuthClientFunction.Arn
         UpdateServiceClientFunctionArn: !GetAtt UpdateServiceClientFunction.Arn
 
   StepFunctionsLogGroup:
     # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
     # checkov:skip=CKV_AWS_66: "Ensure that CloudWatch Log Group specifies retention days"
     Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupNamePrefix}/states/${AWS::StackName}
 
   #--- Notifications ---#
 
@@ -574,41 +528,41 @@ Resources:
     # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
     # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
+    Condition: SendNotifications
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/notifications/send-private-beta-notification.privateBetaRequestHandler
-      Runtime: nodejs18.x
-      Timeout: 100
       Description: Publish a message to the private beta request notification topic
       Environment:
         Variables:
-          NODE_OPTIONS: --enable-source-maps
-          SNS_TOPIC_ARN: !Ref PrivateBetaSnsTopic
+          SNS_TOPIC_ARN: !Ref NotificationsSnsTopic
       Policies:
         - SNSPublishMessagePolicy:
-            TopicName: !GetAtt PrivateBetaSnsTopic.TopicName
+            TopicName: !GetAtt NotificationsSnsTopic.TopicName
       Events:
         Api:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref SelfServiceApi
             Path: /send-private-beta-request-notification
             Method: POST
 
-  PrivateBetaSnsTopic:
+  NotificationsSnsTopic:
     # checkov:skip=CKV_AWS_26: "Ensure all data stored in the SNS topic is encrypted"
     Type: AWS::SNS::Topic
+    Condition: SendNotifications
     Properties:
-      DisplayName: Private beta notification topic
+      DisplayName: DI Admin Tool
       Subscription:
         - Protocol: email
-          Endpoint: !Ref PrivateBetaNotificationEmail
+          Endpoint: !Ref NotificationEmail
 
 Outputs:
   # SAM Serverless Function implicit API resources
   # https://github.com/aws/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  ApiBaseUrl:
+  SelfServiceApiBaseUrl:
     Description: API Gateway base URL of the self-service backend endpoints
-    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com
+    Value: !Sub ${SelfServiceApi.ApiEndpoint}/${SelfServiceApi.Stage}
