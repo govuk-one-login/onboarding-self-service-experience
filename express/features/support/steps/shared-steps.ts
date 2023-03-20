@@ -148,6 +148,6 @@ When("the user submits the mobile phone number {string}", async function (mobile
 });
 
 When("they click on the forgot password link in their email", async function () {
-    const path = "/create-new-password?userName=registered@gds.gov.uk&confirmationCode=123456";
+    const path = "/sign-in/forgot-password/create-new-password?userName=registered@gds.gov.uk&confirmationCode=123456";
     await this.goToPath(path);
 });

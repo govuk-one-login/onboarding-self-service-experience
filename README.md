@@ -64,3 +64,24 @@ In general the application will use the full implementations if the environment 
 `gds aws <account> -- npm run dev` if you want it to restart every time you change something. This sets the above environment variables to the stub values if they're not set explicitly (see [package.json](./express/package.json))
 
 `gds aws <account> -- npm start` if you don't want the application to restart.
+
+## URL Patterns
+
+All URLs related to account section start with `account-` prefix.
+
+Show a list of things
+/things
+e.g. /services (and not /list-services)
+
+Show details about a thing
+/thing/:thingId
+e.g. /service/123456
+
+List objects belonging to a thing
+/thing/:thingId/objects
+e.g. /service/123456/clients
+
+Show details about a child thing belonging to a parent thing
+/parent/:parentId/child/:childId
+e.g. /service/123456/client/456789
+

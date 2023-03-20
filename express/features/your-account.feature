@@ -1,11 +1,11 @@
 Feature: A page where users can view and change the details associated with their account
 
   Background:
-    Given that the user is on the "/sign-in" page
+    Given that the user is on the "/sign-in/enter-email-address" page
     And the user submits the email "registered@gds.gov.uk"
     And the user submits the password "this-is-not-a-common-password"
     And the user submits the security code "123123"
-    Then they should be redirected to a page with the path starting with "/client-details"
+    Then they should be redirected to a page with the path starting with "/services"
 
     When they click on the "Your account" link
     Then they should be redirected to the "/account" page
@@ -49,7 +49,7 @@ Feature: A page where users can view and change the details associated with thei
 
     Scenario: The user tries to change their phone number but enters an incorrect SMS code
       When the user submits the security code "666666"
-      Then they should be redirected to the "/account/verify-phone-code" page
+      Then they should be redirected to the "/account/change-phone-number/enter-text-code" page
       And they should see the text "The code you entered is not correct or has expired - enter it again or request a new code"
 
     # TODO this test doesn't check the resending of the phone code
@@ -59,7 +59,7 @@ Feature: A page where users can view and change the details associated with thei
       And they should see the text "We sent a code to: 0770 9000 124"
 
       When they click on the "Problems receiving a text message?" link
-      Then they should be redirected to the "/account/resend-phone-code" page
+      Then they should be redirected to the "/account/change-phone-number/resend-text-code" page
       And they should see the text "Resend security code"
 
   Rule: The user tries to change their password

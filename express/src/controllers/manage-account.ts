@@ -28,11 +28,11 @@ export const listServices = async function (req: Request, res: Response) {
 
     const services = await s4.listServices(userId as string, req.session.authenticationResult?.AccessToken as string);
     if (services.length === 0) {
-        res.redirect(`/add-service-name`);
+        res.redirect(`/register/create-service`);
         return;
     }
     if (services.length === 1) {
-        res.redirect(`/client-details/${services[0].id}`);
+        res.redirect(`/services/${services[0].id}/client`);
         return;
     }
 
@@ -63,19 +63,19 @@ export const showClient = async function (req: Request, res: Response) {
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         urls: {
             // TODO changeClientName is currently not used
-            changeClientName: `/change-client-name/${serviceId}/${selfServiceClientId}/${authClientId}?clientName=${encodeURIComponent(
+            changeClientName: `/service/${serviceId}/client/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
                 client.clientName
             )}`,
-            changeRedirectUris: `/change-redirect-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURIComponent(
+            changeRedirectUris: `/service/${serviceId}/client/${authClientId}/${selfServiceClientId}/change-redirect-uris?redirectUris=${encodeURIComponent(
                 client.redirectUris.join(" ")
             )}`,
-            changeUserAttributes: `/change-user-attributes/${serviceId}/${selfServiceClientId}/${authClientId}?userAttributes=${encodeURIComponent(
+            changeUserAttributes: `/service/${serviceId}/client/${authClientId}/${selfServiceClientId}/change-user-attributes?userAttributes=${encodeURIComponent(
                 client.scopes.join(" ")
             )}`,
-            changePublicKey: `/change-public-key/${serviceId}/${selfServiceClientId}/${authClientId}?publicKey=${encodeURIComponent(
+            changePublicKey: `/service/${serviceId}/client/${authClientId}/${selfServiceClientId}/change-public-key?publicKey=${encodeURIComponent(
                 userPublicKey
             )}`,
-            changePostLogoutUris: `/change-post-logout-uris/${serviceId}/${selfServiceClientId}/${authClientId}?redirectUris=${encodeURIComponent(
+            changePostLogoutUris: `/service/${serviceId}/client/${authClientId}/${selfServiceClientId}/change-post-logout-uris?redirectUris=${encodeURIComponent(
                 client.postLogoutUris.join(" ")
             )}`
         }
@@ -140,7 +140,7 @@ export const processPrivateBetaForm = async function (req: Request, res: Respons
         req.session.authenticationResult?.AccessToken as string
     );
 
-    res.redirect(`/private-beta-form-submitted/${serviceId}/${selfServiceClientId}/${clientId}`);
+    res.redirect(`/service/${serviceId}/client/${clientId}/${selfServiceClientId}/private-beta/submitted`);
 };
 
 export const showPrivateBetaFormSubmitted = async function (req: Request, res: Response) {
@@ -182,7 +182,7 @@ export const processAddServiceForm = async function (req: Request, res: Response
     const body = JSON.parse(generatedClient.data.output).body;
     const serviceId = JSON.parse(body).pk;
     req.session.serviceName = req.body.serviceName;
-    res.redirect(`/client-details/${serviceId.substring(8)}`);
+    res.redirect(`/services/${serviceId.substring(8)}/client`);
 };
 
 export const processChangeServiceNameForm = async function (req: Request, res: Response) {
@@ -215,7 +215,7 @@ export const processChangeServiceNameForm = async function (req: Request, res: R
     );
     req.session.updatedField = "service name";
     req.session.serviceName = newServiceName;
-    res.redirect(`/client-details/${serviceId}`);
+    res.redirect(`/services/${serviceId}/client`);
 };
 
 export const showChangePasswordForm = async function (req: Request, res: Response) {
@@ -373,7 +373,7 @@ export const processChangePhoneNumberForm = async function (req: Request, res: R
     req.session.enteredMobileNumber = req.body.mobileNumber;
     await s4.sendMobileNumberVerificationCode(req.session.authenticationResult?.AccessToken as string);
 
-    res.redirect("/account/verify-phone-code");
+    res.redirect("/account/change-phone-number/enter-text-code");
 };
 
 export const showVerifyMobileWithSmsCode = async function (req: Request, res: Response) {
@@ -381,7 +381,7 @@ export const showVerifyMobileWithSmsCode = async function (req: Request, res: Re
         headerActiveItem: "your-account",
         values: {
             mobileNumber: req.session.enteredMobileNumber,
-            textMessageNotReceivedUrl: "/account/resend-phone-code"
+            textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code"
         }
     });
 };
@@ -411,7 +411,7 @@ export const verifyMobileWithSmsCode = async function (req: Request, res: Respon
                 values: {
                     securityCode: req.body.securityCode,
                     mobileNumber: req.session.enteredMobileNumber,
-                    textMessageNotReceivedUrl: "/account/resend-phone-code"
+                    textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code"
                 },
                 errorMessages: {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"

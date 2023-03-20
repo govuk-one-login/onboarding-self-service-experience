@@ -12,7 +12,7 @@ export const showSignInFormEmail = async function (req: Request, res: Response) 
 export const showCheckPhonePage = async function (req: Request, res: Response) {
     // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
-        res.redirect("/sign-in");
+        res.redirect("/sign-in/enter-email-address");
         return;
     }
 
@@ -20,7 +20,7 @@ export const showCheckPhonePage = async function (req: Request, res: Response) {
         headerActiveItem: "sign-in",
         values: {
             mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo),
-            textMessageNotReceivedUrl: "/resend-text-code"
+            textMessageNotReceivedUrl: "/sign-in/resend-text-code"
         }
     });
 };
@@ -38,15 +38,15 @@ export const finishSignIn = async function (req: Request, res: Response) {
                 req.session?.authenticationResult?.AccessToken as string
             );
         }
-        res.redirect(`/account/list-services`);
+        res.redirect(`/services`);
         return;
     } else {
-        res.redirect("/sign-in-otp-mobile");
+        res.redirect("/sign-in/enter-text-code");
     }
 };
 
 export const processEmailAddress = async function (req: Request, res: Response) {
-    res.redirect("/sign-in-password");
+    res.redirect("/sign-in/enter-password");
 };
 
 export const showSignInFormPassword = async function (req: Request, res: Response) {

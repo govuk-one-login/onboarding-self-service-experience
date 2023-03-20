@@ -1,6 +1,5 @@
 import express from "express";
 import {
-    accountExists,
     checkEmailPasswordReset,
     confirmForgotPassword,
     confirmForgotPasswordForm,
@@ -25,75 +24,71 @@ const router = express.Router();
 
 router.get("/session-timeout", sessionTimeout);
 
-router.get("/sign-in", showSignInFormEmail);
-router.post("/sign-in", emailValidator("sign-in.njk"), processEmailAddress);
+router.get("/sign-in/enter-email-address", showSignInFormEmail);
+router.post("/sign-in/enter-email-address", emailValidator("sign-in.njk"), processEmailAddress);
+
+router.get("/sign-in", (req, res) => {
+    res.redirect(303, "/sign-in/enter-email-address");
+});
 
 router.get(
-    "/sign-in-password",
+    "/sign-in/enter-password",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
     showSignInFormPassword
 );
 
 router.post(
-    "/sign-in-password",
+    "/sign-in/enter-password",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
     processSignInForm("sign-in-enter-password.njk")
 );
 
-router.get("/sign-in-otp-mobile", showCheckPhonePage);
+router.get("/sign-in/enter-text-code", showCheckPhonePage);
 
 router.post(
-    "/sign-in-otp-mobile",
+    "/sign-in/enter-text-code",
     (req, res, next) => {
         res.locals.headerActiveItem = "sign-in";
         next();
     },
-    mobileSecurityCodeValidator("/resend-text-code"),
+    mobileSecurityCodeValidator("/sign-in/resend-text-code"),
     processSecurityCode,
     finishSignIn
 );
 
-router.get("/resend-text-code", showResendPhoneCodePage);
+router.get("/sign-in/resend-text-code", showResendPhoneCodePage);
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
-router.post("/resend-text-code", showCheckPhonePage);
+router.post("/sign-in/resend-text-code", showCheckPhonePage);
 
-router.get("/account/sign-out", signOut);
-router.get("/existing-account", accountExists);
-router.post("/existing-account", processSignInForm("create-account/existing-account.njk"));
+router.get("/sign-out", signOut);
 
-router.get("/no-account", (req, res) => {
+router.get("/sign-in/account-not-found", (req, res) => {
     res.render("no-account-found.njk");
 });
 
 router.get(
-    "/forgot-password",
+    "/sign-in/forgot-password",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
     forgotPasswordForm
 );
 
 router.get(
-    "/check-email-password-reset",
+    "/sign-in/forgot-password/enter-email-code",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
     checkEmailPasswordReset
 );
 
 router.post(
-    "/check-email-password-reset",
+    "/sign-in/forgot-password/enter-email-code",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
     checkEmailPasswordReset
 );
 
-router.post(
-    "/check-email-password-reset",
-    emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
-    checkEmailPasswordReset
-);
-
-router.get("/create-new-password", confirmForgotPasswordForm);
+router.get("/sign-in/forgot-password/create-new-password", confirmForgotPasswordForm);
 
 router.post(
-    "/create-new-password",
+    "/sign-in/forgot-password/create-new-password",
     notOnCommonPasswordListValidator("create-new-password.njk", "password", ["password"]),
     confirmForgotPassword,
     processSignInForm("create-new-password.njk")

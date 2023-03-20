@@ -43,14 +43,14 @@ export default function processSignInForm(template: string): MiddlewareFunction<
 
             if (error instanceof UserNotFoundException) {
                 req.session.emailAddress = email;
-                res.redirect("/no-account");
+                res.redirect("/sign-in/account-not-found");
                 return;
             }
 
             throw error;
         }
 
-        res.redirect("/sign-in-otp-mobile");
+        res.redirect("/sign-in/enter-text-code");
         return;
     };
 }

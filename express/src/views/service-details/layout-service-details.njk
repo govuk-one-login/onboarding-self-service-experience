@@ -9,7 +9,7 @@
       <div class="govuk-breadcrumbs">
         <ol class="govuk-breadcrumbs__list navigation-service-change-list">
           <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19">
-            <a class="govuk-breadcrumbs__link" href="/account/list-services">Your services</a>
+            <a class="govuk-breadcrumbs__link" href="/services">Your services</a>
           </li>
           {% if serviceName %}
             <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19 govuk-!-font-weight-bold">{{ serviceName }}</li>
@@ -32,10 +32,10 @@
         <nav class="side-navigation govuk-!-margin-top-3">
           <ul class="govuk-list side-navigation__list">
             <li class="side-navigation__item{% if sidebarActiveItem == 'client-details' %} side-navigation__item--active{% endif %}">
-              <a class="govuk-link govuk-link--no-visited-state" href="/client-details/{{ serviceId }}">Client details</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}">Client details</a>
             </li>
             <li class="side-navigation__item{% if sidebarActiveItem == 'private-beta' %} side-navigation__item--active{% endif %}">
-              <a class="govuk-link govuk-link--no-visited-state" href="/private-beta/{{ serviceId }}/{{ selfServiceClientId }}/{{ clientId }}">
+              <a class="govuk-link govuk-link--no-visited-state" href="/service/{{ serviceId }}/client/{{ clientId }}/{{ selfServiceClientId }}/private-beta">
                 Joining private beta
               </a>
             </li>
