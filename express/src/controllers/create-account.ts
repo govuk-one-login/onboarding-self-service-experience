@@ -34,7 +34,7 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
 
 export const showCheckEmailForm = function (req: Request, res: Response) {
     if (!req.session.emailAddress) {
-        res.redirect("/register/enter-email-address");
+        res.redirect("/register");
         return;
     }
 
@@ -44,7 +44,7 @@ export const showCheckEmailForm = function (req: Request, res: Response) {
 export const submitEmailSecurityCode = async function (req: Request, res: Response, next: NextFunction) {
     if (!req.session.emailAddress) {
         console.error("submitEmailOtp::EmailAddress is not in the session, redirecting to submitEmailOtp");
-        res.redirect("/register/enter-email-address");
+        res.redirect("/register");
         return;
     }
 

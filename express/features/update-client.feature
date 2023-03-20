@@ -1,7 +1,7 @@
 Feature: Users can update clients
 
   Background:
-    And that the user is on the "/sign-in/enter-email-address" page
+    And that the user is on the "/sign-in" page
     And the user submits the email "registered@gds.gov.uk"
     And the user submits the password "this-is-not-a-common-password"
     And the user submits the security code "123456"
