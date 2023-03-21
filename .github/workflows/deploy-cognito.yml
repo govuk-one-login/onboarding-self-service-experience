@@ -1,0 +1,46 @@
+name: Deploy Cognito stack to devplatform secure pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths: [ backend/cognito/** ]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+
+  deploy:
+    name: Deploy Cognito
+    runs-on: ubuntu-latest
+    environment: build
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.COGNITO_GHA_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: SAM validate
+        working-directory: backend/cognito
+        run: |
+          sam validate --template template.yml
+          sam validate --template template.yml --lint
+
+      - name: SAM build
+        working-directory: backend/cognito
+        run: sam build --template template.yml
+
+      - name: Deploy SAM app
+        uses: alphagov/di-devplatform-upload-action@v3.2
+        with:
+          artifact-bucket-name: ${{ secrets.COGNITO_ARTIFACT_SOURCE_BUCKET_NAME }}
+          signing-profile-name: ${{ secrets.AWS_SIGNING_PROFILE_NAME }}
+          working-directory: backend/cognito
+          template-file: template.yml
