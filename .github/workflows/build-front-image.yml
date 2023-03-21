@@ -25,6 +25,11 @@ jobs:
       - name: Pull repository
         uses: actions/checkout@v3
 
+      - name: Get distribution artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: self-service-front
+
       - name: Assume AWS Role
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -39,7 +44,7 @@ jobs:
           repository: self-service/frontend
           image-version: ${{ github.sha }}
           image-tags: ${{ github.head_ref || github.ref_name }}
-          build-path: express
+          dockerfile-path: infrastructure/frontend/Dockerfile
 
       - name: Get ECS roles
         id: get-ecs-roles

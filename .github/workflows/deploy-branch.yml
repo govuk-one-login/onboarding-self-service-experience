@@ -25,6 +25,7 @@ jobs:
 
   build-front-image:
     name: Build
+    needs: build-front-app
     uses: ./.github/workflows/build-front-image.yml
     permissions:
       id-token: write
