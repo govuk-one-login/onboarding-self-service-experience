@@ -2,11 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Infrastructure to deploy the DI self-service frontend
 
-Parameters:
-  AppName:
-    Type: String
-    Default: self-service
-
 Conditions:
   IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, 494650018671 ]
 
@@ -15,7 +10,7 @@ Resources:
     Condition: IsDevelopmentAccount
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: !Sub ${AppName}/frontend
+      RepositoryName: self-service/frontend
       ImageTagMutability: IMMUTABLE
       ImageScanningConfiguration:
         ScanOnPush: true
@@ -86,7 +81,7 @@ Resources:
     Type: AWS::SSM::Parameter
     Properties:
       Description: ARNs of the roles to use when deploying and running frontend ECS tasks
-      Name: !Sub /${AppName}/frontend/ecs-roles
+      Name: !Sub /self-service/config/frontend/ecs-roles
       Tags:
         Application: SSE
         Component: Frontend

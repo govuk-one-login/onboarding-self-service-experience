@@ -24,6 +24,8 @@ nvm use 14.20.0
 
 Deploy your own stacks to the AWS development account
 
+Use the [SAM deployment script](infrastructure/deploy-sam-stack.sh) in the repo to deploy personal stacks, so they get tagged with the required metadata.
+
 ```shell
 cd backend/cognito
 sam build

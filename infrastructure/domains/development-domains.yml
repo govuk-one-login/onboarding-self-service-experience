@@ -1,6 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Transform: AWS::Serverless-2016-10-31
-Description: DNS configuration for self-service development and preview sub domains deployed in the development account
+Description: DNS configuration for the self-service development and preview sub-domains deployed in the development account
 
 Conditions:
   IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, 494650018671 ]
