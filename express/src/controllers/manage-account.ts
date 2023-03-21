@@ -97,7 +97,7 @@ export const showPrivateBetaForm = async function (req: Request, res: Response) 
 };
 
 export const processPrivateBetaForm = async function (req: Request, res: Response) {
-    const yourName = req.body.yourName;
+    const userName = req.body.userName;
     const department = req.body.department;
     const serviceName = req.body.serviceName;
     const emailAddress = req.session.emailAddress;
@@ -106,8 +106,8 @@ export const processPrivateBetaForm = async function (req: Request, res: Respons
     const clientId = req.params.clientId;
     const errorMessages = new Map<string, string>();
 
-    if (yourName === "") {
-        errorMessages.set("yourName", "Enter your name");
+    if (userName === "") {
+        errorMessages.set("userName", "Enter your name");
     }
 
     if (department === "") {
@@ -123,7 +123,7 @@ export const processPrivateBetaForm = async function (req: Request, res: Respons
             emailAddress: emailAddress,
             errorMessages: Object.fromEntries(errorMessages),
             values: {
-                yourName: yourName,
+                userName: userName,
                 department: department
             }
         });
@@ -133,7 +133,7 @@ export const processPrivateBetaForm = async function (req: Request, res: Respons
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     await s4.privateBetaRequest(
-        yourName,
+        userName,
         department,
         serviceName,
         emailAddress as string,
@@ -272,7 +272,7 @@ function wasToday(someTime: number): boolean {
 }
 
 export const changePassword = async function (req: Request, res: Response) {
-    const newPassword = req.body.password;
+    const newPassword = req.body.newPassword;
     const currentPassword = req.body.currentPassword;
 
     // TODO Use a password validator
@@ -292,7 +292,7 @@ export const changePassword = async function (req: Request, res: Response) {
                 currentPassword: currentPassword
             },
             errorMessages: {
-                password: "Enter your new password"
+                newPassword: "Enter your new password"
             }
         });
 
@@ -303,10 +303,10 @@ export const changePassword = async function (req: Request, res: Response) {
         res.render("account/change-password.njk", {
             values: {
                 currentPassword: currentPassword,
-                password: newPassword
+                newPassword: newPassword
             },
             errorMessages: {
-                password: "Your password must be 8 characters or more"
+                newPassword: "Your password must be 8 characters or more"
             }
         });
 
@@ -320,11 +320,11 @@ export const changePassword = async function (req: Request, res: Response) {
         if (error instanceof LimitExceededException) {
             res.render("account/change-password.njk", {
                 errorMessages: {
-                    password: "You have tried to change your password too many times. Try again in 15 minutes."
+                    newPassword: "You have tried to change your password too many times. Try again in 15 minutes."
                 },
                 values: {
                     currentPassword: currentPassword,
-                    password: newPassword
+                    newPassword: newPassword
                 }
             });
 
@@ -334,11 +334,11 @@ export const changePassword = async function (req: Request, res: Response) {
         if (error instanceof NotAuthorizedException) {
             res.render("account/change-password.njk", {
                 errorMessages: {
-                    password: "Your current password is incorrect"
+                    currentPassword: "Your current password is incorrect"
                 },
                 values: {
                     currentPassword: "",
-                    password: newPassword
+                    newPassword: newPassword
                 }
             });
 

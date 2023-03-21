@@ -565,10 +565,10 @@ router.get("/name-content-info", (req, res) => {
 });
 
 router.post("/name-content-info", async (req, res) => {
-    if (req.body.yourName === "") {
+    if (req.body.userName === "") {
         res.render("name-content-info.njk", {
             errorMessages: {
-                yourName: "Enter your name"
+                userName: "Enter your name"
             }
         });
         return;
@@ -604,19 +604,19 @@ router.get("/choose-security-codes", (req, res) => {
 });
 
 router.post("/choose-security-codes", (req, res) => {
-    if (!req.body.chooseSecurityCodes) {
+    if (!req.body.chooseSecurityCodeMethod) {
         res.render("create-account/choose-security-codes.njk", {
             errorMessages: {
-                "chooseSecurityCodes-options": "Select how to get security codes"
+                "chooseSecurityCodeMethod-options": "Select how to get security codes"
             }
         });
         return;
     }
-    if (req.body.chooseSecurityCodes === "authenticator") {
+    if (req.body.chooseSecurityCodeMethod === "authenticator") {
         res.redirect("/set-up-auth-app");
         return;
     }
-    if (req.body.chooseSecurityCodes === "textMessage") {
+    if (req.body.chooseSecurityCodeMethod === "textMessage") {
         res.redirect("/create/enter-mobile-test-url");
         return;
     }

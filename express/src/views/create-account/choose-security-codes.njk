@@ -5,18 +5,18 @@
 {% block formInputs %}
   {{ form.radiosInput("Choose how to get security codes",
     "govuk-fieldset__legend--l",
-    "chooseSecurityCodes",
+    "chooseSecurityCodeMethod",
     "You’ll need to enter a security code every time you sign in. This helps keep your account secure.",
     items = [
       {
         text: "Authenticator app for smartphone, tablet or computer",
         value: "authenticator",
-        checked: chooseSecurityCodes == "authenticator"
+        checked: chooseSecurityCodeMethod == "authenticator"
       },
       {
         text: "Text message",
         value: "textMessage",
-        checked: chooseSecurityCodes == "textMessage",
+        checked: chooseSecurityCodeMethod == "textMessage",
         hint: {
           text: "You must use a UK phone number"
         }
