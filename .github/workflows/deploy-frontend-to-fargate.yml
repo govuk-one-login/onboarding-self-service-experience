@@ -1,0 +1,69 @@
+name: Deploy Frontend to Fargate
+
+on:
+  workflow_call:
+    inputs:
+      environment: { required: true, type: string }
+    secrets:
+      aws-role-arn: { required: true}
+      ecs-task-role-arn: { required: false }
+      ecs-execution-role-arn: { required: false }
+      ecr-registry: { required: false }
+      ecr-repository: { required: false }
+      aws-s3-bucket: { required: true}
+
+concurrency: deploy-fargate-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to Fargate
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3 
+        
+      - name: Get distribution artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: self-service-front
+          
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.aws-role-arn }}
+          aws-region: eu-west-2
+
+      - name: Push Docker image
+        id: push-docker-image
+        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@f9d4fd5fb5f5a92151bc522925fe2ba7cb1c05fc
+        with: 
+          repository: ${{ secrets.ecr-repository }}
+          image-version: ${{ github.sha }}
+          image-tags: ${{ github.head_ref || github.ref_name }}
+          dockerfile-path: infrastructure/frontend/Dockerfile
+          
+      - name: SAM Frontend Validate
+        run: sam validate --region eu-west-2 -t infrastructure/frontend/frontend-template.yml
+      
+      - name: Update SAM frontend template with ECR image
+        env:
+          ECR_REGISTRY: ${{ secrets.ecr-registry }}
+          ECR_REPOSITORY: ${{ secrets.ecr-repository }}
+        run: |
+          cd infrastructure/frontend || exit 1
+          sed -i "s|CONTAINER-IMAGE-PLACEHOLDER|$ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA|" frontend-template.yml
+          mv frontend-template.yml template.yml 
+            
+      - name: Create template yaml and sha zip file and upload to artifacts S3
+        uses: alphagov/di-devplatform-upload-action@v3
+        with:
+          artifact-bucket-name: ${{ secrets.aws-s3-bucket }}
+          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          working-directory: infrastructure/frontend
+          template-file: template.yml

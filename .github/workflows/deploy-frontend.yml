@@ -1,0 +1,44 @@
+name: Deploy Frontend App
+run-name: Deploy Frontend [${{ github.head_ref || github.ref_name }}]
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions: read-all
+
+jobs:
+  build-front-app:
+    name: Build
+    uses: ./.github/workflows/build-front-app.yml
+
+  deploy-frontend-preview-paas:
+    name: Preview-pass
+    needs: build-front-app
+    uses: ./.github/workflows/deploy-to-paas.yml
+    with:
+      environment: preview
+      cf-space-name: self-service-preview
+      app-name-prefix: di-sse-prev
+      cognito-client: StubCognitoClient
+      lambda-facade: StubLambdaFacade
+    secrets:
+      cf-username: ${{ secrets.CF_USERNAME }}
+      cf-password: ${{ secrets.CF_PASSWORD }}
+
+
+  deploy-frontend-fargate:
+    name: deploy-frontend-fargate
+    needs: build-front-app
+    uses: ./.github/workflows/deploy-frontend-to-fargate.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: build
+    secrets:
+      aws-role-arn: ${{ secrets.FRONTEND_BUILD_GHA_ROLE_ARN }}
+      aws-s3-bucket: ${{ secrets.FRONTEND_BUILD_ARTIFACT_BUCKET_NAME }}
+      ecr-registry: ${{ secrets.FRONTEND_BUILD_ECR_REGISTRY }}
+      ecr-repository: ${{ secrets.FRONTEND_BUILD_ECR_REPOSITORY }}
