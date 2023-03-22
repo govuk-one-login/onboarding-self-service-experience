@@ -6,6 +6,7 @@ import {
     AdminUpdateUserAttributesCommandOutput,
     ChangePasswordCommandOutput,
     CodeMismatchException,
+    CognitoIdentityProviderServiceException,
     ForgotPasswordCommandOutput,
     GetUserAttributeVerificationCodeCommandOutput,
     NotAuthorizedException,
@@ -14,7 +15,6 @@ import {
     UserNotFoundException,
     VerifyUserAttributeCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
-import {ServiceException} from "@aws-sdk/smithy-client/dist-types/exceptions";
 import {MetadataBearer} from "@aws-sdk/types";
 import * as crypto from "crypto";
 import {promises as fs} from "fs";
@@ -212,7 +212,7 @@ export class CognitoClient implements CognitoInterface {
         return methodOverrides.filter(override => override.parameter === parameter).filter(override => override.value === value)[0];
     }
 
-    private getException(exception: string): ServiceException {
+    private getException(exception: string): CognitoIdentityProviderServiceException {
         switch (exception) {
             case "UsernameExistsException":
                 return new UsernameExistsException({message: "", $metadata: {}});
