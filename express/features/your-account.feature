@@ -1,7 +1,7 @@
 Feature: A page where users can view and change the details associated with their account
 
   Background:
-    Given that the user is on the "/sign-in/enter-email-address" page
+    Given that the user is on the "/sign-in" page
     And the user submits the email "registered@gds.gov.uk"
     And the user submits the password "this-is-not-a-common-password"
     And the user submits the security code "123123"

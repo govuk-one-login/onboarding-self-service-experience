@@ -1,7 +1,7 @@
 Feature: Unhappy paths for the self-service sign-in flow
 
   Background:
-    Given that the user is on the "/sign-in/enter-email-address" page
+    Given that the user is on the "/sign-in" page
 
   Scenario: User does not enter a valid email address
     When the user submits the email "invalid-email.com"
