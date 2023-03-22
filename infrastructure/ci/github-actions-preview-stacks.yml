@@ -17,6 +17,12 @@ Parameters:
     Default: preview
   DevNotificationEmail:
     Type: String
+  FrontendECSTaskRole:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/config/frontend/ecs/task-role-arn
+  FrontendECSExecutionRole:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/config/frontend/ecs/execution-role-arn
 
 Conditions:
   CreateOIDCProvider: !Equals [ !Ref CreateOIDCProvider, "true" ]
@@ -76,7 +82,10 @@ Resources:
 
               - Effect: Allow
                 Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/self-service/config/*
-                Action: ssm:GetParameters
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
 
   DeployFrontendPolicy:
     Type: AWS::IAM::Policy
@@ -110,8 +119,15 @@ Resources:
               - ecr:PutImage
 
           - Effect: Allow
-            Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/self-service-frontend-*FrontendECS*Role*
+            Resource:
+              - !Ref FrontendECSTaskRole
+              - !Ref FrontendECSExecutionRole
             Action: iam:PassRole
+            Condition:
+              StringEquals:
+                iam:PassedToService: ecs-tasks.amazonaws.com
+              ArnLike:
+                iam:AssociatedResourceARN: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/self-service-frontend*
 
   DeployApiPolicy:
     Type: AWS::IAM::Policy

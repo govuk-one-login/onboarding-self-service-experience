@@ -43,7 +43,7 @@ jobs:
 
       - name: Push to PaaS
         id: push-to-paas
-        uses: alphagov/di-github-actions/paas/deploy-app@adca52e1188a4ee53d6c17eeeaefe3a6f8840e59
+        uses: alphagov/di-github-actions/paas/deploy-app@f9d4fd5fb5f5a92151bc522925fe2ba7cb1c05fc
         with:
           url: ${{ inputs.url }}
           manifest: express/manifest.yml

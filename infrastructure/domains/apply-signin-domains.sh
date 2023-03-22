@@ -11,7 +11,7 @@ ACCOUNT=$(../check-aws-account.sh --get-account-name) || exit $?
 ../deploy-sam-stack.sh "$@" \
   --validate \
   --stack-name "$ACCOUNT"-hosted-zone \
-  --template "$ACCOUNT"-domains.yml \
+  --template sse-domains.yml \
   --tags sse:stack-type=dns
 
 popd > /dev/null

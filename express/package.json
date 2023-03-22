@@ -5,6 +5,7 @@
     "start": "node dist/app.js",
     "local": "npm run build && node --inspect -r 'dotenv/config' dist/app.js",
     "dev": "COGNITO_CLIENT=${COGNITO_CLIENT:-StubCognitoClient} LAMBDA_FACADE=${LAMBDA_FACADE:-StubLambdaFacade} nodemon --config nodemon.json --inspect -r 'dotenv/config' src/app.ts",
+    "docker": "docker run --rm --publish 3000:3000 self-service-frontend",
     "minifyjs": "for script in dist/assets/javascripts/*.js; do uglifyjs $script -cmo $script $(${CI:-false} || echo --source-map includeSources,url=${script##*/}.map); done",
     "buildts": "tsc $(${CI:-false} && echo --sourceMap false)",
     "buildsass": "sass --load-path=$(npm ls -p govuk-frontend)/.. --style compressed assets/css/app.scss dist/assets/app.css $(${CI:-false} && echo --no-source-map || echo --embed-sources)",
@@ -14,7 +15,8 @@
     "coverage": "jest --coverage --coverageDirectory coverage --silent",
     "test": "jest --silent",
     "cucumber": "cucumber-js --require-module ts-node/register --require features/support/test-setup.ts --require features/support/steps/**/*.ts --publish-quiet --tags 'not @wip'",
-    "cucumber-report": "npm run cucumber -- --format html:test-report.html"
+    "cucumber-report": "npm run cucumber -- --format html:test-report.html",
+    "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile .."
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.266.0",

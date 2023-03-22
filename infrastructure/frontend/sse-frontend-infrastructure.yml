@@ -1,13 +1,9 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Transform: AWS::Serverless-2016-10-31
-Description: Infrastructure to deploy the DI self-service frontend
-
-Conditions:
-  IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, 494650018671 ]
+Description: Infrastructure to deploy the DI self-service frontend to Fargate
+Transform: AWS::LanguageExtensions
 
 Resources:
   FrontendECRRepository:
-    Condition: IsDevelopmentAccount
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: self-service/frontend
@@ -16,85 +12,66 @@ Resources:
         ScanOnPush: true
       EncryptionConfiguration:
         EncryptionType: KMS
-      Tags:
-        - { Key: Application, Value: SSE }
-        - { Key: Component, Value: Frontend }
       LifecyclePolicy:
         RegistryId: !Ref AWS::AccountId
-        LifecyclePolicyText: '{
-          "rules": [
-            {
-              "rulePriority": 1,
-              "description": "Keep images pushed in the last 5 days",
-              "selection": {
-                "tagStatus": "any",
-                "countType": "sinceImagePushed",
-                "countUnit": "days",
-                "countNumber": 5
-              },
-              "action": {
-                "type": "expire"
-              }
-            }
-          ]
-        }'
-
-  FrontendECSExecutionRole:
-    Condition: IsDevelopmentAccount
-    Type: AWS::IAM::Role
-    Properties:
-      Tags:
-        - { Key: Application, Value: SSE }
-        - { Key: Component, Value: Frontend }
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service:
-                - ecs-tasks.amazonaws.com
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        LifecyclePolicyText:
+          Fn::ToJsonString:
+            rules:
+              - rulePriority: 1
+                description: Keep images pushed in the last 5 days
+                selection:
+                  tagStatus: any
+                  countType: sinceImagePushed
+                  countUnit: days
+                  countNumber: 5
+                action:
+                  type: expire
 
   FrontendECSTaskRole:
-    Condition: IsDevelopmentAccount
     Type: AWS::IAM::Role
     Properties:
-      Tags:
-        - { Key: Application, Value: SSE }
-        - { Key: Component, Value: Frontend }
+      Description: The role assumed by the frontend application containers
       AssumeRolePolicyDocument:
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Action: sts:AssumeRole
             Principal:
-              Service:
-                - ecs-tasks.amazonaws.com
+              Service: ecs-tasks.amazonaws.com
             Condition:
               ArnLike:
                 aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+      ManagedPolicyArns: [ arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role ]
 
-  FrontendECSRoleParams:
-    Condition: IsDevelopmentAccount
+  FrontendECSExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: The role granting the Fargate and ECS container agents permissions to make AWS API calls
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+      ManagedPolicyArns: [ arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy ]
+
+  FrontendECSTaskRoleParam:
     Type: AWS::SSM::Parameter
     Properties:
-      Description: ARNs of the roles to use when deploying and running frontend ECS tasks
-      Name: !Sub /self-service/config/frontend/ecs-roles
-      Tags:
-        Application: SSE
-        Component: Frontend
+      Name: /self-service/config/frontend/ecs/task-role-arn
+      Value: !GetAtt FrontendECSTaskRole.Arn
       Type: String
-      Value: !Sub '{
-          "taskRole": "${FrontendECSTaskRole.Arn}",
-          "executionRole": "${FrontendECSExecutionRole.Arn}"
-        }'
+
+  FrontendECSExecutionRoleArnParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /self-service/config/frontend/ecs/execution-role-arn
+      Value: !GetAtt FrontendECSExecutionRole.Arn
+      Type: String
 
 Outputs:
   ECSTaskRoleARN:
-    Condition: IsDevelopmentAccount
     Value: !GetAtt FrontendECSTaskRole.Arn
   ECSExecutionRoleARN:
-    Condition: IsDevelopmentAccount
     Value: !GetAtt FrontendECSExecutionRole.Arn
