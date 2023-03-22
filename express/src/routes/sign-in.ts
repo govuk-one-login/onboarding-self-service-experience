@@ -6,12 +6,10 @@ import {
     finishSignIn,
     forgotPasswordForm,
     processEmailAddress,
-    sessionTimeout,
     showCheckPhonePage,
     showResendPhoneCodePage,
     showSignInFormEmail,
-    showSignInFormPassword,
-    signOut
+    showSignInFormPassword
 } from "../controllers/sign-in";
 import processSignInForm from "../middleware/processSignInForm";
 import {processSecurityCode} from "../middleware/sign-in-middleware";
@@ -21,8 +19,6 @@ import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpVal
 import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
 
 const router = express.Router();
-
-router.get("/session-timeout", sessionTimeout);
 
 router.get("/sign-in/enter-email-address", showSignInFormEmail);
 router.post("/sign-in/enter-email-address", emailValidator("sign-in.njk"), processEmailAddress);
@@ -60,8 +56,6 @@ router.get("/sign-in/resend-text-code", showResendPhoneCodePage);
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
 router.post("/sign-in/resend-text-code", showCheckPhonePage);
-
-router.get("/sign-out", signOut);
 
 router.get("/sign-in/account-not-found", (req, res) => {
     res.render("no-account-found.njk");

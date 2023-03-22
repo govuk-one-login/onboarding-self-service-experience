@@ -1,19 +1,13 @@
 import express from "express";
 import {
     changePassword,
-    listServices,
     processChangePhoneNumberForm,
-    processChangeServiceNameForm,
-    processPrivateBetaForm,
     showAccount,
     showChangePasswordForm,
     showChangePhoneNumberForm,
-    showClient,
-    showPrivateBetaForm,
-    showPrivateBetaFormSubmitted,
     showVerifyMobileWithSmsCode,
     verifyMobileWithSmsCode
-} from "../controllers/manage-account";
+} from "../controllers/account";
 import {checkAuthorisation} from "../middleware/authoriser";
 import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpValidator";
 import validateMobileNumber from "../middleware/validators/mobileValidator";
@@ -22,19 +16,6 @@ import notOnCommonPasswordListValidator from "../middleware/validators/notOnComm
 const router = express.Router();
 
 router.get("/account", checkAuthorisation, showAccount);
-
-router.get("/services", checkAuthorisation, listServices);
-
-// TODO This should have params :serviceId/:clientId but at the moment we're abusing the fact that each service only has one client
-router.get("/services/:serviceId/client", checkAuthorisation, showClient);
-
-router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/private-beta", checkAuthorisation, showPrivateBetaForm);
-router.post("/service/:serviceId/client/:clientId/:selfServiceClientId/private-beta", checkAuthorisation, processPrivateBetaForm);
-router.get(
-    "/service/:serviceId/client/:clientId/:selfServiceClientId/private-beta/submitted",
-    checkAuthorisation,
-    showPrivateBetaFormSubmitted
-);
 
 router.get("/account/change-password", checkAuthorisation, showChangePasswordForm);
 
@@ -66,21 +47,6 @@ router.post(
     },
     mobileSecurityCodeValidator("/verify-phone-code", false),
     verifyMobileWithSmsCode
-);
-
-router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-service-name", checkAuthorisation, (req, res) => {
-    res.render("account/change-service-name.njk", {
-        serviceId: req.params.serviceId,
-        values: {
-            serviceName: req.query.serviceName
-        }
-    });
-});
-
-router.post(
-    "/service/:serviceId/client/:clientId/:selfServiceClientId/change-service-name",
-    checkAuthorisation,
-    processChangeServiceNameForm
 );
 
 router.get("/account/change-phone-number/resend-text-code", checkAuthorisation, (req, res) => {

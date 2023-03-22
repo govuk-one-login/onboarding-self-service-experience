@@ -1,10 +1,13 @@
-import express, {Request, Response} from "express";
+import express from "express";
 import "express-async-errors";
 import {
+    accountExists,
+    processAddServiceForm,
     processEnterMobileForm,
     processGetEmailForm,
     resendEmailVerificationCode,
     resendMobileVerificationCode,
+    showAddServiceForm,
     showCheckEmailForm,
     showEnterMobileForm,
     showGetEmailForm,
@@ -15,17 +18,15 @@ import {
     submitEmailSecurityCode,
     submitMobileVerificationCode,
     updatePassword
-} from "../controllers/create-account";
+} from "../controllers/register";
 import {checkAuthorisation} from "../middleware/authoriser";
+import processSignInForm from "../middleware/processSignInForm";
 import {emailSecurityCodeValidator} from "../middleware/validators/emailOtpValidator";
 import {emailValidator} from "../middleware/validators/emailValidator";
 import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpValidator";
 import validateMobileNumber from "../middleware/validators/mobileValidator";
 import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
 import {passwordValidator} from "../middleware/validators/passwordValidator";
-import {accountExists} from "../controllers/sign-in";
-import processSignInForm from "../middleware/processSignInForm";
-import {processAddServiceForm, showAddServiceForm} from "../controllers/manage-account";
 import {serviceNameValidator} from "../middleware/validators/serviceNameValidator";
 
 const router = express.Router();
@@ -64,10 +65,6 @@ router.post(
     mobileSecurityCodeValidator("/register/resend-text-code", false),
     submitMobileVerificationCode
 );
-
-router.get("/there-is-a-problem", (req: Request, res: Response) => {
-    res.render("there-is-a-problem.njk");
-});
 
 router.get("/register/resend-text-code", checkAuthorisation, showResendPhoneCodeForm);
 router.post("/register/resend-text-code", checkAuthorisation, resendMobileVerificationCode);

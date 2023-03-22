@@ -4,7 +4,9 @@ import {
     NotAuthorizedException,
     UsernameExistsException
 } from "@aws-sdk/client-cognito-identity-provider";
+import {randomUUID} from "crypto";
 import {NextFunction, Request, Response} from "express";
+import {Service} from "../../@types/Service";
 import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {convertToCountryPrefixFormat} from "../lib/mobileNumberUtils";
 import {domainUserToDynamoUser} from "../lib/userUtils";
@@ -89,6 +91,7 @@ export const updatePassword = async function (req: Request, res: Response) {
         req.body["password"],
         req.session.cognitoSession as string
     );
+
     await s4.setEmailAsVerified(req.session.emailAddress as string);
     res.redirect("/register/enter-phone-number");
 };
@@ -102,6 +105,7 @@ export const showEnterMobileForm = async function (req: Request, res: Response) 
 export const processEnterMobileForm = async function (req: Request, res: Response) {
     // The user needs to be logged in for this
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
+
     if (accessToken === undefined) {
         console.error("processEnterMobileForm::user must log in before we can process their mobile number redirecting to /sign-in");
         // user must log in before we can process their mobile number
@@ -205,4 +209,47 @@ export const resendEmailVerificationCode = async function (req: Request, res: Re
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
     res.redirect("/register/enter-email-code");
+};
+
+export const showAddServiceForm = async function (req: Request, res: Response) {
+    res.render("add-service-name.njk");
+};
+
+export const processAddServiceForm = async function (req: Request, res: Response) {
+    const uuid = randomUUID();
+    const service: Service = {
+        id: `service#${uuid}`,
+        serviceName: req.body.serviceName
+    };
+
+    const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
+    if (userId === undefined) {
+        console.log("Can't get CognitoId from authenticationResult in session");
+        res.render("there-is-a-problem.njk");
+        return;
+    }
+
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    try {
+        await s4.newService(service, userId, req.session.authenticationResult as AuthenticationResultType);
+    } catch (error) {
+        console.error(error);
+        res.render("there-is-a-problem.njk");
+        return;
+    }
+
+    const generatedClient = await s4.generateClient(service, req.session.authenticationResult as AuthenticationResultType);
+    console.log(generatedClient.data);
+    const body = JSON.parse(generatedClient.data.output).body;
+    const serviceId = JSON.parse(body).pk;
+    req.session.serviceName = req.body.serviceName;
+    res.redirect(`/services/${serviceId.substring(8)}/client`);
+};
+
+export const accountExists = async function (req: Request, res: Response) {
+    res.render("create-account/existing-account.njk", {
+        values: {
+            emailAddress: req.session.emailAddress
+        }
+    });
 };

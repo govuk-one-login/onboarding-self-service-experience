@@ -1,9 +1,9 @@
 import {AuthenticationResultType, LimitExceededException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import "express-async-errors";
+import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {obscureNumber} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
-import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
     res.render("sign-in.njk");
@@ -53,24 +53,8 @@ export const showSignInFormPassword = async function (req: Request, res: Respons
     res.render("sign-in-enter-password.njk");
 };
 
-export const signOut = async function (req: Request, res: Response) {
-    req.session.destroy(() => res.redirect("/"));
-};
-
 export const showResendPhoneCodePage = async function (req: Request, res: Response) {
     res.render("resend-phone-code-sign-in.njk");
-};
-
-export const sessionTimeout = async function (req: Request, res: Response) {
-    res.render("session-timeout.njk");
-};
-
-export const accountExists = async function (req: Request, res: Response) {
-    res.render("create-account/existing-account.njk", {
-        values: {
-            emailAddress: req.session.emailAddress
-        }
-    });
 };
 
 export const forgotPasswordForm = async function (req: Request, res: Response) {
