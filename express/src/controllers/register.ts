@@ -243,7 +243,7 @@ export const processAddServiceForm = async function (req: Request, res: Response
     const body = JSON.parse(generatedClient.data.output).body;
     const serviceId = JSON.parse(body).pk;
     req.session.serviceName = req.body.serviceName;
-    res.redirect(`/services/${serviceId.substring(8)}/client`);
+    res.redirect(`/services/${serviceId.substring(8)}/clients`);
 };
 
 export const accountExists = async function (req: Request, res: Response) {

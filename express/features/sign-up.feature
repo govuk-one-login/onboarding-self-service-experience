@@ -155,7 +155,7 @@ Feature: Users can sign up to the self-service experience
 
     Scenario: The user types everything correctly, creates an account and adds a service
       When the user submits a correct service name
-      Then they should be redirected to the "/services/vice-id/client" page
+      Then they should be redirected to the "/services/vice-id/clients" page
 
     Scenario: The user submits an empty service name
       When the user submits the service name ""

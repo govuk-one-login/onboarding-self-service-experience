@@ -11,21 +11,17 @@ import {checkAuthorisation} from "../middleware/authoriser";
 
 export const router = express.Router();
 
-router.get("/services", checkAuthorisation, listServices);
+router.get("/", checkAuthorisation, listServices);
 
 // TODO This should have params :serviceId/:clientId but at the moment we're abusing the fact that each service only has one client
-router.get("/services/:serviceId/client", checkAuthorisation, showClient);
+router.get("/:serviceId/clients", checkAuthorisation, showClient);
 
-router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/private-beta", checkAuthorisation, showPrivateBetaForm);
-router.post("/service/:serviceId/client/:clientId/:selfServiceClientId/private-beta", checkAuthorisation, processPrivateBetaForm);
+router.get("/:serviceId/clients/:clientId/:selfServiceClientId/private-beta", checkAuthorisation, showPrivateBetaForm);
+router.post("/:serviceId/clients/:clientId/:selfServiceClientId/private-beta", checkAuthorisation, processPrivateBetaForm);
 
-router.get(
-    "/service/:serviceId/client/:clientId/:selfServiceClientId/private-beta/submitted",
-    checkAuthorisation,
-    showPrivateBetaFormSubmitted
-);
+router.get("/:serviceId/clients/:clientId/:selfServiceClientId/private-beta/submitted", checkAuthorisation, showPrivateBetaFormSubmitted);
 
-router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-service-name", checkAuthorisation, (req, res) => {
+router.get("/:serviceId/clients/:clientId/:selfServiceClientId/change-service-name", checkAuthorisation, (req, res) => {
     res.render("account/change-service-name.njk", {
         serviceId: req.params.serviceId,
         values: {
@@ -34,10 +30,6 @@ router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-ser
     });
 });
 
-router.post(
-    "/service/:serviceId/client/:clientId/:selfServiceClientId/change-service-name",
-    checkAuthorisation,
-    processChangeServiceNameForm
-);
+router.post("/:serviceId/clients/:clientId/:selfServiceClientId/change-service-name", checkAuthorisation, processChangeServiceNameForm);
 
 export default router;

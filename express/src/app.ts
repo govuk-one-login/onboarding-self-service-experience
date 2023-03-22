@@ -63,11 +63,11 @@ configureViews(app);
 app.use(setSignedInStatus);
 
 app.use("/", baseRoutes);
-app.use("/", register);
-app.use("/", signIn);
-app.use("/", account);
-app.use("/", services);
-app.use("/", testingRoutes);
+app.use("/register", register);
+app.use("/sign-in", signIn);
+app.use("/account", account);
+app.use("/services", services);
+app.use("/test", testingRoutes);
 
 app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {headerActiveItem: "get-started"});

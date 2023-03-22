@@ -25,7 +25,7 @@ export const listServices = async function (req: Request, res: Response) {
     }
 
     if (services.length === 1) {
-        res.redirect(`/services/${services[0].id}/client`);
+        res.redirect(`/services/${services[0].id}/clients`);
         return;
     }
 
@@ -56,19 +56,19 @@ export const showClient = async function (req: Request, res: Response) {
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         urls: {
             // TODO changeClientName is currently not used
-            changeClientName: `/service/${serviceId}/client/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
+            changeClientName: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
                 client.clientName
             )}`,
-            changeRedirectUris: `/service/${serviceId}/client/${authClientId}/${selfServiceClientId}/change-redirect-uris?redirectUris=${encodeURIComponent(
+            changeRedirectUris: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-redirect-uris?redirectUris=${encodeURIComponent(
                 client.redirectUris.join(" ")
             )}`,
-            changeUserAttributes: `/service/${serviceId}/client/${authClientId}/${selfServiceClientId}/change-user-attributes?userAttributes=${encodeURIComponent(
+            changeUserAttributes: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-user-attributes?userAttributes=${encodeURIComponent(
                 client.scopes.join(" ")
             )}`,
-            changePublicKey: `/service/${serviceId}/client/${authClientId}/${selfServiceClientId}/change-public-key?publicKey=${encodeURIComponent(
+            changePublicKey: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-public-key?publicKey=${encodeURIComponent(
                 userPublicKey
             )}`,
-            changePostLogoutUris: `/service/${serviceId}/client/${authClientId}/${selfServiceClientId}/change-post-logout-uris?redirectUris=${encodeURIComponent(
+            changePostLogoutUris: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-post-logout-uris?redirectUris=${encodeURIComponent(
                 client.postLogoutUris.join(" ")
             )}`
         }
@@ -133,7 +133,7 @@ export const processPrivateBetaForm = async function (req: Request, res: Respons
         req.session.authenticationResult?.AccessToken as string
     );
 
-    res.redirect(`/service/${serviceId}/client/${clientId}/${selfServiceClientId}/private-beta/submitted`);
+    res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/private-beta/submitted`);
 };
 
 export const showPrivateBetaFormSubmitted = async function (req: Request, res: Response) {
@@ -175,5 +175,5 @@ export const processChangeServiceNameForm = async function (req: Request, res: R
 
     req.session.updatedField = "service name";
     req.session.serviceName = newServiceName;
-    res.redirect(`/services/${serviceId}/client`);
+    res.redirect(`/services/${serviceId}/clients`);
 };

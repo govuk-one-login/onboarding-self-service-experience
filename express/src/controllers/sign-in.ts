@@ -9,6 +9,7 @@ export const showSignInFormEmail = async function (req: Request, res: Response) 
     res.render("sign-in.njk");
 };
 
+// TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
 export const showCheckPhonePage = async function (req: Request, res: Response) {
     // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
