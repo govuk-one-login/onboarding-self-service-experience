@@ -70,39 +70,6 @@ export const checkEmailPasswordReset = async function (req: Request, res: Respon
     await forgotPassword(req, res);
 };
 
-const forgotPassword = async function (req: Request, res: Response) {
-    const s4: SelfServiceServicesService = await req.app.get("backing-service");
-    const uri = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
-    try {
-        await s4.forgotPassword(req.session.emailAddress as string, uri as string);
-    } catch (error) {
-        if (error instanceof UserNotFoundException) {
-            res.render("sign-in.njk", {
-                errorMessages: {
-                    emailAddress: "User does not exist."
-                },
-                values: {
-                    emailAddress: req.session.emailAddress
-                }
-            });
-            return;
-        }
-        if (error instanceof LimitExceededException) {
-            res.render("sign-in.njk", {
-                errorMessages: {
-                    emailAddress: "You have tried to change your password too many times. Try again in 15 minutes."
-                },
-                values: {
-                    emailAddress: req.session.emailAddress
-                }
-            });
-            return;
-        }
-        throw error;
-    }
-    res.render("check-email-password-reset.njk");
-};
-
 export const confirmForgotPasswordForm = async function (req: Request, res: Response) {
     res.render("create-new-password.njk", {
         loginName: req.query.loginName,
@@ -135,4 +102,37 @@ export const confirmForgotPassword = async function (req: Request, res: Response
         }
         throw error;
     }
+};
+
+const forgotPassword = async function (req: Request, res: Response) {
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
+    const uri = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
+    try {
+        await s4.forgotPassword(req.session.emailAddress as string, uri as string);
+    } catch (error) {
+        if (error instanceof UserNotFoundException) {
+            res.render("sign-in.njk", {
+                errorMessages: {
+                    emailAddress: "User does not exist."
+                },
+                values: {
+                    emailAddress: req.session.emailAddress
+                }
+            });
+            return;
+        }
+        if (error instanceof LimitExceededException) {
+            res.render("sign-in.njk", {
+                errorMessages: {
+                    emailAddress: "You have tried to change your password too many times. Try again in 15 minutes."
+                },
+                values: {
+                    emailAddress: req.session.emailAddress
+                }
+            });
+            return;
+        }
+        throw error;
+    }
+    res.render("check-email-password-reset.njk");
 };
