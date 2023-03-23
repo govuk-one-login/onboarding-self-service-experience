@@ -36,19 +36,19 @@ router.get(
     showPrivateBetaFormSubmitted
 );
 
-router.get("/change-password", checkAuthorisation, showChangePasswordForm);
+router.get("/account/change-password", checkAuthorisation, showChangePasswordForm);
 
 router.post(
-    "/change-password",
+    "/account/change-password",
     checkAuthorisation,
     notOnCommonPasswordListValidator("account/change-password.njk", "password", ["currentPassword"]),
     changePassword
 );
 
-router.get("/change-phone-number", checkAuthorisation, showChangePhoneNumberForm);
+router.get("/account/change-phone-number", checkAuthorisation, showChangePhoneNumberForm);
 
 router.post(
-    "/change-phone-number",
+    "/account/change-phone-number",
     checkAuthorisation,
     validateMobileNumber("account/change-phone-number.njk"),
     processChangePhoneNumberForm
@@ -68,7 +68,7 @@ router.post(
     verifyMobileWithSmsCode
 );
 
-router.get("/change-service-name/:serviceId/:selfServiceClientId/:clientId", checkAuthorisation, (req, res) => {
+router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-service-name", checkAuthorisation, (req, res) => {
     res.render("account/change-service-name.njk", {
         serviceId: req.params.serviceId,
         values: {
@@ -77,7 +77,11 @@ router.get("/change-service-name/:serviceId/:selfServiceClientId/:clientId", che
     });
 });
 
-router.post("/change-service-name/:serviceId/:selfServiceClientId/:clientId", checkAuthorisation, processChangeServiceNameForm);
+router.post(
+    "/service/:serviceId/client/:clientId/:selfServiceClientId/change-service-name",
+    checkAuthorisation,
+    processChangeServiceNameForm
+);
 
 router.get("/account/change-phone-number/resend-text-code", checkAuthorisation, (req, res) => {
     res.render("common/resend-security-code.njk", {

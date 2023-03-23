@@ -13,30 +13,30 @@ Feature: A page where users can view and change the details associated with thei
 
   Rule: The user tries to change their phone number
     Background:
-      When they click on the link that points to "/change-phone-number"
+      When they click on the link that points to "/account/change-phone-number"
       Then they should see the text "Change your mobile phone number"
       Then the user submits the mobile phone number "0770 9000 124"
 
     Scenario: The user does not enter any characters when changing the phone number
-      Given that the user is on the "/change-phone-number" page
+      Given that the user is on the "/account/change-phone-number" page
       Then they should see the text "Change your mobile phone number"
       Then the user submits the mobile phone number ""
       Then the error message "Enter a mobile phone number" must be displayed for the "mobileNumber" field
 
     Scenario: User enters an international phone number when changing phone number
-      Given that the user is on the "/change-phone-number" page
+      Given that the user is on the "/account/change-phone-number" page
       Then they should see the text "Change your mobile phone number"
       Then the user submits the mobile phone number "+919465245634"
       Then the error message "Enter a UK mobile phone number, like 07700 900000" must be displayed for the "mobileNumber" field
 
     Scenario: User enters invalid characters when changing phone number
-      Given that the user is on the "/change-phone-number" page
+      Given that the user is on the "/account/change-phone-number" page
       Then they should see the text "Change your mobile phone number"
       Then the user submits the mobile phone number "077$$ 900000"
       Then the error message "Enter a UK mobile phone number using numbers only" must be displayed for the "mobileNumber" field
 
     Scenario: User enters an invalid number when changing phone number
-      Given that the user is on the "/change-phone-number" page
+      Given that the user is on the "/account/change-phone-number" page
       Then they should see the text "Change your mobile phone number"
       Then the user submits the mobile phone number "08723900"
       Then the error message "Enter a UK mobile phone number, like 07700 900000" must be displayed for the "mobileNumber" field
@@ -64,8 +64,8 @@ Feature: A page where users can view and change the details associated with thei
 
   Rule: The user tries to change their password
     Background:
-      When they click on the link that points to "/change-password"
-      Then they should be redirected to the "/change-password" page
+      When they click on the link that points to "/account/change-password"
+      Then they should be redirected to the "/account/change-password" page
       And they should see the text "Add your new password"
 
     Scenario: User enters less than 8 characters for their new password

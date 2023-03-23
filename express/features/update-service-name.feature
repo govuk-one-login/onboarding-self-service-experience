@@ -6,7 +6,7 @@ Feature: Change your service name
     And the user submits the password "this-is-not-a-common-password"
     And the user submits the security code "123456"
     Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
-    When they click on the link with the URL starting with "/change-service-name"
+    When they click on the "Change service name" link
     Then they should be redirected to a page with the title "Change service name - GOV.UK One Login"
 
   Scenario: The user does not enter any characters into the ‘Change your service name’ field
