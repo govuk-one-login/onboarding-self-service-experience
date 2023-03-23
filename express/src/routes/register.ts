@@ -31,6 +31,7 @@ import {passwordValidator} from "../middleware/validators/passwordValidator";
 import {serviceNameValidator} from "../middleware/validators/serviceNameValidator";
 
 const router = express.Router();
+export default router;
 
 router.get("/", (req, res) => {
     res.redirect(303, path.join(req.baseUrl, "/enter-email-address"));
@@ -42,6 +43,9 @@ router.post("/enter-email-address", emailValidator("create-account/get-email.njk
 router.get("/enter-email-code", showCheckEmailForm);
 router.post("/enter-email-code", emailSecurityCodeValidator, submitEmailSecurityCode);
 
+router.get("/resend-email-code", showResendEmailCodeForm);
+router.post("/resend-email-code", resendEmailVerificationCode);
+
 router.get("/create-password", showNewPasswordForm);
 router.post(
     "/create-password",
@@ -50,27 +54,19 @@ router.post(
     updatePassword
 );
 
-router.get("/enter-phone-number", checkAuthorisation, showEnterMobileForm);
-router.post("/enter-phone-number", checkAuthorisation, validateMobileNumber("create-account/enter-mobile.njk"), processEnterMobileForm);
-
-router.get("/enter-text-code", checkAuthorisation, showSubmitMobileVerificationCode);
-router.post(
-    "/enter-text-code",
-    checkAuthorisation,
-    mobileSecurityCodeValidator("resend-text-code", false),
-    submitMobileVerificationCode
-);
-
-router.get("/resend-text-code", checkAuthorisation, showResendPhoneCodeForm);
-router.post("/resend-text-code", checkAuthorisation, resendMobileVerificationCode);
-
-router.get("/resend-email-code", showResendEmailCodeForm);
-router.post("/resend-email-code", resendEmailVerificationCode);
-
 router.get("/account-exists", accountExists);
 router.post("/account-exists", processSignInForm("create-account/existing-account.njk"));
 
-router.get("/create-service", checkAuthorisation, showAddServiceForm);
-router.post("/create-service", checkAuthorisation, serviceNameValidator, processAddServiceForm);
+router.use(checkAuthorisation);
 
-export default router;
+router.get("/enter-phone-number", showEnterMobileForm);
+router.post("/enter-phone-number", validateMobileNumber("create-account/enter-mobile.njk"), processEnterMobileForm);
+
+router.get("/enter-text-code", showSubmitMobileVerificationCode);
+router.post("/enter-text-code", mobileSecurityCodeValidator("resend-text-code", false), submitMobileVerificationCode);
+
+router.get("/resend-text-code", showResendPhoneCodeForm);
+router.post("/resend-text-code", resendMobileVerificationCode);
+
+router.get("/create-service", showAddServiceForm);
+router.post("/create-service", serviceNameValidator, processAddServiceForm);

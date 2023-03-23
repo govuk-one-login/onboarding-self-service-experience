@@ -20,6 +20,7 @@ import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpVal
 import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
 
 const router = express.Router();
+export default router;
 
 router.get("/", (req, res) => {
     res.redirect(303, path.join(req.baseUrl, "/enter-email-address"));
@@ -84,5 +85,3 @@ router.post(
     confirmForgotPassword,
     processSignInForm("create-new-password.njk")
 );
-
-export default router;

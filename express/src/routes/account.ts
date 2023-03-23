@@ -14,29 +14,25 @@ import validateMobileNumber from "../middleware/validators/mobileValidator";
 import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
 
 const router = express.Router();
+export default router;
 
-router.get("/", checkAuthorisation, showAccount);
+router.use(checkAuthorisation);
 
-router.get("/change-password", checkAuthorisation, showChangePasswordForm);
+router.get("/", showAccount);
+
+router.get("/change-password", showChangePasswordForm);
 router.post(
     "/change-password",
-    checkAuthorisation,
     notOnCommonPasswordListValidator("account/change-password.njk", "newPassword", ["currentPassword"]),
     changePassword
 );
 
-router.get("/change-phone-number", checkAuthorisation, showChangePhoneNumberForm);
-router.post(
-    "/change-phone-number",
-    checkAuthorisation,
-    validateMobileNumber("account/change-phone-number.njk"),
-    processChangePhoneNumberForm
-);
+router.get("/change-phone-number", showChangePhoneNumberForm);
+router.post("/change-phone-number", validateMobileNumber("account/change-phone-number.njk"), processChangePhoneNumberForm);
 
-router.get("/change-phone-number/enter-text-code", checkAuthorisation, showVerifyMobileWithSmsCode);
+router.get("/change-phone-number/enter-text-code", showVerifyMobileWithSmsCode);
 router.post(
     "/change-phone-number/enter-text-code",
-    checkAuthorisation,
     // TODO refactor routers
     (req, res, next) => {
         res.locals.headerActiveItem = "your-account";
@@ -46,7 +42,7 @@ router.post(
     verifyMobileWithSmsCode
 );
 
-router.get("/change-phone-number/resend-text-code", checkAuthorisation, (req, res) => {
+router.get("/change-phone-number/resend-text-code", (req, res) => {
     res.render("common/resend-security-code.njk", {
         securityCodeMethod: "phone"
     });
@@ -55,5 +51,3 @@ router.get("/change-phone-number/resend-text-code", checkAuthorisation, (req, re
 router.post("/change-phone-number/resend-text-code", (req, res) => {
     res.redirect("change-phone-number/enter-text-code");
 });
-
-export default router;

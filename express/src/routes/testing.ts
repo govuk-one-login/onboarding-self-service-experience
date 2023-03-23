@@ -7,6 +7,7 @@ import {urisValidator} from "../middleware/validators/urisValidator";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 const router = express.Router();
+export default router;
 
 // Testing routes for Change your client name page
 router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-client-name", (req, res) => {
@@ -641,5 +642,3 @@ router.post("/set-up-auth-app", (req, res) => {
     }
     res.redirect("/service-name-testing");
 });
-
-export default router;

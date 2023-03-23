@@ -16,8 +16,7 @@ export const showChangePasswordForm = async function (req: Request, res: Respons
 
 export const showAccount = async function (req: Request, res: Response) {
     if (!req.session.authenticationResult) {
-        console.error("showAccount::authenticationResult not in session, redirecting to sign-in");
-        res.redirect("sign-in.njk");
+        res.redirect("/sign-in");
         return;
     }
 
