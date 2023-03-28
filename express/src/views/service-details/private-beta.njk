@@ -32,7 +32,7 @@
 
 {% if not privateBetaRequestSubmitted %}
   {% block formInputs %}
-    {{ form.textInput("Your name", "yourName") }}
+    {{ form.textInput("Your name", "userName") }}
     {{ form.textInput("Department", "department") }}
     {{ form.hiddenInput("serviceName", serviceName) }}
   {% endblock %}

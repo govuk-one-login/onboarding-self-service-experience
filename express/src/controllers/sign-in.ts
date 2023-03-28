@@ -120,20 +120,20 @@ const forgotPassword = async function (req: Request, res: Response) {
 
 export const confirmForgotPasswordForm = async function (req: Request, res: Response) {
     res.render("create-new-password.njk", {
-        userName: req.query.userName,
+        loginName: req.query.loginName,
         confirmationCode: req.query.confirmationCode
     });
 };
 
 export const confirmForgotPassword = async function (req: Request, res: Response, next: NextFunction) {
-    const userName = req.body.userName;
+    const loginName = req.body.loginName;
     const password = req.body.password;
     const confirmationCode = req.body.confirmationCode;
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
     try {
-        await s4.confirmForgotPassword(userName as string, password as string, confirmationCode as string);
-        req.session.emailAddress = req.body.userName;
+        await s4.confirmForgotPassword(loginName as string, password as string, confirmationCode as string);
+        req.session.emailAddress = req.body.loginName;
         req.session.updatedField = "password";
         next();
     } catch (error) {

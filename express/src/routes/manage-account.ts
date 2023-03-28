@@ -41,7 +41,7 @@ router.get("/account/change-password", checkAuthorisation, showChangePasswordFor
 router.post(
     "/account/change-password",
     checkAuthorisation,
-    notOnCommonPasswordListValidator("account/change-password.njk", "password", ["currentPassword"]),
+    notOnCommonPasswordListValidator("account/change-password.njk", "newPassword", ["currentPassword"]),
     changePassword
 );
 

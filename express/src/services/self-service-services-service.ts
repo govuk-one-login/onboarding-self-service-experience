@@ -149,8 +149,8 @@ export default class SelfServiceServicesService {
         await this.lambda.updateClient(serviceId, selfServiceClientId, clientId, updates, accessToken);
     }
 
-    async privateBetaRequest(yourName: string, department: string, serviceName: string, emailAddress: string, accessToken: string) {
-        await this.lambda.privateBetaRequest(yourName, department, serviceName, emailAddress, accessToken as string);
+    async privateBetaRequest(userName: string, department: string, serviceName: string, emailAddress: string, accessToken: string) {
+        await this.lambda.privateBetaRequest(userName, department, serviceName, emailAddress, accessToken as string);
     }
 
     async listServices(userId: string, accessToken: string): Promise<Service[]> {

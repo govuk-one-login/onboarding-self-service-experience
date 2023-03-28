@@ -70,21 +70,21 @@ Feature: A page where users can view and change the details associated with thei
 
     Scenario: User enters less than 8 characters for their new password
       When they enter "TestPa$$word" into the "currentPassword" field
-      When they enter "NewTest" into the "password" field
+      When they enter "NewTest" into the "newPassword" field
       When they click the Confirm button
-      Then the error message "Your password must be 8 characters or more" must be displayed for the "password" field
+      Then the error message "Your password must be 8 characters or more" must be displayed for the "newPassword" field
 
     Scenario: User selects the Show toggle for the current password field
       When they toggle the "Show" link on the field "currentPassword"
       Then they see the toggle link "Hide" on the field "currentPassword"
 
     Scenario: User selects Show for the new password field
-      When they toggle the "Show" link on the field "password"
-      Then they see the toggle link "Hide" on the field "password"
+      When they toggle the "Show" link on the field "newPassword"
+      Then they see the toggle link "Hide" on the field "newPassword"
 
     Scenario: User successfully changes their password
       When they enter "OldTestPa$$word" into the "currentPassword" field
-      When they enter "NewTestPa$$word" into the "password" field
+      When they enter "NewTestPa$$word" into the "newPassword" field
       When they click the Confirm button
       Then they should be redirected to the "/account" page
       And they should see the text "You have changed your password"
@@ -96,9 +96,9 @@ Feature: A page where users can view and change the details associated with thei
     Scenario: The user tries to change their current password and does not enter any value into Enter a new password field
       When they enter "OldTestPa$$word" into the "currentPassword" field
       When they click the Confirm button
-      Then the error message "Enter your new password" must be displayed for the "password" field
+      Then the error message "Enter your new password" must be displayed for the "newPassword" field
 
     Scenario: The user tries to change their current password and does not enter any value into Current password field
-      When they enter "NewTestPa$$word" into the "password" field
+      When they enter "NewTestPa$$word" into the "newPassword" field
       When they click the Confirm button
       Then the error message "Enter your current password" must be displayed for the "currentPassword" field

@@ -24,7 +24,7 @@ export default function notOnCommonPasswordListValidator(
             res.render(template, {
                 values: values,
                 errorMessages: {
-                    password: ERROR_MESSAGE
+                    [passwordField]: ERROR_MESSAGE
                 }
             });
 

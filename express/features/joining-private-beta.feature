@@ -15,9 +15,9 @@ Feature: Joining private beta
     And they should see the text "Find out more about private beta"
 
   Scenario: The user does not enter any characters into the Your name field
-    When they enter "" into the "yourName" field
+    When they enter "" into the "userName" field
     When they click the Continue button
-    Then the error message "Enter your name" must be displayed for the "yourName" field
+    Then the error message "Enter your name" must be displayed for the "userName" field
 
   Scenario: The user does not enter any characters into the Department field
     When they enter "" into the "department" field
@@ -29,13 +29,13 @@ Feature: Joining private beta
     Then they should see the text "Test Service"
 
   Scenario: The user submits their private beta request
-    When they enter "Test User" into the "yourName" field
+    When they enter "Test User" into the "userName" field
     When they enter "Test Department" into the "department" field
     When they click the Submit button
     Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
 
   Scenario: The user wants to contact the team via slack
-    When they enter "Test User" into the "yourName" field
+    When they enter "Test User" into the "userName" field
     When they enter "Test Department" into the "department" field
     When they click the Submit button
     Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
@@ -43,7 +43,7 @@ Feature: Joining private beta
     Then they should be directed to the URL "https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC"
 
   Scenario: The user wants to contact the team via the support form
-    When they enter "Test User" into the "yourName" field
+    When they enter "Test User" into the "userName" field
     When they enter "Test Department" into the "department" field
     When they click the Submit button
     Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
