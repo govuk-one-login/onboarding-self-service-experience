@@ -2,7 +2,7 @@
 
 set -eu
 
-if [[ "$#" -ne 2 || ! "development  build  staging  integration production" =~ ( |^)$1( |$) ]]; then
+if [[ "$#" -lt 2 || ! "development  build  staging  integration production" =~ ( |^)$1( |$) ]]; then
   echo "Usage: $0 <development | build | staging | integration | production> <grafana-key-secret-name>"
   echo "or"
   echo "SECRET_VALUE=<grafana-api-key> $0 <development | build | staging | integration | production> <grafana-key-secret-name>"
