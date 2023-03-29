@@ -11,7 +11,9 @@ Parameters:
   SignInHostedZone:
     Type: String
     Description: Deployment specific SignInHostedZone
-
+  ExternalId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/config/cognito/external-id
 Resources:
   DomainIdentityForSES:
     Type: AWS::SES::EmailIdentity
@@ -19,8 +21,6 @@ Resources:
       EmailIdentity: !Ref DomainOrEmailIdentityToVerify
 
   DevelopmentEmailIdentityRoute53Records:
-    DependsOn:
-      - DomainIdentityForSES
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: "Records created to verify domain ownership with SES"
@@ -63,10 +63,10 @@ Resources:
             Resource: !Sub arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${DomainOrEmailIdentityToVerify}
             Condition:
               StringEquals:
-                "ses:FromAddress": !Sub 'sign-in@${DomainOrEmailIdentityToVerify}'
+                "ses:FromAddress": !Sub 'admin-tool@${DomainOrEmailIdentityToVerify}'
       Environment:
         Variables:
-          FROM_EMAIL_ADDRESS: !Sub 'sign-in@${DomainOrEmailIdentityToVerify}'
+          FROM_EMAIL_ADDRESS: !Sub 'admin-tool@${DomainOrEmailIdentityToVerify}'
 
 
       Handler: src/handlers/confirm-forgot-password-message.handler
@@ -124,7 +124,6 @@ Resources:
 
   UserPool:
     Type: AWS::Cognito::UserPool
-    DependsOn: SmsRole
     Properties:
       Policies:
         PasswordPolicy:
@@ -442,9 +441,10 @@ Resources:
       EmailConfiguration:
         EmailSendingAccount: DEVELOPER
         SourceArn: !Sub arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${DomainOrEmailIdentityToVerify}
-        From: !Sub 'sign-in@${DomainOrEmailIdentityToVerify}'
+        From: !Sub 'admin-tool@${DomainOrEmailIdentityToVerify}'
       SmsConfiguration:
         SnsCallerArn: !GetAtt SmsRole.Arn
+        ExternalId: !Ref ExternalId
         SnsRegion: eu-west-2
       UserPoolTags: { }
       AdminCreateUserConfig:
@@ -599,7 +599,6 @@ Resources:
 
   Client:
     Type: AWS::Cognito::UserPoolClient
-    DependsOn: UserPool
     Properties:
       UserPoolId: !Ref UserPool
       ExplicitAuthFlows:
@@ -615,6 +614,9 @@ Resources:
           - Effect: "Allow"
             Principal:
               Service: "cognito-idp.amazonaws.com"
+            Condition:
+              StringEquals:
+                "sts:ExternalId": !Ref ExternalId
             Action: "sts:AssumeRole"
       Policies:
         - PolicyName: !Sub "${AWS::StackName}-SnsPublishPolicy"
