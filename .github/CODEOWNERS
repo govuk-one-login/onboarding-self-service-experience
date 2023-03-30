@@ -1,15 +1,16 @@
 # Global
-*   @alphagov/digital-identity-self-service-approvers
+*   @alphagov/di-sse-approvers
+
+# Packages
+package*.json           @alphagov/di-sse-sres         @alphagov/di-sse-frontend        @alphagov/di-sse-approvers
 
 # Infrastructure
-/.github/             @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
-/backend/             @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
-/infrastructure/      @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
-package*.json         @alphagov/digital-identity-self-service-sres     @alphagov/digital-identity-self-service-approvers
+/.github/               @alphagov/di-sse-sres         @alphagov/di-sse-approvers
+/backend/               @alphagov/di-sse-sres         @alphagov/di-sse-approvers
+/infrastructure/        @alphagov/di-sse-sres         @alphagov/di-sse-approvers
 
 # Frontend
-/express/assets/      @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers
-/express/features/    @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers
-/express/src/routes/  @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers
-/express/src/views/   @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers
-/express/stubs/       @alphagov/digital-identity-self-service-frontend @alphagov/digital-identity-self-service-approvers
+/express/src/           @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
+/express/assets/        @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
+/express/features/      @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
+/express/stubs/         @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
