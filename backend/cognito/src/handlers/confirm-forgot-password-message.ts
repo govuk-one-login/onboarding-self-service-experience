@@ -136,7 +136,7 @@ const generate_email_body = () => `
                           font-size: 24px;
                           line-height: 32px;
                           color: white;
-                          "> Sign In <strong style="display: inline-block;
+                          "> One Login <strong style="display: inline-block;
                               outline: 2px solid transparent;
                               outline-offset: -2px;
                               color: #ffffff;
