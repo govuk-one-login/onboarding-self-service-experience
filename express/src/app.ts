@@ -6,6 +6,7 @@ import {distribution} from "./config/resources";
 import configureViews from "./config/views";
 import {sessionStorage} from "./lib/dynamodb/sessionStorage";
 import Express from "./lib/express";
+import "./lib/utils/optional";
 import setSignedInStatus from "./middleware/setSignedInStatus";
 import account from "./routes/account";
 import baseRoutes from "./routes/base";
