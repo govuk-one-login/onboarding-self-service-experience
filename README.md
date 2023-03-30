@@ -76,14 +76,13 @@ Show a list of things
 e.g. /services (and not /list-services)
 
 Show details about a thing
-/thing/:thingId
-e.g. /service/123456
+/things/:thingId
+e.g. /services/123456
 
 List objects belonging to a thing
-/thing/:thingId/objects
-e.g. /service/123456/clients
+/things/:thingId/objects
+e.g. /services/123456/clients
 
 Show details about a child thing belonging to a parent thing
-/parent/:parentId/child/:childId
-e.g. /service/123456/client/456789
-
+/parents/:parentId/children/:childId
+e.g. /services/123456/clients/456789

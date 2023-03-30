@@ -1,10 +1,8 @@
-import {NextFunction, Request, Response} from "express";
+import {RequestHandler} from "express";
 import {validateUris} from "../../lib/validators/urisValidator";
 
-type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
-
-export function urisValidator(template: string): MiddlewareFunction<Request, Response, NextFunction> {
-    return (req: Request, res: Response, next: NextFunction) => {
+export function urisValidator(template: string): RequestHandler {
+    return (req, res, next) => {
         const uris: string = req.body.redirectUris;
         const result = validateUris(uris.split(" ").filter(url => url.length > 0));
 

@@ -2,6 +2,7 @@ import {createPublicKey} from "crypto";
 
 const BEGIN = "-----BEGIN PUBLIC KEY-----";
 const END = "-----END PUBLIC KEY-----";
+
 export default function getAuthApiCompliantPublicKey(publicKey: string): string {
     publicKey = publicKey.trim();
     // assume PEM with headers
@@ -19,16 +20,10 @@ export default function getAuthApiCompliantPublicKey(publicKey: string): string 
     }
 }
 
-function makeAuthCompliant(publicKey: string): string {
-    const key = createPublicKey({key: publicKey, format: "pem"});
-    return key
-        .export({
-            format: "pem",
-            type: "spki"
-        })
+const makeAuthCompliant = (publicKey: string) =>
+    createPublicKey({key: publicKey, format: "pem"})
+        .export({format: "pem", type: "spki"})
         .toString()
         .replace(BEGIN, "")
         .replace(END, "")
-        .replace(/\n/g, "")
-        .replace(/\r/g, "");
-}
+        .replace(/[\n\r]/g, "");

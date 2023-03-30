@@ -15,7 +15,7 @@
             <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19 govuk-!-font-weight-bold">{{ serviceName }}</li>
           {% endif %}
         </ol>
-        <a href="/service/{{ serviceId }}/client/{{ clientId }}/{{ selfServiceClientId }}/change-service-name?serviceName={{ serviceName }}"
+        <a href="/services/{{ serviceId }}/clients/{{ clientId }}/{{ selfServiceClientId }}/change-service-name?serviceName={{ serviceName }}"
            class="govuk-link govuk-link--no-visited-state navigation-service-change govuk-!-font-size-19">
           Change service name
         </a>
@@ -35,7 +35,7 @@
               <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}">Client details</a>
             </li>
             <li class="side-navigation__item{% if sidebarActiveItem == 'private-beta' %} side-navigation__item--active{% endif %}">
-              <a class="govuk-link govuk-link--no-visited-state" href="/service/{{ serviceId }}/client/{{ clientId }}/{{ selfServiceClientId }}/private-beta">
+              <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}/clients/{{ clientId }}/{{ selfServiceClientId }}/private-beta">
                 Joining private beta
               </a>
             </li>

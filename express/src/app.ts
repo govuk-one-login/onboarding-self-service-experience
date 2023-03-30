@@ -2,14 +2,16 @@ import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provide
 import bodyParser from "body-parser";
 import express, {NextFunction, Request, Response} from "express";
 import "express-async-errors";
-import configureViews from "./config/configure-views";
 import {distribution} from "./config/resources";
-import setSignedInStatus from "./middleware/setSignedInStatus";
-import createAccount from "./routes/register";
-import manageAccount from "./routes/manage-account";
-import signIn from "./routes/sign-in";
-import testingRoutes from "./routes/testing-routes";
+import configureViews from "./config/views";
 import {sessionStorage} from "./lib/dynamodb/sessionStorage";
+import setSignedInStatus from "./middleware/setSignedInStatus";
+import account from "./routes/account";
+import baseRoutes from "./routes/base";
+import register from "./routes/register";
+import services from "./routes/services";
+import signIn from "./routes/sign-in";
+import testingRoutes from "./routes/testing";
 import SelfServiceServicesService, {MfaResponse} from "./services/self-service-services-service";
 
 const app = express();
@@ -60,10 +62,12 @@ configureViews(app);
 
 app.use(setSignedInStatus);
 
-app.use("/", createAccount);
-app.use("/", signIn);
-app.use("/", manageAccount);
-app.use("/", testingRoutes);
+app.use("/", baseRoutes);
+app.use("/register", register);
+app.use("/sign-in", signIn);
+app.use("/account", account);
+app.use("/services", services);
+app.use("/test", testingRoutes);
 
 app.get("/", function (req: Request, res: Response) {
     res.render("index.njk", {headerActiveItem: "get-started"});

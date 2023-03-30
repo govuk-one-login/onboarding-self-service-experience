@@ -7,9 +7,10 @@ import {urisValidator} from "../middleware/validators/urisValidator";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 const router = express.Router();
+export default router;
 
 // Testing routes for Change your client name page
-router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-client-name", (req, res) => {
+router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-client-name", (req, res) => {
     res.render("service-details/change-client-name.njk", {
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -20,7 +21,7 @@ router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-cli
     });
 });
 
-router.post("/service/:serviceId/client/:clientId/:selfServiceClientId/change-client-name", async (req, res) => {
+router.post("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-client-name", async (req, res) => {
     const newClientName = req.body.clientName;
 
     if (newClientName === "") {
@@ -52,11 +53,11 @@ router.post("/service/:serviceId/client/:clientId/:selfServiceClientId/change-cl
     }
 
     req.session.updatedField = "client name";
-    res.redirect(`/services/${req.params.serviceId}/client}`);
+    res.redirect(`/services/${req.params.serviceId}/clients}`);
 });
 
 // Testing routes for Change your redirect URIs page
-router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-redirect-uris", (req, res) => {
+router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-redirect-uris", (req, res) => {
     res.render("service-details/change-redirect-uris.njk", {
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -68,7 +69,7 @@ router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-red
 });
 
 router.post(
-    "/service/:serviceId/client/:clientId/:selfServiceClientId/change-redirect-uris",
+    "/services/:serviceId/clients/:clientId/:selfServiceClientId/change-redirect-uris",
     urisValidator("service-details/change-redirect-uris.njk"),
     async (req, res) => {
         const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
@@ -83,12 +84,12 @@ router.post(
         );
 
         req.session.updatedField = "redirect URIs";
-        res.redirect(`/services/${req.params.serviceId}/client`);
+        res.redirect(`/services/${req.params.serviceId}/clients`);
     }
 );
 
 // Testing routes for Change user attributes page
-router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-user-attributes", (req, res) => {
+router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-user-attributes", (req, res) => {
     const userAttributes = (req.query.userAttributes as string).split(" ");
     const email: boolean = userAttributes.includes("email");
     const phone: boolean = userAttributes.includes("phone");
@@ -104,7 +105,7 @@ router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-use
     });
 });
 
-router.post("/service/:serviceId/client/:clientId/:selfServiceClientId/change-user-attributes", async (req, res) => {
+router.post("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-user-attributes", async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const attributes: string[] = ["openid"];
 
@@ -123,11 +124,11 @@ router.post("/service/:serviceId/client/:clientId/:selfServiceClientId/change-us
     );
 
     req.session.updatedField = "required user attributes";
-    res.redirect(`/services/${req.params.serviceId}/client`);
+    res.redirect(`/services/${req.params.serviceId}/clients`);
 });
 
 // Testing routes for Change your post logout redirect URIs page
-router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-post-logout-uris", (req, res) => {
+router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-post-logout-uris", (req, res) => {
     res.render("service-details/change-post-logout-uris.njk", {
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -139,7 +140,7 @@ router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-pos
 });
 
 router.post(
-    "/service/:serviceId/client/:clientId/:selfServiceClientId/change-post-logout-uris",
+    "/services/:serviceId/clients/:clientId/:selfServiceClientId/change-post-logout-uris",
     urisValidator("service-details/change-post-logout-uris.njk"),
     async (req, res) => {
         const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
@@ -154,12 +155,12 @@ router.post(
         );
 
         req.session.updatedField = "post-logout redirect URIs";
-        res.redirect(`/services/${req.params.serviceId}/client`);
+        res.redirect(`/services/${req.params.serviceId}/clients`);
     }
 );
 
 // Testing routes for Change your public key page
-router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-public-key", (req, res) => {
+router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-public-key", (req, res) => {
     res.render("service-details/change-public-key.njk", {
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -168,7 +169,7 @@ router.get("/service/:serviceId/client/:clientId/:selfServiceClientId/change-pub
     });
 });
 
-router.post("/service/:serviceId/client/:clientId/:selfServiceClientId/change-public-key", convertPublicKeyForAuth, async (req, res) => {
+router.post("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-public-key", convertPublicKeyForAuth, async (req, res) => {
     const publicKey = req.body.authCompliantPublicKey as string;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
@@ -181,14 +182,14 @@ router.post("/service/:serviceId/client/:clientId/:selfServiceClientId/change-pu
     );
 
     req.session.updatedField = "public key";
-    res.redirect(`/services/${req.params.serviceId}/client`);
+    res.redirect(`/services/${req.params.serviceId}/clients`);
 });
 
 // Testing route for "Finish connecting the sign in journey to your service" page
 router.get("/redirect-placeholder", (req, res) => {
     res.render("service-details/finish-connecting-sign-in-journey.njk", {
-        changeRedirectUrisUrl: "/service/:serviceId/client/:clientId/:selfServiceClientId/change-redirect-uris",
-        changePublicKeyUrl: "/service/:serviceId/client/:clientId/:selfServiceClientId/change-public-key"
+        changeRedirectUrisUrl: "/services/:serviceId/clients/:clientId/:selfServiceClientId/change-redirect-uris",
+        changePublicKeyUrl: "/services/:serviceId/clients/:clientId/:selfServiceClientId/change-public-key"
     });
 });
 
@@ -641,5 +642,3 @@ router.post("/set-up-auth-app", (req, res) => {
     }
     res.redirect("/service-name-testing");
 });
-
-export default router;

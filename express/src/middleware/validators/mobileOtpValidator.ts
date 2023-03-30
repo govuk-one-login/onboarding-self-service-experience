@@ -1,14 +1,9 @@
-import {NextFunction, Request, Response} from "express";
+import {Request, RequestHandler} from "express";
 import {obscureNumber} from "../../lib/mobileNumberUtils";
 import {validateSecurityCode} from "../../lib/validators/checkOtp";
 
-type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
-
-export function mobileSecurityCodeValidator(
-    textMessageNotReceivedUrl: string,
-    hideNumber = true
-): MiddlewareFunction<Request, Response, NextFunction> {
-    return async (req: Request, res: Response, next: NextFunction) => {
+export function mobileSecurityCodeValidator(textMessageNotReceivedUrl: string, hideNumber = true): RequestHandler {
+    return async (req, res, next) => {
         const securityCode: string = req.body.securityCode.replace(/\s+/g, "");
         let mobileNumber;
 

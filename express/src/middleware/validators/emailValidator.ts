@@ -1,11 +1,9 @@
-import {NextFunction, Request, Response} from "express";
+import {RequestHandler} from "express";
 import {validateEmail} from "../../lib/validators/emailValidator";
 import {validationResult} from "../../lib/validators/validationResult";
 
-type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
-
-export function emailValidator(template: string): MiddlewareFunction<Request, Response, NextFunction> {
-    return async (req: Request, res: Response, next: NextFunction) => {
+export function emailValidator(template: string): RequestHandler {
+    return async (req, res, next) => {
         const emailAddress = req.body.emailAddress.trim();
         const result: validationResult = await validateEmail(emailAddress);
 

@@ -15,6 +15,7 @@ export function convertPublicKeyForAuth(req: Request, res: Response, next: NextF
             },
             serviceUserPublicKey: req.body.authCompliantPublicKey
         });
+
         return;
     }
 

@@ -3,6 +3,8 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 
 // TODO This only checks the user is signed in but doesn't check the user's permissions to view objects or do actions
 export async function checkAuthorisation(req: Request, res: Response, next: NextFunction) {
+    // TODO only redirect to /session-timeout if the session is timed out - we need to have a way of checking this
+    // TODO Otherwise, redirect to /sign-in
     if (!req.session.authenticationResult?.AccessToken) {
         res.redirect("/session-timeout");
         return;

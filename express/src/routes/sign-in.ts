@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import {
     checkEmailPasswordReset,
     confirmForgotPassword,
@@ -6,12 +7,10 @@ import {
     finishSignIn,
     forgotPasswordForm,
     processEmailAddress,
-    sessionTimeout,
     showCheckPhonePage,
     showResendPhoneCodePage,
     showSignInFormEmail,
-    showSignInFormPassword,
-    signOut
+    showSignInFormPassword
 } from "../controllers/sign-in";
 import processSignInForm from "../middleware/processSignInForm";
 import {processSecurityCode} from "../middleware/sign-in-middleware";
@@ -21,77 +20,58 @@ import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpVal
 import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
 
 const router = express.Router();
+export default router;
 
-router.get("/session-timeout", sessionTimeout);
-
-router.get("/sign-in/enter-email-address", showSignInFormEmail);
-router.post("/sign-in/enter-email-address", emailValidator("sign-in.njk"), processEmailAddress);
-
-router.get("/sign-in", (req, res) => {
-    res.redirect(303, "/sign-in/enter-email-address");
+router.get("/", (req, res) => {
+    res.redirect(303, path.join(req.baseUrl, "/enter-email-address"));
 });
 
-router.get(
-    "/sign-in/enter-password",
-    emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
-    showSignInFormPassword
-);
+router.route("/enter-email-address").get(showSignInFormEmail).post(emailValidator("sign-in.njk"), processEmailAddress);
 
-router.post(
-    "/sign-in/enter-password",
-    emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
-    processSignInForm("sign-in-enter-password.njk")
-);
+router
+    .route("/enter-password")
+    .get(emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}), showSignInFormPassword)
+    .post(
+        emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+        processSignInForm("sign-in-enter-password.njk")
+    );
 
-router.get("/sign-in/enter-text-code", showCheckPhonePage);
+router
+    .route("/enter-text-code")
+    .get(showCheckPhonePage)
+    .post(
+        (req, res, next) => {
+            res.locals.headerActiveItem = "sign-in";
+            next();
+        },
+        mobileSecurityCodeValidator("resend-text-code"),
+        processSecurityCode,
+        finishSignIn
+    );
 
-router.post(
-    "/sign-in/enter-text-code",
-    (req, res, next) => {
-        res.locals.headerActiveItem = "sign-in";
-        next();
-    },
-    mobileSecurityCodeValidator("/sign-in/resend-text-code"),
-    processSecurityCode,
-    finishSignIn
-);
+router.route("/resend-text-code").get(showResendPhoneCodePage, showCheckPhonePage);
 
-router.get("/sign-in/resend-text-code", showResendPhoneCodePage);
-
-// TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
-router.post("/sign-in/resend-text-code", showCheckPhonePage);
-
-router.get("/sign-out", signOut);
-
-router.get("/sign-in/account-not-found", (req, res) => {
+router.get("/account-not-found", (req, res) => {
     res.render("no-account-found.njk");
 });
 
 router.get(
-    "/sign-in/forgot-password",
+    "/forgot-password",
     emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
     forgotPasswordForm
 );
 
-router.get(
-    "/sign-in/forgot-password/enter-email-code",
-    emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
-    checkEmailPasswordReset
-);
+// TODO this is wrong - get and post can't be the same - fix and check this works
+router
+    .route("/forgot-password/enter-email-code")
+    .get(emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}), checkEmailPasswordReset)
+    .post(emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}), checkEmailPasswordReset);
 
-router.post(
-    "/sign-in/forgot-password/enter-email-code",
-    emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
-    checkEmailPasswordReset
-);
-
-router.get("/sign-in/forgot-password/create-new-password", confirmForgotPasswordForm);
-
-router.post(
-    "/sign-in/forgot-password/create-new-password",
-    notOnCommonPasswordListValidator("create-new-password.njk", "password", ["password"]),
-    confirmForgotPassword,
-    processSignInForm("create-new-password.njk")
-);
-
-export default router;
+router
+    .route("/forgot-password/create-new-password")
+    .get(confirmForgotPasswordForm)
+    .post(
+        notOnCommonPasswordListValidator("create-new-password.njk", "password", ["password"]),
+        confirmForgotPassword,
+        processSignInForm("create-new-password.njk")
+    );

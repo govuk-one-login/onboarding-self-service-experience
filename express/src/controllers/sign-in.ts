@@ -1,14 +1,15 @@
 import {AuthenticationResultType, LimitExceededException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import "express-async-errors";
+import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 import {obscureNumber} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
-import AuthenticationResultParser from "../lib/AuthenticationResultParser";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
     res.render("sign-in.njk");
 };
 
+// TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
 export const showCheckPhonePage = async function (req: Request, res: Response) {
     // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
@@ -53,24 +54,8 @@ export const showSignInFormPassword = async function (req: Request, res: Respons
     res.render("sign-in-enter-password.njk");
 };
 
-export const signOut = async function (req: Request, res: Response) {
-    req.session.destroy(() => res.redirect("/"));
-};
-
 export const showResendPhoneCodePage = async function (req: Request, res: Response) {
     res.render("resend-phone-code-sign-in.njk");
-};
-
-export const sessionTimeout = async function (req: Request, res: Response) {
-    res.render("session-timeout.njk");
-};
-
-export const accountExists = async function (req: Request, res: Response) {
-    res.render("create-account/existing-account.njk", {
-        values: {
-            emailAddress: req.session.emailAddress
-        }
-    });
 };
 
 export const forgotPasswordForm = async function (req: Request, res: Response) {
@@ -83,39 +68,6 @@ export const forgotPasswordForm = async function (req: Request, res: Response) {
 
 export const checkEmailPasswordReset = async function (req: Request, res: Response) {
     await forgotPassword(req, res);
-};
-
-const forgotPassword = async function (req: Request, res: Response) {
-    const s4: SelfServiceServicesService = await req.app.get("backing-service");
-    const uri = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
-    try {
-        await s4.forgotPassword(req.session.emailAddress as string, uri as string);
-    } catch (error) {
-        if (error instanceof UserNotFoundException) {
-            res.render("sign-in.njk", {
-                errorMessages: {
-                    emailAddress: "User does not exist."
-                },
-                values: {
-                    emailAddress: req.session.emailAddress
-                }
-            });
-            return;
-        }
-        if (error instanceof LimitExceededException) {
-            res.render("sign-in.njk", {
-                errorMessages: {
-                    emailAddress: "You have tried to change your password too many times. Try again in 15 minutes."
-                },
-                values: {
-                    emailAddress: req.session.emailAddress
-                }
-            });
-            return;
-        }
-        throw error;
-    }
-    res.render("check-email-password-reset.njk");
 };
 
 export const confirmForgotPasswordForm = async function (req: Request, res: Response) {
@@ -150,4 +102,37 @@ export const confirmForgotPassword = async function (req: Request, res: Response
         }
         throw error;
     }
+};
+
+const forgotPassword = async function (req: Request, res: Response) {
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
+    const uri = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
+    try {
+        await s4.forgotPassword(req.session.emailAddress as string, uri as string);
+    } catch (error) {
+        if (error instanceof UserNotFoundException) {
+            res.render("sign-in.njk", {
+                errorMessages: {
+                    emailAddress: "User does not exist."
+                },
+                values: {
+                    emailAddress: req.session.emailAddress
+                }
+            });
+            return;
+        }
+        if (error instanceof LimitExceededException) {
+            res.render("sign-in.njk", {
+                errorMessages: {
+                    emailAddress: "You have tried to change your password too many times. Try again in 15 minutes."
+                },
+                values: {
+                    emailAddress: req.session.emailAddress
+                }
+            });
+            return;
+        }
+        throw error;
+    }
+    res.render("check-email-password-reset.njk");
 };
