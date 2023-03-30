@@ -1,4 +1,3 @@
-import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import bodyParser from "body-parser";
 import express from "express";
 import "express-async-errors";
@@ -15,7 +14,8 @@ import register from "./routes/register";
 import services from "./routes/services";
 import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing";
-import SelfServiceServicesService, {MfaResponse} from "./services/self-service-services-service";
+import SelfServiceServicesService from "./services/self-service-services-service";
+import "./types/session";
 
 const app = Express();
 
@@ -35,20 +35,6 @@ Promise.all([cognitoPromise, lambdaPromise]).then(deps => {
     app.set("backing-service", new SelfServiceServicesService(deps[0], deps[1]));
     console.log("Backing service created");
 });
-
-declare module "express-session" {
-    interface SessionData {
-        emailAddress: string;
-        mobileNumber: string;
-        cognitoSession: string;
-        isSignedIn: boolean;
-        authenticationResult: AuthenticationResultType;
-        enteredMobileNumber: string;
-        mfaResponse: MfaResponse;
-        updatedField: string;
-        serviceName: string;
-    }
-}
 
 configureViews(app);
 
