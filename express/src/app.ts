@@ -1,13 +1,14 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import bodyParser from "body-parser";
-import express, {NextFunction, Request, Response} from "express";
+import express from "express";
 import "express-async-errors";
 import {distribution} from "./config/resources";
+import sessionStorage from "./config/session-storage";
 import configureViews from "./config/views";
-import {sessionStorage} from "./lib/dynamodb/sessionStorage";
 import Express from "./lib/express";
 import "./lib/utils/optional";
-import setSignedInStatus from "./middleware/setSignedInStatus";
+import {errorHandler, notFoundHandler} from "./middleware/errors";
+import signInStatus from "./middleware/sign-in-status";
 import account from "./routes/account";
 import baseRoutes from "./routes/base";
 import register from "./routes/register";
@@ -17,8 +18,6 @@ import testingRoutes from "./routes/testing";
 import SelfServiceServicesService, {MfaResponse} from "./services/self-service-services-service";
 
 const app = Express();
-
-app.use(sessionStorage());
 
 const cognitoPromise = import(`./services/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(client => {
     const cognito = new client.default.CognitoClient();
@@ -37,15 +36,6 @@ Promise.all([cognitoPromise, lambdaPromise]).then(deps => {
     console.log("Backing service created");
 });
 
-app.use("/assets", express.static(distribution.assets));
-app.use("/assets/images", express.static(distribution.images));
-
-app.use(
-    bodyParser.urlencoded({
-        extended: true
-    })
-);
-
 declare module "express-session" {
     interface SessionData {
         emailAddress: string;
@@ -62,31 +52,25 @@ declare module "express-session" {
 
 configureViews(app);
 
-app.use(setSignedInStatus);
+app.use("/assets", express.static(distribution.assets));
+app.use("/assets/images", express.static(distribution.images));
 
-app.use("/", baseRoutes);
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.use(sessionStorage);
+app.use(signInStatus);
+
+app.use(baseRoutes);
 app.use("/register", register);
 app.use("/sign-in", signIn);
 app.use("/account", account);
 app.use("/services", services);
 app.use("/test", testingRoutes);
 
-app.get("/", function (req: Request, res: Response) {
-    res.render("index.njk", {headerActiveItem: "get-started"});
-});
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 app.locals.googleTagId = process.env.GOOGLE_TAG_ID;
-
-app.use((req: Request, res: Response) => {
-    res.status(404).render("404.njk");
-    return;
-});
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
-app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
-    console.error(err);
-    res.render("there-is-a-problem.njk");
-});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running; listening on port ${port}`));

@@ -1,4 +1,4 @@
-import express from "express";
+import {Router} from "express";
 import path from "path";
 import {
     checkEmailPasswordReset,
@@ -19,7 +19,7 @@ import {emailValidator} from "../middleware/validators/emailValidator";
 import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpValidator";
 import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
 
-const router = express.Router();
+const router = Router();
 export default router;
 
 router.get("/", (req, res) => {

@@ -1,7 +1,7 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
-import setSignedInStatus from "../../src/middleware/setSignedInStatus";
+import setSignInStatus from "../../src/middleware/sign-in-status";
 import {MfaResponse} from "../../src/services/self-service-services-service";
 
 declare module "express-session" {
@@ -17,7 +17,7 @@ declare module "express-session" {
     }
 }
 
-describe("setSignedInStatus is correctly set in res.locals so that any page that is rendered can tell whether the user is signedIn and display the correct contextual information", () => {
+describe("Sign-in status is correctly set in res.locals so it can be accessed on any page", () => {
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
     let nextFunction: NextFunction;
@@ -39,20 +39,20 @@ describe("setSignedInStatus is correctly set in res.locals so that any page that
 
     it("should set res.locals.isSignedIn to true if req.session.isSignedIn is true", () => {
         mockSession.isSignedIn = true;
-        setSignedInStatus(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+        setSignInStatus(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
         expect(nextFunction).toBeCalledTimes(1);
         expect(mockResponse.locals?.isSignedIn).toBe(true);
     });
 
     it("should set res.locals.isSignedIn to false if req.session.isSignedIn is false", () => {
         mockSession.isSignedIn = false;
-        setSignedInStatus(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+        setSignInStatus(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
         expect(nextFunction).toBeCalledTimes(1);
         expect(mockResponse.locals?.isSignedIn).toBe(false);
     });
 
     it("should set res.locals.isSignedIn to false if req.session.isSignedIn is undefined", () => {
-        setSignedInStatus(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+        setSignInStatus(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
         expect(nextFunction).toBeCalledTimes(1);
         expect(mockResponse.locals?.isSignedIn).toBe(false);
     });
