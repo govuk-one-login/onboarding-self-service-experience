@@ -1,11 +1,9 @@
-import {NextFunction, Request, Response} from "express";
-import SelfServiceServicesService from "../services/self-service-services-service";
 import {NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
+import {RequestHandler} from "express";
+import SelfServiceServicesService from "../services/self-service-services-service";
 
-type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
-
-export default function processSignInForm(template: string): MiddlewareFunction<Request, Response, NextFunction> {
-    return async (req: Request, res: Response, next: NextFunction) => {
+export default function processSignInForm(template: string): RequestHandler {
+    return async (req, res) => {
         const email = req.session.emailAddress as string;
         const password = req.body.password;
         const s4: SelfServiceServicesService = req.app.get("backing-service");

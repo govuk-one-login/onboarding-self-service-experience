@@ -1,16 +1,14 @@
-import {NextFunction, Request, Response} from "express";
+import {RequestHandler} from "express";
 import CommonPasswords from "../../lib/commonPasswords/commonPasswordsSingleton";
 
 const ERROR_MESSAGE = "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers.";
-
-type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
 
 export default function notOnCommonPasswordListValidator(
     template: string,
     passwordField: string,
     valuesToRender?: string[]
-): MiddlewareFunction<Request, Response, NextFunction> {
-    return async (req: Request, res: Response, next: NextFunction) => {
+): RequestHandler {
+    return async (req, res, next) => {
         if ((await CommonPasswords).notOnList(req.body[passwordField])) {
             next();
         } else {
@@ -27,8 +25,6 @@ export default function notOnCommonPasswordListValidator(
                     [passwordField]: ERROR_MESSAGE
                 }
             });
-
-            return;
         }
     };
 }

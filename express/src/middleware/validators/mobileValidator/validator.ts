@@ -1,10 +1,8 @@
-import {NextFunction, Request, Response} from "express";
+import {RequestHandler} from "express";
 import {validate} from "../../../lib/mobileNumberUtils";
 
-type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
-
-export default function validateMobileNumber(template: string): MiddlewareFunction<Request, Response, NextFunction> {
-    return (req: Request, res: Response, next: NextFunction) => {
+export default function validateMobileNumber(template: string): RequestHandler {
+    return (req, res, next) => {
         const validationResult = validate(req.body.mobileNumber);
         if (validationResult.isValid) {
             next();

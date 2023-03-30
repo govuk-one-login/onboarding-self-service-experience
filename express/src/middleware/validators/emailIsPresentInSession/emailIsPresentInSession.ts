@@ -1,6 +1,4 @@
-import {NextFunction, Request, Response} from "express";
-
-type MiddlewareFunction<T, U, V> = (T: Request, U: Response, V: NextFunction) => void;
+import {RequestHandler} from "express";
 
 export default function emailIsPresentInSession(
     template: string,
@@ -8,8 +6,8 @@ export default function emailIsPresentInSession(
         values?: {[name: string]: string};
         errorMessages?: {[name: string]: string};
     }
-): MiddlewareFunction<Request, Response, NextFunction> {
-    return async (req: Request, res: Response, next: NextFunction) => {
+): RequestHandler {
+    return async (req, res, next) => {
         if (req.session.emailAddress) {
             next();
         } else {
