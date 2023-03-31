@@ -5,6 +5,8 @@ import "express-async-errors";
 import {distribution} from "./config/resources";
 import configureViews from "./config/views";
 import {sessionStorage} from "./lib/dynamodb/sessionStorage";
+import Express from "./lib/express";
+import "./lib/utils/optional";
 import setSignedInStatus from "./middleware/setSignedInStatus";
 import account from "./routes/account";
 import baseRoutes from "./routes/base";
@@ -14,7 +16,7 @@ import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing";
 import SelfServiceServicesService, {MfaResponse} from "./services/self-service-services-service";
 
-const app = express();
+const app = Express();
 
 app.use(sessionStorage());
 
