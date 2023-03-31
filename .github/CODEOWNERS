@@ -11,6 +11,7 @@ package*.json           @alphagov/di-sse-sres         @alphagov/di-sse-frontend 
 
 # Frontend
 /express/src/           @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
+/express/tests/         @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
 /express/assets/        @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
 /express/features/      @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
 /express/stubs/         @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
