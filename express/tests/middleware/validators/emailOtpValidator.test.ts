@@ -1,21 +1,7 @@
-import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
 import {emailSecurityCodeValidator} from "../../../src/middleware/validators/emailOtpValidator";
-import {MfaResponse} from "../../../src/services/self-service-services-service";
-
-declare module "express-session" {
-    interface SessionData {
-        emailAddress: string;
-        mobileNumber: string;
-        enteredMobileNumber: string;
-        cognitoSession: string;
-        authenticationResult: AuthenticationResultType;
-        mfaResponse: MfaResponse;
-        updatedField: string;
-        isSignedIn: boolean;
-    }
-}
+import "../../../src/types/session";
 
 describe("It checks whether an email security code is valid and behaves accordingly", () => {
     let mockRequest: Partial<Request>;

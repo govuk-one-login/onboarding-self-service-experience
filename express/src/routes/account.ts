@@ -1,4 +1,4 @@
-import express from "express";
+import {Router} from "express";
 import {
     changePassword,
     processChangePhoneNumberForm,
@@ -13,7 +13,7 @@ import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpVal
 import validateMobileNumber from "../middleware/validators/mobileValidator";
 import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
 
-const router = express.Router();
+const router = Router();
 export default router;
 
 router.use(checkAuthorisation);

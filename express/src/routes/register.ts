@@ -1,4 +1,4 @@
-import express from "express";
+import {Router} from "express";
 import "express-async-errors";
 import path from "path";
 import {
@@ -30,7 +30,7 @@ import notOnCommonPasswordListValidator from "../middleware/validators/notOnComm
 import {passwordValidator} from "../middleware/validators/passwordValidator";
 import {serviceNameValidator} from "../middleware/validators/serviceNameValidator";
 
-const router = express.Router();
+const router = Router();
 export default router;
 
 router.get("/", (req, res) => {

@@ -1,13 +1,17 @@
-import express, {Request, Response} from "express";
+import {Router} from "express";
 import {sessionTimeout, signOut} from "../controllers/session";
 
-export const router = express.Router();
+const router = Router();
 export default router;
+
+router.get("/", (req, res) => {
+    res.render("index.njk", {headerActiveItem: "get-started"});
+});
 
 router.get("/sign-out", signOut);
 
 router.get("/session-timeout", sessionTimeout);
 
-router.get("/there-is-a-problem", (req: Request, res: Response) => {
+router.get("/there-is-a-problem", (req, res) => {
     res.render("there-is-a-problem.njk");
 });

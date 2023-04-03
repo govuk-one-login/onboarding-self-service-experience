@@ -1,4 +1,4 @@
-import express from "express";
+import {Router} from "express";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 import {emailValidator} from "../middleware/validators/emailValidator";
 import validateMobileNumber from "../middleware/validators/mobileValidator";
@@ -6,7 +6,7 @@ import {passwordValidator} from "../middleware/validators/passwordValidator";
 import {urisValidator} from "../middleware/validators/urisValidator";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
-const router = express.Router();
+const router = Router();
 export default router;
 
 // Testing routes for Change your client name page
