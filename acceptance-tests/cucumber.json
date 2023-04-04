@@ -1,0 +1,13 @@
+{
+  "default": {
+    "tags": "not @wip",
+    "publishQuiet": true,
+    "requireModule": [
+      "ts-node/register"
+    ],
+    "require": [
+      "support/test-setup.ts",
+      "support/steps/**/*.ts"
+    ]
+  }
+}

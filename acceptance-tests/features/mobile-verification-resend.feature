@@ -16,7 +16,7 @@ Feature: Resending the security code to a mobile phone
 
   Scenario: The user wants to contact the service via slack
     When they click on the "Problems receiving a text message?" link
-    And they click on the "Slack channel" link
+    And they click on the "Slack channel" external link
     Then they should be directed to the URL "https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC"
 
   Scenario: The user wants to contact the service

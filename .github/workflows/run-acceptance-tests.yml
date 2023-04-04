@@ -18,7 +18,7 @@ jobs:
     name: Acceptance
     runs-on: ubuntu-latest
     defaults:
-      run: { working-directory: express }
+      run: { working-directory: acceptance-tests }
 
     steps:
       - name: Pull repository
@@ -30,11 +30,12 @@ jobs:
           cache: npm
 
       - name: Install Node dependencies
-        run: npm install
+        run: npm install --include-workspace-root
 
       - name: Run cucumber tests
         id: run-tests
         shell: bash
+        timeout-minutes: 10
         env:
           HOST: ${{ inputs.host }}
           REPORT: ${{ runner.temp }}/acceptance-tests.report

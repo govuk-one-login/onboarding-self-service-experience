@@ -14,8 +14,7 @@
     "build": "npm run buildts && npm run buildsass && npm run buildjs && npm run buildgovuk && npm run minifyjs",
     "coverage": "jest --coverage --coverageDirectory coverage --silent",
     "test": "jest --silent",
-    "cucumber": "cucumber-js --require-module ts-node/register --require features/support/test-setup.ts --require features/support/steps/**/*.ts --publish-quiet --tags 'not @wip'",
-    "cucumber-report": "npm run cucumber -- --format html:test-report.html",
+    "cucumber": "npm run cucumber -w ../acceptance-tests --",
     "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile .."
   },
   "dependencies": {
@@ -33,12 +32,9 @@
     "@types/node": "^18.15.8",
     "@types/nunjucks": "^3.2.2",
     "@types/uuid": "^9.0.1",
-    "@cucumber/cucumber": "^9.0.1",
     "dotenv": "^16.0.3",
     "nodemon": "^2.0.22",
-    "puppeteer": "^19.8.0",
     "sass": "^1.60.0",
-    "ts-node": "^10.9.1",
     "uglify-js": "^3.17.4"
   }
 }

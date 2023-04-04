@@ -39,7 +39,7 @@ Feature: Joining private beta
     When they enter "Test Department" into the "department" field
     When they click the Submit button
     Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
-    When they click on the "Slack channel" link
+    When they click on the "Slack channel" external link
     Then they should be directed to the URL "https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC"
 
   Scenario: The user wants to contact the team via the support form

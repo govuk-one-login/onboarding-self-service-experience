@@ -28,6 +28,11 @@ When("they click on the {string} link", async function (text: string) {
     await clickElement(this.page, link);
 });
 
+When("they click on the {string} external link", async function (text: string) {
+    const link = await getLink(this.page, text);
+    await clickElement(this.page, link, 10000);
+});
+
 When("they click on the {string} link that opens in a new tab", async function (this: TestContext, linkText: string) {
     const link = await getLink(this.page, linkText);
     this.page = await clickLinkThatOpensInNewTab(this.page, link);
@@ -109,8 +114,8 @@ Then("the error message {string} must be displayed for the {string} radios", asy
 });
 
 Then("they should see the text {string}", async function (this: TestContext, text) {
-    const bodyText: string = await this.page.$eval("body", element => element.textContent);
-    assert.equal(bodyText.includes(text), true, `Body text does not contain '${text}'`);
+    const bodyText = await this.page.$eval("body", element => element.textContent);
+    assert.equal(bodyText?.includes(text), true, `Body text does not contain '${text}'`);
 });
 
 Then("the {string} link will point to the following URL: {string}", async function (linkText, expectedUrl) {
