@@ -52,6 +52,6 @@ Given("the user submits a valid public key without headers", async function () {
 
 Then("they should see the public key they just entered in an inset text component", async function (this: TestContext) {
     const publicKeySpan = await this.page.$("p#current-public-key");
-    const publicKey = await this.page.evaluate(element => element.textContent, publicKeySpan);
-    assert.equal(publicKey.replace(/\n/g, "").trim(), VALID_PUBLIC_KEY_WITHOUT_HEADERS.replace(/\n/g, ""));
+    const publicKey = await this.page.evaluate(element => element?.textContent, publicKeySpan);
+    assert.equal(publicKey?.replace(/\n/g, "").trim(), VALID_PUBLIC_KEY_WITHOUT_HEADERS.replace(/\n/g, ""));
 });

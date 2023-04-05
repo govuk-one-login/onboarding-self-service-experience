@@ -17,10 +17,13 @@
   "exclude": ["node_modules"],
   "references": [
     {
-      "path": "express"
+      "path": "acceptance-tests"
     },
     {
       "path": "backend/api"
+    },
+    {
+      "path": "express"
     }
   ]
 }

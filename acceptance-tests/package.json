@@ -1,0 +1,13 @@
+{
+  "name": "gds-di-self-service-acceptance-tests",
+  "description": "DI self-service acceptance tests",
+  "scripts": {
+    "cucumber": "cucumber-js",
+    "cucumber-fast": "npm run cucumber -- --parallel 5",
+    "cucumber-report": "npm run cucumber -- --format html:test-report.html"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^9.1.0",
+    "puppeteer": "^19.8.3"
+  }
+}

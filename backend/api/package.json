@@ -9,11 +9,11 @@
     "test": "jest --silent"
   },
   "dependencies": {
-    "@aws-sdk/client-sfn": "^3.266.0",
-    "@aws-sdk/client-sns": "^3.266.0",
-    "esbuild": "^0.15.6"
+    "@aws-sdk/client-sfn": "^3.306.0",
+    "@aws-sdk/client-sns": "^3.306.0",
+    "esbuild": "^0.15.18"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.102"
+    "@types/aws-lambda": "^8.10.114"
   }
 }

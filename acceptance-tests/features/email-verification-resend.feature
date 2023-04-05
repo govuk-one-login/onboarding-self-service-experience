@@ -11,7 +11,7 @@ Feature: A contact form to resend the verification code to email
 
   Scenario: The user wants to contact the service via slack
     When they click on the "Not received an email?" link
-    And they click on the "Slack channel" link
+    And they click on the "Slack channel" external link
     Then they should be directed to the URL "https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC"
 
   Scenario: The user wants to contact the service
