@@ -196,6 +196,6 @@ const cookieBanner = function () {
 };
 
 if (window) {
-    window.GOVUKSignIn = window.GOVUKSignIn || {};
+    window.GOVUKSignIn = window.GOVUKSignIn ?? {};
     window.GOVUKSignIn.CookieBanner = cookieBanner();
 }

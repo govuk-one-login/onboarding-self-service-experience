@@ -32,16 +32,16 @@ export class TestContext extends World {
 }
 
 BeforeAll(async function () {
-    console.log(`Running tests against ${process.env.HOST || "local"}`);
+    console.log(`Running tests against ${process.env.HOST ?? "local"}`);
     browser = await puppeteer.launch({headless: !process.env.SHOW_BROWSER});
 });
 
-Before(async function () {
-    this.host = (process.env.HOST as string) || "http://localhost:3000";
+Before(async function (this: TestContext) {
+    this.host = process.env.HOST ?? "http://localhost:3000";
     this.page = await browser.newPage();
 });
 
-After(async function () {
+After(async function (this: TestContext) {
     if (!process.env.SHOW_BROWSER) {
         await this.page.close();
     }

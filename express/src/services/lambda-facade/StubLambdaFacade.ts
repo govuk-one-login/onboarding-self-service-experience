@@ -1,18 +1,27 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
+import {convertToAttr} from "@aws-sdk/util-dynamodb";
 import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {DynamoUser} from "../../../@types/user";
 import {Updates} from "../self-service-services-service";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
-import {convertToAttr} from "@aws-sdk/util-dynamodb";
+
+const defaultPublicKey =
+    "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
 
 /* eslint-disable @typescript-eslint/no-unused-vars --
  * Ignore unused vars in stubs
  */
 class StubLambdaFacade implements LambdaFacadeInterface {
-    user: DynamoUser = {
+    private publicKey = defaultPublicKey;
+    private serviceName = "Test Service";
+    private redirectUris = ["http://localhost/"];
+    private postLogoutRedirectUris = ["http://localhost/", "http://localhost/logged_out"];
+    private scopes = ["openid"];
+
+    private user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
         data: {S: "we haven't collected this full name"},
         first_name: {S: "we haven't collected this first name"},
@@ -23,17 +32,8 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         phone: {S: "07700 987 654"}
     };
 
-    private readonly defaultPublicKey =
-        "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
-
-    publicKey = this.defaultPublicKey;
-    serviceName = "";
-    redirectUris = ["http://localhost/"];
-    postLogoutRedirectUris = ["http://localhost/", "http://localhost/logged_out"];
-    scopes = ["openid"];
-
     constructor() {
-        console.log("Creating stub lambda facade...");
+        console.log("Creating stub Lambda facade...");
     }
 
     getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
@@ -71,18 +71,23 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         if (updates.public_key) {
             this.publicKey = updates.public_key as string;
         }
+
         if (updates.service_name) {
             this.serviceName = updates.service_name as string;
         }
+
         if (updates.redirect_uris) {
             this.redirectUris = updates.redirect_uris as string[];
         }
+
         if (updates.post_logout_redirect_uris) {
             this.postLogoutRedirectUris = updates.post_logout_redirect_uris as string[];
         }
+
         if (updates.scopes) {
             this.scopes = updates.scopes as string[];
         }
+
         return Promise.resolve({} as AxiosResponse);
     }
 
@@ -107,7 +112,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
             data: {
                 Items: [
                     {
-                        service_name: {S: this.serviceName || "Test Service"},
+                        service_name: {S: this.serviceName},
                         post_logout_redirect_uris: convertToAttr(this.postLogoutRedirectUris),
                         subject_type: {S: "pairwise"},
                         contacts: {L: [{S: "john.watts@digital.cabinet-office.gov.uk"}, {S: "onboarding@digital.cabinet-office.gov.uk"}]},

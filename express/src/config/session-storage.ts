@@ -9,9 +9,9 @@ function getSessionStorage(): RequestHandler {
     if (process.env.SESSION_STORAGE === "DynamoDB") {
         const table = process.env.SESSIONS_TABLE;
         const endpoint = process.env.DYNAMO_DB_ENDPOINT;
-        const region = process.env.AWS_REGION || "eu-west-2";
+        const region = process.env.AWS_REGION ?? "eu-west-2";
         const client = new DynamoDB({region: region, endpoint: endpoint});
-        console.log(`Using dynamoDB session storage | Table: ${table} | Endpoint: ${endpoint || "AWS"}`);
+        console.log(`Using dynamoDB session storage | Table: ${table} | Endpoint: ${endpoint ?? "AWS"}`);
 
         const options = {
             table: table,

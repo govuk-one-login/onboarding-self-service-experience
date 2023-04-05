@@ -38,5 +38,5 @@ function findInvalidUrls(urls: string[]): string[] {
 }
 
 function isValidLocalHost(url: URL): boolean {
-    return url.hostname === "localhost" && (url.protocol === "http:" || url.protocol === "https:");
+    return url.hostname === "localhost" && (url.protocol === "http:" ?? url.protocol === "https:");
 }

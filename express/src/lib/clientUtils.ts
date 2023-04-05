@@ -8,7 +8,7 @@ export function dynamoClientToDomainClient(client: ClientFromDynamo): Client {
         clientName: client.client_name,
         contacts: client.contacts,
         defaultFields: client.default_fields,
-        postLogoutUris: client.post_logout_redirect_uris || [],
+        postLogoutUris: client.post_logout_redirect_uris ?? [],
         publicKey: client.public_key,
         redirectUris: client.redirect_uris,
         scopes: client.scopes,

@@ -130,17 +130,17 @@ export class CognitoClient implements CognitoInterface {
 
     async createUser(email: string): Promise<AdminCreateUserCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("createUser", "email", email);
-        return Promise.resolve(returnValue || {$metadata: {}});
+        return Promise.resolve(returnValue ?? {$metadata: {}});
     }
 
     async resendEmailAuthCode(email: string): Promise<AdminCreateUserCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("login", "email", email);
-        return Promise.resolve(returnValue || {$metadata: {}});
+        return Promise.resolve(returnValue ?? {$metadata: {}});
     }
 
     async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("login", "email", email);
-        return Promise.resolve(returnValue || {$metadata: {}});
+        return Promise.resolve(returnValue ?? {$metadata: {}});
     }
 
     sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput> {
@@ -161,7 +161,7 @@ export class CognitoClient implements CognitoInterface {
 
     async setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("setNewPassword", "password", password);
-        return Promise.resolve(returnValue || {$metadata: {}});
+        return Promise.resolve(returnValue ?? {$metadata: {}});
     }
 
     changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<ChangePasswordCommandOutput> {
@@ -175,7 +175,7 @@ export class CognitoClient implements CognitoInterface {
 
     async verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<VerifyUserAttributeCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("verifySmsCode", "code", code);
-        return Promise.resolve(returnValue || {$metadata: {}});
+        return Promise.resolve(returnValue ?? {$metadata: {}});
     }
 
     setMfaPreference(cognitoUsername: string): Promise<AdminSetUserMFAPreferenceCommandOutput> {
@@ -193,7 +193,7 @@ export class CognitoClient implements CognitoInterface {
             throw this.getException(override.throw);
         }
 
-        return {...override.return, $metadata: override.return?.$metadata || {}};
+        return {...override.return, $metadata: override.return?.$metadata ?? {}};
     }
 
     private async getOverrideFor(method: string, parameter: string, value: string): Promise<Override | undefined> {
@@ -229,7 +229,7 @@ export class CognitoClient implements CognitoInterface {
 
     async respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
         const returnValue = await this.getOverriddenReturnValue("respondToMfaChallenge", "username", username);
-        return Promise.resolve(returnValue || {$metadata: {}});
+        return Promise.resolve(returnValue ?? {$metadata: {}});
     }
 
     setMobilePhoneAsVerified(username: string): Promise<AdminUpdateUserAttributesCommandOutput> {
