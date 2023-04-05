@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
-    "lib": ["es2020"],
-    "module": "commonjs",
-    "target": "es2020",
+    "lib": ["ES2022"],
+    "target": "ES2022",
+    "module": "CommonJS",
     "strict": true,
     "sourceMap": true,
-    "esModuleInterop": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "allowUnreachableCode": false,
+    "moduleResolution": "Node",
     "removeComments": true,
     "noUnusedLocals": true,
     "baseUrl": "./"

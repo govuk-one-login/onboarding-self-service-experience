@@ -2,7 +2,8 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "lib": ["DOM"],
-    "rootDir": "./support"
+    "rootDir": "./support",
+    "noEmit": true
   },
   "include": ["support/**/*"]
 }
