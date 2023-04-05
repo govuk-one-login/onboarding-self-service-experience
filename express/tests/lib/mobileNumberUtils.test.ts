@@ -1,4 +1,4 @@
-import {obscureNumber, convertToCountryPrefixFormat, validate} from "../../src/lib/mobileNumberUtils";
+import {obscureNumber, convertToCountryPrefixFormat, validate} from "lib/mobileNumberUtils";
 
 export const INTERNATIONAL_PREFIX = "+44";
 export const UK_PREFIX = "0";

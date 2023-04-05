@@ -1,4 +1,4 @@
-import DynamoDbClient from "../src/dynamodb-client";
+import DynamoDbClient from "dynamodb-client";
 
 describe("DynamoDB client", () => {
     describe("table name not set", () => {

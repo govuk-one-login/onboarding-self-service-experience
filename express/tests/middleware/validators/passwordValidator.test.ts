@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {passwordValidator} from "../../../src/middleware/validators/passwordValidator";
+import {passwordValidator} from "middleware/validators/passwordValidator";
 
 describe("passwords of 8 or more characters are allowed, passwords with less characters are rejected", () => {
     let mockRequest: Partial<Request>;

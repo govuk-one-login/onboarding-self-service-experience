@@ -1,4 +1,4 @@
-import commonPasswordsSingleton from "../../src/lib/commonPasswords/commonPasswordsSingleton";
+import commonPasswordsSingleton from "lib/commonPasswords/commonPasswordsSingleton";
 
 const COMMON_PASSWORD = "Password123";
 const UNCOMMON_PASSWORD = "this-is-not-a-common-password";

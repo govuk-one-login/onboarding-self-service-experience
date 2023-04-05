@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {Session} from "express-session";
-import validateMobileNumber from "../../../src/middleware/validators/mobileValidator";
+import validateMobileNumber from "middleware/validators/mobileValidator";
 import {INVALID_NUMBERS, VALID_NUMBERS} from "../../lib/mobileNumberUtils.test";
 
 describe("Validating numbers works as expected", () => {

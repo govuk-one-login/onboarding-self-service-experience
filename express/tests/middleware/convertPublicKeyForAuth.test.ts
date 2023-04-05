@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
-import {convertPublicKeyForAuth} from "../../src/middleware/convertPublicKeyForAuth";
+import {convertPublicKeyForAuth} from "middleware/convertPublicKeyForAuth";
 import {VALID_PUBLIC_KEY_NO_HEADERS_OR_LINE_BREAKS, VALID_PUBLIC_KEY_WITH_HEADERS} from "../lib/publicKeyUtils.test";
 
 describe("It correctly handles user input", () => {

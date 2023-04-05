@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import notOnCommonPasswordListValidator from "../../../src/middleware/validators/notOnCommonPasswordListValidator";
+import notOnCommonPasswordListValidator from "middleware/validators/notOnCommonPasswordListValidator";
 
 describe("it will not allow a user to submit a common password but will allow one not on the list", () => {
     let mockRequest: Partial<Request>;

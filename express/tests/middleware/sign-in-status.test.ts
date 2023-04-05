@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
-import setSignInStatus from "../../src/middleware/sign-in-status";
-import "../../src/types/session";
+import setSignInStatus from "middleware/sign-in-status";
+import "types/session";
 
 describe("Sign-in status is correctly set in res.locals so it can be accessed on any page", () => {
     let mockRequest: Partial<Request>;
