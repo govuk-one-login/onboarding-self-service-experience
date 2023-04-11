@@ -16,7 +16,7 @@ jobs:
     concurrency: deploy-paas-preview-${{ github.head_ref || github.ref_name }}
     steps:
       - name: PaaS login
-        uses: alphagov/di-github-actions/paas/log-in-to-paas@f9d4fd5fb5f5a92151bc522925fe2ba7cb1c05fc
+        uses: alphagov/di-github-actions/paas/log-in-to-paas@5dacba941def444d69f02843feaebed79b5fca51
         with:
           cf-org-name: gds-digital-identity-onboarding
           cf-space-name: self-service-preview
@@ -24,7 +24,7 @@ jobs:
           cf-password: ${{ secrets.CF_PASSWORD }}
 
       - name: Get app name
-        uses: alphagov/di-github-actions/beautify-branch-name@f9d4fd5fb5f5a92151bc522925fe2ba7cb1c05fc
+        uses: alphagov/di-github-actions/beautify-branch-name@5dacba941def444d69f02843feaebed79b5fca51
         with:
           downcase: true
           length-limit: 63
@@ -48,7 +48,7 @@ jobs:
 
     steps:
       - name: Delete docker image
-        uses: alphagov/di-github-actions/aws/ecr/delete-docker-images@f9d4fd5fb5f5a92151bc522925fe2ba7cb1c05fc
+        uses: alphagov/di-github-actions/aws/ecr/delete-docker-images@5dacba941def444d69f02843feaebed79b5fca51
         with:
           aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
           repository: self-service/frontend
