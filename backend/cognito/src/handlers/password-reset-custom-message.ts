@@ -1,8 +1,31 @@
-"use strict";
+import {CustomMessageForgotPasswordTriggerEvent} from "aws-lambda";
 
-import {CustomMessageForgotPasswordTriggerEvent} from "aws-lambda/trigger/cognito-user-pool-trigger/custom-message";
+export const handler = async (event: CustomMessageForgotPasswordTriggerEvent): Promise<CustomMessageForgotPasswordTriggerEvent> => {
+    return event.triggerSource === "CustomMessage_ForgotPassword" ? forgotPassword(event) : event;
+};
 
-const generate_email_body = (emailBody: string) => `
+async function forgotPassword(event: CustomMessageForgotPasswordTriggerEvent): Promise<CustomMessageForgotPasswordTriggerEvent> {
+    const clientMetadata = event.request.clientMetadata;
+
+    if (!clientMetadata) {
+        throw new Error("Client metadata is missing from the event");
+    }
+
+    const code = event.request.codeParameter;
+    const username = encodeURIComponent(clientMetadata.username);
+    const link = `${clientMetadata.uri}/create-new-password?userName=${username}&confirmationCode=${code}`;
+
+    event.response = {
+        smsMessage: "",
+        emailSubject: "Reset your password for GOV.UK One Login",
+        emailMessage: generateEmailBody(link)
+    };
+
+    return event;
+}
+
+function generateEmailBody(emailBody: string) {
+    return `
     <html>
         <body>
             <head>
@@ -125,7 +148,7 @@ const generate_email_body = (emailBody: string) => `
                         <div style="margin-top: 40px;"></div>
                         <p class="norrmal-text">We received a request to reset your password for GOV.UK One Login.</p>
                         <p class="norrmal-text">Reset your password at</p>
-                        <p class="bold-text"><a style="word-wrap:break-word;color:#1d70b8" href=${emailBody} target="_blank" data-saferedirecturl="GOV.UK">${emailBody}</a></p>
+                        <p class="bold-text"><a style="word-wrap:break-word;color:#1d70b8" href="${emailBody}" target="_blank" data-saferedirecturl="GOV.UK">${emailBody}</a></p>
                         <p class="norrmal-text">The link will expire after 15 minutes.</p>
                         <p class="norrmal-text">If you did not use this email you can ignore it - your password has not been changed.</p>
                         <p class="norrmal-text">Thanks,</p>
@@ -139,23 +162,4 @@ const generate_email_body = (emailBody: string) => `
         </body>
     </html>
 `;
-
-export const forgot_password = async (event: CustomMessageForgotPasswordTriggerEvent): Promise<CustomMessageForgotPasswordTriggerEvent> => {
-    const code = event.request.codeParameter;
-    const username = encodeURIComponent(event.request.clientMetadata.username);
-    const link = `${event.request.clientMetadata.uri}/create-new-password?userName=${username}&confirmationCode=${code}`;
-    event.response = {
-        smsMessage: "",
-        emailSubject: "Reset your password for GOV.UK One Login",
-        emailMessage: generate_email_body(link)
-    };
-    return event;
-};
-
-export const handler = async (event: CustomMessageForgotPasswordTriggerEvent): Promise<CustomMessageForgotPasswordTriggerEvent> => {
-    if (event.triggerSource === "CustomMessage_ForgotPassword") {
-        return forgot_password(event);
-    } else {
-        return event;
-    }
-};
+}

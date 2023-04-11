@@ -4,6 +4,7 @@
   "workspaces": [
     "acceptance-tests",
     "backend/api",
+    "backend/cognito",
     "express"
   ],
   "scripts": {
@@ -23,9 +24,11 @@
     "axios": "^0.27.2"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.114",
     "@types/jest": "^29.5.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
+    "esbuild": "^0.17.18",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",

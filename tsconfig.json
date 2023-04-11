@@ -25,6 +25,9 @@
       "path": "backend/api"
     },
     {
+      "path": "backend/cognito"
+    },
+    {
       "path": "express"
     }
   ]

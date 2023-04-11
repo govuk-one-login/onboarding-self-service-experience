@@ -1,8 +1,6 @@
-AWSTemplateFormatVersion: 2010-09-09
-Description: >-
-  Cognito UserPool and Client
-Transform:
-  - AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Cognito UserPool and Client
+Transform: AWS::Serverless-2016-10-31
 
 Parameters:
   DomainOrEmailIdentityToVerify:
@@ -67,7 +65,6 @@ Resources:
       Environment:
         Variables:
           FROM_EMAIL_ADDRESS: !Sub 'admin-tool@${DomainOrEmailIdentityToVerify}'
-
 
       Handler: src/handlers/confirm-forgot-password-message.handler
       Runtime: nodejs14.x
