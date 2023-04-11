@@ -5,7 +5,7 @@ Transform: AWS::LanguageExtensions
 Parameters:
   Environment:
     Type: String
-    AllowedPattern: ((production)|(integration)|(staging)|(build)|(development))
+    AllowedPattern: development|build|staging|integration|production
   VpcStackName:
     Type: String
     Description: The name of the stack that defines the VPC in which the frontend container will run
@@ -15,7 +15,7 @@ Parameters:
     Description: The ARN of the permissions boundary to apply when creating IAM roles
 
 Conditions:
-  NotDevelopment: !Not [ !Equals [ !Ref AWS::AccountId, 494650018671 ] ]
+  NotDevelopment: !Not [ !Equals [ !Ref Environment, development ] ]
 
 Mappings:
   # See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
@@ -147,7 +147,7 @@ Resources:
     Condition: NotDevelopment
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub sse-frontend-${Environment}-access-logs
+      BucketName: sse-frontend-access-logs
       VersioningConfiguration:
         Status: Enabled
       PublicAccessBlockConfiguration:
@@ -174,7 +174,7 @@ Resources:
                 - arn:aws:iam::${ElbAccountId}:root
                 - ElbAccountId: !FindInMap [ ElasticLoadBalancerAccountIds, !Ref AWS::Region, AccountId ]
             Action: s3:PutObject
-            Resource: !Sub arn:aws:s3:::${AccessLogsBucket}/sse-front-${Environment}/AWSLogs/${AWS::AccountId}/*
+            Resource: !Sub arn:aws:s3:::${AccessLogsBucket}/sse-front-alb/AWSLogs/${AWS::AccountId}/*
 
   ApplicationLoadBalancer:
     # checkov:skip=CKV_AWS_91:Ensure the ELBv2 (Application/Network) has access logging enabled
@@ -195,7 +195,7 @@ Resources:
           - Key: access_logs.s3.bucket
             Value: !Ref AccessLogsBucket
           - Key: access_logs.s3.prefix
-            Value: !Sub sse-front-${Environment}
+            Value: sse-front-alb
         - !Ref AWS::NoValue
 
   ApplicationLoadBalancerTargetGroup:
@@ -262,7 +262,7 @@ Resources:
   ApiGwHttpEndpoint:
     Type: AWS::ApiGatewayV2::Api
     Properties:
-      Name: !Sub ${AWS::StackName}-${Environment}
+      Name: !Sub ${AWS::StackName}
       ProtocolType: HTTP
 
   ApiGwHttpEndpointIntegration:
