@@ -6,7 +6,7 @@ import {obscureNumber} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
-    res.render("sign-in.njk");
+    res.render("sign-in/enter-email-address.njk");
 };
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
@@ -111,7 +111,7 @@ const forgotPassword = async function (req: Request, res: Response) {
         await s4.forgotPassword(req.session.emailAddress as string, uri as string);
     } catch (error) {
         if (error instanceof UserNotFoundException) {
-            res.render("sign-in.njk", {
+            res.render("sign-in/enter-email-address.njk", {
                 errorMessages: {
                     emailAddress: "User does not exist."
                 },
@@ -122,7 +122,7 @@ const forgotPassword = async function (req: Request, res: Response) {
             return;
         }
         if (error instanceof LimitExceededException) {
-            res.render("sign-in.njk", {
+            res.render("sign-in/enter-email-address.njk", {
                 errorMessages: {
                     emailAddress: "You have tried to change your password too many times. Try again in 15 minutes."
                 },

@@ -26,13 +26,16 @@ router.get("/", (req, res) => {
     res.redirect(303, path.join(req.baseUrl, "/enter-email-address"));
 });
 
-router.route("/enter-email-address").get(showSignInFormEmail).post(emailValidator("sign-in.njk"), processEmailAddress);
+router.route("/enter-email-address").get(showSignInFormEmail).post(emailValidator("sign-in/enter-email-address.njk"), processEmailAddress);
 
 router
     .route("/enter-password")
-    .get(emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}), showSignInFormPassword)
+    .get(
+        emailIsPresentInSession("sign-in/enter-email-address.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+        showSignInFormPassword
+    )
     .post(
-        emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+        emailIsPresentInSession("sign-in/enter-email-address.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
         processSignInForm("sign-in-enter-password.njk")
     );
 
@@ -57,15 +60,21 @@ router.get("/account-not-found", (req, res) => {
 
 router.get(
     "/forgot-password",
-    emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+    emailIsPresentInSession("sign-in/enter-email-address.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
     forgotPasswordForm
 );
 
 // TODO this is wrong - get and post can't be the same - fix and check this works
 router
     .route("/forgot-password/enter-email-code")
-    .get(emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}), checkEmailPasswordReset)
-    .post(emailIsPresentInSession("sign-in.njk", {errorMessages: {emailAddress: "Enter your email address"}}), checkEmailPasswordReset);
+    .get(
+        emailIsPresentInSession("sign-in/enter-email-address.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+        checkEmailPasswordReset
+    )
+    .post(
+        emailIsPresentInSession("sign-in/enter-email-address.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+        checkEmailPasswordReset
+    );
 
 router
     .route("/forgot-password/create-new-password")
