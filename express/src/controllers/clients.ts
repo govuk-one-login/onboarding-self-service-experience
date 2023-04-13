@@ -9,7 +9,7 @@ export const showClient: RequestHandler = async (req, res) => {
     // TODO make S4 instances static in all controllers
     const serviceId = req.context.serviceId;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const client = (await s4.listClients(nonNull(serviceId), req.session.authenticationResult?.AccessToken as string))[0];
+    const client = (await s4.listClients(nonNull(serviceId), nonNull(req.session.authenticationResult?.AccessToken)))[0];
     const selfServiceClientId = client.dynamoServiceId;
     const authClientId = client.authClientId;
     const serviceName = client.serviceName;
@@ -31,16 +31,16 @@ export const showClient: RequestHandler = async (req, res) => {
             changeClientName: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
                 client.clientName
             )}`,
-            changeRedirectUris: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-redirect-uris?redirectUris=${encodeURIComponent(
+            changeRedirectUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-redirect-uris?redirectUris=${encodeURIComponent(
                 client.redirectUris.join(" ")
             )}`,
-            changeUserAttributes: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-user-attributes?userAttributes=${encodeURIComponent(
+            changeUserAttributes: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-user-attributes?userAttributes=${encodeURIComponent(
                 client.scopes.join(" ")
             )}`,
-            changePublicKey: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-public-key?publicKey=${encodeURIComponent(
+            changePublicKey: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-public-key?publicKey=${encodeURIComponent(
                 userPublicKey
             )}`,
-            changePostLogoutUris: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-post-logout-uris?redirectUris=${encodeURIComponent(
+            changePostLogoutUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-post-logout-uris?redirectUris=${encodeURIComponent(
                 client.postLogoutUris.join(" ")
             )}`
         }
@@ -102,7 +102,7 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
         department,
         serviceName,
         emailAddress as string,
-        req.session.authenticationResult?.AccessToken as string
+        nonNull(req.session.authenticationResult?.AccessToken)
     );
 
     res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/private-beta/submitted`);
@@ -151,10 +151,127 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
         selfServiceClientId,
         clientId,
         {service_name: newServiceName},
-        req.session.authenticationResult?.AccessToken as string
+        nonNull(req.session.authenticationResult?.AccessToken)
     );
 
     req.session.updatedField = "service name";
     req.session.serviceName = newServiceName;
     res.redirect(`/services/${serviceId}/clients`);
+};
+
+export const showProcessChangePublicKeyForm: RequestHandler = async (req, res) => {
+    res.render("service-details/change-public-key.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        serviceUserPublicKey: req.query.publicKey
+    });
+};
+
+export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
+    const publicKey = req.body.authCompliantPublicKey;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {public_key: publicKey},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "public key";
+    res.redirect(`/services/${req.context.serviceId}/clients`);
+};
+
+export const showProcessChangeRedirectUrlsForm: RequestHandler = async (req, res) => {
+    res.render("service-details/change-redirect-uris.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        values: {
+            redirectUris: req.query.redirectUris
+        }
+    });
+};
+
+export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) => {
+    const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {redirect_uris: redirectUris},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "redirect URIs";
+    res.redirect(`/services/${req.context.serviceId}/clients`);
+};
+
+export const showProcessChangeUserAttributesForm: RequestHandler = async (req, res) => {
+    const userAttributes = nonNull(req.query.userAttributes?.toString()).split(" ");
+    const email: boolean = userAttributes.includes("email");
+    const phone: boolean = userAttributes.includes("phone");
+    const offline_access: boolean = userAttributes.includes("offline_access");
+
+    res.render("service-details/change-user-attributes.njk", {
+        email: email,
+        phone: phone,
+        offline_access: offline_access,
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId
+    });
+};
+
+export const processChangeUserAttributesForm: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const attributes: string[] = ["openid"];
+
+    if (Array.isArray(req.body.userAttributes)) {
+        attributes.push(...req.body.userAttributes);
+    } else if (typeof req.body.userAttributes === "string") {
+        attributes.push(req.body.userAttributes);
+    }
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {scopes: attributes},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "required user attributes";
+    res.redirect(`/services/${req.context.serviceId}/clients`);
+};
+
+export const showProcessChangePostLogoutUrisForm: RequestHandler = async (req, res) => {
+    res.render("service-details/change-post-logout-uris.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        values: {
+            redirectUris: req.query.redirectUris
+        }
+    });
+};
+
+export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) => {
+    const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {post_logout_redirect_uris: postLogoutUris},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "post-logout redirect URIs";
+    res.redirect(`/services/${req.context.serviceId}/clients`);
 };

@@ -1,9 +1,7 @@
 import {Router} from "express";
-import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
 import {emailValidator} from "../middleware/validators/emailValidator";
 import validateMobileNumber from "../middleware/validators/mobileValidator";
 import {passwordValidator} from "../middleware/validators/passwordValidator";
-import {urisValidator} from "../middleware/validators/urisValidator";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 const router = Router();
@@ -54,135 +52,6 @@ router.post("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-
 
     req.session.updatedField = "client name";
     res.redirect(`/services/${req.params.serviceId}/clients}`);
-});
-
-// Testing routes for Change your redirect URIs page
-router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-redirect-uris", (req, res) => {
-    res.render("service-details/change-redirect-uris.njk", {
-        serviceId: req.params.serviceId,
-        selfServiceClientId: req.params.selfServiceClientId,
-        clientId: req.params.clientId,
-        values: {
-            redirectUris: req.query.redirectUris
-        }
-    });
-});
-
-router.post(
-    "/services/:serviceId/clients/:clientId/:selfServiceClientId/change-redirect-uris",
-    urisValidator("service-details/change-redirect-uris.njk"),
-    async (req, res) => {
-        const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
-        const s4: SelfServiceServicesService = req.app.get("backing-service");
-
-        await s4.updateClient(
-            req.params.serviceId,
-            req.params.selfServiceClientId,
-            req.params.clientId,
-            {redirect_uris: redirectUris},
-            req.session.authenticationResult?.AccessToken as string
-        );
-
-        req.session.updatedField = "redirect URIs";
-        res.redirect(`/services/${req.params.serviceId}/clients`);
-    }
-);
-
-// Testing routes for Change user attributes page
-router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-user-attributes", (req, res) => {
-    const userAttributes = (req.query.userAttributes as string).split(" ");
-    const email: boolean = userAttributes.includes("email");
-    const phone: boolean = userAttributes.includes("phone");
-    const offline_access: boolean = userAttributes.includes("offline_access");
-
-    res.render("service-details/change-user-attributes.njk", {
-        email: email,
-        phone: phone,
-        offline_access: offline_access,
-        serviceId: req.params.serviceId,
-        selfServiceClientId: req.params.selfServiceClientId,
-        clientId: req.params.clientId
-    });
-});
-
-router.post("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-user-attributes", async (req, res) => {
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const attributes: string[] = ["openid"];
-
-    if (Array.isArray(req.body.userAttributes)) {
-        attributes.push(...req.body.userAttributes);
-    } else if (typeof req.body.userAttributes === "string") {
-        attributes.push(req.body.userAttributes);
-    }
-
-    await s4.updateClient(
-        req.params.serviceId,
-        req.params.selfServiceClientId,
-        req.params.clientId,
-        {scopes: attributes},
-        req.session.authenticationResult?.AccessToken as string
-    );
-
-    req.session.updatedField = "required user attributes";
-    res.redirect(`/services/${req.params.serviceId}/clients`);
-});
-
-// Testing routes for Change your post logout redirect URIs page
-router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-post-logout-uris", (req, res) => {
-    res.render("service-details/change-post-logout-uris.njk", {
-        serviceId: req.params.serviceId,
-        selfServiceClientId: req.params.selfServiceClientId,
-        clientId: req.params.clientId,
-        values: {
-            redirectUris: req.query.redirectUris
-        }
-    });
-});
-
-router.post(
-    "/services/:serviceId/clients/:clientId/:selfServiceClientId/change-post-logout-uris",
-    urisValidator("service-details/change-post-logout-uris.njk"),
-    async (req, res) => {
-        const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
-        const s4: SelfServiceServicesService = req.app.get("backing-service");
-
-        await s4.updateClient(
-            req.params.serviceId,
-            req.params.selfServiceClientId,
-            req.params.clientId,
-            {post_logout_redirect_uris: postLogoutUris},
-            req.session.authenticationResult?.AccessToken as string
-        );
-
-        req.session.updatedField = "post-logout redirect URIs";
-        res.redirect(`/services/${req.params.serviceId}/clients`);
-    }
-);
-
-// Testing routes for Change your public key page
-router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-public-key", (req, res) => {
-    res.render("service-details/change-public-key.njk", {
-        serviceId: req.params.serviceId,
-        selfServiceClientId: req.params.selfServiceClientId,
-        clientId: req.params.clientId,
-        serviceUserPublicKey: req.query.publicKey
-    });
-});
-
-router.post("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-public-key", convertPublicKeyForAuth, async (req, res) => {
-    const publicKey = req.body.authCompliantPublicKey as string;
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
-
-    await s4.updateClient(
-        req.params.serviceId,
-        req.params.selfServiceClientId,
-        req.params.clientId,
-        {public_key: publicKey},
-        req.session.authenticationResult?.AccessToken as string
-    );
-
-    req.session.updatedField = "public key";
-    res.redirect(`/services/${req.params.serviceId}/clients`);
 });
 
 // Testing route for "Finish connecting the sign in journey to your service" page
