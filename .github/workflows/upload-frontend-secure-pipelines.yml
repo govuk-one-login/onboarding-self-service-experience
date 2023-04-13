@@ -43,4 +43,3 @@ jobs:
           ecr-repo-name: ${{ secrets.FRONTEND_BUILD_ECR_REPOSITORY }}
           dockerfile: infrastructure/frontend/Dockerfile
           checkout-repo: false
-          

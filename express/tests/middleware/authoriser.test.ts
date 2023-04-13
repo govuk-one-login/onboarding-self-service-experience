@@ -1,4 +1,3 @@
-import "config/session-data";
 import checkAuthorisation from "middleware/authoriser";
 import {request, response} from "../mocks";
 

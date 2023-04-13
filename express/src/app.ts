@@ -3,10 +3,7 @@ import express from "express";
 import "express-async-errors";
 import Express from "./config/express";
 import {distribution} from "./config/resources";
-import "./config/session-data";
 import sessionStorage from "./config/session-storage";
-import configureViews from "./config/views";
-import "./lib/utils/optional";
 import {errorHandler, notFoundHandler} from "./middleware/errors";
 import signInStatus from "./middleware/sign-in-status";
 import account from "./routes/account";
@@ -35,8 +32,6 @@ Promise.all([cognitoPromise, lambdaPromise]).then(deps => {
     app.set("backing-service", new SelfServiceServicesService(deps[0], deps[1]));
     console.log("Backing service created");
 });
-
-configureViews(app);
 
 app.use("/assets", express.static(distribution.assets));
 app.use("/assets/images", express.static(distribution.images));

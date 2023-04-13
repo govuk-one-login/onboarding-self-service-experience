@@ -1,4 +1,3 @@
-import "config/session-data";
 import {Request} from "express";
 import validator from "middleware/validators/email-code-validator";
 import {request, response} from "../../mocks";

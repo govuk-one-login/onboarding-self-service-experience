@@ -3,5 +3,6 @@ import baseConfig from "../jest.config.base";
 
 export default {
     ...baseConfig,
-    displayName: "sse-frontend"
+    displayName: "frontend",
+    setupFiles: ["<rootDir>/../src/config/express.ts"]
 } satisfies Config;

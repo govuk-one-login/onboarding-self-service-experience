@@ -1,6 +1,4 @@
-import "config/session-data";
 import {Request} from "express";
-import "lib/utils/optional";
 import validateMobileSecurityCode from "middleware/validators/mobile-code-validator";
 import {request, response} from "../../mocks";
 

@@ -1,4 +1,3 @@
-import "config/session-data";
 import {Request} from "express";
 import setSignInStatus from "middleware/sign-in-status";
 import {request, response} from "../mocks";
