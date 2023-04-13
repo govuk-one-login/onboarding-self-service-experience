@@ -1,0 +1,27 @@
+{% extends "layouts/base-form-client.njk" %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% set pageTitle = "Change public key" %}
+
+{% set publicKeyBlock %}
+  <p class="govuk-body govuk-!-static-margin-bottom-0 govuk-!-font-weight-bold">Current public key</p>
+  <p class="govuk-body govuk-!-static-margin-bottom-0" id="current-public-key">{{ serviceUserPublicKey }}</p>
+{% endset %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
+
+  <p class="govuk-body">You need to
+    <a href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/generate-a-key/" class="govuk-link" rel="noreferrer noopener" target="_blank">
+      generate a key pair (opens in new tab)</a> and add the public key. This is so our services can securely send messages to each other.
+  </p>
+  {{ govukInsetText({
+    html: publicKeyBlock
+  }) if serviceUserPublicKey }}
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.textAreaInput("Public key", "serviceUserPublicKey",
+    "Paste in the entire public key in PEM format, including the headers"
+  ) }}
+{% endblock %}

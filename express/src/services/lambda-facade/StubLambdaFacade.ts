@@ -6,6 +6,7 @@ import {Service} from "../../../@types/Service";
 import {DynamoUser} from "../../../@types/user";
 import {Updates} from "../self-service-services-service";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
+import {convertToAttr} from "@aws-sdk/util-dynamodb";
 
 /* eslint-disable @typescript-eslint/no-unused-vars --
  * Ignore unused vars in stubs
@@ -27,6 +28,9 @@ class StubLambdaFacade implements LambdaFacadeInterface {
 
     publicKey = this.defaultPublicKey;
     serviceName = "";
+    redirectUris = ["http://localhost/"];
+    postLogoutRedirectUris = ["http://localhost/", "http://localhost/logged_out"];
+    scopes = ["openid"];
 
     constructor() {
         console.log("Creating stub lambda facade...");
@@ -61,14 +65,23 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         serviceId: string,
         selfServiceClientId: string,
         clientId: string,
-        updates: Record<string, string>,
+        updates: Record<string, string | string[]>,
         accessToken: string
     ): Promise<AxiosResponse> {
         if (updates.public_key) {
-            this.publicKey = updates.public_key;
+            this.publicKey = updates.public_key as string;
         }
         if (updates.service_name) {
-            this.serviceName = updates.service_name;
+            this.serviceName = updates.service_name as string;
+        }
+        if (updates.redirect_uris) {
+            this.redirectUris = updates.redirect_uris as string[];
+        }
+        if (updates.post_logout_redirect_uris) {
+            this.postLogoutRedirectUris = updates.post_logout_redirect_uris as string[];
+        }
+        if (updates.scopes) {
+            this.scopes = updates.scopes as string[];
         }
         return Promise.resolve({} as AxiosResponse);
     }
@@ -95,13 +108,13 @@ class StubLambdaFacade implements LambdaFacadeInterface {
                 Items: [
                     {
                         service_name: {S: this.serviceName || "Test Service"},
-                        post_logout_redirect_uris: {L: [{S: "http://localhost/"}, {S: "http://localhost/logged_out"}]},
+                        post_logout_redirect_uris: convertToAttr(this.postLogoutRedirectUris),
                         subject_type: {S: "pairwise"},
                         contacts: {L: [{S: "john.watts@digital.cabinet-office.gov.uk"}, {S: "onboarding@digital.cabinet-office.gov.uk"}]},
                         public_key: {
                             S: this.publicKey
                         },
-                        scopes: {L: [{S: "openid"}]},
+                        scopes: convertToAttr(this.scopes),
                         clientId: {S: "P0_ZdXojEGDlaZEU8Q9Zlv-fo1s"},
                         default_fields: {
                             L: [
@@ -115,7 +128,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
                             ]
                         },
                         data: {S: "SAM Service as a Service Service"},
-                        redirect_uris: {L: [{S: "http:/localhost/"}, {S: "http:/localhost/logged-in"}]},
+                        redirect_uris: convertToAttr(this.redirectUris),
                         sk: {S: "client#d61db4f3-7403-431d-9ead-14cc96476ce4"},
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
                         service_type: {S: "MANDATORY"},

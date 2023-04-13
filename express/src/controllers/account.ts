@@ -141,7 +141,7 @@ export const processChangePhoneNumberForm = async function (req: Request, res: R
 };
 
 export const showVerifyMobileWithSmsCode = async function (req: Request, res: Response) {
-    res.render("common/check-mobile.njk", {
+    res.render("common/enter-text-code.njk", {
         headerActiveItem: "your-account",
         values: {
             mobileNumber: req.session.enteredMobileNumber,
@@ -170,7 +170,7 @@ export const verifyMobileWithSmsCode = async function (req: Request, res: Respon
         req.session.enteredMobileNumber = undefined;
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            res.render("common/check-mobile.njk", {
+            res.render("common/enter-text-code.njk", {
                 headerActiveItem: "your-account",
                 values: {
                     securityCode: req.body.securityCode,

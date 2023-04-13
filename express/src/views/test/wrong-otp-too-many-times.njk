@@ -1,0 +1,12 @@
+{% extends "layouts/form.njk" %}
+
+{% set pageTitle = pageTitle %}
+{% set formButtonText = "Get a new code" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l">
+    You entered the wrong security code too many times
+  </h1>
+
+  <p class="govuk-body">You need to get a new code and try again.</p>
+{% endblock %}

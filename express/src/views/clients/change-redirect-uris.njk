@@ -1,0 +1,14 @@
+{% extends "layouts/base-form-client.njk" %}
+
+{% set pageTitle = "Change redirect URIs" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your redirect URIs</h1>
+  <p class="govuk-body">Add the URI for the page you want your users to see after they sign in to your service.</p>
+  <p class="govuk-body">You can add multiple redirect URIs if you want different groups of users to see different pages
+    once they sign in to your service. To do this, enter the URIs separated by a space.</p>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.urlInput("Redirect URIs") }}
+{% endblock %}

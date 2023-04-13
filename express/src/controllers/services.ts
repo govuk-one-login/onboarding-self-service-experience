@@ -26,5 +26,5 @@ export const listServices = async function (req: Request, res: Response) {
     }
 
     req.session.serviceName = undefined;
-    res.render("manage-account/list-services.njk", {services: services});
+    res.render("services/services.njk", {services: services});
 };

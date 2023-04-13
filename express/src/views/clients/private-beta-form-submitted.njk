@@ -1,0 +1,18 @@
+{% extends "layouts/client.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% set sidebarActiveItem = "private-beta" %}
+{% set pageTitle = "Private beta form submitted" %}
+
+{% block mainContent %}
+  {{ govukPanel({
+    titleText: "Form submitted",
+    classes: "govuk-!-margin-top-5 govuk-!-margin-bottom-6"
+  }) }}
+
+  <p class="govuk-body">Thank you for requesting to talk to us about joining the private beta. We’ll be in touch within 5 working days.</p>
+  <p class="govuk-body">If you have any questions in the meantime, contact us using our
+    <a class="govuk-link" href="https://www.sign-in.service.gov.uk/contact-us">support form</a> or via our
+    <a class="govuk-link" href="https://ukgovernmentdigital.slack.com/archives/C02AQUJ6WTC">Slack channel</a>.
+  </p>
+{% endblock %}

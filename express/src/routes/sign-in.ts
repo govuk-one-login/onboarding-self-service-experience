@@ -36,7 +36,7 @@ router
     )
     .post(
         emailIsPresentInSession("sign-in/enter-email-address.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
-        processSignInForm("sign-in-enter-password.njk")
+        processSignInForm("sign-in/enter-password.njk")
     );
 
 router
@@ -55,7 +55,7 @@ router
 router.route("/resend-text-code").get(showResendPhoneCodePage, showCheckPhonePage);
 
 router.get("/account-not-found", (req, res) => {
-    res.render("no-account-found.njk");
+    res.render("sign-in/account-not-found.njk");
 });
 
 router.get(
@@ -80,7 +80,7 @@ router
     .route("/forgot-password/create-new-password")
     .get(confirmForgotPasswordForm)
     .post(
-        notOnCommonPasswordListValidator("create-new-password.njk", "password", ["password"]),
+        notOnCommonPasswordListValidator("sign-in/create-new-password.njk", "password", ["password"]),
         confirmForgotPassword,
-        processSignInForm("create-new-password.njk")
+        processSignInForm("sign-in/create-new-password.njk")
     );
