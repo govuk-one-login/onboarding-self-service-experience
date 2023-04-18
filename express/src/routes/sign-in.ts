@@ -49,7 +49,7 @@ router
         finishSignIn
     );
 
-router.route("/resend-text-code").get(showResendPhoneCodePage, showCheckPhonePage);
+router.route("/resend-text-code").get(showResendPhoneCodePage).post(showCheckPhonePage);
 
 router.get("/account-not-found", (req, res) => {
     res.render("no-account-found.njk");
