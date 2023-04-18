@@ -1,18 +1,18 @@
-name: Deploy DynamoDB stack to secure pipeline
+name: Upload DynamoDB to secure pipelines
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - main
-    paths:
-      - backend/dynamo-db/**
+    branches: [ main ]
+    paths: [ backend/dynamo-db/** ]
 
 permissions:
   id-token: write
   contents: read
 
-jobs:
+concurrency: upload-dynamo-db-secure-pipelines-development-${{ github.head_ref || github.ref_name }}
 
+jobs:
   deploy:
     name: Deploy DynamoDB
     runs-on: ubuntu-latest
@@ -43,12 +43,12 @@ jobs:
 
       - name: SAM validate
         working-directory: backend/dynamo-db
-        run: sam validate --template template.yaml
+        run: sam validate --template template.yml
 
       - name: SAM build
         working-directory: backend/dynamo-db
         run:
-          sam build --template template.yaml
+          sam build --template template.yml
 
       - name: Deploy Dynamo DB stack
         uses: alphagov/di-devplatform-upload-action@v2
@@ -56,4 +56,4 @@ jobs:
           artifact-bucket-name: ${{ secrets.DYNAMO_DB_ARTEFACT_BUCKET_NAME }}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
           working-directory: backend/dynamo-db
-          template-file: template.yaml
+          template-file: template.yml

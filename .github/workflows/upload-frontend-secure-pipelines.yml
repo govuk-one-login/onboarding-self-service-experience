@@ -1,0 +1,69 @@
+name: Upload Frontend to secure pipelines
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths: [ express/** ]
+
+permissions: read-all
+concurrency: upload-frontend-secure-pipelines-build-${{ github.head_ref || github.ref_name }}
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/build-front-app.yml
+
+  deploy:
+    name: Upload package
+    runs-on: ubuntu-latest
+    environment: build
+    needs: build
+    env:
+      TEMPLATE: infrastructure/ci/dev-platform/frontend-template.yml
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
+      - name: Get distribution artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: self-service-front
+
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.FRONTEND_BUILD_GHA_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Push Docker image
+        id: push-docker-image
+        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@5dacba941def444d69f02843feaebed79b5fca51
+        with:
+          repository: ${{ secrets.FRONTEND_BUILD_ECR_REPOSITORY }}
+          image-version: ${{ github.sha }}
+          image-tags: ${{ github.head_ref || github.ref_name }}
+          dockerfile-path: infrastructure/frontend/Dockerfile
+
+      - name: Validate template
+        run: |
+          sam validate --template "${TEMPLATE}"
+          sam validate --template "${TEMPLATE}" --lint
+
+      - name: Update template with ECR image tag
+        env:
+          ECR_REGISTRY: ${{ secrets.FRONTEND_BUILD_ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ secrets.FRONTEND_BUILD_ECR_REPOSITORY }}
+        run: sed -i "s|CONTAINER-IMAGE-PLACEHOLDER|$ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA|" "${TEMPLATE}"
+
+      - name: Upload SAM artifact
+        uses: alphagov/di-devplatform-upload-action@v3.2
+        with:
+          artifact-bucket-name: ${{ secrets.FRONTEND_BUILD_ARTIFACT_BUCKET_NAME }}
+          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          template-file: ${{ env.TEMPLATE }}
