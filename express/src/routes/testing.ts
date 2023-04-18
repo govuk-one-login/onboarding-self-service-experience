@@ -232,7 +232,7 @@ router.post("/security-check-change-number", async (req, res) => {
         return;
     }
 
-    res.redirect("/confirm-phone-number");
+    res.redirect("/test/confirm-phone-number");
 });
 
 // Testing routes for 'Confirm the phone number' page
@@ -242,7 +242,7 @@ router.get("/confirm-phone-number", (req, res) => {
 
 // TODO this validates the string but it needs to check the given number matches what's in Cognito
 router.post("/confirm-phone-number", validateMobileNumber("confirm-phone-number.njk"), async (req, res) => {
-    res.redirect("/new-phone-number");
+    res.redirect("/test/new-phone-number");
 });
 
 // Testing routes for 'You’ve changed the phone number linked to your account' page
