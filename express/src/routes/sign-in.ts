@@ -7,8 +7,9 @@ import {
     finishSignIn,
     forgotPasswordForm,
     processEmailAddress,
-    showCheckPhonePage,
-    showResendPhoneCodePage,
+    processResendPhoneCodeForm,
+    showCheckPhoneForm,
+    showResendPhoneCodeForm,
     showSignInFormEmail,
     showSignInFormPassword
 } from "../controllers/sign-in";
@@ -38,7 +39,7 @@ router
 
 router
     .route("/enter-text-code")
-    .get(showCheckPhonePage)
+    .get(showCheckPhoneForm)
     .post(
         (req, res, next) => {
             res.locals.headerActiveItem = "sign-in";
@@ -49,7 +50,7 @@ router
         finishSignIn
     );
 
-router.route("/resend-text-code").get(showResendPhoneCodePage).post(showCheckPhonePage);
+router.route("/resend-text-code").get(showResendPhoneCodeForm).post(processResendPhoneCodeForm);
 
 router.get("/account-not-found", (req, res) => {
     res.render("no-account-found.njk");
