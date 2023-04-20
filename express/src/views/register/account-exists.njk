@@ -1,0 +1,24 @@
+{% extends "layouts/form.njk" %}
+
+{% set pageTitle = "An account already exists" %}
+{% set backLinkPath = "/register" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l">An account already exists</h1>
+  <div class="govuk-inset-text">
+    An account already exists with the email address <span class="govuk-!-font-weight-bold">{{ values.emailAddress }}</span>
+  </div>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.passwordInput("Enter your password") }}
+{% endblock %}
+
+{% block afterForm %}
+  <p class="govuk-body"><a class="govuk-link" href="/sign-in/forgot-password">Forgot your password?</a></p>
+  <p class="govuk-body">If this is your email address and you did not register for an account, please <a class="govuk-link" href="https://www.sign-in.service.gov.uk/contact-us">contact us</a>.</p>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/assets/javascripts/show-password.js"></script>
+{% endblock %}

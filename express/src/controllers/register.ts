@@ -13,7 +13,7 @@ import {domainUserToDynamoUser} from "../lib/userUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const showGetEmailForm = function (req: Request, res: Response) {
-    res.render("create-account/get-email.njk");
+    res.render("register/enter-email-address.njk");
 };
 
 export const processGetEmailForm = async function (req: Request, res: Response, next: NextFunction) {
@@ -40,7 +40,7 @@ export const showCheckEmailForm = function (req: Request, res: Response) {
         return;
     }
 
-    res.render("create-account/check-email.njk", {values: {emailAddress: req.session.emailAddress}});
+    res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
 
 export const submitEmailSecurityCode = async function (req: Request, res: Response, next: NextFunction) {
@@ -59,7 +59,7 @@ export const submitEmailSecurityCode = async function (req: Request, res: Respon
         return;
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
-            res.render("create-account/check-email.njk", {
+            res.render("register/enter-email-code.njk", {
                 values: {emailAddress: req.session.emailAddress as string},
                 errorMessages: {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
@@ -76,7 +76,7 @@ export const submitEmailSecurityCode = async function (req: Request, res: Respon
 export const showNewPasswordForm = async function (req: Request, res: Response) {
     // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
-        res.render("create-account/new-password.njk");
+        res.render("register/create-password.njk");
         return;
     } else {
         res.redirect("/sign-in");
@@ -97,7 +97,7 @@ export const updatePassword = async function (req: Request, res: Response) {
 };
 
 export const showEnterMobileForm = async function (req: Request, res: Response) {
-    res.render("create-account/enter-mobile.njk", {
+    res.render("register/enter-phone-number.njk", {
         value: {mobileNumber: req.session.mobileNumber}
     });
 };
@@ -130,7 +130,7 @@ export const resendMobileVerificationCode = async function (req: Request, res: R
 };
 
 export const showSubmitMobileVerificationCode = async function (req: Request, res: Response) {
-    res.render("common/check-mobile.njk", {
+    res.render("common/enter-text-code.njk", {
         values: {
             mobileNumber: req.session.enteredMobileNumber,
             textMessageNotReceivedUrl: "/register/resend-text-code"
@@ -142,7 +142,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
     const securityCode = req.body.securityCode;
 
     if (securityCode === undefined) {
-        res.render("common/check-mobile.njk", {
+        res.render("common/enter-text-code.njk", {
             values: {
                 mobileNumber: req.session.mobileNumber,
                 textMessageNotReceivedUrl: "/register/resend-text-code"
@@ -158,7 +158,7 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
         await s4.verifyMobileUsingSmsCode(req.session.authenticationResult?.AccessToken as string, securityCode);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            res.render("common/check-mobile.njk", {
+            res.render("common/enter-text-code.njk", {
                 values: {
                     securityCode: req.body.securityCode,
                     mobileNumber: req.session.enteredMobileNumber,
@@ -198,11 +198,11 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
 };
 
 export const showResendPhoneCodeForm = async function (req: Request, res: Response) {
-    res.render("create-account/resend-phone-code.njk");
+    res.render("register/resend-text-code.njk");
 };
 
 export const showResendEmailCodeForm = async function (req: Request, res: Response) {
-    res.render("create-account/resend-email-code.njk");
+    res.render("register/resend-email-code.njk");
 };
 
 export const resendEmailVerificationCode = async function (req: Request, res: Response) {
@@ -212,7 +212,7 @@ export const resendEmailVerificationCode = async function (req: Request, res: Re
 };
 
 export const showAddServiceForm = async function (req: Request, res: Response) {
-    res.render("add-service-name.njk");
+    res.render("register/add-service-name.njk");
 };
 
 export const processAddServiceForm = async function (req: Request, res: Response) {
@@ -247,7 +247,7 @@ export const processAddServiceForm = async function (req: Request, res: Response
 };
 
 export const accountExists = async function (req: Request, res: Response) {
-    res.render("create-account/existing-account.njk", {
+    res.render("register/account-exists.njk", {
         values: {
             emailAddress: req.session.emailAddress
         }

@@ -1,0 +1,24 @@
+{% extends "./base.njk" %}
+
+{% set mainClasses = "govuk-!-padding-top-5 left-nav-wrapper" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+      <nav class="side-navigation govuk-!-margin-top-3">
+        <ul class="govuk-list side-navigation__list">
+          <li class="side-navigation__item{% if activeSidenavAccount == 'your-account-sidenav' %} side-navigation__item--active{% endif %}">
+            <a class="govuk-link govuk-link--no-visited-state" href="/account">Your account</a>
+          </li>
+          <li class="side-navigation__item{% if activeSidenavAccount == 'your-services-sidenav' %} side-navigation__item--active{% endif %}">
+            <a class="govuk-link govuk-link--no-visited-state" href="/services">Your services</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="govuk-grid-column-two-thirds manage-account-content-container">
+      {% block mainContent %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}

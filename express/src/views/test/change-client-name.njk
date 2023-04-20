@@ -1,0 +1,20 @@
+{% extends "layouts/client-form.njk" %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set pageTitle = "Change client name" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your client name</h1>
+
+  {{ govukWarningText({
+    text: "Your client name is shown to your users.",
+    iconFallbackText: "Warning"
+  }) }}
+
+  <p class="govuk-body">It should usually be your service name as written on your service start page.</p>
+  <p class="govuk-body">It needs to fit into a sentence like “You can now continue to the [client name] service.”</p>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.textInput("Client name", "clientName") }}
+{% endblock %}

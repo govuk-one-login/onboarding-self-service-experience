@@ -4,7 +4,7 @@ export async function serviceNameValidator(req: Request, res: Response, next: Ne
     const serviceName: string = req.body.serviceName.trim();
 
     if (serviceName.length == 0) {
-        res.render("add-service-name.njk", {
+        res.render("register/add-service-name.njk", {
             errorMessages: {
                 serviceName: "Enter your service name"
             }

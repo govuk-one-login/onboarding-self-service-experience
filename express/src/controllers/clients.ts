@@ -16,7 +16,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const redirectUrls = String(client.redirectUris).split(",");
     const userPublicKey = client.publicKey == defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);
 
-    res.render("service-details/client-details.njk", {
+    res.render("clients/client-details.njk", {
         clientId: authClientId,
         selfServiceClientId: selfServiceClientId,
         serviceId: serviceId,
@@ -52,7 +52,7 @@ export const showClient: RequestHandler = async (req, res) => {
 };
 
 export const showPrivateBetaForm: RequestHandler = async (req, res) => {
-    res.render("service-details/private-beta.njk", {
+    res.render("clients/private-beta.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
@@ -80,7 +80,7 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
     }
 
     if (errorMessages.size > 0) {
-        res.render("service-details/private-beta.njk", {
+        res.render("clients/private-beta.njk", {
             serviceId: serviceId,
             selfServiceClientId: selfServiceClientId,
             clientId: clientId,
@@ -109,7 +109,7 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
 };
 
 export const showPrivateBetaFormSubmitted: RequestHandler = async (req, res) => {
-    res.render("service-details/private-beta-form-submitted.njk", {
+    res.render("clients/private-beta-form-submitted.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId
@@ -117,7 +117,7 @@ export const showPrivateBetaFormSubmitted: RequestHandler = async (req, res) => 
 };
 
 export const showProcessChangeServiceNameForm: RequestHandler = async (req, res) => {
-    res.render("account/change-service-name.njk", {
+    res.render("clients/change-service-name.njk", {
         serviceId: req.context.serviceId,
         values: {
             serviceName: req.query.serviceName
@@ -130,7 +130,7 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
     const serviceId = req.context.serviceId;
 
     if (newServiceName === "") {
-        res.render("account/change-service-name.njk", {
+        res.render("clients/change-service-name.njk", {
             serviceId: serviceId,
             errorMessages: {
                 serviceName: "Enter your service name"
@@ -160,7 +160,7 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
 };
 
 export const showProcessChangePublicKeyForm: RequestHandler = async (req, res) => {
-    res.render("service-details/change-public-key.njk", {
+    res.render("clients/change-public-key.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
@@ -185,7 +185,7 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
 };
 
 export const showProcessChangeRedirectUrlsForm: RequestHandler = async (req, res) => {
-    res.render("service-details/change-redirect-uris.njk", {
+    res.render("clients/change-redirect-uris.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
@@ -217,7 +217,7 @@ export const showProcessChangeUserAttributesForm: RequestHandler = async (req, r
     const phone: boolean = userAttributes.includes("phone");
     const offline_access: boolean = userAttributes.includes("offline_access");
 
-    res.render("service-details/change-user-attributes.njk", {
+    res.render("clients/change-user-attributes.njk", {
         email: email,
         phone: phone,
         offline_access: offline_access,
@@ -250,7 +250,7 @@ export const processChangeUserAttributesForm: RequestHandler = async (req, res) 
 };
 
 export const showProcessChangePostLogoutUrisForm: RequestHandler = async (req, res) => {
-    res.render("service-details/change-post-logout-uris.njk", {
+    res.render("clients/change-post-logout-uris.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,

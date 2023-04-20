@@ -9,7 +9,7 @@ export default router;
 
 // Testing routes for Change your client name page
 router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-client-name", (req, res) => {
-    res.render("service-details/change-client-name.njk", {
+    res.render("test/change-client-name.njk", {
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
@@ -23,7 +23,7 @@ router.post("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-
     const newClientName = req.body.clientName;
 
     if (newClientName === "") {
-        res.render("service-details/change-client-name.njk", {
+        res.render("test/change-client-name.njk", {
             serviceId: req.params.serviceId,
             selfServiceClientId: req.params.selfServiceClientId,
             clientId: req.params.clientId,
@@ -56,7 +56,7 @@ router.post("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-
 
 // Testing route for "Finish connecting the sign in journey to your service" page
 router.get("/redirect-placeholder", (req, res) => {
-    res.render("service-details/finish-connecting-sign-in-journey.njk", {
+    res.render("test/service-details/finish-connecting-sign-in-journey.njk", {
         changeRedirectUrisUrl: "/services/:serviceId/clients/:clientId/:selfServiceClientId/change-redirect-uris",
         changePublicKeyUrl: "/services/:serviceId/clients/:clientId/:selfServiceClientId/change-public-key"
     });
@@ -68,7 +68,7 @@ router.get("/redirect-placeholder", (req, res) => {
 
 //// Testing route without public key - "First time change"
 router.get("/change-public-key-v2", (req, res) => {
-    res.render("service-details/change-public-key-v2.njk", {
+    res.render("test/change-public-key-v2.njk", {
         serviceId: "mockedServiceId",
         selfServiceClientId: "mockedSelfServiceClientId",
         clientId: "mockedClientId",
@@ -78,7 +78,7 @@ router.get("/change-public-key-v2", (req, res) => {
 
 //// Testing route with public key - "Returning change"
 router.get("/change-public-key-v2-returning", (req, res) => {
-    res.render("service-details/change-public-key-v2.njk", {
+    res.render("test/change-public-key-v2.njk", {
         serviceId: "mockedServiceId",
         selfServiceClientId: "mockedSelfServiceClientId",
         clientId: "mockedClientId",
@@ -95,7 +95,7 @@ router.post("/change-public-key-v2", async (req, res) => {
     const serviceUserPublicKeyFile = req.body.serviceUserPublicKeyFile;
 
     if (serviceUserPublicKey === "text" && serviceUserPublicKeyText === "") {
-        res.render("service-details/change-public-key-v2.njk", {
+        res.render("test/change-public-key-v2.njk", {
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
             clientId: "mockedClientId",
@@ -110,7 +110,7 @@ router.post("/change-public-key-v2", async (req, res) => {
     }
 
     if (serviceUserPublicKey === "file" && serviceUserPublicKeyFile === "") {
-        res.render("service-details/change-public-key-v2.njk", {
+        res.render("test/change-public-key-v2.njk", {
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
             clientId: "mockedClientId",
@@ -125,7 +125,7 @@ router.post("/change-public-key-v2", async (req, res) => {
     }
 
     if (serviceUserPublicKeyText === "" && serviceUserPublicKeyFile === "") {
-        res.render("service-details/change-public-key-v2.njk", {
+        res.render("test/change-public-key-v2.njk", {
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
             clientId: "mockedClientId",
@@ -143,28 +143,28 @@ router.post("/change-public-key-v2", async (req, res) => {
 
 //// Testing route to redirect to client details
 router.get("/client-details-mocked", (req, res) => {
-    res.render("service-details/client-details.njk", {
+    res.render("clients/client-details.njk", {
         serviceName: "My juggling service"
     });
 });
 
 // Testing routes for Change your email address page
 router.get("/change-email-address", (req, res) => {
-    res.render("account/change-email-address.njk", {
+    res.render("test/change-email-address.njk", {
         values: {
             emailAddress: "your.email@digital.cabinet-office.gov.uk"
         }
     });
 });
 
-router.post("/change-email-address", emailValidator("account/change-email-address.njk"), async (req, res) => {
+router.post("/change-email-address", emailValidator("test/change-email-address.njk"), async (req, res) => {
     res.redirect("/account");
 });
 
 // Testing routes for Check your email address page
 // The url needs to be updated when implementing functionality
 router.get("/check-email-visual-test", (req, res) => {
-    res.render("account/check-email.njk", {
+    res.render("test/check-email.njk", {
         values: {
             emailAddress: "email@address.com"
         }
@@ -173,7 +173,7 @@ router.get("/check-email-visual-test", (req, res) => {
 
 router.post("/check-email-visual-test", async (req, res) => {
     if (req.body.securityCode === "") {
-        res.render("account/check-email.njk", {
+        res.render("test/check-email.njk", {
             errorMessages: {
                 securityCode: "Your code should be 6 characters long"
             }
@@ -197,21 +197,16 @@ router.get("/account-success-screen-test", (req, res) => {
 
 // Testing route for testing when the private beta request has already been submitted.
 router.get("/private-beta-submitted", (req, res) => {
-    res.render("service-details/private-beta.njk", {
+    res.render("clients/private-beta.njk", {
         privateBetaRequestSubmitted: true,
         dateRequestSubmitted: "10 May 2022",
         serviceName: "My juggling license"
     });
 });
 
-// Testing route for 'Problem with the service' page
-router.get("/there-is-a-problem-test", (req, res) => {
-    res.render("there-is-a-problem.njk");
-});
-
 // Testing routs for 'We need to do security checks' page
 router.get("/security-check-change-number", (req, res) => {
-    res.render("security-check-change-number.njk", {
+    res.render("test/security-check-change-number.njk", {
         values: {
             emailAddress: "your.email@digital.cabinet-office.gov.uk"
         }
@@ -220,7 +215,7 @@ router.get("/security-check-change-number", (req, res) => {
 
 router.post("/security-check-change-number", async (req, res) => {
     if (req.body.securityCode === "") {
-        res.render("security-check-change-number.njk", {
+        res.render("test/security-check-change-number.njk", {
             values: {
                 emailAddress: "your.email@digital.cabinet-office.gov.uk"
             },
@@ -232,22 +227,22 @@ router.post("/security-check-change-number", async (req, res) => {
         return;
     }
 
-    res.redirect("/test/confirm-phone-number");
+    res.redirect("/confirm-phone-number");
 });
 
 // Testing routes for 'Confirm the phone number' page
 router.get("/confirm-phone-number", (req, res) => {
-    res.render("confirm-phone-number.njk");
+    res.render("test/confirm-phone-number.njk");
 });
 
 // TODO this validates the string but it needs to check the given number matches what's in Cognito
-router.post("/confirm-phone-number", validateMobileNumber("confirm-phone-number.njk"), async (req, res) => {
-    res.redirect("/test/new-phone-number");
+router.post("/confirm-phone-number", validateMobileNumber("test/confirm-phone-number.njk"), async (req, res) => {
+    res.redirect("/new-phone-number");
 });
 
 // Testing routes for 'You’ve changed the phone number linked to your account' page
 router.get("/phone-number-changed", (req, res) => {
-    res.render("phone-number-changed.njk");
+    res.render("test/phone-number-changed.njk");
 });
 
 router.post("/phone-number-changed", async (req, res) => {
@@ -256,38 +251,38 @@ router.post("/phone-number-changed", async (req, res) => {
 
 // Testing routes for 'Confirm the phone number' page
 router.get("/new-phone-number", (req, res) => {
-    res.render("new-phone-number.njk");
+    res.render("test/new-phone-number.njk");
 });
 
-router.post("/new-phone-number", validateMobileNumber("new-phone-number.njk"), async (req, res) => {
-    res.render("common/check-mobile.njk");
+router.post("/new-phone-number", validateMobileNumber("test/new-phone-number.njk"), async (req, res) => {
+    res.render("common/enter-text-code.njk");
 });
 
 // Testing routes for 'An account already exist' page
 router.get("/account-exists", (req, res) => {
-    res.render("create-account/account-exists.njk", {
+    res.render("register/account-exists.njk", {
         values: {
             emailAddress: "email@address.com"
         }
     });
 });
 
-router.post("/account-exists", passwordValidator("create-account/account-exists.njk"), async (req, res) => {
-    res.render("common/check-mobile.njk");
+router.post("/account-exists", passwordValidator("register/account-exists.njk"), async (req, res) => {
+    res.render("common/enter-text-code.njk");
 });
 
 //// Testing routes for 'You entered the wrong mobile security code too many times' page
 //// The code below is for frontend/visual testing purposes only
 
 router.get("/wrong-text-code", (req, res) => {
-    res.render("wrong-otp-too-many-times.njk", {
+    res.render("test/wrong-otp-too-many-times.njk", {
         pageTitle: "Wrong text message code entered too many times"
     });
 });
 
 // When implementing the backend, depending on journey we should request new code and after that redirect (/create/enter-mobile or /sign-in/enter-text-code) or render the appropriate template - depending on implementation
 router.post("/wrong-text-code", async (req, res) => {
-    res.render("common/check-mobile.njk");
+    res.render("common/enter-text-code.njk");
 });
 
 //// Testing routes for 'You entered the wrong email security code too many times' page
@@ -299,7 +294,7 @@ router.get("/wrong-email-code", (req, res) => {
 
 // When implementing the backend, depending on journey we should request new code and after that redirect or render the appropriate template - depending on implementation
 router.post("/wrong-email-code", async (req, res) => {
-    res.render("account/check-email.njk");
+    res.render("test/check-email.njk");
 });
 
 router.get("/resend-email-code", async (req, res) => {
@@ -314,7 +309,7 @@ router.post("/resend-email-code", async (req, res) => {
 
 // Testing route for 'Team members' page
 router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res) => {
-    res.render("service-details/team-members.njk", {
+    res.render("test/team-members.njk", {
         serviceId: req.params.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
@@ -412,18 +407,18 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
 
 //// Testing routes for Create 'invite team member' page
 router.get("/invite-team-member", (req, res) => {
-    res.render("service-details/invite-team-member.njk", {
+    res.render("test/invite-team-member.njk", {
         serviceName: "Frontend Test Service"
     });
 });
 
-router.post("/invite-team-member", emailValidator("service-details/invite-team-member.njk"), async (req, res) => {
+router.post("/invite-team-member", emailValidator("test/invite-team-member.njk"), async (req, res) => {
     res.redirect("/invitation-sent");
 });
 
 //// Testing routes for 'Email invite sent' page
 router.get("/invitation-sent", (req, res) => {
-    res.render("service-details/invitation-sent.njk", {
+    res.render("test/invitation-sent.njk", {
         serviceName: "Frontend Test Service",
         userEmail: "james.pirot@digital.cabinet-office.gov.uk"
     });
@@ -431,12 +426,12 @@ router.get("/invitation-sent", (req, res) => {
 
 //// Testing routes for Create the 'Add a name' page
 router.get("/name-content-info", (req, res) => {
-    res.render("name-content-info.njk");
+    res.render("test/name-content-info.njk");
 });
 
 router.post("/name-content-info", async (req, res) => {
     if (req.body.userName === "") {
-        res.render("name-content-info.njk", {
+        res.render("test/name-content-info.njk", {
             errorMessages: {
                 userName: "Enter your name"
             }
@@ -448,17 +443,17 @@ router.post("/name-content-info", async (req, res) => {
 
 //// Testing routes for 'Service unavailable' page
 router.get("/service-unavailable", (req, res) => {
-    res.render("service-unavailable.njk");
+    res.render("test/service-unavailable.njk");
 });
 
 //// Testing routes for 'Enter the 6 digit security code from your authenticator app' page
 router.get("/enter-app-code", (req, res) => {
-    res.render("common/enter-app-code.njk");
+    res.render("test/enter-app-code.njk");
 });
 
 router.post("/enter-app-code", (req, res) => {
     if (!req.body.securityCode) {
-        res.render("common/enter-app-code.njk", {
+        res.render("test/enter-app-code.njk", {
             errorMessages: {
                 securityCode: "Enter the 6 digit code from your authenticator app"
             }
@@ -470,12 +465,12 @@ router.post("/enter-app-code", (req, res) => {
 
 //// Testing routes for 'Choose how to get your security code' page
 router.get("/choose-security-codes", (req, res) => {
-    res.render("create-account/choose-security-codes.njk");
+    res.render("test/choose-security-codes.njk");
 });
 
 router.post("/choose-security-codes", (req, res) => {
     if (!req.body.chooseSecurityCodeMethod) {
-        res.render("create-account/choose-security-codes.njk", {
+        res.render("test/choose-security-codes.njk", {
             errorMessages: {
                 "chooseSecurityCodeMethod-options": "Select how to get security codes"
             }
@@ -494,14 +489,14 @@ router.post("/choose-security-codes", (req, res) => {
 
 ////// Testing routes for 'Set up authenticator app' page
 router.get("/set-up-auth-app", (req, res) => {
-    res.render("create-account/set-up-auth-app.njk", {
+    res.render("test/set-up-auth-app.njk", {
         qrCodeUrl: "/assets/images/test-qr-code.png"
     });
 });
 
 router.post("/set-up-auth-app", (req, res) => {
     if (!req.body.securityCode) {
-        res.render("create-account/set-up-auth-app.njk", {
+        res.render("test/set-up-auth-app.njk", {
             qrCodeUrl: "/assets/images/test-qr-code.png",
             errorMessages: {
                 securityCode: "Enter the 6 digit code"

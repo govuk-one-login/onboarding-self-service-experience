@@ -1,0 +1,26 @@
+{% extends "layouts/form.njk" %}
+
+{% set pageTitle = "Security check" %}
+{% set backLinkPath = "/sign-in/resend-text-code" %}
+{% set formButtonText = "Continue" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l">We need to do a security check</h1>
+  <p class="govuk-body">Before you can change your phone number, we need to do a security check to make sure it’s you.</p>
+
+  <div class="govuk-inset-text">
+    We have sent an email to: <span class="govuk-!-font-weight-bold">{{ values.emailAddress }}</span>
+  </div>
+
+  <p class="govuk-body">The email contains a 6 digit security code.</p>
+  <p class="govuk-body">The email might take a few minutes to arrive. If you do not get an email, check your spam folder.</p>
+  <p class="govuk-body">The code will expire after 15 minutes.</p>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.securityCodeInput() }}
+{% endblock %}
+
+{% block afterForm %}
+  <p class="govuk-body"><a id="resend-code-page" class="govuk-link" href="/resend-email-code">Problems receiving an email?</a></p>
+{% endblock %}
