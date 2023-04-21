@@ -1,5 +1,4 @@
 import {Router} from "express";
-import "express-async-errors";
 import path from "path";
 import {
     accountExists,

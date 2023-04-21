@@ -1,19 +1,13 @@
-import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import {convertToAttr} from "@aws-sdk/util-dynamodb";
 import {AxiosResponse} from "axios";
-import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {DynamoUser} from "../../../@types/user";
-import {Updates} from "../self-service-services-service";
-import LambdaFacadeInterface from "./LambdaFacadeInterface";
+import LambdaFacadeInterface, {ClientUpdates, UserUpdates} from "./LambdaFacadeInterface";
 
 const defaultPublicKey =
     "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
 
-/* eslint-disable @typescript-eslint/no-unused-vars --
- * Ignore unused vars in stubs
- */
 class StubLambdaFacade implements LambdaFacadeInterface {
     private publicKey = defaultPublicKey;
     private serviceName = "Test Service";
@@ -36,7 +30,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         console.log("Creating stub Lambda facade...");
     }
 
-    getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
+    getUserByCognitoId(): Promise<AxiosResponse> {
         return Promise.resolve({
             data: {
                 Item: this.user
@@ -44,16 +38,15 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         } as AxiosResponse);
     }
 
-    newService(service: Service, userId: string, email: string, accessToken: string): Promise<AxiosResponse> {
+    async newService(service: Service): Promise<void> {
         this.serviceName = service.serviceName;
-        return Promise.resolve({data: {output: JSON.stringify({serviceId: "stub-service-id"})}} as AxiosResponse);
     }
 
-    putUser(user: OnboardingTableItem, accessToken: string): Promise<AxiosResponse> {
-        return Promise.resolve({} as AxiosResponse);
+    async putUser(): Promise<void> {
+        return;
     }
 
-    generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse> {
+    generateClient(): Promise<AxiosResponse> {
         return Promise.resolve({
             data: {
                 output: JSON.stringify({body: JSON.stringify({pk: "stub-service-id"})})
@@ -61,13 +54,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         } as AxiosResponse);
     }
 
-    updateClient(
-        serviceId: string,
-        selfServiceClientId: string,
-        clientId: string,
-        updates: Record<string, string | string[]>,
-        accessToken: string
-    ): Promise<AxiosResponse> {
+    async updateClient(serviceId: string, selfServiceClientId: string, clientId: string, updates: ClientUpdates): Promise<void> {
         if (updates.public_key) {
             this.publicKey = updates.public_key as string;
         }
@@ -87,11 +74,9 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         if (updates.scopes) {
             this.scopes = updates.scopes as string[];
         }
-
-        return Promise.resolve({} as AxiosResponse);
     }
 
-    listServices(userId: string, accessToken: string): Promise<AxiosResponse> {
+    listServices(): Promise<AxiosResponse> {
         return Promise.resolve({
             data: {
                 Items: [
@@ -107,7 +92,7 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         } as AxiosResponse);
     }
 
-    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse<QueryCommandOutput>> {
+    listClients(): Promise<AxiosResponse<QueryCommandOutput>> {
         return Promise.resolve({
             data: {
                 Items: [
@@ -144,20 +129,13 @@ class StubLambdaFacade implements LambdaFacadeInterface {
         } as AxiosResponse);
     }
 
-    updateUser(selfServiceUserId: string, updates: Updates, accessToken: string): Promise<AxiosResponse> {
+    async updateUser(selfServiceUserId: string, updates: UserUpdates): Promise<void> {
         Object.keys(updates).forEach(key => (this.user[key as keyof DynamoUser] = {S: updates[key] as string}));
-        return Promise.resolve({} as AxiosResponse);
     }
 
-    privateBetaRequest(
-        name: string,
-        department: string,
-        serviceName: string,
-        emailAddress: string,
-        accessToken: string
-    ): Promise<AxiosResponse> {
-        return Promise.resolve({} as AxiosResponse);
+    async privateBetaRequest(): Promise<void> {
+        return;
     }
 }
 
-export const lambdaFacadeInstance = new StubLambdaFacade();
+export default new StubLambdaFacade();
