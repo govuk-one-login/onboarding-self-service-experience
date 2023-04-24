@@ -37,8 +37,8 @@ router.get("/", (req, res) => {
     res.redirect(303, path.join(req.baseUrl, "/enter-email-address"));
 });
 
-router.route("/enter-email-address").get(showGetEmailForm).post(emailValidator("create-account/get-email.njk"), processGetEmailForm);
-router.route("/account-exists").get(accountExists).post(processSignInForm("create-account/existing-account.njk"));
+router.route("/enter-email-address").get(showGetEmailForm).post(emailValidator("register/enter-email-address.njk"), processGetEmailForm);
+router.route("/account-exists").get(accountExists).post(processSignInForm("register/account-exists.njk"));
 router.route("/enter-email-code").get(showCheckEmailForm).post(emailSecurityCodeValidator, submitEmailSecurityCode);
 router.route("/resend-email-code").get(showResendEmailCodeForm).post(resendEmailVerificationCode);
 
@@ -46,8 +46,8 @@ router
     .route("/create-password")
     .get(showNewPasswordForm)
     .post(
-        passwordValidator("create-account/new-password.njk"),
-        notOnCommonPasswordListValidator("create-account/new-password.njk", "password", ["password"]),
+        passwordValidator("register/create-password.njk"),
+        notOnCommonPasswordListValidator("register/create-password.njk", "password", ["password"]),
         updatePassword
     );
 
@@ -56,7 +56,7 @@ router.use(checkAuthorisation);
 router
     .route("/enter-phone-number")
     .get(showEnterMobileForm)
-    .post(validateMobileNumber("create-account/enter-mobile.njk"), processEnterMobileForm);
+    .post(validateMobileNumber("register/enter-phone-number.njk"), processEnterMobileForm);
 
 router
     .route("/enter-text-code")

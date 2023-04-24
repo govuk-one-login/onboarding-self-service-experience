@@ -35,7 +35,7 @@ describe("It checks whether a mobile security code is valid and behaves accordin
 
         mobileSecurityCodeValidator("/get-another-message", false)(mockRequest as Request, mockResponse as Response, nextFunction);
 
-        expect(mockResponse.render).toHaveBeenCalledWith("common/check-mobile.njk", {
+        expect(mockResponse.render).toHaveBeenCalledWith("common/enter-text-code.njk", {
             errorMessages: {
                 securityCode: "Enter the security code using only 6 digits"
             },

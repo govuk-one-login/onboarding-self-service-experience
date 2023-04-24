@@ -10,7 +10,7 @@ export async function emailSecurityCodeValidator(req: Request, res: Response, ne
     if (result.isValid) {
         next();
     } else {
-        res.render("create-account/check-email.njk", {
+        res.render("register/enter-email-code.njk", {
             values: {
                 emailAddress: req.session.emailAddress as string,
                 securityCode: securityCode

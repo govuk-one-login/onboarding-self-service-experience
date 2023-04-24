@@ -17,7 +17,7 @@ export function mobileSecurityCodeValidator(textMessageNotReceivedUrl: string, h
         if (validationResponse.isValid) {
             next();
         } else {
-            res.render("common/check-mobile.njk", {
+            res.render("common/enter-text-code.njk", {
                 values: {
                     securityCode: securityCode,
                     mobileNumber: mobileNumber,

@@ -35,7 +35,7 @@ describe("It checks whether an email security code is valid and behaves accordin
 
         emailSecurityCodeValidator(mockRequest as Request, mockResponse as Response, nextFunction);
 
-        expect(mockResponse.render).toHaveBeenCalledWith("create-account/check-email.njk", {
+        expect(mockResponse.render).toHaveBeenCalledWith("register/enter-email-code.njk", {
             values: {
                 emailAddress: "render-this@test.gov.uk",
                 securityCode: "123"

@@ -6,7 +6,7 @@ import {obscureNumber} from "../lib/mobileNumberUtils";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const showSignInFormEmail = async function (req: Request, res: Response) {
-    res.render("sign-in.njk");
+    res.render("sign-in/enter-email-address.njk");
 };
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
@@ -17,7 +17,7 @@ export const showCheckPhonePage = async function (req: Request, res: Response) {
         return;
     }
 
-    res.render("common/check-mobile.njk", {
+    res.render("common/enter-text-code.njk", {
         headerActiveItem: "sign-in",
         values: {
             mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo),
@@ -51,15 +51,15 @@ export const processEmailAddress = async function (req: Request, res: Response) 
 };
 
 export const showSignInFormPassword = async function (req: Request, res: Response) {
-    res.render("sign-in-enter-password.njk");
+    res.render("sign-in/enter-password.njk");
 };
 
 export const showResendPhoneCodePage = async function (req: Request, res: Response) {
-    res.render("resend-phone-code-sign-in.njk");
+    res.render("sign-in/resend-text-code.njk");
 };
 
 export const forgotPasswordForm = async function (req: Request, res: Response) {
-    res.render("forgot-password.njk", {
+    res.render("sign-in/forgot-password.njk", {
         values: {
             emailAddress: req.session.emailAddress
         }
@@ -71,7 +71,7 @@ export const checkEmailPasswordReset = async function (req: Request, res: Respon
 };
 
 export const confirmForgotPasswordForm = async function (req: Request, res: Response) {
-    res.render("create-new-password.njk", {
+    res.render("sign-in/create-new-password.njk", {
         loginName: req.query.loginName,
         confirmationCode: req.query.confirmationCode
     });
@@ -90,7 +90,7 @@ export const confirmForgotPassword = async function (req: Request, res: Response
         next();
     } catch (error) {
         if (error instanceof LimitExceededException) {
-            res.render("create-new-password.njk", {
+            res.render("sign-in/create-new-password.njk", {
                 errorMessages: {
                     password: "You have tried to change your password too many times. Try again in 15 minutes."
                 },
@@ -111,7 +111,7 @@ const forgotPassword = async function (req: Request, res: Response) {
         await s4.forgotPassword(req.session.emailAddress as string, uri as string);
     } catch (error) {
         if (error instanceof UserNotFoundException) {
-            res.render("sign-in.njk", {
+            res.render("sign-in/enter-email-address.njk", {
                 errorMessages: {
                     emailAddress: "User does not exist."
                 },
@@ -122,7 +122,7 @@ const forgotPassword = async function (req: Request, res: Response) {
             return;
         }
         if (error instanceof LimitExceededException) {
-            res.render("sign-in.njk", {
+            res.render("sign-in/enter-email-address.njk", {
                 errorMessages: {
                     emailAddress: "You have tried to change your password too many times. Try again in 15 minutes."
                 },
@@ -134,5 +134,5 @@ const forgotPassword = async function (req: Request, res: Response) {
         }
         throw error;
     }
-    res.render("check-email-password-reset.njk");
+    res.render("sign-in/enter-email-code.njk");
 };

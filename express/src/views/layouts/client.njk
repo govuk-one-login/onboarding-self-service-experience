@@ -1,0 +1,50 @@
+{% extends "./base.njk" %}
+
+{% set sidebarActiveItem = sidebarActiveItem | default("client-details") %}
+{% set mainClasses = "govuk-!-padding-top-5 left-nav-wrapper" %}
+
+{% block beforeContent %}
+  <nav>
+    <div class="govuk-phase-banner govuk-clearfix">
+      <div class="govuk-breadcrumbs">
+        <ol class="govuk-breadcrumbs__list navigation-service-change-list">
+          <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19">
+            <a class="govuk-breadcrumbs__link" href="/services">Your services</a>
+          </li>
+          {% if serviceName %}
+            <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19 govuk-!-font-weight-bold">{{ serviceName }}</li>
+          {% endif %}
+        </ol>
+        <a href="/services/{{ serviceId }}/clients/{{ clientId }}/{{ selfServiceClientId }}/change-service-name?serviceName={{ serviceName }}"
+           class="govuk-link govuk-link--no-visited-state navigation-service-change govuk-!-font-size-19">
+          Change service name
+        </a>
+      </div>
+    </div>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    {% if sidebarNavigationState === "disabled" %}
+    {% else %}
+      <div class="govuk-grid-column-one-third">
+        <nav class="side-navigation govuk-!-margin-top-3">
+          <ul class="govuk-list side-navigation__list">
+            <li class="side-navigation__item{% if sidebarActiveItem == 'client-details' %} side-navigation__item--active{% endif %}">
+              <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}/clients">Client details</a>
+            </li>
+            <li class="side-navigation__item{% if sidebarActiveItem == 'private-beta' %} side-navigation__item--active{% endif %}">
+              <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}/clients/{{ clientId }}/{{ selfServiceClientId }}/private-beta">
+                Joining private beta
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
+    <div class="govuk-grid-column-two-thirds left-nav-service-details">
+      {% block mainContent %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layouts/form.njk" %}
+{% from "macros/back-link.njk" import backLink %}
+
+{% set pageTitle = "Check your mobile phone" %}
+{% set backLinkHtml = backLink("#", {onclick: "history.back()"}) %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l">Check your mobile phone</h1>
+  <div class="govuk-inset-text">
+    We sent a code to: <span class="govuk-!-font-weight-bold">{{ values.mobileNumber }}</span>
+  </div>
+  <p class="govuk-body">It might take a few minutes to arrive. The code will expire after 15 minutes.</p>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.securityCodeInput() }}
+{% endblock %}
+
+{% block afterForm %}
+  <p class="govuk-body">
+    <a class="govuk-link " href="{{ values.textMessageNotReceivedUrl }}">Problems receiving a text message?</a>
+  </p>
+{% endblock %}

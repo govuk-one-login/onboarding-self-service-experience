@@ -43,7 +43,7 @@ router
 router
     .route("/:clientId/:selfServiceClientId/change-redirect-uris")
     .get(showProcessChangeRedirectUrlsForm)
-    .post(urisValidator("service-details/change-redirect-uris.njk"), processChangeRedirectUrlsForm);
+    .post(urisValidator("clients/change-redirect-uris.njk"), processChangeRedirectUrlsForm);
 
 router
     .route("/:clientId/:selfServiceClientId/change-user-attributes")
@@ -53,4 +53,4 @@ router
 router
     .route("/:clientId/:selfServiceClientId/change-post-logout-uris")
     .get(showProcessChangePostLogoutUrisForm)
-    .post(urisValidator("service-details/change-post-logout-uris.njk"), processChangePostLogoutUrisForm);
+    .post(urisValidator("clients/change-post-logout-uris.njk"), processChangePostLogoutUrisForm);
