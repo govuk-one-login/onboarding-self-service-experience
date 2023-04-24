@@ -1,7 +1,7 @@
 Feature: Happy paths for the self-service sign-in flow
 
   Background:
-    Given that the user is on the "/sign-in" page
+    Given the user is on the "/sign-in" page
 
   Scenario: The user’s email address is accepted for sign-in
     When they enter "registered@gds.gov.uk" into the "emailAddress" field

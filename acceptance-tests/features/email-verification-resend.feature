@@ -1,7 +1,7 @@
 Feature: A contact form to resend the verification code to email
 
   Background:
-    Given that the user is on the "/register" page
+    Given the user is on the "/register" page
     And the user submits the email "registering-successfully@gds.gov.uk"
     Then they should be redirected to the "/register/enter-email-code" page
 

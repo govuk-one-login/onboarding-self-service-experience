@@ -1,7 +1,7 @@
 Feature: Resending the security code to a mobile phone
 
   Background:
-    Given that the user is on the "/register" page
+    Given the user is on the "/register" page
     And the user submits the email "registering-successfully@gds.gov.uk"
     And the user submits the security code "435553"
     And the user submits the password "this-is-not-a-common-password"
