@@ -1,16 +1,16 @@
 import {Router} from "express";
 import {
     changePassword,
-    processChangePhoneNumberForm,
+    changePasswordForm,
+    changePhoneNumber,
+    changePhoneNumberForm,
+    enterTextCodeForm,
     showAccount,
-    showChangePasswordForm,
-    showChangePhoneNumberForm,
-    showVerifyMobileWithSmsCode,
-    verifyMobileWithSmsCode
+    submitTextCode
 } from "../controllers/account";
 import checkAuthorisation from "../middleware/authoriser";
 import headerActiveItem, {HeaderItem} from "../middleware/navigation";
-import {redirect} from "../middleware/request-handler";
+import {redirect, render} from "../middleware/request-handler";
 import checkPasswordAllowed from "../middleware/validators/common-password-validator";
 import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator";
 import validateMobileNumber from "../middleware/validators/mobile-number-validator";
@@ -26,7 +26,7 @@ router.get("/", showAccount);
 
 router
     .route("/change-password")
-    .get(showChangePasswordForm)
+    .get(changePasswordForm)
     .post(
         // TODO replace this by field validation middleware
         (req, res, next) => {
@@ -53,19 +53,19 @@ router
 
 router
     .route("/change-phone-number")
-    .get(showChangePhoneNumberForm)
-    .post(validateMobileNumber("account/change-phone-number.njk"), processChangePhoneNumberForm);
+    .get(changePhoneNumberForm)
+    .post(validateMobileNumber("account/change-phone-number.njk"), changePhoneNumber);
 
 router
     .route("/change-phone-number/enter-text-code")
-    .get(showVerifyMobileWithSmsCode)
-    .post(validateMobileSecurityCode("resend-text-code", false), verifyMobileWithSmsCode);
+    .get(enterTextCodeForm)
+    .post(validateMobileSecurityCode("resend-text-code", false), submitTextCode);
 
 router
     .route("/change-phone-number/resend-text-code")
-    .get((req, res) => {
-        res.render("common/resend-security-code.njk", {
+    .get(
+        render("common/resend-security-code.njk", {
             securityCodeMethod: "phone"
-        });
-    })
+        })
+    )
     .post(redirect("change-phone-number/enter-text-code"));

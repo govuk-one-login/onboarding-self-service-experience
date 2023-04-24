@@ -7,7 +7,6 @@ import {lambda} from "../../config/environment";
 import AuthenticationResultParser from "../../lib/authentication-result-parser";
 import LambdaFacadeInterface, {ClientUpdates, UserUpdates} from "./LambdaFacadeInterface";
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 class LambdaFacade implements LambdaFacadeInterface {
     private readonly client: Axios;
 
@@ -78,6 +77,14 @@ class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async updateUser(selfServiceUserId: string, updates: UserUpdates, accessToken: string): Promise<void> {
+        for (const property in updates) {
+            const value = updates[property];
+
+            if (value instanceof Date) {
+                updates[property] = value.toISOString();
+            }
+        }
+
         const body = {
             userId: selfServiceUserId,
             updates: updates

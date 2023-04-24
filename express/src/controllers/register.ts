@@ -8,9 +8,9 @@ import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
-export const showGetEmailForm = render("register/enter-email-address.njk");
+export const enterEmailForm = render("register/enter-email-address.njk");
 
-export const processGetEmailForm: RequestHandler = async (req, res) => {
+export const submitEmail: RequestHandler = async (req, res) => {
     const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
@@ -28,7 +28,15 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
     res.redirect("/register/enter-email-code");
 };
 
-export const showCheckEmailForm: RequestHandler = (req, res) => {
+export const accountExists: RequestHandler = (req, res) => {
+    res.render("register/account-exists.njk", {
+        values: {
+            emailAddress: req.session.emailAddress
+        }
+    });
+};
+
+export const enterEmailCodeForm: RequestHandler = (req, res) => {
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
@@ -36,7 +44,7 @@ export const showCheckEmailForm: RequestHandler = (req, res) => {
     res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
 
-export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
+export const submitEmailCode: RequestHandler = async (req, res) => {
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
@@ -62,7 +70,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     res.redirect("/register/create-password");
 };
 
-export const showNewPasswordForm: RequestHandler = (req, res) => {
+export const createPasswordForm: RequestHandler = (req, res) => {
     // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
         return res.render("register/create-password.njk");
@@ -71,7 +79,7 @@ export const showNewPasswordForm: RequestHandler = (req, res) => {
     res.redirect("/sign-in");
 };
 
-export const updatePassword: RequestHandler = async (req, res) => {
+export const createPassword: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const emailAddress = nonNull(req.session.emailAddress);
 
@@ -82,13 +90,13 @@ export const updatePassword: RequestHandler = async (req, res) => {
     res.redirect("/register/enter-phone-number");
 };
 
-export const showEnterMobileForm: RequestHandler = (req, res) => {
+export const enterPhoneNumberForm: RequestHandler = (req, res) => {
     res.render("register/enter-phone-number.njk", {
         value: {mobileNumber: req.session.mobileNumber}
     });
 };
 
-export const processEnterMobileForm: RequestHandler = async (req, res) => {
+export const submitPhoneNumber: RequestHandler = async (req, res) => {
     const accessToken = req.session.authenticationResult?.AccessToken;
 
     if (!accessToken) {
@@ -106,12 +114,7 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
     res.redirect("/register/enter-text-code");
 };
 
-export const resendMobileVerificationCode: RequestHandler = (req, res, next) => {
-    req.body.mobileNumber = req.session.enteredMobileNumber;
-    return processEnterMobileForm(req, res, next);
-};
-
-export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
+export const enterTextCodeForm: RequestHandler = (req, res) => {
     res.render("common/enter-text-code.njk", {
         values: {
             mobileNumber: req.session.enteredMobileNumber,
@@ -120,7 +123,7 @@ export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
     });
 };
 
-export const submitMobileVerificationCode: RequestHandler = async (req, res) => {
+export const submitTextCode: RequestHandler = async (req, res) => {
     const securityCode = req.body.securityCode;
 
     if (!securityCode) {
@@ -174,18 +177,24 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     res.redirect("/register/create-service");
 };
 
-export const showResendPhoneCodeForm = render("register/resend-text-code.njk");
-export const showResendEmailCodeForm = render("register/resend-email-code.njk");
+export const resendTextCodeForm = render("register/resend-text-code.njk");
 
-export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
+export const resendTextCode: RequestHandler = (req, res, next) => {
+    req.body.mobileNumber = req.session.enteredMobileNumber;
+    return submitPhoneNumber(req, res, next);
+};
+
+export const resendEmailCodeForm = render("register/resend-email-code.njk");
+
+export const resendEmailCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
     res.redirect("/register/enter-email-code");
 };
 
-export const showAddServiceForm = render("register/add-service-name.njk");
+export const createServiceForm = render("register/add-service-name.njk");
 
-export const processAddServiceForm: RequestHandler = async (req, res) => {
+export const createService: RequestHandler = async (req, res) => {
     const uuid = randomUUID();
     const service: Service = {
         id: `service#${uuid}`,
@@ -214,12 +223,4 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
 
     req.session.serviceName = req.body.serviceName;
     res.redirect(`/services/${serviceId.substring(8)}/clients`);
-};
-
-export const accountExists: RequestHandler = (req, res) => {
-    res.render("register/account-exists.njk", {
-        values: {
-            emailAddress: req.session.emailAddress
-        }
-    });
 };

@@ -15,8 +15,8 @@ export function redirect(url: string, fromAppRoot = false): RequestHandler {
     };
 }
 
-export function render(view: string): RequestHandler {
+export function render(view: string, options?: object): RequestHandler {
     return (req, res) => {
-        res.render(view);
+        res.render(view, options);
     };
 }

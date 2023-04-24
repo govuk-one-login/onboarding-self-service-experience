@@ -1,5 +1,5 @@
-import {User, DynamoUser} from "../../../@types/user";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
+import {DynamoUser, User} from "../../../@types/user";
 
 export function userToDomainUser(user: DynamoUser): User {
     return {

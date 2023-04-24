@@ -7,10 +7,9 @@ import {
 import {RequestHandler} from "express";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
+import parseDate from "../lib/utils/time";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
-
-export const showChangePasswordForm = render("account/change-password.njk");
 
 export const showAccount: RequestHandler = async (req, res) => {
     const authenticationResult = nonNull(req.session.authenticationResult);
@@ -20,7 +19,7 @@ export const showAccount: RequestHandler = async (req, res) => {
     res.render("account/account.njk", {
         emailAddress: user.email,
         mobilePhoneNumber: user.mobileNumber,
-        passwordLastChanged: lastUpdated(user.passwordLastUpdated),
+        passwordLastChanged: `Last updated ${parseDate(user.passwordLastUpdated)}`,
         serviceName: "My juggling service",
         updatedField: req.session.updatedField
     });
@@ -28,6 +27,8 @@ export const showAccount: RequestHandler = async (req, res) => {
     req.session.mobileNumber = AuthenticationResultParser.getPhoneNumber(authenticationResult);
     req.session.updatedField = undefined;
 };
+
+export const changePasswordForm = render("account/change-password.njk");
 
 export const changePassword: RequestHandler = async (req, res) => {
     const newPassword = req.body.newPassword;
@@ -63,9 +64,9 @@ export const changePassword: RequestHandler = async (req, res) => {
     res.redirect("/account");
 };
 
-export const showChangePhoneNumberForm = render("account/change-phone-number.njk");
+export const changePhoneNumberForm = render("account/change-phone-number.njk");
 
-export const processChangePhoneNumberForm: RequestHandler = async (req, res) => {
+export const changePhoneNumber: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     await s4.setPhoneNumber(
@@ -79,7 +80,7 @@ export const processChangePhoneNumberForm: RequestHandler = async (req, res) => 
     res.redirect("/account/change-phone-number/enter-text-code");
 };
 
-export const showVerifyMobileWithSmsCode: RequestHandler = (req, res) => {
+export const enterTextCodeForm: RequestHandler = (req, res) => {
     res.render("common/enter-text-code.njk", {
         values: {
             mobileNumber: req.session.enteredMobileNumber,
@@ -88,7 +89,7 @@ export const showVerifyMobileWithSmsCode: RequestHandler = (req, res) => {
     });
 };
 
-export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
+export const submitTextCode: RequestHandler = async (req, res) => {
     const authenticationResult = nonNull(req.session.authenticationResult);
     const accessToken = nonNull(authenticationResult.AccessToken);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
@@ -125,30 +126,3 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
     req.session.updatedField = "mobile phone number";
     res.redirect("/account");
 };
-
-function lastUpdated(lastUpdated: string): string {
-    const lastUpdateMillis: number = +new Date(lastUpdated);
-    const now = +new Date();
-
-    if (lastUpdateMillis > fiveMinutesBefore(now)) {
-        return "Last updated just now";
-    } else if (wasToday(lastUpdateMillis)) {
-        return "Last updated today";
-    } else {
-        return `Last updated ${new Date(lastUpdateMillis).toLocaleDateString("en-gb", {
-            weekday: "long",
-            day: "numeric",
-            year: "numeric",
-            month: "long"
-        })}`;
-    }
-}
-
-function fiveMinutesBefore(someTime: number): number {
-    return someTime - 5 * 60 * 1_000;
-}
-
-function wasToday(someTime: number): boolean {
-    const today = new Date(new Date().toLocaleDateString());
-    return someTime > today.getTime();
-}
