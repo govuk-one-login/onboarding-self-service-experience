@@ -3,8 +3,8 @@ name: Upload Frontend to secure pipelines
 on:
   workflow_dispatch:
   push:
-#    branches: [ main ]
-#    paths: [ express/** ]
+   branches: [ main ]
+   paths: [ express/** ]
 
 permissions: read-all
 concurrency: upload-frontend-secure-pipelines-build-${{ github.head_ref || github.ref_name }}
