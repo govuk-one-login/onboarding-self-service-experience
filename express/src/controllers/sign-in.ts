@@ -20,7 +20,6 @@ export const showCheckPhonePage: RequestHandler = (req, res) => {
     }
 
     res.render("common/enter-text-code.njk", {
-        headerActiveItem: "sign-in",
         values: {
             mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo),
             textMessageNotReceivedUrl: "/sign-in/resend-text-code"

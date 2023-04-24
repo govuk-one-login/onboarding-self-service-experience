@@ -1,5 +1,4 @@
 import {Router} from "express";
-import path from "path";
 import {
     checkEmailPasswordReset,
     confirmForgotPassword,
@@ -12,8 +11,9 @@ import {
     showSignInFormEmail,
     showSignInFormPassword
 } from "../controllers/sign-in";
+import headerActiveItem, {HeaderItem} from "../middleware/navigation";
 import processSignInForm from "../middleware/process-sign-in-form";
-import {render} from "../middleware/request-handler";
+import {redirect, render} from "../middleware/request-handler";
 import processSecurityCode from "../middleware/sign-in-middleware";
 import checkPasswordAllowed from "../middleware/validators/common-password-validator";
 import checkEmailInSession from "../middleware/validators/email-present-in-session";
@@ -23,9 +23,9 @@ import validateMobileSecurityCode from "../middleware/validators/mobile-code-val
 const router = Router();
 export default router;
 
-router.get("/", (req, res) => {
-    res.redirect(303, path.join(req.baseUrl, "/enter-email-address"));
-});
+router.use(headerActiveItem(HeaderItem.SignIn));
+
+router.get("/", redirect("/enter-email-address", true));
 
 router.route("/enter-email-address").get(showSignInFormEmail).post(validateEmail("sign-in/enter-email-address.njk"), processEmailAddress);
 
@@ -43,15 +43,7 @@ router
 router
     .route("/enter-text-code")
     .get(showCheckPhonePage)
-    .post(
-        (req, res, next) => {
-            res.locals.headerActiveItem = "sign-in";
-            next();
-        },
-        validateMobileSecurityCode("resend-text-code"),
-        processSecurityCode,
-        finishSignIn
-    );
+    .post(validateMobileSecurityCode("resend-text-code"), processSecurityCode, finishSignIn);
 
 router.route("/resend-text-code").get(showResendPhoneCodePage).post(showCheckPhonePage);
 router.route("/account-not-found").get(render("sign-in/account-not-found.njk"));

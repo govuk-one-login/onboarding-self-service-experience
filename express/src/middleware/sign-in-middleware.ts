@@ -15,7 +15,6 @@ export default async function processSecurityCode(req: Request, res: Response, n
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             return res.render("common/enter-text-code.njk", {
-                headerActiveItem: "sign-in",
                 errorMessages: {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
                 },

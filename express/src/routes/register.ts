@@ -1,5 +1,4 @@
 import {Router} from "express";
-import path from "path";
 import {
     accountExists,
     processAddServiceForm,
@@ -21,6 +20,7 @@ import {
 } from "../controllers/register";
 import checkAuthorisation from "../middleware/authoriser";
 import processSignInForm from "../middleware/process-sign-in-form";
+import {redirect} from "../middleware/request-handler";
 import checkPasswordAllowed from "../middleware/validators/common-password-validator";
 import validateEmailSecurityCode from "../middleware/validators/email-code-validator";
 import validateEmail from "../middleware/validators/email-validator";
@@ -32,9 +32,7 @@ import validateServiceName from "../middleware/validators/service-name-validator
 const router = Router();
 export default router;
 
-router.get("/", (req, res) => {
-    res.redirect(303, path.join(req.baseUrl, "/enter-email-address"));
-});
+router.get("/", redirect("/enter-email-address", true));
 
 router.route("/enter-email-address").get(showGetEmailForm).post(validateEmail("register/enter-email-address.njk"), processGetEmailForm);
 router.route("/account-exists").get(accountExists).post(processSignInForm("register/account-exists.njk"));

@@ -9,6 +9,8 @@ import {
     verifyMobileWithSmsCode
 } from "../controllers/account";
 import checkAuthorisation from "../middleware/authoriser";
+import headerActiveItem, {HeaderItem} from "../middleware/navigation";
+import {redirect} from "../middleware/request-handler";
 import checkPasswordAllowed from "../middleware/validators/common-password-validator";
 import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator";
 import validateMobileNumber from "../middleware/validators/mobile-number-validator";
@@ -18,6 +20,7 @@ const router = Router();
 export default router;
 
 router.use(checkAuthorisation);
+router.use(headerActiveItem(HeaderItem.YourAccount));
 
 router.get("/", showAccount);
 
@@ -56,15 +59,7 @@ router
 router
     .route("/change-phone-number/enter-text-code")
     .get(showVerifyMobileWithSmsCode)
-    .post(
-        // TODO refactor routers
-        (req, res, next) => {
-            res.locals.headerActiveItem = "your-account";
-            next();
-        },
-        validateMobileSecurityCode("resend-text-code", false),
-        verifyMobileWithSmsCode
-    );
+    .post(validateMobileSecurityCode("resend-text-code", false), verifyMobileWithSmsCode);
 
 router
     .route("/change-phone-number/resend-text-code")
@@ -73,6 +68,4 @@ router
             securityCodeMethod: "phone"
         });
     })
-    .post((req, res) => {
-        res.redirect("change-phone-number/enter-text-code");
-    });
+    .post(redirect("change-phone-number/enter-text-code"));

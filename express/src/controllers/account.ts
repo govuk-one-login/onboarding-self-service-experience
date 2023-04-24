@@ -81,7 +81,6 @@ export const processChangePhoneNumberForm: RequestHandler = async (req, res) => 
 
 export const showVerifyMobileWithSmsCode: RequestHandler = (req, res) => {
     res.render("common/enter-text-code.njk", {
-        headerActiveItem: "your-account",
         values: {
             mobileNumber: req.session.enteredMobileNumber,
             textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code"
@@ -99,7 +98,6 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             return res.render("common/enter-text-code.njk", {
-                headerActiveItem: "your-account",
                 values: {
                     securityCode: req.body.securityCode,
                     mobileNumber: req.session.enteredMobileNumber,
