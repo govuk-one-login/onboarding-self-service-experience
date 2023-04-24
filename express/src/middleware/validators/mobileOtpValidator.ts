@@ -32,9 +32,5 @@ export function mobileSecurityCodeValidator(textMessageNotReceivedUrl: string, h
 }
 
 function getMobileNumber(req: Request): string {
-    if (req.session?.mfaResponse?.codeSentTo) {
-        return req.session.mfaResponse.codeSentTo;
-    } else {
-        return (req.session.enteredMobileNumber as string) || (req.session.mobileNumber as string);
-    }
+    return nonNull(req.session.mfaResponse?.codeSentTo ?? req.session.enteredMobileNumber ?? req.session.mobileNumber);
 }

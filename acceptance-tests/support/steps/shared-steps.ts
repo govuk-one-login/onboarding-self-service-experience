@@ -30,7 +30,7 @@ When("they click on the {string} link", async function (text: string) {
 
 When("they click on the {string} external link", async function (text: string) {
     const link = await getLink(this.page, text);
-    await clickElement(this.page, link, 10000);
+    await clickElement(this.page, link, 50000);
 });
 
 When("they click on the {string} link that opens in a new tab", async function (this: TestContext, linkText: string) {

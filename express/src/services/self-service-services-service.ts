@@ -164,7 +164,7 @@ export default class SelfServiceServicesService {
     async listClients(serviceId: string, accessToken: string): Promise<Client[]> {
         return this.lambda
             .listClients(serviceId, accessToken)
-            .then(results => results.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) || []);
+            .then(results => results.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? []);
     }
 }
 

@@ -137,7 +137,7 @@ class DynamoDbClient {
     }
 
     private getAttributeNameAlias(attributeName: string) {
-        return DynamoDbClient.KEYWORD_SUBSTITUTES[attributeName] || `#${attributeName}`;
+        return DynamoDbClient.KEYWORD_SUBSTITUTES[attributeName] ?? `#${attributeName}`;
     }
 
     private getAttributeValueLabel(attributeName: string) {

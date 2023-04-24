@@ -19,13 +19,13 @@ import "./types/session";
 
 const app = Express();
 
-const cognitoPromise = import(`./services/cognito/${process.env.COGNITO_CLIENT || "CognitoClient"}`).then(client => {
+const cognitoPromise = import(`./services/cognito/${process.env.COGNITO_CLIENT ?? "CognitoClient"}`).then(client => {
     const cognito = new client.default.CognitoClient();
     app.set("cognitoClient", cognito);
     return cognito;
 });
 
-const lambdaPromise = import(`./services/lambda-facade/${process.env.LAMBDA_FACADE || "LambdaFacade"}`).then(facade => {
+const lambdaPromise = import(`./services/lambda-facade/${process.env.LAMBDA_FACADE ?? "LambdaFacade"}`).then(facade => {
     const lambda = facade.lambdaFacadeInstance;
     app.set("lambdaFacade", facade.lambdaFacadeInstance);
     return lambda;
@@ -58,5 +58,5 @@ app.use(errorHandler);
 
 app.locals.googleTagId = process.env.GOOGLE_TAG_ID;
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT ?? 3000;
 app.listen(port, () => console.log(`Server running; listening on port ${port}`));

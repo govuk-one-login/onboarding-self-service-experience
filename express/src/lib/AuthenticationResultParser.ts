@@ -12,7 +12,7 @@ export default class AuthenticationResultParser {
 
     static getCognitoId(authenticationResult: AuthenticationResultType): string {
         const claims = this.getIdClaims(authenticationResult);
-        return claims["cognito:username"] || claims["sub"];
+        return claims["cognito:username"] ?? claims["sub"];
     }
 
     static getPhoneNumber(authenticationResult: AuthenticationResultType): string {
