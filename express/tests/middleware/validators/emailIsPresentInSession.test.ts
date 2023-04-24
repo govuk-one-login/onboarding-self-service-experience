@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
-import emailIsPresentInSession from "../../../src/middleware/validators/emailIsPresentInSession/emailIsPresentInSession";
-import "../../../src/types/session";
+import emailIsPresentInSession from "middleware/validators/emailIsPresentInSession/emailIsPresentInSession";
+import "types/session";
 
 describe("It checks whether an email is present in the session and behaves accordingly", () => {
     let mockRequest: Partial<Request>;

@@ -1,4 +1,4 @@
-import {validateEmail} from "../../../src/lib/validators/emailValidator";
+import {validateEmail} from "lib/validators/emailValidator";
 
 const EMAIL_WITH_ALLOWED_DOMAIN = "allowed@email.gov.uk";
 const EMAIL_WITH_DISALLOWED_DOMAIN = "allowed@hackers.co.uk";

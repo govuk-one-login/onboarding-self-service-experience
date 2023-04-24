@@ -15,11 +15,11 @@ import {
     getLinkWithHrefStarting
 } from "./shared-functions";
 
-Given("that the user is on the home page", async function () {
+Given("the user is on the home page", async function () {
     await this.goToPath("/");
 });
 
-Given("that the user is on the {string} page", async function (path: string) {
+Given("the user is on the {string} page", async function (path: string) {
     await this.goToPath(path);
 });
 

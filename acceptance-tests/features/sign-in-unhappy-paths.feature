@@ -1,7 +1,7 @@
 Feature: Unhappy paths for the self-service sign-in flow
 
   Background:
-    Given that the user is on the "/sign-in" page
+    Given the user is on the "/sign-in" page
 
   Scenario: User does not enter a valid email address
     When the user submits the email "invalid-email.com"
@@ -11,7 +11,7 @@ Feature: Unhappy paths for the self-service sign-in flow
     When the user submits the email ""
     Then the error message "Enter your email address" must be displayed for the "emailAddress" field
 
-  Scenario: User doesn’t enter any characters into the password field
+  Scenario: User doesn't enter any characters into the password field
     When they enter "registered@gds.gov.uk" into the "emailAddress" field
     When they click the Continue button
     Then they should be redirected to the "/sign-in/enter-password" page

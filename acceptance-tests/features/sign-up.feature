@@ -1,7 +1,7 @@
 Feature: Users can sign up to the self-service experience
 
   Background:
-    Given that the user is on the "/register" page
+    Given the user is on the "/register" page
 
   Rule: The user tries to submit an email address when creating an account
 

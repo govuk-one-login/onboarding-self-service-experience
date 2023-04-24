@@ -1,4 +1,4 @@
-import {validateUris} from "../../../src/lib/validators/urisValidator";
+import {validateUris} from "lib/validators/urisValidator";
 
 describe("URIs are correctly validated", () => {
     it("rejects an empty array", () => {

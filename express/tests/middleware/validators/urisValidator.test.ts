@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
-import {urisValidator} from "../../../src/middleware/validators/urisValidator";
+import {urisValidator} from "middleware/validators/urisValidator";
 
 describe("it calls the NextFunction if the URIs are valid or renders an error page if not", () => {
     let mockRequest: Partial<Request>;

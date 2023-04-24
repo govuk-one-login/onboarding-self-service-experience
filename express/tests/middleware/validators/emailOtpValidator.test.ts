@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
-import {emailSecurityCodeValidator} from "../../../src/middleware/validators/emailOtpValidator";
-import "../../../src/types/session";
+import {emailSecurityCodeValidator} from "middleware/validators/emailOtpValidator";
+import "types/session";
 
 describe("It checks whether an email security code is valid and behaves accordingly", () => {
     let mockRequest: Partial<Request>;

@@ -1,4 +1,4 @@
-import {validateSecurityCode} from "../../../src/lib/validators/checkOtp";
+import {validateSecurityCode} from "lib/validators/checkOtp";
 
 const OTP_WITH_EMPTY_VALUE = "";
 const OTP_LESS_THAN_6_DIGITS = "123";

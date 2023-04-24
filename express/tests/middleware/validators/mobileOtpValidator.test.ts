@@ -1,8 +1,8 @@
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
-import "../../../src/lib/utils/optional";
-import {mobileSecurityCodeValidator} from "../../../src/middleware/validators/mobileOtpValidator";
-import "../../../src/types/session";
+import "lib/utils/optional";
+import {mobileSecurityCodeValidator} from "middleware/validators/mobileOtpValidator";
+import "types/session";
 
 describe("It checks whether a mobile security code is valid and behaves accordingly", () => {
     let mockRequest: Partial<Request>;
