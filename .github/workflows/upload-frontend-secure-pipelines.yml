@@ -36,7 +36,7 @@ jobs:
           name: self-service-front
 
       - name: Deploy SAM app to ECR
-        uses: alphagov/di-devplatform-upload-action-ecr@140a214b7a4ef468c4b332a1727744490bc664cc
+        uses: alphagov/di-devplatform-upload-action-ecr@d4be332eb73f1e19c0ffecc1213c6cfdae0240a4
         with:
           artifact-bucket-name: ${{ secrets.FRONTEND_BUILD_ARTIFACT_BUCKET_NAME }}
           container-sign-kms-key-arn: ${{ secrets.FRONTEND_CONTAINER_SIGN_KMS_KEY }}
