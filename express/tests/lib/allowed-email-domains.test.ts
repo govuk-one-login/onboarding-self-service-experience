@@ -1,4 +1,4 @@
-import {validateEmail} from "../../src/lib/validators/emailValidator";
+import hasAllowedDomain from "lib/validators/allowed-email-domains";
 
 jest.mock("fs/promises", () => {
     return {
@@ -12,29 +12,29 @@ const allowedSubDomain = ".partial.subdomain";
 describe("Verify email domains", () => {
     describe("Accept valid domains", () => {
         it("Allows an email address with a domain on the allowed list", async () => {
-            expect((await validateEmail(`email@${allowedDomain}`)).isValid).toBe(true);
+            expect(await hasAllowedDomain(`email@${allowedDomain}`)).toBe(true);
         });
 
         it("Allows an email address ending with a domain on the allowed list", async () => {
-            expect((await validateEmail(`email@top.level.${allowedDomain}`)).isValid).toBe(true);
+            expect(await hasAllowedDomain(`email@top.level.${allowedDomain}`)).toBe(true);
         });
 
         it("Allows an email address ending with a subdomain on the allowed list", async () => {
-            expect((await validateEmail(`email@top.level${allowedSubDomain}`)).isValid).toBe(true);
+            expect(await hasAllowedDomain(`email@top.level${allowedSubDomain}`)).toBe(true);
         });
     });
 
     describe("Reject invalid domains", () => {
         it("Rejects an email address with a domain not on the allowed list", async () => {
-            expect((await validateEmail("email@bad.domain")).isValid).toBe(false);
+            expect(await hasAllowedDomain("email@bad.domain")).toBe(false);
         });
 
         it("Rejects an email address not ending with a domain on the allowed list", async () => {
-            expect((await validateEmail(`email@${allowedDomain}.subdomain`)).isValid).toBe(false);
+            expect(await hasAllowedDomain(`email@${allowedDomain}.subdomain`)).toBe(false);
         });
 
         it("Rejects an email address not ending with a subdomain on the allowed list", async () => {
-            expect((await validateEmail(`email@top.level.${allowedSubDomain}.subdomain`)).isValid).toBe(false);
+            expect(await hasAllowedDomain(`email@top.level.${allowedSubDomain}.subdomain`)).toBe(false);
         });
     });
 });

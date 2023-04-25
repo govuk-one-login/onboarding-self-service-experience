@@ -1,5 +1,5 @@
 import {RequestHandler} from "express";
-import {validatePassword} from "../../lib/validators/passwordValidator";
+import validatePassword from "../../lib/validators/password-validator";
 import {validationResult} from "../../lib/validators/validationResult";
 
 export function passwordValidator(render: string): RequestHandler {

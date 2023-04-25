@@ -1,5 +1,5 @@
 import {RequestHandler} from "express";
-import {validateEmail} from "../../lib/validators/emailValidator";
+import validateEmail from "../../lib/validators/emailValidator";
 import {validationResult} from "../../lib/validators/validationResult";
 
 export function emailValidator(template: string): RequestHandler {

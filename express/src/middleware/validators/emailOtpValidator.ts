@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {validateSecurityCode} from "../../lib/validators/checkOtp";
+import validateSecurityCode from "../../lib/validators/checkOtp";
 import {validationResult} from "../../lib/validators/validationResult";
 
 export async function emailSecurityCodeValidator(req: Request, res: Response, next: NextFunction) {

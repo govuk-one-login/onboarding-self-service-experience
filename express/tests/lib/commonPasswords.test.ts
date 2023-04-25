@@ -1,14 +1,17 @@
-import commonPasswordsSingleton from "lib/commonPasswords/commonPasswordsSingleton";
+import isCommonPassword from "lib/commonPasswords/CommonPasswords";
 
-const COMMON_PASSWORD = "Password123";
-const UNCOMMON_PASSWORD = "this-is-not-a-common-password";
+jest.mock("fs/promises", () => {
+    return {
+        readFile: jest.fn(() => "common-password")
+    };
+});
 
-describe("Only common passwords are excluded", () => {
-    it(`Does not allow ${COMMON_PASSWORD}`, async () => {
-        expect((await commonPasswordsSingleton).notOnList(COMMON_PASSWORD)).toBe(false);
+describe("Check if a password is allowed", () => {
+    it("Reject a commonly used password", async () => {
+        expect(await isCommonPassword("common-password")).toBe(true);
     });
 
-    it(`Does allow ${UNCOMMON_PASSWORD}`, async () => {
-        expect((await commonPasswordsSingleton).notOnList(UNCOMMON_PASSWORD)).toBe(true);
+    it("Accept a password not on the common passwords list", async () => {
+        expect(await isCommonPassword("unique-password")).toBe(false);
     });
 });
