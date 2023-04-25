@@ -1,15 +1,15 @@
 import {AuthenticationResultType, LimitExceededException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
-import {NextFunction, Request, Response} from "express";
+import {RequestHandler} from "express";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
 import {obscureNumber} from "../lib/mobile-number";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
-export const showSignInFormEmail = async function (req: Request, res: Response) {
+export const showSignInFormEmail: RequestHandler = (req, res) => {
     res.render("sign-in/enter-email-address.njk");
 };
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
-export const showCheckPhonePage = async function (req: Request, res: Response) {
+export const showCheckPhonePage: RequestHandler = (req, res) => {
     // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
         res.redirect("/sign-in");
@@ -25,7 +25,7 @@ export const showCheckPhonePage = async function (req: Request, res: Response) {
     });
 };
 
-export const finishSignIn = async function (req: Request, res: Response) {
+export const finishSignIn: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const user = await s4.getSelfServiceUser(req.session.authenticationResult as AuthenticationResultType);
 
@@ -45,19 +45,19 @@ export const finishSignIn = async function (req: Request, res: Response) {
     }
 };
 
-export const processEmailAddress = async function (req: Request, res: Response) {
+export const processEmailAddress: RequestHandler = (req, res) => {
     res.redirect("/sign-in/enter-password");
 };
 
-export const showSignInFormPassword = async function (req: Request, res: Response) {
+export const showSignInFormPassword: RequestHandler = (req, res) => {
     res.render("sign-in/enter-password.njk");
 };
 
-export const showResendPhoneCodePage = async function (req: Request, res: Response) {
+export const showResendPhoneCodePage: RequestHandler = (req, res) => {
     res.render("sign-in/resend-text-code.njk");
 };
 
-export const forgotPasswordForm = async function (req: Request, res: Response) {
+export const forgotPasswordForm: RequestHandler = (req, res) => {
     res.render("sign-in/forgot-password.njk", {
         values: {
             emailAddress: req.session.emailAddress
@@ -65,18 +65,18 @@ export const forgotPasswordForm = async function (req: Request, res: Response) {
     });
 };
 
-export const checkEmailPasswordReset = async function (req: Request, res: Response) {
-    await forgotPassword(req, res);
+export const checkEmailPasswordReset: RequestHandler = async (req, res, next) => {
+    await forgotPassword(req, res, next);
 };
 
-export const confirmForgotPasswordForm = async function (req: Request, res: Response) {
+export const confirmForgotPasswordForm: RequestHandler = (req, res) => {
     res.render("sign-in/create-new-password.njk", {
         loginName: req.query.loginName,
         confirmationCode: req.query.confirmationCode
     });
 };
 
-export const confirmForgotPassword = async function (req: Request, res: Response, next: NextFunction) {
+export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
     const loginName = req.body.loginName;
     const password = req.body.password;
     const confirmationCode = req.body.confirmationCode;
@@ -103,7 +103,7 @@ export const confirmForgotPassword = async function (req: Request, res: Response
     }
 };
 
-const forgotPassword = async function (req: Request, res: Response) {
+const forgotPassword: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     const uri = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
     try {

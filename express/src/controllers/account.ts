@@ -4,17 +4,17 @@ import {
     LimitExceededException,
     NotAuthorizedException
 } from "@aws-sdk/client-cognito-identity-provider";
-import {Request, Response} from "express";
+import {RequestHandler} from "express";
 import {User} from "../../@types/user";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
-export const showChangePasswordForm = async function (req: Request, res: Response) {
+export const showChangePasswordForm: RequestHandler = async (req, res) => {
     res.render("account/change-password.njk");
 };
 
-export const showAccount = async function (req: Request, res: Response) {
+export const showAccount: RequestHandler = async (req, res) => {
     if (!req.session.authenticationResult) {
         res.redirect("/sign-in");
         return;
@@ -32,10 +32,11 @@ export const showAccount = async function (req: Request, res: Response) {
         serviceName: "My juggling service",
         updatedField: req.session.updatedField
     });
+
     req.session.updatedField = undefined;
 };
 
-export const changePassword = async function (req: Request, res: Response) {
+export const changePassword: RequestHandler = async (req, res) => {
     const newPassword = req.body.newPassword;
     const currentPassword = req.body.currentPassword;
 
@@ -123,11 +124,11 @@ export const changePassword = async function (req: Request, res: Response) {
     res.redirect("/account");
 };
 
-export const showChangePhoneNumberForm = async function (req: Request, res: Response) {
+export const showChangePhoneNumberForm: RequestHandler = (req, res) => {
     res.render("account/change-phone-number.njk");
 };
 
-export const processChangePhoneNumberForm = async function (req: Request, res: Response) {
+export const processChangePhoneNumberForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     await s4.setPhoneNumber(
         AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType),
@@ -140,7 +141,7 @@ export const processChangePhoneNumberForm = async function (req: Request, res: R
     res.redirect("/account/change-phone-number/enter-text-code");
 };
 
-export const showVerifyMobileWithSmsCode = async function (req: Request, res: Response) {
+export const showVerifyMobileWithSmsCode: RequestHandler = (req, res) => {
     res.render("common/enter-text-code.njk", {
         headerActiveItem: "your-account",
         values: {
@@ -150,7 +151,7 @@ export const showVerifyMobileWithSmsCode = async function (req: Request, res: Re
     });
 };
 
-export const verifyMobileWithSmsCode = async function (req: Request, res: Response) {
+export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     const accessToken = req.session.authenticationResult?.AccessToken as string;
 

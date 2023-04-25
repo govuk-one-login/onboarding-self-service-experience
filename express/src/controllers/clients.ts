@@ -51,7 +51,7 @@ export const showClient: RequestHandler = async (req, res) => {
     req.session.updatedField = undefined;
 };
 
-export const showPrivateBetaForm: RequestHandler = async (req, res) => {
+export const showPrivateBetaForm: RequestHandler = (req, res) => {
     res.render("clients/private-beta.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -102,7 +102,7 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
     res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/private-beta/submitted`);
 };
 
-export const showPrivateBetaFormSubmitted: RequestHandler = async (req, res) => {
+export const showPrivateBetaFormSubmitted: RequestHandler = (req, res) => {
     res.render("clients/private-beta-form-submitted.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -110,7 +110,7 @@ export const showPrivateBetaFormSubmitted: RequestHandler = async (req, res) => 
     });
 };
 
-export const showProcessChangeServiceNameForm: RequestHandler = async (req, res) => {
+export const showProcessChangeServiceNameForm: RequestHandler = (req, res) => {
     res.render("clients/change-service-name.njk", {
         serviceId: req.context.serviceId,
         values: {
@@ -153,7 +153,7 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
     res.redirect(`/services/${serviceId}/clients`);
 };
 
-export const showProcessChangePublicKeyForm: RequestHandler = async (req, res) => {
+export const showProcessChangePublicKeyForm: RequestHandler = (req, res) => {
     res.render("clients/change-public-key.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -178,7 +178,7 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
 
-export const showProcessChangeRedirectUrlsForm: RequestHandler = async (req, res) => {
+export const showProcessChangeRedirectUrlsForm: RequestHandler = (req, res) => {
     res.render("clients/change-redirect-uris.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -205,7 +205,7 @@ export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) =>
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
 
-export const showProcessChangeUserAttributesForm: RequestHandler = async (req, res) => {
+export const showProcessChangeUserAttributesForm: RequestHandler = (req, res) => {
     const userAttributes = nonNull(req.query.userAttributes?.toString()).split(" ");
     const email: boolean = userAttributes.includes("email");
     const phone: boolean = userAttributes.includes("phone");
@@ -243,7 +243,7 @@ export const processChangeUserAttributesForm: RequestHandler = async (req, res) 
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
 
-export const showProcessChangePostLogoutUrisForm: RequestHandler = async (req, res) => {
+export const showProcessChangePostLogoutUrisForm: RequestHandler = (req, res) => {
     res.render("clients/change-post-logout-uris.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,

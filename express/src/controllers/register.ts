@@ -5,18 +5,18 @@ import {
     UsernameExistsException
 } from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
-import {NextFunction, Request, Response} from "express";
+import {RequestHandler} from "express";
 import {Service} from "../../@types/Service";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
-import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import {domainUserToDynamoUser} from "../lib/models/user-utils";
+import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
-export const showGetEmailForm = function (req: Request, res: Response) {
+export const showGetEmailForm: RequestHandler = (req, res) => {
     res.render("register/enter-email-address.njk");
 };
 
-export const processGetEmailForm = async function (req: Request, res: Response, next: NextFunction) {
+export const processGetEmailForm: RequestHandler = async (req, res, next) => {
     const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     try {
@@ -34,7 +34,7 @@ export const processGetEmailForm = async function (req: Request, res: Response, 
     res.redirect("/register/enter-email-code");
 };
 
-export const showCheckEmailForm = function (req: Request, res: Response) {
+export const showCheckEmailForm: RequestHandler = (req, res) => {
     if (!req.session.emailAddress) {
         res.redirect("/register");
         return;
@@ -43,7 +43,7 @@ export const showCheckEmailForm = function (req: Request, res: Response) {
     res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
 
-export const submitEmailSecurityCode = async function (req: Request, res: Response, next: NextFunction) {
+export const submitEmailSecurityCode: RequestHandler = async (req, res, next) => {
     if (!req.session.emailAddress) {
         console.error("submitEmailOtp::EmailAddress is not in the session, redirecting to submitEmailOtp");
         res.redirect("/register");
@@ -73,7 +73,7 @@ export const submitEmailSecurityCode = async function (req: Request, res: Respon
     }
 };
 
-export const showNewPasswordForm = async function (req: Request, res: Response) {
+export const showNewPasswordForm: RequestHandler = (req, res) => {
     // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
         res.render("register/create-password.njk");
@@ -83,7 +83,7 @@ export const showNewPasswordForm = async function (req: Request, res: Response) 
     }
 };
 
-export const updatePassword = async function (req: Request, res: Response) {
+export const updatePassword: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     req.session.authenticationResult = await s4.setNewPassword(
@@ -96,13 +96,13 @@ export const updatePassword = async function (req: Request, res: Response) {
     res.redirect("/register/enter-phone-number");
 };
 
-export const showEnterMobileForm = async function (req: Request, res: Response) {
+export const showEnterMobileForm: RequestHandler = (req, res) => {
     res.render("register/enter-phone-number.njk", {
         value: {mobileNumber: req.session.mobileNumber}
     });
 };
 
-export const processEnterMobileForm = async function (req: Request, res: Response) {
+export const processEnterMobileForm: RequestHandler = async (req, res) => {
     // The user needs to be logged in for this
     const accessToken: string | undefined = req.session.authenticationResult?.AccessToken;
 
@@ -124,12 +124,12 @@ export const processEnterMobileForm = async function (req: Request, res: Respons
     res.redirect("/register/enter-text-code");
 };
 
-export const resendMobileVerificationCode = async function (req: Request, res: Response) {
+export const resendMobileVerificationCode: RequestHandler = async (req, res, next) => {
     req.body.mobileNumber = req.session.enteredMobileNumber;
-    await processEnterMobileForm(req, res);
+    await processEnterMobileForm(req, res, next);
 };
 
-export const showSubmitMobileVerificationCode = async function (req: Request, res: Response) {
+export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
     res.render("common/enter-text-code.njk", {
         values: {
             mobileNumber: req.session.enteredMobileNumber,
@@ -138,7 +138,7 @@ export const showSubmitMobileVerificationCode = async function (req: Request, re
     });
 };
 
-export const submitMobileVerificationCode = async function (req: Request, res: Response) {
+export const submitMobileVerificationCode: RequestHandler = async (req, res) => {
     const securityCode = req.body.securityCode;
 
     if (securityCode === undefined) {
@@ -197,25 +197,25 @@ export const submitMobileVerificationCode = async function (req: Request, res: R
     res.redirect("/register/create-service");
 };
 
-export const showResendPhoneCodeForm = async function (req: Request, res: Response) {
+export const showResendPhoneCodeForm: RequestHandler = (req, res) => {
     res.render("register/resend-text-code.njk");
 };
 
-export const showResendEmailCodeForm = async function (req: Request, res: Response) {
+export const showResendEmailCodeForm: RequestHandler = (req, res) => {
     res.render("register/resend-email-code.njk");
 };
 
-export const resendEmailVerificationCode = async function (req: Request, res: Response) {
+export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
     res.redirect("/register/enter-email-code");
 };
 
-export const showAddServiceForm = async function (req: Request, res: Response) {
+export const showAddServiceForm: RequestHandler = (req, res) => {
     res.render("register/add-service-name.njk");
 };
 
-export const processAddServiceForm = async function (req: Request, res: Response) {
+export const processAddServiceForm: RequestHandler = async (req, res) => {
     const uuid = randomUUID();
     const service: Service = {
         id: `service#${uuid}`,
@@ -246,7 +246,7 @@ export const processAddServiceForm = async function (req: Request, res: Response
     res.redirect(`/services/${serviceId.substring(8)}/clients`);
 };
 
-export const accountExists = async function (req: Request, res: Response) {
+export const accountExists: RequestHandler = (req, res) => {
     res.render("register/account-exists.njk", {
         values: {
             emailAddress: req.session.emailAddress
