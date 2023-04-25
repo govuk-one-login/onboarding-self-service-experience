@@ -1,5 +1,4 @@
-import bodyParser from "body-parser";
-import express from "express";
+import {static as serveStatic, urlencoded} from "express";
 import {cognito, googleTagId, lambda, port} from "./config/environment";
 import Express from "./config/express";
 import {distribution} from "./config/resources";
@@ -24,11 +23,10 @@ Promise.all([cognitoPromise, lambdaPromise]).then(deps => {
     console.log("Backing service created");
 });
 
-app.use("/assets", express.static(distribution.assets));
-app.use("/assets/images", express.static(distribution.images));
+app.use("/assets", serveStatic(distribution.assets));
+app.use("/assets/images", serveStatic(distribution.images));
 
-app.use(bodyParser.urlencoded({extended: true}));
-
+app.use(urlencoded({extended: true}));
 app.use(sessionStorage);
 app.use(signInStatus);
 

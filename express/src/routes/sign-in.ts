@@ -13,6 +13,7 @@ import {
     showSignInFormPassword
 } from "../controllers/sign-in";
 import processSignInForm from "../middleware/process-sign-in-form";
+import {render} from "../middleware/request-handler";
 import processSecurityCode from "../middleware/sign-in-middleware";
 import checkPasswordAllowed from "../middleware/validators/common-password-validator";
 import checkEmailInSession from "../middleware/validators/email-present-in-session";
@@ -53,10 +54,7 @@ router
     );
 
 router.route("/resend-text-code").get(showResendPhoneCodePage).post(showCheckPhonePage);
-
-router.get("/account-not-found", (req, res) => {
-    res.render("sign-in/account-not-found.njk");
-});
+router.route("/account-not-found").get(render("sign-in/account-not-found.njk"));
 
 router.get(
     "/forgot-password",

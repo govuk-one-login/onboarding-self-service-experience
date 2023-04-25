@@ -8,11 +8,10 @@ import {RequestHandler} from "express";
 import {User} from "../../@types/user";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
+import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
-export const showChangePasswordForm: RequestHandler = async (req, res) => {
-    res.render("account/change-password.njk");
-};
+export const showChangePasswordForm = render("account/change-password.njk");
 
 export const showAccount: RequestHandler = async (req, res) => {
     if (!req.session.authenticationResult) {
