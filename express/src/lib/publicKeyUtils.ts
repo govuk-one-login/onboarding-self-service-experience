@@ -4,26 +4,32 @@ const BEGIN = "-----BEGIN PUBLIC KEY-----";
 const END = "-----END PUBLIC KEY-----";
 
 export default function getAuthApiCompliantPublicKey(publicKey: string): string {
-    publicKey = publicKey.trim();
-    // assume PEM with headers
     try {
         return makeAuthCompliant(publicKey);
-    } catch (ignored) {}
-
-    try {
-        // assume they didn't supply headers
-        const publicKeyWithHeaders = `${BEGIN}\n${publicKey}\n${END}\n`;
-        return makeAuthCompliant(publicKeyWithHeaders);
     } catch (err) {
         console.error(err);
-        throw new Error(`Failed to convert\n${publicKey}\n`);
+        throw new Error(`Failed to convert public key\n${publicKey}`);
     }
 }
 
-const makeAuthCompliant = (publicKey: string) =>
-    createPublicKey({key: publicKey, format: "pem"})
+function makeAuthCompliant(publicKey: string) {
+    return createPublicKey({key: prepareKey(publicKey), format: "pem"})
         .export({format: "pem", type: "spki"})
         .toString()
         .replace(BEGIN, "")
         .replace(END, "")
-        .replace(/[\n\r]/g, "");
+        .replaceAll(/[\n\r]/g, "");
+}
+
+function prepareKey(publicKey: string) {
+    publicKey = publicKey.trim();
+
+    const hasHeader = publicKey.includes(BEGIN);
+    const hasFooter = publicKey.includes(END);
+
+    const publicKeyContent = publicKey
+        .substring(hasHeader ? publicKey.indexOf(BEGIN) + BEGIN.length : 0, hasFooter ? publicKey.indexOf(END) : undefined)
+        .replaceAll(/[\n\r\s]/g, "");
+
+    return `${BEGIN}\n${publicKeyContent}\n${END}`;
+}

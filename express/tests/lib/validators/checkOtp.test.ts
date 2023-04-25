@@ -1,4 +1,4 @@
-import {validateSecurityCode} from "../../../src/lib/validators/checkOtp";
+import validateSecurityCode from "lib/validators/checkOtp";
 
 describe("Validate security codes", () => {
     it("Accept valid 6 digit codes", () => {

@@ -1,34 +1,24 @@
-import fs from "fs/promises";
+import {readFile} from "fs/promises";
 import {resources} from "../../config/resources";
 
-export class CommonPasswords {
-    private static MINIMUM_PASSWORD_LENGTH = 8;
-    private commonPasswords: Map<string, boolean>;
+const minimumPasswordLength = 8;
+const commonPasswords = loadCommonPasswords();
 
-    private constructor() {
-        this.commonPasswords = new Map<string, boolean>();
-    }
+export default async function isCommonPassword(password: string): Promise<boolean> {
+    const passwords = await commonPasswords;
+    return passwords.has(password);
+}
 
-    static async loadCommonPasswords(): Promise<CommonPasswords> {
-        const instance: CommonPasswords = new CommonPasswords();
-        const data = fs
-            .readFile(resources.commonPasswords, {
-                encoding: "utf8"
-            })
-            .catch(error => {
-                console.error("List of 10k most common passwords could not be loaded. We will not be starting the application");
-                console.error(error);
-                process.kill(process.pid, "SIGTERM");
-                throw error; // this keeps the compiler happy about using data next.
-            });
+async function loadCommonPasswords() {
+    const commonPasswords = await readFile(resources.commonPasswords, {encoding: "utf8"});
 
-        const arr = (await data).split("\n");
-        arr.filter(p => p.length >= this.MINIMUM_PASSWORD_LENGTH).forEach(p => instance.commonPasswords.set(p, true));
-        console.log(`Loaded ${instance.commonPasswords.size} common passwords of ${this.MINIMUM_PASSWORD_LENGTH} characters or more.`);
-        return instance;
-    }
+    const passwords = new Set(
+        commonPasswords
+            .trim()
+            .split("\n")
+            .filter(password => password.length >= minimumPasswordLength)
+    );
 
-    notOnList(password: string): boolean {
-        return !this.commonPasswords.get(password);
-    }
+    console.log(`Loaded ${passwords.size} common passwords of ${minimumPasswordLength} characters or more`);
+    return passwords;
 }

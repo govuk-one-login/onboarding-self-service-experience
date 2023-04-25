@@ -1,6 +1,6 @@
 import {Request, RequestHandler} from "express";
 import {obscureNumber} from "../../lib/mobileNumberUtils";
-import {validateSecurityCode} from "../../lib/validators/checkOtp";
+import validateSecurityCode from "../../lib/validators/checkOtp";
 
 export function mobileSecurityCodeValidator(textMessageNotReceivedUrl: string, hideNumber = true): RequestHandler {
     return async (req, res, next) => {

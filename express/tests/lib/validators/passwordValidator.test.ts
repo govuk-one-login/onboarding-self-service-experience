@@ -1,4 +1,4 @@
-import {validatePassword} from "lib/validators/passwordValidator";
+import validatePassword from "lib/validators/password-validator";
 
 const PASSWORD_WITH_EMPTY_VALUE = "";
 const PASSWORD_LESS_THAN_8_CHAR = "123";

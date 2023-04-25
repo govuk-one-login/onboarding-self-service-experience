@@ -1,5 +1,5 @@
 import {RequestHandler} from "express";
-import {validateUris} from "../../lib/validators/urisValidator";
+import validateUris from "../../lib/validators/uris-validator";
 
 export function urisValidator(template: string): RequestHandler {
     return (req, res, next) => {
