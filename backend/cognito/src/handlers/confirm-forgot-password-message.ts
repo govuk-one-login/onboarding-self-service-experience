@@ -1,13 +1,31 @@
 import {SendEmailCommand, SESClient} from "@aws-sdk/client-ses";
-import {PostConfirmationConfirmForgotPassword} from "aws-lambda/trigger/cognito-user-pool-trigger/post-confirmation";
+import {PostConfirmationConfirmForgotPassword} from "aws-lambda";
+
 const client = new SESClient({region: "eu-west-2"});
 
 exports.handler = async (event: PostConfirmationConfirmForgotPassword): Promise<PostConfirmationConfirmForgotPassword> => {
-    await run(event.request.clientMetadata.email);
+    const toAddress = event.request.clientMetadata?.email;
+
+    if (!toAddress) {
+        throw new Error("Destination email address is missing from the event");
+    }
+
+    await run(toAddress);
     return event;
 };
 
-const createSendEmailCommand = (toAddress: string, fromAddress: string) => {
+async function run(toAddress: string) {
+    const sendEmailCommand = createSendEmailCommand(toAddress, process.env.FROM_EMAIL_ADDRESS as string);
+
+    try {
+        return await client.send(sendEmailCommand);
+    } catch (err) {
+        console.error("ConfirmForgotPasswordEmailHandler :: Failed to send email.", err);
+        throw err;
+    }
+}
+
+function createSendEmailCommand(toAddress: string, fromAddress: string) {
     return new SendEmailCommand({
         Destination: {
             /* required */
@@ -25,7 +43,7 @@ const createSendEmailCommand = (toAddress: string, fromAddress: string) => {
                 /* required */
                 Html: {
                     Charset: "UTF-8",
-                    Data: generate_email_body()
+                    Data: generateEmailBody()
                 }
             },
             Subject: {
@@ -39,19 +57,10 @@ const createSendEmailCommand = (toAddress: string, fromAddress: string) => {
             /* more items */
         ]
     });
-};
+}
 
-const run = async (toAddress: string) => {
-    const sendEmailCommand = createSendEmailCommand(toAddress, process.env.FROM_EMAIL_ADDRESS as string);
-    try {
-        return await client.send(sendEmailCommand);
-    } catch (e) {
-        console.error("ConfirmForgotPasswordEmailHandler :: Failed to send email.", e);
-        return e;
-    }
-};
-
-const generate_email_body = () => `
+function generateEmailBody() {
+    return `
     <html>
         <body>
             <head>
@@ -183,3 +192,4 @@ const generate_email_body = () => `
         </body>
     </html>
 `;
+}

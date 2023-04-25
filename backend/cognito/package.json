@@ -1,0 +1,8 @@
+{
+  "name": "gds-di-self-service-backend-cognito",
+  "description": "DI self-service backend - Cognito",
+  "dependencies": {
+    "@aws-sdk/client-ses": "^3.306.0",
+    "esbuild": "^0.17.16"
+  }
+}
