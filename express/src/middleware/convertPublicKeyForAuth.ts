@@ -6,7 +6,8 @@ export function convertPublicKeyForAuth(req: Request, res: Response, next: NextF
         req.body.authCompliantPublicKey = getAuthApiCompliantPublicKey(req.body.serviceUserPublicKey as string);
     } catch (err) {
         console.error(err);
-        res.render("clients/change-public-key.njk", {
+
+        return res.render("clients/change-public-key.njk", {
             serviceId: req.params.serviceId,
             selfServiceClientId: req.params.selfServiceClientId,
             clientId: req.params.clientId,
@@ -15,8 +16,6 @@ export function convertPublicKeyForAuth(req: Request, res: Response, next: NextF
             },
             serviceUserPublicKey: req.body.authCompliantPublicKey
         });
-
-        return;
     }
 
     next();

@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import notOnCommonPasswordListValidator from "middleware/validators/notOnCommonPasswordListValidator";
+import checkPasswordAllowed from "middleware/validators/notOnCommonPasswordListValidator";
 
 describe("it will not allow a user to submit a common password but will allow one not on the list", () => {
     let mockRequest: Partial<Request>;
@@ -18,7 +18,7 @@ describe("it will not allow a user to submit a common password but will allow on
     it("doesn't allow password as a password", async () => {
         mockRequest.body.password = "password";
 
-        await notOnCommonPasswordListValidator("template.njk", "password", [])(
+        await checkPasswordAllowed("template.njk", "password", [])(
             mockRequest as Request,
             mockResponse as Response,
             nextFunction as NextFunction
@@ -30,7 +30,7 @@ describe("it will not allow a user to submit a common password but will allow on
     it("allows somerandomtestvalue as a password", async () => {
         mockRequest.body.password = "somerandomtestvalue";
 
-        await notOnCommonPasswordListValidator("template.njk", "password", [])(
+        await checkPasswordAllowed("template.njk", "password", [])(
             mockRequest as Request,
             mockResponse as Response,
             nextFunction as NextFunction

@@ -9,9 +9,9 @@ import {
     verifyMobileWithSmsCode
 } from "../controllers/account";
 import {checkAuthorisation} from "../middleware/authoriser";
-import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpValidator";
-import validateMobileNumber from "../middleware/validators/mobileValidator";
-import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
+import validateMobileSecurityCode from "../middleware/validators/mobileOtpValidator";
+import validateMobileNumber from "../middleware/validators/mobileValidator/validator";
+import checkPasswordAllowed from "../middleware/validators/notOnCommonPasswordListValidator";
 
 const router = Router();
 export default router;
@@ -23,7 +23,7 @@ router.get("/", showAccount);
 router
     .route("/change-password")
     .get(showChangePasswordForm)
-    .post(notOnCommonPasswordListValidator("account/change-password.njk", "newPassword", ["currentPassword"]), changePassword);
+    .post(checkPasswordAllowed("account/change-password.njk", "newPassword", ["currentPassword"]), changePassword);
 
 router
     .route("/change-phone-number")
@@ -39,7 +39,7 @@ router
             res.locals.headerActiveItem = "your-account";
             next();
         },
-        mobileSecurityCodeValidator("resend-text-code", false),
+        validateMobileSecurityCode("resend-text-code", false),
         verifyMobileWithSmsCode
     );
 

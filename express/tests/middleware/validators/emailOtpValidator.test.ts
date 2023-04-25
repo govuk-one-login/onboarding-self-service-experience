@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
-import {emailSecurityCodeValidator} from "middleware/validators/emailOtpValidator";
+import validateEmailSecurityCode from "middleware/validators/emailOtpValidator";
 import "types/session";
 
 describe("It checks whether an email security code is valid and behaves accordingly", () => {
@@ -22,7 +22,7 @@ describe("It checks whether an email security code is valid and behaves accordin
 
     it("calls the NextFunction if the security code is valid", () => {
         mockRequest.body.securityCode = "123456";
-        emailSecurityCodeValidator(mockRequest as Request, mockResponse as Response, nextFunction);
+        validateEmailSecurityCode(mockRequest as Request, mockResponse as Response, nextFunction);
         expect(nextFunction).toHaveBeenCalled();
     });
 
@@ -33,7 +33,7 @@ describe("It checks whether an email security code is valid and behaves accordin
             render: jest.fn()
         };
 
-        emailSecurityCodeValidator(mockRequest as Request, mockResponse as Response, nextFunction);
+        validateEmailSecurityCode(mockRequest as Request, mockResponse as Response, nextFunction);
 
         expect(mockResponse.render).toHaveBeenCalledWith("register/enter-email-code.njk", {
             values: {

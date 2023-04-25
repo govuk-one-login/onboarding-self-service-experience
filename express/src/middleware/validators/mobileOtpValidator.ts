@@ -1,33 +1,26 @@
 import {Request, RequestHandler} from "express";
 import {obscureNumber} from "../../lib/mobileNumberUtils";
-import validateSecurityCode from "../../lib/validators/checkOtp";
+import validate from "../../lib/validators/checkOtp";
 
-export function mobileSecurityCodeValidator(textMessageNotReceivedUrl: string, hideNumber = true): RequestHandler {
-    return async (req, res, next) => {
-        const securityCode: string = req.body.securityCode.replace(/\s+/g, "");
-        let mobileNumber;
+export default function validateMobileSecurityCode(textMessageNotReceivedUrl: string, hideNumber = true): RequestHandler {
+    return (req, res, next) => {
+        const securityCode: string = req.body.securityCode.trim();
+        const result = validate(securityCode);
 
-        if (hideNumber) {
-            mobileNumber = obscureNumber(getMobileNumber(req));
-        } else {
-            mobileNumber = String(req.session.enteredMobileNumber);
+        if (result.isValid) {
+            return next();
         }
 
-        const validationResponse = validateSecurityCode(securityCode);
-        if (validationResponse.isValid) {
-            next();
-        } else {
-            res.render("common/enter-text-code.njk", {
-                values: {
-                    securityCode: securityCode,
-                    mobileNumber: mobileNumber,
-                    textMessageNotReceivedUrl: textMessageNotReceivedUrl
-                },
-                errorMessages: {
-                    securityCode: validationResponse.errorMessage
-                }
-            });
-        }
+        res.render("common/enter-text-code.njk", {
+            values: {
+                securityCode: securityCode,
+                mobileNumber: hideNumber ? obscureNumber(getMobileNumber(req)) : req.session.enteredMobileNumber,
+                textMessageNotReceivedUrl: textMessageNotReceivedUrl
+            },
+            errorMessages: {
+                securityCode: result.errorMessage
+            }
+        });
     };
 }
 

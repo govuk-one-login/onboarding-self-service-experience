@@ -34,6 +34,7 @@ function findInvalidUrls(urls: string[]): string[] {
             invalidUrls.push(url);
         }
     }
+
     return invalidUrls;
 }
 

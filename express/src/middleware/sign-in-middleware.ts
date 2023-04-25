@@ -7,15 +7,14 @@ export async function processSecurityCode(req: Request, res: Response, next: Nex
 
     // TODO figure out error handling, maybe throw?
     if (!req.session.mfaResponse) {
-        res.redirect("/sign-in");
-        return;
+        return res.redirect("/sign-in");
     }
 
     try {
         req.session.authenticationResult = await s4.respondToMfaChallenge(req.session.mfaResponse, req.body.securityCode);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            res.render("common/enter-text-code.njk", {
+            return res.render("common/enter-text-code.njk", {
                 headerActiveItem: "sign-in",
                 errorMessages: {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
@@ -25,8 +24,6 @@ export async function processSecurityCode(req: Request, res: Response, next: Nex
                     mobileNumber: req.session.mobileNumber
                 }
             });
-
-            return;
         }
 
         throw error;

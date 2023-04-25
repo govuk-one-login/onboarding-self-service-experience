@@ -22,13 +22,13 @@ import {
 } from "../controllers/register";
 import {checkAuthorisation} from "../middleware/authoriser";
 import processSignInForm from "../middleware/processSignInForm";
-import {emailSecurityCodeValidator} from "../middleware/validators/emailOtpValidator";
-import {emailValidator} from "../middleware/validators/emailValidator";
-import {mobileSecurityCodeValidator} from "../middleware/validators/mobileOtpValidator";
-import validateMobileNumber from "../middleware/validators/mobileValidator";
-import notOnCommonPasswordListValidator from "../middleware/validators/notOnCommonPasswordListValidator";
-import {passwordValidator} from "../middleware/validators/passwordValidator";
-import {serviceNameValidator} from "../middleware/validators/serviceNameValidator";
+import validateEmailSecurityCode from "../middleware/validators/emailOtpValidator";
+import validateEmail from "../middleware/validators/emailValidator";
+import validateMobileSecurityCode from "../middleware/validators/mobileOtpValidator";
+import validateMobileNumber from "../middleware/validators/mobileValidator/validator";
+import checkPasswordAllowed from "../middleware/validators/notOnCommonPasswordListValidator";
+import validatePassword from "../middleware/validators/passwordValidator";
+import validateServiceName from "../middleware/validators/serviceNameValidator";
 
 const router = Router();
 export default router;
@@ -37,17 +37,17 @@ router.get("/", (req, res) => {
     res.redirect(303, path.join(req.baseUrl, "/enter-email-address"));
 });
 
-router.route("/enter-email-address").get(showGetEmailForm).post(emailValidator("register/enter-email-address.njk"), processGetEmailForm);
+router.route("/enter-email-address").get(showGetEmailForm).post(validateEmail("register/enter-email-address.njk"), processGetEmailForm);
 router.route("/account-exists").get(accountExists).post(processSignInForm("register/account-exists.njk"));
-router.route("/enter-email-code").get(showCheckEmailForm).post(emailSecurityCodeValidator, submitEmailSecurityCode);
+router.route("/enter-email-code").get(showCheckEmailForm).post(validateEmailSecurityCode, submitEmailSecurityCode);
 router.route("/resend-email-code").get(showResendEmailCodeForm).post(resendEmailVerificationCode);
 
 router
     .route("/create-password")
     .get(showNewPasswordForm)
     .post(
-        passwordValidator("register/create-password.njk"),
-        notOnCommonPasswordListValidator("register/create-password.njk", "password", ["password"]),
+        validatePassword("register/create-password.njk"),
+        checkPasswordAllowed("register/create-password.njk", "password", ["password"]),
         updatePassword
     );
 
@@ -61,7 +61,7 @@ router
 router
     .route("/enter-text-code")
     .get(showSubmitMobileVerificationCode)
-    .post(mobileSecurityCodeValidator("resend-text-code", false), submitMobileVerificationCode);
+    .post(validateMobileSecurityCode("resend-text-code", false), submitMobileVerificationCode);
 
 router.route("/resend-text-code").get(showResendPhoneCodeForm).post(resendMobileVerificationCode);
-router.route("/create-service").get(showAddServiceForm).post(serviceNameValidator, processAddServiceForm);
+router.route("/create-service").get(showAddServiceForm).post(validateServiceName, processAddServiceForm);
