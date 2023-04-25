@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {Session} from "express-session";
 import validateMobileNumber from "middleware/validators/mobileValidator";
-import {INVALID_NUMBERS, VALID_NUMBERS} from "../../lib/mobileNumberUtils.test";
+import {invalidNumbers, validNumbers} from "../../lib/mobileNumberUtils.test";
 
 describe("Validating numbers works as expected", () => {
     let mockRequest: Partial<Request>;
@@ -9,7 +9,7 @@ describe("Validating numbers works as expected", () => {
     let nextFunction: NextFunction;
     let session: Partial<Session>;
 
-    it.each(VALID_NUMBERS)("Accepts valid number %s", validNumber => {
+    it.each(validNumbers)("Accepts valid number %s", validNumber => {
         mockRequest = {
             body: jest.fn(),
             session: session as Session
@@ -24,7 +24,7 @@ describe("Validating numbers works as expected", () => {
         expect(nextFunction).toBeCalledTimes(1);
     });
 
-    it.each(INVALID_NUMBERS)("Rejects invalid number %s", invalidNumber => {
+    it.each(invalidNumbers)("Rejects invalid number %s", invalidNumber => {
         mockRequest = {
             body: jest.fn()
         };
