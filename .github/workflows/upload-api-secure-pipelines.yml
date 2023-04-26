@@ -29,12 +29,22 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: self-service-api
+          
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.FRONTEND_BUILD_GHA_ROLE_ARN }}
+          aws-region: eu-west-2
 
-      - name: Deploy API
+      - name:  Build SAM app
+        working-directory: infrastructure/api
+        run: sam build --template ${{env.TEMPLATE}} --base-dir .
+
+      - name: Deploy SAM app
         uses: alphagov/di-devplatform-upload-action@d191917e2d6caf2e78d1dc4b639251a053f4e8e3
         with:
           artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
-          working-directory: ./sam-app
+          working-directory: ./
           template-file: ${{env.TEMPLATE}}
           
