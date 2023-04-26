@@ -20,15 +20,15 @@ import {
     submitMobileVerificationCode,
     updatePassword
 } from "../controllers/register";
-import {checkAuthorisation} from "../middleware/authoriser";
-import processSignInForm from "../middleware/processSignInForm";
-import validateEmailSecurityCode from "../middleware/validators/emailOtpValidator";
-import validateEmail from "../middleware/validators/emailValidator";
-import validateMobileSecurityCode from "../middleware/validators/mobileOtpValidator";
-import validateMobileNumber from "../middleware/validators/mobileValidator/validator";
-import checkPasswordAllowed from "../middleware/validators/notOnCommonPasswordListValidator";
-import validatePassword from "../middleware/validators/passwordValidator";
-import validateServiceName from "../middleware/validators/serviceNameValidator";
+import checkAuthorisation from "../middleware/authoriser";
+import processSignInForm from "../middleware/process-sign-in-form";
+import checkPasswordAllowed from "../middleware/validators/common-password-validator";
+import validateEmailSecurityCode from "../middleware/validators/email-code-validator";
+import validateEmail from "../middleware/validators/email-validator";
+import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator";
+import validateMobileNumber from "../middleware/validators/mobile-number-validator";
+import validatePassword from "../middleware/validators/password-validator";
+import validateServiceName from "../middleware/validators/service-name-validator";
 
 const router = Router();
 export default router;
@@ -45,11 +45,7 @@ router.route("/resend-email-code").get(showResendEmailCodeForm).post(resendEmail
 router
     .route("/create-password")
     .get(showNewPasswordForm)
-    .post(
-        validatePassword("register/create-password.njk"),
-        checkPasswordAllowed("register/create-password.njk", "password", ["password"]),
-        updatePassword
-    );
+    .post(validatePassword("register/create-password.njk"), checkPasswordAllowed("register/create-password.njk"), updatePassword);
 
 router.use(checkAuthorisation);
 

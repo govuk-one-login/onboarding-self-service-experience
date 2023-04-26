@@ -8,10 +8,10 @@ import {
     showVerifyMobileWithSmsCode,
     verifyMobileWithSmsCode
 } from "../controllers/account";
-import {checkAuthorisation} from "../middleware/authoriser";
-import validateMobileSecurityCode from "../middleware/validators/mobileOtpValidator";
-import validateMobileNumber from "../middleware/validators/mobileValidator/validator";
-import checkPasswordAllowed from "../middleware/validators/notOnCommonPasswordListValidator";
+import checkAuthorisation from "../middleware/authoriser";
+import checkPasswordAllowed from "../middleware/validators/common-password-validator";
+import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator";
+import validateMobileNumber from "../middleware/validators/mobile-number-validator";
 
 const router = Router();
 export default router;

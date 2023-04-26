@@ -2,7 +2,7 @@ import {CodeMismatchException} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
-export async function processSecurityCode(req: Request, res: Response, next: NextFunction) {
+export default async function processSecurityCode(req: Request, res: Response, next: NextFunction) {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     // TODO figure out error handling, maybe throw?

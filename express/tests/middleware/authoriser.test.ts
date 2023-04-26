@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
-import {checkAuthorisation} from "middleware/authoriser";
-import "types/session";
+import checkAuthorisation from "middleware/authoriser";
+import "config/session-data";
 
 describe("test authoriser", () => {
     let mockRequest: Partial<Request>;

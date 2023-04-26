@@ -1,6 +1,6 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {Request, Response} from "express";
-import AuthenticationResultParser from "../lib/AuthenticationResultParser";
+import AuthenticationResultParser from "../lib/authentication-result-parser";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const listServices = async function (req: Request, res: Response) {

@@ -15,8 +15,8 @@ import {
     showProcessChangeServiceNameForm,
     showProcessChangeUserAttributesForm
 } from "../controllers/clients";
-import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
-import validateUris from "../middleware/validators/urisValidator";
+import convertPublicKeyForAuth from "../middleware/convert-public-key";
+import validateUris from "../middleware/validators/uris-validator";
 
 const router = Router();
 export default router;

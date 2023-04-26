@@ -1,5 +1,5 @@
 import {RequestParamHandler} from "express";
-import {ContextProperty} from "../types/request";
+import {ContextProperty} from "../types/request-context";
 
 export default setRequestContext();
 

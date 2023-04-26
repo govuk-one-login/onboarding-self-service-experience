@@ -1,10 +1,11 @@
 import bodyParser from "body-parser";
 import express from "express";
 import "express-async-errors";
+import Express from "./config/express";
 import {distribution} from "./config/resources";
+import "./config/session-data";
 import sessionStorage from "./config/session-storage";
 import configureViews from "./config/views";
-import Express from "./lib/express";
 import "./lib/utils/optional";
 import {errorHandler, notFoundHandler} from "./middleware/errors";
 import signInStatus from "./middleware/sign-in-status";
@@ -15,7 +16,6 @@ import services from "./routes/services";
 import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing";
 import SelfServiceServicesService from "./services/self-service-services-service";
-import "./types/session";
 
 const app = Express();
 

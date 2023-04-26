@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {listServices} from "../controllers/services";
-import {checkAuthorisation} from "../middleware/authoriser";
+import checkAuthorisation from "../middleware/authoriser";
 import setRequestContext from "../middleware/request-context";
 import clients from "./clients";
 

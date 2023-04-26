@@ -3,9 +3,10 @@ import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import axios, {Axios, AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
-import AuthenticationResultParser from "../../lib/AuthenticationResultParser";
+import AuthenticationResultParser from "../../lib/authentication-result-parser";
 import LambdaFacadeInterface from "./LambdaFacadeInterface";
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 class LambdaFacade implements LambdaFacadeInterface {
     private instance: Axios;
 

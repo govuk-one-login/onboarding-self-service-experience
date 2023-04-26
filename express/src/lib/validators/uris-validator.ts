@@ -1,6 +1,6 @@
-import {validationResult} from "./validationResult";
+import {ValidationResult} from "../../types/validation-result";
 
-export default function validateUris(urls: string[]): validationResult {
+export default function validateUris(urls: string[]): ValidationResult {
     if (urls.length === 0) {
         return {isValid: false, errorMessage: "Enter your redirect URIs"};
     }
