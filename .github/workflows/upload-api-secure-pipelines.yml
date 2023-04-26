@@ -14,7 +14,6 @@ jobs:
     name: Upload API package
     runs-on: ubuntu-latest
     environment: build
-    needs: build
     env:
       TEMPLATE: infrastructure/api/sse-api.yml
 
