@@ -25,10 +25,10 @@ jobs:
       - name: Pull repository
         uses: actions/checkout@v3
 
-      - name: Get distribution artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: self-service-api
+#       - name: Get distribution artifact
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: self-service-api
           
       - name: Assume AWS Role
         uses: aws-actions/configure-aws-credentials@v1-node16
