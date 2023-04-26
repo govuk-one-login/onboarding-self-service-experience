@@ -9,7 +9,7 @@ export default function processSignInForm(template: string): RequestHandler {
         const s4: SelfServiceServicesService = req.app.get("backing-service");
 
         if (password.length === 0) {
-            res.render(template, {
+            return res.render(template, {
                 values: {
                     password: password,
                     emailAddress: email
@@ -18,15 +18,13 @@ export default function processSignInForm(template: string): RequestHandler {
                     password: "Enter your password"
                 }
             });
-
-            return;
         }
 
         try {
             req.session.mfaResponse = await s4.login(email, password);
         } catch (error) {
             if (error instanceof NotAuthorizedException) {
-                res.render(template, {
+                return res.render(template, {
                     values: {
                         password: password,
                         emailAddress: email
@@ -35,20 +33,16 @@ export default function processSignInForm(template: string): RequestHandler {
                         password: "Incorrect password"
                     }
                 });
-
-                return;
             }
 
             if (error instanceof UserNotFoundException) {
                 req.session.emailAddress = email;
-                res.redirect("/sign-in/account-not-found");
-                return;
+                return res.redirect("/sign-in/account-not-found");
             }
 
             throw error;
         }
 
         res.redirect("/sign-in/enter-text-code");
-        return;
     };
 }

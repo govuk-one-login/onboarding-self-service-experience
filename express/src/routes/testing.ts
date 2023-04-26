@@ -1,7 +1,7 @@
 import {Router} from "express";
-import {emailValidator} from "../middleware/validators/emailValidator";
-import validateMobileNumber from "../middleware/validators/mobileValidator";
-import {passwordValidator} from "../middleware/validators/passwordValidator";
+import validateEmail from "../middleware/validators/emailValidator";
+import validateMobileNumber from "../middleware/validators/mobileValidator/validator";
+import validatePassword from "../middleware/validators/passwordValidator";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 const router = Router();
@@ -157,7 +157,7 @@ router.get("/change-email-address", (req, res) => {
     });
 });
 
-router.post("/change-email-address", emailValidator("test/change-email-address.njk"), async (req, res) => {
+router.post("/change-email-address", validateEmail("test/change-email-address.njk"), async (req, res) => {
     res.redirect("/account");
 });
 
@@ -267,7 +267,7 @@ router.get("/account-exists", (req, res) => {
     });
 });
 
-router.post("/account-exists", passwordValidator("register/account-exists.njk"), async (req, res) => {
+router.post("/account-exists", validatePassword("register/account-exists.njk"), async (req, res) => {
     res.render("common/enter-text-code.njk");
 });
 
@@ -412,7 +412,7 @@ router.get("/invite-team-member", (req, res) => {
     });
 });
 
-router.post("/invite-team-member", emailValidator("test/invite-team-member.njk"), async (req, res) => {
+router.post("/invite-team-member", validateEmail("test/invite-team-member.njk"), async (req, res) => {
     res.redirect("/invitation-sent");
 });
 

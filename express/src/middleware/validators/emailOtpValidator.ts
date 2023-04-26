@@ -1,23 +1,21 @@
 import {NextFunction, Request, Response} from "express";
-import validateSecurityCode from "../../lib/validators/checkOtp";
-import {validationResult} from "../../lib/validators/validationResult";
+import validate from "../../lib/validators/checkOtp";
 
-export async function emailSecurityCodeValidator(req: Request, res: Response, next: NextFunction) {
-    const securityCode = req.body.securityCode.replace(/\s+/g, "");
-
-    const result: validationResult = validateSecurityCode(securityCode);
+export default function validateEmailSecurityCode(req: Request, res: Response, next: NextFunction) {
+    const securityCode = req.body.securityCode.trim();
+    const result = validate(securityCode);
 
     if (result.isValid) {
-        next();
-    } else {
-        res.render("register/enter-email-code.njk", {
-            values: {
-                emailAddress: req.session.emailAddress as string,
-                securityCode: securityCode
-            },
-            errorMessages: {
-                securityCode: result.errorMessage
-            }
-        });
+        return next();
     }
+
+    res.render("register/enter-email-code.njk", {
+        values: {
+            emailAddress: req.session.emailAddress,
+            securityCode: securityCode
+        },
+        errorMessages: {
+            securityCode: result.errorMessage
+        }
+    });
 }

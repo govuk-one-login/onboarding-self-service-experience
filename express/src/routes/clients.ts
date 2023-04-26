@@ -1,22 +1,22 @@
 import {Router} from "express";
 import {
+    processChangePostLogoutUrisForm,
+    processChangePublicKeyForm,
+    processChangeRedirectUrlsForm,
     processChangeServiceNameForm,
+    processChangeUserAttributesForm,
     processPrivateBetaForm,
     showClient,
     showPrivateBetaForm,
     showPrivateBetaFormSubmitted,
-    showProcessChangeServiceNameForm,
-    showProcessChangePublicKeyForm,
-    processChangePublicKeyForm,
-    showProcessChangeRedirectUrlsForm,
-    processChangeRedirectUrlsForm,
-    showProcessChangeUserAttributesForm,
-    processChangeUserAttributesForm,
     showProcessChangePostLogoutUrisForm,
-    processChangePostLogoutUrisForm
+    showProcessChangePublicKeyForm,
+    showProcessChangeRedirectUrlsForm,
+    showProcessChangeServiceNameForm,
+    showProcessChangeUserAttributesForm
 } from "../controllers/clients";
 import {convertPublicKeyForAuth} from "../middleware/convertPublicKeyForAuth";
-import {urisValidator} from "../middleware/validators/urisValidator";
+import validateUris from "../middleware/validators/urisValidator";
 
 const router = Router();
 export default router;
@@ -43,7 +43,7 @@ router
 router
     .route("/:clientId/:selfServiceClientId/change-redirect-uris")
     .get(showProcessChangeRedirectUrlsForm)
-    .post(urisValidator("clients/change-redirect-uris.njk"), processChangeRedirectUrlsForm);
+    .post(validateUris("clients/change-redirect-uris.njk"), processChangeRedirectUrlsForm);
 
 router
     .route("/:clientId/:selfServiceClientId/change-user-attributes")
@@ -53,4 +53,4 @@ router
 router
     .route("/:clientId/:selfServiceClientId/change-post-logout-uris")
     .get(showProcessChangePostLogoutUrisForm)
-    .post(urisValidator("clients/change-post-logout-uris.njk"), processChangePostLogoutUrisForm);
+    .post(validateUris("clients/change-post-logout-uris.njk"), processChangePostLogoutUrisForm);

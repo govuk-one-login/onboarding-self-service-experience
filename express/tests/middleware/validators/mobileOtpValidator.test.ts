@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {Session, SessionData} from "express-session";
 import "lib/utils/optional";
-import {mobileSecurityCodeValidator} from "middleware/validators/mobileOtpValidator";
+import validateMobileSecurityCode from "middleware/validators/mobileOtpValidator";
 import "types/session";
 
 describe("It checks whether a mobile security code is valid and behaves accordingly", () => {
@@ -23,7 +23,7 @@ describe("It checks whether a mobile security code is valid and behaves accordin
 
     it("calls the NextFunction if the security code is valid", () => {
         mockRequest.body.securityCode = "123456";
-        mobileSecurityCodeValidator("/get-another-message")(mockRequest as Request, mockResponse as Response, nextFunction);
+        validateMobileSecurityCode("/get-another-message")(mockRequest as Request, mockResponse as Response, nextFunction);
         expect(nextFunction).toHaveBeenCalled();
     });
 
@@ -34,7 +34,7 @@ describe("It checks whether a mobile security code is valid and behaves accordin
             render: jest.fn()
         };
 
-        mobileSecurityCodeValidator("/get-another-message", false)(mockRequest as Request, mockResponse as Response, nextFunction);
+        validateMobileSecurityCode("/get-another-message", false)(mockRequest as Request, mockResponse as Response, nextFunction);
 
         expect(mockResponse.render).toHaveBeenCalledWith("common/enter-text-code.njk", {
             errorMessages: {
