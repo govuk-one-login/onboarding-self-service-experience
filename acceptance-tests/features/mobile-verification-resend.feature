@@ -2,10 +2,10 @@ Feature: Resending the security code to a mobile phone
 
   Background:
     Given the user is on the "/register" page
-    And the user submits the email "registering-successfully@gds.gov.uk"
-    And the user submits the security code "435553"
-    And the user submits the password "this-is-not-a-common-password"
-    And the user submits the mobile phone number "+447700900000"
+    And they submit the email "registering-successfully@gds.gov.uk"
+    And they submit a correct security code
+    And they submit a valid password
+    And they submit a valid mobile phone number
     Then they should be redirected to the "/register/enter-text-code" page
     And they should see the text "Check your mobile phone"
 

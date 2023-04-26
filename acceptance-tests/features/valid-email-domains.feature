@@ -3,7 +3,7 @@ Feature: Users can only register with email addresses from certain domains
   Scenario Outline: User can register allowed email addresses
 
     Given the user is on the "/register" page
-    When the user submits the email <email>
+    When they submit the email <email>
     Then they should be redirected to the "/register/enter-email-code" page
 
     Examples:
@@ -16,8 +16,8 @@ Feature: Users can only register with email addresses from certain domains
   Scenario Outline: User tries to register with a verboten email address
 
     Given the user is on the "/register" page
-    When the user submits the email <email>
-    Then the error message "Enter a government email address" must be displayed for the "emailAddress" field
+    When they submit the email <email>
+    Then the error message "Enter a government email address" must be displayed for the email field
 
     Examples:
       | email                                                            |
