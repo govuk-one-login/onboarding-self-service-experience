@@ -1,31 +1,16 @@
-import {NextFunction, Request, Response} from "express";
-import {Session, SessionData} from "express-session";
-import checkAuthorisation from "middleware/authoriser";
 import "config/session-data";
+import checkAuthorisation from "middleware/authoriser";
+import {request, response} from "../mocks";
 
-describe("test authoriser", () => {
-    let mockRequest: Partial<Request>;
-    let mockResponse: Partial<Response>;
-    let nextFunction: NextFunction;
+const next = jest.fn();
+const req = request();
+const res = response();
 
-    const mockSession: Partial<Session & Partial<SessionData>> = {};
+describe("Verify access token in the session", () => {
+    it("Redirect to the session timeout page if there is no access token", async () => {
+        await checkAuthorisation(req, res, next);
 
-    beforeEach(() => {
-        mockRequest = {
-            body: jest.fn(),
-            session: mockSession as Session
-        };
-
-        mockResponse = {};
-        mockResponse.render = jest.fn();
-        mockResponse.redirect = jest.fn();
-        nextFunction = jest.fn();
-    });
-
-    it("should redirect to /session-timeout when there is no access token", async function () {
-        mockRequest.body.render = "account/change-password.njk";
-        await checkAuthorisation(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
-        expect(nextFunction).toBeCalledTimes(0);
-        expect(mockResponse.redirect).toHaveBeenCalledWith("/session-timeout");
+        expect(next).not.toHaveBeenCalled();
+        expect(res.redirect).toHaveBeenCalledWith("/session-timeout");
     });
 });

@@ -1,40 +1,37 @@
-import {NextFunction, Request, Response} from "express";
+import {Request} from "express";
 import checkPasswordAllowed from "middleware/validators/common-password-validator";
+import {request, response} from "../../mocks";
 
-describe("it will not allow a user to submit a common password but will allow one not on the list", () => {
-    let mockRequest: Partial<Request>;
-    let mockResponse: Partial<Response>;
-    const nextFunction = jest.fn();
+jest.mock("fs/promises", () => {
+    return {
+        readFile: jest.fn(() => "common-password")
+    };
+});
 
+let req: Request;
+
+const next = jest.fn();
+const res = response();
+const validator = checkPasswordAllowed("template.njk", "password");
+
+describe("Validate submitted password against commonly used list", () => {
     beforeEach(() => {
-        mockRequest = {
-            body: jest.fn()
-        };
-
-        mockResponse = {render: jest.fn()};
+        req = request();
     });
 
-    it("doesn't allow password as a password", async () => {
-        mockRequest.body.password = "password";
+    it("Render errors if password is not allowed", async () => {
+        req.body.password = "common-password";
+        await validator(req, res, next);
 
-        await checkPasswordAllowed("template.njk", "password", [])(
-            mockRequest as Request,
-            mockResponse as Response,
-            nextFunction as NextFunction
-        );
-
-        expect(nextFunction).toHaveBeenCalledTimes(0);
+        expect(next).not.toHaveBeenCalled();
+        expect(res.render).toHaveBeenCalledWith("template.njk", expect.objectContaining({errorMessages: {password: expect.any(String)}}));
     });
 
-    it("allows somerandomtestvalue as a password", async () => {
-        mockRequest.body.password = "somerandomtestvalue";
+    it("Call next middleware if password is allowed", async () => {
+        req.body.password = "not-common-password";
+        await validator(req, res, next);
 
-        await checkPasswordAllowed("template.njk", "password", [])(
-            mockRequest as Request,
-            mockResponse as Response,
-            nextFunction as NextFunction
-        );
-
-        expect(nextFunction).toHaveBeenCalledTimes(1);
+        expect(next).toHaveBeenCalled();
+        expect(res.render).not.toHaveBeenCalled();
     });
 });

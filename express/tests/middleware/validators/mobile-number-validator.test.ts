@@ -1,44 +1,38 @@
-import {NextFunction, Request, Response} from "express";
-import {Session} from "express-session";
+import {Request} from "express";
 import validateMobileNumber from "middleware/validators/mobile-number-validator";
-import {invalidNumbers, validNumbers} from "../../lib/mobile-number.test";
+import {request, response} from "../../mocks";
 
-describe("Validating numbers works as expected", () => {
-    let mockRequest: Partial<Request>;
-    let mockResponse: Partial<Response>;
-    let nextFunction: NextFunction;
-    let session: Partial<Session>;
+let req: Request;
 
-    it.each(validNumbers)("Accepts valid number %s", validNumber => {
-        mockRequest = {
-            body: jest.fn(),
-            session: session as Session
-        };
+const next = jest.fn();
+const res = response();
+const validator = validateMobileNumber("template.njk");
 
-        mockResponse = {};
-        nextFunction = jest.fn();
-
-        mockRequest.body.mobileNumber = validNumber;
-        validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
-
-        expect(nextFunction).toBeCalledTimes(1);
+describe("Validate submitted mobile phone number", () => {
+    beforeEach(() => {
+        req = request();
     });
 
-    it.each(invalidNumbers)("Rejects invalid number %s", invalidNumber => {
-        mockRequest = {
-            body: jest.fn()
-        };
+    it("Call next middleware if the number is valid", () => {
+        req.body.mobileNumber = "07765 387 483";
+        validator(req, res, next);
 
-        mockResponse = {
-            render: jest.fn()
-        };
+        expect(next).toHaveBeenCalled();
+        expect(res.render).not.toHaveBeenCalled();
+    });
 
-        nextFunction = jest.fn();
+    it("Render error if the number is invalid", () => {
+        req.body.mobileNumber = "0707 123 456";
+        validator(req, res, next);
 
-        mockRequest.body.mobileNumber = invalidNumber;
-        validateMobileNumber("./any-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
-
-        expect(nextFunction).not.toBeCalled();
-        expect(mockResponse.render).toHaveBeenCalledTimes(1);
+        expect(next).not.toBeCalled();
+        expect(res.render).toHaveBeenCalledWith("template.njk", {
+            values: {
+                mobileNumber: "0707 123 456"
+            },
+            errorMessages: {
+                mobileNumber: expect.stringMatching(/UK.*number/)
+            }
+        });
     });
 });

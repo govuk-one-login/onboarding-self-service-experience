@@ -1,37 +1,32 @@
-import {NextFunction, Request, Response} from "express";
-import {Session, SessionData} from "express-session";
-import checkEmailIsPresentInSession from "middleware/validators/email-present-in-session";
 import "config/session-data";
+import {Request} from "express";
+import checkEmailIsPresentInSession from "middleware/validators/email-present-in-session";
+import {request, response} from "../../mocks";
 
-describe("It checks whether an email is present in the session and behaves accordingly", () => {
-    let mockRequest: Partial<Request>;
-    let mockResponse: Partial<Response>;
-    let nextFunction: NextFunction;
-    let mockSession: Partial<Session & Partial<SessionData>>;
+let req: Request;
 
+const next = jest.fn();
+const res = response();
+const validator = checkEmailIsPresentInSession("template.njk", {});
+
+describe("Checks whether email is present in the session", () => {
     beforeEach(() => {
-        mockSession = {};
-        mockRequest = {
-            body: jest.fn(),
-            session: mockSession as Session
-        };
-
-        nextFunction = jest.fn();
+        req = request();
     });
 
-    it("calls the NextFunction if emailAddress is present in the session", () => {
-        mockSession.emailAddress = "testing@test.gov.uk";
-        checkEmailIsPresentInSession("sign-in.njk", {})(mockRequest as Request, mockResponse as Response, nextFunction);
-        expect(nextFunction).toHaveBeenCalled();
+    it("Call next middleware if email is present in the session", () => {
+        req.session.emailAddress = "testing@test.gov.uk";
+        validator(req, res, next);
+
+        expect(next).toHaveBeenCalled();
+        expect(res.render).not.toHaveBeenCalled();
     });
 
-    it("renders the given template if emailAddress is not present in the session", () => {
-        mockSession.emailAddress = undefined;
-        mockResponse = {
-            render: jest.fn()
-        };
+    it("Render errors if email is not present in the session", () => {
+        req.session.emailAddress = undefined;
+        validator(req, res, next);
 
-        checkEmailIsPresentInSession("sign-in.njk", {})(mockRequest as Request, mockResponse as Response, nextFunction);
-        expect(mockResponse.render).toHaveBeenCalledWith("sign-in.njk", {});
+        expect(next).not.toHaveBeenCalled();
+        expect(res.render).toHaveBeenCalledWith("template.njk", {});
     });
 });

@@ -1,42 +1,35 @@
-import {NextFunction, Request, Response} from "express";
-import {Session, SessionData} from "express-session";
-import validateEmail from "middleware/validators/email-validator";
 import "config/session-data";
+import {Request} from "express";
+import validateEmail from "middleware/validators/email-validator";
+import {request, response} from "../../mocks";
 
-describe("It checks whether an email is valid and behaves accordingly", () => {
-    let mockRequest: Partial<Request>;
-    let mockResponse: Partial<Response>;
-    let nextFunction: NextFunction;
-    let mockSession: Partial<Session & Partial<SessionData>>;
+let req: Request;
 
+const next = jest.fn();
+const res = response();
+const validator = validateEmail("template.njk");
+
+describe("Validate submitted email address", () => {
     beforeEach(() => {
-        mockSession = {};
-        mockRequest = {
-            body: jest.fn(),
-            session: mockSession as Session
-        };
-
-        nextFunction = jest.fn();
-        mockResponse = {render: jest.fn()};
+        req = request();
     });
 
-    it("calls the NextFunction if the security code is valid", async () => {
-        mockRequest.body.emailAddress = "valid@test.gov.uk";
-        await validateEmail("sign-in.njk")(mockRequest as Request, mockResponse as Response, nextFunction);
-        expect(nextFunction).toHaveBeenCalled();
+    it("Call next middleware if the email address is valid", async () => {
+        req.body.emailAddress = "valid@test.gov.uk";
+        await validator(req, res, next);
+
+        expect(next).toHaveBeenCalled();
+        expect(res.render).not.toHaveBeenCalled();
     });
 
-    it("renders the correct page if the email address is not valid", async () => {
-        mockRequest.body.emailAddress = "nope@test.yahoo.uk";
-        mockResponse = {
-            render: jest.fn()
-        };
+    it("Render errors if the email address is not valid", async () => {
+        req.body.emailAddress = "nope@test.yahoo.uk";
+        await validator(req, res, next);
 
-        await validateEmail("sign-in.njk")(mockRequest as Request, mockResponse as Response, nextFunction);
-
-        expect(mockResponse.render).toHaveBeenCalledWith("sign-in.njk", {
+        expect(next).not.toHaveBeenCalled();
+        expect(res.render).toHaveBeenCalledWith("template.njk", {
             values: {
-                emailAddress: mockRequest.body.emailAddress
+                emailAddress: req.body.emailAddress
             },
             errorMessages: {
                 emailAddress: "Enter a government email address"

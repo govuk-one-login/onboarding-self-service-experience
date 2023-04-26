@@ -196,7 +196,7 @@ export const showProcessChangeRedirectUrlsForm: RequestHandler = async (req, res
 };
 
 export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) => {
-    const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
+    const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url.trim().length > 0);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     await s4.updateClient(
@@ -261,7 +261,7 @@ export const showProcessChangePostLogoutUrisForm: RequestHandler = async (req, r
 };
 
 export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) => {
-    const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
+    const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url.trim().length > 0);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     await s4.updateClient(
