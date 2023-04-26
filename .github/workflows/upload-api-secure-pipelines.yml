@@ -37,7 +37,7 @@ jobs:
           aws-region: eu-west-2
 
       - name:  Build SAM app
-        working-directory: infrastructure/api
+        working-directory: .
         run: sam build --template ${{env.TEMPLATE}} --base-dir .
 
       - name: Deploy SAM app
