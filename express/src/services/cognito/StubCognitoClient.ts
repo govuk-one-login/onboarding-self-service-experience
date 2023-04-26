@@ -19,7 +19,7 @@ import {MetadataBearer} from "@aws-sdk/types";
 import * as crypto from "crypto";
 import {promises as fs} from "fs";
 import path from "path";
-import {convertToCountryPrefixFormat} from "../../lib/mobileNumberUtils";
+import {convertToCountryPrefixFormat} from "../../lib/mobile-number";
 import CognitoInterface from "./CognitoInterface";
 
 type CognitoResponse = MetadataBearer;

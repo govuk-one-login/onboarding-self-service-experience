@@ -1,7 +1,7 @@
 import {Router} from "express";
-import validateEmail from "../middleware/validators/emailValidator";
-import validateMobileNumber from "../middleware/validators/mobileValidator/validator";
-import validatePassword from "../middleware/validators/passwordValidator";
+import validateEmail from "../middleware/validators/email-validator";
+import validateMobileNumber from "../middleware/validators/mobile-number-validator";
+import validatePassword from "../middleware/validators/password-validator";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 const router = Router();

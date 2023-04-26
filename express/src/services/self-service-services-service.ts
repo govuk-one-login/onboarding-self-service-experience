@@ -10,11 +10,12 @@ import {Client, ClientFromDynamo} from "../../@types/client";
 import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
 import {Service} from "../../@types/Service";
 import {DynamoUser, User} from "../../@types/user";
-import AuthenticationResultParser from "../lib/AuthenticationResultParser";
-import {dynamoClientToDomainClient} from "../lib/clientUtils";
-import {SelfServiceError} from "../lib/SelfServiceError";
-import {dynamoServicesToDomainServices} from "../lib/serviceUtils";
-import {userToDomainUser} from "../lib/userUtils";
+import AuthenticationResultParser from "../lib/authentication-result-parser";
+import SelfServiceError from "../lib/errors";
+import {dynamoClientToDomainClient} from "../lib/models/client-utils";
+import {dynamoServicesToDomainServices} from "../lib/models/service-utils";
+import {userToDomainUser} from "../lib/models/user-utils";
+import MfaResponse from "../types/mfa-response";
 import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface from "./lambda-facade/LambdaFacadeInterface";
 
@@ -166,10 +167,4 @@ export default class SelfServiceServicesService {
             .listClients(serviceId, accessToken)
             .then(results => results.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? []);
     }
-}
-
-export interface MfaResponse {
-    cognitoSession: string;
-    cognitoId: string;
-    codeSentTo: string;
 }

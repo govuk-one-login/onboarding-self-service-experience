@@ -1,0 +1,40 @@
+import {NextFunction, Request, Response} from "express";
+import checkPasswordAllowed from "middleware/validators/common-password-validator";
+
+describe("it will not allow a user to submit a common password but will allow one not on the list", () => {
+    let mockRequest: Partial<Request>;
+    let mockResponse: Partial<Response>;
+    const nextFunction = jest.fn();
+
+    beforeEach(() => {
+        mockRequest = {
+            body: jest.fn()
+        };
+
+        mockResponse = {render: jest.fn()};
+    });
+
+    it("doesn't allow password as a password", async () => {
+        mockRequest.body.password = "password";
+
+        await checkPasswordAllowed("template.njk", "password", [])(
+            mockRequest as Request,
+            mockResponse as Response,
+            nextFunction as NextFunction
+        );
+
+        expect(nextFunction).toHaveBeenCalledTimes(0);
+    });
+
+    it("allows somerandomtestvalue as a password", async () => {
+        mockRequest.body.password = "somerandomtestvalue";
+
+        await checkPasswordAllowed("template.njk", "password", [])(
+            mockRequest as Request,
+            mockResponse as Response,
+            nextFunction as NextFunction
+        );
+
+        expect(nextFunction).toHaveBeenCalledTimes(1);
+    });
+});

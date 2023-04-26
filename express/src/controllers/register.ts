@@ -7,9 +7,9 @@ import {
 import {randomUUID} from "crypto";
 import {NextFunction, Request, Response} from "express";
 import {Service} from "../../@types/Service";
-import AuthenticationResultParser from "../lib/AuthenticationResultParser";
-import {convertToCountryPrefixFormat} from "../lib/mobileNumberUtils";
-import {domainUserToDynamoUser} from "../lib/userUtils";
+import AuthenticationResultParser from "../lib/authentication-result-parser";
+import {convertToCountryPrefixFormat} from "../lib/mobile-number";
+import {domainUserToDynamoUser} from "../lib/models/user-utils";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const showGetEmailForm = function (req: Request, res: Response) {

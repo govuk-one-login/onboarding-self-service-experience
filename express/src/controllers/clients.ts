@@ -1,5 +1,5 @@
 import {RequestHandler} from "express";
-import getAuthApiCompliantPublicKey from "../lib/publicKeyUtils";
+import getAuthApiCompliantPublicKey from "../lib/public-key";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 const defaultPublicKey =

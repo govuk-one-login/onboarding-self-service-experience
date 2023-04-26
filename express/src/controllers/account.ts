@@ -6,8 +6,8 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Request, Response} from "express";
 import {User} from "../../@types/user";
-import AuthenticationResultParser from "../lib/AuthenticationResultParser";
-import {convertToCountryPrefixFormat} from "../lib/mobileNumberUtils";
+import AuthenticationResultParser from "../lib/authentication-result-parser";
+import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const showChangePasswordForm = async function (req: Request, res: Response) {

@@ -1,6 +1,6 @@
-import {validationResult} from "./validationResult";
+import {ValidationResult} from "../../types/validation-result";
 
-export default function validatePassword(password: string): validationResult {
+export default function validatePassword(password: string): ValidationResult {
     if (password.length === 0) {
         return {isValid: false, errorMessage: "Enter a password"};
     }

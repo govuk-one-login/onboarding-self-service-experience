@@ -12,12 +12,12 @@ import {
     showSignInFormEmail,
     showSignInFormPassword
 } from "../controllers/sign-in";
-import processSignInForm from "../middleware/processSignInForm";
-import {processSecurityCode} from "../middleware/sign-in-middleware";
-import checkEmailInSession from "../middleware/validators/emailIsPresentInSession/emailIsPresentInSession";
-import validateEmail from "../middleware/validators/emailValidator";
-import validateMobileSecurityCode from "../middleware/validators/mobileOtpValidator";
-import checkPasswordAllowed from "../middleware/validators/notOnCommonPasswordListValidator";
+import processSignInForm from "../middleware/process-sign-in-form";
+import processSecurityCode from "../middleware/sign-in-middleware";
+import checkPasswordAllowed from "../middleware/validators/common-password-validator";
+import checkEmailInSession from "../middleware/validators/email-present-in-session";
+import validateEmail from "../middleware/validators/email-validator";
+import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator";
 
 const router = Router();
 export default router;
@@ -80,7 +80,7 @@ router
     .route("/forgot-password/create-new-password")
     .get(confirmForgotPasswordForm)
     .post(
-        checkPasswordAllowed("sign-in/create-new-password.njk", "password", ["password"]),
+        checkPasswordAllowed("sign-in/create-new-password.njk"),
         confirmForgotPassword,
         processSignInForm("sign-in/create-new-password.njk")
     );
