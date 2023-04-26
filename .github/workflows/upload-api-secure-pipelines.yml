@@ -1,0 +1,41 @@
+name: Upload API to secure pipelines
+
+on:
+#   workflow_dispatch:
+  push:
+#    branches: [ main ]
+
+permissions: read-all
+concurrency: upload-api-secure-pipelines-build-${{ github.head_ref || github.ref_name }}
+
+jobs:
+
+  deploy:
+    name: Upload API package
+    runs-on: ubuntu-latest
+    environment: build
+    needs: build
+    env:
+      TEMPLATE: infrastructure/api/sse-api.yml
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
+      - name: Get distribution artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: self-service-api
+
+      - name: Deploy API
+        uses: alphagov/di-devplatform-upload-action@d191917e2d6caf2e78d1dc4b639251a053f4e8e3
+        with:
+          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
+          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          working-directory: ./sam-app
+          template-file: ${{TEMPLATE}}
+          
