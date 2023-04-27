@@ -22,13 +22,7 @@ jobs:
 
     steps:
       - name: Pull repository
-        uses: actions/checkout@v3
-
-#       - name: Get distribution artifact
-#         uses: actions/download-artifact@v3
-#         with:
-#           name: self-service-api
-          
+        uses: actions/checkout@v3          
           
       - name: Assume AWS Role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -40,7 +34,6 @@ jobs:
         working-directory: .
         run: sam build --template infrastructure/api/sse-api.yml --base-dir .
 
-
       - name: Deploy SAM app
         uses: alphagov/di-devplatform-upload-action@d191917e2d6caf2e78d1dc4b639251a053f4e8e3
         with:
@@ -48,32 +41,3 @@ jobs:
           signing-profile-name: ${{ secrets.AWS_SIGNING_PROFILE_NAME }}
           working-directory: .
           template-file: infrastructure/api/sse-api.yml
-
-#       - name: Package SAM application
-#         env:
-#           ARTIFACT_SOURCE_BUCKET_NAME: ${{ secrets.API_BUILD_ARTIFACT_BUCKET_NAME }}
-#           SIGNING_PROFILE_NAME: ${{ secrets.AWS_SIGNING_PROFILE_NAME }}
-#         run: |
-#           sam package \
-#             --s3-bucket="$ARTIFACT_SOURCE_BUCKET_NAME" \
-#             --output-template-file=infrastructure/api/sse-api.yml \
-#             --signing-profiles \
-#               UpdateUserFunction="$SIGNING_PROFILE_NAME" \
-#               GetServicesFunction="$SIGNING_PROFILE_NAME" \
-#               PutServiceFunction="$SIGNING_PROFILE_NAME" \
-#               GetServiceClientsFunction="$SIGNING_PROFILE_NAME" \
-#               PutServiceClientFunction="$SIGNING_PROFILE_NAME" \
-#               UpdateServiceClientFunction="$SIGNING_PROFILE_NAME" \
-#               PutServiceUserFunction="$SIGNING_PROFILE_NAME" \
-#               RegisterAuthClientFunction="$SIGNING_PROFILE_NAME"
-                  
-
-#           - name: Zip CloudFormation template
-#             run: zip template.zip cf-template.yaml
-
-#           - name: Push CloudFormation artifact to S3
-#             env:
-#               ARTIFACT_SOURCE_BUCKET_NAME: ${{ secrets.ARTIFACT_SOURCE_BUCKET_NAME }}
-#               RELEASE_NAME: "sse-api-release"
-#             run: aws s3 cp template.zip "s3://$ARTIFACT_SOURCE_BUCKET_NAME/template.zip" --metadata "repository=$GITHUB_REPOSITORY,commitsha=$GITHUB_SHA,release=$RELEASE_NAME,codepipeline-artifact-revision-summary=$RELEASE_NAME"
-          
