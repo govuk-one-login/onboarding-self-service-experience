@@ -44,7 +44,7 @@ jobs:
       - name: Package SAM application
         env:
           ARTIFACT_SOURCE_BUCKET_NAME: ${{ secrets.API_BUILD_ARTIFACT_BUCKET_NAME }}
-          SIGNING_PROFILE_NAME: ${{ secrets.SIGNING_PROFILE_NAME }}
+          SIGNING_PROFILE_NAME: "SigningProfile_tI0KRsWSzl5S"
         run: |
           sam package \
             --s3-bucket="$ARTIFACT_SOURCE_BUCKET_NAME" \
