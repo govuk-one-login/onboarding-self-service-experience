@@ -32,7 +32,7 @@ jobs:
       - name: Assume AWS Role
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
-          role-to-assume: ${{ secrets.FRONTEND_BUILD_GHA_ROLE_ARN }}
+          role-to-assume: ${{ secrets.API_BUILD_GHA_ROLE_ARN }}
           aws-region: eu-west-2
 
       - name:  Build SAM app
