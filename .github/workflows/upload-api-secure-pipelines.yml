@@ -43,7 +43,7 @@ jobs:
         uses: alphagov/di-devplatform-upload-action@d191917e2d6caf2e78d1dc4b639251a053f4e8e3
         with:
           artifact-bucket-name: ${{ secrets.API_BUILD_ARTIFACT_BUCKET_NAME }}
-          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          signing-profile-name: ''
           working-directory: ./
           template-file: infrastructure/api/sse-api.yml
           
