@@ -2,9 +2,9 @@ name: Upload Frontend to secure pipelines
 
 on:
   workflow_dispatch:
-#  push:
-#    branches: [ main ]
-#    paths: [ express/** ]
+  push:
+   branches: [ main ]
+   paths: [ express/** ]
 
 permissions: read-all
 concurrency: upload-frontend-secure-pipelines-build-${{ github.head_ref || github.ref_name }}
@@ -19,8 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: build
     needs: build
-    env:
-      TEMPLATE: infrastructure/ci/dev-platform/frontend-template.yml
 
     permissions:
       id-token: write
@@ -35,35 +33,14 @@ jobs:
         with:
           name: self-service-front
 
-      - name: Assume AWS Role
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          role-to-assume: ${{ secrets.FRONTEND_BUILD_GHA_ROLE_ARN }}
-          aws-region: eu-west-2
-
-      - name: Push Docker image
-        id: push-docker-image
-        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@5dacba941def444d69f02843feaebed79b5fca51
-        with:
-          repository: ${{ secrets.FRONTEND_BUILD_ECR_REPOSITORY }}
-          image-version: ${{ github.sha }}
-          image-tags: ${{ github.head_ref || github.ref_name }}
-          dockerfile-path: infrastructure/frontend/Dockerfile
-
-      - name: Validate template
-        run: |
-          sam validate --template "${TEMPLATE}"
-          sam validate --template "${TEMPLATE}" --lint
-
-      - name: Update template with ECR image tag
-        env:
-          ECR_REGISTRY: ${{ secrets.FRONTEND_BUILD_ECR_REGISTRY }}
-          ECR_REPOSITORY: ${{ secrets.FRONTEND_BUILD_ECR_REPOSITORY }}
-        run: sed -i "s|CONTAINER-IMAGE-PLACEHOLDER|$ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA|" "${TEMPLATE}"
-
-      - name: Upload SAM artifact
-        uses: alphagov/di-devplatform-upload-action@v3.2
+      - name: Upload frontend package
+        uses: alphagov/di-devplatform-upload-action-ecr@d1.0.3
         with:
           artifact-bucket-name: ${{ secrets.FRONTEND_BUILD_ARTIFACT_BUCKET_NAME }}
-          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
-          template-file: ${{ env.TEMPLATE }}
+          container-sign-kms-key-arn: ${{ secrets.FRONTEND_CONTAINER_SIGN_KMS_KEY }}
+          template-file: infrastructure/ci/dev-platform/frontend-template.yml
+          role-to-assume-arn:  ${{ secrets.FRONTEND_BUILD_GHA_ROLE_ARN }}
+          ecr-repo-name: ${{ secrets.FRONTEND_BUILD_ECR_REPOSITORY }}
+          dockerfile: infrastructure/frontend/Dockerfile
+          checkout-repo: false
+          
