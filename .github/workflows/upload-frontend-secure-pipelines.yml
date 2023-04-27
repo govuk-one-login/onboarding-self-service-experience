@@ -19,8 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: build
     needs: build
-    env:
-      TEMPLATE: infrastructure/ci/dev-platform/frontend-template.yml
 
     permissions:
       id-token: write
@@ -35,13 +33,12 @@ jobs:
         with:
           name: self-service-front
 
-      - name: Deploy SAM app to ECR
-        uses: alphagov/di-devplatform-upload-action-ecr@d4be332eb73f1e19c0ffecc1213c6cfdae0240a4
+      - name: Upload frontend package
+        uses: alphagov/di-devplatform-upload-action-ecr@d1.0.3
         with:
           artifact-bucket-name: ${{ secrets.FRONTEND_BUILD_ARTIFACT_BUCKET_NAME }}
           container-sign-kms-key-arn: ${{ secrets.FRONTEND_CONTAINER_SIGN_KMS_KEY }}
-          template-file: ${{ env.TEMPLATE }}
-          docker-build-path: .
+          template-file: infrastructure/ci/dev-platform/frontend-template.yml
           role-to-assume-arn:  ${{ secrets.FRONTEND_BUILD_GHA_ROLE_ARN }}
           ecr-repo-name: ${{ secrets.FRONTEND_BUILD_ECR_REPOSITORY }}
           dockerfile: infrastructure/frontend/Dockerfile
