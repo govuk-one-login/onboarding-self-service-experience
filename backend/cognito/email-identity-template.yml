@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: SES Domain Identity for UserPool
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  DomainToVerify:
+    Type: String
+    Description: Domain that will be created as verified identity.
+  SignInHostedZone:
+    Type: String
+    Description: Deployment specific SignInHostedZone
+
+Resources:
+  DomainIdentityForSES:
+    Type: AWS::SES::EmailIdentity
+    Properties:
+      EmailIdentity: !Ref DomainToVerify
+
+  EmailIdentityRoute53Records:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      Comment: "Records created to verify domain ownership with SES"
+      HostedZoneId: !ImportValue
+        'Fn::Sub': '${SignInHostedZone}'
+      RecordSets:
+        - Name: !GetAtt DomainIdentityForSES.DkimDNSTokenName1
+          Type: CNAME
+          TTL: 86400
+          ResourceRecords:
+            - !GetAtt DomainIdentityForSES.DkimDNSTokenValue1
+
+        - Name: !GetAtt DomainIdentityForSES.DkimDNSTokenName2
+          Type: CNAME
+          TTL: 86400
+          ResourceRecords:
+            - !GetAtt DomainIdentityForSES.DkimDNSTokenValue2
+
+        - Name: !GetAtt DomainIdentityForSES.DkimDNSTokenName3
+          Type: CNAME
+          TTL: 86400
+          ResourceRecords:
+            - !GetAtt DomainIdentityForSES.DkimDNSTokenValue3
+
+Outputs:
+  EmailIdentityArn:
+    Description: ARN of the created email identity
+    Value: !Ref DomainIdentityForSES
+    Export:
+      Name: EmailIdentityArn
