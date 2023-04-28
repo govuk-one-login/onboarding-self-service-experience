@@ -56,11 +56,12 @@ router
 router.route("/resend-text-code").get(showResendPhoneCodePage).post(showCheckPhonePage);
 router.route("/account-not-found").get(render("sign-in/account-not-found.njk"));
 
-router.get(
-    "/forgot-password",
-    checkEmailInSession("sign-in/enter-email-address.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
-    forgotPasswordForm
-);
+router
+    .route("/forgot-password")
+    .get(
+        checkEmailInSession("sign-in/enter-email-address.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+        forgotPasswordForm
+    );
 
 // TODO this is wrong - get and post can't be the same - fix and check this works
 router

@@ -6,18 +6,14 @@ export const listServices: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
-    if (userId == undefined) {
-        console.log(req.query);
-        console.error("Could not get CognitoId from AuthenticationResult in session");
-        res.render("there-is-a-problem.njk");
-        return;
+    if (!userId) {
+        return res.render("there-is-a-problem.njk");
     }
 
     const services = await s4.listServices(userId);
 
     if (services.length === 0) {
-        res.redirect(`/register/create-service`);
-        return;
+        return res.redirect(`/register/create-service`);
     }
 
     req.session.serviceName = undefined;

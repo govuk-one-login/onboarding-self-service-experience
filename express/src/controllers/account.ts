@@ -1,11 +1,10 @@
 import {
-    AuthenticationResultType,
     CodeMismatchException,
+    CognitoIdentityProviderServiceException,
     LimitExceededException,
     NotAuthorizedException
 } from "@aws-sdk/client-cognito-identity-provider";
 import {RequestHandler} from "express";
-import {User} from "../../@types/user";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
@@ -14,15 +13,9 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 export const showChangePasswordForm = render("account/change-password.njk");
 
 export const showAccount: RequestHandler = async (req, res) => {
-    if (!req.session.authenticationResult) {
-        res.redirect("/sign-in");
-        return;
-    }
-
-    req.session.mobileNumber = AuthenticationResultParser.getPhoneNumber(req.session.authenticationResult as AuthenticationResultType);
-
+    const authenticationResult = nonNull(req.session.authenticationResult);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const user: User = await s4.getSelfServiceUser(req.session.authenticationResult as AuthenticationResultType);
+    const user = await s4.getSelfServiceUser(authenticationResult);
 
     res.render("account/account.njk", {
         emailAddress: user.email,
@@ -32,6 +25,7 @@ export const showAccount: RequestHandler = async (req, res) => {
         updatedField: req.session.updatedField
     });
 
+    req.session.mobileNumber = AuthenticationResultParser.getPhoneNumber(authenticationResult);
     req.session.updatedField = undefined;
 };
 
@@ -39,19 +33,16 @@ export const changePassword: RequestHandler = async (req, res) => {
     const newPassword = req.body.newPassword;
     const currentPassword = req.body.currentPassword;
 
-    // TODO Use a password validator
-    if (currentPassword === "") {
-        res.render("account/change-password.njk", {
+    if (!currentPassword) {
+        return res.render("account/change-password.njk", {
             errorMessages: {
                 currentPassword: "Enter your current password"
             }
         });
-
-        return;
     }
 
-    if (newPassword === "") {
-        res.render("account/change-password.njk", {
+    if (!newPassword) {
+        return res.render("account/change-password.njk", {
             values: {
                 currentPassword: currentPassword
             },
@@ -59,12 +50,10 @@ export const changePassword: RequestHandler = async (req, res) => {
                 newPassword: "Enter your new password"
             }
         });
-
-        return;
     }
 
     if (newPassword.length < 8) {
-        res.render("account/change-password.njk", {
+        return res.render("account/change-password.njk", {
             values: {
                 currentPassword: currentPassword,
                 newPassword: newPassword
@@ -73,70 +62,60 @@ export const changePassword: RequestHandler = async (req, res) => {
                 newPassword: "Your password must be 8 characters or more"
             }
         });
-
-        return;
     }
 
+    const authenticationResult = nonNull(req.session.authenticationResult);
+    const accessToken = nonNull(authenticationResult.AccessToken);
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
     try {
-        const s4: SelfServiceServicesService = await req.app.get("backing-service");
-        await s4.changePassword(req.session?.authenticationResult?.AccessToken as string, currentPassword, newPassword);
+        await s4.changePassword(accessToken, currentPassword, newPassword);
     } catch (error) {
-        if (error instanceof LimitExceededException) {
-            res.render("account/change-password.njk", {
+        if (error instanceof CognitoIdentityProviderServiceException) {
+            const options = {
                 errorMessages: {
-                    newPassword: "You have tried to change your password too many times. Try again in 15 minutes."
-                },
-                values: {
-                    currentPassword: currentPassword,
-                    newPassword: newPassword
-                }
-            });
-
-            return;
-        }
-
-        if (error instanceof NotAuthorizedException) {
-            res.render("account/change-password.njk", {
-                errorMessages: {
-                    currentPassword: "Your current password is incorrect"
+                    newPassword: ""
                 },
                 values: {
                     currentPassword: "",
                     newPassword: newPassword
                 }
-            });
+            };
 
-            return;
+            if (error instanceof LimitExceededException) {
+                options.errorMessages.newPassword = "You have tried to change your password too many times. Try again in 15 minutes.";
+                options.values.currentPassword = currentPassword;
+            } else if (error instanceof NotAuthorizedException) {
+                options.errorMessages.newPassword = "Your current password is incorrect";
+            } else {
+                throw error;
+            }
+
+            return res.render("account/change-password.njk", options);
         }
 
         throw error;
     }
 
-    const s4: SelfServiceServicesService = await req.app.get("backing-service");
-    await s4.updateUser(
-        AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType),
-        {password_last_updated: new Date()},
-        req.session?.authenticationResult?.AccessToken as string
-    );
+    await s4.updateUser(AuthenticationResultParser.getCognitoId(authenticationResult), {password_last_updated: new Date()}, accessToken);
 
     req.session.updatedField = "password";
     res.redirect("/account");
 };
 
-export const showChangePhoneNumberForm: RequestHandler = (req, res) => {
-    res.render("account/change-phone-number.njk");
-};
+export const showChangePhoneNumberForm = render("account/change-phone-number.njk");
 
 export const processChangePhoneNumberForm: RequestHandler = async (req, res) => {
-    const s4: SelfServiceServicesService = await req.app.get("backing-service");
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
     await s4.setPhoneNumber(
-        AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType),
+        AuthenticationResultParser.getEmail(nonNull(req.session.authenticationResult)),
         convertToCountryPrefixFormat(req.body.mobileNumber)
     );
 
-    req.session.enteredMobileNumber = req.body.mobileNumber;
-    await s4.sendMobileNumberVerificationCode(req.session.authenticationResult?.AccessToken as string);
+    await s4.sendMobileNumberVerificationCode(nonNull(req.session.authenticationResult?.AccessToken));
 
+    req.session.enteredMobileNumber = req.body.mobileNumber;
     res.redirect("/account/change-phone-number/enter-text-code");
 };
 
@@ -151,26 +130,15 @@ export const showVerifyMobileWithSmsCode: RequestHandler = (req, res) => {
 };
 
 export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
-    const s4: SelfServiceServicesService = await req.app.get("backing-service");
-    const accessToken = req.session.authenticationResult?.AccessToken as string;
+    const authenticationResult = nonNull(req.session.authenticationResult);
+    const accessToken = nonNull(authenticationResult.AccessToken);
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
         await s4.verifyMobileUsingSmsCode(accessToken, req.body.securityCode);
-        await s4.setMobilePhoneAsVerified(
-            AuthenticationResultParser.getEmail(req.session.authenticationResult as AuthenticationResultType) as string
-        );
-
-        await s4.updateUser(
-            AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType),
-            {phone: req.session.enteredMobileNumber as string},
-            accessToken as string
-        );
-
-        req.session.mobileNumber = req.session.enteredMobileNumber;
-        req.session.enteredMobileNumber = undefined;
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            res.render("common/enter-text-code.njk", {
+            return res.render("common/enter-text-code.njk", {
                 headerActiveItem: "your-account",
                 values: {
                     securityCode: req.body.securityCode,
@@ -181,13 +149,21 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
                 }
             });
-
-            return;
         }
 
         throw error;
     }
 
+    await s4.setMobilePhoneAsVerified(AuthenticationResultParser.getEmail(nonNull(req.session.authenticationResult)));
+
+    await s4.updateUser(
+        AuthenticationResultParser.getCognitoId(authenticationResult),
+        {phone: nonNull(req.session.enteredMobileNumber)},
+        accessToken
+    );
+
+    req.session.mobileNumber = req.session.enteredMobileNumber;
+    req.session.enteredMobileNumber = undefined;
     req.session.updatedField = "mobile phone number";
     res.redirect("/account");
 };
