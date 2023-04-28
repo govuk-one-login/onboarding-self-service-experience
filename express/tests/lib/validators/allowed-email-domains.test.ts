@@ -11,29 +11,29 @@ const allowedSubDomain = ".partial.subdomain";
 
 describe("Verify email domains", () => {
     describe("Accept valid domains", () => {
-        it("Allows an email address with a domain on the allowed list", async () => {
+        it("Allow an email address with a domain on the allowed list", async () => {
             expect(await hasAllowedDomain(`email@${allowedDomain}`)).toBe(true);
         });
 
-        it("Allows an email address ending with a domain on the allowed list", async () => {
+        it("Allow an email address ending with a domain on the allowed list", async () => {
             expect(await hasAllowedDomain(`email@top.level.${allowedDomain}`)).toBe(true);
         });
 
-        it("Allows an email address ending with a subdomain on the allowed list", async () => {
+        it("Allow an email address ending with a subdomain on the allowed list", async () => {
             expect(await hasAllowedDomain(`email@top.level${allowedSubDomain}`)).toBe(true);
         });
     });
 
     describe("Reject invalid domains", () => {
-        it("Rejects an email address with a domain not on the allowed list", async () => {
+        it("Reject an email address with a domain not on the allowed list", async () => {
             expect(await hasAllowedDomain("email@bad.domain")).toBe(false);
         });
 
-        it("Rejects an email address not ending with a domain on the allowed list", async () => {
+        it("Reject an email address not ending with a domain on the allowed list", async () => {
             expect(await hasAllowedDomain(`email@${allowedDomain}.subdomain`)).toBe(false);
         });
 
-        it("Rejects an email address not ending with a subdomain on the allowed list", async () => {
+        it("Reject an email address not ending with a subdomain on the allowed list", async () => {
             expect(await hasAllowedDomain(`email@top.level.${allowedSubDomain}.subdomain`)).toBe(false);
         });
     });

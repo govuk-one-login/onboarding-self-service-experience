@@ -1,4 +1,4 @@
-globalThis.nonNull = nonNull;
+global.nonNull = nonNull;
 
 function nonNull<Type>(value: Type | undefined): NonNullable<Type>;
 function nonNull<Type, Key extends keyof Type>(object: Type, property: Key): NonNullable<Type[Key]>;
@@ -34,21 +34,17 @@ function tryGetProperty<Type, Key extends keyof Type>(object: Type, property: Ke
 }
 
 function tryGetProperties<Type, Key extends keyof Type>(object: Type, keys: Key[]): NonNullable<Pick<Type, Key>> {
-    const values = {} as Pick<Type, Key>;
+    const missing: Key[] = [];
 
     keys.forEach(key => {
-        const value = object[key];
-        if (value) {
-            values[key] = value;
+        if (!object[key]) {
+            missing.push(key);
         }
     });
 
-    const properties = Object.keys(values);
-
-    if (properties.length < keys.length) {
-        const missing = keys.filter(key => !properties.includes(key.toString()));
+    if (missing.length > 0) {
         throw new ReferenceError(`Undefined properties (${missing.join(" | ")})`);
     }
 
-    return values;
+    return object;
 }

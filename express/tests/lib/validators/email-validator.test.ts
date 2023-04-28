@@ -1,40 +1,39 @@
 import validateEmail from "lib/validators/email-validator";
 
-const EMAIL_WITH_ALLOWED_DOMAIN = "allowed@email.gov.uk";
-const EMAIL_WITH_DISALLOWED_DOMAIN = "allowed@hackers.co.uk";
-
-const EMAIL_WITH_NO_AT_SYMBOL = "copyAndPaste_at_some.domain.gov.uk";
-const EMAIL_COMPLYING_WITH_RFC822 = "an_Email+modification@some.domain.gov.uk";
-const EMAIL_WITH_UNDERSCORE_AFTER_AT_SYMBOL = "emailWithUNderscoreAfterAtSymbol@_domain.gov.uk";
-
-describe("Checking that the email domain is on the allowed list in 'allowed-email-domains.txt'", () => {
-    it("should return true for an email with a domain in the list of allowed domains", async () => {
-        expect(await validateEmail(EMAIL_WITH_ALLOWED_DOMAIN)).toEqual({isValid: true});
-    });
-
-    it("should return false for an email with a domain that is not in the list of allowed domains", async () => {
-        expect(await validateEmail(EMAIL_WITH_DISALLOWED_DOMAIN)).toEqual({
-            isValid: false,
-            errorMessage: "Enter a government email address"
-        });
-    });
+jest.mock("fs/promises", () => {
+    return {
+        readFile: jest.fn(() => `allowed.domain\n.gov.uk`)
+    };
 });
 
-describe("Checking that well formed email addresses are accepted and badly formed ones are not", () => {
-    it(`should return true for the email address ${EMAIL_COMPLYING_WITH_RFC822}`, async () => {
-        expect(await validateEmail(EMAIL_COMPLYING_WITH_RFC822)).toEqual({isValid: true});
-    });
+describe("Verify email addresses", () => {
+    describe("Check that an email domain is allowed", () => {
+        it("Accept an allowed domain", async () => {
+            expect((await validateEmail("email@allowed.domain")).isValid).toBe(true);
+        });
 
-    it(`should return false for the email address ${EMAIL_WITH_NO_AT_SYMBOL}`, async () => {
-        expect(await validateEmail(EMAIL_WITH_NO_AT_SYMBOL)).toEqual({
-            isValid: false,
-            errorMessage: "Enter an email address in the correct format, like name@example.com"
+        it("Reject a domain not on the allowed list", async () => {
+            expect(await validateEmail("allowed@hackers.co.uk")).toEqual({
+                isValid: false,
+                errorMessage: expect.stringMatching(/government.*email/)
+            });
         });
     });
 
-    it(`should return true for the email address ${EMAIL_WITH_UNDERSCORE_AFTER_AT_SYMBOL}`, async () => {
-        expect(await validateEmail(EMAIL_WITH_UNDERSCORE_AFTER_AT_SYMBOL)).toEqual({
-            isValid: true
+    describe("Verify an email address is formatted correctly", () => {
+        it("Accept an RFC822 compliant email address", async () => {
+            expect((await validateEmail("an_Email+modification@some.domain.gov.uk")).isValid).toBe(true);
+        });
+
+        it("Reject an email without the @ symbol", async () => {
+            expect(await validateEmail("copyAndPaste_at_some.domain.gov.uk")).toEqual({
+                isValid: false,
+                errorMessage: expect.stringMatching(/correct.*format/)
+            });
+        });
+
+        it("Accept an email with an _ after the @ symbol", async () => {
+            expect((await validateEmail("emailWithUNderscoreAfterAtSymbol@_domain.gov.uk")).isValid).toBe(true);
         });
     });
 });

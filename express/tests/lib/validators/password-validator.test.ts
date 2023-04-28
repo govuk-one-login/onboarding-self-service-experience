@@ -1,32 +1,42 @@
 import validatePassword from "lib/validators/password-validator";
 
-const PASSWORD_WITH_EMPTY_VALUE = "";
-const PASSWORD_LESS_THAN_8_CHAR = "123";
-const PASSWORD_8_CHAR = "12345678";
-const PASSWORD_9_CHAR = "123456789";
-const PASSWORD_WITH_LEADING_AND_TRAILING_SPACES = " 123456 ";
+const password8Chars = "12345678";
 
-describe("Checking that the user has entered a valid password", () => {
-    it(`accepts an 8 character password like "${PASSWORD_8_CHAR}"`, () => {
-        expect(validatePassword(PASSWORD_8_CHAR)).toEqual({isValid: true});
+describe("Validate passwords", () => {
+    it("Reject an empty value", () => {
+        expect(validatePassword("").isValid).toBe(false);
     });
 
-    it(`accepts a password with more than 8 characters like "${PASSWORD_9_CHAR}"`, () => {
-        expect(validatePassword(PASSWORD_9_CHAR)).toEqual({isValid: true});
+    it("Reject a whitespace-only value", () => {
+        expect(validatePassword("        ").isValid).toBe(false);
     });
 
-    it(`accepts a valid password with leading or trailing spaces like "${PASSWORD_WITH_LEADING_AND_TRAILING_SPACES}"`, () => {
-        expect(validatePassword(PASSWORD_9_CHAR)).toEqual({isValid: true});
+    it("Accept a password with 8 characters", () => {
+        expect(validatePassword(password8Chars).isValid).toBe(true);
     });
 
-    it(`does not accept a password with less than 8 characters like "${PASSWORD_LESS_THAN_8_CHAR}"`, () => {
-        expect(validatePassword(PASSWORD_LESS_THAN_8_CHAR)).toEqual({
+    it("Accept a password with more than 8 characters", () => {
+        expect(validatePassword(`${password8Chars}9`).isValid).toBe(true);
+    });
+
+    it("Reject a password with less than 8 characters", () => {
+        expect(validatePassword(password8Chars.substring(1, 7))).toEqual({
             isValid: false,
-            errorMessage: "Your password must be 8 characters or more"
+            errorMessage: expect.stringContaining("8 characters or more")
         });
     });
 
-    it("does not accept a password with empty value", () => {
-        expect(validatePassword(PASSWORD_WITH_EMPTY_VALUE)).toEqual({isValid: false, errorMessage: "Enter a password"});
+    describe("Accept passwords with spaces", () => {
+        it("Accept a password with leading spaces", () => {
+            expect(validatePassword(`   ${password8Chars}`).isValid).toBe(true);
+        });
+
+        it("Accept a password with trailing spaces", () => {
+            expect(validatePassword(`${password8Chars}   `).isValid).toBe(true);
+        });
+
+        it("Accept a password with spaces in the middle", () => {
+            expect(validatePassword(`${password8Chars.substring(0, 4)}   ${password8Chars.substring(4)}`).isValid).toBe(true);
+        });
     });
 });

@@ -1,39 +1,45 @@
 import validateUris from "lib/validators/uris-validator";
 
-describe("URIs are correctly validated", () => {
-    it("rejects an empty array", () => {
-        expect(validateUris([])).toEqual({isValid: false, errorMessage: "Enter your redirect URIs"});
+describe("Validate URIs", () => {
+    it("Reject an empty array", () => {
+        expect(validateUris([]).isValid).toBe(false);
     });
 
-    it("accepts a single valid URL", () => {
-        expect(validateUris(["https://some.gov.uk/url"])).toEqual({isValid: true});
+    it("Reject an array with all empty values", () => {
+        expect(validateUris([""]).isValid).toBe(false);
     });
 
-    it("accepts multiple valid URLs", () => {
-        expect(validateUris(["https://some.gov.uk/url", "https://some.other.gov.uk/url"])).toEqual({isValid: true});
+    it("Ignore empty values", () => {
+        expect(validateUris(["", "https://some.gov.uk/url"]).isValid).toBe(true);
     });
 
-    it("rejects a single invalid URL, saying which one it is", () => {
+    it("Accepts a single valid URL", () => {
+        expect(validateUris(["https://some.gov.uk/url"]).isValid).toBe(true);
+    });
+
+    it("Accepts multiple valid URLs", () => {
+        expect(validateUris(["https://some.gov.uk/url", "https://some.other.gov.uk/url"]).isValid).toBe(true);
+    });
+
+    it("Reject a single invalid URL", () => {
         expect(validateUris(["some.gov.uk/url", "https://some.other.gov.uk/url"])).toEqual({
             isValid: false,
-            errorMessage: "some.gov.uk/url is not a valid URL"
+            errorMessage: expect.stringContaining("in the format https://example.com")
         });
     });
 
-    it("rejects multiple invalid URLs, listing them", () => {
+    it("Reject multiple invalid URLs", () => {
         expect(validateUris(["some.gov.uk/url", "some.other.gov.uk/url", "https://fine.gov.uk/login"])).toEqual({
             isValid: false,
-            errorMessage: "The following URLs are not valid: some.gov.uk/url some.other.gov.uk/url"
+            errorMessage: expect.stringContaining("in the format https://example.com")
         });
     });
 
-    it("accepts http for a localhost URL", () => {
-        expect(validateUris(["http://localhost/link"])).toEqual({
-            isValid: true
-        });
+    it("Accept http for a localhost URL", () => {
+        expect(validateUris(["http://localhost/link"]).isValid).toBe(true);
     });
 
-    it("does not accept http for a non localhost URL", () => {
+    it("Reject http for a non-localhost URL", () => {
         expect(validateUris(["http://some.gov.uk/link"])).toEqual({
             isValid: false,
             errorMessage: "URLs must be https (except for localhost)"
