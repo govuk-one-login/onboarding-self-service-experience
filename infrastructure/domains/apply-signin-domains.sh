@@ -6,8 +6,6 @@ pushd "$BASE_DIR" > /dev/null
 
 ACCOUNT=$(../check-aws-account.sh --get-account-name) || exit $?
 
-[[ $ACCOUNT == build ]] && echo "Cannot deploy this stack to '$ACCOUNT'" && exit 1
-
 ../deploy-sam-stack.sh "$@" \
   --validate \
   --stack-name "$ACCOUNT"-hosted-zone \

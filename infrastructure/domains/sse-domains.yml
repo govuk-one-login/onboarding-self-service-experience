@@ -4,6 +4,7 @@ Description: DNS configuration for the self-service domains in different AWS acc
 Conditions:
   IsDevelopmentAccount: !Equals [ !Ref AWS::AccountId, 494650018671 ]
   IsStagingAccount: !Equals [ !Ref AWS::AccountId, 325730373996 ]
+  IsBuildAccount: !Equals [ !Ref AWS::AccountId, 399055180839 ]
   IsIntegrationAccount: !Equals [ !Ref AWS::AccountId, 663985455444 ]
   IsProductionAccount: !Equals [ !Ref AWS::AccountId, 389946456390 ]
 
@@ -26,6 +27,16 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       Name: preview.sign-in.service.gov.uk.
+
+  #--- Build ---#
+
+  SignInServiceBuildHostedZone:
+    Type: AWS::Route53::HostedZone
+    Condition: IsBuildAccount
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name: build.sign-in.service.gov.uk.
 
   #--- Staging ---#
 
@@ -161,6 +172,12 @@ Outputs:
     Value: !Ref SignInServicePreviewHostedZone
     Export:
       Name: SignInServicePreviewHostedZone
+
+  BuildHostedZone:
+    Condition: IsBuildAccount
+    Value: !Ref SignInServiceBuildHostedZone
+    Export:
+      Name: SignInServiceBuildHostedZone
 
   StagingHostedZone:
     Condition: IsStagingAccount

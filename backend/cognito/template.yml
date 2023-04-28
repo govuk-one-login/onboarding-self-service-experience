@@ -4,14 +4,36 @@ Transform: AWS::Serverless-2016-10-31
 
 Parameters:
   DomainOrEmailIdentityToVerify:
-    Type: String
     Description: Domain or email that will be created as verified identity.
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/config/cognito/email-domain
   SignInHostedZone:
-    Type: String
     Description: Deployment specific SignInHostedZone
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/config/dns/hosted-zone
   ExternalId:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/config/cognito/external-id
+  PermissionsBoundary:
+    Type: String
+    Default: ""
+    Description: The ARN of the permissions boundary to apply when creating IAM roles [Secure Pipeline]
+  CodeSigningConfigArn:
+    Type: String
+    Default: ""
+    Description: The ARN of the code signing configuration resource to use [Secure Pipeline]
+
+Conditions:
+  UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
+  UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+
+Globals:
+  Function:
+    Timeout: 100
+    Runtime: nodejs18.x
+    CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+    PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
+
 Resources:
   DomainIdentityForSES:
     Type: AWS::SES::EmailIdentity
@@ -605,6 +627,7 @@ Resources:
   SmsRole:
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -637,3 +660,4 @@ Outputs:
     Value: !Ref Client
     Export:
       Name: !Sub "${AWS::StackName}-Self-Service-user-pool-client"
+
