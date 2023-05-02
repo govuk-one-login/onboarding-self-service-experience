@@ -42,4 +42,3 @@ jobs:
           working-directory: .
           template-file: infrastructure/api/sse-api.yml
           
-          
