@@ -1,4 +1,5 @@
 import express, {Express} from "express";
+import "express-async-errors";
 import "../lib/utils/optional";
 import RequestContext from "../types/request-context";
 import "./session-data";

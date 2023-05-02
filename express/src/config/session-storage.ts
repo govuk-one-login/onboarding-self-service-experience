@@ -2,21 +2,21 @@ import {DynamoDB} from "@aws-sdk/client-dynamodb";
 import connect_dynamodb from "connect-dynamodb";
 import {RequestHandler} from "express";
 import session from "express-session";
+import {awsRegion, sessionStorage} from "./environment";
 
 export default getSessionStorage();
 
 function getSessionStorage(): RequestHandler {
-    if (process.env.SESSION_STORAGE === "DynamoDB") {
-        const table = process.env.SESSIONS_TABLE;
-        const endpoint = process.env.DYNAMO_DB_ENDPOINT;
-        const region = process.env.AWS_REGION ?? "eu-west-2";
-        const client = new DynamoDB({region: region, endpoint: endpoint});
+    if (sessionStorage.store === "DynamoDB") {
+        const table = sessionStorage.tableName;
+        const endpoint = sessionStorage.dynamoDbEndpoint;
+        const client = new DynamoDB({region: awsRegion, endpoint: endpoint});
         console.log(`Using dynamoDB session storage | Table: ${table} | Endpoint: ${endpoint ?? "AWS"}`);
 
         const options = {
             table: table,
             client: client,
-            AWSRegion: region
+            AWSRegion: awsRegion
         };
 
         const DynamoDBStore = connect_dynamodb({session: session});

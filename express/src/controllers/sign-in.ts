@@ -1,6 +1,5 @@
 import {AuthenticationResultType, LimitExceededException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
-import "express-async-errors";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
 import {obscureNumber} from "../lib/mobile-number";
 import SelfServiceServicesService from "../services/self-service-services-service";

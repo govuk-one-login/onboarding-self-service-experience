@@ -3,78 +3,59 @@ import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import axios, {Axios, AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
+import {lambda} from "../../config/environment";
 import AuthenticationResultParser from "../../lib/authentication-result-parser";
-import LambdaFacadeInterface from "./LambdaFacadeInterface";
+import LambdaFacadeInterface, {ClientUpdates, UserUpdates} from "./LambdaFacadeInterface";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 class LambdaFacade implements LambdaFacadeInterface {
-    private instance: Axios;
+    private readonly client: Axios;
 
-    constructor(baseURL: string) {
-        this.instance = axios.create({
-            baseURL: baseURL,
+    constructor() {
+        console.log("Creating Lambda facade...");
+
+        this.client = axios.create({
+            baseURL: lambda.apiBaseUrl,
             headers: {
                 "Content-Type": "application/json"
             }
         });
     }
 
-    async putUser(user: OnboardingTableItem, accessToken: string): Promise<AxiosResponse> {
-        return await (
-            await this.instance
-        ).post("/put-user", user, {
-            headers: {
-                "authorised-by": accessToken
-            }
-        });
+    async putUser(user: OnboardingTableItem, accessToken: string): Promise<void> {
+        await this.post("/put-user", user, accessToken);
     }
 
-    async getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
-        return await (
-            await this.instance
-        ).post("/get-user", `user#${cognitoId}`, {
-            headers: {
-                "authorised-by": accessToken
-            }
-        });
+    getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
+        return this.post("/get-user", `user#${cognitoId}`, accessToken);
     }
 
-    async newService(service: Service, userId: string, email: string, accessToken: string): Promise<AxiosResponse> {
+    async newService(service: Service, userId: string, email: string, accessToken: string): Promise<void> {
         const body = {
             service: service,
             userDynamoId: userId,
             userEmail: email
         };
-        return await (
-            await this.instance
-        ).post("/new-service", JSON.stringify(body), {
-            headers: {
-                "authorised-by": accessToken
-            }
-        });
+
+        await this.post("/new-service", JSON.stringify(body), accessToken);
     }
 
-    async generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse> {
+    generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse> {
         const body = {
             service: service,
             contactEmail: AuthenticationResultParser.getEmail(authenticationResult)
         };
-        return await (
-            await this.instance
-        ).post("/new-client", JSON.stringify(body), {
-            headers: {
-                "authorised-by": authenticationResult.AccessToken as string
-            }
-        });
+
+        return this.post("/new-client", JSON.stringify(body), authenticationResult.AccessToken);
     }
 
     async updateClient(
         serviceId: string,
         selfServiceClientId: string,
         clientId: string,
-        updates: object,
+        updates: ClientUpdates,
         accessToken: string
-    ): Promise<AxiosResponse<QueryCommandOutput>> {
+    ): Promise<void> {
         // TODO constrain type later
         const body = {
             serviceId: serviceId,
@@ -83,45 +64,29 @@ class LambdaFacade implements LambdaFacadeInterface {
             updates: updates
         };
 
-        return this.instance.post(`/update-client`, JSON.stringify(body), {
-            headers: {
-                "authorised-by": accessToken
-            }
-        });
+        await this.post(`/update-client`, JSON.stringify(body), accessToken);
     }
 
-    async listServices(userId: string, accessToken: string): Promise<AxiosResponse> {
-        return await (await this.instance).get(`/get-services/${userId}`);
+    listServices(userId: string): Promise<AxiosResponse> {
+        return this.get(`/get-services/${userId}`);
     }
 
     // TODO Don't we need to use the token to authorise when making the call to the database? Seems odd it's not used
-    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse<QueryCommandOutput>> {
+    listClients(serviceId: string): Promise<AxiosResponse<QueryCommandOutput>> {
         const bareServiceId = serviceId.startsWith("service#") ? serviceId.substring(8) : serviceId;
-        return this.instance.get(`/get-service-clients/${bareServiceId}`);
+        return this.get(`/get-service-clients/${bareServiceId}`);
     }
 
-    async updateUser(selfServiceUserId: string, updates: Record<string, string | Date>, accessToken: string): Promise<AxiosResponse> {
+    async updateUser(selfServiceUserId: string, updates: UserUpdates, accessToken: string): Promise<void> {
         const body = {
             userId: selfServiceUserId,
             updates: updates
         };
 
-        return await (
-            await this.instance
-        ).post("/update-user", JSON.stringify(body), {
-            headers: {
-                "authorised-by": accessToken
-            }
-        });
+        await this.post("/update-user", JSON.stringify(body), accessToken);
     }
 
-    async privateBetaRequest(
-        name: string,
-        department: string,
-        serviceName: string,
-        emailAddress: string,
-        accessToken: string
-    ): Promise<AxiosResponse> {
+    async privateBetaRequest(name: string, department: string, serviceName: string, emailAddress: string): Promise<void> {
         const body = {
             name: name,
             department: department,
@@ -129,8 +94,20 @@ class LambdaFacade implements LambdaFacadeInterface {
             emailAddress: emailAddress
         };
 
-        return await (await this.instance).post("/send-private-beta-request-notification", JSON.stringify(body));
+        await this.post("/send-private-beta-request-notification", JSON.stringify(body));
+    }
+
+    private get(endpoint: string): Promise<AxiosResponse> {
+        return this.client.get(endpoint);
+    }
+
+    private post(endpoint: string, data: object | string, accessToken = ""): Promise<AxiosResponse> {
+        return this.client.post(endpoint, data, {
+            headers: {
+                "authorised-by": accessToken
+            }
+        });
     }
 }
 
-export const lambdaFacadeInstance = new LambdaFacade(process.env.API_BASE_URL as string);
+export default new LambdaFacade();

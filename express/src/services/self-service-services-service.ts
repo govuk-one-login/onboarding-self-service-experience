@@ -1,11 +1,6 @@
-import {
-    AdminCreateUserCommandOutput,
-    AdminInitiateAuthCommandOutput,
-    AdminSetUserMFAPreferenceCommandOutput,
-    AuthenticationResultType,
-    GetUserAttributeVerificationCodeCommandOutput
-} from "@aws-sdk/client-cognito-identity-provider";
+import {AdminInitiateAuthCommandOutput, AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {unmarshall} from "@aws-sdk/util-dynamodb";
+import {AxiosResponse} from "axios";
 import {Client, ClientFromDynamo} from "../../@types/client";
 import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
 import {Service} from "../../@types/Service";
@@ -17,9 +12,7 @@ import {dynamoServicesToDomainServices} from "../lib/models/service-utils";
 import {userToDomainUser} from "../lib/models/user-utils";
 import MfaResponse from "../types/mfa-response";
 import CognitoInterface from "./cognito/CognitoInterface";
-import LambdaFacadeInterface from "./lambda-facade/LambdaFacadeInterface";
-
-export type Updates = Record<string, string | Date>;
+import LambdaFacadeInterface, {ClientUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -30,16 +23,16 @@ export default class SelfServiceServicesService {
         this.lambda = lambda;
     }
 
-    async changePassword(accessToken: string, previousPassword: string, proposedPassword: string) {
-        await this.cognito.changePassword(accessToken, previousPassword, proposedPassword);
+    changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<void> {
+        return this.cognito.changePassword(accessToken, previousPassword, proposedPassword);
     }
 
-    async forgotPassword(email: string, uri: string) {
-        await this.cognito.forgotPassword(email, uri);
+    forgotPassword(email: string, uri: string): Promise<void> {
+        return this.cognito.forgotPassword(email, uri);
     }
 
-    async confirmForgotPassword(username: string, password: string, confirmationCode: string) {
-        await this.cognito.confirmForgotPassword(username, password, confirmationCode);
+    confirmForgotPassword(username: string, password: string, confirmationCode: string): Promise<void> {
+        return this.cognito.confirmForgotPassword(username, password, confirmationCode);
     }
 
     async respondToMfaChallenge(mfaResponse: MfaResponse, mfaCode: string): Promise<AuthenticationResultType> {
@@ -71,6 +64,7 @@ export default class SelfServiceServicesService {
 
     async login(email: string, password: string): Promise<MfaResponse> {
         const response = await this.cognito.login(email, password);
+
         return {
             cognitoId: response.ChallengeParameters?.USER_ID_FOR_SRP as string,
             cognitoSession: response.Session as string,
@@ -78,93 +72,91 @@ export default class SelfServiceServicesService {
         };
     }
 
-    async putUser(user: OnboardingTableItem, accessToken: string) {
-        return await this.lambda.putUser(user, accessToken);
+    putUser(user: OnboardingTableItem, accessToken: string): Promise<void> {
+        return this.lambda.putUser(user, accessToken);
     }
 
     async setNewPassword(emailAddress: string, password: string, cognitoSession: string): Promise<AuthenticationResultType> {
-        return (await this.cognito.setNewPassword(emailAddress, password, cognitoSession)).AuthenticationResult as AuthenticationResultType;
+        return nonNull((await this.cognito.setNewPassword(emailAddress, password, cognitoSession)).AuthenticationResult);
     }
 
-    async setEmailAsVerified(emailAddress: string): Promise<void> {
-        await this.cognito.setEmailAsVerified(emailAddress);
+    setEmailAsVerified(emailAddress: string): Promise<void> {
+        return this.cognito.setEmailAsVerified(emailAddress);
     }
 
-    async createUser(emailAddress: string): Promise<AdminCreateUserCommandOutput> {
-        return await this.cognito.createUser(emailAddress);
+    createUser(emailAddress: string): Promise<void> {
+        return this.cognito.createUser(emailAddress);
     }
 
-    async resendEmailAuthCode(emailAddress: string) {
-        return await this.cognito.resendEmailAuthCode(emailAddress);
+    resendEmailAuthCode(emailAddress: string): Promise<void> {
+        return this.cognito.resendEmailAuthCode(emailAddress);
     }
 
-    async submitUsernamePassword(emailAddress: string, password: string) {
-        return await this.cognito.login(emailAddress, password);
+    submitUsernamePassword(emailAddress: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
+        return this.cognito.login(emailAddress, password);
     }
 
-    async setPhoneNumber(emailAddress: string, mobileNumber: string) {
-        return await this.cognito.setPhoneNumber(emailAddress, mobileNumber);
+    setPhoneNumber(emailAddress: string, mobileNumber: string): Promise<void> {
+        return this.cognito.setPhoneNumber(emailAddress, mobileNumber);
     }
 
-    async setMfaPreference(cognitoId: string): Promise<AdminSetUserMFAPreferenceCommandOutput> {
+    setMfaPreference(cognitoId: string): Promise<void> {
         return this.cognito.setMfaPreference(cognitoId);
     }
 
-    async sendMobileNumberVerificationCode(accessToken: string): Promise<GetUserAttributeVerificationCodeCommandOutput> {
-        return await this.cognito.sendMobileNumberVerificationCode(accessToken);
+    sendMobileNumberVerificationCode(accessToken: string): Promise<void> {
+        return this.cognito.sendMobileNumberVerificationCode(accessToken);
     }
 
-    async useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput> {
-        return await this.cognito.useRefreshToken(refreshToken);
+    useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        return this.cognito.useRefreshToken(refreshToken);
     }
 
-    async verifyMobileUsingSmsCode(accessToken: string, code: string) {
+    verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<void> {
         return this.cognito.verifyMobileUsingSmsCode(accessToken, code);
     }
 
-    async setMobilePhoneAsVerified(emailAddress: string) {
-        return await this.cognito.setMobilePhoneAsVerified(emailAddress);
+    setMobilePhoneAsVerified(emailAddress: string): Promise<void> {
+        return this.cognito.setMobilePhoneAsVerified(emailAddress);
     }
 
-    async newService(service: Service, userId: string, authenticationResult: AuthenticationResultType) {
-        const response = await this.lambda.newService(
+    async newService(service: Service, userId: string, authenticationResult: AuthenticationResultType): Promise<void> {
+        return this.lambda.newService(
             service,
             userId,
             AuthenticationResultParser.getEmail(authenticationResult),
-            authenticationResult.AccessToken as string
+            nonNull(authenticationResult.AccessToken)
         );
-        return JSON.parse(response.data.output);
     }
 
-    async generateClient(service: Service, authenticationResult: AuthenticationResultType) {
-        return await this.lambda.generateClient(service, authenticationResult);
+    generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse> {
+        return this.lambda.generateClient(service, authenticationResult);
     }
 
-    async updateClient(
+    updateClient(
         serviceId: string,
         selfServiceClientId: string,
         clientId: string,
-        updates: {[key: string]: unknown},
+        updates: ClientUpdates,
         accessToken: string
     ): Promise<void> {
-        await this.lambda.updateClient(serviceId, selfServiceClientId, clientId, updates, accessToken);
+        return this.lambda.updateClient(serviceId, selfServiceClientId, clientId, updates, accessToken);
     }
 
-    async privateBetaRequest(userName: string, department: string, serviceName: string, emailAddress: string, accessToken: string) {
-        await this.lambda.privateBetaRequest(userName, department, serviceName, emailAddress, accessToken as string);
+    privateBetaRequest(userName: string, department: string, serviceName: string, emailAddress: string): Promise<void> {
+        return this.lambda.privateBetaRequest(userName, department, serviceName, emailAddress);
     }
 
-    async listServices(userId: string, accessToken: string): Promise<Service[]> {
-        return dynamoServicesToDomainServices((await this.lambda.listServices(userId, accessToken)).data.Items);
+    async listServices(userId: string): Promise<Service[]> {
+        return dynamoServicesToDomainServices((await this.lambda.listServices(userId)).data.Items);
     }
 
-    async updateUser(userId: string, updates: Updates, accessToken: string): Promise<void> {
-        await this.lambda.updateUser(userId, updates, accessToken as string);
+    updateUser(userId: string, updates: UserUpdates, accessToken: string): Promise<void> {
+        return this.lambda.updateUser(userId, updates, accessToken);
     }
 
-    async listClients(serviceId: string, accessToken: string): Promise<Client[]> {
-        return this.lambda
-            .listClients(serviceId, accessToken)
-            .then(results => results.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? []);
+    async listClients(serviceId: string): Promise<Client[]> {
+        const clients = await this.lambda.listClients(serviceId);
+        return clients.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? [];
     }
 }

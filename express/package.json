@@ -3,7 +3,7 @@
   "description": "DI self-service frontend",
   "scripts": {
     "start": "node dist/app.js",
-    "local": "npm run build && node --inspect -r 'dotenv/config' dist/app.js",
+    "local": "npm run buildts && node --inspect -r 'dotenv/config' dist/app.js",
     "dev": "COGNITO_CLIENT=${COGNITO_CLIENT:-StubCognitoClient} LAMBDA_FACADE=${LAMBDA_FACADE:-StubLambdaFacade} nodemon --config nodemon.json --inspect -r 'dotenv/config' src/app.ts",
     "docker": "docker run --rm --publish 3000:3000 self-service-frontend",
     "minifyjs": "for script in dist/assets/javascripts/*.js; do uglifyjs $script -cmo $script $(${CI:-false} || echo --source-map includeSources,url=${script##*/}.map); done",
