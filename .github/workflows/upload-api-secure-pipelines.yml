@@ -1,9 +1,9 @@
 name: Upload API to secure pipelines
 
 on:
-#   workflow_dispatch:
+  workflow_dispatch:
   push:
-#    branches: [ main ]
+   branches: [ main ]
 
 
 permissions: read-all
