@@ -13,7 +13,7 @@ async function forgotPassword(event: CustomMessageForgotPasswordTriggerEvent): P
 
     const code = event.request.codeParameter;
     const username = encodeURIComponent(clientMetadata.username);
-    const link = `${clientMetadata.uri}/create-new-password?userName=${username}&confirmationCode=${code}`;
+    const link = `${clientMetadata.uri}/sign-in/forgot-password/create-new-password?loginName=${username}&confirmationCode=${code}`;
 
     event.response = {
         smsMessage: "",
