@@ -12,7 +12,7 @@ let req: Request;
 
 const next = jest.fn();
 const res = response();
-const validator = checkPasswordAllowed("template.njk", "password");
+const validator = checkPasswordAllowed("template.njk");
 
 describe("Validate submitted password against commonly used list", () => {
     beforeEach(() => {

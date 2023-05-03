@@ -32,38 +32,6 @@ export const showAccount: RequestHandler = async (req, res) => {
 export const changePassword: RequestHandler = async (req, res) => {
     const newPassword = req.body.newPassword;
     const currentPassword = req.body.currentPassword;
-
-    if (!currentPassword) {
-        return res.render("account/change-password.njk", {
-            errorMessages: {
-                currentPassword: "Enter your current password"
-            }
-        });
-    }
-
-    if (!newPassword) {
-        return res.render("account/change-password.njk", {
-            values: {
-                currentPassword: currentPassword
-            },
-            errorMessages: {
-                newPassword: "Enter your new password"
-            }
-        });
-    }
-
-    if (newPassword.length < 8) {
-        return res.render("account/change-password.njk", {
-            values: {
-                currentPassword: currentPassword,
-                newPassword: newPassword
-            },
-            errorMessages: {
-                newPassword: "Your password must be 8 characters or more"
-            }
-        });
-    }
-
     const authenticationResult = nonNull(req.session.authenticationResult);
     const accessToken = nonNull(authenticationResult.AccessToken);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
@@ -72,15 +40,7 @@ export const changePassword: RequestHandler = async (req, res) => {
         await s4.changePassword(accessToken, currentPassword, newPassword);
     } catch (error) {
         if (error instanceof CognitoIdentityProviderServiceException) {
-            const options = {
-                errorMessages: {
-                    newPassword: ""
-                },
-                values: {
-                    currentPassword: "",
-                    newPassword: newPassword
-                }
-            };
+            const options: Record<string, Record<string, string>> = {values: {newPassword: newPassword}};
 
             if (error instanceof LimitExceededException) {
                 options.errorMessages.newPassword = "You have tried to change your password too many times. Try again in 15 minutes.";
