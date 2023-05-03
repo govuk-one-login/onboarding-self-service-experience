@@ -5,7 +5,9 @@ Feature: Users can update clients
     And they submit the email "registered@gds.gov.uk"
     And they submit a valid password
     And they submit a correct security code
-    Then they should see the text "Client details"
+    Then they should be redirected to a page with the title "Your services - GOV.UK One Login"
+    When they click on the "Test Service" link
+    Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
 
   Rule: The user updates their public key
     Scenario: They user submits a valid public key with headers

@@ -12,7 +12,8 @@ import {
     getButtonLink,
     getLink,
     getLinkWithHref,
-    getLinkWithHrefStarting
+    getLinkWithHrefStarting,
+    clickYourAccountSubnavLink
 } from "./shared-functions";
 
 Given("the user is on the home page", async function () {
@@ -130,4 +131,8 @@ When("they enter {string} into the {string} field", async function (text: string
 When("they click on the forgot password link in their email", async function () {
     const path = "/sign-in/forgot-password/create-new-password?loginName=registered@gds.gov.uk&confirmationCode=123456";
     await this.goToPath(path);
+});
+
+When("they click Your account link in the left side navigation", async function () {
+    await clickYourAccountSubnavLink(this.page);
 });

@@ -20,11 +20,6 @@ export const listServices = async function (req: Request, res: Response) {
         return;
     }
 
-    if (services.length === 1) {
-        res.redirect(`/services/${services[0].id}/clients`);
-        return;
-    }
-
     req.session.serviceName = undefined;
     res.render("services/services.njk", {services: services});
 };

@@ -5,9 +5,9 @@ Feature: A page where users can view and change the details associated with thei
     And they submit the email "registered@gds.gov.uk"
     And they submit a valid password
     And they submit a correct security code
-    Then they should be redirected to a page with the path starting with "/services"
+    Then they should be redirected to a page with the title "Your services - GOV.UK One Login"
 
-    When they click on the "Your account" link
+    When they click Your account link in the left side navigation
     Then they should be redirected to the "/account" page
     And they should see the text "Your account"
 

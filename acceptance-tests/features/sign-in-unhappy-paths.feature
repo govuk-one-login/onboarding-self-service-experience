@@ -39,7 +39,7 @@ Feature: Unhappy paths for the self-service sign-in flow
     And they submit a correct security code
     Then they should be redirected to a page with the path starting with "/services"
     And they should see the text "Your services"
-    When they click on the "Your account" link
+    When they click Your account link in the left side navigation
     Then they should be redirected to the "/account" page
     And they should see the text "Last updated just now"
 
