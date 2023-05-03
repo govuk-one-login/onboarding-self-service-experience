@@ -2,9 +2,9 @@ Feature: Users can update clients
 
   Background:
     Given the user is on the "/sign-in" page
-    And the user submits the email "registered@gds.gov.uk"
-    And the user submits the password "this-is-not-a-common-password"
-    And the user submits the security code "123456"
+    And they submit the email "registered@gds.gov.uk"
+    And they submit a valid password
+    And they submit a correct security code
     Then they should see the text "Client details"
 
   Rule: The user updates their public key
