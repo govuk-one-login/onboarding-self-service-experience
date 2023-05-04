@@ -41,4 +41,4 @@ jobs:
           signing-profile-name: ${{ secrets.AWS_SIGNING_PROFILE_NAME }}
           working-directory: .
           template-file: infrastructure/api/sse-api.yml
-          
+      
