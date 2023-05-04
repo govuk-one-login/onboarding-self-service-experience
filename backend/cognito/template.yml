@@ -3,14 +3,9 @@ Description: Cognito UserPool and Client
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  DomainOrEmailIdentityToVerify:
+  EmailDomain:
+    Type: String
     Description: Domain or email that will be created as verified identity.
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /self-service/config/cognito/email-domain
-  SignInHostedZone:
-    Description: Deployment specific SignInHostedZone
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /self-service/config/dns/hosted-zone
   ExternalId:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/config/cognito/external-id
@@ -35,35 +30,6 @@ Globals:
     PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
 
 Resources:
-  DomainIdentityForSES:
-    Type: AWS::SES::EmailIdentity
-    Properties:
-      EmailIdentity: !Ref DomainOrEmailIdentityToVerify
-
-  DevelopmentEmailIdentityRoute53Records:
-    Type: AWS::Route53::RecordSetGroup
-    Properties:
-      Comment: "Records created to verify domain ownership with SES"
-      HostedZoneId: !ImportValue
-       'Fn::Sub': '${SignInHostedZone}'
-      RecordSets:
-        - Name: !GetAtt DomainIdentityForSES.DkimDNSTokenName1
-          Type: CNAME
-          TTL: 86400
-          ResourceRecords:
-            - !GetAtt DomainIdentityForSES.DkimDNSTokenValue1
-
-        - Name: !GetAtt DomainIdentityForSES.DkimDNSTokenName2
-          Type: CNAME
-          TTL: 86400
-          ResourceRecords:
-            - !GetAtt DomainIdentityForSES.DkimDNSTokenValue2
-
-        - Name: !GetAtt DomainIdentityForSES.DkimDNSTokenName3
-          Type: CNAME
-          TTL: 86400
-          ResourceRecords:
-            - !GetAtt DomainIdentityForSES.DkimDNSTokenValue3
 
   confirmForgotPasswordCustomMessage:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
@@ -80,13 +46,13 @@ Resources:
             Action:
               - 'ses:SendEmail'
               - 'ses:SendRawEmail'
-            Resource: !Sub arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${DomainOrEmailIdentityToVerify}
+            Resource: !ImportValue EmailIdentityArn
             Condition:
               StringEquals:
-                "ses:FromAddress": !Sub 'admin-tool@${DomainOrEmailIdentityToVerify}'
+                "ses:FromAddress": !Sub 'admin-tool@${EmailDomain}'
       Environment:
         Variables:
-          FROM_EMAIL_ADDRESS: !Sub 'admin-tool@${DomainOrEmailIdentityToVerify}'
+          FROM_EMAIL_ADDRESS: !Sub 'admin-tool@${EmailDomain}'
 
       Handler: src/handlers/confirm-forgot-password-message.handler
       Runtime: nodejs14.x
@@ -459,8 +425,8 @@ Resources:
       MfaConfiguration: OPTIONAL
       EmailConfiguration:
         EmailSendingAccount: DEVELOPER
-        SourceArn: !Sub arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${DomainOrEmailIdentityToVerify}
-        From: !Sub 'admin-tool@${DomainOrEmailIdentityToVerify}'
+        SourceArn: !ImportValue EmailIdentityArn
+        From: !Sub 'admin-tool@${EmailDomain}'
       SmsConfiguration:
         SnsCallerArn: !GetAtt SmsRole.Arn
         ExternalId: !Ref ExternalId

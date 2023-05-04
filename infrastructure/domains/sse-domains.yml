@@ -142,6 +142,15 @@ Resources:
             - ns-1074.awsdns-06.org.
             - ns-1987.awsdns-56.co.uk.
 
+        - Name: build.sign-in.service.gov.uk.
+          Type: NS
+          TTL: 60
+          ResourceRecords:
+            - ns-1269.awsdns-30.org
+            - ns-1946.awsdns-51.co.uk
+            - ns-516.awsdns-00.net
+            - ns-206.awsdns-25.com
+
         - Name: staging.sign-in.service.gov.uk.
           Type: NS
           TTL: 60
