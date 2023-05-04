@@ -44,6 +44,11 @@ Resources:
 Outputs:
   EmailIdentityArn:
     Description: ARN of the created email identity
-    Value: !Ref DomainIdentityForSES
+    Value: !Sub arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${DomainToVerify}
     Export:
       Name: EmailIdentityArn
+  EmailDomain:
+    Description: The domain that will be used for the email identity
+    Value: !Ref DomainToVerify
+    Export:
+      Name: EmailDomain
