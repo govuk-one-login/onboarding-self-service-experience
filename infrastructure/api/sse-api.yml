@@ -445,12 +445,16 @@ Resources:
               - Effect: Allow
                 Action:
                   - logs:CreateLogDelivery
+                  - logs:CreateLogStream
                   - logs:GetLogDelivery
                   - logs:UpdateLogDelivery
                   - logs:DeleteLogDelivery
                   - logs:ListLogDeliveries
+                  - logs:PutLogEvents
+                  - logs:PutResourcePolicy
                   - logs:DescribeResourcePolicies
-                Resource: "*"
+                  - logs:DescribeLogGroups
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*:*
               - Effect: Allow
                 Action: logs:DescribeLogGroups
                 Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${StepFunctionsLogGroup}
