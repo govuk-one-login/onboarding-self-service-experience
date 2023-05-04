@@ -3,9 +3,6 @@ Description: Cognito UserPool and Client
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  EmailDomain:
-    Type: String
-    Description: Domain or email that will be created as verified identity.
   ExternalId:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/config/cognito/external-id
@@ -49,10 +46,10 @@ Resources:
             Resource: !ImportValue EmailIdentityArn
             Condition:
               StringEquals:
-                "ses:FromAddress": !Sub 'admin-tool@${EmailDomain}'
+                "ses:FromAddress": !Sub ['admin-tool@${emailDomain}', {emailDomain: !ImportValue EmailDomain}]
       Environment:
         Variables:
-          FROM_EMAIL_ADDRESS: !Sub 'admin-tool@${EmailDomain}'
+          FROM_EMAIL_ADDRESS: !Sub ['admin-tool@${emailDomain}', {emailDomain: !ImportValue EmailDomain}]
 
       Handler: src/handlers/confirm-forgot-password-message.handler
       Runtime: nodejs14.x
@@ -426,7 +423,7 @@ Resources:
       EmailConfiguration:
         EmailSendingAccount: DEVELOPER
         SourceArn: !ImportValue EmailIdentityArn
-        From: !Sub 'admin-tool@${EmailDomain}'
+        From: !Sub ['admin-tool@${emailDomain}', {emailDomain: !ImportValue EmailDomain}]
       SmsConfiguration:
         SnsCallerArn: !GetAtt SmsRole.Arn
         ExternalId: !Ref ExternalId
