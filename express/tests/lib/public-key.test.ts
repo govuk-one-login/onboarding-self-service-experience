@@ -46,26 +46,82 @@ describe("Public keys are validated and prepared for the Auth API", () => {
             it(`Accepts and corrects a ${type} key without the header`, () => {
                 expect(getAuthApiCompliantPublicKey(`${key}\n${footer}`)).toEqual(publicKeyCompact);
             });
+
+            it(`Accepts and corrects a ${type} key without the footer`, () => {
+                expect(getAuthApiCompliantPublicKey(`${header}\n${key}`)).toEqual(publicKeyCompact);
+            });
         });
 
         describe.each([
-            {key: publicKey, type: "multiline"},
-            {key: publicKeyWithHeaders, type: "wrapped multiline"},
-            {key: publicKeyCompact, type: "compact"},
-            {key: publicKeyCompactWithHeaders, type: "wrapped compact"}
-        ])("Keys with extra spaces and line breaks outside the key content are accepted", ({key, type}) => {
-            const whitespace = "     \n      \n\n\n   ";
+            {whitespace: "\n\n\n", whitespaceName: "newlines"},
+            {whitespace: "   ", whitespaceName: "spaces"},
+            {whitespace: "     \n      \n\n\n   ", whitespaceName: "space"}
+        ])("Keys with extra whitespace are correced and accepted", ({whitespace, whitespaceName}) => {
+            describe("Keys with extra whitespace outside the key content are accepted", () => {
+                describe.each([
+                    {key: publicKey, type: "multiline"},
+                    {key: publicKeyWithHeaders, type: "wrapped multiline"},
+                    {key: publicKeyCompact, type: "compact"},
+                    {key: publicKeyCompactWithHeaders, type: "wrapped compact"}
+                ])(`Keys with extra ${whitespaceName} outside the key content are accepted`, ({key, type}) => {
+                    it(`Accepts a ${type} key with extra ${whitespaceName} before the key content`, () => {
+                        expect(getAuthApiCompliantPublicKey(`${whitespace}${key}`)).toEqual(publicKeyCompact);
+                    });
 
-            it(`Accepts a ${type} key with extra whitespace before the key content`, () => {
-                expect(getAuthApiCompliantPublicKey(`${whitespace}${key}`)).toEqual(publicKeyCompact);
+                    it(`Accepts a ${type} key with extra ${whitespaceName} after the key content`, () => {
+                        expect(getAuthApiCompliantPublicKey(`${key}${whitespace}`)).toEqual(publicKeyCompact);
+                    });
+
+                    it(`Accepts a ${type} key with extra ${whitespaceName} before and after the key content`, () => {
+                        expect(getAuthApiCompliantPublicKey(`${whitespace}${key}${whitespace}`)).toEqual(publicKeyCompact);
+                    });
+                });
             });
 
-            it(`Accepts a ${type} key with extra whitespace after the key content`, () => {
-                expect(getAuthApiCompliantPublicKey(`${key}${whitespace}`)).toEqual(publicKeyCompact);
+            describe("Keys with extra whitespace inside the key content are accepted", () => {
+                describe.each([
+                    {key: publicKey, type: "multiline"},
+                    {key: publicKeyCompact, type: "compact"}
+                ])(`Keys with extra ${whitespaceName} inside the key content are accepted`, ({key, type}) => {
+                    it(`Accepts a ${type} key with extra ${whitespaceName} after the header`, () => {
+                        expect(getAuthApiCompliantPublicKey(`${header}${whitespace}${key}${footer}`)).toEqual(publicKeyCompact);
+                    });
+
+                    it(`Accepts a ${type} key with extra ${whitespaceName} before the footer`, () => {
+                        expect(getAuthApiCompliantPublicKey(`${header}${key}${whitespace}${footer}`)).toEqual(publicKeyCompact);
+                    });
+
+                    it(`Accepts a ${type} key with extra ${whitespaceName} inside the main part`, () => {
+                        expect(
+                            getAuthApiCompliantPublicKey(`${header}${key.substring(0, 20)}${whitespace}${key.substring(20)}${footer}`)
+                        ).toEqual(publicKeyCompact);
+                    });
+
+                    it(`Accepts a ${type} key with extra ${whitespaceName}`, () => {
+                        expect(
+                            getAuthApiCompliantPublicKey(
+                                `${header}${whitespace}${key.substring(0, 20)}${whitespace}${key.substring(20)}${whitespace}${footer}`
+                            )
+                        ).toEqual(publicKeyCompact);
+                    });
+                });
+            });
+        });
+
+        describe("Keys with extra text outside the key content are accepted", () => {
+            it("Accepts a key with extra text before the header", () => {
+                expect(getAuthApiCompliantPublicKey(`not-part-of-the-key\n${publicKeyWithHeaders}`)).toEqual(publicKeyCompact);
+                expect(getAuthApiCompliantPublicKey(`not-part-of-the-key${publicKeyWithHeaders}`)).toEqual(publicKeyCompact);
             });
 
-            it(`Accepts a ${type} key with extra whitespace before and after the key content`, () => {
-                expect(getAuthApiCompliantPublicKey(`${whitespace}${key}${whitespace}`)).toEqual(publicKeyCompact);
+            it("Accepts a key with extra text after the footer", () => {
+                expect(getAuthApiCompliantPublicKey(`${publicKeyWithHeaders}\nnot-part-of-the-key`)).toEqual(publicKeyCompact);
+                expect(getAuthApiCompliantPublicKey(`${publicKeyWithHeaders}not-part-of-the-key`)).toEqual(publicKeyCompact);
+            });
+
+            it("Accepts a key with extra text before and after the key content", () => {
+                expect(getAuthApiCompliantPublicKey(`text-before\n${publicKeyWithHeaders}\ntext-after`)).toEqual(publicKeyCompact);
+                expect(getAuthApiCompliantPublicKey(`text-before${publicKeyWithHeaders}text-after`)).toEqual(publicKeyCompact);
             });
         });
     });

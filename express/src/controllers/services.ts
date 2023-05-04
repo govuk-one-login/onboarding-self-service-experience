@@ -1,11 +1,10 @@
-import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {Request, Response} from "express";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const listServices = async function (req: Request, res: Response) {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const userId = AuthenticationResultParser.getCognitoId(req.session.authenticationResult as AuthenticationResultType);
+    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
     if (userId == undefined) {
         console.log(req.query);
@@ -14,7 +13,8 @@ export const listServices = async function (req: Request, res: Response) {
         return;
     }
 
-    const services = await s4.listServices(userId as string, req.session.authenticationResult?.AccessToken as string);
+    const services = await s4.listServices(userId);
+
     if (services.length === 0) {
         res.redirect(`/register/create-service`);
         return;

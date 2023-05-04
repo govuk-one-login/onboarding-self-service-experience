@@ -9,7 +9,7 @@ export const showClient: RequestHandler = async (req, res) => {
     // TODO make S4 instances static in all controllers
     const serviceId = req.context.serviceId;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const client = (await s4.listClients(nonNull(serviceId), nonNull(req.session.authenticationResult?.AccessToken)))[0];
+    const client = (await s4.listClients(nonNull(serviceId)))[0];
     const selfServiceClientId = client.dynamoServiceId;
     const authClientId = client.authClientId;
     const serviceName = client.serviceName;
@@ -97,13 +97,7 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    await s4.privateBetaRequest(
-        userName,
-        department,
-        serviceName,
-        emailAddress as string,
-        nonNull(req.session.authenticationResult?.AccessToken)
-    );
+    await s4.privateBetaRequest(userName, department, serviceName, nonNull(emailAddress));
 
     res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/private-beta/submitted`);
 };
@@ -196,7 +190,7 @@ export const showProcessChangeRedirectUrlsForm: RequestHandler = async (req, res
 };
 
 export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) => {
-    const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
+    const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url.trim().length > 0);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     await s4.updateClient(
@@ -261,7 +255,7 @@ export const showProcessChangePostLogoutUrisForm: RequestHandler = async (req, r
 };
 
 export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) => {
-    const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url !== "");
+    const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url.trim().length > 0);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     await s4.updateClient(

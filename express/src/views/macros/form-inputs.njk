@@ -80,7 +80,7 @@
 {% endmacro %}
 
 {% macro urlInput(label) %}
-  {{ textInput(label, "redirectUris", "govuk-!-width-full", "Enter URIs starting with https://", "url", "url") }}
+  {{ textInput(label, "redirectUris", "govuk-!-width-full", "Enter URIs starting with https:// (or http://localhost)", "url", "url") }}
 {% endmacro %}
 
 {% macro hiddenInput(id, value) %}

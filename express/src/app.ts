@@ -1,12 +1,9 @@
 import bodyParser from "body-parser";
 import express from "express";
-import "express-async-errors";
+import {cognito, googleTagId, lambda, port} from "./config/environment";
 import Express from "./config/express";
 import {distribution} from "./config/resources";
-import "./config/session-data";
 import sessionStorage from "./config/session-storage";
-import configureViews from "./config/views";
-import "./lib/utils/optional";
 import {errorHandler, notFoundHandler} from "./middleware/errors";
 import signInStatus from "./middleware/sign-in-status";
 import account from "./routes/account";
@@ -19,24 +16,13 @@ import SelfServiceServicesService from "./services/self-service-services-service
 
 const app = Express();
 
-const cognitoPromise = import(`./services/cognito/${process.env.COGNITO_CLIENT ?? "CognitoClient"}`).then(client => {
-    const cognito = new client.default.CognitoClient();
-    app.set("cognitoClient", cognito);
-    return cognito;
-});
-
-const lambdaPromise = import(`./services/lambda-facade/${process.env.LAMBDA_FACADE ?? "LambdaFacade"}`).then(facade => {
-    const lambda = facade.lambdaFacadeInstance;
-    app.set("lambdaFacade", facade.lambdaFacadeInstance);
-    return lambda;
-});
+const cognitoPromise = import(`./services/cognito/${cognito.client}`).then(client => client.default);
+const lambdaPromise = import(`./services/lambda-facade/${lambda.facade}`).then(facade => facade.default);
 
 Promise.all([cognitoPromise, lambdaPromise]).then(deps => {
     app.set("backing-service", new SelfServiceServicesService(deps[0], deps[1]));
     console.log("Backing service created");
 });
-
-configureViews(app);
 
 app.use("/assets", express.static(distribution.assets));
 app.use("/assets/images", express.static(distribution.images));
@@ -56,7 +42,6 @@ app.use("/test", testingRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.locals.googleTagId = process.env.GOOGLE_TAG_ID;
+app.locals.googleTagId = googleTagId;
 
-const port = process.env.PORT ?? 3000;
 app.listen(port, () => console.log(`Server running; listening on port ${port}`));

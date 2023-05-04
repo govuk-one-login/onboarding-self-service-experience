@@ -103,11 +103,6 @@ Then("their data is saved in the spreadsheet", async function () {
     // we can't check the sheet but if we're on the right page and can find some content then that's good enough
 });
 
-Then("the error message {string} must be displayed for the {string} field", async function (errorMessage, field) {
-    const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${field}"]`);
-    await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, field);
-});
-
 Then("the error message {string} must be displayed for the {string} radios", async function (errorMessage, field) {
     const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${field}-error"]`);
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, field);
@@ -130,26 +125,6 @@ Then("the {string} link will point to the following page: {string}", async funct
 
 When("they enter {string} into the {string} field", async function (text: string, field: string) {
     await enterTextIntoTextInput(this.page, text, field);
-});
-
-When("the user submits the email {string}", async function (email: string) {
-    await enterTextIntoTextInput(this.page, email, "emailAddress");
-    await clickSubmitButton(this.page);
-});
-
-When("the user submits the security code {string}", async function (securityCode: string) {
-    await enterTextIntoTextInput(this.page, securityCode, "securityCode");
-    await clickSubmitButton(this.page);
-});
-
-When("the user submits the password {string}", async function (password: string) {
-    await enterTextIntoTextInput(this.page, password, "password");
-    await clickSubmitButton(this.page);
-});
-
-When("the user submits the mobile phone number {string}", async function (mobileNumber: string) {
-    await enterTextIntoTextInput(this.page, mobileNumber, "mobileNumber");
-    await clickSubmitButton(this.page);
 });
 
 When("they click on the forgot password link in their email", async function () {

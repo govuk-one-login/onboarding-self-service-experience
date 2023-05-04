@@ -1,5 +1,9 @@
 import express, {Express} from "express";
+import "express-async-errors";
+import "../lib/utils/optional";
 import RequestContext from "../types/request-context";
+import "./session-data";
+import configureViews from "./views";
 
 export default function Express(): Express {
     const app = express();
@@ -15,5 +19,6 @@ export default function Express(): Express {
         }
     });
 
+    configureViews(app);
     return app;
 }

@@ -1,34 +1,38 @@
-import {NextFunction, Request, Response} from "express";
+import {Request} from "express";
 import validatePassword from "middleware/validators/password-validator";
+import {request, response} from "../../mocks";
 
-describe("passwords of 8 or more characters are allowed, passwords with less characters are rejected", () => {
-    let mockRequest: Partial<Request>;
-    let mockResponse: Partial<Response>;
-    let nextFunction: NextFunction;
+let req: Request;
 
+const next = jest.fn();
+const res = response();
+const validator = validatePassword("template.njk");
+
+describe("Validate submitted password", () => {
     beforeEach(() => {
-        mockRequest = {
-            body: jest.fn()
-        };
-
-        mockResponse = {
-            render: jest.fn()
-        };
-
-        nextFunction = jest.fn();
+        req = request();
     });
 
-    it("allows a 12 character password", () => {
-        mockRequest.body.password = "12_character";
-        validatePassword("some-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
-        expect(nextFunction).toHaveBeenCalledTimes(1);
-        expect(mockResponse.render).toHaveBeenCalledTimes(0);
+    it("Call next middleware if the password is valid", () => {
+        req.body.password = "12_character";
+        validator(req, res, next);
+
+        expect(next).toHaveBeenCalled();
+        expect(res.render).not.toHaveBeenCalled();
     });
 
-    it("rejects a 7 character password", () => {
-        mockRequest.body.password = "7_chars";
-        validatePassword("some-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
-        expect(nextFunction).toHaveBeenCalledTimes(0);
-        expect(mockResponse.render).toHaveBeenCalledTimes(1);
+    it("Render errors if the password is invalid", () => {
+        req.body.password = "7_chars";
+        validator(req, res, next);
+
+        expect(next).not.toHaveBeenCalled();
+        expect(res.render).toHaveBeenCalledWith("template.njk", {
+            values: {
+                password: "7_chars"
+            },
+            errorMessages: {
+                password: expect.stringContaining("8 characters or more")
+            }
+        });
     });
 });

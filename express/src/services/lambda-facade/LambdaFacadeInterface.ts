@@ -3,37 +3,33 @@ import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
-import {Updates} from "../self-service-services-service";
+
+export type UserUpdates = Record<string, string | Date>;
+export type ClientUpdates = Record<string, string | string[]>;
 
 export default interface LambdaFacadeInterface {
-    putUser(user: OnboardingTableItem, accessToken: string): Promise<AxiosResponse>;
+    putUser(user: OnboardingTableItem, accessToken: string): Promise<void>;
 
-    updateUser(selfServiceUserId: string, updates: Updates, accessToken: string): Promise<AxiosResponse>;
+    updateUser(selfServiceUserId: string, updates: UserUpdates, accessToken: string): Promise<void>;
 
     getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse>;
 
-    newService(service: Service, userId: string, email: string, accessToken: string): Promise<AxiosResponse>;
+    newService(service: Service, userId: string, email: string, accessToken: string): Promise<void>;
 
     generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse>;
 
-    listServices(userId: string, accessToken: string): Promise<AxiosResponse>;
+    listServices(userId: string): Promise<AxiosResponse>;
 
     // TODO The QueryCommandOutput type should be replaced by a class shared between the frontend and the API (contract)
-    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse<QueryCommandOutput>>;
+    listClients(serviceId: string): Promise<AxiosResponse<QueryCommandOutput>>;
+
+    privateBetaRequest(name: string, department: string, serviceName: string, emailAddress: string): Promise<void>;
 
     updateClient(
         serviceId: string,
         selfServiceClientId: string,
         clientId: string,
-        updates: object,
+        updates: ClientUpdates,
         accessToken: string
-    ): Promise<AxiosResponse<QueryCommandOutput>>;
-
-    privateBetaRequest(
-        name: string,
-        department: string,
-        serviceName: string,
-        emailAddress: string,
-        accessToken: string
-    ): Promise<AxiosResponse>;
+    ): Promise<void>;
 }

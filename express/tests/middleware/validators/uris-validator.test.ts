@@ -1,39 +1,31 @@
-import {NextFunction, Request, Response} from "express";
-import {Session, SessionData} from "express-session";
+import {Request} from "express";
 import validateUris from "middleware/validators/uris-validator";
+import {request, response} from "../../mocks";
 
-describe("it calls the NextFunction if the URIs are valid or renders an error page if not", () => {
-    let mockRequest: Partial<Request>;
-    let mockResponse: Partial<Response>;
-    let nextFunction: NextFunction;
-    let mockSession: Partial<Session & Partial<SessionData>>;
+let req: Request;
 
+const next = jest.fn();
+const res = response();
+const validator = validateUris("template.njk");
+
+describe("Validate submitted URIs", () => {
     beforeEach(() => {
-        mockRequest = {
-            body: jest.fn(),
-            session: mockSession as Session,
-            params: {
-                serviceId: "foo",
-                selfServiceClientId: "bar",
-                clientId: "baz"
-            }
-        };
-
-        nextFunction = jest.fn();
-        mockResponse = {render: jest.fn()};
+        req = request({params: {serviceId: "foo", selfServiceClientId: "bar", clientId: "baz"}});
     });
 
-    it("works calls the next function with valid URLs", () => {
-        mockRequest.body.redirectUris = "https://valid.gov.uk/ https://also-valid.gov.uk";
-        validateUris("some-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
-        expect(nextFunction).toHaveBeenCalledTimes(1);
-        expect(mockResponse.render).toHaveBeenCalledTimes(0);
+    it("Call next middleware if the URIs are valid", () => {
+        req.body.redirectUris = "https://valid.gov.uk/ https://also-valid.gov.uk";
+        validator(req, res, next);
+
+        expect(next).toHaveBeenCalled();
+        expect(res.render).not.toHaveBeenCalled();
     });
 
-    it("works calls the render function with invalid URLs", () => {
-        mockRequest.body.redirectUris = "http://invalid.gov.uk/ http://also-invalid.gov.uk";
-        validateUris("some-template.njk")(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
-        expect(nextFunction).toHaveBeenCalledTimes(0);
-        expect(mockResponse.render).toHaveBeenCalledTimes(1);
+    it("Render errors if the URIs are not valid", () => {
+        req.body.redirectUris = "http://invalid.gov.uk/ http://also-invalid.gov.uk";
+        validator(req, res, next);
+
+        expect(next).not.toHaveBeenCalled();
+        expect(res.render).toHaveBeenCalledWith("template.njk", expect.any(Object));
     });
 });
