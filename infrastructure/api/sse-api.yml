@@ -447,18 +447,18 @@ Resources:
               - Effect: Allow
                 Action:
                   - logs:CreateLogDelivery
-                  - logs:CreateLogStream
                   - logs:GetLogDelivery
                   - logs:UpdateLogDelivery
                   - logs:DeleteLogDelivery
                   - logs:ListLogDeliveries
-                  - logs:PutLogEvents
-                  - logs:PutResourcePolicy
                   - logs:DescribeResourcePolicies
                   - logs:DescribeLogGroups
-                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*:*
+                Resource: "*"
               - Effect: Allow
-                Action: logs:DescribeLogGroups
+                Action:
+                  - logs:DescribeLogGroups
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
                 Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${StepFunctionsLogGroup}
               - Effect: Allow
                 Action: lambda:InvokeFunction
