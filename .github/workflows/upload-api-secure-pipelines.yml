@@ -1,0 +1,43 @@
+name: Upload API to secure pipelines
+
+on:
+  workflow_dispatch:
+  push:
+   branches: [ main ]
+
+permissions: read-all
+concurrency: upload-api-secure-pipelines-build-${{ github.head_ref || github.ref_name }}
+
+jobs:
+
+  deploy:
+    name: Upload API package
+    runs-on: ubuntu-latest
+    environment: build
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3          
+          
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.API_BUILD_GHA_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name:  Build SAM app
+        working-directory: .
+        run: sam build --template infrastructure/api/sse-api.yml --base-dir .
+
+      - name: Deploy SAM app
+        uses: alphagov/di-devplatform-upload-action@d191917e2d6caf2e78d1dc4b639251a053f4e8e3
+        with:
+          artifact-bucket-name: ${{ secrets.API_BUILD_ARTIFACT_BUCKET_NAME }}
+          signing-profile-name: ${{ secrets.AWS_SIGNING_PROFILE_NAME }}
+          working-directory: .
+          template-file: infrastructure/api/sse-api.yml
+      
