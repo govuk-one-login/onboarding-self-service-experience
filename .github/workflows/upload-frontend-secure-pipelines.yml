@@ -34,7 +34,7 @@ jobs:
           name: self-service-front
 
       - name: Upload frontend package
-        uses: alphagov/di-devplatform-upload-action-ecr@d1.0.3
+        uses: alphagov/di-devplatform-upload-action-ecr@1.0.3
         with:
           artifact-bucket-name: ${{ secrets.FRONTEND_BUILD_ARTIFACT_BUCKET_NAME }}
           container-sign-kms-key-arn: ${{ secrets.FRONTEND_CONTAINER_SIGN_KMS_KEY }}
