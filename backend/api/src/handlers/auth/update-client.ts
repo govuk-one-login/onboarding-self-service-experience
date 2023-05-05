@@ -5,11 +5,14 @@ import axios, {Axios} from "axios";
 const instance: Axios = axios.create({
     baseURL: process.env.AUTH_REGISTRATION_BASE_URL,
     headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-API-Key": process.env.AUTH_API_KEY as string
     }
 });
+
 export const updateClientInRegistryHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     // TODO remove explicit any
+    // eslint-disable-next-line
     const payload: any = event;
     const result = await (await instance).put(`/connect/register/${payload.clientId}`, payload.updates);
 
