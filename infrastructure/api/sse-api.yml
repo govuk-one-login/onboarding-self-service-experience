@@ -7,10 +7,6 @@ Parameters:
     Type: String
     Default: https://oidc.integration.account.gov.uk
     Description: API Gateway endpoint for client registration
-  DynamoDbTableStackName:
-    Type: String
-    Default: dynamo-db-stack
-    Description: The name of the stack exporting the self-service table
   NotificationEmail:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/config/api/notification-email
@@ -66,14 +62,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/get-user.getUserHandler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
+            TableName: !ImportValue AdminToolDataTable
       Environment:
         Variables:
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
+          TABLE: !ImportValue AdminToolDataTable
       Events:
         Api:
           Type: HttpApi
@@ -96,14 +88,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-user.putUserHandler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
+            TableName: !ImportValue AdminToolDataTable
       Environment:
         Variables:
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
+          TABLE: !ImportValue AdminToolDataTable
       Events:
         Api:
           Type: HttpApi
@@ -127,14 +115,10 @@ Resources:
       Description: Updates user data in DynamoDB (without touching Cognito)
       Policies:
         - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
+            TableName: !ImportValue AdminToolDataTable
       Environment:
         Variables:
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
+          TABLE: !ImportValue AdminToolDataTable
       Events:
         Api:
           Type: HttpApi
@@ -159,14 +143,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/get-services.getServicesHandler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
+            TableName: !ImportValue AdminToolDataTable
       Environment:
         Variables:
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
+          TABLE: !ImportValue AdminToolDataTable
       Events:
         Api:
           Type: HttpApi
@@ -189,14 +169,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-service.putServiceHandler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
+            TableName: !ImportValue AdminToolDataTable
       Environment:
         Variables:
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
+          TABLE: !ImportValue AdminToolDataTable
 
   #--- Service clients ---#
 
@@ -214,14 +190,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/get-service-clients.getServiceClientsHandler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
+            TableName: !ImportValue AdminToolDataTable
       Environment:
         Variables:
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
+          TABLE: !ImportValue AdminToolDataTable
       Events:
         Api:
           Type: HttpApi
@@ -244,14 +216,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-service-client.putServiceClientHandler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
+            TableName: !ImportValue AdminToolDataTable
       Environment:
         Variables:
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
+          TABLE: !ImportValue AdminToolDataTable
 
   UpdateServiceClientFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
@@ -267,14 +235,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/update-service-client.updateServiceClientHandler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
+            TableName: !ImportValue AdminToolDataTable
       Environment:
         Variables:
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
+          TABLE: !ImportValue AdminToolDataTable
 
   #--- Service users ---#
 
@@ -292,14 +256,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-service-user.putServiceUserHandler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue:
-                !Sub ${DynamoDbTableStackName}-Self-Service-table
+            TableName: !ImportValue AdminToolDataTable
       Environment:
         Variables:
-          TABLE:
-            Fn::ImportValue:
-              !Sub ${DynamoDbTableStackName}-Self-Service-table
+          TABLE: !ImportValue AdminToolDataTable
 
   #--- Auth clients ---#
 
