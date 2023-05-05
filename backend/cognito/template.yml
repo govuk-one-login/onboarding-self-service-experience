@@ -616,11 +616,10 @@ Outputs:
     Description: User Pool generated for this stack
     Value: !Ref UserPool
     Export:
-      Name: !Sub "${AWS::StackName}-Self-Service-user-pool"
+      Name: CognitoUserPool
 
   ClientId:
     Description: ID for the client attached to the user pool
     Value: !Ref Client
     Export:
-      Name: !Sub "${AWS::StackName}-Self-Service-user-pool-client"
-
+      Name: CognitoUserPoolClient

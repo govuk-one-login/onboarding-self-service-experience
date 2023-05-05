@@ -61,9 +61,9 @@ Outputs:
     Description: TableName generated for this stack
     Value: !Ref Table
     Export:
-      Name: !Sub "${AWS::StackName}-Self-Service-table"
+      Name: AdminToolDataTable
   SessionsTableName:
     Description: Sessions table name for session storage
     Value: !Ref Sessions
     Export:
-      Name: !Sub "${AWS::StackName}-Self-Service-sessions"
+      Name: AdminToolSessionsTable
