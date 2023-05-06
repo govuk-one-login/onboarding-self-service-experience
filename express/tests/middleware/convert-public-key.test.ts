@@ -8,7 +8,7 @@ const res = response();
 
 describe("Validate and convert submitted public key", () => {
     it("Call next middleware if public key successfully converted", () => {
-        req.body.serviceUserPublicKey = publicKeyWithHeaders;
+        req.body.publicKey = publicKeyWithHeaders;
         convertPublicKeyForAuth(req, res, next);
 
         expect(req.body.authCompliantPublicKey).toEqual(publicKeyCompact);

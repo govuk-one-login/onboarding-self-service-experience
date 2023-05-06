@@ -12,8 +12,9 @@ Feature: Change your service name
     Then they should be redirected to a page with the title "Change service name - GOV.UK One Login"
 
   Scenario: The user does not enter any characters into the ‘Change your service name’ field
+    Given the service name field should contain the value "Test Service"
     When they submit the service name ""
-    Then the error message "Enter your service name" must be displayed for the service name field
+    Then the error message "Enter your service name" should be displayed for the service name field
 
   Scenario: The user enters characters into the free text field
     When they submit the service name "Updated Test Service"

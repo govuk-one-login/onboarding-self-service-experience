@@ -10,6 +10,7 @@ Feature: Users can update clients
     Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
 
   Rule: The user updates their public key
+
     Scenario: They user submits a valid public key with headers
       Given they click on the link that points to "/change-public-key"
       And they submit a valid public key with headers

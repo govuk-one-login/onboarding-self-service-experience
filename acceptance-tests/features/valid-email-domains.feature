@@ -17,7 +17,7 @@ Feature: Users can only register with email addresses from certain domains
 
     Given the user is on the "/register" page
     When they submit the email <email>
-    Then the error message "Enter a government email address" must be displayed for the email field
+    Then the error message "Enter a government email address" should be displayed for the email field
 
     Examples:
       | email                                                            |

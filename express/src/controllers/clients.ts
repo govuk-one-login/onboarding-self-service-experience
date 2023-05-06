@@ -15,7 +15,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const authClientId = client.authClientId;
     const serviceName = client.serviceName;
     const redirectUrls = client.redirectUris;
-    const userPublicKey = client.publicKey == defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);
+    const publicKey = client.publicKey === defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
@@ -25,7 +25,7 @@ export const showClient: RequestHandler = async (req, res) => {
         updatedField: req.session.updatedField,
         redirectUrls: redirectUrls,
         userAttributesRequired: client.scopes,
-        userPublicKey: userPublicKey,
+        userPublicKey: publicKey,
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         urls: {
             // TODO changeClientName is currently not used
@@ -39,7 +39,7 @@ export const showClient: RequestHandler = async (req, res) => {
                 client.scopes.join(" ")
             )}`,
             changePublicKey: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-public-key?publicKey=${encodeURIComponent(
-                userPublicKey
+                publicKey
             )}`,
             changePostLogoutUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-post-logout-uris?redirectUris=${encodeURIComponent(
                 client.postLogoutUris.join(" ")
@@ -155,7 +155,7 @@ export const showChangePublicKeyForm: RequestHandler = (req, res) => {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
-        serviceUserPublicKey: req.query.publicKey
+        publicKey: req.query.publicKey
     });
 };
 

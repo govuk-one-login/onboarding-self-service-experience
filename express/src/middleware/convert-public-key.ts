@@ -3,18 +3,18 @@ import getAuthApiCompliantPublicKey from "../lib/public-key";
 
 export default function convertPublicKeyForAuth(req: Request, res: Response, next: NextFunction) {
     try {
-        req.body.authCompliantPublicKey = getAuthApiCompliantPublicKey(req.body.serviceUserPublicKey as string);
-    } catch (err) {
-        console.error(err);
-
+        req.body.authCompliantPublicKey = getAuthApiCompliantPublicKey(req.body.publicKey);
+    } catch (ignored) {
         return res.render("clients/change-public-key.njk", {
             serviceId: req.params.serviceId,
             selfServiceClientId: req.params.selfServiceClientId,
             clientId: req.params.clientId,
-            errorMessages: {
-                serviceUserPublicKey: "Enter a valid public key"
+            values: {
+                publicKey: req.body.publicKey
             },
-            serviceUserPublicKey: req.body.authCompliantPublicKey
+            errorMessages: {
+                publicKey: "Enter a valid public key"
+            }
         });
     }
 

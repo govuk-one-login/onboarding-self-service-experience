@@ -90,48 +90,48 @@ router.get("/change-public-key-v2-returning", (req, res) => {
 
 //// Testing post route to test error messages
 router.post("/change-public-key-v2", async (req, res) => {
-    const serviceUserPublicKey = req.body.serviceUserPublicKey;
-    const serviceUserPublicKeyText = req.body.serviceUserPublicKeyText;
-    const serviceUserPublicKeyFile = req.body.serviceUserPublicKeyFile;
+    const publicKey = req.body.publicKey;
+    const publicKeyText = req.body.publicKeyText;
+    const publicKeyFile = req.body.publicKeyFile;
 
-    if (serviceUserPublicKey === "text" && serviceUserPublicKeyText === "") {
+    if (publicKey === "text" && publicKeyText === "") {
         res.render("test/change-public-key-v2.njk", {
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
             clientId: "mockedClientId",
             serviceName: "My juggling service",
-            serviceUserPublicKey: "text",
+            publicKey: "text",
             errorMessages: {
-                serviceUserPublicKeyText: "Enter a public key"
+                publicKeyText: "Enter a public key"
             }
         });
 
         return;
     }
 
-    if (serviceUserPublicKey === "file" && serviceUserPublicKeyFile === "") {
+    if (publicKey === "file" && publicKeyFile === "") {
         res.render("test/change-public-key-v2.njk", {
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
             clientId: "mockedClientId",
             serviceName: "My juggling service",
-            serviceUserPublicKey: "file".trim(),
+            publicKey: "file".trim(),
             errorMessages: {
-                serviceUserPublicKeyFile: "Upload a file"
+                publicKeyFile: "Upload a file"
             }
         });
 
         return;
     }
 
-    if (serviceUserPublicKeyText === "" && serviceUserPublicKeyFile === "") {
+    if (publicKeyText === "" && publicKeyFile === "") {
         res.render("test/change-public-key-v2.njk", {
             serviceId: "mockedServiceId",
             selfServiceClientId: "mockedSelfServiceClientId",
             clientId: "mockedClientId",
             serviceName: "My juggling service",
             errorMessages: {
-                "serviceUserPublicKey-options": "Choose how to change your public key"
+                "publicKeyUploadMethod-options": "Choose how to change your public key"
             }
         });
 

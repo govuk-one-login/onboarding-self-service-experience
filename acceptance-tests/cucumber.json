@@ -6,8 +6,7 @@
       "ts-node/register"
     ],
     "require": [
-      "support/test-setup.ts",
-      "support/steps/**/*.ts"
+      "support/**/*.ts"
     ]
   }
 }

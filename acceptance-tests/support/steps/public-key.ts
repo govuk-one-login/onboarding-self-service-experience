@@ -1,6 +1,7 @@
 import {Given, Then} from "@cucumber/cucumber";
-import {clickSubmitButton, enterTextIntoTextInput} from "./shared-functions";
 import {strict as assert} from "assert";
+import {getElement} from "../helpers/elements";
+import {submitFieldValue} from "../helpers/inputs";
 import {TestContext} from "../test-setup";
 
 const publicKey = `
@@ -26,22 +27,19 @@ this text after the end line is not a part of the public key;
 `.trim();
 
 Given("they submit a valid public key with headers", async function () {
-    await enterTextIntoTextInput(this.page, publicKeyWithHeaders, "serviceUserPublicKey");
-    await clickSubmitButton(this.page);
+    await submitFieldValue(this.page, "public key", publicKeyWithHeaders, "textarea");
 });
 
 Given("they submit a valid public key with extra text", async function () {
-    await enterTextIntoTextInput(this.page, publicKeyWithExtraText, "serviceUserPublicKey");
-    await clickSubmitButton(this.page);
+    await submitFieldValue(this.page, "public key", publicKeyWithExtraText, "textarea");
 });
 
 Given("they submit a valid public key without headers", async function () {
-    await enterTextIntoTextInput(this.page, publicKey, "serviceUserPublicKey");
-    await clickSubmitButton(this.page);
+    await submitFieldValue(this.page, "public key", publicKey, "textarea");
 });
 
 Then("they should see the public key they just entered", async function (this: TestContext) {
-    const publicKeySpan = await this.page.$("p#current-public-key");
-    const publicKey = await this.page.evaluate(element => element?.textContent, publicKeySpan);
+    const publicKeyElement = await getElement(this.page, "current-public-key");
+    const publicKey = await publicKeyElement.evaluate(element => element.textContent);
     assert.equal(publicKey?.replace(/\n/g, "").trim(), publicKey?.replace(/\n/g, ""));
 });

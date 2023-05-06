@@ -16,13 +16,13 @@ Feature: Joining private beta
     Then they should be directed to the URL "https://www.sign-in.service.gov.uk/getting-started/private-beta"
     And they should see the text "Find out more about private beta"
 
-  Scenario: The user does not enter any characters into the Your name field
+  Scenario: The user does not enter any characters into the name field
     When they submit the name ""
-    Then the error message "Enter your name" must be displayed for the name field
+    Then the error message "Enter your name" should be displayed for the name field
 
-  Scenario: The user does not enter any characters into the Department field
+  Scenario: The user does not enter any characters into the department name field
     When they submit the department name ""
-    Then the error message "Enter your department" must be displayed for the department name field
+    Then the error message "Enter your department" should be displayed for the department name field
 
   Scenario: The user’s data is replayed to them
     Then they should see the text "registered@gds.gov.uk"
@@ -30,19 +30,19 @@ Feature: Joining private beta
 
   Scenario: The user submits their private beta request
     When they enter the name "Test User"
-    When they submit the department name "Test Department"
+    And they submit the department name "Test Department"
     Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
 
   Scenario: The user wants to contact the team via slack
     When they enter the name "Test User"
-    When they submit the department name "Test Department"
+    And they submit the department name "Test Department"
     Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
     When they click on the "Slack channel" external link
     Then they should be directed to the URL "https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC"
 
   Scenario: The user wants to contact the team via the support form
     When they enter the name "Test User"
-    When they submit the department name "Test Department"
+    And they submit the department name "Test Department"
     Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
     When they click on the "support form" link
     Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us"

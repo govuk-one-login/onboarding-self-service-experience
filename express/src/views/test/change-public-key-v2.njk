@@ -13,35 +13,35 @@
     and add the public key. This is so our services can securely send messages to each other.
   </p>
 
-  {% if currentPublicKey %}
+  {% if publicKey %}
     {% call govukInsetText() %}
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">Current public key</p>
-      <p class="govuk-body current-public-key-container">{{ currentPublicKey }}</p>
+      <p class="govuk-body" id="current-public-key">{{ publicKey }}</p>
     {% endcall %}
   {% endif %}
 {% endblock %}
 
 {% block formInputs %}
   {% set textFieldHtml %}
-    {{ form.textAreaInput("Public key", "serviceUserPublicKeyText",
+    {{ form.textAreaInput("Public key", "publicKey",
       "Paste in the entire public key in PEM format, including the headers"
     ) }}
   {% endset %}
 
   {% set fileUploadHtml %}
-    {{ form.fileUploadInput("serviceUserPublicKeyFile", ".pem", "Upload a file in .PEM format") }}
+    {{ form.fileUploadInput("publicKeyFile", ".pem", "Upload a file in .PEM format") }}
   {% endset %}
 
-  {{ form.radiosInput("Choose how to change your public key", "govuk-fieldset__legend--m", "serviceUserPublicKey",
+  {{ form.radiosInput("Choose how to change your public key", "govuk-fieldset__legend--m", "publicKeyUploadMethod",
     items = [
       {
-        text: "Paste in your public key", value: "text", checked: serviceUserPublicKey == "text",
+        text: "Paste in your public key", value: "text", checked: publicKeyUploadMethod == "text",
         conditional: {
           html: textFieldHtml
         }
       },
       {
-        text: "Upload your public key as a file", value: "file", checked: serviceUserPublicKey == "file",
+        text: "Upload your public key as a file", value: "file", checked: publicKeyUploadMethod == "file",
         conditional: {
           html: fileUploadHtml
         }
