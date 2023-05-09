@@ -3,8 +3,8 @@ name: Upload Frontend to secure pipelines
 on:
   workflow_dispatch:
   push:
-   branches: [ main ]
-   paths: [ express/** ]
+    branches: [ main ]
+    paths: [ express/** ]
 
 permissions: read-all
 concurrency: upload-frontend-secure-pipelines-build-${{ github.head_ref || github.ref_name }}
@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: build
     needs: build
+    env:
+      TEMPLATE: infrastructure/ci/dev-platform/frontend-template.yml
 
     permissions:
       id-token: write
@@ -33,13 +35,33 @@ jobs:
         with:
           name: self-service-front
 
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.FRONTEND_BUILD_GHA_ROLE_ARN }}
+          mask-aws-account-id: false
+          aws-region: eu-west-2
+
+      - name: Validate template
+        run: |
+          sam validate --template ${{ env.TEMPLATE }}
+          sam validate --template ${{ env.TEMPLATE }} --lint
+
+      - name: Check image exists
+        id: check-image-exists
+        uses: alphagov/di-github-actions/aws/ecr/check-image-exists@47f1c6344f6191a50487a357a6bddb83e3efbcd0
+        with:
+          repository: ${{ secrets.FRONTEND_BUILD_ECR_REPOSITORY }}
+          image-tags: ${{ github.sha }}
+
       - name: Upload frontend package
+        if: ${{ steps.check-image-exists.outputs.image-exists == 'false' }}
         uses: alphagov/di-devplatform-upload-action-ecr@1.0.3
         with:
+          role-to-assume-arn: ${{ secrets.FRONTEND_BUILD_GHA_ROLE_ARN }}
           artifact-bucket-name: ${{ secrets.FRONTEND_BUILD_ARTIFACT_BUCKET_NAME }}
           container-sign-kms-key-arn: ${{ secrets.FRONTEND_CONTAINER_SIGN_KMS_KEY }}
-          template-file: infrastructure/ci/dev-platform/frontend-template.yml
-          role-to-assume-arn:  ${{ secrets.FRONTEND_BUILD_GHA_ROLE_ARN }}
           ecr-repo-name: ${{ secrets.FRONTEND_BUILD_ECR_REPOSITORY }}
           dockerfile: infrastructure/frontend/Dockerfile
+          template-file: ${{ env.TEMPLATE }}
           checkout-repo: false
