@@ -57,6 +57,12 @@ export const processEmailAddress: RequestHandler = (req, res) => {
 export const showSignInFormPassword = render("sign-in/enter-password.njk");
 export const showResendPhoneCodePage = render("sign-in/resend-text-code.njk");
 
+export const showSignInPasswordResendTextCode = render("sign-in/resend-text-code/enter-password.njk");
+
+export const processResendPhoneCodePage: RequestHandler = (req, res) => {
+    res.redirect("/sign-in/resend-text-code/enter-password");
+};
+
 export const forgotPasswordForm: RequestHandler = (req, res) => {
     res.render("sign-in/forgot-password.njk", {
         values: {

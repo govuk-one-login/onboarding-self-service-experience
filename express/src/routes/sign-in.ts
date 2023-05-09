@@ -9,8 +9,10 @@ import {
     processEmailAddress,
     showCheckPhonePage,
     showResendPhoneCodePage,
+    processResendPhoneCodePage,
     showSignInFormEmail,
-    showSignInFormPassword
+    showSignInFormPassword,
+    showSignInPasswordResendTextCode
 } from "../controllers/sign-in";
 import processSignInForm from "../middleware/process-sign-in-form";
 import {render} from "../middleware/request-handler";
@@ -41,6 +43,17 @@ router
     );
 
 router
+    .route("/resend-text-code/enter-password")
+    .get(
+        checkEmailInSession("sign-in/enter-email-address.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+        showSignInPasswordResendTextCode
+    )
+    .post(
+        checkEmailInSession("sign-in/enter-email-address.njk", {errorMessages: {emailAddress: "Enter your email address"}}),
+        processSignInForm("sign-in/resend-text-code/enter-password.njk")
+    );
+
+router
     .route("/enter-text-code")
     .get(showCheckPhonePage)
     .post(
@@ -53,7 +66,7 @@ router
         finishSignIn
     );
 
-router.route("/resend-text-code").get(showResendPhoneCodePage).post(showCheckPhonePage);
+router.route("/resend-text-code").get(showResendPhoneCodePage).post(processResendPhoneCodePage);
 router.route("/account-not-found").get(render("sign-in/account-not-found.njk"));
 
 router
