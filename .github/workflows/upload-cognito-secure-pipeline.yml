@@ -10,12 +10,16 @@ permissions:
   id-token: write
   contents: read
 
-jobs:
+concurrency: upload-cognito-secure-pipelines-build-${{ github.head_ref || github.ref_name }}
 
+jobs:
   deploy:
     name: Deploy Cognito
     runs-on: ubuntu-latest
     environment: build
+    defaults:
+      run:
+        working-directory: backend/cognito
 
     steps:
       - name: Pull repository
@@ -28,16 +32,14 @@ jobs:
           aws-region: eu-west-2
 
       - name: SAM validate
-        working-directory: backend/cognito
         run: |
           sam validate --template template.yml
           sam validate --template template.yml --lint
 
       - name: SAM build
-        working-directory: backend/cognito
         run: sam build --template template.yml
 
-      - name: Deploy SAM app
+      - name: Upload Cognito package
         uses: alphagov/di-devplatform-upload-action@v3.2
         with:
           artifact-bucket-name: ${{ secrets.COGNITO_ARTIFACT_SOURCE_BUCKET_NAME }}
