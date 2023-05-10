@@ -7,10 +7,10 @@
     <div class="govuk-grid-column-one-third">
       <nav class="side-navigation govuk-!-margin-top-3">
         <ul class="govuk-list side-navigation__list">
-          <li class="side-navigation__item{% if activeSidenavAccount == 'your-account-sidenav' %} side-navigation__item--active{% endif %}">
-            <a class="govuk-link govuk-link--no-visited-state" href="/account">Your account</a>
+          <li class="side-navigation__item{% if sidenavActiveItem == 'your-account-sidenav' %} side-navigation__item--active{% endif %}">
+            <a class="govuk-link govuk-link--no-visited-state" href="/account" id="yourAccountSubnav">Your account</a>
           </li>
-          <li class="side-navigation__item{% if activeSidenavAccount == 'your-services-sidenav' %} side-navigation__item--active{% endif %}">
+          <li class="side-navigation__item{% if sidenavActiveItem == 'your-services-sidenav' %} side-navigation__item--active{% endif %}">
             <a class="govuk-link govuk-link--no-visited-state" href="/services">Your services</a>
           </li>
         </ul>

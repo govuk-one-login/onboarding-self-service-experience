@@ -95,3 +95,7 @@ function getSingleElement(elements: ElementHandle<Node>[], tagName: keyof HTMLEl
     assert.equal(elements.length, 1, `Not exactly one element matched ${match} (matches: ${elements.length})`);
     return elements[0].toElement(tagName);
 }
+
+export async function clickYourAccountSubnavLink(page: Page, timeout = defaultTimeout) {
+    await clickButtonWithId(page, "yourAccountSubnav", timeout);
+}

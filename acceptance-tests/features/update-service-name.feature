@@ -5,6 +5,8 @@ Feature: Change your service name
     And they submit the email "registered@gds.gov.uk"
     And they submit a valid password
     And they submit a correct security code
+    Then they should be redirected to a page with the title "Your services - GOV.UK One Login"
+    When they click on the "Test Service" link
     Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
     When they click on the "Change service name" link
     Then they should be redirected to a page with the title "Change service name - GOV.UK One Login"

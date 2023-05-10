@@ -1,7 +1,7 @@
-{% extends 'layouts/services.njk' %}
+{% extends "layouts/account.njk" %}
 
 {% set headerActiveItem = "your-account" %}
-{% set activeSidenavAccount = "your-services-sidenav" %}
+{% set sidenavActiveItem = "your-services-sidenav" %}
 {% set pageTitle = "Your services" %}
 
 {% block mainContent %}
@@ -11,7 +11,7 @@
 
   {% for service in services %}
     <p>
-      <a class="govuk-body"
+      <a class="govuk-body-l govuk-!-font-weight-bold govuk-link--no-visited-state"
          href="/services/{{ service.id }}/clients">{{ service.serviceName }}</a>
     </p>
     <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--l">
