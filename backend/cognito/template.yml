@@ -14,6 +14,11 @@ Parameters:
     Type: String
     Default: ""
     Description: The ARN of the code signing configuration resource to use [Secure Pipeline]
+  ExportNamePrefix:
+    Type: String
+    Default: self-service
+    AllowedPattern: ^.*[^-]$
+    Description: Prefix to use when importing or exporting values from other stacks
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
@@ -616,10 +621,10 @@ Outputs:
     Description: User Pool generated for this stack
     Value: !Ref UserPool
     Export:
-      Name: CognitoUserPool
+      Name: !Sub "${ExportNamePrefix}-CognitoUserPool"
 
   ClientId:
     Description: ID for the client attached to the user pool
     Value: !Ref Client
     Export:
-      Name: CognitoUserPoolClient
+      Name: !Sub "${ExportNamePrefix}-CognitoUserPoolClient"

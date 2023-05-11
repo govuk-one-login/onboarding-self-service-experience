@@ -1,8 +1,14 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
-  DynaomDB table for di-onboarding-self-service-experience
+Description: DynamoDB table for di-onboarding-self-service-experience
 Transform:
   - AWS::Serverless-2016-10-31
+
+Parameters:
+  ExportNamePrefix:
+    Type: String
+    Default: self-service
+    AllowedPattern: ^.*[^-]$
+    Description: Prefix to use when importing or exporting values from other stacks
 
 Resources:
   Table:
@@ -61,9 +67,9 @@ Outputs:
     Description: TableName generated for this stack
     Value: !Ref Table
     Export:
-      Name: AdminToolDataTable
+      Name: !Sub "${ExportNamePrefix}-AdminToolDataTable"
   SessionsTableName:
     Description: Sessions table name for session storage
     Value: !Ref Sessions
     Export:
-      Name: AdminToolSessionsTable
+      Name: !Sub "${ExportNamePrefix}-AdminToolSessionsTable"

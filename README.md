@@ -9,18 +9,44 @@ brew install aws-sam-cli
 
 ## Install the right version of Node
 
-Make sure you have an appropriate version of node. 14 is the current LTS version and the one we use for our applications.
+Make sure you have an appropriate version of node. At the time of writing our lambdas use 18 which is the latest version provided by AWS but you can use the most recent versions of node.
 
 ```shell
 brew install nvm
 # follow the instructions about adding some commands to your shell, creating ~/.zshrc or whatever your shell uses if necessary
 . ~/.zshrc
-nvm install 14.20.0
-nvm use 14.20.0
+nvm install 18
+nvm use 18
 # if it's not already the default
 ```
 
+Other ways to install node are available. `nodenv` for example.
+
 ## Deploy dev stacks
+
+### Run a single script
+
+Run `infrastructure/ci/development-stacks/deploy-development-stack.sh` with your chosen prefix (your name is probably a sensible choice, whatever you choose - don't end it with a `-`). The script needs you to provide AWS creds for the `di-onboarding-development` account.
+
+```bash
+development-stacks/ % gds aws di-onboarding-development -- deploy-development-stack.sh john-is-awesome
+```
+
+This will create the stacks you need and create a config file in `express` which you should rename to `.env`
+
+```bash
+express/ % mv .env.john-is-awesome .env
+```
+
+You can now start your front end. Again you'll need AWS creds for the `di-onboarding-development` account.
+
+```bash
+express/ % COGNITO_CLIENT=CognitoClient LAMBDA_FACADE=LambdaFacade gds aws di-onboarding-development -- npm run dev
+```
+
+Then go to http://localhost:3000 and create an account. Your creds will expire eventually and you'll need to restart express. You'll see something about an expired token in the console when that happens.
+
+### Or
 
 Deploy your own stacks to the AWS development account
 
