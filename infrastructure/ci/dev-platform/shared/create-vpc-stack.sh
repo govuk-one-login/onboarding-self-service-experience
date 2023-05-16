@@ -24,7 +24,7 @@ aws cloudformation create-stack --stack-name vpc-stack \
   ParameterKey=DynamoDBApiEnabled,ParameterValue="Yes" \
   ParameterKey=S3ApiEnabled,ParameterValue="Yes" \
   ParameterKey=SNSApiEnabled,ParameterValue="Yes" \
-  ParameterKey=KMSApiEnabled,ParameterValue="Yes" \
+  ParameterKey=ECRApiEnabled,ParameterValue="Yes" \
   ParameterKey=RestAPIGWVpcLinkEnabled,ParameterValue="Yes" \
   --tags Key=Product,Value="GOV.UK Sign In" \
   Key=System,Value="Onboarding Self-Service" \
