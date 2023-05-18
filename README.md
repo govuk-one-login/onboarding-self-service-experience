@@ -7,6 +7,18 @@ brew tap aws/tap
 brew install aws-sam-cli
 ```
 
+## Install bash
+
+```shell
+brew install bash
+```
+
+## Install JQ
+
+```shell
+brew install jq
+```
+
 ## Install the right version of Node
 
 Make sure you have an appropriate version of node. At the time of writing our lambdas use 18 which is the latest version provided by AWS but you can use the most recent versions of node.
@@ -29,13 +41,21 @@ Other ways to install node are available. `nodenv` for example.
 Run `infrastructure/ci/development-stacks/deploy-development-stack.sh` with your chosen prefix (your name is probably a sensible choice, whatever you choose - don't end it with a `-`). The script needs you to provide AWS creds for the `di-onboarding-development` account.
 
 ```bash
-development-stacks/ % gds aws di-onboarding-development -- deploy-development-stack.sh john-is-awesome
+development-stacks/ % gds aws di-onboarding-development -- ./deploy-development-stack.sh john-is-awesome
 ```
 
 This will create the stacks you need and create a config file in `express` which you should rename to `.env`
 
 ```bash
 express/ % mv .env.john-is-awesome .env
+```
+
+Run from project root directory:
+
+```shell
+npm install
+
+npm run build
 ```
 
 You can now start your front end. Again you'll need AWS creds for the `di-onboarding-development` account.
