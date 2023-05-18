@@ -24,7 +24,7 @@ export const showClient: RequestHandler = async (req, res) => {
         serviceName: serviceName,
         updatedField: req.session.updatedField,
         redirectUrls: redirectUrls,
-        userAttributesRequired: client.scopes.join(", "),
+        userAttributesRequired: client.scopes,
         userPublicKey: userPublicKey,
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         urls: {
@@ -202,15 +202,8 @@ export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) =>
 };
 
 export const showChangeUserAttributesForm: RequestHandler = (req, res) => {
-    const userAttributes = nonNull(req.query.userAttributes?.toString()).split(" ");
-    const email: boolean = userAttributes.includes("email");
-    const phone: boolean = userAttributes.includes("phone");
-    const offline_access: boolean = userAttributes.includes("offline_access");
-
     res.render("clients/change-user-attributes.njk", {
-        email: email,
-        phone: phone,
-        offline_access: offline_access,
+        selectedUserAttributes: req.query.userAttributes?.toString().split(" "),
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId

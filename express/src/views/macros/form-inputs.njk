@@ -105,7 +105,7 @@
   }) }}
 {% endmacro %}
 
-{% macro checkboxesInput(label, id, items) %}
+{% macro checkboxesInput(label, id, items, checkedItems) %}
   {{ govukCheckboxes({
     fieldset: {
       legend: {
@@ -114,7 +114,8 @@
     } if label,
     id: id,
     name: id,
-    items: items
+    items: items,
+    values: checkedItems
   }) }}
 {% endmacro %}
 
