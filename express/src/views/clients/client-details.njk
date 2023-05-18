@@ -5,6 +5,9 @@
 {% set pageTitle = "Client details" %}
 
 {% set userAttributes %}
+  {% if userAttributesRequired | length == 1 %}
+    None selected
+  {% endif %}
   {% for item in userAttributesRequired %}
     {% if item == "email" %}Email address<br>{% endif %}
     {% if item == "phone" %}Phone number<br>{% endif %}
