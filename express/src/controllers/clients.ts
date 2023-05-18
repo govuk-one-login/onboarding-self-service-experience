@@ -7,13 +7,14 @@ const defaultPublicKey =
 
 export const showClient: RequestHandler = async (req, res) => {
     // TODO make S4 instances static in all controllers
-    const serviceId = req.context.serviceId;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const client = (await s4.listClients(nonNull(serviceId)))[0];
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId);
+    const client = clients[0];
     const selfServiceClientId = client.dynamoServiceId;
     const authClientId = client.authClientId;
     const serviceName = client.serviceName;
-    const redirectUrls = String(client.redirectUris).split(",");
+    const redirectUrls = client.redirectUris;
     const userPublicKey = client.publicKey == defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);
 
     res.render("clients/client-details.njk", {
@@ -51,7 +52,7 @@ export const showClient: RequestHandler = async (req, res) => {
     req.session.updatedField = undefined;
 };
 
-export const showPrivateBetaForm: RequestHandler = async (req, res) => {
+export const showPrivateBetaForm: RequestHandler = (req, res) => {
     res.render("clients/private-beta.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -65,7 +66,7 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
     const userName = req.body.userName;
     const department = req.body.department;
     const serviceName = req.body.serviceName;
-    const emailAddress = req.session.emailAddress;
+    const emailAddress = nonNull(req.session.emailAddress);
     const serviceId = req.context.serviceId;
     const selfServiceClientId = req.params.selfServiceClientId;
     const clientId = req.params.clientId;
@@ -80,7 +81,7 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
     }
 
     if (errorMessages.size > 0) {
-        res.render("clients/private-beta.njk", {
+        return res.render("clients/private-beta.njk", {
             serviceId: serviceId,
             selfServiceClientId: selfServiceClientId,
             clientId: clientId,
@@ -92,17 +93,15 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
                 department: department
             }
         });
-
-        return;
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    await s4.privateBetaRequest(userName, department, serviceName, nonNull(emailAddress));
+    await s4.privateBetaRequest(userName, department, serviceName, emailAddress);
 
     res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/private-beta/submitted`);
 };
 
-export const showPrivateBetaFormSubmitted: RequestHandler = async (req, res) => {
+export const showPrivateBetaFormSubmitted: RequestHandler = (req, res) => {
     res.render("clients/private-beta-form-submitted.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -110,7 +109,7 @@ export const showPrivateBetaFormSubmitted: RequestHandler = async (req, res) => 
     });
 };
 
-export const showProcessChangeServiceNameForm: RequestHandler = async (req, res) => {
+export const showChangeServiceNameForm: RequestHandler = (req, res) => {
     res.render("clients/change-service-name.njk", {
         serviceId: req.context.serviceId,
         values: {
@@ -121,17 +120,15 @@ export const showProcessChangeServiceNameForm: RequestHandler = async (req, res)
 
 export const processChangeServiceNameForm: RequestHandler = async (req, res) => {
     const newServiceName = req.body.serviceName;
-    const serviceId = req.context.serviceId;
+    const serviceId = nonNull(req.context.serviceId);
 
     if (newServiceName === "") {
-        res.render("clients/change-service-name.njk", {
+        return res.render("clients/change-service-name.njk", {
             serviceId: serviceId,
             errorMessages: {
                 serviceName: "Enter your service name"
             }
         });
-
-        return;
     }
 
     const selfServiceClientId = req.params.selfServiceClientId;
@@ -141,7 +138,7 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
     // TODO service_name is the db layer leaking into the domain
     // TODO is this correct? Don't we also need to update the pk:service sk:service entry? We need an updateService call
     await s4.updateClient(
-        nonNull(serviceId),
+        serviceId,
         selfServiceClientId,
         clientId,
         {service_name: newServiceName},
@@ -153,7 +150,7 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
     res.redirect(`/services/${serviceId}/clients`);
 };
 
-export const showProcessChangePublicKeyForm: RequestHandler = async (req, res) => {
+export const showChangePublicKeyForm: RequestHandler = (req, res) => {
     res.render("clients/change-public-key.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -163,14 +160,13 @@ export const showProcessChangePublicKeyForm: RequestHandler = async (req, res) =
 };
 
 export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
-    const publicKey = req.body.authCompliantPublicKey;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
         req.params.selfServiceClientId,
         req.params.clientId,
-        {public_key: publicKey},
+        {public_key: req.body.authCompliantPublicKey},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
 
@@ -178,7 +174,7 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
 
-export const showProcessChangeRedirectUrlsForm: RequestHandler = async (req, res) => {
+export const showChangeRedirectUrlsForm: RequestHandler = (req, res) => {
     res.render("clients/change-redirect-uris.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -205,7 +201,7 @@ export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) =>
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
 
-export const showProcessChangeUserAttributesForm: RequestHandler = async (req, res) => {
+export const showChangeUserAttributesForm: RequestHandler = (req, res) => {
     const userAttributes = nonNull(req.query.userAttributes?.toString()).split(" ");
     const email: boolean = userAttributes.includes("email");
     const phone: boolean = userAttributes.includes("phone");
@@ -223,7 +219,7 @@ export const showProcessChangeUserAttributesForm: RequestHandler = async (req, r
 
 export const processChangeUserAttributesForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const attributes: string[] = ["openid"];
+    const attributes = ["openid"];
 
     if (Array.isArray(req.body.userAttributes)) {
         attributes.push(...req.body.userAttributes);
@@ -243,7 +239,7 @@ export const processChangeUserAttributesForm: RequestHandler = async (req, res) 
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
 
-export const showProcessChangePostLogoutUrisForm: RequestHandler = async (req, res) => {
+export const showChangePostLogoutUrisForm: RequestHandler = (req, res) => {
     res.render("clients/change-post-logout-uris.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,

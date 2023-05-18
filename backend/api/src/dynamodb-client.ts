@@ -8,9 +8,10 @@ import {
     QueryCommand,
     QueryCommandOutput,
     UpdateItemCommand,
+    UpdateItemCommandInput,
     UpdateItemCommandOutput
 } from "@aws-sdk/client-dynamodb";
-import {marshall} from "@aws-sdk/util-dynamodb";
+import {convertToAttr, marshall} from "@aws-sdk/util-dynamodb";
 import * as process from "process";
 import {OnboardingTableItem} from "./onboarding-table-item";
 
@@ -19,7 +20,7 @@ type AttributeNames = {[nameToken: string]: string};
 type AttributeValues = {[valueToken: string]: AttributeValue};
 type Updates = {[attributeName: string]: AttributeData};
 
-class DynamoDbClient {
+export default class DynamoDbClient {
     private static readonly KEYWORD_SUBSTITUTES: {[name: string]: string} = {
         data: "#D"
     };
@@ -41,6 +42,7 @@ class DynamoDbClient {
             TableName: this.tableName,
             Key: marshall({pk: id, sk: id})
         };
+
         const command = new GetItemCommand(params);
         return this.dynamodb.send(command);
     }
@@ -103,7 +105,7 @@ class DynamoDbClient {
     private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: Updates): Promise<UpdateItemCommandOutput> {
         const attributeNames = Object.keys(updates);
 
-        const params = {
+        const params: UpdateItemCommandInput = {
             TableName: this.tableName,
             Key: {
                 pk: {S: `${pkPrefix}#${pk}`},
@@ -131,9 +133,7 @@ class DynamoDbClient {
     }
 
     generateExpressionAttributeValues(attributes: string[], updates: Updates): AttributeValues {
-        return Object.fromEntries(
-            attributes.map(attribute => [this.getAttributeValueLabel(attribute), this.marshallAttribute(updates[attribute])])
-        );
+        return Object.fromEntries(attributes.map(attribute => [this.getAttributeValueLabel(attribute), convertToAttr(updates[attribute])]));
     }
 
     private getAttributeNameAlias(attributeName: string) {
@@ -143,14 +143,4 @@ class DynamoDbClient {
     private getAttributeValueLabel(attributeName: string) {
         return `:${attributeName}`;
     }
-
-    private marshallAttribute(attribute: AttributeData): AttributeValue {
-        if (Array.isArray(attribute)) {
-            return {L: marshall(attribute)} as unknown as AttributeValue.LMember;
-        } else {
-            return marshall(attribute) as unknown as AttributeValue;
-        }
-    }
 }
-
-export default DynamoDbClient;

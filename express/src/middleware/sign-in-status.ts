@@ -1,10 +1,7 @@
-import {RequestHandler} from "express";
+import {NextFunction, Request, RequestHandler, Response} from "express";
 
-export default setSignInStatus();
-
-function setSignInStatus(): RequestHandler {
-    return (req, res, next) => {
-        res.locals.isSignedIn = !!req.session.isSignedIn;
-        next();
-    };
-}
+export default (function setSignInStatus(req: Request, res: Response, next: NextFunction) {
+    // TODO this should be determined by the AuthToken possibly or some other authentication property rather than manually set value
+    res.locals.isSignedIn = !!req.session.isSignedIn;
+    next();
+} satisfies RequestHandler);
