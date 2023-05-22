@@ -1,12 +1,10 @@
 import {strict as assert} from "assert";
 import {Page} from "puppeteer";
-import {FieldName, getFieldElement, getFieldId} from "./inputs";
+import {FieldName, getFieldAttribute, getFieldId} from "./inputs";
 import {XPathQuery} from "./xpath";
 
 export async function checkPasswordValueHidden(page: Page, fieldName: FieldName, shouldBeHidden = true) {
-    const passwordField = await getFieldElement(page, fieldName);
-    const fieldType = await passwordField.evaluate(field => field.type);
-    assert.equal(fieldType, shouldBeHidden ? "password" : "text");
+    assert.equal(await getFieldAttribute(page, fieldName, "type"), shouldBeHidden ? "password" : "text");
 }
 
 export async function checkErrorMessageDisplayedForField(page: Page, fieldName: FieldName, errorMessage: string) {
@@ -15,7 +13,7 @@ export async function checkErrorMessageDisplayedForField(page: Page, fieldName: 
     const messageInSummary = await XPathQuery.create(
         ["div", {attribute: "class", value: "govuk-error-summary"}],
         ["a", {attribute: "href", value: `#${fieldId}`}]
-    ).evaluate(page, element => element.textContent);
+    ).getAttribute(page, "textContent");
 
     assert.equal(messageInSummary, errorMessage, `Expected the text of the error link for the '${fieldId}' field to be '${errorMessage}'`);
 
@@ -23,7 +21,7 @@ export async function checkErrorMessageDisplayedForField(page: Page, fieldName: 
         "p",
         {attribute: "class", value: "govuk-error-message"},
         {attribute: "id", value: `${fieldId}-error`}
-    ]).evaluate(page, element => element.textContent);
+    ]).getAttribute(page, "textContent");
 
     assert.equal(
         messageAboveElement?.trim(),

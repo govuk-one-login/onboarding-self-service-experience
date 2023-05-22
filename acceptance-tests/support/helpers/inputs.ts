@@ -1,6 +1,7 @@
-import {ElementFor, ElementHandle, Page} from "puppeteer";
-import {getElement} from "./elements";
+import {ElementFor, HandleFor, Page} from "puppeteer";
+import {getElement, getElementAttribute} from "./elements";
 import {clickSubmitButton} from "./navigation";
+import {HTMLElementHandle} from "./xpath";
 
 const Fields = {
     name: "userName",
@@ -17,7 +18,7 @@ const Fields = {
 
 export type FieldName = keyof typeof Fields;
 type InputElementTag = keyof Pick<HTMLElementTagNameMap, "input" | "textarea">;
-type InputElement<Tag extends InputElementTag = InputElementTag> = ElementHandle<ElementFor<Tag>>;
+type InputElement<Tag extends InputElementTag = InputElementTag> = HTMLElementHandle<Tag>;
 
 export async function enterTextIntoField(page: Page, fieldName: FieldName, value: string, clearValue = false, tag?: InputElementTag) {
     const field = await getFieldElement(page, fieldName, tag);
@@ -45,7 +46,20 @@ export function getFieldId(fieldName: FieldName) {
 export function getFieldElement(page: Page, fieldName: FieldName): Promise<InputElement<"input">>;
 export function getFieldElement<Tag extends InputElementTag>(page: Page, fieldName: FieldName, tag?: Tag): Promise<InputElement<Tag>>;
 export function getFieldElement<Tag extends InputElementTag>(page: Page, fieldName: FieldName, tag?: Tag) {
-    return getElement(page, Fields[fieldName], tag ?? "input");
+    return getElement(page, getFieldId(fieldName), tag ?? "input");
+}
+
+export function getFieldEl<Tag extends InputElementTag = "input">(page: Page, fieldName: FieldName, tag?: Tag): Promise<InputElement<Tag>> {
+    const el = getElement(page, getFieldId(fieldName), tag ?? "input");
+}
+
+export function getFieldAttribute<Attribute extends keyof Element, Tag extends InputElementTag = "input", Element = ElementFor<Tag>>(
+    page: Page,
+    fieldName: FieldName,
+    attribute: Attribute,
+    tag?: Tag
+): Promise<Element[Attribute]> {
+    return getElementAttribute(page, getFieldId(fieldName), attribute, tag ?? "input");
 }
 
 async function clearField(field: InputElement) {

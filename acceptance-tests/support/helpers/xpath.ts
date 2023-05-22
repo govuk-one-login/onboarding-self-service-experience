@@ -1,4 +1,4 @@
-import {ElementFor, EvaluateFunc, HandleFor, Page} from "puppeteer";
+import {ElementFor, EvaluateFunc, FlattenHandle, HandleFor, Page} from "puppeteer";
 
 export type HTMLTag = keyof HTMLElementTagNameMap;
 export type HTMLElementHandle<Tag extends HTMLTag> = HandleFor<ElementFor<Tag>>;
@@ -32,6 +32,10 @@ export class XPathQuery<Tag extends HTMLTag = HTMLTag> {
 
     async evaluate<Func extends EvaluateFunc<[HTMLElementHandle<Tag>]>>(page: Page, func: Func) {
         return page.evaluate(func, await this.getElement(page));
+    }
+
+    async getAttribute<Attribute extends keyof FlattenHandle<HandleFor<ElementFor<Tag>>>>(page: Page, attribute: Attribute) {
+        return this.evaluate(page, element => element[attribute]);
     }
 
     async getElement(page: Page): Promise<HTMLElementHandle<Tag>> {
