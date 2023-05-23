@@ -94,7 +94,7 @@ sam deploy \
   ${CONFIG:---resolve-s3} \
   ${DISABLE_ROLLBACK_OPTION:---no-disable-rollback} \
   --no-fail-on-empty-changeset \
-  --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+  --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
   ${CONFIRM_OPTION:---confirm-changeset} \
   ${TEMPLATE:+--template "$TEMPLATE"} \
   ${FORCE_UPLOAD:+--force-upload} \
