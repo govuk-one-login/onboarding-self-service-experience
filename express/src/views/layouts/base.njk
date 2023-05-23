@@ -7,6 +7,16 @@
 {% set showTopNav = showTopNav | default(true) %}
 {% set mainClasses = ["govuk-main-wrapper--auto-spacing", mainClasses] | join(" ") %}
 
+{% set phaseTagText  = "test" if showTestBanner else "beta" %}
+{% set phaseBannerClasses  = "test-banner" if showTestBanner %}
+{% set phaseBannerHtml = "This is a test environment." %}
+{% if not showTestBanner %}
+  {% set phaseBannerHtml %}
+    This is a new service – your
+    <a href="https://www.sign-in.service.gov.uk/contact-us" class="govuk-link" rel="noreferrer noopener" target="_blank">feedback (opens in a new tab)</a> will help us improve it.
+  {% endset %}
+{% endif %}
+
 {% block pageTitle %}{% if errorMessages %}Error: {% endif %}{{ pageTitle }} - GOV.UK One Login{% endblock %}
 
 {% block head %}
@@ -26,7 +36,7 @@
 {% endblock %}
 
 {% block header %}
-  <header class="govuk-header" role="banner" data-module="govuk-header" id="top">
+  <header class="govuk-header {{ phaseBannerClasses }}" role="banner" data-module="govuk-header" id="top">
     <div class="govuk-header__container govuk-width-container">
 
       <div class="govuk-header__logo">
@@ -38,7 +48,7 @@
             <span class="govuk-header__logotype-text">GOV.UK</span>
           </span>
           <span class="govuk-header__product-name">
-            One Login admin tool <strong class="govuk-tag govuk-phase-banner__content__tag">beta</strong>
+            One Login admin tool<strong class="govuk-tag govuk-phase-banner__content__tag">{{ phaseTagText }}</strong>
           </span>
         </a>
       </div>
@@ -86,8 +96,9 @@
   </header>
   <div class="govuk-width-container">
     {{ govukPhaseBanner({
-      tag: {text: "beta"},
-      html: 'This is a new service – your <a href="https://www.sign-in.service.gov.uk/contact-us" class="govuk-link" rel="noreferrer noopener" target="_blank">feedback (opens in a new tab)</a> will help us improve it.'
+      tag: {text: phaseTagText},
+      html: phaseBannerHtml,
+      classes: phaseBannerClasses
     }) }}
   </div>
 {% endblock %}

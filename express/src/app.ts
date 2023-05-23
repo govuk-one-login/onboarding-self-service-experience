@@ -1,5 +1,5 @@
 import {static as serveStatic, urlencoded} from "express";
-import {cognito, googleTagId, lambda, port} from "./config/environment";
+import {cognito, googleTagId, lambda, port, showTestBanner} from "./config/environment";
 import Express from "./config/express";
 import {distribution} from "./config/resources";
 import sessionStorage from "./config/session-storage";
@@ -41,5 +41,6 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.locals.googleTagId = googleTagId;
+app.locals.showTestBanner = showTestBanner;
 
 app.listen(port, () => console.log(`Server running; listening on port ${port}`));

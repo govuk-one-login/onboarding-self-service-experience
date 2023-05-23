@@ -26,6 +26,7 @@ jobs:
       app-name-prefix: di-sse-prev
       cognito-client: StubCognitoClient
       lambda-facade: StubLambdaFacade
+      show-test-banner: true
     secrets:
       cf-username: ${{ secrets.CF_USERNAME }}
       cf-password: ${{ secrets.CF_PASSWORD }}
