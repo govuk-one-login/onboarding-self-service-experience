@@ -6,6 +6,11 @@ Parameters:
   TemplateStorageBucket:
     Type: String
     Default: https://template-storage-templatebucket-1upzyw6v9cs42.s3.amazonaws.com
+  ExportNamePrefix:
+    Type: String
+    Default: secure-pipelines
+    AllowedPattern: ^.*[^-]$
+    Description: Prefix to use when importing or exporting values
   EnvironmentType:
     Type: String
     Default: test
@@ -108,19 +113,26 @@ Resources:
         AccessLogsCustomBucketNameEnabled: "No"
 
 Outputs:
-  GitHubIdentityProviderArn:
+  GitHubIdentityProviderARN:
     Condition: IsInitialAccount
     Value: !GetAtt GitHubIdentityProvider.Outputs.GitHubIdentityProviderArn
-  SigningProfileArn:
+  SigningProfileName:
+    Condition: IsInitialAccount
+    Value: !GetAtt CodeSigner.Outputs.SigningProfileName
+  SigningProfileARN:
     Condition: IsInitialAccount
     Value: !GetAtt CodeSigner.Outputs.SigningProfileArn
-  SigningProfileVersionArn:
+  SigningProfileVersionARN:
     Condition: IsInitialAccount
     Value: !GetAtt CodeSigner.Outputs.SigningProfileVersionArn
-  ContainerSignerKmsKeyArn:
+  ContainerSigningKeyARN:
     Condition: IsInitialAccount
     Value: !GetAtt ContainerSigner.Outputs.ContainerSignerKmsKeyArn
   SlackNotificationsStackName:
     Value: !Select [ 1, !Split [ "/", !Ref SlackNotifications ] ]
-  VpcStackName:
+    Export:
+      Name: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
+  VPCStackName:
     Value: !Select [ 1, !Split [ "/", !Ref VPC ] ]
+    Export:
+      Name: !Sub ${ExportNamePrefix}-VPCStackName
