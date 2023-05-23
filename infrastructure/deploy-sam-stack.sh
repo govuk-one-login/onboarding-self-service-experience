@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Utility script to deploy SAM stacks
 set -e
 
 BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
@@ -23,7 +24,7 @@ while [[ -n $1 ]]; do
     -s3 | --prefix | --s3-prefix) shift && S3_PREFIX=$1 ;;
     -f | --template | --template-file) shift && TEMPLATE=$1 ;;
     -a | --account) shift && ACCOUNT=$1 ;;
-    -s | --base-dir) shift && BUILD_BASE_DIR=$1 ;;
+    -s | --base-dir) shift && BUILD_DIR=$1 ;;
     -b | --build) BUILD=true ;;
     -d | --no-build) SKIP_BUILD=true ;;
     -x | --no-deploy) DEPLOY=false ;;
@@ -41,7 +42,7 @@ while [[ -n $1 ]]; do
   shift
 done
 
-"$BASE_DIR"/check-aws-account.sh "${ACCOUNT:-}" 2> /dev/null && CREDS=true || CREDS=false
+"$BASE_DIR"/aws.sh check-current-account "${ACCOUNT:-}" 2> /dev/null && CREDS=true || CREDS=false
 [[ $TEMPLATE ]] && ! [[ -f $TEMPLATE ]] && echo "File '$TEMPLATE' does not exist" && exit 1
 ${SKIP_BUILD:-false} && BUILD=false
 
@@ -77,7 +78,7 @@ if $BUILD; then
   echo "Building${TEMPLATE:+" template '$TEMPLATE'"}..."
   sam build \
     ${TEMPLATE:+--template "$TEMPLATE"} \
-    ${BUILD_BASE_DIR:+--base-dir "$BUILD_BASE_DIR"} \
+    ${BUILD_DIR:+--base-dir "$BUILD_DIR"} \
     ${PARALLEL:+--parallel} \
     ${CACHED:+--cached}
 fi

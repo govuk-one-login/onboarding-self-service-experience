@@ -1,0 +1,28 @@
+{
+  "development": [
+    {
+      "name": "development",
+      "number": 494650018671
+    }
+  ],
+  "testing": [
+    {
+      "name": "build",
+      "number": 399055180839
+    },
+    {
+      "name": "staging",
+      "number": 325730373996
+    }
+  ],
+  "production": [
+    {
+      "name": "integration",
+      "number": 663985455444
+    },
+    {
+      "name": "production",
+      "number": 389946456390
+    }
+  ]
+}
