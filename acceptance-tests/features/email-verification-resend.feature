@@ -17,7 +17,7 @@ Feature: A contact form to resend the verification code to email
   Scenario: The user wants to contact the service
     When they click on the "Not received an email?" link
     And they click on the "support form" link
-    Then they should be directed to the URL "https://www.sign-in.service.gov.uk/support"
+    Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us"
 
   Scenario: The user wants the app to resend their code
     When they click on the "Not received an email?" link
