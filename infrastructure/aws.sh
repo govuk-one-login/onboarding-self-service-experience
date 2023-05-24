@@ -11,8 +11,8 @@ function get-account-group {
   jq --arg name "$1" 'with_entries(select(.value | contains([{name: $name}]))) | flatten' aws-accounts.json
 }
 
-function print-account-names {
-  jq --raw-output 'map(.name) | join(" | ")' < <(get-all-accounts)
+function get-account-number {
+  jq --exit-status --arg name "$1" '.[] | select(.name == $name) | .number' < <(get-all-accounts)
 }
 
 function get-initial-account {
@@ -20,20 +20,37 @@ function get-initial-account {
 }
 
 function get-next-account {
-  get-downstream-accounts "$1" 1
+  get-higher-accounts-in-group "$1" 1
+}
+
+function get-previous-account-name {
+  local name=$1 accounts
+  accounts=$(get-account-group "$name")
+  idx=$(get-account-index-in-group "$accounts" "$name") || return 0
+  jq --raw-output --exit-status ".[$((idx - 1)):$idx] | map(.name) | .[]" <<< "$accounts" || return 0
 }
 
 function get-downstream-accounts {
-  local accounts numbers idx name=$1 num=${2:-}
-  [[ -z $num && $name != $(get-initial-account "$name") ]] && return 0
-  accounts=$(get-account-group "$name")
+  local name=$1 accounts
+  [[ $name == $(get-initial-account "$name") ]] || return 0
+  accounts=$(get-higher-accounts-in-group "$name")
+  echo "${accounts:=$(get-account-number "$name")}"
+}
 
-  idx=$(jq --exit-status --arg name "$name" 'map(.name == $name) | index(true)' <<< "$accounts") || return 0
+function get-account-index-in-group {
+  jq --exit-status --arg name "$2" 'map(.name == $name) | index(true)' <<< "$1"
+}
+
+function get-higher-accounts-in-group {
+  local accounts numbers idx name=$1 num=${2:-}
+  accounts=$(get-account-group "$name")
+  idx=$(get-account-index-in-group "$accounts" "$name") || return 0
 
   start=$((idx + 1))
   [[ $num ]] && end=$(("$start" + "$num"))
+  downstream_accounts=$(jq --exit-status ".[$start:${end:-}] | map(.number) | .[]" <<< "$accounts") || return 0
 
-  mapfile -t numbers < <(jq ".[$start:${end:-}] | map(.number) | .[]" <<< "$accounts")
+  mapfile -t numbers <<< "$downstream_accounts"
   (IFS="," && echo "${numbers[*]}")
 }
 

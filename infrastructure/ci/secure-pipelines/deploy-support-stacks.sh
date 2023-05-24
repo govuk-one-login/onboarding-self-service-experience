@@ -20,12 +20,13 @@ ACCOUNT=$(../../aws.sh get-current-account-name)
 DOWNSTREAM_ACCOUNTS=$(../../aws.sh get-downstream-accounts "$ACCOUNT")
 [[ $ACCOUNT == "production" ]] && ENV_TYPE="production"
 
-GRAFANA_KEY_SECRET_NAME=secure-pipelines-grafana-api-key
-check-grafana-secret $GRAFANA_KEY_SECRET_NAME
+GRAFANA_SECRET=secure-pipelines-grafana-api-key
+check-grafana-secret $GRAFANA_SECRET
 
 ../../deploy-sam-stack.sh "$@" \
   --validate \
   --stack-name deployment-support \
-  --template support-stacks.template.yml \
-  --tags Product="GOV.UK One Login" System="Dev Platform" Service="ci/cd" Owner="Self-Service" Environment="$ACCOUNT" \
-  --parameters EnvironmentType="${ENV_TYPE:-test}" DownstreamAccounts="${DOWNSTREAM_ACCOUNTS:-""}" GrafanaKeySecretName=$GRAFANA_KEY_SECRET_NAME
+  --template deployment-support.template.yml \
+  --tags Product="GOV.UK One Login" System="Dev Platform" Service="ci/cd" Owner="Self-Service Team" Environment="$ACCOUNT" \
+  --parameters EnvironmentType=${ENV_TYPE:-test} DownstreamAccounts="${DOWNSTREAM_ACCOUNTS:-''}" \
+  GrafanaKeySecretName=$GRAFANA_SECRET

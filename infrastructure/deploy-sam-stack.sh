@@ -37,6 +37,7 @@ while [[ -n $1 ]]; do
     --config-file) shift && CONFIG_FILE=$1 ;;
     --config-env) shift && CONFIG_ENV=$1 ;;
     --force-upload) FORCE_UPLOAD=true ;;
+    --no-delete-rollback-complete) DELETE_ON_FAILED_CREATION=false ;;
     *) echo "Unknown option '$1'" && exit 1 ;;
   esac
   shift
@@ -87,6 +88,10 @@ $DEPLOY || exit 0
 $BUILD || [[ -e .aws-sam/build/template.yaml ]] && unset TEMPLATE
 ${NO_CONFIRM:-false} && CONFIRM_OPTION="--no-confirm-changeset"
 ${DISABLE_ROLLBACK:-false} && DISABLE_ROLLBACK_OPTION="--disable-rollback"
+
+STACK_STATE=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query "Stacks[].StackStatus" --output text 2> /dev/null) &&
+  [[ $STACK_STATE == ROLLBACK_COMPLETE ]] && ${DELETE_ON_FAILED_CREATION:-true} &&
+  sam delete --no-prompts --region "$AWS_DEFAULT_REGION" --stack-name "$STACK_NAME"
 
 sam deploy \
   ${STACK_NAME:+--stack-name "$STACK_NAME"} \
