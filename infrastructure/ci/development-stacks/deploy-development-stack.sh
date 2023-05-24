@@ -19,7 +19,7 @@ STACK_PREFIX="$1"
 BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
 pushd "$BASE_DIR" > /dev/null
 
-../../check-aws-account.sh development
+../../aws.sh check-current-account development
 
 cat ./unnecessary-ddb-banner.txt
 
