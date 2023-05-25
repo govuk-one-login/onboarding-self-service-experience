@@ -59,8 +59,10 @@ Resources:
       KeySchema:
         - AttributeName: id
           KeyType: HASH
-
       BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: expires
+        Enabled: true
 
 Outputs:
   TableName:
@@ -73,3 +75,8 @@ Outputs:
     Value: !Ref Sessions
     Export:
       Name: !Sub "${ExportNamePrefix}-AdminToolSessionsTable"
+  SessionsTableArn:
+    Description: Sessions table ARN for session storage
+    Value: !GetAtt Sessions.Arn
+    Export:
+      Name: !Sub "${ExportNamePrefix}-AdminToolSessionsTableArn"
