@@ -1,7 +1,7 @@
 {% extends "layouts/form.njk" %}
 
 {% set pageTitle = "Resend security code" %}
-{% set formButtonText = "Resend security code" %}
+{% set formButtonText = formButtonText | default("Resend security code") %}
 
 {% if securityCodeMethod == "phone" %}
   {% set securityCodeDestination = "mobile phone" %}
