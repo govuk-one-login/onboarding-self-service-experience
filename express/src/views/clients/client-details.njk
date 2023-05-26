@@ -6,6 +6,7 @@
 
 {% set userAttributes %}
   {% for item in userAttributesRequired %}
+    {% if item == "openid" %}OpenID<br>{% endif %}
     {% if item == "email" %}Email address<br>{% endif %}
     {% if item == "phone" %}Phone number<br>{% endif %}
     {% if item == "offline_access" %}Offline access{% endif %}
