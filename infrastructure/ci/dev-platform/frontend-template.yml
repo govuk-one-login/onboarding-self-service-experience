@@ -13,6 +13,11 @@ Parameters:
     Type: String
     Default: ""
     Description: The ARN of the permissions boundary to apply when creating IAM roles
+  ExportNamePrefix:
+    Type: String
+    Default: self-service
+    AllowedPattern: ^.*[^-]$
+    Description: Prefix to use when importing or exporting values from other stacks
 
 Conditions:
   NotDevelopment: !Not [ !Equals [ !Ref Environment, development ] ]
@@ -113,7 +118,22 @@ Resources:
             Condition:
               ArnLike:
                 aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
-      ManagedPolicyArns: [ arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role ]
+      Policies:
+        - PolicyName: DynamoDbActions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Scan
+                  - dynamodb:DescribeTable
+                  - dynamodb:CreateTable
+                  - dynamodb:PutItem
+                Resource:
+                  Fn::ImportValue: !Sub ${ ExportNamePrefix }-AdminToolSessionsTableArn
 
   FrontendAppTaskDefinition:
     Type: AWS::ECS::TaskDefinition
