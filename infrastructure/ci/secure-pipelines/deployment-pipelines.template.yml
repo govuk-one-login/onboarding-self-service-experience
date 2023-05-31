@@ -11,6 +11,12 @@ Parameters:
     Default: secure-pipelines
     AllowedPattern: ^.*[^-]$
     Description: Prefix to use when importing or exporting values
+  StackNamePrefix:
+    Type: String
+    Default: self-service
+    AllowedPattern: ^.*[^-]$
+    MaxLength: 14
+    Description: Prefix applied to the deployed application stack names
   Environment:
     Type: String
   NextAccount:
@@ -25,9 +31,7 @@ Parameters:
     Type: String
   ContainerSigningKeyARN:
     Type: String
-  SlackNotificationType:
-    Type: String
-    Default: Failures
+    Default: none
   APISourceBucketARN:
     Type: String
     Default: none
@@ -47,11 +51,12 @@ Conditions:
   CognitoSourceBucket: !Not [ !Equals [ !Ref CognitoSourceBucketARN, "none" ] ]
   DynamoDBSourceBucket: !Not [ !Equals [ !Ref DynamoDBSourceBucketARN, "none" ] ]
   FrontendSourceBucket: !Not [ !Equals [ !Ref FrontendSourceBucketARN, "none" ] ]
+  IsFinalAccount: !Not [ !Condition PromotionEnabled ]
 
 Resources:
-  API:
+  APIDeployer:
     Type: AWS::CloudFormation::Stack
-    DependsOn: DynamoDB
+    DependsOn: DynamoDBDeployer
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/sam-deploy-pipeline/template.yaml
       Tags:
@@ -59,17 +64,20 @@ Resources:
           Value: Self-Service
         - Key: Service
           Value: Backend
+        - Key: sse:deployment-source
+          Value: secure-pipelines
       Parameters:
         Environment: !Ref Environment
-        SAMStackName: self-service-api
-        SigningProfileArn: !Ref SigningProfileARN
+        SAMStackName: !Sub ${StackNamePrefix}-api
+        TruncatedPipelineStackName: !Sub ${StackNamePrefix}-api
         SigningProfileVersionArn: !Ref SigningProfileVersionARN
+        SigningProfileArn: !Ref SigningProfileARN
         # TODO confirm the API stacks needs this param
         VpcStackName:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-VPCStackName
         BuildNotificationStackName:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
-        SlackNotificationType: !Ref SlackNotificationType
+        SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref APISourceBucketARN
         GitHubRepositoryName: !If [ APISourceBucket, "none", !Ref GitHubRepositoryName ]
         AllowedAccounts: !Ref NextAccount
@@ -81,7 +89,7 @@ Resources:
         AllowedServiceThree: SNS
         AllowedServiceFour: StepFunctions
 
-  Cognito:
+  CognitoDeployer:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/sam-deploy-pipeline/template.yaml
@@ -90,14 +98,17 @@ Resources:
           Value: Self-Service
         - Key: Service
           Value: Authentication
+        - Key: sse:deployment-source
+          Value: secure-pipelines
       Parameters:
         Environment: !Ref Environment
-        SAMStackName: self-service-cognito
-        SigningProfileArn: !Ref SigningProfileARN
+        SAMStackName: !Sub ${StackNamePrefix}-cognito
+        TruncatedPipelineStackName: !Sub ${StackNamePrefix}-cognito
         SigningProfileVersionArn: !Ref SigningProfileVersionARN
+        SigningProfileArn: !Ref SigningProfileARN
         BuildNotificationStackName:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
-        SlackNotificationType: !Ref SlackNotificationType
+        SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref CognitoSourceBucketARN
         GitHubRepositoryName: !If [ CognitoSourceBucket, "none", !Ref GitHubRepositoryName ]
         AllowedAccounts: !Ref NextAccount
@@ -108,7 +119,7 @@ Resources:
         AllowedServiceTwo: Lambda
         AllowedServiceThree: SNS
 
-  DynamoDB:
+  DynamoDBDeployer:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/sam-deploy-pipeline/template.yaml
@@ -117,14 +128,17 @@ Resources:
           Value: Self-Service
         - Key: Service
           Value: Database
+        - Key: sse:deployment-source
+          Value: secure-pipelines
       Parameters:
         Environment: !Ref Environment
-        SAMStackName: self-service-dynamo-db
-        SigningProfileArn: !Ref SigningProfileARN
+        SAMStackName: !Sub ${StackNamePrefix}-dynamodb
+        TruncatedPipelineStackName: !Sub ${StackNamePrefix}-dynamodb
         SigningProfileVersionArn: !Ref SigningProfileVersionARN
+        SigningProfileArn: !Ref SigningProfileARN
         BuildNotificationStackName:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
-        SlackNotificationType: !Ref SlackNotificationType
+        SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref DynamoDBSourceBucketARN
         GitHubRepositoryName: !If [ DynamoDBSourceBucket, "none", !Ref GitHubRepositoryName ]
         AllowedAccounts: !Ref NextAccount
@@ -133,8 +147,9 @@ Resources:
         ProgrammaticPermissionsBoundary: "True"
         AllowedServiceOne: DynamoDB
 
-  Frontend:
+  FrontendDeployer:
     Type: AWS::CloudFormation::Stack
+    DependsOn: DynamoDBDeployer
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/sam-deploy-pipeline/template.yaml
       Tags:
@@ -142,17 +157,20 @@ Resources:
           Value: Self-Service
         - Key: Service
           Value: Frontend
+        - Key: sse:deployment-source
+          Value: secure-pipelines
       Parameters:
         Environment: !Ref Environment
-        SAMStackName: self-service-frontend
-        SigningProfileArn: !Ref SigningProfileARN
-        SigningProfileVersionArn: !Ref SigningProfileVersionARN
+        SAMStackName: !Sub ${StackNamePrefix}-frontend
+        TruncatedPipelineStackName: !Sub ${StackNamePrefix}-frontend
         ContainerSignerKmsKeyArn: !Ref ContainerSigningKeyARN
+        SigningProfileVersionArn: !Ref SigningProfileVersionARN
+        SigningProfileArn: !Ref SigningProfileARN
         VpcStackName:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-VPCStackName
         BuildNotificationStackName:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
-        SlackNotificationType: !Ref SlackNotificationType
+        SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref FrontendSourceBucketARN
         GitHubRepositoryName: !If [ FrontendSourceBucket, "none", !Ref GitHubRepositoryName ]
         AllowedAccounts: !Ref NextAccount
@@ -164,13 +182,13 @@ Resources:
 Outputs:
   APIPromotionBucket:
     Condition: PromotionEnabled
-    Value: !GetAtt API.Outputs.ArtifactPromotionBucketArn
+    Value: !GetAtt APIDeployer.Outputs.ArtifactPromotionBucketArn
   CognitoPromotionBucket:
     Condition: PromotionEnabled
-    Value: !GetAtt Cognito.Outputs.ArtifactPromotionBucketArn
+    Value: !GetAtt CognitoDeployer.Outputs.ArtifactPromotionBucketArn
   DynamoDBPromotionBucket:
     Condition: PromotionEnabled
-    Value: !GetAtt DynamoDB.Outputs.ArtifactPromotionBucketArn
+    Value: !GetAtt DynamoDBDeployer.Outputs.ArtifactPromotionBucketArn
   FrontendPromotionBucket:
     Condition: PromotionEnabled
-    Value: !GetAtt Frontend.Outputs.ArtifactPromotionBucketArn
+    Value: !GetAtt FrontendDeployer.Outputs.ArtifactPromotionBucketArn
