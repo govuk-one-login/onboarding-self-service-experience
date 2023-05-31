@@ -51,6 +51,7 @@ Conditions:
   CognitoSourceBucket: !Not [ !Equals [ !Ref CognitoSourceBucketARN, "none" ] ]
   DynamoDBSourceBucket: !Not [ !Equals [ !Ref DynamoDBSourceBucketARN, "none" ] ]
   FrontendSourceBucket: !Not [ !Equals [ !Ref FrontendSourceBucketARN, "none" ] ]
+  CreateFrontendECRRepo: !Not [ !Condition FrontendSourceBucket ]
   IsFinalAccount: !Not [ !Condition PromotionEnabled ]
 
 Resources:
@@ -178,6 +179,14 @@ Resources:
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
         AllowedServiceOne: ECR & ECS
+
+  FrontendECRRepository:
+    Type: AWS::CloudFormation::Stack
+    Condition: CreateFrontendECRRepo
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/container-image-repository/template.yaml
+      Parameters:
+        PipelineStackName: !Select [ 1, !Split [ "/", !Ref FrontendDeployer ] ]
 
 Outputs:
   APIPromotionBucket:
