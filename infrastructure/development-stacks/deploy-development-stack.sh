@@ -19,11 +19,11 @@ STACK_PREFIX="$1"
 BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
 pushd "$BASE_DIR" > /dev/null
 
-../../aws.sh check-current-account development
+../aws.sh check-current-account development
 
 cat ./unnecessary-ddb-banner.txt
 
-pushd ../../../backend/dynamo-db/
+pushd ../../backend/dynamo-db/
 
 sam build
 sam validate
@@ -38,7 +38,7 @@ popd > /dev/null
 
 cat ./unnecessary-cognito-banner.txt
 
-pushd ../../../backend/cognito/
+pushd ../../backend/cognito/
 
 sam build
 sam validate
@@ -53,7 +53,7 @@ popd > /dev/null
 
 cat ./unnecessary-api-banner.txt
 
-pushd ../../..
+pushd ../..
 
 npm run deploy-api -- --stack-name "${STACK_PREFIX}-api" --no-confirm --parameter-overrides ExportNamePrefix="${STACK_PREFIX}"
 
@@ -63,7 +63,7 @@ EXPORTS=$(aws cloudformation list-exports)
 
 FILTERED=$(echo "$EXPORTS" | jq --arg STACK_PREFIX "$STACK_PREFIX" '.Exports[] | select(.Name | startswith($STACK_PREFIX))')
 
-cd ../../../express
+cd ../../express
 
 FILE=.env."${STACK_PREFIX}"
 
