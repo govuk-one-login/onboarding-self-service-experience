@@ -17,3 +17,6 @@ package*.json           @alphagov/di-sse-sres         @alphagov/di-sse-frontend 
 
 # Acceptance tests
 /acceptance-tests/     	@alphagov/di-sse-frontend     @alphagov/di-sse-approvers
+
+# Content
+/express/src/views/			@alphagov/di-sse-content			@alphagov/di-sse-approvers
