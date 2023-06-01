@@ -6,14 +6,14 @@ import {
     processChangeServiceNameForm,
     processChangeUserAttributesForm,
     processPrivateBetaForm,
+    showChangePostLogoutUrisForm,
+    showChangePublicKeyForm,
+    showChangeRedirectUrlsForm,
+    showChangeServiceNameForm,
+    showChangeUserAttributesForm,
     showClient,
     showPrivateBetaForm,
-    showPrivateBetaFormSubmitted,
-    showProcessChangePostLogoutUrisForm,
-    showProcessChangePublicKeyForm,
-    showProcessChangeRedirectUrlsForm,
-    showProcessChangeServiceNameForm,
-    showProcessChangeUserAttributesForm
+    showPrivateBetaFormSubmitted
 } from "../controllers/clients";
 import convertPublicKeyForAuth from "../middleware/convert-public-key";
 import validateUris from "../middleware/validators/uris-validator";
@@ -27,30 +27,27 @@ router.get("/", showClient);
 // TODO This shouldn't use the clientId - private beta is per service
 router.route("/:clientId/:selfServiceClientId/private-beta").get(showPrivateBetaForm).post(processPrivateBetaForm);
 
-router.get("/:clientId/:selfServiceClientId/private-beta/submitted", showPrivateBetaFormSubmitted);
+router.route("/:clientId/:selfServiceClientId/private-beta/submitted").get(showPrivateBetaFormSubmitted);
 
 // TODO This shouldn't use the clientId - we're changing the service name
-router
-    .route("/:clientId/:selfServiceClientId/change-service-name")
-    .get(showProcessChangeServiceNameForm)
-    .post(processChangeServiceNameForm);
+router.route("/:clientId/:selfServiceClientId/change-service-name").get(showChangeServiceNameForm).post(processChangeServiceNameForm);
 
 router
     .route("/:clientId/:selfServiceClientId/change-public-key")
-    .get(showProcessChangePublicKeyForm)
+    .get(showChangePublicKeyForm)
     .post(convertPublicKeyForAuth, processChangePublicKeyForm);
 
 router
     .route("/:clientId/:selfServiceClientId/change-redirect-uris")
-    .get(showProcessChangeRedirectUrlsForm)
+    .get(showChangeRedirectUrlsForm)
     .post(validateUris("clients/change-redirect-uris.njk"), processChangeRedirectUrlsForm);
 
 router
     .route("/:clientId/:selfServiceClientId/change-user-attributes")
-    .get(showProcessChangeUserAttributesForm)
+    .get(showChangeUserAttributesForm)
     .post(processChangeUserAttributesForm);
 
 router
     .route("/:clientId/:selfServiceClientId/change-post-logout-uris")
-    .get(showProcessChangePostLogoutUrisForm)
+    .get(showChangePostLogoutUrisForm)
     .post(validateUris("clients/change-post-logout-uris.njk"), processChangePostLogoutUrisForm);

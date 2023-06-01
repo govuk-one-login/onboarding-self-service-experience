@@ -1,9 +1,9 @@
 import {RequestHandler} from "express";
 import validate from "../../lib/validators/password-validator";
 
-export default function validatePassword(render: string): RequestHandler {
+export default function validatePassword(render: string, passwordField = "password"): RequestHandler {
     return (req, res, next) => {
-        const result = validate(req.body["password"]);
+        const result = validate(req.body[passwordField]);
 
         if (result.isValid) {
             return next();
@@ -11,10 +11,10 @@ export default function validatePassword(render: string): RequestHandler {
 
         res.render(render, {
             values: {
-                password: req.body["password"]
+                [passwordField]: req.body[passwordField]
             },
             errorMessages: {
-                password: result.errorMessage
+                [passwordField]: result.errorMessage
             }
         });
     };

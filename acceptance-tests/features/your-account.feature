@@ -90,12 +90,13 @@ Feature: A page where users can view and change the details associated with thei
     Scenario: The user tries to change their current password and does not enter any value into any of the two fields
       When they click the Confirm button
       Then the error message "Enter your current password" must be displayed for the current password field
+      Then the error message "Enter your new password" must be displayed for the new password field
 
-    Scenario: The user tries to change their current password and does not enter any value into Enter a new password field
+    Scenario: The user tries to change their current password and does not enter any value for the new password
       When they enter the current password "OldTestPa$$word"
       When they click the Confirm button
       Then the error message "Enter your new password" must be displayed for the new password field
 
-    Scenario: The user tries to change their current password and does not enter any value into Current password field
+    Scenario: The user tries to change their current password and does not enter any value for the current password
       When they submit the new password "NewTestPa$$word"
       Then the error message "Enter your current password" must be displayed for the current password field

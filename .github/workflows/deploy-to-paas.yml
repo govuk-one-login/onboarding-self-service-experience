@@ -12,6 +12,7 @@ on:
       cognito-client: { required: false, type: string, default: CognitoClient }
       lambda-facade: { required: false, type: string, default: LambdaFacade }
       google-tag-id: { required: false, type: string, default: GTM-PFTQ6G2 }
+      show-test-banner: { required: false, type: boolean, default: false }
     secrets:
       cf-username: { required: true }
       cf-password: { required: true }
@@ -58,3 +59,4 @@ jobs:
             cognito-client = ${{ inputs.cognito-client }}
             lambda-facade = ${{ inputs.lambda-facade }}
             google-tag-id = ${{ inputs.google-tag-id }}
+            show-test-banner = ${{ inputs.show-test-banner }}

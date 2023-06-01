@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-
+cd "$(dirname "${BASH_SOURCE[0]}")"
 set -eu
 
 if [[ "$#" -ne 2 || ! "development  build  staging  integration production" =~ ( |^)$1( |$) ]]; then
   echo "Usage: $0 <development | build | staging | integration | production> <email-domain>"
   exit 1
 fi
+
+../../infrastructure/aws.sh check-current-account "$1"
 
 if [[ "$1" == "production" ]]; then
   ACCOUNT=""
@@ -17,10 +19,6 @@ DOMAIN=$2
 HOSTED_ZONE="SignInService""${ACCOUNT}""HostedZone"
 
 export DOMAIN
-BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
-pushd "$BASE_DIR" > /dev/null
-
-../../infrastructure/check-aws-account.sh
 
 check_domain_verified() {
   echo "Checking that $DOMAIN has been verified"
@@ -43,5 +41,3 @@ sam deploy \
   --stack-name sse-email-identity
 
 timeout --foreground 300s bash -c check_domain_verified
-
-popd > /dev/null

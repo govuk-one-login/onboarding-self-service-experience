@@ -1,0 +1,138 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Supporting stacks for secure pipelines
+
+Parameters:
+  # Template reference https://github.com/alphagov/di-devplatform-deploy
+  TemplateStorageBucket:
+    Type: String
+    Default: https://template-storage-templatebucket-1upzyw6v9cs42.s3.amazonaws.com
+  ExportNamePrefix:
+    Type: String
+    Default: secure-pipelines
+    AllowedPattern: ^.*[^-]$
+    Description: Prefix to use when importing or exporting values
+  EnvironmentType:
+    Type: String
+    Default: test
+    AllowedValues: [ test, production ]
+  DownstreamAccounts:
+    Type: String
+    Default: ""
+  GrafanaKeySecretName:
+    Type: String
+    Default: secure-pipelines-grafana-api-key
+
+Mappings:
+  Grafana:
+    test:
+      env: non-prod
+    production:
+      env: prod
+
+Conditions:
+  IsInitialAccount: !Not [ !Equals [ !Ref DownstreamAccounts, "" ] ]
+
+Resources:
+  GitHubIdentityProvider:
+    Type: AWS::CloudFormation::Stack
+    Condition: IsInitialAccount
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/github-identity/template.yaml
+      Parameters:
+        System: Dev Platform
+
+  CodeSigner:
+    Type: AWS::CloudFormation::Stack
+    Condition: IsInitialAccount
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/signer/template.yaml
+      Parameters:
+        System: Dev Platform
+
+  ContainerSigner:
+    Type: AWS::CloudFormation::Stack
+    Condition: IsInitialAccount
+    DependsOn: GitHubIdentityProvider
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/container-signer/template.yaml
+      Parameters:
+        AllowedAccounts: !Ref DownstreamAccounts
+
+  GrafanaMetrics:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/grafana-metrics/template.yaml
+      Parameters:
+        GrafanaEnvironment: !FindInMap [ Grafana, !Ref EnvironmentType, env ]
+
+  # Setting up Grafana key rotation
+  # https://govukverify.atlassian.net/wiki/spaces/PLAT/pages/3467509761/Grafana+key+rotation
+  # https://di-team-manual.london.cloudapps.digital/development-standards-processes/aws-environment-grafana/
+  GrafanaKeyRotator:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/grafana-key-rotation/template.yaml
+      Parameters:
+        GrafanaEnvironment: !FindInMap [ Grafana, !Ref EnvironmentType, env ]
+        GrafanaKeySecretId: !Ref GrafanaKeySecretName
+
+  SlackNotifications:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/build-notifications/template.yaml
+      Parameters:
+        SlackWorkspaceId: T8GT9416G
+        SlackChannelId: C02T6P3NVDX   # di-sse-tech-notifications
+
+  LambdaAuditHook:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/lambda-audit-hook/template.yaml
+
+  InfrastructureAuditHook:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/infrastructure-audit-hook/template.yaml
+
+  APIGatewayLoggingConfig:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/api-gateway-logs/template.yaml
+
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/vpc/template.yaml
+      Parameters:
+        DynamoDBApiEnabled: "Yes"
+        ECRApiEnabled: "Yes"
+        ExecuteApiGatewayEnabled: "Yes"
+        LogsApiEnabled: "Yes"
+        VpcLinkEnabled: "Yes"
+        RestAPIGWVpcLinkEnabled: "Yes"
+        AccessLogsCustomBucketNameEnabled: "No"
+
+Outputs:
+  GitHubIdentityProviderARN:
+    Condition: IsInitialAccount
+    Value: !GetAtt GitHubIdentityProvider.Outputs.GitHubIdentityProviderArn
+  SigningProfileName:
+    Condition: IsInitialAccount
+    Value: !GetAtt CodeSigner.Outputs.SigningProfileName
+  SigningProfileARN:
+    Condition: IsInitialAccount
+    Value: !GetAtt CodeSigner.Outputs.SigningProfileArn
+  SigningProfileVersionARN:
+    Condition: IsInitialAccount
+    Value: !GetAtt CodeSigner.Outputs.SigningProfileVersionArn
+  ContainerSigningKeyARN:
+    Condition: IsInitialAccount
+    Value: !GetAtt ContainerSigner.Outputs.ContainerSignerKmsKeyArn
+  SlackNotificationsStackName:
+    Value: !Select [ 1, !Split [ "/", !Ref SlackNotifications ] ]
+    Export:
+      Name: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
+  VPCStackName:
+    Value: !Select [ 1, !Split [ "/", !Ref VPC ] ]
+    Export:
+      Name: !Sub ${ExportNamePrefix}-VPCStackName

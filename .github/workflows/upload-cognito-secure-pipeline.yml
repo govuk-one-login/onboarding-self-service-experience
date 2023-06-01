@@ -1,4 +1,4 @@
-name: Deploy Cognito stack to devplatform secure pipeline
+name: Upload Cognito to secure pipelines
 
 on:
   workflow_dispatch:

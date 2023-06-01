@@ -22,7 +22,7 @@ Feature: Resending the security code to a mobile phone
   Scenario: The user wants to contact the service
     When they click on the "Problems receiving a text message?" link
     And they click on the "support form" link
-    Then they should be directed to the URL "https://www.sign-in.service.gov.uk/support"
+    Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us"
 
   Scenario: The user wants the app to resend their code
     When they click on the "Problems receiving a text message?" link

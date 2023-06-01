@@ -1,9 +1,8 @@
 import {RequestHandler} from "express";
+import {render} from "../middleware/request-handler";
 
 export const signOut: RequestHandler = (req, res) => {
     req.session.destroy(() => res.redirect("/"));
 };
 
-export const sessionTimeout: RequestHandler = (req, res) => {
-    res.render("session-timeout.njk");
-};
+export const sessionTimeout = render("session-timeout.njk");

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Utility script to deploy SAM stacks
 set -e
 
 BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
@@ -23,7 +24,7 @@ while [[ -n $1 ]]; do
     -s3 | --prefix | --s3-prefix) shift && S3_PREFIX=$1 ;;
     -f | --template | --template-file) shift && TEMPLATE=$1 ;;
     -a | --account) shift && ACCOUNT=$1 ;;
-    -s | --base-dir) shift && BUILD_BASE_DIR=$1 ;;
+    -s | --base-dir) shift && BUILD_DIR=$1 ;;
     -b | --build) BUILD=true ;;
     -d | --no-build) SKIP_BUILD=true ;;
     -x | --no-deploy) DEPLOY=false ;;
@@ -36,12 +37,13 @@ while [[ -n $1 ]]; do
     --config-file) shift && CONFIG_FILE=$1 ;;
     --config-env) shift && CONFIG_ENV=$1 ;;
     --force-upload) FORCE_UPLOAD=true ;;
+    --no-delete-rollback-complete) DELETE_ON_FAILED_CREATION=false ;;
     *) echo "Unknown option '$1'" && exit 1 ;;
   esac
   shift
 done
 
-"$BASE_DIR"/check-aws-account.sh "${ACCOUNT:-}" 2> /dev/null && CREDS=true || CREDS=false
+"$BASE_DIR"/aws.sh check-current-account "${ACCOUNT:-}" 2> /dev/null && CREDS=true || CREDS=false
 [[ $TEMPLATE ]] && ! [[ -f $TEMPLATE ]] && echo "File '$TEMPLATE' does not exist" && exit 1
 ${SKIP_BUILD:-false} && BUILD=false
 
@@ -77,7 +79,7 @@ if $BUILD; then
   echo "Building${TEMPLATE:+" template '$TEMPLATE'"}..."
   sam build \
     ${TEMPLATE:+--template "$TEMPLATE"} \
-    ${BUILD_BASE_DIR:+--base-dir "$BUILD_BASE_DIR"} \
+    ${BUILD_DIR:+--base-dir "$BUILD_DIR"} \
     ${PARALLEL:+--parallel} \
     ${CACHED:+--cached}
 fi
@@ -87,13 +89,17 @@ $BUILD || [[ -e .aws-sam/build/template.yaml ]] && unset TEMPLATE
 ${NO_CONFIRM:-false} && CONFIRM_OPTION="--no-confirm-changeset"
 ${DISABLE_ROLLBACK:-false} && DISABLE_ROLLBACK_OPTION="--disable-rollback"
 
+STACK_STATE=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query "Stacks[].StackStatus" --output text 2> /dev/null) &&
+  [[ $STACK_STATE == ROLLBACK_COMPLETE ]] && ${DELETE_ON_FAILED_CREATION:-true} &&
+  sam delete --no-prompts --region "$AWS_DEFAULT_REGION" --stack-name "$STACK_NAME"
+
 sam deploy \
   ${STACK_NAME:+--stack-name "$STACK_NAME"} \
   ${S3_PREFIX:+--s3-prefix "$S3_PREFIX"} \
   ${CONFIG:---resolve-s3} \
   ${DISABLE_ROLLBACK_OPTION:---no-disable-rollback} \
   --no-fail-on-empty-changeset \
-  --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+  --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
   ${CONFIRM_OPTION:---confirm-changeset} \
   ${TEMPLATE:+--template "$TEMPLATE"} \
   ${FORCE_UPLOAD:+--force-upload} \

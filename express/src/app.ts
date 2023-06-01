@@ -1,6 +1,5 @@
-import bodyParser from "body-parser";
-import express from "express";
-import {cognito, googleTagId, lambda, port} from "./config/environment";
+import {static as serveStatic, urlencoded} from "express";
+import {cognito, googleTagId, lambda, port, showTestBanner} from "./config/environment";
 import Express from "./config/express";
 import {distribution} from "./config/resources";
 import sessionStorage from "./config/session-storage";
@@ -24,11 +23,10 @@ Promise.all([cognitoPromise, lambdaPromise]).then(deps => {
     console.log("Backing service created");
 });
 
-app.use("/assets", express.static(distribution.assets));
-app.use("/assets/images", express.static(distribution.images));
+app.use("/assets", serveStatic(distribution.assets));
+app.use("/assets/images", serveStatic(distribution.images));
 
-app.use(bodyParser.urlencoded({extended: true}));
-
+app.use(urlencoded({extended: true}));
 app.use(sessionStorage);
 app.use(signInStatus);
 
@@ -43,5 +41,6 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.locals.googleTagId = googleTagId;
+app.locals.showTestBanner = showTestBanner;
 
 app.listen(port, () => console.log(`Server running; listening on port ${port}`));

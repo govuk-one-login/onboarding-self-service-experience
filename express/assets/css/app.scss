@@ -257,3 +257,13 @@ code {
   width: 175px;
   height: 175px;
 }
+
+.test-banner {
+  .govuk-tag {
+    color: #594D00;
+    background-color: #FFF7BF;
+  }
+  .govuk-header__container {
+    border-bottom: 10px solid govuk-colour("yellow");
+  }
+}

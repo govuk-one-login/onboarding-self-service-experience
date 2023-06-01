@@ -25,6 +25,7 @@ jobs:
       cf-space-name: self-service-test
       cognito-client: StubCognitoClient
       lambda-facade: StubLambdaFacade
+      show-test-banner: true
       url: https://di-self-service-test.london.cloudapps.digital
     secrets:
       cf-username: ${{ secrets.CF_USERNAME }}
