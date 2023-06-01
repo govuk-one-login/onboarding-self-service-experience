@@ -22,6 +22,9 @@ Parameters:
     Type: String
     Default: ""
     Description: The ARN of the permissions boundary to apply when creating IAM roles [Secure Pipelines]
+  SecurityCodeTextMessageTemplate:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/cognito/security-code-text-message-template
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
@@ -37,6 +40,30 @@ Globals:
         NODE_OPTIONS: --enable-source-maps
 
 Resources:
+  SecurityCodeEncryptionKey:
+    # checkov:skip=CKV_AWS_7: "Ensure rotation for customer created CMKs is enabled"
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: kms:*
+            Resource: "*"
+          - Effect: Allow
+            Principal:
+              Service: cognito-idp.amazonaws.com
+            Action: kms:CreateGrant
+            Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
+
   SendPasswordChangedEmailFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
     # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
@@ -93,6 +120,28 @@ Resources:
             Trigger: CustomMessage
             UserPool: !Ref UserPool
 
+  SecurityCodeTextMessageSender:
+    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    Type: AWS::Serverless::Function
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+    Properties:
+      Handler: src/handlers/security-code-text-message-sender.lambdaHandler
+      Environment:
+        Variables:
+          NOTIFY_API_KEY: "{{resolve:secretsmanager:/self-service/cognito/notify-api-key:SecretString}}"
+          SECURITY_CODE_TEXT_MESSAGE_TEMPLATE: !Ref SecurityCodeTextMessageTemplate
+      Policies:
+        Statement:
+            Effect: Allow
+            Action: kms:Decrypt
+            Resource: !GetAtt SecurityCodeEncryptionKey.Arn
+
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
@@ -132,7 +181,6 @@ Resources:
             MaxLength: 2048
       AutoVerifiedAttributes: [ email ]
       UsernameAttributes: [ email ]
-      SmsVerificationMessage: "{####} is your GOV.UK One Login security code."
       EmailVerificationMessage: |-
         <html>
           <head>
@@ -269,7 +317,6 @@ Resources:
         </html>
       EmailVerificationSubject: Your security code for the GOV.UK One Login Admin Tool
       VerificationMessageTemplate:
-        SmsMessage: "{####} is your GOV.UK One Login security code."
         EmailMessage: |-
           <html>
             <head>
@@ -406,7 +453,6 @@ Resources:
           </html>
         EmailSubject: Your security code for the GOV.UK One Login Admin Tool
         DefaultEmailOption: CONFIRM_WITH_CODE
-      SmsAuthenticationMessage: "{####} is your GOV.UK One Login security code."
       MfaConfiguration: OPTIONAL
       EmailConfiguration:
         EmailSendingAccount: DEVELOPER
@@ -417,13 +463,14 @@ Resources:
         SnsCallerArn: !GetAtt SmsRole.Arn
         ExternalId: !Ref ExternalId
         SnsRegion: !Ref AWS::Region
+      LambdaConfig:
+        CustomSMSSender:
+          LambdaArn: !GetAtt SecurityCodeTextMessageSender.Arn
+          LambdaVersion: V1_0
+        KMSKeyID: !GetAtt SecurityCodeEncryptionKey.Arn
       AdminCreateUserConfig:
         AllowAdminCreateUserOnly: false
         InviteMessageTemplate:
-          SMSMessage: |-
-            {####} is your GOV.UK One Login Admin Tool security code.
-
-            {username}
           EmailMessage: |-
             <html>
               <head>
@@ -599,6 +646,13 @@ Resources:
               Effect: Allow
               Action: sns:publish
               Resource: "*"
+
+  CognitoInvokeSecurityCodeTextMessageSenderPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref SecurityCodeTextMessageSender
+      Principal: "cognito-idp.amazonaws.com"
 
 Outputs:
   UserPoolName:
