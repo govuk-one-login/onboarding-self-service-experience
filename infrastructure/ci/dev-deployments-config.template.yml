@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: AWS infrastructure to deploy self-service local stacks from dev machines and preview stacks from GitHub Actions
+Description: AWS config to deploy self-service local stacks from dev machines and preview stacks from GitHub Actions
 Transform: AWS::LanguageExtensions
 
 Parameters:
@@ -312,3 +312,8 @@ Outputs:
     Value: !GetAtt GitHubActionsRole.Arn
   GitHubDeploymentArtifactsBucket:
     Value: !Ref GitHubDeploymentArtifactsBucket
+  GitHubIdentityProviderARN:
+    Condition: CreateOIDCProvider
+    Value: !Ref GithubOIDCProvider
+    Export:
+      Name: GitHubIdentityProviderArn

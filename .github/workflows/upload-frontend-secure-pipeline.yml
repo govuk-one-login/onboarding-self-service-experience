@@ -20,7 +20,7 @@ jobs:
     environment: build
     needs: build
     env:
-      TEMPLATE: infrastructure/ci/dev-platform/frontend-template.yml
+      TEMPLATE: infrastructure/ci/frontend/frontend.template.yml
 
     permissions:
       id-token: write

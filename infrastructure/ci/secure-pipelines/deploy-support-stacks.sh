@@ -9,7 +9,7 @@ function check-grafana-secret {
     echo "Grafana API key secret with the name '$secret_name' does not exist in Secret Manager"
     while [[ -z ${grafana_key:-} ]]; do read -rp "Enter the value for the initial grafana API key: " grafana_key; done
 
-    if ! aws secretsmanager create-secret --name "$secret_name" --secret-string "$grafana_key"; then
+    if ! aws secretsmanager create-secret --name "$secret_name" --secret-string "$(xargs <<< "$grafana_key")"; then
       echo "Couldn't create secret"
       return 1
     fi
@@ -18,15 +18,15 @@ function check-grafana-secret {
 
 ACCOUNT=$(../../aws.sh get-current-account-name)
 DOWNSTREAM_ACCOUNTS=$(../../aws.sh get-downstream-accounts "$ACCOUNT")
-[[ $ACCOUNT == "production" ]] && ENV_TYPE="production"
+[[ $ACCOUNT =~ ^development|production$ ]] && ENV_TYPE=$ACCOUNT
 
-GRAFANA_SECRET=secure-pipelines-grafana-api-key
+GRAFANA_SECRET=/self-service/secure-pipelines/grafana-api-key
 check-grafana-secret $GRAFANA_SECRET
 
 ../../deploy-sam-stack.sh "$@" \
   --validate \
-  --stack-name deployment-support \
+  --stack-name secure-pipelines-support \
   --template deployment-support.template.yml \
   --tags Product="GOV.UK One Login" System="Dev Platform" Service="ci/cd" Owner="Self-Service Team" Environment="$ACCOUNT" \
-  --parameters EnvironmentType=${ENV_TYPE:-test} DownstreamAccounts="${DOWNSTREAM_ACCOUNTS:-''}" \
+  --parameters EnvironmentType="${ENV_TYPE:-test}" DownstreamAccounts="${DOWNSTREAM_ACCOUNTS:-''}" \
   GrafanaKeySecretName=$GRAFANA_SECRET
