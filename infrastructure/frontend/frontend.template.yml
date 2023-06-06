@@ -360,7 +360,7 @@ Resources:
           !Sub ${VpcStackName}-VpcId
 
 
-  frontendWebAcl:
+  FrontendWebAcl:
     Type: 'AWS::WAFv2::WebACL'
     Properties:
       Description: Web ACL for Frontend API Gateway
@@ -494,11 +494,11 @@ Resources:
         - !GetAtt WAFLoggingKmsKey.Arn
         - !Ref AWS::NoValue
 
-  webAcllogging:
+  WebAclLogging:
     Type: 'AWS::WAFv2::LoggingConfiguration'
     Properties:
       ResourceArn: !GetAtt
-        - frontendWebAcl
+        - FrontendWebAcl
         - Arn
       LogDestinationConfigs:
         - !GetAtt cloudwatchLogsGroup.Arn
@@ -547,7 +547,7 @@ Resources:
     Type: AWS::WAFv2::WebACLAssociation
     Properties: 
       ResourceArn: !Ref ApiGwHttpEndpoint
-      WebACLArn: !Ref frontendWebAcl
+      WebACLArn: !Ref FrontendWebAcl
 
 Outputs:
   SseFrontUrl:
