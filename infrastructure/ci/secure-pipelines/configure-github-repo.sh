@@ -17,12 +17,10 @@ function update-subject-claim-template {
   gh api $api_path
 }
 
-function get-support-stacks-outputs {
-  ../../aws.sh get-stack-outputs secure-pipelines-support SigningProfileName ContainerSigningKeyARN
-}
-
-function get-secure-pipelines-outputs {
-  ../../aws.sh get-stack-outputs secure-pipelines DeploymentRoleArn ArtifactSourceBucketName FrontendECRRepositoryName
+function update-deployment-environment {
+  write-github-actions-variables \
+    "$(../../aws.sh get-stack-outputs secure-pipelines-support SigningProfileName ContainerSigningKeyARN)" \
+    "$(../../aws.sh get-stack-outputs secure-pipelines DeploymentRoleArn ArtifactSourceBucketName FrontendECRRepositoryName)"
 }
 
 function check-deployment-environment-config {
@@ -31,24 +29,17 @@ function check-deployment-environment-config {
   gh api --method PUT "$api_path" --input - < <(jq '{deployment_branch_policy: .}' <<< "${policy:-null}") > /dev/null
 }
 
-function update-deployment-environment {
-  local account outputs env
-  account=$(../../aws.sh get-current-account-name)
-  ../../aws.sh is-initial-account "$account" || exit
-
-  outputs=$(get-support-stacks-outputs || echo "")$(get-secure-pipelines-outputs || echo "")
-  [[ $outputs ]] || exit
+function write-github-actions-variables {
+  local outputs=$* account env repo_id api_path name variable value current_value
+  [[ $(xargs <<< "$outputs") ]]
+  account=$(../../aws.sh is-initial-account)
 
   env=$account-secure-pipelines
-  echo "➡ Updating GitHub Actions deployment environment '$env'"
-  check-deployment-environment-config "$env"
-  write-github-actions-variables "$env" "$outputs"
-}
-
-function write-github-actions-variables {
-  local env=$1 outputs=${*:2} repo_id api_path name variable value current_value
   repo_id=$(gh api "/repos/{owner}/{repo}" --jq .id)
   api_path=/repositories/$repo_id/environments/$env/variables
+
+  echo "➡ Updating GitHub Actions deployment environment '$env'"
+  check-deployment-environment-config "$env"
 
   for name in $(jq --raw-output '.name' <<< "$outputs"); do
     value=$(jq --raw-output --arg name "$name" 'select(.name == $name) | .value' <<< "$outputs")

@@ -22,6 +22,7 @@ function get-initial-account {
 function is-initial-account {
   local name=${1:-$(get-current-account-name)}
   [[ $name == $(get-initial-account "$name") ]]
+  echo "$name"
 }
 
 function get-next-account {
