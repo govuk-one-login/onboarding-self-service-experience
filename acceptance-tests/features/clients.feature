@@ -9,27 +9,38 @@ Feature: Users can update clients
     When they click on the "Test Service" link
     Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
 
-  Rule: The user updates their public key
+  Rule: The user adds their public key for the first time
     Scenario: They user submits a valid public key with headers
-      Given they click on the link that points to "/change-public-key"
+      Given the public key has not been added yet by the user
+      Then they click on the link that points to "/change-public-key"
       And they submit a valid public key with headers
       Then they should be redirected to a page with the path starting with "/services"
       And they should see the text "You have changed your public key"
+      And they are able see their public key
       When they click on the link that points to "/change-public-key"
       Then they should see the public key they just entered
 
-    Scenario: The user submits a valid public key with extra text
-      Given they click on the link that points to "/change-public-key"
-      And they submit a valid public key with extra text
+  Rule: The user updates their public key by entering it in different formats
+    Scenario Outline: The user submits a valid public key <keyVersion>
+      Given they are able see their public key
+      Then they click on the link that points to "/change-public-key"
+      And they submit a valid public key <keyVersion>
       Then they should be redirected to a page with the path starting with "/services"
       And they should see the text "You have changed your public key"
+      And they are able see their public key
       When they click on the link that points to "/change-public-key"
       Then they should see the public key they just entered
 
-    Scenario: The user submits a valid public key without headers
-      Given they click on the link that points to "/change-public-key"
-      And they submit a valid public key without headers
+      Examples:
+        | keyVersion      |
+        | with extra text |
+        | without headers |
+
+  Rule: The user updates their public key with different one
+    Scenario: They user submits a different valid public key with headers
+      Given they are able see their public key
+      Then they click on the link that points to "/change-public-key"
+      And they submit a valid public key with different value
       Then they should be redirected to a page with the path starting with "/services"
       And they should see the text "You have changed your public key"
-      When they click on the link that points to "/change-public-key"
-      Then they should see the public key they just entered
+      And they are able see the updated value for public key

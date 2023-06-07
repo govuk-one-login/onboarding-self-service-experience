@@ -25,18 +25,22 @@ ${publicKeyWithHeaders}
 this text after the end line is not a part of the public key;
 `.trim();
 
-Given("they submit a valid public key with headers", async function () {
-    await enterTextIntoTextInput(this.page, publicKeyWithHeaders, "serviceUserPublicKey");
-    await clickSubmitButton(this.page);
-});
+const publicKey2 = `
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCxkqfYJp2cqfmFB63DkqI6AC8m
+pjiZj6tN54SVKHVAOJ5EBiz9tsFfv7f5C8Ck4LPvbYbrqeNwBMRzi6eki5Jsn2LM
+i4xPt3HFvs5aMmCSAa22rDpoo2R2bSLkpWXRa91VfrIC1Q2GzepW4VfHS+SV5wQK
+RtlswrYQW59AfWQcdQIDAQAB
+`.trim();
 
-Given("they submit a valid public key with extra text", async function () {
-    await enterTextIntoTextInput(this.page, publicKeyWithExtraText, "serviceUserPublicKey");
-    await clickSubmitButton(this.page);
-});
+const keys = {
+    "without headers": publicKey,
+    "with headers": publicKeyWithHeaders,
+    "with extra text": publicKeyWithExtraText,
+    "with different value": publicKey2
+};
 
-Given("they submit a valid public key without headers", async function () {
-    await enterTextIntoTextInput(this.page, publicKey, "serviceUserPublicKey");
+Given("they submit a valid public key {}", async function (keyValue) {
+    await enterTextIntoTextInput(this.page, keys[keyValue as keyof typeof keys], "serviceUserPublicKey");
     await clickSubmitButton(this.page);
 });
 
@@ -44,4 +48,19 @@ Then("they should see the public key they just entered", async function (this: T
     const publicKeySpan = await this.page.$("p#current-public-key");
     const publicKey = await this.page.evaluate(element => element?.textContent, publicKeySpan);
     assert.equal(publicKey?.replace(/\n/g, "").trim(), publicKey?.replace(/\n/g, ""));
+});
+
+Given("the public key has not been added yet by the user", async function (this: TestContext) {
+    const keyContainerContent = await this.page.$eval("#publicKeyContainer", element => element.textContent);
+    assert.equal(keyContainerContent?.trim(), "Not yet added");
+});
+
+Then("they are able see their public key", async function (this: TestContext) {
+    const keyContainerContent = await this.page.$eval("#publicKeyLong", element => element.textContent);
+    assert.equal(keyContainerContent, publicKey.replace(/\n/g, ""));
+});
+
+Then("they are able see the updated value for public key", async function (this: TestContext) {
+    const keyContainerContent = await this.page.$eval("#publicKeyLong", element => element.textContent);
+    assert.equal(keyContainerContent, publicKey2.replace(/\n/g, ""));
 });

@@ -74,5 +74,5 @@ router
         });
     })
     .post((req, res) => {
-        res.redirect("change-phone-number/enter-text-code");
+        res.redirect("enter-text-code");
     });

@@ -24,3 +24,4 @@ Feature: Change your service name
   Scenario: The user User has changed their mind
     When they click on the "Cancel" link
     Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
+    And they should see the text "Test Service"
