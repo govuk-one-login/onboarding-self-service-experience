@@ -15,7 +15,7 @@ exports.handler = async (event: PostConfirmationConfirmForgotPassword): Promise<
 };
 
 async function run(toAddress: string) {
-    const sendEmailCommand = createSendEmailCommand(toAddress, process.env.FROM_EMAIL_ADDRESS as string);
+    const sendEmailCommand = createSendEmailCommand(toAddress, process.env.FROM_ADDRESS as string);
 
     try {
         return await client.send(sendEmailCommand);

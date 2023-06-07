@@ -34,7 +34,7 @@ Conditions:
 
 Globals:
   Function:
-    Timeout: 100
+    Timeout: 10
     Runtime: nodejs18.x
     CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
     PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]

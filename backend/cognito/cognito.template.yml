@@ -1,24 +1,24 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Cognito UserPool and Client
+Description: Cognito UserPool and Client for the Admin Tool
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
   ExternalId:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /self-service/config/cognito/external-id
-  PermissionsBoundary:
-    Type: String
-    Default: ""
-    Description: The ARN of the permissions boundary to apply when creating IAM roles [Secure Pipeline]
-  CodeSigningConfigArn:
-    Type: String
-    Default: ""
-    Description: The ARN of the code signing configuration resource to use [Secure Pipeline]
+    Default: /self-service/cognito/external-id
   ExportNamePrefix:
     Type: String
     Default: self-service
     AllowedPattern: ^.*[^-]$
     Description: Prefix to use when importing or exporting values from other stacks
+  CodeSigningConfigArn:
+    Type: String
+    Default: ""
+    Description: The ARN of the code signing configuration to use for lambdas [Secure Pipelines]
+  PermissionsBoundary:
+    Type: String
+    Default: ""
+    Description: The ARN of the permissions boundary to apply when creating IAM roles [Secure Pipelines]
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
@@ -26,43 +26,39 @@ Conditions:
 
 Globals:
   Function:
-    Timeout: 100
+    Timeout: 10
     Runtime: nodejs18.x
-    CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
     PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
 
 Resources:
-
-  confirmForgotPasswordCustomMessage:
+  SendPasswordChangedEmailFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
     # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
     # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
     # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
     Properties:
+      Handler: src/handlers/send-password-changed-email.handler
+      Description: Send an email to confirm the user's password has been changed
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Environment:
+        Variables:
+          FROM_ADDRESS: !Sub [ "admin-tool@${emailDomain}", { emailDomain: !ImportValue EmailDomain } ]
       Policies:
-        - Version: '2012-10-17'
+        - Version: 2012-10-17
           Statement:
-            Sid: 'AuthorizeFromAddress'
             Effect: Allow
             Action:
-              - 'ses:SendEmail'
-              - 'ses:SendRawEmail'
+              - ses:SendEmail
+              - ses:SendRawEmail
             Resource: !ImportValue EmailIdentityArn
             Condition:
               StringEquals:
-                "ses:FromAddress": !Sub ['admin-tool@${emailDomain}', {emailDomain: !ImportValue EmailDomain}]
-      Environment:
-        Variables:
-          FROM_EMAIL_ADDRESS: !Sub ['admin-tool@${emailDomain}', {emailDomain: !ImportValue EmailDomain}]
-
-      Handler: src/handlers/confirm-forgot-password-message.handler
-      Runtime: nodejs14.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
-      Description: Sending confirmation email on confirm forgot password.
+                ses:FromAddress: !Sub [ "admin-tool@${emailDomain}", { emailDomain: !ImportValue EmailDomain } ]
       Events:
         Cognito:
           Type: Cognito
@@ -70,44 +66,26 @@ Resources:
             Trigger: PostConfirmation
             UserPool: !Ref UserPool
 
-    Metadata: # Manage esbuild properties
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: "es2020"
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/confirm-forgot-password-message.ts
-
-  passwordResetCustomMessage:
+  CreatePasswordResetMessageFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
     # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
     # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
     # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
     Properties:
-      Handler: src/handlers/password-reset-custom-message.handler
-      Runtime: nodejs14.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
-      Description: Customised email message on forgot password.
+      Handler: src/handlers/create-password-reset-message.handler
+      Description: Create a customised email message to send when resetting the user's password
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Events:
         Cognito:
           Type: Cognito
           Properties:
             Trigger: CustomMessage
             UserPool: !Ref UserPool
-
-    Metadata: # Manage esbuild properties
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: "es2020"
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/password-reset-custom-message.ts
 
   UserPool:
     Type: AWS::Cognito::UserPool
@@ -127,29 +105,27 @@ Resources:
           Mutable: false
           Required: true
           StringAttributeConstraints:
-            MinLength: "1"
-            MaxLength: "2048"
+            MinLength: 1
+            MaxLength: 2048
         - Name: email
           AttributeDataType: String
           DeveloperOnlyAttribute: false
           Mutable: true
           Required: false
           StringAttributeConstraints:
-            MinLength: "0"
-            MaxLength: "2048"
+            MinLength: 0
+            MaxLength: 2048
         - Name: phone_number
           AttributeDataType: String
           DeveloperOnlyAttribute: false
           Mutable: true
           Required: false
           StringAttributeConstraints:
-            MinLength: "0"
-            MaxLength: "2048"
-      AutoVerifiedAttributes:
-        - email
-      UsernameAttributes:
-        - email
-      SmsVerificationMessage: '{####} is your GOV.UK One Login security code.'
+            MinLength: 0
+            MaxLength: 2048
+      AutoVerifiedAttributes: [ email ]
+      UsernameAttributes: [ email ]
+      SmsVerificationMessage: "{####} is your GOV.UK One Login security code."
       EmailVerificationMessage: |-
         <html>
           <head>
@@ -284,15 +260,15 @@ Resources:
             </table>
           </body>
         </html>
-      EmailVerificationSubject: Your security code for the GOV.UK One Login admin tool
+      EmailVerificationSubject: Your security code for the GOV.UK One Login Admin Tool
       VerificationMessageTemplate:
-        SmsMessage: '{####} is your GOV.UK One Login security code.'
+        SmsMessage: "{####} is your GOV.UK One Login security code."
         EmailMessage: |-
           <html>
             <head>
               <meta name="viewport" content="width=device-width, initial-scale=1.0" />
               <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-              <title>Your security code for the GOV.UK One Login admin tool</title>
+              <title>Your security code for the GOV.UK One Login Admin Tool</title>
               <style>
                 body {
                   -webkit-font-smoothing: antialiased;
@@ -372,7 +348,7 @@ Resources:
                             font-size: 24px;
                             line-height: 32px;
                             color: white;
-                            "> One Login admin tool <strong style="display: inline-block;
+                            "> One Login Admin Tool <strong style="display: inline-block;
                                 outline: 2px solid transparent;
                                 outline-offset: -2px;
                                 color: #ffffff;
@@ -421,24 +397,24 @@ Resources:
               </table>
             </body>
           </html>
-        EmailSubject: Your security code for the GOV.UK One Login admin tool
+        EmailSubject: Your security code for the GOV.UK One Login Admin Tool
         DefaultEmailOption: CONFIRM_WITH_CODE
-      SmsAuthenticationMessage: '{####} is your GOV.UK One Login security code.'
+      SmsAuthenticationMessage: "{####} is your GOV.UK One Login security code."
       MfaConfiguration: OPTIONAL
       EmailConfiguration:
         EmailSendingAccount: DEVELOPER
         SourceArn: !ImportValue EmailIdentityArn
-        From: !Sub ['admin-tool@${emailDomain}', {emailDomain: !ImportValue EmailDomain}]
+        From: !Sub [ "admin-tool@${emailDomain}", { emailDomain: !ImportValue EmailDomain } ]
+      # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
       SmsConfiguration:
         SnsCallerArn: !GetAtt SmsRole.Arn
         ExternalId: !Ref ExternalId
-        SnsRegion: eu-west-2
-      UserPoolTags: { }
+        SnsRegion: !Ref AWS::Region
       AdminCreateUserConfig:
         AllowAdminCreateUserOnly: false
         InviteMessageTemplate:
           SMSMessage: |-
-            {####} is your GOV.UK One Login security code.
+            {####} is your GOV.UK One Login Admin Tool security code.
 
             {username}
           EmailMessage: |-
@@ -446,7 +422,7 @@ Resources:
               <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-                <title>Your security code for the GOV.UK One Login admin tool</title>
+                <title>Your security code for the GOV.UK One Login Admin Tool</title>
                 <style>
                   body {
                     -webkit-font-smoothing: antialiased;
@@ -526,7 +502,7 @@ Resources:
                               font-size: 24px;
                               line-height: 32px;
                               color: white;
-                              "> One Login admin tool <strong style="display: inline-block;
+                              "> One Login Admin Tool <strong style="display: inline-block;
                                   outline: 2px solid transparent;
                                   outline-offset: -2px;
                                   color: #ffffff;
@@ -576,7 +552,7 @@ Resources:
                       </table>
               </body>
             </html>
-          EmailSubject: Your security code for the GOV.UK One Login admin tool
+          EmailSubject: Your security code for the GOV.UK One Login Admin Tool
       UsernameConfiguration:
         CaseSensitive: false
       AccountRecoverySetting:
@@ -584,7 +560,7 @@ Resources:
           - Priority: 1
             Name: verified_email
 
-  Client:
+  UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       UserPoolId: !Ref UserPool
@@ -592,39 +568,37 @@ Resources:
         - ALLOW_ADMIN_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
 
+  # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
   SmsRole:
     Type: AWS::IAM::Role
     Properties:
       PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
-          - Effect: "Allow"
+          - Effect: Allow
+            Action: sts:AssumeRole
             Principal:
-              Service: "cognito-idp.amazonaws.com"
+              Service: cognito-idp.amazonaws.com
             Condition:
               StringEquals:
-                "sts:ExternalId": !Ref ExternalId
-            Action: "sts:AssumeRole"
+                sts:ExternalId: !Ref ExternalId
+                aws:SourceAccount: !Ref AWS::AccountId
       Policies:
-        - PolicyName: !Sub "${AWS::StackName}-SnsPublishPolicy"
+        - PolicyName: !Sub ${AWS::StackName}-SnsPublishPolicy
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: 2012-10-17
             Statement:
-              Effect: "Allow"
-              Action: "sns:publish"
-              Resource:
-                "*"
+              Effect: Allow
+              Action: sns:publish
+              Resource: "*"
 
 Outputs:
   UserPoolName:
-    Description: User Pool generated for this stack
     Value: !Ref UserPool
     Export:
-      Name: !Sub "${ExportNamePrefix}-CognitoUserPool"
-
-  ClientId:
-    Description: ID for the client attached to the user pool
-    Value: !Ref Client
+      Name: !Sub ${ExportNamePrefix}-CognitoUserPoolName
+  UserPoolClientId:
+    Value: !Ref UserPoolClient
     Export:
-      Name: !Sub "${ExportNamePrefix}-CognitoUserPoolClient"
+      Name: !Sub ${ExportNamePrefix}-CognitoUserPoolClientID
