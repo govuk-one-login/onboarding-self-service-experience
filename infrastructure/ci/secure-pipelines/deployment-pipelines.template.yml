@@ -46,13 +46,12 @@ Parameters:
     Default: none
 
 Conditions:
-  PromotionEnabled: !Not [ !Equals [ !Ref NextAccount, "" ] ]
-  APISourceBucket: !Not [ !Equals [ !Ref APISourceBucketARN, "none" ] ]
-  CognitoSourceBucket: !Not [ !Equals [ !Ref CognitoSourceBucketARN, "none" ] ]
-  DynamoDBSourceBucket: !Not [ !Equals [ !Ref DynamoDBSourceBucketARN, "none" ] ]
-  FrontendSourceBucket: !Not [ !Equals [ !Ref FrontendSourceBucketARN, "none" ] ]
-  CreateFrontendECRRepo: !Not [ !Condition FrontendSourceBucket ]
   IsFinalAccount: !Not [ !Condition PromotionEnabled ]
+  PromotionEnabled: !Not [ !Equals [ !Ref NextAccount, "" ] ]
+  APIRepositorySource: !Equals [ !Ref APISourceBucketARN, "none" ]
+  CognitoRepositorySource: !Equals [ !Ref CognitoSourceBucketARN, "none" ]
+  DynamoDBRepositorySource: !Equals [ !Ref DynamoDBSourceBucketARN, "none" ]
+  FrontendRepositorySource: !Equals [ !Ref FrontendSourceBucketARN, "none" ]
 
 Resources:
   APIDeployer:
@@ -80,7 +79,7 @@ Resources:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
         SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref APISourceBucketARN
-        GitHubRepositoryName: !If [ APISourceBucket, "none", !Ref GitHubRepositoryName ]
+        GitHubRepositoryName: !If [ APIRepositorySource, !Ref GitHubRepositoryName, "none" ]
         AllowedAccounts: !Ref NextAccount
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
@@ -111,7 +110,7 @@ Resources:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
         SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref CognitoSourceBucketARN
-        GitHubRepositoryName: !If [ CognitoSourceBucket, "none", !Ref GitHubRepositoryName ]
+        GitHubRepositoryName: !If [ CognitoRepositorySource, !Ref GitHubRepositoryName, "none" ]
         AllowedAccounts: !Ref NextAccount
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
@@ -141,7 +140,7 @@ Resources:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
         SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref DynamoDBSourceBucketARN
-        GitHubRepositoryName: !If [ DynamoDBSourceBucket, "none", !Ref GitHubRepositoryName ]
+        GitHubRepositoryName: !If [ DynamoDBRepositorySource, !Ref GitHubRepositoryName, "none" ]
         AllowedAccounts: !Ref NextAccount
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
@@ -173,7 +172,7 @@ Resources:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
         SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref FrontendSourceBucketARN
-        GitHubRepositoryName: !If [ FrontendSourceBucket, "none", !Ref GitHubRepositoryName ]
+        GitHubRepositoryName: !If [ FrontendRepositorySource, !Ref GitHubRepositoryName, "none" ]
         AllowedAccounts: !Ref NextAccount
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
@@ -182,13 +181,14 @@ Resources:
 
   FrontendECRRepository:
     Type: AWS::CloudFormation::Stack
-    Condition: CreateFrontendECRRepo
+    Condition: FrontendRepositorySource
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/container-image-repository/template.yaml
       Parameters:
         PipelineStackName: !Select [ 1, !Split [ "/", !Ref FrontendDeployer ] ]
 
 Outputs:
+  # Promotion
   APIPromotionBucket:
     Condition: PromotionEnabled
     Value: !GetAtt APIDeployer.Outputs.ArtifactPromotionBucketArn
@@ -201,3 +201,32 @@ Outputs:
   FrontendPromotionBucket:
     Condition: PromotionEnabled
     Value: !GetAtt FrontendDeployer.Outputs.ArtifactPromotionBucketArn
+
+  # Deployment
+  APIDeploymentRoleArn:
+    Condition: APIRepositorySource
+    Value: !GetAtt APIDeployer.Outputs.GitHubActionsRoleArn
+  APIArtifactSourceBucketName:
+    Condition: APIRepositorySource
+    Value: !GetAtt APIDeployer.Outputs.GitHubArtifactSourceBucketName
+  CognitoDeploymentRoleArn:
+    Condition: CognitoRepositorySource
+    Value: !GetAtt CognitoDeployer.Outputs.GitHubActionsRoleArn
+  CognitoArtifactSourceBucketName:
+    Condition: CognitoRepositorySource
+    Value: !GetAtt CognitoDeployer.Outputs.GitHubArtifactSourceBucketName
+  DynamoDBDeploymentRoleArn:
+    Condition: DynamoDBRepositorySource
+    Value: !GetAtt DynamoDBDeployer.Outputs.GitHubActionsRoleArn
+  DynamoDBArtifactSourceBucketName:
+    Condition: DynamoDBRepositorySource
+    Value: !GetAtt DynamoDBDeployer.Outputs.GitHubArtifactSourceBucketName
+  FrontendDeploymentRoleArn:
+    Condition: FrontendRepositorySource
+    Value: !GetAtt FrontendDeployer.Outputs.GitHubActionsRoleArn
+  FrontendArtifactSourceBucketName:
+    Condition: FrontendRepositorySource
+    Value: !GetAtt FrontendDeployer.Outputs.GitHubArtifactSourceBucketName
+  FrontendECRRepositoryName:
+    Condition: FrontendRepositorySource
+    Value: !GetAtt FrontendECRRepository.Outputs.ContainerRepositoryName

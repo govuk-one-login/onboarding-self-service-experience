@@ -19,6 +19,11 @@ function get-initial-account {
   jq --raw-output '.[0] | .name' < <(get-account-group "$1")
 }
 
+function is-initial-account {
+  local name=${1:-$(get-current-account-name)}
+  [[ $name == $(get-initial-account "$name") ]]
+}
+
 function get-next-account {
   get-higher-accounts-in-group "$1" 1
 }
@@ -89,6 +94,18 @@ function check-current-account {
   fi
 
   echo "» You're in the '$account' account"
+}
+
+function get-stack-outputs {
+  local stack=$1 selectors=${*:2} selector query outputs
+
+  for selector in $selectors; do
+    query+="${query:+ || }contains(OutputKey, '$selector')"
+  done
+
+  query=${query:+?${query}}
+  outputs=$(aws cloudformation describe-stacks --stack-name "$stack" --query "Stacks[0].Outputs[$query]" 2> /dev/null)
+  [[ $outputs != null ]] && [[ $outputs != "[]" ]] && jq 'map({name: .OutputKey, value: .OutputValue}) | .[]' <<< "$outputs"
 }
 
 "$@"
