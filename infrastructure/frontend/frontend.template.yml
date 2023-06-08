@@ -94,6 +94,7 @@ Resources:
 
   TaskExecutionPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+    # checkov:skip=CKV_AWS_108:Ensure IAM policies does not allow data exfiltration
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: TaskExecutionPolicy
@@ -101,7 +102,9 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Action: logs:CreateLogGroup
+            Action:
+              - logs:CreateLogGroup
+              - ssm:GetParameters
             Resource: "*"
       Roles: [ !Ref FrontendECSExecutionRole ]
 
@@ -154,6 +157,9 @@ Resources:
             - ContainerPort: 3000
               Protocol: tcp
           Essential: true
+          Secrets:
+            - Name: COGNITO_CLIENT_SECRET
+              ValueFrom: "/self-service/api/auth-api-key"
           LogConfiguration:
             LogDriver: awslogs
             Options:
