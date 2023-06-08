@@ -299,11 +299,11 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
       Description: Assumes a cross-account role and invokes the Auth register lambda
-      KmsKeyArn: !Ref EnvironmentEncryptionKey
+      KmsKeyArn: !GetAtt EnvironmentEncryptionKey.Arn
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
-          AUTH_API_KEY: "{{resolve:ssm:/self-service/api/auth-api-key}}"
+          AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/auth-api-key}}"
       Policies:
         - Statement:
             - Effect: Allow
@@ -311,7 +311,7 @@ Resources:
                 - "kms:Decrypt"
                 - "kms:Encrypt"
               Resource:
-                - !Ref EnvironmentEncryptionKey
+                - !GetAtt EnvironmentEncryptionKey.Arn
 
   UpdateAuthClientFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
@@ -326,11 +326,11 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
       Description: Updates a client using an HTTP endpoint
-      KmsKeyArn: !Ref EnvironmentEncryptionKey
+      KmsKeyArn: !GetAtt EnvironmentEncryptionKey.Arn
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
-          AUTH_API_KEY: "{{resolve:ssm:/self-service/api/auth-api-key}}"
+          AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/auth-api-key}}"
       Policies:
         - Statement:
             - Effect: Allow
@@ -338,7 +338,7 @@ Resources:
                 - "kms:Decrypt"
                 - "kms:Encrypt"
               Resource:
-                - !Ref EnvironmentEncryptionKey
+                - !GetAtt EnvironmentEncryptionKey.Arn
 
   EnvironmentEncryptionKey:
     Type: AWS::KMS::Key
@@ -355,8 +355,8 @@ Resources:
               AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action: kms:*
             Resource: '*'
-      KeySpec: ECC_NIST_P256
-      KeyUsage: SIGN_VERIFY
+      KeySpec: SYMMETRIC_DEFAULT
+      KeyUsage: ENCRYPT_DECRYPT
 
   EnvironmentEncryptionKeyAlias:
     Type: AWS::KMS::Alias
