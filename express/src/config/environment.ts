@@ -6,7 +6,8 @@ export const showTestBanner = process.env.SHOW_TEST_BANNER === "true";
 export const cognito = {
     client: process.env.COGNITO_CLIENT ?? "CognitoClient",
     userPoolId: process.env.USERPOOL_ID,
-    clientId: process.env.CLIENT_ID
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.COGNITO_CLIENT_SECRET
 };
 
 export const lambda = {
