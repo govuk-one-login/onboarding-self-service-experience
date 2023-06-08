@@ -356,7 +356,7 @@ Resources:
             Action: kms:*
             Resource: '*'
       KeySpec: ECC_NIST_P256
-      KeyUsage: ENCRYPT_DECRYPT
+      KeyUsage: SIGN_VERIFY
 
   EnvironmentEncryptionKeyAlias:
     Type: AWS::KMS::Alias
