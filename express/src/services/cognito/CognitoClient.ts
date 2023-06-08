@@ -38,12 +38,14 @@ class CognitoClient implements CognitoInterface {
     private readonly userPoolId;
     private readonly clientId;
     private readonly client;
+    private readonly clientSecret;
 
     constructor() {
         console.log("Creating Cognito client...");
 
         this.clientId = nonNull(cognito.clientId);
         this.userPoolId = nonNull(cognito.userPoolId);
+        this.clientSecret = nonNull(cognito.clientSecret);
 
         this.client = new CognitoIdentityProviderClient({
             endpoint: "https://cognito-idp.eu-west-2.amazonaws.com",
