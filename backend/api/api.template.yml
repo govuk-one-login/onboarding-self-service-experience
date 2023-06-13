@@ -9,11 +9,16 @@ Parameters:
     Description: API Gateway endpoint for client registration
   NotificationEmail:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /self-service/config/api/notification-email
+    Default: /self-service/api/notification-email
     Description: Email address to send internal notifications
   LogGroupNamePrefix:
     Type: String
     Default: /aws/vendedlogs
+  ExportNamePrefix:
+    Type: String
+    Default: self-service
+    AllowedPattern: ^.*[^-]$
+    Description: Prefix to use when importing or exporting values from other application stacks
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -22,11 +27,6 @@ Parameters:
     Type: String
     Default: ""
     Description: The ARN of the code signing configuration resource to use [Secure Pipeline]
-  ExportNamePrefix:
-    Type: String
-    Default: self-service
-    AllowedPattern: ^.*[^-]$
-    Description: Prefix to use when importing or exporting values from other stacks
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
@@ -36,7 +36,6 @@ Globals:
   Function:
     Timeout: 10
     Runtime: nodejs18.x
-    CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
     PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
     Environment:
       Variables:
@@ -65,14 +64,15 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-user.getUserHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Events:
         Api:
           Type: HttpApi
@@ -93,14 +93,15 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-user.putUserHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Events:
         Api:
           Type: HttpApi
@@ -121,15 +122,16 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/update-user.updateUserHandler
-      Description: Updates user data in DynamoDB (without touching Cognito)
+      Description: Updates user data in DynamoDB
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Events:
         Api:
           Type: HttpApi
@@ -152,14 +154,15 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-services.getServicesHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Environment:
         Variables:
           TABLE:
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Events:
         Api:
           Type: HttpApi
@@ -180,14 +183,15 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service.putServiceHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
 
   #--- Service clients ---#
 
@@ -203,14 +207,15 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-service-clients.getServiceClientsHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Events:
         Api:
           Type: HttpApi
@@ -231,14 +236,15 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service-client.putServiceClientHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
 
   UpdateServiceClientFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
@@ -252,14 +258,15 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/update-service-client.updateServiceClientHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
 
   #--- Service users ---#
 
@@ -275,14 +282,15 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service-user.putServiceUserHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
       Environment:
         Variables:
           TABLE:
-              Fn::ImportValue: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
 
   #--- Auth clients ---#
 
@@ -298,7 +306,8 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
-      Description: Assumes a cross-account role and invokes the Auth register lambda
+      Description: Assumes a cross-account role and invokes the Auth register Lambda
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       KmsKeyArn: !GetAtt EnvironmentEncryptionKey.Arn
       Environment:
         Variables:
@@ -326,6 +335,7 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
       Description: Updates a client using an HTTP endpoint
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       KmsKeyArn: !GetAtt EnvironmentEncryptionKey.Arn
       Environment:
         Variables:
@@ -379,6 +389,7 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/step-functions/new-service.newServiceHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref NewServiceStepFunction
@@ -408,6 +419,7 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/step-functions/new-client.newClientHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref NewClientStepFunction
@@ -437,6 +449,7 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: backend/api/src/handlers/step-functions/update-client.doUpdateClientHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref UpdateClientStepFunction
@@ -567,6 +580,7 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/notifications/send-private-beta-notification.privateBetaRequestHandler
       Description: Publish a message to the private beta request notification topic
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Environment:
         Variables:
           SNS_TOPIC_ARN: !Ref NotificationsSnsTopic
@@ -594,7 +608,5 @@ Outputs:
   # SAM Serverless Function implicit API resources
   # https://github.com/aws/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   SelfServiceApiBaseUrl:
-    Description: API Gateway base URL of the self-service backend endpoints
+    Description: API Gateway base URL of the Self-Service backend endpoints
     Value: !Sub ${SelfServiceApi.ApiEndpoint}/${SelfServiceApi.Stage}
-    Export:
-      Name: !Sub "${ExportNamePrefix}-SelfServiceApiBaseUrl"
