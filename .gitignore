@@ -105,5 +105,7 @@ dist
 
 .idea/
 **/*.iml
+
+# SAM
 **/.aws-sam
-**/*samconfig.toml
+**/samconfig.toml
