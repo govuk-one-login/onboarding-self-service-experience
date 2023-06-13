@@ -36,21 +36,14 @@ jobs:
     secrets:
       aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
 
-  build-api-lambdas:
+  build-api:
     name: Build
-    uses: ./.github/workflows/build-api-lambdas.yml
-    permissions:
-      id-token: write
-      contents: read
-    with:
-      environment: development
-    secrets:
-      aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
+    uses: ./.github/workflows/build-api.yml
 
   deploy-api-preview-aws:
     name: Preview
-    needs: build-api-lambdas
-    uses: ./.github/workflows/deploy-api-lambdas.yml
+    needs: build-api
+    uses: ./.github/workflows/deploy-api.yml
     permissions:
       id-token: write
       contents: read

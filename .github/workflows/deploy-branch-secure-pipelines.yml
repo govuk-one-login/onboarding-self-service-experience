@@ -11,8 +11,32 @@ permissions:
   contents: read
 
 jobs:
-  upload:
-    name: AWS
-    uses: ./.github/workflows/upload-to-secure-pipelines.yml
+  build-cognito:
+    name: Build
+    uses: ./.github/workflows/build-cognito.yml
+
+  upload-cognito:
+    name: Upload
+    needs: build-cognito
+    uses: ./.github/workflows/upload-cognito-package.yml
     with:
       environment: development-secure-pipelines
+      artifact-name: ${{ needs.build-cognito.outputs.artifact-name }}
+
+  upload-dynamodb:
+    name: Upload
+    uses: ./.github/workflows/upload-dynamodb-package.yml
+    with:
+      environment: development-secure-pipelines
+
+  build-api:
+    name: Build
+    uses: ./.github/workflows/build-api.yml
+
+  upload-api:
+    name: Upload
+    needs: [ build-api, upload-dynamodb ]
+    uses: ./.github/workflows/upload-api-package.yml
+    with:
+      environment: development-secure-pipelines
+      artifact-name: ${{ needs.build-api.outputs.artifact-name }}

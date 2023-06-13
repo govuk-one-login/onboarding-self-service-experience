@@ -36,7 +36,7 @@ jobs:
       - name: Get distribution artifact
         uses: actions/download-artifact@v3
         with:
-          name: self-service-api
+          name: api-sam
 
       - name: Assume AWS Role
         uses: aws-actions/configure-aws-credentials@v2
