@@ -308,19 +308,10 @@ Resources:
       Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
       Description: Assumes a cross-account role and invokes the Auth register Lambda
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      KmsKeyArn: !GetAtt EnvironmentEncryptionKey.Arn
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
           AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/auth-api-key}}"
-      Policies:
-        - Statement:
-            - Effect: Allow
-              Action:
-                - "kms:Decrypt"
-                - "kms:Encrypt"
-              Resource:
-                - !GetAtt EnvironmentEncryptionKey.Arn
 
   UpdateAuthClientFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
@@ -336,44 +327,10 @@ Resources:
       Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
       Description: Updates a client using an HTTP endpoint
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      KmsKeyArn: !GetAtt EnvironmentEncryptionKey.Arn
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
           AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/auth-api-key}}"
-      Policies:
-        - Statement:
-            - Effect: Allow
-              Action:
-                - "kms:Decrypt"
-                - "kms:Encrypt"
-              Resource:
-                - !GetAtt EnvironmentEncryptionKey.Arn
-
-  EnvironmentEncryptionKey:
-    Type: AWS::KMS::Key
-    # checkov:skip=CKV_AWS_7: "Ensure rotation for customer created CMKs is enabled"
-    Properties:
-      Description: Lambda environment variable encryption key
-      Enabled: TRUE
-      KeyPolicy:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: Enable IAM User Permissions
-            Effect: Allow
-            Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-            Action: kms:*
-            Resource: '*'
-      KeySpec: SYMMETRIC_DEFAULT
-      KeyUsage: ENCRYPT_DECRYPT
-
-  EnvironmentEncryptionKeyAlias:
-    Type: AWS::KMS::Alias
-    Properties:
-      AliasName: alias/api-lambda-environment-encryption-key
-      TargetKeyId: !Ref EnvironmentEncryptionKey
-
 
   #--- Step Functions ---#
 
