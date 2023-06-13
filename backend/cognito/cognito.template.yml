@@ -6,11 +6,14 @@ Parameters:
   ExternalId:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/cognito/external-id
+  DeletionProtection:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/config/deletion-protection-enabled
   ExportNamePrefix:
     Type: String
     Default: self-service
     AllowedPattern: ^.*[^-]$
-    Description: Prefix to use when importing or exporting values from other stacks
+    Description: Prefix to use when importing or exporting values from other application stacks
   CodeSigningConfigArn:
     Type: String
     Default: ""
@@ -55,7 +58,7 @@ Resources:
             Action:
               - ses:SendEmail
               - ses:SendRawEmail
-            Resource: !ImportValue EmailIdentityArn
+            Resource: !ImportValue EmailIdentityARN
             Condition:
               StringEquals:
                 ses:FromAddress: !Sub [ "admin-tool@${emailDomain}", { emailDomain: !ImportValue EmailDomain } ]
@@ -90,6 +93,7 @@ Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
+      DeletionProtection: !Ref DeletionProtection
       Policies:
         PasswordPolicy:
           MinimumLength: 6
@@ -157,7 +161,7 @@ Resources:
                 color: black;
               }
 
-              .norrmal-text {
+              .normal-text {
                 font-family: Arial;
                 font-size: 18px;
                 font-weight: 400;
@@ -247,11 +251,11 @@ Resources:
                           </tbody>
                         </table>
                         <div style="margin-top: 40px;"></div>
-                        <p class="norrmal-text">Your security code is: </p>
+                        <p class="normal-text">Your security code is: </p>
                         <p class="bold-text">{####}</p>
-                        <p class="norrmal-text">The code will expire after 15 minutes.</p>
-                        <p class="norrmal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> One Login account: </p>
-                        <p class="norrmal-text">If you did not use this email address to create an account, you can ignore this email.</p>
+                        <p class="normal-text">The code will expire after 15 minutes.</p>
+                        <p class="normal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> One Login account: </p>
+                        <p class="normal-text">If you did not use this email address to create an account, you can ignore this email.</p>
                       </td>
                     </tr>
                   </table>
@@ -294,7 +298,7 @@ Resources:
                   color: black;
                 }
 
-                .norrmal-text {
+                .normal-text {
                   font-family: Arial;
                   font-size: 18px;
                   font-weight: 400;
@@ -384,11 +388,11 @@ Resources:
                             </tbody>
                           </table>
                           <div style="margin-top: 40px;"></div>
-                          <p class="norrmal-text">Your security code is: </p>
+                          <p class="normal-text">Your security code is: </p>
                           <p class="bold-text">{####}</p>
-                          <p class="norrmal-text">The code will expire after 15 minutes.</p>
-                          <p class="norrmal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> One Login account: </p>
-                          <p class="norrmal-text">If you did not use this email address to create an account, you can ignore this email.</p>
+                          <p class="normal-text">The code will expire after 15 minutes.</p>
+                          <p class="normal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> One Login account: </p>
+                          <p class="normal-text">If you did not use this email address to create an account, you can ignore this email.</p>
                         </td>
                       </tr>
                     </table>
@@ -403,7 +407,7 @@ Resources:
       MfaConfiguration: OPTIONAL
       EmailConfiguration:
         EmailSendingAccount: DEVELOPER
-        SourceArn: !ImportValue EmailIdentityArn
+        SourceArn: !ImportValue EmailIdentityARN
         From: !Sub [ "admin-tool@${emailDomain}", { emailDomain: !ImportValue EmailDomain } ]
       # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
       SmsConfiguration:
@@ -448,7 +452,7 @@ Resources:
                     color: black;
                   }
 
-                  .norrmal-text {
+                  .normal-text {
                     font-family: Arial;
                     font-size: 18px;
                     font-weight: 400;
@@ -538,12 +542,12 @@ Resources:
                               </tbody>
                             </table>
                             <div style="margin-top: 40px;"></div>
-                            <p class="norrmal-text">Your security code is: </p>
+                            <p class="normal-text">Your security code is: </p>
                             <p class="bold-text">{####}</p>
-                            <p class="norrmal-text">The code will expire after 15 minutes.</p>
-                            <p class="norrmal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> One Login account: </p>
-                            <p class="norrmal-text"> <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">{username} </a></p>
-                            <p class="norrmal-text">If you did not use this email address to create an account, you can ignore this email.</p>
+                            <p class="normal-text">The code will expire after 15 minutes.</p>
+                            <p class="normal-text"> It will confirm the email address for your <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">GOV.UK</a> One Login account: </p>
+                            <p class="normal-text"> <a style="word-wrap:break-word;color:#1d70b8" href="GOV.UK" target="_blank" data-saferedirecturl="GOV.UK ">{username} </a></p>
+                            <p class="normal-text">If you did not use this email address to create an account, you can ignore this email.</p>
                           </span>
                         </tr>
                       </table>
