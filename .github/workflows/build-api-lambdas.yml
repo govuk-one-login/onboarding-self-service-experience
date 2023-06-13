@@ -1,11 +1,9 @@
-name: Build API lambdas
+name: Build API Lambdas
 
 on:
   workflow_call:
     inputs:
       environment: { required: true, type: string }
-    secrets:
-      aws-role-arn: { required: true }
 
 concurrency:
   group: build-api-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
@@ -37,7 +35,6 @@ jobs:
       - name: Build self-service API
         uses: alphagov/di-github-actions/sam/build-application@5dacba941def444d69f02843feaebed79b5fca51
         with:
-          aws-role-arn: ${{ secrets.aws-role-arn }}
           sam-template-file: infrastructure/api/sse-api.yml
           base-dir: ${{ github.workspace }}
 

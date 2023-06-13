@@ -1,82 +1,76 @@
-AWSTemplateFormatVersion: 2010-09-09
-Description: DynamoDB table for di-onboarding-self-service-experience
-Transform:
-  - AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: "2010-09-09"
+Description: DynamoDB tables for Admin Tool
+Transform: AWS::Serverless-2016-10-31
 
 Parameters:
+  DeletionProtection:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/config/deletion-protection-enabled
   ExportNamePrefix:
     Type: String
     Default: self-service
     AllowedPattern: ^.*[^-]$
-    Description: Prefix to use when importing or exporting values from other stacks
+    Description: Prefix to use when importing or exporting values from other application stacks
+
+Conditions:
+  DeletionProtectionEnabled: !Equals [ !Ref DeletionProtection, ACTIVE ]
 
 Resources:
-  Table:
+  DataTable:
     # checkov:skip=CKV_AWS_28: "Ensure Dynamodb point in time recovery (backup) is enabled"
     # checkov:skip=CKV_AWS_119: "Ensure DynamoDB Tables are encrypted using a KMS Customer Managed CMK"
     Type: AWS::DynamoDB::Table
     Properties:
       TableClass: STANDARD
+      BillingMode: PAY_PER_REQUEST
+      DeletionProtectionEnabled: !If [ DeletionProtectionEnabled, true, false ]
       AttributeDefinitions:
-        -
-          AttributeName: pk
+        - AttributeName: pk
           AttributeType: S
-        -
-          AttributeName: sk
+        - AttributeName: sk
           AttributeType: S
       KeySchema:
-        -
-          AttributeName: pk
+        - AttributeName: pk
           KeyType: HASH
-        -
-          AttributeName: sk
+        - AttributeName: sk
           KeyType: RANGE
-
-      BillingMode: PAY_PER_REQUEST
-
       GlobalSecondaryIndexes:
-        -
-          IndexName: gsi1
+        - IndexName: gsi1
           KeySchema:
-            -
-              AttributeName: sk
+            - AttributeName: sk
               KeyType: HASH
-            -
-              AttributeName: pk
+            - AttributeName: pk
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
 
-  Sessions:
+  SessionsTable:
     # checkov:skip=CKV_AWS_28: "Ensure Dynamodb point in time recovery (backup) is enabled"
     # checkov:skip=CKV_AWS_119: "Ensure DynamoDB Tables are encrypted using a KMS Customer Managed CMK"
     Type: AWS::DynamoDB::Table
     Properties:
       TableClass: STANDARD
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
       KeySchema:
         - AttributeName: id
           KeyType: HASH
-      BillingMode: PAY_PER_REQUEST
       TimeToLiveSpecification:
         AttributeName: expires
         Enabled: true
 
 Outputs:
-  TableName:
-    Description: TableName generated for this stack
-    Value: !Ref Table
+  DataTableName:
+    Value: !Ref DataTable
     Export:
-      Name: !Sub "${ExportNamePrefix}-AdminToolDataTable"
+      Name: !Sub ${ExportNamePrefix}-DataTableName
   SessionsTableName:
-    Description: Sessions table name for session storage
-    Value: !Ref Sessions
+    Value: !Ref SessionsTable
     Export:
-      Name: !Sub "${ExportNamePrefix}-AdminToolSessionsTable"
+      Name: !Sub ${ExportNamePrefix}-SessionsTableName
   SessionsTableArn:
-    Description: Sessions table ARN for session storage
-    Value: !GetAtt Sessions.Arn
+    Value: !GetAtt SessionsTable.Arn
     Export:
-      Name: !Sub "${ExportNamePrefix}-AdminToolSessionsTableArn"
+      Name: !Sub ${ExportNamePrefix}-SessionsTableArn

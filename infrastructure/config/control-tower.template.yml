@@ -1,9 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Config to enable Control Tower in self-service AWS accounts
+Description: Config to enable Control Tower in Self-Service AWS accounts
 
 Resources:
   ControlTowerAccessRole:
     Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       RoleName: AWSControlTowerExecution
       ManagedPolicyArns: [ arn:aws:iam::aws:policy/AdministratorAccess ]

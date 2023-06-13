@@ -1,7 +1,10 @@
-name: Deploy branch with secure pipelines
+name: Deploy secure pipelines preview
 run-name: Upload to AWS [${{ github.head_ref || github.ref_name }}]
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
 
 permissions:
   id-token: write
@@ -9,7 +12,7 @@ permissions:
 
 jobs:
   upload:
-    name: Upload
+    name: AWS
     uses: ./.github/workflows/upload-to-secure-pipelines.yml
     with:
       environment: development-secure-pipelines
