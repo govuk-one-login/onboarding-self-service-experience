@@ -57,7 +57,7 @@ function write-github-actions-variables {
     gh api --method POST "$api_path" -f name="$variable" -f value="$value" > /dev/null
   done
 
-  echo "--- $env ---"
+  echo "--- Variables ---"
   gh api "$api_path" --jq '.variables | map([.name, .value] | join(": ")) | .[]'
 }
 

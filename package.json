@@ -8,14 +8,16 @@
     "express"
   ],
   "scripts": {
-    "build": "npm run build -w express",
+    "build-express": "npm run build -w express",
     "build-docker": "npm run build-docker -w express --",
-    "build-api": "npm run build -w backend/api --",
-    "deploy-api": "npm run deploy -w backend/api --",
-    "test": "jest --silent",
+    "build": "infrastructure/dev/deploy.sh --no-deploy",
+    "deploy": "infrastructure/dev/deploy.sh",
+    "docker": "npm run docker -w express --",
     "local": "npm run local -w express",
     "dev": "npm run dev -w express",
-    "docker": "npm run docker -w express --",
+    "aws": "npm run remote --",
+    "remote": "infrastructure/dev/deploy.sh run",
+    "test": "jest --silent",
     "cucumber": "npm run cucumber -w acceptance-tests --"
   },
   "dependencies": {

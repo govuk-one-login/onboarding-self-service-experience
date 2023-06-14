@@ -601,7 +601,7 @@ Outputs:
   UserPoolName:
     Value: !Ref UserPool
     Export:
-      Name: !Sub ${ExportNamePrefix}-CognitoUserPoolName
+      Name: !Sub ${ExportNamePrefix}-CognitoUserPoolID
   UserPoolClientId:
     Value: !Ref UserPoolClient
     Export:

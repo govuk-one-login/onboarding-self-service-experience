@@ -6,5 +6,5 @@ set -eu
   --validate \
   --account development \
   --stack-name dev-deployments-config \
-  --template dev-deployments-config.template.yml \
+  --template deployment-config.template.yml \
   --tags sse:stack-type=config sse:stack-role=deployment

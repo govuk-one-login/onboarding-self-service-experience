@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Utility script to deploy SAM stacks
+BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
 set -e
 
-BASE_DIR="$(dirname "${BASH_SOURCE[0]}")"
 OPTION_REGEX="^--?.*"
+BUILD=false
+DEPLOY=true
 
 while [[ -n $1 ]]; do
   case $1 in
@@ -24,7 +26,7 @@ while [[ -n $1 ]]; do
     -s3 | --prefix | --s3-prefix) shift && S3_PREFIX=$1 ;;
     -f | --template | --template-file) shift && TEMPLATE=$1 ;;
     -a | --account) shift && ACCOUNT=$1 ;;
-    -s | --base-dir) shift && BUILD_DIR=$1 ;;
+    -s | --base-dir) shift && SAM_BASE_DIR=$1 ;;
     -b | --build) BUILD=true ;;
     -d | --no-build) SKIP_BUILD=true ;;
     -x | --no-deploy) DEPLOY=false ;;
@@ -43,14 +45,11 @@ while [[ -n $1 ]]; do
   shift
 done
 
-"$BASE_DIR"/aws.sh check-current-account "${ACCOUNT:-}" 2> /dev/null && CREDS=true || CREDS=false
+$DEPLOY && ! "$BASE_DIR"/aws.sh check-current-account "${ACCOUNT:-}" 2> /dev/null &&
+  echo "Authenticate to${ACCOUNT:+" the '$ACCOUNT' account in"} AWS before deploying the stack" && exit 1
+
 [[ $TEMPLATE ]] && ! [[ -f $TEMPLATE ]] && echo "File '$TEMPLATE' does not exist" && exit 1
 ${SKIP_BUILD:-false} && BUILD=false
-
-: ${BUILD:=false}
-: ${DEPLOY:=true}
-
-$DEPLOY && ! $CREDS && echo "Authenticate to${ACCOUNT:+" the '$ACCOUNT' account in"} AWS before deploying the stack" && exit 1
 export AWS_DEFAULT_REGION=eu-west-2
 
 if $DEPLOY; then
@@ -71,15 +70,15 @@ fi
 
 if $BUILD || ${VALIDATE:-false}; then
   echo "Validating template..."
-  $CREDS && sam validate ${TEMPLATE:+--template "$TEMPLATE"}
+  sam validate ${TEMPLATE:+--template "$TEMPLATE"}
   sam validate ${TEMPLATE:+--template "$TEMPLATE"} --lint
 fi
 
 if $BUILD; then
   echo "Building${TEMPLATE:+" template '$TEMPLATE'"}..."
   sam build \
-    ${TEMPLATE:+--template "$TEMPLATE"} \
-    ${BUILD_DIR:+--base-dir "$BUILD_DIR"} \
+    ${TEMPLATE:+--template $TEMPLATE} \
+    ${SAM_BASE_DIR:+--base-dir $SAM_BASE_DIR} \
     ${PARALLEL:+--parallel} \
     ${CACHED:+--cached}
 fi

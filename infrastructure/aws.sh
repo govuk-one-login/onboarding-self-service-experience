@@ -62,19 +62,29 @@ function get-higher-accounts-in-group {
 
 function get-current-account-name {
   local account_number account
-  account_number=$(get-current-account-number "$@") || exit $?
+  account_number=$(get-current-account-number "$@") || exit
   account=$(jq --raw-output ".[] | select(.number == $account_number) | .name" < <(get-all-accounts))
   [[ $account ]] && echo "$account" && return
   echo "Unknown account number: $account_number" >&2 && return 1
 }
 
-function get-current-account-number {
-  aws sts get-caller-identity --query "Account" --output text 2> /dev/null && return
+function get-caller-identity {
+  aws sts get-caller-identity 2> /dev/null && return
 
   local target=${1:-}
   echo "Valid AWS credentials were not found in the environment" >&2
   echo "Authenticate to${target:+" the '$target' account in"} AWS and try again" >&2
   return 255
+}
+
+function get-current-account-number {
+  local identity
+  identity=$(get-caller-identity "$@") || exit
+  jq --raw-output ".Account" <<< "$identity"
+}
+
+function get-user-name {
+  [[ $(get-caller-identity "$@" | jq --raw-output ".Arn") =~ assumed-role\/([a-zA-z.]+) ]] && echo "${BASH_REMATCH[1]}"
 }
 
 function check-current-account {
@@ -109,4 +119,5 @@ function get-stack-outputs {
   [[ $outputs != null ]] && [[ $outputs != "[]" ]] && jq 'map({name: .OutputKey, value: .OutputValue}) | .[]' <<< "$outputs"
 }
 
-"$@"
+[[ $* ]] || check-current-account "$@"
+[[ $* ]] && "$@"

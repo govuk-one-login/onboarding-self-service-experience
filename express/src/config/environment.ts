@@ -5,17 +5,16 @@ export const showTestBanner = process.env.SHOW_TEST_BANNER === "true";
 
 export const cognito = {
     client: process.env.COGNITO_CLIENT ?? "CognitoClient",
-    userPoolId: process.env.USERPOOL_ID,
-    clientId: process.env.CLIENT_ID
+    userPoolId: process.env.COGNITO_USER_POOL_ID,
+    clientId: process.env.COGNITO_CLIENT_ID
 };
 
-export const lambda = {
+export const api = {
     facade: process.env.LAMBDA_FACADE ?? "LambdaFacade",
-    apiBaseUrl: process.env.API_BASE_URL
+    baseUrl: process.env.API_BASE_URL
 };
 
 export const sessionStorage = {
-    store: process.env.SESSION_STORAGE,
     tableName: process.env.SESSIONS_TABLE,
     dynamoDbEndpoint: process.env.DYNAMO_DB_ENDPOINT
 };
