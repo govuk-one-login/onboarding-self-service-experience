@@ -1,0 +1,28 @@
+name: Upload Cognito SAM package to S3
+
+on:
+  workflow_call:
+    inputs:
+      environment: { required: true, type: string }
+      artifact-name: { required: true, type: string }
+
+concurrency:
+  group: upload-cognito-secure-pipelines-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  upload:
+    name: Cognito
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: alphagov/di-github-actions/secure-pipelines/upload-sam-package@f1aa97d64bf1be3a6226e0319c597bf4b28c19c8
+        with:
+          aws-role-arn: ${{ vars.COGNITO_DEPLOYMENT_ROLE_ARN }}
+          artifact-bucket-name: ${{ vars.COGNITO_ARTIFACT_SOURCE_BUCKET_NAME }}
+          signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
+          artifact-name: ${{ inputs.artifact-name }}
