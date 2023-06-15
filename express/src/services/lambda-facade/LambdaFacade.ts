@@ -3,7 +3,7 @@ import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import axios, {Axios, AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
-import {lambda} from "../../config/environment";
+import {api} from "../../config/environment";
 import AuthenticationResultParser from "../../lib/authentication-result-parser";
 import LambdaFacadeInterface, {ClientUpdates, UserUpdates} from "./LambdaFacadeInterface";
 
@@ -15,7 +15,7 @@ class LambdaFacade implements LambdaFacadeInterface {
         console.log("Creating Lambda facade...");
 
         this.client = axios.create({
-            baseURL: lambda.apiBaseUrl,
+            baseURL: api.baseUrl,
             headers: {
                 "Content-Type": "application/json"
             }

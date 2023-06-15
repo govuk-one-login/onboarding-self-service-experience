@@ -2,8 +2,8 @@
   "name": "gds-di-self-service-api",
   "description": "DI self-service API",
   "scripts": {
-    "build": "../../infrastructure/api/deploy-sse-api.sh --no-deploy",
-    "deploy": "../../infrastructure/api/deploy-sse-api.sh",
+    "build": "../../infrastructure/dev/deploy.sh api --no-deploy",
+    "deploy": "../../infrastructure/dev/deploy.sh api",
     "lint": "eslint '*.ts' --quiet --fix",
     "compile": "tsc",
     "test": "jest --silent"

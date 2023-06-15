@@ -1,5 +1,5 @@
 import {static as serveStatic, urlencoded} from "express";
-import {cognito, googleTagId, lambda, port, showTestBanner} from "./config/environment";
+import {cognito, googleTagId, api, port, showTestBanner} from "./config/environment";
 import Express from "./config/express";
 import {distribution} from "./config/resources";
 import sessionStorage from "./config/session-storage";
@@ -16,7 +16,7 @@ import SelfServiceServicesService from "./services/self-service-services-service
 const app = Express();
 
 const cognitoPromise = import(`./services/cognito/${cognito.client}`).then(client => client.default);
-const lambdaPromise = import(`./services/lambda-facade/${lambda.facade}`).then(facade => facade.default);
+const lambdaPromise = import(`./services/lambda-facade/${api.facade}`).then(facade => facade.default);
 
 Promise.all([cognitoPromise, lambdaPromise]).then(deps => {
     app.set("backing-service", new SelfServiceServicesService(deps[0], deps[1]));
