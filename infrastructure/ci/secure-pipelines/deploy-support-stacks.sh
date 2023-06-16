@@ -8,6 +8,7 @@ DOWNSTREAM_ACCOUNTS=$(../../aws.sh get-downstream-accounts "$ACCOUNT")
 
 GRAFANA_SECRET_NAME=/self-service/secure-pipelines/grafana-api-key
 ../configure-deployment-parameters.sh check-secret $GRAFANA_SECRET_NAME
+../configure-deployment-parameters.sh check-parameter /self-service/secure-pipelines/developer-notification-email
 
 ../../deploy-sam-stack.sh "$@" \
   --validate \

@@ -22,6 +22,9 @@ Parameters:
   GrafanaKeySecretName:
     Type: String
     Default: /self-service/secure-pipelines/grafana-api-key
+  DeveloperNotificationsEmail:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/secure-pipelines/developer-notification-email
 
 Mappings:
   Grafana:
@@ -90,7 +93,14 @@ Resources:
       TemplateURL: !Sub ${TemplateStorageBucket}/build-notifications/template.yaml
       Parameters:
         SlackWorkspaceId: T8GT9416G
-        SlackChannelId: !FindInMap [ Slack, channel, !Ref EnvironmentType, { DefaultValue: !FindInMap [ Slack, channel, default ] } ]
+        SlackChannelId: !FindInMap [ Slack, Channel, !Ref EnvironmentType, { DefaultValue: !FindInMap [ Slack, Channel, default ] } ]
+
+  ECRScanningNotifications:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/ecr-image-scan-findings-logger/template.yaml
+      Parameters:
+        NotificationEmail: !Ref DeveloperNotificationsEmail
 
   LambdaAuditHook:
     Type: AWS::CloudFormation::Stack
