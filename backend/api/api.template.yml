@@ -9,7 +9,7 @@ Parameters:
     Description: API Gateway endpoint for client registration
   NotificationEmail:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /self-service/api/notification-email
+    Default: /self-service/api/notifications-email
     Description: Email address to send internal notifications
   LogGroupNamePrefix:
     Type: String

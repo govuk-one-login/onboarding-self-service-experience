@@ -45,6 +45,7 @@ Resources:
             ProjectionType: ALL
 
   SessionsTable:
+    # https://github.com/ca98am79/connect-dynamodb#options
     # checkov:skip=CKV_AWS_28: "Ensure Dynamodb point in time recovery (backup) is enabled"
     # checkov:skip=CKV_AWS_119: "Ensure DynamoDB Tables are encrypted using a KMS Customer Managed CMK"
     Type: AWS::DynamoDB::Table

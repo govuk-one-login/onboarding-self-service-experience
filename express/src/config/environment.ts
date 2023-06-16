@@ -1,7 +1,7 @@
 export const port = process.env.PORT ?? 3000;
-export const awsRegion = process.env.AWS_REGION;
 export const googleTagId = process.env.GOOGLE_TAG_ID;
 export const showTestBanner = process.env.SHOW_TEST_BANNER === "true";
+export const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
 
 export const cognito = {
     client: process.env.COGNITO_CLIENT ?? "CognitoClient",
@@ -15,6 +15,5 @@ export const api = {
 };
 
 export const sessionStorage = {
-    tableName: process.env.SESSIONS_TABLE,
-    dynamoDbEndpoint: process.env.DYNAMO_DB_ENDPOINT
+    tableName: process.env.SESSIONS_TABLE
 };

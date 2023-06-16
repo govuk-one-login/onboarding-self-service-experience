@@ -10,7 +10,7 @@ MANUAL_PARAMETERS=(api_notification_email)
 declare -A PARAMETERS=(
   [cognito_external_id]=$PARAMETER_NAME_PREFIX/cognito/external-id
   [deletion_protection]=$PARAMETER_NAME_PREFIX/config/deletion-protection-enabled
-  [api_notification_email]=$PARAMETER_NAME_PREFIX/api/notification-email
+  [api_notification_email]=$PARAMETER_NAME_PREFIX/api/notifications-email
 )
 
 declare -A SECRETS=(

@@ -1,10 +1,11 @@
 # Developer stacks
 
-## Deploying
+### TL;DR
 
-Authenticate to AWS before deploying. The script checks that AWS credentials are present in the environment and the
-session is not expired. You may use the [gds-cli](https://github.com/alphagov/gds-cli) or any other method to set
-the necessary environment variables.
+Run `npm run deploy` to deploy and `npm run remote` to run a local frontend, or `npm run deploy admin-tool` to do it
+one command.
+
+## Deploying
 
 Deploy a backend component (e.g. `api`) with the default username prefix
 
@@ -31,6 +32,22 @@ Deploy the full stack set
 npm run deploy [prefix]
 ```
 
+### Passing SAM options
+
+Attach additional options to pass to the [SAM build/deploy script](../deploy-sam-stack.sh)
+
+```shell
+./deploy.sh [component] [prefix] --cached --parallel --no-confirm
+```
+
+When invoking with `npm` and passing options, the parameters need to be preceded by the `--` separator
+
+```shell
+npm run deploy [component] [prefix] -- [options]
+```
+
+You most likely should always use `-c -p -y` for fast builds and deploys.
+
 ## Running a local frontend against deployed backend stacks
 
 The script gets the export values from AWS based on the supplied prefix, and sets the environment variables before
@@ -54,16 +71,22 @@ Deploy and run
 npm run deploy admin-tool [prefix]
 ```
 
-## Passing SAM options
+## Listing and deleting stacks
 
-Attach additional options to pass to the [SAM build/deploy script](../deploy-sam-stack.sh)
+List all deployed stacks with the given or default prefix
 
 ```shell
-./deploy.sh api [prefix] --cached --parallel --no-confirm
+npm run list [prefix]
 ```
 
-When invoking with `npm` and passing options, the parameters need to be preceded by the `--` separator
+Delete all stacks with the given or default prefix
 
 ```shell
-npm run deploy -- [component] [prefix] [options]
+npm run delete [prefix]
+```
+
+Delete the specified component stacks with the given prefix
+
+```shell
+npm run delete prefix [components...]
 ```

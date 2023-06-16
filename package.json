@@ -17,6 +17,9 @@
     "dev": "npm run dev -w express",
     "aws": "npm run remote --",
     "remote": "infrastructure/dev/deploy.sh run",
+    "delete": "infrastructure/dev/deploy.sh delete",
+    "list": "infrastructure/dev/deploy.sh list",
+    "creds": "infrastructure/aws.sh",
     "test": "jest --silent",
     "cucumber": "npm run cucumber -w acceptance-tests --"
   },

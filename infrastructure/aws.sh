@@ -4,7 +4,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 set -eu
 
 function get-all-accounts {
-  jq flatten aws-accounts.json
+  jq 'flatten | .[]' aws-accounts.json
 }
 
 function get-account-group {
@@ -12,7 +12,7 @@ function get-account-group {
 }
 
 function get-account-number {
-  jq --exit-status --arg name "$1" '.[] | select(.name == $name) | .number' < <(get-all-accounts)
+  jq --exit-status --arg name "$1" 'select(.name == $name) | .number' < <(get-all-accounts)
 }
 
 function get-initial-account {
@@ -22,7 +22,7 @@ function get-initial-account {
 function is-initial-account {
   local name=${1:-$(get-current-account-name)}
   [[ $name == $(get-initial-account "$name") ]]
-  echo "$name"
+  [[ ${1:-} ]] || echo "$name"
 }
 
 function get-next-account {
@@ -63,7 +63,7 @@ function get-higher-accounts-in-group {
 function get-current-account-name {
   local account_number account
   account_number=$(get-current-account-number "$@") || exit
-  account=$(jq --raw-output ".[] | select(.number == $account_number) | .name" < <(get-all-accounts))
+  account=$(jq --raw-output "select(.number == $account_number) | .name" < <(get-all-accounts))
   [[ $account ]] && echo "$account" && return
   echo "Unknown account number: $account_number" >&2 && return 1
 }
@@ -92,7 +92,7 @@ function check-current-account {
   account=$(get-current-account-name "$target")
 
   if [[ $target ]]; then
-    if ! jq --exit-status --arg name "$target" '.[] | select(.name == $name)' < <(get-all-accounts) 1> /dev/null; then
+    if ! jq --exit-status --slurp --arg name "$target" '.[] | select(.name == $name)' < <(get-all-accounts) 1> /dev/null; then
       echo "Invalid account: '$target'" >&2
       return 1
     fi
