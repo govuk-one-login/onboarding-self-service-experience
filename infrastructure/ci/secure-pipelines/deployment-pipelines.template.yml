@@ -84,6 +84,7 @@ Resources:
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
+        PipelineEnvironentNameEnabled: "Yes"
         AllowedServiceOne: Lambda
         AllowedServiceTwo: DynamoDB
         AllowedServiceThree: SNS
@@ -115,6 +116,7 @@ Resources:
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
+        PipelineEnvironentNameEnabled: "Yes"
         AllowedServiceOne: Cognito
         AllowedServiceTwo: Lambda
         AllowedServiceThree: SNS
@@ -145,6 +147,7 @@ Resources:
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
+        PipelineEnvironentNameEnabled: "Yes"
         AllowedServiceOne: DynamoDB
 
   FrontendDeployer:
@@ -177,6 +180,7 @@ Resources:
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
+        PipelineEnvironentNameEnabled: "Yes"
         AllowedServiceOne: ECR & ECS
 
   FrontendECRRepository:
