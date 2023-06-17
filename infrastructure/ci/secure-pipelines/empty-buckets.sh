@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Empty secure pipeline buckets so they can be deleted
 cd "$(dirname "${BASH_SOURCE[0]}")"
+STEP=1000
 set -eu
 
 function get-objects {
@@ -10,31 +11,39 @@ function get-objects {
 }
 
 function delete-objects {
-  local objects
-  objects=$(get-objects "$@") || return
-  aws s3api delete-objects --bucket "$1" --delete \
-    "$(jq --null-input --argjson objects "$objects" '{Objects: $objects, Quiet: true}')"
+  local objects num lower=0 upper=0
+  objects=$(get-objects "$@") || return 0
+  num=$(jq length <<< "$objects") && echo -n "[$num ${2:-Objects}] "
+
+  while [[ $upper -lt $num ]]; do
+    local upper=$((upper + STEP)) && echo -n "[$lower:$upper] "
+    aws s3api delete-objects --bucket "$1" --delete "$(jq "{Objects: .[$lower:$upper], Quiet: true}" <<< "$objects")"
+    lower=$upper
+  done
+}
+
+function list-buckets {
+  aws s3 ls | cut -d ' ' -f 3 | grep "^secure-pipelines-${1:-}"
 }
 
 function empty-bucket {
-  delete-objects "$1" || delete-objects "$1" DeleteMarkers
+  delete-objects "$1" && delete-objects "$1" DeleteMarkers
 }
 
-BUCKET_TYPE=${1:-pipeline}
-
-BUCKET_NAME_PREFIX=$(case $BUCKET_TYPE in
-  pipeline) echo secure-pipelines ;;
-  support) echo secure-pipelines-support ;;
-  *) exit 1 ;;
-esac)
-
 ../../aws.sh check-current-account
+[[ $* ]] || { list-buckets && exit; }
+[[ $1 == all ]] || suffix=$1
+[[ ${2:-} == loop ]] && loop=true
 
-buckets=$(aws s3 ls | cut -d ' ' -f 3 | grep "^$BUCKET_NAME_PREFIX") || echo "No $BUCKET_TYPE buckets found"
-num_buckets=$(wc -l <<< "$buckets" | xargs)
+while true; do
+  buckets=$(list-buckets "${suffix:-}") || { echo "No '$1' buckets found" && exit; }
+  num_buckets=$(wc -l <<< "$buckets" | xargs)
 
-idx=1
-for bucket in $buckets; do
-  echo -n "[$((idx++))/$num_buckets] Bucket '$bucket' "
-  empty-bucket "$bucket" && echo "has been emptied" || echo "is empty"
+  idx=1
+  for bucket in $buckets; do
+    echo -n "[$((idx++))/$num_buckets] Bucket '$bucket' "
+    empty-bucket "$bucket" && echo "is empty" || echo "failed to empty"
+  done
+
+  ${loop:-false} || break
 done
