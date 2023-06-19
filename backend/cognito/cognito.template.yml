@@ -32,6 +32,9 @@ Globals:
     Timeout: 10
     Runtime: nodejs18.x
     PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
+    Environment:
+      Variables:
+        NODE_OPTIONS: --enable-source-maps
 
 Resources:
   SendPasswordChangedEmailFunction:

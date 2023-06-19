@@ -19,7 +19,7 @@ import {
     VerifyUserAttributeCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Command} from "@aws-sdk/types";
-import {awsRegion, cognito} from "../../config/environment";
+import {cognito, region} from "../../config/environment";
 import CognitoInterface from "./CognitoInterface";
 
 type CognitoCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes> = Command<
@@ -43,7 +43,7 @@ class CognitoClient implements CognitoInterface {
         console.log("Creating Cognito client...");
         this.clientId = nonNull(cognito.clientId);
         this.userPoolId = nonNull(cognito.userPoolId);
-        this.client = new CognitoIdentityProviderClient({region: awsRegion});
+        this.client = new CognitoIdentityProviderClient({region: region});
     }
 
     async createUser(email: string): Promise<void> {

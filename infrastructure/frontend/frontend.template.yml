@@ -119,7 +119,8 @@ Resources:
               ArnLike:
                 aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
       Policies:
-        - PolicyName: DynamoDbActions
+        # https://github.com/ca98am79/connect-dynamodb#iam-permissions
+        - PolicyName: SessionStorageTableAccess
           PolicyDocument:
             Version: 2012-10-17
             Statement:
@@ -133,7 +134,7 @@ Resources:
                   - dynamodb:CreateTable
                   - dynamodb:PutItem
                 Resource:
-                  Fn::ImportValue: !Sub ${ ExportNamePrefix }-AdminToolSessionsTableArn
+                  Fn::ImportValue: !Sub ${ExportNamePrefix}-SessionsTableArn
 
   FrontendAppTaskDefinition:
     Type: AWS::ECS::TaskDefinition

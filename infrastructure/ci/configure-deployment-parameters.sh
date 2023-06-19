@@ -10,7 +10,7 @@ MANUAL_PARAMETERS=(api_notification_email)
 declare -A PARAMETERS=(
   [cognito_external_id]=$PARAMETER_NAME_PREFIX/cognito/external-id
   [deletion_protection]=$PARAMETER_NAME_PREFIX/config/deletion-protection-enabled
-  [api_notification_email]=$PARAMETER_NAME_PREFIX/api/notification-email
+  [api_notification_email]=$PARAMETER_NAME_PREFIX/api/notifications-email
 )
 
 declare -A SECRETS=(
@@ -27,12 +27,12 @@ function check-secret-set {
 }
 
 function get-parameter-value {
-  aws ssm get-parameter --name "${PARAMETERS[$1]}" --query "Parameter.Value" --output text 2> /dev/null
+  aws ssm get-parameter --name "$1" --query "Parameter.Value" --output text 2> /dev/null
 }
 
 function write-parameter-value {
   echo "Setting '$1' to '$2'"
-  aws ssm put-parameter --name "${PARAMETERS[$1]}" --value "$(xargs <<< "$2")" --type String --overwrite > /dev/null
+  aws ssm put-parameter --name "$1" --value "$(xargs <<< "$2")" --type String --overwrite > /dev/null
 }
 
 function write-secret-value {
@@ -48,9 +48,12 @@ function get-value-from-user {
 
 function check-manual-parameters {
   local parameter
-  for parameter in "${MANUAL_PARAMETERS[@]}"; do
-    check-parameter-set "$parameter" || write-parameter-value "$parameter" "$(get-value-from-user "$parameter")"
-  done
+  for parameter in "${MANUAL_PARAMETERS[@]}"; do check-parameter "${PARAMETERS[$parameter]}"; done
+}
+
+function check-parameter {
+  local parameter=$1
+  check-parameter-set "$parameter" || write-parameter-value "$parameter" "$(get-value-from-user "$parameter")"
 }
 
 function check-secret {
@@ -64,19 +67,21 @@ function check-secrets {
 }
 
 function check-cognito-external-id {
-  check-parameter-set cognito_external_id || write-parameter-value cognito_external_id "$(uuidgen)"
+  local parameter=${PARAMETERS[cognito_external_id]}
+  check-parameter-set "$parameter" || write-parameter-value "$parameter" "$(uuidgen)"
 }
 
 function check-deletion-protection {
-  check-parameter-set deletion_protection ||
-    write-parameter-value deletion_protection "$([[ $ACCOUNT == production ]] && echo ACTIVE || echo INACTIVE)"
+  local parameter=${PARAMETERS[deletion_protection]}
+  check-parameter-set "$parameter" ||
+    write-parameter-value "$parameter" "$([[ $ACCOUNT == production ]] && echo ACTIVE || echo INACTIVE)"
 }
 
 function print-parameters {
   local parameter
   echo "--- Deployment parameters ---"
-  for parameter in "${!PARAMETERS[@]}"; do
-    echo "${PARAMETERS[$parameter]}: $(get-parameter-value "$parameter")"
+  for parameter in "${PARAMETERS[@]}"; do
+    echo "$parameter: $(get-parameter-value "$parameter")"
   done
 }
 

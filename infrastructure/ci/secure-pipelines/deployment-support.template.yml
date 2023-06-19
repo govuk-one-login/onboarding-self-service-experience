@@ -12,6 +12,10 @@ Parameters:
     Default: secure-pipelines
     AllowedPattern: ^.*[^-]$
     Description: Prefix to use when importing or exporting values
+  InitialAccount:
+    Type: String
+    Default: No
+    AllowedValues: [ Yes, No ]
   EnvironmentType:
     Type: String
     Default: test
@@ -22,26 +26,30 @@ Parameters:
   GrafanaKeySecretName:
     Type: String
     Default: /self-service/secure-pipelines/grafana-api-key
+  DeveloperNotificationsEmail:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/secure-pipelines/developer-notification-email
 
 Mappings:
   Grafana:
-    env:
+    Env:
       production: prod
       default: non-prod
   Slack:
-    channel:
+    Channel:
       development: C04QFSGKCGG    # di-sse-dev-notifications
       default: C02T6P3NVDX        # di-sse-tech-notifications
 
 Conditions:
-  IsInitialAccount: !Not [ !Equals [ !Ref DownstreamAccounts, "" ] ]
-  IsDevelopmentAccount: !Equals [ !Ref EnvironmentType, development ]
-  IsInitialProductionAccount: !And [ !Condition IsInitialAccount, !Not [ !Condition IsDevelopmentAccount ] ]
+  InitialAccount: !Equals [ !Ref InitialAccount, Yes ]
+  DevelopmentAccount: !Equals [ !Ref EnvironmentType, development ]
+  InitialDevelopmentAccount: !And [ !Condition InitialAccount, !Condition DevelopmentAccount ]
+  InitialProductionAccount: !And [ !Condition InitialAccount, !Not [ !Condition DevelopmentAccount ] ]
 
 Resources:
   GitHubIdentityProvider:
     Type: AWS::CloudFormation::Stack
-    Condition: IsInitialProductionAccount
+    Condition: InitialProductionAccount
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/github-identity/template.yaml
       Parameters:
@@ -49,8 +57,16 @@ Resources:
 
   ContainerSigner:
     Type: AWS::CloudFormation::Stack
-    Condition: IsInitialProductionAccount
+    Condition: InitialProductionAccount
     DependsOn: GitHubIdentityProvider
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/container-signer/template.yaml
+      Parameters:
+        AllowedAccounts: !Ref DownstreamAccounts
+
+  DevelopmentContainerSigner:
+    Type: AWS::CloudFormation::Stack
+    Condition: InitialDevelopmentAccount
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/container-signer/template.yaml
       Parameters:
@@ -58,7 +74,7 @@ Resources:
 
   CodeSigner:
     Type: AWS::CloudFormation::Stack
-    Condition: IsInitialAccount
+    Condition: InitialAccount
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/signer/template.yaml
       Parameters:
@@ -69,7 +85,7 @@ Resources:
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/grafana-metrics/template.yaml
       Parameters:
-        GrafanaEnvironment: !FindInMap [ Grafana, env, !Ref EnvironmentType, { DefaultValue: !FindInMap [ Grafana, env, default ] } ]
+        GrafanaEnvironment: !FindInMap [ Grafana, Env, !Ref EnvironmentType, { DefaultValue: !FindInMap [ Grafana, Env, default ] } ]
 
   # Setting up Grafana key rotation
   # https://govukverify.atlassian.net/wiki/spaces/PLAT/pages/3467509761/Grafana+key+rotation
@@ -80,7 +96,7 @@ Resources:
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/grafana-key-rotation/template.yaml
       Parameters:
-        GrafanaEnvironment: !FindInMap [ Grafana, env, !Ref EnvironmentType, { DefaultValue: !FindInMap [ Grafana, env, default ] } ]
+        GrafanaEnvironment: !FindInMap [ Grafana, Env, !Ref EnvironmentType, { DefaultValue: !FindInMap [ Grafana, Env, default ] } ]
         GrafanaKeySecretId: !Ref GrafanaKeySecretName
 
   SlackNotifications:
@@ -90,7 +106,14 @@ Resources:
       TemplateURL: !Sub ${TemplateStorageBucket}/build-notifications/template.yaml
       Parameters:
         SlackWorkspaceId: T8GT9416G
-        SlackChannelId: !FindInMap [ Slack, channel, !Ref EnvironmentType, { DefaultValue: !FindInMap [ Slack, channel, default ] } ]
+        SlackChannelId: !FindInMap [ Slack, Channel, !Ref EnvironmentType, { DefaultValue: !FindInMap [ Slack, Channel, default ] } ]
+
+  ECRScanningNotifications:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/ecr-image-scan-findings-logger/template.yaml
+      Parameters:
+        NotificationEmail: !Ref DeveloperNotificationsEmail
 
   LambdaAuditHook:
     Type: AWS::CloudFormation::Stack
@@ -123,19 +146,22 @@ Resources:
 
 Outputs:
   GitHubIdentityProviderARN:
-    Condition: IsInitialProductionAccount
+    Condition: InitialProductionAccount
     Value: !GetAtt GitHubIdentityProvider.Outputs.GitHubIdentityProviderArn
   ContainerSigningKeyARN:
-    Condition: IsInitialProductionAccount
-    Value: !GetAtt ContainerSigner.Outputs.ContainerSignerKmsKeyArn
+    Condition: InitialAccount
+    Value: !If
+      - InitialProductionAccount
+      - !GetAtt ContainerSigner.Outputs.ContainerSignerKmsKeyArn
+      - !GetAtt DevelopmentContainerSigner.Outputs.ContainerSignerKmsKeyArn
   SigningProfileName:
-    Condition: IsInitialAccount
+    Condition: InitialAccount
     Value: !GetAtt CodeSigner.Outputs.SigningProfileName
   SigningProfileARN:
-    Condition: IsInitialAccount
+    Condition: InitialAccount
     Value: !GetAtt CodeSigner.Outputs.SigningProfileArn
   SigningProfileVersionARN:
-    Condition: IsInitialAccount
+    Condition: InitialAccount
     Value: !GetAtt CodeSigner.Outputs.SigningProfileVersionArn
   SlackNotificationsStackName:
     Value: !Select [ 1, !Split [ "/", !Ref SlackNotifications ] ]
