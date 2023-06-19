@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # The "it just works" script to deploy backend stacks and run a local Admin Tool frontend against them
 cd "$(dirname "${BASH_SOURCE[0]}")"
-export AWS_DEFAULT_REGION=eu-west-2
 set -eu
 
 declare -A ENV=(
@@ -61,7 +60,9 @@ function list {
 
 function delete {
   local stack
-  for stack in $(list); do sam delete --no-prompts --region $AWS_DEFAULT_REGION --stack-name "$stack"; done
+  for stack in $(list); do
+    sam delete --no-prompts --region "${AWS_REGION:-${AWS_DEFAULT_REGION}}" --stack-name "$stack"
+  done
 }
 
 function deploy-backend-component {

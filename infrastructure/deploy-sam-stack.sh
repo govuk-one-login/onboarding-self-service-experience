@@ -50,7 +50,6 @@ $DEPLOY && ! "$BASE_DIR"/aws.sh check-current-account "${ACCOUNT:-}" 2> /dev/nul
 
 [[ $TEMPLATE ]] && ! [[ -f $TEMPLATE ]] && echo "File '$TEMPLATE' does not exist" && exit 1
 ${SKIP_BUILD:-false} && BUILD=false
-export AWS_DEFAULT_REGION=eu-west-2
 
 if $DEPLOY; then
   [[ -f samconfig.toml || -f $CONFIG_FILE ]] && CONFIG=true
@@ -88,9 +87,9 @@ $BUILD || [[ -e .aws-sam/build/template.yaml ]] && unset TEMPLATE
 ${NO_CONFIRM:-false} && CONFIRM_OPTION="--no-confirm-changeset"
 ${DISABLE_ROLLBACK:-false} && DISABLE_ROLLBACK_OPTION="--disable-rollback"
 
-STACK_STATE=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query "Stacks[].StackStatus" --output text 2> /dev/null) &&
-  [[ $STACK_STATE == ROLLBACK_COMPLETE ]] && ${DELETE_ON_FAILED_CREATION:-true} &&
-  sam delete --no-prompts --region "$AWS_DEFAULT_REGION" --stack-name "$STACK_NAME"
+[[ $(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query "Stacks[].StackStatus" \
+  --output text 2> /dev/null) == ROLLBACK_COMPLETE ]] && ${DELETE_ON_FAILED_CREATION:-true} &&
+  sam delete --no-prompts --region "${AWS_REGION:-${AWS_DEFAULT_REGION}}" --stack-name "$STACK_NAME"
 
 sam deploy \
   ${STACK_NAME:+--stack-name "$STACK_NAME"} \
