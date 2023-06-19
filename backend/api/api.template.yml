@@ -1,6 +1,8 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: DI self-service API
-Transform: AWS::Serverless-2016-10-31
+Transform:
+  - AWS::Serverless-2016-10-31
+  - AWS::LanguageExtensions
 
 Parameters:
   AuthRegistrationBaseUrl:
@@ -49,6 +51,26 @@ Resources:
     Properties:
       FailOnWarnings: true
       StageName: self-service-api
+      AccessLogSettings:
+        DestinationArn: !GetAtt APIGWAccessLogsGroup.Arn
+        Format:
+          Fn::ToJsonString:
+            requestId: $context.requestId
+            ip: $context.identity.sourceIp
+            requestTime: $context.requestTime
+            httpMethod: $context.httpMethod
+            path: $context.path"
+            routeKey: $context.routeKey
+            status: $context.status
+            protocol: $context.protocol
+            responseLength: $context.responseLength
+
+  APIGWAccessLogsGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    # checkov:skip=CKV_AWS_66:Ensure that CloudWatch Log Group specifies retention days
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/apigateway/${AWS::StackName}-backend-API-GW-AccessLogs
 
   #--- Users ---#
 
