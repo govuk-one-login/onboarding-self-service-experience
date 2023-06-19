@@ -1,15 +1,15 @@
 {
-  "name": "gds-di-self-service-api",
-  "description": "DI self-service API",
+  "name": "gds-di-self-service-backend-api",
+  "description": "DI Self-Service backend - API",
   "scripts": {
     "build": "../../infrastructure/dev/deploy.sh api --no-deploy",
     "deploy": "../../infrastructure/dev/deploy.sh api",
-    "lint": "eslint '*.ts' --quiet --fix",
-    "compile": "tsc",
-    "test": "jest --silent"
+    "test": "jest --silent",
+    "compile": "tsc"
   },
   "dependencies": {
-    "@aws-sdk/client-sfn": "^3.306.0",
-    "@aws-sdk/client-sns": "^3.306.0"
+    "@aws-sdk/client-sfn": "^3.354.0",
+    "@aws-sdk/client-sns": "^3.354.0",
+    "esbuild": "^0.18.4"
   }
 }
