@@ -84,7 +84,7 @@ Resources:
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
-        PipelineEnvironentNameEnabled: "Yes"
+        PipelineEnvironmentNameEnabled: "Yes"
         AllowedServiceOne: Lambda
         AllowedServiceTwo: DynamoDB
         AllowedServiceThree: SNS
@@ -116,7 +116,7 @@ Resources:
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
-        PipelineEnvironentNameEnabled: "Yes"
+        PipelineEnvironmentNameEnabled: "Yes"
         AllowedServiceOne: Cognito
         AllowedServiceTwo: Lambda
         AllowedServiceThree: SNS
@@ -147,7 +147,7 @@ Resources:
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
-        PipelineEnvironentNameEnabled: "Yes"
+        PipelineEnvironmentNameEnabled: "Yes"
         AllowedServiceOne: DynamoDB
 
   FrontendDeployer:
@@ -180,7 +180,7 @@ Resources:
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
-        PipelineEnvironentNameEnabled: "Yes"
+        PipelineEnvironmentNameEnabled: "Yes"
         AllowedServiceOne: ECR & ECS
 
   FrontendECRRepository:
@@ -213,18 +213,24 @@ Outputs:
   APIArtifactSourceBucketName:
     Condition: APIRepositorySource
     Value: !GetAtt APIDeployer.Outputs.GitHubArtifactSourceBucketName
+  APIPipelineName:
+    Value: !GetAtt APIDeployer.Outputs.PipelineName
   CognitoDeploymentRoleArn:
     Condition: CognitoRepositorySource
     Value: !GetAtt CognitoDeployer.Outputs.GitHubActionsRoleArn
   CognitoArtifactSourceBucketName:
     Condition: CognitoRepositorySource
     Value: !GetAtt CognitoDeployer.Outputs.GitHubArtifactSourceBucketName
+  CognitoPipelineName:
+    Value: !GetAtt CognitoDeployer.Outputs.PipelineName
   DynamoDBDeploymentRoleArn:
     Condition: DynamoDBRepositorySource
     Value: !GetAtt DynamoDBDeployer.Outputs.GitHubActionsRoleArn
   DynamoDBArtifactSourceBucketName:
     Condition: DynamoDBRepositorySource
     Value: !GetAtt DynamoDBDeployer.Outputs.GitHubArtifactSourceBucketName
+  DynamoDBPipelineName:
+    Value: !GetAtt DynamoDBDeployer.Outputs.PipelineName
   FrontendDeploymentRoleArn:
     Condition: FrontendRepositorySource
     Value: !GetAtt FrontendDeployer.Outputs.GitHubActionsRoleArn
@@ -234,3 +240,5 @@ Outputs:
   FrontendECRRepositoryName:
     Condition: FrontendRepositorySource
     Value: !GetAtt FrontendECRRepository.Outputs.ContainerRepositoryName
+  FrontendPipelineName:
+    Value: !GetAtt FrontendDeployer.Outputs.PipelineName
