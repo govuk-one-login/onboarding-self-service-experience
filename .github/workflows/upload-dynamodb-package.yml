@@ -1,28 +1,33 @@
-name: Upload DynamoDB SAM package to S3
+name: Deploy DynamoDB through Secure Pipelines
 
 on:
   workflow_call:
     inputs:
       environment: { required: true, type: string }
+      cancel-in-progress: { required: false, type: boolean, default: true }
 
 concurrency:
-  group: upload-dynamodb-secure-pipelines-${{ github.workflow }}
-  cancel-in-progress: true
+  group: deploy-dynamodb-secure-pipelines-${{ inputs.environment }}
+  cancel-in-progress: ${{ inputs.cancel-in-progress }}
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  upload:
+  deploy:
     name: DynamoDB
     runs-on: ubuntu-latest
+
     environment:
       name: ${{ inputs.environment }}
-      url: ${{ steps.upload.outputs.pipeline-url }}
+      url: ${{ steps.deploy.outputs.pipeline-url }}
+
     steps:
-      - uses: alphagov/di-github-actions/secure-pipelines/upload-sam-package@670861e1bb962bffdd45e30ce029be26b862ac36
-        id: upload
+      - name: Deploy
+        id: deploy
+        uses: alphagov/di-github-actions/secure-pipelines/deploy-application@670861e1bb962bffdd45e30ce029be26b862ac36
+        timeout-minutes: 15
         with:
           aws-role-arn: ${{ vars.DYNAMO_DB_DEPLOYMENT_ROLE_ARN }}
           artifact-bucket-name: ${{ vars.DYNAMO_DB_ARTIFACT_SOURCE_BUCKET_NAME }}

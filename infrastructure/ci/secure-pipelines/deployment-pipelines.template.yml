@@ -191,6 +191,54 @@ Resources:
       Parameters:
         PipelineStackName: !Select [ 1, !Split [ "/", !Ref FrontendDeployer ] ]
 
+  APIDeploymentMonitoringPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !GetAtt APIDeployer.Outputs.GitHubActionsRoleName ]
+      PolicyName: !Sub ${StackNamePrefix}-api-DeploymentMonitoring
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action: codepipeline:ListPipelineExecutions
+          Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${APIDeployer.Outputs.PipelineName}
+
+  CognitoDeploymentMonitoringPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !GetAtt CognitoDeployer.Outputs.GitHubActionsRoleName ]
+      PolicyName: !Sub ${StackNamePrefix}-cognito-DeploymentMonitoring
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action: codepipeline:ListPipelineExecutions
+          Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CognitoDeployer.Outputs.PipelineName}
+
+  DynamoDBDeploymentMonitoringPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !GetAtt DynamoDBDeployer.Outputs.GitHubActionsRoleName ]
+      PolicyName: !Sub ${StackNamePrefix}-dynamodb-DeploymentMonitoring
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action: codepipeline:ListPipelineExecutions
+          Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${DynamoDBDeployer.Outputs.PipelineName}
+
+  FrontendDeploymentMonitoringPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !GetAtt FrontendDeployer.Outputs.GitHubActionsRoleName ]
+      PolicyName: !Sub ${StackNamePrefix}-frontend-DeploymentMonitoring
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action: codepipeline:ListPipelineExecutions
+          Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${FrontendDeployer.Outputs.PipelineName}
+
 Outputs:
   # Promotion
   APIPromotionBucket:

@@ -11,20 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  build-cognito:
-    name: Build
-    uses: ./.github/workflows/build-cognito.yml
-
-  upload-cognito:
-    name: Upload
-    needs: build-cognito
-    uses: ./.github/workflows/upload-cognito-package.yml
-    with:
-      environment: development-secure-pipelines
-      artifact-name: ${{ needs.build-cognito.outputs.artifact-name }}
-
-  upload-dynamodb:
-    name: Upload
+  deploy-dynamodb:
+    name: Deploy
     uses: ./.github/workflows/upload-dynamodb-package.yml
     with:
       environment: development-secure-pipelines
@@ -33,10 +21,22 @@ jobs:
     name: Build
     uses: ./.github/workflows/build-api.yml
 
-  upload-api:
-    name: Upload
-    needs: [ build-api, upload-dynamodb ]
+  deploy-api:
+    name: Deploy
+    needs: [ build-api, deploy-dynamodb ]
     uses: ./.github/workflows/upload-api-package.yml
     with:
       environment: development-secure-pipelines
       artifact-name: ${{ needs.build-api.outputs.artifact-name }}
+
+  build-cognito:
+    name: Build
+    uses: ./.github/workflows/build-cognito.yml
+
+  deploy-cognito:
+    name: Deploy
+    needs: build-cognito
+    uses: ./.github/workflows/upload-cognito-package.yml
+    with:
+      environment: development-secure-pipelines
+      artifact-name: ${{ needs.build-cognito.outputs.artifact-name }}

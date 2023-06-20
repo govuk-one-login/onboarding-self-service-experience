@@ -1,29 +1,34 @@
-name: Upload API SAM package to S3
+name: Deploy API through Secure Pipelines
 
 on:
   workflow_call:
     inputs:
       environment: { required: true, type: string }
       artifact-name: { required: true, type: string }
+      cancel-in-progress: { required: false, type: boolean, default: true }
 
 concurrency:
-  group: upload-api-secure-pipelines-${{ github.workflow }}
-  cancel-in-progress: true
+  group: deploy-api-secure-pipelines-${{ inputs.environment }}
+  cancel-in-progress: ${{ inputs.cancel-in-progress }}
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  upload:
+  deploy:
     name: API
     runs-on: ubuntu-latest
+
     environment:
       name: ${{ inputs.environment }}
-      url: ${{ steps.upload.outputs.pipeline-url }}
+      url: ${{ steps.deploy.outputs.pipeline-url }}
+
     steps:
-      - uses: alphagov/di-github-actions/secure-pipelines/upload-sam-package@670861e1bb962bffdd45e30ce029be26b862ac36
-        id: upload
+      - name: Deploy
+        id: deploy
+        uses: alphagov/di-github-actions/secure-pipelines/deploy-application@670861e1bb962bffdd45e30ce029be26b862ac36
+        timeout-minutes: 15
         with:
           aws-role-arn: ${{ vars.API_DEPLOYMENT_ROLE_ARN }}
           artifact-bucket-name: ${{ vars.API_ARTIFACT_SOURCE_BUCKET_NAME }}
