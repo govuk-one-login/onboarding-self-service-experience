@@ -4,10 +4,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 set -eu
 
 declare -A ENV=(
-  [SESSIONS_TABLE]=SessionsTableName
-  [API_BASE_URL]=APIBaseURL
-  [COGNITO_USER_POOL_ID]=CognitoUserPoolID
-  [COGNITO_CLIENT_ID]=CognitoUserPoolClientID
+  [API_BASE_URL]=API-BaseURL
+  [SESSIONS_TABLE]=DynamoDB-SessionsTableName
+  [COGNITO_USER_POOL_ID]=Cognito-UserPoolID
+  [COGNITO_CLIENT_ID]=Cognito-UserPoolClientID
 )
 
 COMPONENTS=(cognito dynamodb api)
@@ -77,7 +77,7 @@ function deploy-backend-component {
     ${template:+--template $template} \
     ${STACK_PREFIX:+--stack-name $STACK_PREFIX-$component} \
     --tags sse:component="$component" sse:stack-type=dev sse:stack-role=application sse:owner="$USER_NAME" \
-    --params ${STACK_PREFIX:+ExportNamePrefix=$STACK_PREFIX}
+    --params ${STACK_PREFIX:+DeploymentName=$STACK_PREFIX}
 
   popd > /dev/null
 }
