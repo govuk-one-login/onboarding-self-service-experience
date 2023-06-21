@@ -43,7 +43,6 @@ Mappings:
 Conditions:
   InitialAccount: !Equals [ !Ref InitialAccount, Yes ]
   DevelopmentAccount: !Equals [ !Ref EnvironmentType, development ]
-  InitialDevelopmentAccount: !And [ !Condition InitialAccount, !Condition DevelopmentAccount ]
   InitialProductionAccount: !And [ !Condition InitialAccount, !Not [ !Condition DevelopmentAccount ] ]
 
 Resources:
@@ -59,14 +58,6 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: InitialProductionAccount
     DependsOn: GitHubIdentityProvider
-    Properties:
-      TemplateURL: !Sub ${TemplateStorageBucket}/container-signer/template.yaml
-      Parameters:
-        AllowedAccounts: !Ref DownstreamAccounts
-
-  DevelopmentContainerSigner:
-    Type: AWS::CloudFormation::Stack
-    Condition: InitialDevelopmentAccount
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/container-signer/template.yaml
       Parameters:
@@ -140,11 +131,8 @@ Outputs:
     Condition: InitialProductionAccount
     Value: !GetAtt GitHubIdentityProvider.Outputs.GitHubIdentityProviderArn
   ContainerSigningKeyARN:
-    Condition: InitialAccount
-    Value: !If
-      - InitialProductionAccount
-      - !GetAtt ContainerSigner.Outputs.ContainerSignerKmsKeyArn
-      - !GetAtt DevelopmentContainerSigner.Outputs.ContainerSignerKmsKeyArn
+    Condition: InitialProductionAccount
+    Value: !GetAtt ContainerSigner.Outputs.ContainerSignerKmsKeyArn
   SigningProfileName:
     Condition: InitialAccount
     Value: !GetAtt CodeSigner.Outputs.SigningProfileName
