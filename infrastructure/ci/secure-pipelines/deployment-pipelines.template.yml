@@ -189,53 +189,78 @@ Resources:
       Parameters:
         PipelineStackName: !Select [ 1, !Split [ "/", !Ref FrontendDeployer ] ]
 
-  APIDeploymentMonitoringPolicy:
+  APIDeploymentPolicy:
     Type: AWS::IAM::Policy
+    Condition: APIRepositorySource
     Properties:
       Roles: [ !GetAtt APIDeployer.Outputs.GitHubActionsRoleName ]
-      PolicyName: !Sub ${StackNamePrefix}-api-DeploymentMonitoring
+      PolicyName: !Sub ${StackNamePrefix}-api-deployment
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          Effect: Allow
-          Action: codepipeline:ListPipelineExecutions
-          Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${APIDeployer.Outputs.PipelineName}
+          - Effect: Allow
+            Action:
+              - codepipeline:ListPipelineExecutions
+              - codepipeline:StartPipelineExecution
+            Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${APIDeployer.Outputs.PipelineName}
+          - Effect: Allow
+            Action:
+              - codepipeline:EnableStageTransition
+              - codepipeline:DisableStageTransition
+            Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${APIDeployer.Outputs.PipelineName}/Deploy
 
-  CognitoDeploymentMonitoringPolicy:
+  CognitoDeploymentPolicy:
     Type: AWS::IAM::Policy
+    Condition: CognitoRepositorySource
     Properties:
       Roles: [ !GetAtt CognitoDeployer.Outputs.GitHubActionsRoleName ]
-      PolicyName: !Sub ${StackNamePrefix}-cognito-DeploymentMonitoring
+      PolicyName: !Sub ${StackNamePrefix}-cognito-deployment
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          Effect: Allow
-          Action: codepipeline:ListPipelineExecutions
-          Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CognitoDeployer.Outputs.PipelineName}
+          - Effect: Allow
+            Action:
+              - codepipeline:ListPipelineExecutions
+              - codepipeline:StartPipelineExecution
+            Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CognitoDeployer.Outputs.PipelineName}
+          - Effect: Allow
+            Action:
+              - codepipeline:EnableStageTransition
+              - codepipeline:DisableStageTransition
+            Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CognitoDeployer.Outputs.PipelineName}/Deploy
 
-  DynamoDBDeploymentMonitoringPolicy:
+  DynamoDBDeploymentPolicy:
     Type: AWS::IAM::Policy
+    Condition: DynamoDBRepositorySource
     Properties:
       Roles: [ !GetAtt DynamoDBDeployer.Outputs.GitHubActionsRoleName ]
-      PolicyName: !Sub ${StackNamePrefix}-dynamodb-DeploymentMonitoring
+      PolicyName: !Sub ${StackNamePrefix}-dynamodb-deployment
       PolicyDocument:
         Version: 2012-10-17
         Statement:
           Effect: Allow
-          Action: codepipeline:ListPipelineExecutions
+          Action:
+            - codepipeline:ListPipelineExecutions
+            - codepipeline:StartPipelineExecution
           Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${DynamoDBDeployer.Outputs.PipelineName}
 
-  FrontendDeploymentMonitoringPolicy:
+  FrontendDeploymentPolicy:
     Type: AWS::IAM::Policy
+    Condition: FrontendRepositorySource
     Properties:
       Roles: [ !GetAtt FrontendDeployer.Outputs.GitHubActionsRoleName ]
-      PolicyName: !Sub ${StackNamePrefix}-frontend-DeploymentMonitoring
+      PolicyName: !Sub ${StackNamePrefix}-frontend-deployment
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          Effect: Allow
-          Action: codepipeline:ListPipelineExecutions
-          Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${FrontendDeployer.Outputs.PipelineName}
+          - Effect: Allow
+            Action:
+              - codepipeline:ListPipelineExecutions
+              - codepipeline:StartPipelineExecution
+            Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${FrontendDeployer.Outputs.PipelineName}
+          - Effect: Allow
+            Action: ecr:BatchDeleteImage
+            Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${FrontendECRRepository.Outputs.ContainerRepositoryName}
 
 Outputs:
   # Promotion
