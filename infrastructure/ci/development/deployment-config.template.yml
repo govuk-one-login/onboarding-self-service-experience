@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: AWS config to deploy self-service local stacks from dev machines and preview stacks from GitHub Actions
+Description: AWS config to deploy Admin Tool local stacks from dev machines and preview stacks from GitHub Actions
 Transform: AWS::LanguageExtensions
 
 Parameters:
@@ -9,23 +9,15 @@ Parameters:
   GitHubRepo:
     Type: String
     Default: di-onboarding-self-service-experience
-  CreateOIDCProvider:
-    Type: String
-    Default: true
   PreviewStacksPrefix:
     Type: String
     Default: preview
-  DevNotificationEmail:
+  ServiceName:
     Type: String
-  FrontendECSTaskRole:
+    Default: self-service
+  NotificationsEmail:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /self-service/config/frontend/ecs/task-role-arn
-  FrontendECSExecutionRole:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /self-service/config/frontend/ecs/execution-role-arn
-
-Conditions:
-  CreateOIDCProvider: !Equals [ !Ref CreateOIDCProvider, "true" ]
+    Default: /self-service/api/notifications-email
 
 Resources:
   GitHubActionsRole:
@@ -37,10 +29,7 @@ Resources:
           - Effect: Allow
             Action: sts:AssumeRoleWithWebIdentity
             Principal:
-              Federated: !If
-                - CreateOIDCProvider
-                - !Ref GithubOIDCProvider
-                - !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+              Federated: !Ref GitHubOIDCProvider
             Condition:
               StringLike:
                 token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${GitHubRepo}:*
@@ -65,7 +54,9 @@ Resources:
                   - s3:DeleteObject
 
               - Effect: Allow
-                Resource: !Sub arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-*
+                Resource:
+                  - !Sub arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-*
+                  - !Sub arn:aws:cloudformation:${AWS::Region}:aws:transform/LanguageExtensions
                 Action: cloudformation:CreateChangeSet
 
               - Effect: Allow
@@ -81,13 +72,13 @@ Resources:
                   - cloudformation:DeleteStack
 
               - Effect: Allow
-                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/self-service/config/*
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ServiceName}/*
                 Action:
                   - ssm:GetParameter
                   - ssm:GetParameters
                   - ssm:GetParametersByPath
 
-  DeployFrontendPolicy:
+  FrontendDeploymentPolicy:
     Type: AWS::IAM::Policy
     Properties:
       Roles: [ !Ref GitHubActionsRole ]
@@ -98,6 +89,7 @@ Resources:
           - Effect: Allow
             Resource: "*"
             Action:
+              - ecs:CreateCluster
               - ecr:DescribeRegistry
               - ecr:GetAuthorizationToken
               - ecs:ListTaskDefinitions
@@ -106,7 +98,7 @@ Resources:
               - ecs:DeregisterTaskDefinition
 
           - Effect: Allow
-            Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/self-service/frontend
+            Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ServiceName}/frontend
             Action:
               - ecr:InitiateLayerUpload
               - ecr:CompleteLayerUpload
@@ -119,17 +111,38 @@ Resources:
               - ecr:PutImage
 
           - Effect: Allow
-            Resource:
-              - !Ref FrontendECSTaskRole
-              - !Ref FrontendECSExecutionRole
-            Action: iam:PassRole
+            Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${PreviewStacksPrefix}-frontend-*
+            Action:
+              - iam:GetRole
+              - iam:TagRole
+              - iam:PassRole
+              - iam:UntagRole
+              - iam:CreateRole
+              - iam:DeleteRole
+              - iam:GetRolePolicy
+              - iam:PutRolePolicy
+              - iam:AttachRolePolicy
+              - iam:DetachRolePolicy
+              - iam:DeleteRolePolicy
             Condition:
-              StringEquals:
+              StringEqualsIfExists:
                 iam:PassedToService: ecs-tasks.amazonaws.com
-              ArnLike:
-                iam:AssociatedResourceARN: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/self-service-frontend*
+              ArnLikeIfExists:
+                iam:AssociatedResourceARN: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/${PreviewStacksPrefix}-*
 
-  DeployApiPolicy:
+          - Effect: Allow
+            Resource:
+              - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${PreviewStacksPrefix}-*
+              - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/${PreviewStacksPrefix}-*/${ServiceName}-frontend
+            Action:
+              - ecs:CreateService
+              - ecs:UpdateService
+              - ecs:DeleteService
+              - ecs:DescribeServices
+              - ecs:DescribeClusters
+              - ecs:DeleteCluster
+
+  ApiDeploymentPolicy:
     Type: AWS::IAM::Policy
     Properties:
       Roles: [ !Ref GitHubActionsRole ]
@@ -140,6 +153,10 @@ Resources:
           - Effect: Allow
             Resource: "*"
             Action: logs:DescribeLogGroups
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/api/auth-api-key-*
+            Action: secretsmanager:GetSecretValue
 
           - Effect: Allow
             Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${PreviewStacksPrefix}-api-*
@@ -166,7 +183,7 @@ Resources:
                   - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine*
 
           - Effect: Allow
-            Resource: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${PreviewStacksPrefix}-api-*
+            Resource: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${PreviewStacksPrefix}-*-internal-notifications
             Action:
               - sns:ListSubscriptionsByTopic
               - sns:GetTopicAttributes
@@ -177,7 +194,7 @@ Resources:
               - sns:Subscribe
             Condition:
               StringEqualsIfExists:
-                Endpoint: !Ref DevNotificationEmail
+                Endpoint: !Ref NotificationsEmail
                 Protocol: email
 
           - Effect: Allow
@@ -197,10 +214,11 @@ Resources:
                 lambda:Principal: apigateway.amazonaws.com
 
           - Effect: Allow
-            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/preview/states/${PreviewStacksPrefix}-api-*:log-stream:*
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api/step-functions:log-stream:*
             Action:
               - logs:CreateLogGroup
               - logs:DeleteLogGroup
+              - logs:TagResource
 
           - Effect: Allow
             Resource: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*
@@ -254,14 +272,111 @@ Resources:
                 aws:RequestTag/aws:cloudformation:stack-name: !Sub ${PreviewStacksPrefix}-api-*
 
           - Effect: Allow
-            Resource: !Sub arn:aws:apigateway:${AWS::Region}::/apis/*/stages/self-service-api
+            Resource: !Sub arn:aws:apigateway:${AWS::Region}::/apis/*/stages/${ServiceName}-api
             Action:
               - apigateway:PATCH
               - apigateway:DELETE
 
-  GithubOIDCProvider:
+  CognitoDeploymentPolicy:
+    # checkov:skip=CKV_AWS_109:Ensure IAM policies does not allow permissions management without constraints
+    # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !Ref GitHubActionsRole ]
+      PolicyName: DeployCognito
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: "*"
+            Action: cognito-idp:CreateUserPool
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${AWS::Region}_*
+            Action:
+              - cognito-idp:DeleteUserPool
+              - cognito-idp:CreateUserPoolClient
+              - cognito-idp:DeleteUserPoolClient
+              - cognito-idp:SetUserPoolMfaConfig
+
+          - Effect: Allow
+            Resource: "*"
+            Action:
+              - kms:CreateKey
+              - kms:DescribeKey
+              - kms:PutKeyPolicy
+              - kms:TagResource
+              - kms:CreateGrant
+              - kms:ScheduleKeyDeletion
+            Condition:
+              StringLikeIfExists:
+                aws:RequestTag/aws:cloudformation:stack-name: !Sub ${PreviewStacksPrefix}-cognito-*
+                aws:ResourceTag/aws:cloudformation:stack-name: !Sub ${PreviewStacksPrefix}-cognito-*
+              StringEqualsIfExists:
+                kms:KeySpec: SYMMETRIC_DEFAULT
+                kms:KeyUsage: ENCRYPT_DECRYPT
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${PreviewStacksPrefix}-cognito-*
+            Action:
+              - iam:GetRole
+              - iam:TagRole
+              - iam:UntagRole
+              - iam:PassRole
+              - iam:CreateRole
+              - iam:DeleteRole
+              - iam:GetRolePolicy
+              - iam:PutRolePolicy
+              - iam:AttachRolePolicy
+              - iam:DetachRolePolicy
+              - iam:DeleteRolePolicy
+            Condition:
+              StringEqualsIfExists:
+                iam:PassedToService: lambda.amazonaws.com
+              ArnLikeIfExists:
+                iam:AssociatedResourceARN: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${PreviewStacksPrefix}-cognito-*
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${PreviewStacksPrefix}-cognito-*
+            Action:
+              - lambda:ListTags
+              - lambda:TagResource
+              - lambda:GetFunction
+              - lambda:CreateFunction
+              - lambda:DeleteFunction
+              - lambda:AddPermission
+              - lambda:RemovePermission
+              - lambda:UpdateFunctionCode
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/cognito/notify-api-key-*
+            Action: secretsmanager:GetSecretValue
+
+  DynamoDBDeploymentPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !Ref GitHubActionsRole ]
+      PolicyName: DeployDynamoDB
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${PreviewStacksPrefix}-*
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:CreateTable
+              - dynamodb:DeleteTable
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${PreviewStacksPrefix}-*-sessions
+            Action:
+              - dynamodb:UpdateTimeToLive
+              - dynamodb:DescribeTimeToLive
+
+  GitHubOIDCProvider:
     Type: AWS::IAM::OIDCProvider
-    Condition: CreateOIDCProvider
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       Url: https://token.actions.githubusercontent.com
       ClientIdList: [ sts.amazonaws.com ]
@@ -276,26 +391,18 @@ Resources:
     # checkov:skip=CKV_AWS_56: "Ensure S3 bucket has 'restrict_public_bucket' enabled"
     Type: AWS::S3::Bucket
 
-  DevNotificationEmailParam:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Description: Email address used by the dev API Lambdas to send internal notifications
-      Name: /self-service/config/api/notification-email
-      Value: !Ref DevNotificationEmail
-      Type: String
-
   CloudWatchLogsResourcePolicy:
     Type: AWS::Logs::ResourcePolicy
     Properties:
       PolicyName: PreviewStacksLogDelivery
       PolicyDocument:
         Fn::ToJsonString:
-          Version: "2012-10-17"
+          Version: 2012-10-17
           Statement:
             Effect: Allow
             Resource:
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/preview/*
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/dev/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/dev/*
             Action:
               - logs:CreateLogStream
               - logs:PutLogEvents
@@ -307,13 +414,38 @@ Resources:
               ArnLike:
                 aws:SourceArn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
 
+  FrontendContainerImageRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub ${ServiceName}/frontend
+      ImageTagMutability: IMMUTABLE
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      EncryptionConfiguration:
+        EncryptionType: KMS
+      LifecyclePolicy:
+        RegistryId: !Ref AWS::AccountId
+        LifecyclePolicyText:
+          Fn::ToJsonString:
+            rules:
+              - rulePriority: 1
+                description: Keep images pushed in the last 5 days
+                selection:
+                  tagStatus: any
+                  countType: sinceImagePushed
+                  countUnit: days
+                  countNumber: 14
+                action:
+                  type: expire
+
 Outputs:
-  GitHubActionsRoleARN:
+  DeploymentRoleARN:
     Value: !GetAtt GitHubActionsRole.Arn
-  GitHubDeploymentArtifactsBucket:
+  DeploymentArtifactsBucket:
     Value: !Ref GitHubDeploymentArtifactsBucket
+  FrontendContainerImageRepository:
+    Value: !Ref FrontendContainerImageRepository
   GitHubIdentityProviderARN:
-    Condition: CreateOIDCProvider
-    Value: !Ref GithubOIDCProvider
+    Value: !Ref GitHubOIDCProvider
     Export:
       Name: GitHubIdentityProviderArn

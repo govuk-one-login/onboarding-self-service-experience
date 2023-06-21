@@ -2,7 +2,7 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 set -eu
 
-../deploy-sam-stack.sh "$@" \
+../../deploy-sam-stack.sh "$@" \
   --validate \
   --account development \
   --stack-name dev-deployments-config \
