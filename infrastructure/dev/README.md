@@ -76,7 +76,7 @@ npm run deploy admin-tool [prefix]
 List all deployed stacks with the given or default prefix
 
 ```shell
-npm run list [prefix]
+npm run list [prefix] [--all]
 ```
 
 Delete all stacks with the given or default prefix

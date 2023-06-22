@@ -20,7 +20,8 @@ function update-subject-claim-template {
 function update-deployment-environment {
   write-github-actions-variables \
     "$(../../aws.sh get-stack-outputs secure-pipelines-support SigningProfileName ContainerSigningKeyARN)" \
-    "$(../../aws.sh get-stack-outputs secure-pipelines DeploymentRoleArn ArtifactSourceBucketName FrontendECRRepositoryName)"
+    "$(../../aws.sh get-stack-outputs secure-pipelines \
+      DeploymentRoleArn ArtifactSourceBucketName FrontendECRRepositoryName PipelineName)"
 }
 
 function check-deployment-environment-config {

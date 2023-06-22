@@ -1,14 +1,15 @@
 {
   "name": "gds-di-self-service-backend-cognito",
-  "description": "DI self-service backend - Cognito",
+  "description": "DI Self-Service backend - Cognito",
   "scripts": {
     "build": "../../infrastructure/dev/deploy.sh cognito --no-deploy",
     "deploy": "../../infrastructure/dev/deploy.sh cognito",
-    "test": "jest --silent"
+    "test": "jest --silent",
+    "compile": "tsc"
   },
   "dependencies": {
-    "@aws-sdk/client-ses": "^3.306.0",
-    "esbuild": "^0.17.16",
-    "notifications-node-client": "^7.0.0"
+    "@aws-sdk/client-ses": "^3.354.0",
+    "notifications-node-client": "^7.0.0",
+    "esbuild": "^0.18.4"
   }
 }

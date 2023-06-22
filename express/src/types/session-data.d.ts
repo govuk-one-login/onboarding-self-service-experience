@@ -1,7 +1,7 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import MfaResponse from "./mfa-response";
 
-export default interface SelfServiceSessionData {
+export default interface SelfServiceSessionData extends Record<string, unknown> {
     emailAddress: string;
     mobileNumber: string;
     cognitoSession: string;
