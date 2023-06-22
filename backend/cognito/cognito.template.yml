@@ -3,9 +3,6 @@ Description: Cognito UserPool and Client for the Admin Tool
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  ExternalId:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /self-service/cognito/external-id
   DeletionProtection:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/config/deletion-protection-enabled
@@ -138,6 +135,7 @@ Resources:
           SECURITY_CODE_TEXT_MESSAGE_TEMPLATE: !Ref SecurityCodeTextMessageTemplate
           KEY_ARN: !GetAtt SecurityCodeEncryptionKey.Arn
       MemorySize: 1024
+      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
       Policies:
         Statement:
             Effect: Allow
@@ -461,10 +459,6 @@ Resources:
         SourceArn: !ImportValue EmailIdentityARN
         From: !Sub [ "admin-tool@${emailDomain}", { emailDomain: !ImportValue EmailDomain } ]
       # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
-      SmsConfiguration:
-        SnsCallerArn: !GetAtt SmsRole.Arn
-        ExternalId: !Ref ExternalId
-        SnsRegion: !Ref AWS::Region
       LambdaConfig:
         CustomSMSSender:
           LambdaArn: !GetAtt SecurityCodeTextMessageSender.Arn
@@ -624,30 +618,6 @@ Resources:
         - ALLOW_ADMIN_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
 
-  # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
-  SmsRole:
-    Type: AWS::IAM::Role
-    Properties:
-      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: cognito-idp.amazonaws.com
-            Condition:
-              StringEquals:
-                sts:ExternalId: !Ref ExternalId
-                aws:SourceAccount: !Ref AWS::AccountId
-      Policies:
-        - PolicyName: !Sub ${AWS::StackName}-SnsPublishPolicy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              Effect: Allow
-              Action: sns:publish
-              Resource: "*"
 
   CognitoInvokeSecurityCodeTextMessageSenderPermission:
     Type: AWS::Lambda::Permission
