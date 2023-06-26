@@ -1,5 +1,7 @@
 import {When, Then} from "@cucumber/cucumber";
 import {enterTextIntoTextInput, checkErrorMessageDisplayedForField, clickSubmitButton} from "./shared-functions";
+import {TestContext} from "../test-setup";
+import {strict as assert} from "assert";
 
 const fields = {
     name: "userName",
@@ -40,4 +42,14 @@ When("they submit a valid password", async function () {
 Then("the error message {string} must be displayed for the {} field", async function (errorMessage, fieldName) {
     const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${fields[fieldName as keyof typeof fields]}"]`);
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, fields[fieldName as keyof typeof fields]);
+});
+
+Then("they can see the content in the {} field", async function (this: TestContext, fieldName) {
+    const inputTypeValue = await this.page.$eval(`#${fields[fieldName as keyof typeof fields]}`, element => element.getAttribute("type"));
+    assert.equal(inputTypeValue, "text");
+});
+
+Then("they can not see the content in the {} field", async function (this: TestContext, fieldName) {
+    const inputTypeValue = await this.page.$eval(`#${fields[fieldName as keyof typeof fields]}`, element => element.getAttribute("type"));
+    assert.equal(inputTypeValue, "password");
 });

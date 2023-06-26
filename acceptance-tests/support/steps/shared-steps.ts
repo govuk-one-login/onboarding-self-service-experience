@@ -67,6 +67,10 @@ When("they click the Confirm button", async function () {
     await clickSubmitButton(this.page);
 });
 
+When("they click the Resend security code button", async function () {
+    await clickSubmitButton(this.page);
+});
+
 When("they click the Continue button", async function () {
     const button = await getButtonLink(this.page, "Continue");
 
