@@ -16,6 +16,7 @@ declare -A PARAMETERS=(
 declare -A SECRETS=(
   [auth_api_key]=$PARAMETER_NAME_PREFIX/api/auth-api-key
   [notify_api_key]=$PARAMETER_NAME_PREFIX/cognito/notify-api-key
+  [session_secret]=$PARAMETER_NAME_PREFIX/frontend/session-secret
 )
 
 function check-parameter-set {
