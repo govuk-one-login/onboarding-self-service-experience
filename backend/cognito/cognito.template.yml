@@ -136,6 +136,8 @@ Resources:
         Variables:
           NOTIFY_API_KEY: "{{resolve:secretsmanager:/self-service/cognito/notify-api-key:SecretString}}"
           SECURITY_CODE_TEXT_MESSAGE_TEMPLATE: !Ref SecurityCodeTextMessageTemplate
+          KEY_ARN: !GetAtt SecurityCodeEncryptionKey.Arn
+      MemorySize: 1024
       Policies:
         Statement:
             Effect: Allow
