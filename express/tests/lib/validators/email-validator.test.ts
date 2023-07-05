@@ -22,7 +22,7 @@ describe("Verify email addresses", () => {
 
     describe("Verify an email address is formatted correctly", () => {
         it("Accept an RFC822 compliant email address", async () => {
-            expect((await validateEmail("an_Email+modification@some.domain.gov.uk")).isValid).toBe(true);
+            expect((await validateEmail("an_Email+modification@test.gov.uk")).isValid).toBe(true);
         });
 
         it("Reject an email without the @ symbol", async () => {

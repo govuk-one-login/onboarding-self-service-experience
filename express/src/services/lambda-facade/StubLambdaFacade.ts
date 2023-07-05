@@ -85,7 +85,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         sk: {S: "user#29ad13ba-ceca-4141-95d7-e376b0ca4688"},
                         role: {S: "admin"},
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
-                        data: {S: "john.watts@digital.cabinet-office.gov.uk"}
+                        data: {S: "john.watts@test.gov.uk"}
                     }
                 ]
             }
@@ -100,7 +100,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         service_name: {S: this.serviceName},
                         post_logout_redirect_uris: convertToAttr(this.postLogoutRedirectUris),
                         subject_type: {S: "pairwise"},
-                        contacts: {L: [{S: "john.watts@digital.cabinet-office.gov.uk"}, {S: "onboarding@digital.cabinet-office.gov.uk"}]},
+                        contacts: {L: [{S: "john.watts@test.gov.uk"}, {S: "onboarding@test.gov.uk"}]},
                         public_key: {
                             S: this.publicKey
                         },

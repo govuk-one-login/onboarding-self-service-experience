@@ -133,7 +133,7 @@ When("they enter {string} into the {string} field", async function (text: string
 });
 
 When("they click on the forgot password link in their email", async function () {
-    const path = "/sign-in/forgot-password/create-new-password?loginName=registered@gds.gov.uk&confirmationCode=123456";
+    const path = "/sign-in/forgot-password/create-new-password?loginName=registered@test.gov.uk&confirmationCode=123456";
     await this.goToPath(path);
 });
 

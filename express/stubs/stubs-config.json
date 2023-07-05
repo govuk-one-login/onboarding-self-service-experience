@@ -2,17 +2,17 @@
   "createUser": [
     {
       "parameter": "email",
-      "value": "inuse@foo.gov.uk",
+      "value": "inuse@test.gov.uk",
       "throw": "UsernameExistsException"
     },
     {
       "parameter": "email",
-      "value": "inuse-password-will-be-wrong@foo.gov.uk",
+      "value": "inuse-password-will-be-wrong@test.gov.uk",
       "throw": "UsernameExistsException"
     },
     {
       "parameter": "email",
-      "value": "returnsomething@foo.gov.uk",
+      "value": "returnsomething@test.gov.uk",
       "return": {
         "$metadata": {
           "foo": "bar"
@@ -23,7 +23,7 @@
   "login": [
     {
       "parameter": "email",
-      "value": "registered@gds.gov.uk",
+      "value": "registered@test.gov.uk",
       "return": {
         "$metadata": {
           "httpStatusCode": 200,
@@ -45,7 +45,7 @@
     },
     {
       "parameter": "email",
-      "value": "inuse@foo.gov.uk",
+      "value": "inuse@test.gov.uk",
       "return": {
         "$metadata": {
           "httpStatusCode": 200,
@@ -67,24 +67,24 @@
     },
     {
       "parameter": "email",
-      "value": "inuse-password-will-be-wrong@foo.gov.uk",
+      "value": "inuse-password-will-be-wrong@test.gov.uk",
       "throw": "NotAuthorizedException"
     },
     {
       "parameter": "email",
-      "value": "registering-successfully@gds.gov.uk",
+      "value": "registering-successfully@test.gov.uk",
       "return": {
         "Session": "Some or other arbitrary non-null value"
       }
     },
     {
       "parameter": "email",
-      "value": "password-will-be-wrong@stub.gov.uk",
+      "value": "password-will-be-wrong@test.gov.uk",
       "throw": "NotAuthorizedException"
     },
     {
       "parameter": "email",
-      "value": "not-registered@gds.gov.uk",
+      "value": "not-registered@test.gov.uk",
       "throw": "UserNotFoundException"
     }
   ],
