@@ -453,7 +453,7 @@ Resources:
           </html>
         EmailSubject: Your security code for the GOV.UK One Login Admin Tool
         DefaultEmailOption: CONFIRM_WITH_CODE
-      MfaConfiguration: OPTIONAL
+      MfaConfiguration: "OFF"
       EmailConfiguration:
         EmailSendingAccount: DEVELOPER
         SourceArn: !ImportValue EmailIdentityARN
