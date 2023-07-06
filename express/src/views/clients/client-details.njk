@@ -5,12 +5,14 @@
 {% set pageTitle = "Client details" %}
 
 {% set userAttributes %}
-  {% for item in userAttributesRequired %}
-    {% if item == "openid" %}OpenID<br>{% endif %}
-    {% if item == "email" %}Email address<br>{% endif %}
-    {% if item == "phone" %}Phone number<br>{% endif %}
-    {% if item == "offline_access" %}Offline access{% endif %}
-  {% endfor %}
+  <div id="userAttributes">
+    {% for item in userAttributesRequired %}
+      {% if item == "openid" %}OpenID<br>{% endif %}
+      {% if item == "email" %}Email address<br>{% endif %}
+      {% if item == "phone" %}Phone number<br>{% endif %}
+      {% if item == "offline_access" %}Offline access{% endif %}
+    {% endfor %}
+  </div>
 {% endset %}
 
 {% block mainContent %}
@@ -32,7 +34,7 @@
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Integration client</h2>
 
   {% set clientIdContainer %}
-    <code>{{ clientId }}</code>
+    <code id="client-id-value">{{ clientId }}</code>
   {% endset %}
 
   {% set publicKeyLabel %}
@@ -57,11 +59,15 @@
   {% endset %}
 
   {% set redirectUrlsContainer %}
-      <ul class="govuk-list">
+      <ul class="govuk-list" id="redirectUris">
         {% for item in redirectUrls %}
-          <li>{{ item }}</li>
+          <li id="redirectUri{{ loop.index }}">{{ item }}</li>
         {% endfor %}
       </ul>
+  {% endset %}
+
+  {% set postLogoutRedirectUrlsContainer %}
+    <div id="postLogoutRedirectUris">{{ postLogoutRedirectUrls }}</div>
   {% endset %}
 
   {{ govukSummaryList({
@@ -105,7 +111,7 @@
       },
       {
         key: {text: "Post logout redirect URIs (optional)"},
-        value: {text: postLogoutRedirectUrls},
+        value: {html: postLogoutRedirectUrlsContainer},
         actions: {
           items: [{
             href: urls.changePostLogoutUris,
@@ -117,8 +123,8 @@
     ]
   }) }}
 
-  <details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary">
+  <details class="govuk-details" data-module="govuk-details" id="client-details-summary">
+    <summary class="govuk-details__summary" id="client-details-summary-toggle">
       <span class="govuk-details__summary-text">What do these terms mean?</span>
     </summary>
     <div class="govuk-details__text">

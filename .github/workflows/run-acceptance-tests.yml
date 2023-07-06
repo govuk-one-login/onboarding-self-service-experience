@@ -40,7 +40,8 @@ jobs:
           HOST: ${{ inputs.host }}
           REPORT: ${{ runner.temp }}/acceptance-tests.report
         run: |
-          features=(features/*.feature)
+          shopt -s globstar
+          features=(features/**/*.feature)
           
           for feature in "${features[@]}"; do
             [[ ${idx:-} ]] && idx=$((idx + 1)) && echo | tee heading || idx=1
