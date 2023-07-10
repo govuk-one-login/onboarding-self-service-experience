@@ -1,6 +1,8 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: DI Self-Service API
-Transform: AWS::Serverless-2016-10-31
+Transform:
+  - AWS::Serverless-2016-10-31
+  - AWS::LanguageExtensions
 
 Parameters:
   AuthRegistrationBaseUrl:
@@ -44,11 +46,23 @@ Globals:
 Resources:
 
   SelfServiceApi:
-    # checkov:skip=CKV_AWS_95: "Ensure API Gateway V2 has Access Logging enabled"
     Type: AWS::Serverless::HttpApi
     Properties:
       FailOnWarnings: true
       StageName: self-service-api
+      AccessLogSettings:
+        DestinationArn: !GetAtt HttpApiLogGroup.Arn
+        Format:
+          Fn::ToJsonString:
+            requestId: $context.requestId
+            ip: $context.identity.sourceIp
+            requestTime: $context.requestTime
+            httpMethod: $context.httpMethod
+            path: $context.path"
+            routeKey: $context.routeKey
+            status: $context.status
+            protocol: $context.protocol
+            responseLength: $context.responseLength
 
   #--- Users ---#
 
@@ -517,11 +531,17 @@ Resources:
 
   StepFunctionsLogGroup:
     # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
-    # checkov:skip=CKV_AWS_66: "Ensure that CloudWatch Log Group specifies retention days"
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/step-functions
+      RetentionInDays: 14
 
+  HttpApiLogGroup:
+    # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupNamePrefix}/http-api/${AWS::StackName}
+      RetentionInDays: 14
   #--- Notifications ---#
 
   PrivateBetaNotificationFunction:
