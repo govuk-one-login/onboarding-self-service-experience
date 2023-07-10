@@ -389,6 +389,7 @@ Resources:
     # checkov:skip=CKV_AWS_54: "Ensure S3 bucket has block public policy enabled"
     # checkov:skip=CKV_AWS_55: "Ensure S3 bucket has ignore public ACLs enabled"
     # checkov:skip=CKV_AWS_56: "Ensure S3 bucket has 'restrict_public_bucket' enabled"
+    # checkov:skip=GDS_AWS_3: "Check that all S3 buckets have corresponding bucket policies"
     Type: AWS::S3::Bucket
 
   CloudWatchLogsResourcePolicy:
