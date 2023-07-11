@@ -2,9 +2,14 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 set -eu
 
+STACK_NAME=deployment-config
+
 ../../deploy-sam-stack.sh "$@" \
   --validate \
   --account development \
-  --stack-name dev-deployments-config \
+  --stack-name $STACK_NAME \
   --template deployment-config.template.yml \
   --tags sse:stack-type=config sse:stack-role=deployment
+
+../configure-github-repo.sh update-deployment-environment development $STACK_NAME \
+  DeploymentRoleARN DeploymentArtifactsBucket FrontendContainerImageRepository

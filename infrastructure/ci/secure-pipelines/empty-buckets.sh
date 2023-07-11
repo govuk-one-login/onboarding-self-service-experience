@@ -23,7 +23,7 @@ function delete-objects {
 }
 
 function list-buckets {
-  aws s3 ls | cut -d ' ' -f 3 | grep "^secure-pipelines-${1:-}"
+  aws s3 ls | cut -d ' ' -f 3 | grep --extended-regexp "^secure-pipelines-($(IFS="|" && echo "$*"))"
 }
 
 function empty-bucket {
@@ -32,11 +32,11 @@ function empty-bucket {
 
 ../../aws.sh check-current-account
 [[ $* ]] || { list-buckets && exit; }
-[[ $1 == all ]] || suffix=$1
-[[ ${2:-} == loop ]] && loop=true
+[[ ${1:-} == loop ]] && loop=true && shift
+[[ $* == all ]] || filter=true
 
 while true; do
-  buckets=$(list-buckets "${suffix:-}") || { echo "No '$1' buckets found" && exit; }
+  buckets=$(list-buckets "${filter:+$@}") || { echo "No '$1' buckets found" && exit; }
   num_buckets=$(wc -l <<< "$buckets" | xargs)
 
   idx=1

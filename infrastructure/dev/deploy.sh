@@ -52,9 +52,9 @@ function get-env-vars {
 }
 
 function list {
-  [[ ${OPTIONS[*]} == --all ]] && local all=true
+  [[ ${OPTIONS[*]} =~ --all ]] && OPTIONS=("${OPTIONS[*]//--all/}") && local all=true
   aws cloudformation describe-stacks | (IFS="|" && jq --raw-output \
-    --arg regex "$STACK_PREFIX${all:+.*}-(${COMPONENTS[*]})" \
+    --arg regex "$STACK_PREFIX${all:+.*}-(${OPTIONS[*]:-${COMPONENTS[*]}})" \
     '.Stacks[] | select(.StackName | match($regex)) | .StackName')
 }
 

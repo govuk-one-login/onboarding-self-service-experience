@@ -24,7 +24,7 @@ while [[ -n $1 ]]; do
       done
       ;;
     -s3 | --prefix | --s3-prefix) shift && S3_PREFIX=$1 ;;
-    -f | --template | --template-file) shift && TEMPLATE=$1 ;;
+    -f | --template | --template-file) shift && TEMPLATE=$1 && VALIDATE=true ;;
     -a | --account) shift && ACCOUNT=$1 ;;
     -s | --base-dir) shift && SAM_BASE_DIR=$1 ;;
     -b | --build) BUILD=true ;;
