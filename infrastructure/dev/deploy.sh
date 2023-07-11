@@ -84,7 +84,7 @@ function deploy-backend-component {
 
 function run {
   get-env-vars && (IFS=$'\n' && echo "${env[*]}") || exit
-  eval "${env[*]}" COGNITO_CLIENT=CognitoClient LAMBDA_FACADE=LambdaFacade npm run dev
+  eval "${env[*]}" STUB_API=false npm run dev
 }
 
 function dynamodb {

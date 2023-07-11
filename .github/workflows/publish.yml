@@ -22,10 +22,7 @@ jobs:
     uses: ./.github/workflows/deploy-to-paas.yml
     with:
       environment: test
-      show-test-banner: true
       cf-space-name: self-service-test
-      cognito-client: StubCognitoClient
-      lambda-facade: StubLambdaFacade
       artifact-name: ${{ needs.build-5-frontend.outputs.artifact-name }}
       url: https://di-self-service-test.london.cloudapps.digital
     secrets:

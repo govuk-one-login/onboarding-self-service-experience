@@ -4,7 +4,6 @@ applications:
     memory: 512M
     disk_quota: 512M
     env:
-      COGNITO_CLIENT: ((cognito-client))
-      LAMBDA_FACADE: ((lambda-facade))
       GOOGLE_TAG_ID: ((google-tag-id))
-      SHOW_TEST_BANNER: ((show-test-banner))
+      TEST_BANNER: true
+      STUB_API: true

@@ -4,6 +4,7 @@ import "../lib/utils/optional";
 import RequestContext from "../types/request-context";
 import "./session-data";
 import configureViews from "./views";
+import configureServices from "./services";
 
 export default function Express(): Express {
     const app = express();
@@ -19,6 +20,7 @@ export default function Express(): Express {
         }
     });
 
+    configureServices(app);
     configureViews(app);
     return app;
 }

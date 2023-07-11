@@ -8,7 +8,7 @@ import AuthenticationResultParser from "../../lib/authentication-result-parser";
 import LambdaFacadeInterface, {ClientUpdates, UserUpdates} from "./LambdaFacadeInterface";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-class LambdaFacade implements LambdaFacadeInterface {
+export default class LambdaFacade implements LambdaFacadeInterface {
     private readonly client: Axios;
 
     constructor() {
@@ -109,5 +109,3 @@ class LambdaFacade implements LambdaFacadeInterface {
         });
     }
 }
-
-export default new LambdaFacade();

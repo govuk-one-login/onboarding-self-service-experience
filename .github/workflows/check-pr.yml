@@ -22,11 +22,8 @@ jobs:
     uses: ./.github/workflows/deploy-to-paas.yml
     with:
       environment: preview
-      show-test-banner: true
       app-name-prefix: di-sse-prev
       cf-space-name: self-service-preview
-      cognito-client: StubCognitoClient
-      lambda-facade: StubLambdaFacade
       artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
     secrets:
       cf-username: ${{ secrets.CF_USERNAME }}

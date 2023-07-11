@@ -18,6 +18,6 @@ COPY express/src/views src/views
 COPY express/assets/images assets/images
 
 USER node
-CMD COGNITO_CLIENT=StubCognitoClient LAMBDA_FACADE=StubLambdaFacade npm start
+CMD STUB_API=${STUB_API:-false} npm start
 
 HEALTHCHECK CMD wget --spider http://localhost:$PORT
