@@ -10,10 +10,6 @@ inputs:
   base-dir:
     description: "The SAM base directory to use when building the application"
     required: false
-  upload-artifact:
-    description: "Whether to upload a GitHub Actions artifact"
-    required: false
-    default: "true"
   additional-artifact-paths:
     description: "Additional paths to include in the artifact in addition to the built SAM application"
     required: false
@@ -35,5 +31,4 @@ runs:
         base-dir: ${{ inputs.base-dir }}
         cache-key: ${{ inputs.name }}
         artifact-name: ${{ inputs.name }}-SAM
-        upload-artifact: ${{ inputs.upload-artifact }}
         additional-artifact-paths: ${{ inputs.additional-artifact-paths }}

@@ -9,7 +9,7 @@ permissions: read-all
 
 jobs:
   build-frontend:
-    name: Build
+    name: Frontend
     uses: ./.github/workflows/build-frontend.yml
 
   run-unit-tests:
