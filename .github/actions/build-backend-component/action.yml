@@ -1,0 +1,39 @@
+name: Build a SAM application
+description: Build a backend component and optionally upload a GitHub Actions artifact
+inputs:
+  name:
+    description: "The name of the component to build"
+    required: true
+  template:
+    description: "The template to build"
+    required: false
+  base-dir:
+    description: "The SAM base directory to use when building the application"
+    required: false
+  upload-artifact:
+    description: "Whether to upload a GitHub Actions artifact"
+    required: false
+    default: "true"
+  additional-artifact-paths:
+    description: "Additional paths to include in the artifact in addition to the built SAM application"
+    required: false
+outputs:
+  component:
+    description: "Pass through the component name"
+    value: ${{ inputs.name }}
+  artifact-name:
+    description: "The name of the uploaded artifact"
+    value: ${{ steps.build.outputs.artifact-name }}
+runs:
+  using: composite
+  steps:
+    - name: Build SAM application
+      uses: alphagov/di-github-actions/sam/build-application@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
+      id: build
+      with:
+        template: ${{ inputs.template }}
+        base-dir: ${{ inputs.base-dir }}
+        cache-key: ${{ inputs.name }}
+        artifact-name: ${{ inputs.name }}-SAM
+        upload-artifact: ${{ inputs.upload-artifact }}
+        additional-artifact-paths: ${{ inputs.additional-artifact-paths }}

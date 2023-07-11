@@ -1,0 +1,41 @@
+name: Build frontend image
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name: { required: true, type: string }
+    outputs:
+      image-uri:
+        value: ${{ jobs.build.outputs.image-uri }}
+
+concurrency:
+  group: push-frontend-image-development-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    name: Push image
+    runs-on: ubuntu-latest
+    outputs:
+      image-uri: ${{ steps.push-image.outputs.image-uri }}
+
+    environment:
+      name: development
+      url: ${{ steps.push-image.outputs.image-url }}
+
+    steps:
+      - name: Push Docker image
+        uses: alphagov/di-github-actions/aws/ecr/build-docker-image@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
+        id: push-image
+        with:
+          aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          repository: ${{ vars.FRONTEND_CONTAINER_IMAGE_REPOSITORY }}
+          artifact-name: ${{ inputs.artifact-name }}
+          artifact-path: express/dist
+          image-version: ${{ github.sha }}
+          image-tags: ${{ github.head_ref || github.ref_name }}
+          dockerfile: infrastructure/frontend/Dockerfile

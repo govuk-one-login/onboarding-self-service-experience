@@ -5,6 +5,7 @@ on:
     inputs:
       environment: { required: true, type: string }
       cf-space-name: { required: true, type: string }
+      artifact-name: { required: true, type: string }
       app-name-prefix: { required: false, type: string }
       url: { required: false, type: string }
       instances: { required: false, type: number, default: 1 }
@@ -24,7 +25,7 @@ on:
         description: "The PaaS deployment URL"
         value: ${{ jobs.deploy.outputs.deployment-url }}
 
-permissions: read-all
+permissions: { }
 concurrency: deploy-paas-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
 
 jobs:
@@ -37,10 +38,14 @@ jobs:
     outputs:
       deployment-url: ${{ steps.push-to-paas.outputs.deployment-url }}
     steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
       - name: Get distribution artifact
         uses: actions/download-artifact@v3
         with:
-          name: self-service-front
+          name: ${{ inputs.artifact-name }}
+          path: express/dist
 
       - name: Push to PaaS
         id: push-to-paas
