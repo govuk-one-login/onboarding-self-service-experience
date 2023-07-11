@@ -130,20 +130,6 @@ Resources:
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/api-gateway-logs/template.yaml
 
-  VPC:
-    Type: AWS::CloudFormation::Stack
-    DependsOn: InfrastructureAuditHook
-    Properties:
-      TemplateURL: !Sub ${TemplateStorageBucket}/vpc/template.yaml
-      Parameters:
-        DynamoDBApiEnabled: "Yes"
-        ECRApiEnabled: "Yes"
-        ExecuteApiGatewayEnabled: "Yes"
-        LogsApiEnabled: "Yes"
-        VpcLinkEnabled: "Yes"
-        RestAPIGWVpcLinkEnabled: "Yes"
-        AccessLogsCustomBucketNameEnabled: "No"
-
 Outputs:
   GitHubIdentityProviderARN:
     Condition: InitialProductionAccount
@@ -167,7 +153,3 @@ Outputs:
     Value: !Select [ 1, !Split [ "/", !Ref SlackNotifications ] ]
     Export:
       Name: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
-  VPCStackName:
-    Value: !Select [ 1, !Split [ "/", !Ref VPC ] ]
-    Export:
-      Name: !Sub ${ExportNamePrefix}-VPCStackName

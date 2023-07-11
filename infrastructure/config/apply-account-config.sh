@@ -17,6 +17,10 @@ function control-tower {
   deploy-config-stack control-tower --tags sse:stack-role=account-management "$@"
 }
 
+function network {
+  deploy-config-stack network --tags sse:stack-role=vpc "$@"
+}
+
 function domain {
   local account servers params
 

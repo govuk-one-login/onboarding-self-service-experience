@@ -183,15 +183,13 @@ Resources:
           TargetGroupArn: !Ref ApplicationTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
-          SecurityGroups:
-            - !GetAtt ContainerServiceSecurityGroup.GroupId
-          Subnets: !Split
-            - ","
-            - Fn::ImportValue: VPC-ProtectedSubnets
+          Subnets: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
+          SecurityGroups: [ !GetAtt ContainerServiceSecurityGroup.GroupId ]
 
   ContainerServiceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      VpcId: !ImportValue VPC-ID
       GroupDescription: Frontend container service access
       SecurityGroupIngress:
         - Description: Allow traffic from the application load balancer
@@ -199,8 +197,6 @@ Resources:
           IpProtocol: tcp
           FromPort: !Ref ContainerPort
           ToPort: !Ref ContainerPort
-      VpcId:
-        Fn::ImportValue: VPC-ID
       Tags:
         - Key: Name
           Value: !Sub ${DeploymentName}-frontend-container-service
@@ -214,11 +210,8 @@ Resources:
       Type: application
       Scheme: internal
       Name: !Sub ${DeploymentName}-frontend
-      SecurityGroups:
-        - !Ref ApplicationSecurityGroup
-      Subnets: !Split
-        - ","
-        - Fn::ImportValue: VPC-ProtectedSubnets
+      Subnets: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
+      SecurityGroups: [ !Ref ApplicationSecurityGroup ]
       LoadBalancerAttributes:
         - Key: routing.http.drop_invalid_header_fields.enabled
           Value: true
@@ -231,11 +224,10 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: !Sub ${DeploymentName}-app
+      VpcId: !ImportValue VPC-ID
       Port: !Ref ContainerPort
       Protocol: HTTP
       TargetType: ip
-      VpcId:
-        Fn::ImportValue: VPC-ID
 
   ApplicationLoadBalancerListener:
     # checkov:skip=CKV_AWS_2:Certificate generation must be resolved before the listener can use HTTPS
@@ -252,16 +244,14 @@ Resources:
   ApplicationSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      VpcId: !ImportValue VPC-ID
       GroupDescription: Frontend application load balancer
       SecurityGroupIngress:
         - Description: Allow traffic from the VPC
+          CidrIp: !ImportValue VPC-CIDR
           IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp:
-            Fn::ImportValue: VPC-CIDR
-      VpcId:
-        Fn::ImportValue: VPC-ID
       Tags:
         - Key: Name
           Value: !Sub ${DeploymentName}-frontend-application-load-balancer
@@ -310,21 +300,19 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: !Sub ${DeploymentName}-net
-      Port: 80
-      Protocol: TCP
+      VpcId: !ImportValue VPC-ID
       TargetType: alb
+      Protocol: TCP
+      Port: 80
       Targets:
-        - Id: !Ref ApplicationLoadBalancer
-      VpcId:
-        Fn::ImportValue: VPC-ID
+        -Id: !Ref ApplicationLoadBalancer
 
   NetworkLoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       Port: 80
       Protocol: TCP
-      LoadBalancerArn:
-        Fn::ImportValue: VPC-NetworkLoadBalancerARN
+      LoadBalancerArn: !ImportValue VPC-NetworkLoadBalancerARN
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref NetworkLoadBalancerTargetGroup
@@ -384,9 +372,8 @@ Resources:
       IntegrationMethod: ANY
       IntegrationType: HTTP_PROXY
       IntegrationUri: !Ref NetworkLoadBalancerListener
+      ConnectionId: !ImportValue VPC-LinkID
       ConnectionType: VPC_LINK
-      ConnectionId:
-        Fn::ImportValue: VPC-LinkID
 
   #--- CDN ---#
 

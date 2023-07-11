@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Admin Tool VPC and networking components to provide security controls and public access to the app
+
+Parameters:
+  ExportPrefix:
+    Type: String
+    AllowedPattern: ^.*[^-]$
+    Default: VPC
+  TemplateStorageBucket:
+    Type: String
+    Default: https://template-storage-templatebucket-1upzyw6v9cs42.s3.amazonaws.com
+
+Resources:
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/vpc/template.yaml
+      Parameters:
+        ECRApiEnabled: "Yes"
+        LogsApiEnabled: "Yes"
+        DynamoDBApiEnabled: "Yes"
+        ExecuteApiGatewayEnabled: "Yes"
+        AccessLogsCustomBucketNameEnabled: "No"
+        AvailabilityZoneCount: 2
+        AllowedDomains: !Join [ ",", [
+          !Sub "cognito-idp.${AWS::Region}.amazonaws.com" ] ]
+        AllowRules: !Sub >
+          pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:"cognito-idp.${AWS::Region}.amazonaws.com";
+          startswith; endswith; msg:"Pass TLS to Cognito"; flow:established; sid:2001; rev:1;)
+
+Outputs:
+  VPCID:
+    Value: !GetAtt VPC.Outputs.VpcId
+    Export:
+      Name: !Sub ${ExportPrefix}-ID
+  VPCStackName:
+    Value: !Select [ 1, !Split [ "/", !Ref VPC ] ]
+    Export:
+      Name: !Sub ${ExportPrefix}-StackName
+  PrivateSubnets:
+    Value: !Join [ ",", [ !GetAtt VPC.Outputs.PrivateSubnetIdA, !GetAtt VPC.Outputs.PrivateSubnetIdB ] ]
+    Export:
+      Name: !Sub ${ExportPrefix}-PrivateSubnets
+  ProtectedSubnets:
+    Value: !Join [ ",", [ !GetAtt VPC.Outputs.ProtectedSubnetIdA, !GetAtt VPC.Outputs.ProtectedSubnetIdB ] ]
+    Export:
+      Name: !Sub ${ExportPrefix}-ProtectedSubnets
+  InternetSubnets:
+    Value: !Join [ ",", [ subnet-080611e508d16afa7, subnet-0078deb0ea9800a7b ] ]
+    Export:
+      Name: !Sub ${ExportPrefix}-InternetSubnets
+  ExecuteAPIGatewayVPCEndpointID:
+    Value: !GetAtt VPC.Outputs.ExecuteApiGatewayVpcEndpointId
+    Export:
+      Name: !Sub ${ExportPrefix}-ExecuteAPIGatewayEndpointID
+  VPCEndpointsSecurityGroupID:
+    Value: !GetAtt VPC.Outputs.AWSServicesEndpointSecurityGroupId
+    Export:
+      Name: !Sub ${ExportPrefix}-EndpointsSecurityGroupID
