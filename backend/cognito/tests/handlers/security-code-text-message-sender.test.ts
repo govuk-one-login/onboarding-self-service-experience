@@ -1,85 +1,57 @@
-import {toByteArray} from "base64-js";
-
-const sendSmsMock = jest.fn();
-
-const notifyClientMock = jest.fn().mockImplementation(() => {
-    return {
-        sendSms: sendSmsMock
-    };
-});
-jest.mock("notifications-node-client", () => {
-    return {NotifyClient: notifyClientMock};
-});
-
-const decryptMock = jest.fn().mockImplementation(() => {
+const sendSms = jest.fn();
+const decrypt = jest.fn().mockImplementation(() => {
     return {
         plaintext: "531836"
     };
 });
 
-const buildClientMock = jest.fn().mockImplementation(() => {
+jest.mock("notifications-node-client", () => {
     return {
-        decrypt: decryptMock
+        NotifyClient: jest.fn(() => {
+            return {sendSms: sendSms};
+        })
     };
 });
 
 jest.mock("@aws-crypto/client-node", () => {
-    return {buildClient: buildClientMock, CommitmentPolicy: jest.fn(), KmsKeyringNode: jest.fn()};
+    return {
+        CommitmentPolicy: jest.fn(),
+        KmsKeyringNode: jest.fn(),
+        buildClient: jest.fn(() => {
+            return {
+                decrypt: decrypt
+            };
+        })
+    };
 });
 
-process.env.SECURITY_CODE_TEXT_MESSAGE_TEMPLATE = "ac38449b-efba-4e05-911a-83648caa8de5";
-process.env.KEY_ALIAS = "key-alias-01";
+const encryptedCode = "gtrsdwjstae4";
+const phoneNumber = "084168511";
+const templateId = "template-id";
 
-import {lambdaHandler} from "../../src/handlers/send-security-code-text-message";
+process.env.SECURITY_CODE_TEXT_MESSAGE_TEMPLATE = templateId;
+
+import {toByteArray} from "base64-js";
+import {lambdaHandler} from "handlers/send-security-code-text-message";
+import {smsSenderTrigger} from "../mocks";
 
 describe("Custom SMS sender", () => {
-    it("should send sms for valid trigger", () => {
-        lambdaHandler({
-            triggerSource: "CustomSMSSender_VerifyUserAttribute",
-            request: {
-                type: "",
-                code: "gtrsdwjstae4",
-                userAttributes: {
-                    phone_number: "084168511"
-                }
-            },
-            version: "1",
-            region: "",
-            userPoolId: "id-1",
-            userName: "",
-            callerContext: {awsSdkVersion: "", clientId: ""},
-            response: ""
-        }).then(() => {
-            expect(sendSmsMock).toBeCalledTimes(1);
-            expect(sendSmsMock.mock.calls[0][0]).toBe("ac38449b-efba-4e05-911a-83648caa8de5");
-            expect(sendSmsMock.mock.calls[0][1]).toBe("084168511");
-            expect(sendSmsMock.mock.calls[0][2]).toEqual({
-                personalisation: {code: "531836"},
-                reference: null
-            });
-            expect(decryptMock).toBeCalledTimes(1);
-            expect(decryptMock.mock.calls[0][1]).toEqual(toByteArray("gtrsdwjstae4"));
+    it("Send SMS with a security code", async () => {
+        await lambdaHandler(smsSenderTrigger(phoneNumber, encryptedCode));
+
+        expect(sendSms).toBeCalledTimes(1);
+        expect(sendSms.mock.calls[0][0]).toBe(templateId);
+        expect(sendSms.mock.calls[0][1]).toBe(phoneNumber);
+        expect(sendSms.mock.calls[0][2]).toEqual({
+            personalisation: {code: "531836"},
+            reference: null
         });
+
+        expect(decrypt).toBeCalledTimes(1);
+        expect(decrypt.mock.calls[0][1]).toEqual(toByteArray(encryptedCode));
     });
 
-    it("should throw an error for missing code", () => {
-        lambdaHandler({
-            triggerSource: "CustomSMSSender_VerifyUserAttribute",
-            request: {
-                type: "",
-                code: null,
-                userAttributes: {
-                    phone_number: "084168511"
-                }
-            },
-            version: "1",
-            region: "",
-            userPoolId: "id-1",
-            userName: "",
-            callerContext: {awsSdkVersion: "", clientId: ""},
-            response: ""
-        }).catch((reason: Error) => {
-            expect(reason.message).toBe("Missing code parameter");
-        });
+    it("Throw an error for missing code", async () => {
+        await expect(lambdaHandler(smsSenderTrigger(phoneNumber))).rejects.toThrow(/missing.*code/i);
     });
 });
