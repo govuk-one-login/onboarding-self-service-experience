@@ -540,7 +540,7 @@ Resources:
     # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupNamePrefix}/http-api/${AWS::StackName}
+      LogGroupName: !Sub ${LogGroupPrefix}/http-api/${AWS::StackName}
       RetentionInDays: 14
   #--- Notifications ---#
 
