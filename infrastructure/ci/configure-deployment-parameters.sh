@@ -8,6 +8,7 @@ PARAMETER_NAME_PREFIX=/self-service
 MANUAL_PARAMETERS=(api_notification_email)
 
 declare -A PARAMETERS=(
+  [cognito_external_id]=$PARAMETER_NAME_PREFIX/cognito/external-id
   [deletion_protection]=$PARAMETER_NAME_PREFIX/config/deletion-protection-enabled
   [api_notification_email]=$PARAMETER_NAME_PREFIX/api/notifications-email
 )
@@ -65,6 +66,11 @@ function check-secrets {
   for secret in "${SECRETS[@]}"; do check-secret "$secret"; done
 }
 
+function check-cognito-external-id {
+  local parameter=${PARAMETERS[cognito_external_id]}
+  check-parameter-set "$parameter" || write-parameter-value "$parameter" "$(uuidgen)"
+}
+
 function check-deletion-protection {
   local parameter=${PARAMETERS[deletion_protection]}
   check-parameter-set "$parameter" ||
@@ -89,6 +95,7 @@ function print-secrets {
 
 function check-deployment-parameters {
   ../aws.sh check-current-account
+  check-cognito-external-id
   check-deletion-protection
   check-manual-parameters
   check-secrets

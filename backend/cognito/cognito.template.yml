@@ -3,6 +3,9 @@ Description: Cognito UserPool and Client for the Admin Tool
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
+  ExternalId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/cognito/external-id
   DeletionProtection:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/config/deletion-protection-enabled
@@ -37,12 +40,13 @@ Globals:
         NODE_OPTIONS: --enable-source-maps
 
 Resources:
+  # https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-default.html#key-policy-default-allow-root-enable-iam
   SecurityCodeEncryptionKey:
     # checkov:skip=CKV_AWS_7: "Ensure rotation for customer created CMKs is enabled"
     Type: AWS::KMS::Key
     Properties:
       KeyPolicy:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
           - Sid: Enable IAM User Permissions
             Effect: Allow
@@ -129,22 +133,23 @@ Resources:
         Sourcemap: true
     Properties:
       Handler: src/handlers/security-code-text-message-sender.lambdaHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Environment:
         Variables:
           NOTIFY_API_KEY: "{{resolve:secretsmanager:/self-service/cognito/notify-api-key:SecretString}}"
           SECURITY_CODE_TEXT_MESSAGE_TEMPLATE: !Ref SecurityCodeTextMessageTemplate
           KEY_ARN: !GetAtt SecurityCodeEncryptionKey.Arn
       MemorySize: 1024
-      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
       Policies:
         Statement:
-            Effect: Allow
-            Action: kms:Decrypt
-            Resource: !GetAtt SecurityCodeEncryptionKey.Arn
+          Effect: Allow
+          Action: kms:Decrypt
+          Resource: !GetAtt SecurityCodeEncryptionKey.Arn
 
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
+      UserPoolName: !Ref ExportNamePrefix
       DeletionProtection: !Ref DeletionProtection
       Policies:
         PasswordPolicy:
@@ -453,7 +458,12 @@ Resources:
           </html>
         EmailSubject: Your security code for the GOV.UK One Login Admin Tool
         DefaultEmailOption: CONFIRM_WITH_CODE
-      MfaConfiguration: "OFF"
+      MfaConfiguration: OPTIONAL
+      EnabledMfas: [ SMS_MFA ]
+      SmsConfiguration:
+        SnsCallerArn: !GetAtt SmsRole.Arn
+        ExternalId: !Ref ExternalId
+        SnsRegion: !Ref AWS::Region
       EmailConfiguration:
         EmailSendingAccount: DEVELOPER
         SourceArn: !ImportValue EmailIdentityARN
@@ -610,6 +620,33 @@ Resources:
           - Priority: 1
             Name: verified_email
 
+  # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
+  SmsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: cognito-idp.amazonaws.com
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref ExternalId
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
+      Policies:
+        - PolicyName: SnsPublish
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              Effect: Allow
+              Action: sns:publish
+              Resource: "*"
+
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -618,20 +655,19 @@ Resources:
         - ALLOW_ADMIN_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
 
-
   CognitoInvokeSecurityCodeTextMessageSenderPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !Ref SecurityCodeTextMessageSender
-      Principal: "cognito-idp.amazonaws.com"
+      Principal: cognito-idp.amazonaws.com
 
 Outputs:
-  UserPoolName:
+  UserPoolID:
     Value: !Ref UserPool
     Export:
       Name: !Sub ${ExportNamePrefix}-CognitoUserPoolID
-  UserPoolClientId:
+  UserPoolClientID:
     Value: !Ref UserPoolClient
     Export:
       Name: !Sub ${ExportNamePrefix}-CognitoUserPoolClientID

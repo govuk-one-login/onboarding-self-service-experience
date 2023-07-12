@@ -66,9 +66,9 @@ export default class SelfServiceServicesService {
         const response = await this.cognito.login(email, password);
 
         return {
-            cognitoId: response.ChallengeParameters?.USER_ID_FOR_SRP as string,
-            cognitoSession: response.Session as string,
-            codeSentTo: response.ChallengeParameters?.CODE_DELIVERY_DESTINATION as string
+            cognitoSession: nonNull(response.Session),
+            cognitoId: nonNull(response.ChallengeParameters?.USER_ID_FOR_SRP),
+            codeSentTo: nonNull(response.ChallengeParameters?.CODE_DELIVERY_DESTINATION)
         };
     }
 
