@@ -23,7 +23,7 @@ jobs:
     with:
       environment: test
       cf-space-name: self-service-test
-      artifact-name: ${{ needs.build-5-frontend.outputs.artifact-name }}
+      artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
       url: https://di-self-service-test.london.cloudapps.digital
     secrets:
       cf-username: ${{ secrets.CF_USERNAME }}
