@@ -5,9 +5,11 @@ set -eu
 
 ACCOUNT=$(../aws.sh get-current-account-name)
 PARAMETER_NAME_PREFIX=/self-service
-MANUAL_PARAMETERS=(api_notification_email)
+MANUAL_PARAMETERS=(api_notification_email google_tag_id)
 
 declare -A PARAMETERS=(
+  [test_banner]=$PARAMETER_NAME_PREFIX/frontend/show-test-banner
+  [google_tag_id]=$PARAMETER_NAME_PREFIX/frontend/google-tag-id
   [cognito_external_id]=$PARAMETER_NAME_PREFIX/cognito/external-id
   [deletion_protection]=$PARAMETER_NAME_PREFIX/config/deletion-protection-enabled
   [api_notification_email]=$PARAMETER_NAME_PREFIX/api/notifications-email
@@ -77,6 +79,12 @@ function check-deletion-protection {
     write-parameter-value "$parameter" "$([[ $ACCOUNT == production ]] && echo ACTIVE || echo INACTIVE)"
 }
 
+function check-test-banner {
+  local parameter=${PARAMETERS[test_banner]}
+  check-parameter-set "$parameter" ||
+    write-parameter-value "$parameter" "$([[ $ACCOUNT == production ]] && echo false || echo true)"
+}
+
 function print-parameters {
   local parameter
   echo "--- Deployment parameters ---"
@@ -95,6 +103,7 @@ function print-secrets {
 
 function check-deployment-parameters {
   ../aws.sh check-current-account
+  check-test-banner
   check-cognito-external-id
   check-deletion-protection
   check-manual-parameters

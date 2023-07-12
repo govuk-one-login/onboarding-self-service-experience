@@ -34,7 +34,7 @@ type CognitoCommand<Input extends ServiceInputTypes, Output extends ServiceOutpu
  * Uses the [Amazon Cognito API]{@link https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/Welcome.html} to manage users
  * @see [Amazon Cognito documentation]{@link https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html}
  */
-class CognitoClient implements CognitoInterface {
+export default class CognitoClient implements CognitoInterface {
     private readonly userPoolId;
     private readonly clientId;
     private readonly client;
@@ -225,5 +225,3 @@ class CognitoClient implements CognitoInterface {
         return this.client.send(new commandConstructor(commandInput));
     }
 }
-
-export default new CognitoClient();

@@ -18,10 +18,8 @@ function update-subject-claim-template {
 }
 
 function update-deployment-environment {
-  write-github-actions-variables \
-    "$(../../aws.sh get-stack-outputs secure-pipelines-support SigningProfileName ContainerSigningKeyARN)" \
-    "$(../../aws.sh get-stack-outputs secure-pipelines \
-      DeploymentRoleArn ArtifactSourceBucketName FrontendECRRepositoryName PipelineName)"
+  local env=$1 stack=$2 outputs=${*:3}
+  write-github-actions-variables "$env" "$(../aws.sh get-stack-outputs "$stack" "$outputs")"
 }
 
 function check-deployment-environment-config {
@@ -31,11 +29,9 @@ function check-deployment-environment-config {
 }
 
 function write-github-actions-variables {
-  local outputs=$* account env repo_id api_path name variable value current_value
-  [[ $(xargs <<< "$outputs") ]]
-  account=$(../../aws.sh is-initial-account)
+  local env=$1 outputs=${*:2} repo_id api_path name variable value current_value
+  [[ $(xargs <<< "$outputs") ]] && ../aws.sh is-initial-account || exit 1
 
-  env=$account-secure-pipelines
   repo_id=$(gh api "/repos/{owner}/{repo}" --jq .id)
   api_path=/repositories/$repo_id/environments/$env/variables
 

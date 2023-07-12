@@ -88,7 +88,7 @@ type Override = {
     throw?: string;
 };
 
-class StubCognitoClient implements CognitoInterface {
+export default class StubCognitoClient implements CognitoInterface {
     private readonly overrides: Promise<Record<string, Override[]>> = fs
         .readFile(path.join(__dirname, "../../../stubs/stubs-config.json"))
         .then(buffer => JSON.parse(buffer.toString()));
@@ -215,5 +215,3 @@ function base64EncodeToken(token: object): string {
 function fakeSignature(): string {
     return Buffer.from(crypto.randomBytes(32)).toString("base64");
 }
-
-export default new StubCognitoClient();

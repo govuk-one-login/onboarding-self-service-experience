@@ -48,4 +48,7 @@ get-signing-config
   DynamoDBSourceBucketARN="${dynamodb_source_bucket:-none}" FrontendSourceBucketARN="${frontend_source_bucket:-none}" \
   ContainerSigningKeyARN="${container_signing_key:-none}"
 
-./configure-github-repo.sh update-deployment-environment
+if [[ $ACCOUNT == "$INITIAL_ACCOUNT" ]]; then
+  ../configure-github-repo.sh update-deployment-environment "$ACCOUNT"-secure-pipelines $STACK_NAME \
+    DeploymentRoleArn ArtifactSourceBucketName FrontendECRRepositoryName PipelineName
+fi

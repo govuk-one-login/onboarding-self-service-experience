@@ -1,0 +1,59 @@
+name: Deploy a SAM stack to AWS
+
+on:
+  workflow_call:
+    inputs:
+      name: { required: true, type: string }
+      template: { required: false, type: string }
+      artifact: { required: false, type: string }
+      parameters: { required: false, type: string }
+    outputs:
+      stack-name:
+        description: "The deployed stack name"
+        value: ${{ jobs.deploy.outputs.stack-name }}
+
+concurrency: deploy-${{ inputs.name }}-development-${{ github.head_ref || github.ref_name }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    outputs:
+      stack-name: ${{ steps.deploy.outputs.stack-name }}
+
+    environment:
+      name: development
+      url: ${{ steps.deploy.outputs.stack-url }}
+
+    steps:
+      - name: Get deployment name
+        uses: alphagov/di-github-actions/beautify-branch-name@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
+        id: get-deployment-name
+        with:
+          usage: Deployment name
+          length-limit: 28
+          prefix: preview
+
+      - name: Deploy stack
+        uses: alphagov/di-github-actions/sam/deploy-stack@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
+        id: deploy
+        with:
+          aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          sam-deployment-bucket: ${{ vars.DEPLOYMENT_ARTIFACTS_BUCKET }}
+          stack-name-prefix: preview-${{ inputs.name }}
+          s3-prefix: sse-preview
+          template: ${{ inputs.template }}
+          artifact-name: ${{ inputs.artifact }}
+          delete-failed-stack: true
+          tags: |-
+            sse:component=${{ inputs.name }}
+            sse:stack-type=preview
+            sse:application=self-service
+            sse:deployment-source=github-actions
+          parameters: |-
+            DeploymentName=${{ steps.get-deployment-name.outputs.pretty-branch-name }}
+            ${{ inputs.parameters }}

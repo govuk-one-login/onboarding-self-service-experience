@@ -1,15 +1,22 @@
 name: Build frontend app
 
-on: workflow_call
-permissions: read-all
+on:
+  workflow_call:
+    inputs:
+      artifact-name: { required: false, type: string, default: Frontend-Node }
+    outputs:
+      artifact-name:
+        value: ${{ inputs.artifact-name }}
 
 concurrency:
-  group: build-front-app-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  group: build-frontend-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
+
+permissions: { }
 
 jobs:
   build:
-    name: Self-service front
+    name: Build
     runs-on: ubuntu-latest
     defaults:
       run: { working-directory: express }
@@ -32,14 +39,6 @@ jobs:
       - name: Archive distribution artifact
         uses: actions/upload-artifact@v3
         with:
-          name: self-service-front
+          name: ${{ inputs.artifact-name }}
           retention-days: 7
-          path: |
-            express/dist
-            express/stubs
-            express/resources
-            express/src/views
-            express/assets/images
-            express/manifest.yml
-            express/package*.json
-            package*.json
+          path: express/dist

@@ -1,11 +1,14 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Self-service frontend app
+Description: DI Admin Tool frontend
 Transform: AWS::LanguageExtensions
 
 Parameters:
-  Environment:
+  DeploymentName:
     Type: String
-    AllowedPattern: development|build|staging|integration|production
+    MaxLength: 28
+    AllowedPattern: ^.*[^-]$
+    Default: self-service
+    Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
   VpcStackName:
     Type: String
     Description: The name of the stack that defines the VPC in which the frontend container will run
@@ -13,14 +16,6 @@ Parameters:
     Type: String
     Default: ""
     Description: The ARN of the permissions boundary to apply when creating IAM roles
-  ExportNamePrefix:
-    Type: String
-    Default: self-service
-    AllowedPattern: ^.*[^-]$
-    Description: Prefix to use when importing or exporting values from other stacks
-
-Conditions:
-  NotDevelopment: !Not [ !Equals [ !Ref Environment, development ] ]
 
 Mappings:
   # See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
@@ -28,8 +23,11 @@ Mappings:
     eu-west-2:
       AccountId: 652711504416
 
+Conditions:
+  UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+
 Resources:
-  FargateCluster:
+  ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
       CapacityProviders: [ FARGATE, FARGATE_SPOT ]
@@ -44,7 +42,7 @@ Resources:
     Type: AWS::ECS::Service
     DependsOn: ApplicationLoadBalancerListener
     Properties:
-      Cluster: !Ref FargateCluster
+      Cluster: !Ref ECSCluster
       LaunchType: FARGATE
       SchedulingStrategy: REPLICA
       DeploymentController:
@@ -63,13 +61,12 @@ Resources:
             - Fn::ImportValue:
                 !Sub ${VpcStackName}-PrivateSubnetIdB
       PropagateTags: SERVICE
-      TaskDefinition: !Ref FrontendAppTaskDefinition
+      TaskDefinition: !Ref TaskDefinition
 
   ContainerServiceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group to access the container service
-      GroupName: !Sub ${AWS::StackName}-ContainerService
       SecurityGroupIngress:
         - Description: Allow traffic from the load balancer
           SourceSecurityGroupId: !GetAtt ApplicationLoadBalancerSecurityGroup.GroupId
@@ -80,10 +77,10 @@ Resources:
         Fn::ImportValue:
           !Sub ${VpcStackName}-VpcId
 
-  FrontendECSExecutionRole:
+  ECSExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      PermissionsBoundary: !Ref PermissionsBoundary
+      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -96,6 +93,7 @@ Resources:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
     Type: AWS::IAM::Policy
     Properties:
+      Roles: [ !Ref ECSExecutionRole ]
       PolicyName: TaskExecutionPolicy
       PolicyDocument:
         Version: 2012-10-17
@@ -103,12 +101,11 @@ Resources:
           - Effect: Allow
             Action: logs:CreateLogGroup
             Resource: "*"
-      Roles: [ !Ref FrontendECSExecutionRole ]
 
-  FrontendECSTaskRole:
+  ECSTaskRole:
     Type: AWS::IAM::Role
     Properties:
-      PermissionsBoundary: !Ref PermissionsBoundary
+      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -126,25 +123,24 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                  - dynamodb:DescribeTable
                   - dynamodb:GetItem
+                  - dynamodb:PutItem
                   - dynamodb:UpdateItem
                   - dynamodb:DeleteItem
                   - dynamodb:Scan
-                  - dynamodb:DescribeTable
-                  - dynamodb:CreateTable
-                  - dynamodb:PutItem
                 Resource:
-                  Fn::ImportValue: !Sub ${ExportNamePrefix}-SessionsTableArn
+                  Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableARN
 
-  FrontendAppTaskDefinition:
+  TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       RequiresCompatibilities: [ FARGATE ]
-      ExecutionRoleArn: !GetAtt FrontendECSExecutionRole.Arn
-      TaskRoleArn: !GetAtt FrontendECSTaskRole.Arn
+      ExecutionRoleArn: !GetAtt ECSExecutionRole.Arn
+      TaskRoleArn: !GetAtt ECSTaskRole.Arn
       Cpu: 256
       Memory: 512
-      Family: !Sub ${AWS::StackName}-task
+      Family: !Ref DeploymentName
       NetworkMode: awsvpc
       ContainerDefinitions:
         - Name: frontend
@@ -165,10 +161,8 @@ Resources:
 
   AccessLogsBucket:
     # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
-    Condition: NotDevelopment
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: sse-frontend-access-logs
       VersioningConfiguration:
         Status: Enabled
       PublicAccessBlockConfiguration:
@@ -181,8 +175,7 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
 
-  FrontendAccessLogsBucketPolicy:
-    Condition: NotDevelopment
+  AccessLogsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref AccessLogsBucket
@@ -209,15 +202,13 @@ Resources:
             !Sub ${VpcStackName}-PrivateSubnetIdA
         - Fn::ImportValue:
             !Sub ${VpcStackName}-PrivateSubnetIdB
-      LoadBalancerAttributes: !If
-        - NotDevelopment
-        - - Key: access_logs.s3.enabled
-            Value: true
-          - Key: access_logs.s3.bucket
-            Value: !Ref AccessLogsBucket
-          - Key: access_logs.s3.prefix
-            Value: sse-front-alb
-        - !Ref AWS::NoValue
+      LoadBalancerAttributes:
+        - Key: access_logs.s3.enabled
+          Value: true
+        - Key: access_logs.s3.bucket
+          Value: !Ref AccessLogsBucket
+        - Key: access_logs.s3.prefix
+          Value: sse-front-alb
 
   ApplicationLoadBalancerTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -280,16 +271,16 @@ Resources:
       FromPort: 0
       ToPort: 65535
 
-  ApiGwHttpEndpoint:
+  APIGatewayEndpoint:
     Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: !Sub ${AWS::StackName}
       ProtocolType: HTTP
 
-  ApiGwHttpEndpointIntegration:
+  APIGatewayEndpointIntegration:
     Type: AWS::ApiGatewayV2::Integration
     Properties:
-      ApiId: !Ref ApiGwHttpEndpoint
+      ApiId: !Ref APIGatewayEndpoint
       IntegrationType: HTTP_PROXY
       ConnectionId:
         Fn::ImportValue:
@@ -299,18 +290,18 @@ Resources:
       IntegrationUri: !Ref NetworkLoadBalancerListener
       PayloadFormatVersion: 1.0
 
-  APIGWRoute:
+  APIGatewayRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
-      ApiId: !Ref ApiGwHttpEndpoint
+      ApiId: !Ref APIGatewayEndpoint
       RouteKey: ANY /{proxy+}
-      Target: !Sub integrations/${ApiGwHttpEndpointIntegration}
+      Target: !Sub integrations/${APIGatewayEndpointIntegration}
 
-  APIStageDefault:
+  APIStage:
     # checkov:skip=CKV_AWS_95:Ensure API Gateway V2 has Access Logging enabled
     Type: AWS::ApiGatewayV2::Stage
     Properties:
-      ApiId: !Ref ApiGwHttpEndpoint
+      ApiId: !Ref APIGatewayEndpoint
       StageName: $default
       AutoDeploy: true
       AccessLogSettings:
@@ -361,6 +352,5 @@ Resources:
           !Sub ${VpcStackName}-VpcId
 
 Outputs:
-  SseFrontUrl:
-    Description: The URL for self-service Frontend application.
-    Value: !GetAtt  ApiGwHttpEndpoint.ApiEndpoint
+  AdminToolURL:
+    Value: !GetAtt APIGatewayEndpoint.ApiEndpoint

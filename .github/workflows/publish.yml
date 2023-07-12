@@ -8,24 +8,22 @@ on:
 permissions: read-all
 
 jobs:
-  build-front:
+  build-frontend:
     name: Build
-    uses: ./.github/workflows/build-front-app.yml
+    uses: ./.github/workflows/build-frontend.yml
 
   run-unit-tests:
     name: Run tests
     uses: ./.github/workflows/run-unit-tests.yml
 
-  deploy-test-front:
+  deploy-test-frontend:
     name: Test
-    needs: [ build-front, run-unit-tests ]
+    needs: [ build-frontend, run-unit-tests ]
     uses: ./.github/workflows/deploy-to-paas.yml
     with:
       environment: test
       cf-space-name: self-service-test
-      cognito-client: StubCognitoClient
-      lambda-facade: StubLambdaFacade
-      show-test-banner: true
+      artifact-name: ${{ needs.build-5-frontend.outputs.artifact-name }}
       url: https://di-self-service-test.london.cloudapps.digital
     secrets:
       cf-username: ${{ secrets.CF_USERNAME }}
@@ -33,8 +31,8 @@ jobs:
 
   run-acceptance-tests:
     name: Run tests
-    needs: deploy-test-front
+    needs: deploy-test-frontend
     uses: ./.github/workflows/run-acceptance-tests.yml
     with:
-      host: ${{ needs.deploy-test-front.outputs.deployment-url }}
-      environment: ${{ needs.deploy-test-front.outputs.environment }}
+      host: ${{ needs.deploy-test-frontend.outputs.deployment-url }}
+      environment: ${{ needs.deploy-test-frontend.outputs.environment }}

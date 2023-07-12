@@ -3,6 +3,8 @@ name: Build API SAM application
 on:
   workflow_call:
     outputs:
+      component:
+        value: ${{ jobs.build.outputs.component }}
       artifact-name:
         value: ${{ jobs.build.outputs.artifact-name }}
 
@@ -14,17 +16,20 @@ permissions: { }
 
 jobs:
   build:
-    name: API
+    name: Build
     runs-on: ubuntu-latest
     outputs:
+      component: ${{ steps.build.outputs.component }}
       artifact-name: ${{ steps.build.outputs.artifact-name }}
     steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
       - name: Build SAM application
-        uses: alphagov/di-github-actions/sam/build-application@f1aa97d64bf1be3a6226e0319c597bf4b28c19c8
+        uses: ./.github/actions/build-backend-component
         id: build
         with:
-          additional-artifact-paths: backend/api/state-machines
-          template: backend/api/api.template.yml
+          name: API
           base-dir: ${{ github.workspace }}
-          artifact-name: api-sam
-          cache-key: api
+          template: backend/api/api.template.yml
+          additional-artifact-paths: backend/api/state-machines

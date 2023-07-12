@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: DI self-service API
+Description: DI Self-Service API
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
@@ -11,22 +11,22 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/api/notifications-email
     Description: Email address to send internal notifications
-  LogGroupNamePrefix:
+  LogGroupPrefix:
     Type: String
+    AllowedPattern: ^.*[^\/]$
     Default: /aws/vendedlogs
-  ExportNamePrefix:
+  DeploymentName:
     Type: String
-    Default: self-service
+    MaxLength: 28
     AllowedPattern: ^.*[^-]$
-    Description: Prefix to use when importing or exporting values from other application stacks
+    Default: self-service
+    Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
   PermissionsBoundary:
     Type: String
     Default: ""
-    Description: The ARN of the permissions boundary to apply when creating IAM roles [Secure Pipeline]
   CodeSigningConfigArn:
     Type: String
     Default: ""
-    Description: The ARN of the code signing configuration resource to use [Secure Pipeline]
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
@@ -68,11 +68,11 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
           Type: HttpApi
@@ -97,11 +97,11 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
           Type: HttpApi
@@ -127,11 +127,11 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
           Type: HttpApi
@@ -158,11 +158,11 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           TABLE:
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
           Type: HttpApi
@@ -187,11 +187,11 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName:
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
 
   #--- Service clients ---#
 
@@ -211,11 +211,11 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
           Type: HttpApi
@@ -240,11 +240,11 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
 
   UpdateServiceClientFunction:
     # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
@@ -262,11 +262,11 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           TABLE: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
 
   #--- Service users ---#
 
@@ -286,11 +286,11 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: 
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           TABLE:
-              Fn::ImportValue: !Sub ${ExportNamePrefix}-DataTableName
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
 
   #--- Auth clients ---#
 
@@ -520,7 +520,7 @@ Resources:
     # checkov:skip=CKV_AWS_66: "Ensure that CloudWatch Log Group specifies retention days"
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupNamePrefix}/states/${AWS::StackName}
+      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/step-functions
 
   #--- Notifications ---#
 
@@ -557,6 +557,7 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       DisplayName: DI Admin Tool
+      TopicName: !Sub ${DeploymentName}-internal-notifications
       Subscription:
         - Protocol: email
           Endpoint: !Ref NotificationEmail
@@ -567,4 +568,4 @@ Outputs:
   APIBaseURL:
     Value: !Sub ${SelfServiceApi.ApiEndpoint}/${SelfServiceApi.Stage}
     Export:
-      Name: !Sub ${ExportNamePrefix}-APIBaseURL
+      Name: !Sub ${DeploymentName}-API-BaseURL

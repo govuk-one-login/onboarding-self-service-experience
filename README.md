@@ -49,15 +49,9 @@ appropriate values. These values will relate to the stacks you've just created.
 `npm run build` the first time you need to run the application in order to build the stylesheets and assets. If you
 don't do this, the page will look like it's escaped from Netscape in the late 1990s.
 
-There are two environment variables which can be set:
-
-```shell
-COGNITO_CLIENT=[CognitoClient|StubCognitoClient]
-LAMBDA_FACADE=[LambdaFacade|StubLambdaFacade]
-```
-
 In general the application will use the full implementations if the environment variables have not been set to use the
-stubs. To use the full implementations you'll need AWS Credentials; these can be set using `gds aws <your-account> --`
+stubs (by setting the environment variable `STUB_API` to `true`). To use the full implementations you'll need AWS
+Credentials; these can be set using `gds aws <your-account> --`
 
 `gds aws <account> -- npm run dev` if you want it to restart every time you change something. This sets the above
 environment variables to the stub values if they're not set explicitly (see [package.json](./express/package.json))

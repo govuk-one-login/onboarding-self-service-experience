@@ -2,54 +2,54 @@ name: Deploy branch preview
 run-name: Deploy preview [${{ github.head_ref || github.ref_name }}]
 
 on: workflow_dispatch
-permissions: read-all
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  build-front-app:
-    name: Build
-    uses: ./.github/workflows/build-front-app.yml
+  build-frontend:
+    name: Frontend
+    permissions: { }
+    uses: ./.github/workflows/build-frontend.yml
 
-  deploy-front-preview-paas:
-    name: Preview
-    needs: build-front-app
-    uses: ./.github/workflows/deploy-to-paas.yml
+  build-frontend-image:
+    name: Frontend
+    needs: build-frontend
+    uses: ./.github/workflows/build-frontend-image.yml
     with:
-      environment: preview
-      cf-space-name: self-service-preview
-      app-name-prefix: di-sse-prev
-      cognito-client: StubCognitoClient
-      lambda-facade: StubLambdaFacade
-      show-test-banner: true
-    secrets:
-      cf-username: ${{ secrets.CF_USERNAME }}
-      cf-password: ${{ secrets.CF_PASSWORD }}
+      artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
 
-  build-front-image:
-    name: Build
-    needs: build-front-app
-    uses: ./.github/workflows/build-front-image.yml
-    permissions:
-      id-token: write
-      contents: read
+  build-cognito:
+    name: Cognito
+    permissions: { }
+    uses: ./.github/workflows/build-cognito.yml
+
+  deploy-cognito:
+    name: Cognito
+    needs: build-cognito
+    uses: ./.github/workflows/deploy-component.yml
     with:
-      environment: development
-    secrets:
-      aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
+      name: ${{ needs.build-cognito.outputs.component }}
+      artifact: ${{ needs.build-cognito.outputs.artifact-name }}
 
-  build-api:
-    name: Build
+  build-sse-api:
+    name: API
+    permissions: { }
     uses: ./.github/workflows/build-api.yml
 
-  deploy-api-preview-aws:
-    name: Preview
-    needs: build-api
-    uses: ./.github/workflows/deploy-api.yml
-    permissions:
-      id-token: write
-      contents: read
+  deploy-sse-api:
+    name: API
+    needs: [ build-sse-api, deploy-dynamodb ]
+    uses: ./.github/workflows/deploy-component.yml
     with:
-      environment: development
-      log-group-name-prefix: /self-service/preview
-    secrets:
-      aws-role-arn: ${{ secrets.GHA_AWS_ROLE_ARN }}
-      sam-deployment-bucket: ${{ secrets.GHA_SAM_DEPLOYMENT_BUCKET }}
+      name: ${{ needs.build-sse-api.outputs.component }}
+      artifact: ${{ needs.build-sse-api.outputs.artifact-name }}
+      parameters: LogGroupPrefix=/self-service/preview
+
+  deploy-dynamodb:
+    name: DynamoDB
+    uses: ./.github/workflows/deploy-component.yml
+    with:
+      name: DynamoDB
+      template: backend/dynamodb/dynamodb.template.yml

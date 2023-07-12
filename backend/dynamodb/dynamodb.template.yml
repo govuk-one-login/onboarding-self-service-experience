@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: DynamoDB tables for Admin Tool
-Transform: AWS::Serverless-2016-10-31
 
 Parameters:
   DeletionProtection:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/config/deletion-protection-enabled
-  ExportNamePrefix:
+  DeploymentName:
     Type: String
-    Default: self-service
+    MaxLength: 28
     AllowedPattern: ^.*[^-]$
-    Description: Prefix to use when importing or exporting values from other application stacks
+    Default: self-service
+    Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
 
 Conditions:
   DeletionProtectionEnabled: !Equals [ !Ref DeletionProtection, ACTIVE ]
@@ -23,6 +23,7 @@ Resources:
     Properties:
       TableClass: STANDARD
       BillingMode: PAY_PER_REQUEST
+      TableName: !Sub ${DeploymentName}-data
       DeletionProtectionEnabled: !If [ DeletionProtectionEnabled, true, false ]
       AttributeDefinitions:
         - AttributeName: pk
@@ -52,6 +53,7 @@ Resources:
     Properties:
       TableClass: STANDARD
       BillingMode: PAY_PER_REQUEST
+      TableName: !Sub ${DeploymentName}-sessions
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
@@ -66,12 +68,12 @@ Outputs:
   DataTableName:
     Value: !Ref DataTable
     Export:
-      Name: !Sub ${ExportNamePrefix}-DataTableName
+      Name: !Sub ${DeploymentName}-DynamoDB-DataTableName
   SessionsTableName:
     Value: !Ref SessionsTable
     Export:
-      Name: !Sub ${ExportNamePrefix}-SessionsTableName
-  SessionsTableArn:
+      Name: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
+  SessionsTableARN:
     Value: !GetAtt SessionsTable.Arn
     Export:
-      Name: !Sub ${ExportNamePrefix}-SessionsTableArn
+      Name: !Sub ${DeploymentName}-DynamoDB-SessionsTableARN

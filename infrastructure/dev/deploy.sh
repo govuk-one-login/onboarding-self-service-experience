@@ -4,10 +4,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 set -eu
 
 declare -A ENV=(
-  [SESSIONS_TABLE]=SessionsTableName
-  [API_BASE_URL]=APIBaseURL
-  [COGNITO_USER_POOL_ID]=CognitoUserPoolID
-  [COGNITO_CLIENT_ID]=CognitoUserPoolClientID
+  [API_BASE_URL]=API-BaseURL
+  [SESSIONS_TABLE]=DynamoDB-SessionsTableName
+  [COGNITO_USER_POOL_ID]=Cognito-UserPoolID
+  [COGNITO_CLIENT_ID]=Cognito-UserPoolClientID
 )
 
 COMPONENTS=(cognito dynamodb api)
@@ -52,9 +52,9 @@ function get-env-vars {
 }
 
 function list {
-  [[ ${OPTIONS[*]} == --all ]] && local all=true
+  [[ ${OPTIONS[*]} =~ --all ]] && OPTIONS=("${OPTIONS[*]//--all/}") && local all=true
   aws cloudformation describe-stacks | (IFS="|" && jq --raw-output \
-    --arg regex "$STACK_PREFIX${all:+.*}-(${COMPONENTS[*]})" \
+    --arg regex "$STACK_PREFIX${all:+.*}-(${OPTIONS[*]:-${COMPONENTS[*]}})" \
     '.Stacks[] | select(.StackName | match($regex)) | .StackName')
 }
 
@@ -77,14 +77,14 @@ function deploy-backend-component {
     ${template:+--template $template} \
     ${STACK_PREFIX:+--stack-name $STACK_PREFIX-$component} \
     --tags sse:component="$component" sse:stack-type=dev sse:stack-role=application sse:owner="$USER_NAME" \
-    --params ${STACK_PREFIX:+ExportNamePrefix=$STACK_PREFIX}
+    --params ${STACK_PREFIX:+DeploymentName=$STACK_PREFIX}
 
   popd > /dev/null
 }
 
 function run {
   get-env-vars && (IFS=$'\n' && echo "${env[*]}") || exit
-  eval "${env[*]}" COGNITO_CLIENT=CognitoClient LAMBDA_FACADE=LambdaFacade npm run dev
+  eval "${env[*]}" STUB_API=false npm run dev
 }
 
 function dynamodb {
