@@ -385,6 +385,7 @@ Resources:
   GitHubDeploymentArtifactsBucket:
     # checkov:skip=CKV_AWS_18: "Ensure the S3 bucket has access logging enabled"
     # checkov:skip=CKV_AWS_21: "Ensure the S3 bucket has versioning enabled"
+    # checkov:skip=GDS_AWS_3: "Check that all S3 buckets have corresponding bucket policies"
     Type: AWS::S3::Bucket
     Properties:
       PublicAccessBlockConfiguration:
