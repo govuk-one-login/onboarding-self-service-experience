@@ -1,7 +1,7 @@
 import connect from "connect-dynamodb";
 import {RequestHandler} from "express";
 import session, {SessionData} from "express-session";
-import {region, sessionStorage} from "./environment";
+import {region, sessionSecret, sessionStorage} from "./environment";
 import {DynamoDB} from "@aws-sdk/client-dynamodb";
 
 export default getSessionStorage();
@@ -11,8 +11,10 @@ function getSessionStorage(): RequestHandler {
         console.log("Using DynamoDB session storage");
         const DynamoDBStore = connect<SessionData>(session);
         return session({
-            secret: "keyboard cat",
+            secret: nonNull(sessionSecret),
             cookie: {maxAge: 1000 * 60 * 60},
+            resave: false,
+            saveUninitialized: false,
             store: new DynamoDBStore({
                 table: sessionStorage.tableName,
                 client: new DynamoDB({region: region})

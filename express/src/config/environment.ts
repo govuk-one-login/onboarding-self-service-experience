@@ -4,6 +4,8 @@ export const showTestBanner = process.env.TEST_BANNER == "true";
 export const googleTagId = process.env.GOOGLE_TAG_ID;
 export const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
 
+export const sessionSecret = process.env.SESSION_SECRET;
+
 export const cognito = {
     userPoolId: process.env.COGNITO_USER_POOL_ID,
     clientId: process.env.COGNITO_CLIENT_ID

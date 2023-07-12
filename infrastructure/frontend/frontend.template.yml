@@ -158,6 +158,9 @@ Resources:
               awslogs-stream-prefix: frontend
               awslogs-region: !Ref AWS::Region
               awslogs-create-group: true
+          Environment:
+            - Name: SESSION_SECRET
+              Value: "{{resolve:secretsmanager:/self-service/frontend/session-secret:SecretString}}"
 
   AccessLogsBucket:
     # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
