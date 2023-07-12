@@ -573,9 +573,9 @@ Resources:
             Method: POST
 
   NotificationsSnsTopic:
-    # checkov:skip=CKV_AWS_26: "Ensure all data stored in the SNS topic is encrypted"
     Type: AWS::SNS::Topic
     Properties:
+      KmsMasterKeyId: "alias/aws/sns"
       DisplayName: DI Admin Tool
       TopicName: !Sub ${DeploymentName}-internal-notifications
       Subscription:
