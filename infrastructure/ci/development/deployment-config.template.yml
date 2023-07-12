@@ -385,7 +385,6 @@ Resources:
   GitHubDeploymentArtifactsBucket:
     # checkov:skip=CKV_AWS_18: "Ensure the S3 bucket has access logging enabled"
     # checkov:skip=CKV_AWS_21: "Ensure the S3 bucket has versioning enabled"
-    # checkov:skip=GDS_AWS_3: "Check that all S3 buckets have corresponding bucket policies"
     Type: AWS::S3::Bucket
     Properties:
       PublicAccessBlockConfiguration:
@@ -393,6 +392,22 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+
+  GitHubDeploymentArtifactsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref GitHubDeploymentArtifactsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !If
+                - CreateOIDCProvider
+                - !Ref GithubOIDCProvider
+                - !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Action: s3:ListBucket
+            Resource: !Sub arn:aws:s3:::${GitHubDeploymentArtifactsBucket}
 
   CloudWatchLogsResourcePolicy:
     Type: AWS::Logs::ResourcePolicy
