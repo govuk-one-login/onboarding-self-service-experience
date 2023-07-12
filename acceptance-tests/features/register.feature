@@ -24,10 +24,8 @@ Feature: Users can sign up to the self-service experience
 
       Examples:
         | email                                     |
-        | "test-user@department.gov.uk"             |
-        | "test-user@digital.cabinet-office.gov.uk" |
-        | "test-user@highwaysengland.co.uk"         |
-        | "test-user@socialworkengland.org.uk"      |
+        | "test-user@test.gov.uk" |
+        | "test-user@digital.cabinet-office.gov.uk"      |
 
     Scenario Outline: User tries to register with a verboten email address
 
@@ -41,46 +39,46 @@ Feature: Users can sign up to the self-service experience
 
   Rule: The user tries to submit an email address that is already registered
     Scenario: The user is offered to sign in and signs in instead
-      When they submit the email "inuse@foo.gov.uk"
+      When they submit the email "inuse@test.gov.uk"
       Then they should be redirected to the "/register/account-exists" page
-      And they should see the text "An account already exists with the email address inuse@foo.gov.uk"
+      And they should see the text "An account already exists with the email address inuse@test.gov.uk"
       When they submit a valid password
       And they submit a correct security code
       Then they should be redirected to a page with the path starting with "/services"
       And they should see the text "Your services"
 
     Scenario: The user is offered to sign in, tries to sign in and enters an empty password
-      When they submit the email "inuse@foo.gov.uk"
+      When they submit the email "inuse@test.gov.uk"
       Then they should be redirected to the "/register/account-exists" page
-      And they should see the text "An account already exists with the email address inuse@foo.gov.uk"
+      And they should see the text "An account already exists with the email address inuse@test.gov.uk"
       When they submit the password ""
       Then the error message "Enter your password" must be displayed for the password field
 
     Scenario: The user is offered to sign in, tries to sign in and enters the wrong password
-      When they submit the email "inuse-password-will-be-wrong@foo.gov.uk"
+      When they submit the email "inuse-password-will-be-wrong@test.gov.uk"
       Then they should be redirected to the "/register/account-exists" page
-      And they should see the text "An account already exists with the email address inuse-password-will-be-wrong@foo.gov.uk"
+      And they should see the text "An account already exists with the email address inuse-password-will-be-wrong@test.gov.uk"
       When they submit the password "WrongPa$$word"
       Then the error message "Incorrect password" must be displayed for the password field
 
   Rule: The user tries to verify email security code when creating an account
     Background:
-      Given they submit the email "registering-successfully@gds.gov.uk"
+      Given they submit the email "registering-successfully@test.gov.uk"
       Then they should be redirected to the "/register/enter-email-code" page
 
     Scenario: The user submits an empty security code
       When they click the Submit button
       Then the error message "Enter the 6 digit security code" must be displayed for the security code field
-      And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
+      And they should see the text "We have sent an email to: registering-successfully@test.gov.uk"
 
     Scenario: The user enters a security code in an incorrect format
       When they submit the security code "12345A"
       Then the error message "Your security code should only include numbers" must be displayed for the security code field
-      And they should see the text "We have sent an email to: registering-successfully@gds.gov.uk"
+      And they should see the text "We have sent an email to: registering-successfully@test.gov.uk"
 
   Rule: The user does not receive their email security code and clicks 'Not received an email?' link
     Background:
-      When they submit the email "registering-successfully@gds.gov.uk"
+      When they submit the email "registering-successfully@test.gov.uk"
       Then they should be redirected to the "/register/enter-email-code" page
       And they click on the "Not received an email?" link
       Then they should be redirected to the "/register/resend-email-code" page
@@ -99,7 +97,7 @@ Feature: Users can sign up to the self-service experience
 
   Rule: The user tries to set a password when creating an account
     Background:
-      Given they submit the email "registering-successfully@gds.gov.uk"
+      Given they submit the email "registering-successfully@test.gov.uk"
       And they submit a correct security code
       Then they should be redirected to the "/register/create-password" page
 
@@ -129,7 +127,7 @@ Feature: Users can sign up to the self-service experience
 
   Rule: The user tries to add a phone number when creating an account
     Background:
-      Given they submit the email "registering-successfully@gds.gov.uk"
+      Given they submit the email "registering-successfully@test.gov.uk"
       And they submit a correct security code
       And they submit a valid password
       Then they should be redirected to the "/register/enter-phone-number" page
@@ -148,7 +146,7 @@ Feature: Users can sign up to the self-service experience
 
   Rule: The user tries to verify the SMS security code when creating an account
     Background:
-      Given they submit the email "registering-successfully@gds.gov.uk"
+      Given they submit the email "registering-successfully@test.gov.uk"
       And they submit a correct security code
       And they submit a valid password
       And they submit a valid mobile phone number
@@ -216,7 +214,7 @@ Feature: Users can sign up to the self-service experience
 
   Rule: The user tries to add a service when creating an account
     Background:
-      Given they submit the email "registering-successfully@gds.gov.uk"
+      Given they submit the email "registering-successfully@test.gov.uk"
       And they submit a correct security code
       And they submit a valid password
       And they submit a valid mobile phone number

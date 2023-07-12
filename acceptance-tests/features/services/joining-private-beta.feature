@@ -2,7 +2,7 @@ Feature: Joining private beta
 
   Background:
     Given the user is on the "/sign-in" page
-    And they submit the email "registered@gds.gov.uk"
+    And they submit the email "registered@test.gov.uk"
     And they submit a valid password
     And they submit a correct security code
     Then they should be redirected to a page with the title "Your services - GOV.UK One Login"
@@ -27,7 +27,7 @@ Feature: Joining private beta
       Then the error message "Enter your department" must be displayed for the department name field
 
     Scenario: The user’s data is replayed to them
-      Then they should see the text "registered@gds.gov.uk"
+      Then they should see the text "registered@test.gov.uk"
       Then they should see the text "Test Service"
 
     Scenario: The user submits their private beta request

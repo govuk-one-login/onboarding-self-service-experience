@@ -16,5 +16,8 @@ function getEmailDomain(email: string) {
 async function loadAllowedEmailDomains() {
     console.log("Loading allowed email domains....");
     const domains = await readFile(resources.validDomains, {encoding: "utf8"});
-    return domains.trim().split("\n");
+    return domains
+        .trim()
+        .split("\n")
+        .filter(line => !line.startsWith("#"));
 }

@@ -14,25 +14,25 @@ Feature: Users can sign in to the self-service experience
 
   Rule: The user tries to submit a password
     Scenario: User doesn't enter any characters into the password field
-      When they submit the email "registered@gds.gov.uk"
+      When they submit the email "registered@test.gov.uk"
       Then they should be redirected to the "/sign-in/enter-password" page
       When they submit the password ""
       Then the error message "Enter your password" must be displayed for the password field
 
     Scenario: User enters an invalid password
-      When they submit the email "password-will-be-wrong@stub.gov.uk"
+      When they submit the email "password-will-be-wrong@test.gov.uk"
       Then they should see the text "Enter your password"
       When they submit the password "Invalid-Password"
       Then the error message "Incorrect password" must be displayed for the password field
 
     Scenario: The user tries to log in and submits registered email but enters wrong password
-      When they submit the email "password-will-be-wrong@stub.gov.uk"
+      When they submit the email "password-will-be-wrong@test.gov.uk"
       Then they should see the text "Enter your password"
       When they submit the password "WrongPa$$word"
       Then the error message "Incorrect password" must be displayed for the password field
 
     Scenario: The user wants to see or hide their password as they type it
-      When they submit the email "registered@gds.gov.uk"
+      When they submit the email "registered@test.gov.uk"
       Then they should see the text "Enter your password"
       When they toggle the "Show" link on the field "password"
       And they enter the password "PasswordIsShown"
@@ -44,13 +44,13 @@ Feature: Users can sign in to the self-service experience
 
   Rule: The user tries to sign in with account which is not registered
     Scenario: The user submits email and password but account is not registered
-      When they submit the email "not-registered@gds.gov.uk"
+      When they submit the email "not-registered@test.gov.uk"
       When they submit a valid password
       Then they should be redirected to the "/sign-in/account-not-found" page
 
   Rule: The user tries to reset their password
     Background:
-      When they submit the email "registered@gds.gov.uk"
+      When they submit the email "registered@test.gov.uk"
       Then they click on the "Forgot your password?" link
       Then they should be redirected to the "/sign-in/forgot-password" page
       Then they click the Continue button

@@ -152,7 +152,7 @@ router.get("/client-details-mocked", (req, res) => {
 router.get("/change-email-address", (req, res) => {
     res.render("test/change-email-address.njk", {
         values: {
-            emailAddress: "your.email@digital.cabinet-office.gov.uk"
+            emailAddress: "your.email@test.gov.uk"
         }
     });
 });
@@ -188,7 +188,7 @@ router.post("/check-email-visual-test", async (req, res) => {
 //// Testing route to redirect to account page success screen
 router.get("/account-success-screen-test", (req, res) => {
     res.render("account/account.njk", {
-        emailAddress: "your.email@digital.cabinet-office.gov.uk",
+        emailAddress: "your.email@test.gov.uk",
         mobilePhoneNumber: "07123456789",
         passwordLastChanged: "Last changed 1 month ago",
         updatedField: "email address"
@@ -208,7 +208,7 @@ router.get("/private-beta-submitted", (req, res) => {
 router.get("/security-check-change-number", (req, res) => {
     res.render("test/security-check-change-number.njk", {
         values: {
-            emailAddress: "your.email@digital.cabinet-office.gov.uk"
+            emailAddress: "your.email@test.gov.uk"
         }
     });
 });
@@ -217,7 +217,7 @@ router.post("/security-check-change-number", async (req, res) => {
     if (req.body.securityCode === "") {
         res.render("test/security-check-change-number.njk", {
             values: {
-                emailAddress: "your.email@digital.cabinet-office.gov.uk"
+                emailAddress: "your.email@test.gov.uk"
             },
             errorMessages: {
                 securityCode: "Enter the security code"
@@ -318,7 +318,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
             {
                 userPersonalName: "Courtney Toth",
                 isCurrentUser: true,
-                userEmail: "courtney.toth@gov.uk.cabinet-office.gov.uk",
+                userEmail: "courtney.toth@test.gov.uk",
                 permissions: {
                     "Manage team members": true,
                     "Change integration client details": true,
@@ -329,7 +329,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
             {
                 userPersonalName: "Beth Walton",
                 isCurrentUser: false,
-                userEmail: "beth.walton@gov.cabinet-office.gov.uk",
+                userEmail: "beth.walton@test.gov.uk",
                 permissions: {
                     "Manage team members": true,
                     "Change integration client details": false,
@@ -340,7 +340,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
             {
                 userPersonalName: "Onyebuchi Hathway",
                 isCurrentUser: false,
-                userEmail: "onyebuchi.hathwayk@gov.cabinet-office.gov.uk",
+                userEmail: "onyebuchi.hathwayk@test.gov.uk",
                 permissions: {
                     "Manage team members": false,
                     "Change integration client details": true,
@@ -351,7 +351,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
             {
                 userPersonalName: "Robin Jöllenbeck",
                 isCurrentUser: false,
-                userEmail: "robin.jöllenbeck@gov.cabinet-office.gov.uk",
+                userEmail: "robin.jöllenbeck@test.gov.uk",
                 permissions: {
                     "Manage team members": false,
                     "Change integration client details": true,
@@ -362,7 +362,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
             {
                 userPersonalName: "Wallace Martinez",
                 isCurrentUser: false,
-                userEmail: "wallace.martinez@gov.cabinet-office.gov.uk",
+                userEmail: "wallace.martinez@test.gov.uk",
                 permissions: {
                     "Manage team members": false,
                     "Change integration client details": false,
@@ -373,7 +373,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
             {
                 userPersonalName: "Zawadi Cameron",
                 isCurrentUser: false,
-                userEmail: "zawadi.cameron@gov.cabinet-office.gov.uk",
+                userEmail: "zawadi.cameron@test.gov.uk",
                 permissions: {
                     "Manage team members": false,
                     "Change integration client details": true,
@@ -384,7 +384,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
         ],
         pendingInvitations: [
             {
-                userEmail: "james.pirot@gov.cabinet-office.gov.uk",
+                userEmail: "james.pirot@test.gov.uk",
                 permissions: {
                     "Manage team members": false,
                     "Change integration client details": false,
@@ -393,7 +393,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
                 }
             },
             {
-                userEmail: "leighton.brey@gov.cabinet-office.gov.uk",
+                userEmail: "leighton.brey@test.gov.uk",
                 permissions: {
                     "Manage team members": true,
                     "Change integration client details": true,
@@ -420,7 +420,7 @@ router.post("/invite-team-member", validateEmail("test/invite-team-member.njk"),
 router.get("/invitation-sent", (req, res) => {
     res.render("test/invitation-sent.njk", {
         serviceName: "Frontend Test Service",
-        userEmail: "james.pirot@digital.cabinet-office.gov.uk"
+        userEmail: "james.pirot@test.gov.uk"
     });
 });
 

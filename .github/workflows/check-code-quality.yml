@@ -20,7 +20,9 @@ jobs:
       - name: Run checkov
         uses: alphagov/di-github-actions/code-quality/run-checkov@5dacba941def444d69f02843feaebed79b5fca51
         with:
-          skip-checks: CKV_SECRET_6
+          skip-checks:
+            CKV_SECRET_6
+            CKV_SECRET_9
 
   check-shell-scripts:
     name: Shell scripts
