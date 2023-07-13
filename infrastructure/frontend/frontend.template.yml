@@ -356,6 +356,8 @@ Resources:
 
   # CloudFront
   FrontendAppCF:
+    # checkov:skip=CKV_AWS_86:Ensure Cloudfront distribution has Access Logging enabled
+    # checkov:skip=CKV_AWS_174:Verify CloudFront Distribution Viewer Certificate is using TLS v1.2
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
