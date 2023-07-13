@@ -354,6 +354,41 @@ Resources:
         Fn::ImportValue:
           !Sub ${VpcStackName}-VpcId
 
+  # CloudFront
+  FrontendAppCF:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        WebACLId: !Sub "{{resolve:ssm:/${Environment}/FrontendWafCloudfrontArn}}"
+        Enabled: true
+        HttpVersion: http2
+        PriceClass: PriceClass_All
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          ViewerProtocolPolicy: redirect-to-https
+          DefaultTTL: 10
+          MaxTTL: 20
+          MinTTL: 10
+          TargetOriginId: !Sub ${AWS::StackName}-frontend
+          ForwardedValues:
+            Cookies:
+              Forward: none
+            QueryString: true
+        Origins:
+          - DomainName:  !Sub '${APIGatewayEndpoint}.execute-api.${AWS::Region}.amazonaws.com'
+            CustomOriginConfig:
+              HTTPPort: '80'
+              HTTPSPort: '443'
+              OriginProtocolPolicy: https-only
+            Id: !Sub ${AWS::StackName}-frontend
+
 Outputs:
   AdminToolURL:
     Value: !GetAtt APIGatewayEndpoint.ApiEndpoint
