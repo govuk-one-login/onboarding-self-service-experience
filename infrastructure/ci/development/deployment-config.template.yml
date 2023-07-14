@@ -403,10 +403,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Federated: !If
-                - CreateOIDCProvider
-                - !Ref GithubOIDCProvider
-                - !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+              Federated: !Ref GitHubOIDCProvider
             Action: s3:ListBucket
             Resource: !Sub arn:aws:s3:::${GitHubDeploymentArtifactsBucket}
 
