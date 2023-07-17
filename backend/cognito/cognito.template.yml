@@ -18,6 +18,12 @@ Parameters:
     AllowedPattern: ^.*[^-]$
     Default: self-service
     Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
+  EmailSenderID:
+    Type: String
+    Default: GOV.UK One Login
+  ProductName:
+    Type: String
+    Default: GOV.UK One Login admin tool
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -41,7 +47,7 @@ Globals:
 Resources:
   # https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-default.html#key-policy-default-allow-root-enable-iam
   SecurityCodeEncryptionKey:
-    # checkov:skip=CKV_AWS_7: "Ensure rotation for customer created CMKs is enabled"
+    # checkov:skip=CKV_AWS_7:Ensure rotation for customer created CMKs is enabled
     Type: AWS::KMS::Key
     Properties:
       KeyPolicy:
@@ -49,15 +55,15 @@ Resources:
         Statement:
           - Sid: Enable IAM User Permissions
             Effect: Allow
-            Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-            Action: kms:*
             Resource: "*"
+            Action: kms:*
+            Principal:
+              AWS: !Ref AWS::AccountId
           - Effect: Allow
+            Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+            Action: kms:CreateGrant
             Principal:
               Service: cognito-idp.amazonaws.com
-            Action: kms:CreateGrant
-            Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
             Condition:
               StringEquals:
                 aws:SourceAccount: !Ref AWS::AccountId
@@ -65,10 +71,10 @@ Resources:
                 aws:SourceArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
 
   SendPasswordChangedEmailFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -80,7 +86,7 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Environment:
         Variables:
-          FROM_ADDRESS: !Sub [ "admin-tool@${emailDomain}", { emailDomain: !ImportValue EmailDomain } ]
+          FROM_ADDRESS: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
       Policies:
         - Version: 2012-10-17
           Statement:
@@ -91,7 +97,7 @@ Resources:
             Resource: !ImportValue EmailIdentityARN
             Condition:
               StringEquals:
-                ses:FromAddress: !Sub [ "admin-tool@${emailDomain}", { emailDomain: !ImportValue EmailDomain } ]
+                ses:FromAddress: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
       Events:
         Cognito:
           Type: Cognito
@@ -100,10 +106,10 @@ Resources:
             UserPool: !Ref UserPool
 
   CreatePasswordResetMessageFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -121,10 +127,10 @@ Resources:
             UserPool: !Ref UserPool
 
   SecurityCodeTextMessageSender:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
@@ -185,12 +191,12 @@ Resources:
             MaxLength: 2048
       AutoVerifiedAttributes: [ email ]
       UsernameAttributes: [ email ]
-      EmailVerificationMessage: |-
+      EmailVerificationMessage: !Sub |-
         <html>
           <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-            <title>Your security code for the GOV.UK One Login admin tool</title>
+            <title>Your security code for the ${ProductName}</title>
             <style>
               body {
                 -webkit-font-smoothing: antialiased;
@@ -319,14 +325,14 @@ Resources:
             </table>
           </body>
         </html>
-      EmailVerificationSubject: Your security code for the GOV.UK One Login Admin Tool
+      EmailVerificationSubject: !Sub Your security code for the ${ProductName}
       VerificationMessageTemplate:
-        EmailMessage: |-
+        EmailMessage: !Sub |-
           <html>
             <head>
               <meta name="viewport" content="width=device-width, initial-scale=1.0" />
               <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-              <title>Your security code for the GOV.UK One Login Admin Tool</title>
+              <title>Your security code for the ${ProductName}</title>
               <style>
                 body {
                   -webkit-font-smoothing: antialiased;
@@ -406,7 +412,7 @@ Resources:
                             font-size: 24px;
                             line-height: 32px;
                             color: white;
-                            "> One Login Admin Tool <strong style="display: inline-block;
+                            "> One Login admin tool <strong style="display: inline-block;
                                 outline: 2px solid transparent;
                                 outline-offset: -2px;
                                 color: #ffffff;
@@ -455,7 +461,7 @@ Resources:
               </table>
             </body>
           </html>
-        EmailSubject: Your security code for the GOV.UK One Login Admin Tool
+        EmailSubject: !Sub Your security code for the ${ProductName}
         DefaultEmailOption: CONFIRM_WITH_CODE
       MfaConfiguration: OPTIONAL
       EnabledMfas: [ SMS_MFA ]
@@ -466,7 +472,7 @@ Resources:
       EmailConfiguration:
         EmailSendingAccount: DEVELOPER
         SourceArn: !ImportValue EmailIdentityARN
-        From: !Sub [ "admin-tool@${emailDomain}", { emailDomain: !ImportValue EmailDomain } ]
+        From: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
       # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
       LambdaConfig:
         CustomSMSSender:
@@ -476,12 +482,12 @@ Resources:
       AdminCreateUserConfig:
         AllowAdminCreateUserOnly: false
         InviteMessageTemplate:
-          EmailMessage: |-
+          EmailMessage: !Sub |-
             <html>
               <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-                <title>Your security code for the GOV.UK One Login Admin Tool</title>
+                <title>Your security code for the ${ProductName}</title>
                 <style>
                   body {
                     -webkit-font-smoothing: antialiased;
@@ -561,7 +567,7 @@ Resources:
                               font-size: 24px;
                               line-height: 32px;
                               color: white;
-                              "> One Login Admin Tool <strong style="display: inline-block;
+                              "> One Login admin tool <strong style="display: inline-block;
                                   outline: 2px solid transparent;
                                   outline-offset: -2px;
                                   color: #ffffff;
@@ -611,7 +617,7 @@ Resources:
                       </table>
               </body>
             </html>
-          EmailSubject: Your security code for the GOV.UK One Login Admin Tool
+          EmailSubject: !Sub Your security code for the ${ProductName}
       UsernameConfiguration:
         CaseSensitive: false
       AccountRecoverySetting:

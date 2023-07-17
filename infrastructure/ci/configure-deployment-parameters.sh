@@ -6,6 +6,7 @@ set -eu
 ACCOUNT=$(../aws.sh get-current-account-name)
 PARAMETER_NAME_PREFIX=/self-service
 MANUAL_PARAMETERS=(api_notification_email google_tag_id)
+MANUAL_SECRETS=(auth_api_key notify_api_key)
 
 declare -A PARAMETERS=(
   [test_banner]=$PARAMETER_NAME_PREFIX/frontend/show-test-banner
@@ -54,6 +55,11 @@ function check-manual-parameters {
   for parameter in "${MANUAL_PARAMETERS[@]}"; do check-parameter "${PARAMETERS[$parameter]}"; done
 }
 
+function check-manual-secrets {
+  local secret
+  for secret in "${MANUAL_SECRETS[@]}"; do check-secret "${SECRETS[$secret]}"; done
+}
+
 function check-parameter {
   local parameter=$1
   check-parameter-set "$parameter" || write-parameter-value "$parameter" "$(get-value-from-user "$parameter")"
@@ -64,9 +70,9 @@ function check-secret {
   check-secret-set "$secret" || write-secret-value "$secret" "$(get-value-from-user "$secret" secret)"
 }
 
-function check-secrets {
-  local secret
-  for secret in "${SECRETS[@]}"; do check-secret "$secret"; done
+function check-session-secret {
+  local secret=${SECRETS[session_secret]}
+  check-secret-set "$secret" || write-secret-value "$secret" "$(uuidgen)"
 }
 
 function check-cognito-external-id {
@@ -104,11 +110,15 @@ function print-secrets {
 
 function check-deployment-parameters {
   ../aws.sh check-current-account
+
   check-test-banner
   check-cognito-external-id
   check-deletion-protection
   check-manual-parameters
-  check-secrets
+
+  check-session-secret
+  check-manual-secrets
+
   print-parameters
   print-secrets
 }

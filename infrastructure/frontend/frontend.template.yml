@@ -3,108 +3,120 @@ Description: DI Admin Tool frontend
 Transform: AWS::LanguageExtensions
 
 Parameters:
+  ImageURI:
+    Type: String
+    Default: ""
+    Description: The URI of the ECR image to use for the container
+  ContainerPort:
+    Type: Number
+    Default: 3000
+  LogGroupPrefix:
+    Type: String
+    AllowedPattern: ^.*[^\/]$
+    Default: /aws/vendedlogs
   DeploymentName:
     Type: String
     MaxLength: 28
     AllowedPattern: ^.*[^-]$
     Default: self-service
     Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
-  VpcStackName:
-    Type: String
-    Description: The name of the stack that defines the VPC in which the frontend container will run
+  ShowTestBanner:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/show-test-banner
+  GoogleTagID:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/google-tag-id
   PermissionsBoundary:
     Type: String
     Default: ""
     Description: The ARN of the permissions boundary to apply when creating IAM roles
 
 Mappings:
-  # See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
-  ElasticLoadBalancerAccountIds:
+  # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+  ElasticLoadBalancer:
     eu-west-2:
-      AccountId: 652711504416
+      AccountID: 652711504416
 
 Conditions:
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
 
 Resources:
-  ECSCluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      CapacityProviders: [ FARGATE, FARGATE_SPOT ]
-      ClusterSettings:
-        - Name: containerInsights
-          Value: enabled
-      Configuration:
-        ExecuteCommandConfiguration:
-          Logging: DEFAULT
 
-  ContainerService:
-    Type: AWS::ECS::Service
-    DependsOn: ApplicationLoadBalancerListener
-    Properties:
-      Cluster: !Ref ECSCluster
-      LaunchType: FARGATE
-      SchedulingStrategy: REPLICA
-      DeploymentController:
-        Type: ECS
-      LoadBalancers:
-        - ContainerName: frontend
-          ContainerPort: 3000
-          TargetGroupArn: !Ref ApplicationLoadBalancerTargetGroup
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          SecurityGroups: [ !GetAtt ContainerServiceSecurityGroup.GroupId ]
-          Subnets:
-            - Fn::ImportValue:
-                !Sub ${VpcStackName}-PrivateSubnetIdA
-            - Fn::ImportValue:
-                !Sub ${VpcStackName}-PrivateSubnetIdB
-      PropagateTags: SERVICE
-      TaskDefinition: !Ref TaskDefinition
+  #--- Fargate / ECS ---#
 
-  ContainerServiceSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
     Properties:
-      GroupDescription: Security group to access the container service
-      SecurityGroupIngress:
-        - Description: Allow traffic from the load balancer
-          SourceSecurityGroupId: !GetAtt ApplicationLoadBalancerSecurityGroup.GroupId
-          IpProtocol: tcp
-          FromPort: 80 # ALB port
-          ToPort: 3000 # Container port
-      VpcId:
-        Fn::ImportValue:
-          !Sub ${VpcStackName}-VpcId
+      RequiresCompatibilities: [ FARGATE ]
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: !GetAtt ExecutionRole.Arn
+      Cpu: 256
+      Memory: 512
+      Family: !Sub ${DeploymentName}
+      NetworkMode: awsvpc
+      ContainerDefinitions:
+        - Name: self-service-frontend
+          Image: !Ref ImageURI
+          Environment:
+            - Name: PORT
+              Value: !Ref ContainerPort
+            - Name: TEST_BANNER
+              Value: !Ref ShowTestBanner
+            - Name: GOOGLE_TAG_ID
+              Value: !Ref GoogleTagID
+            - Name: SESSIONS_TABLE
+              Value:
+                Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
+            - Name: API_BASE_URL
+              Value:
+                Fn::ImportValue: !Sub ${DeploymentName}-API-BaseURL
+            - Name: COGNITO_USER_POOL_ID
+              Value:
+                Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolID
+            - Name: COGNITO_CLIENT_ID
+              Value:
+                Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolClientID
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+          HealthCheck:
+            Command: [ "CMD", "wget", "--spider", !Sub "http://localhost:${ContainerPort}" ]
+          LogConfiguration:
+            # https://docs.docker.com/config/containers/logging/awslogs/
+            LogDriver: awslogs
+            Options:
+              # Consider lines not starting with whitespace as a multi-line log message boundary
+              awslogs-multiline-pattern: ^[^\s}]+.*$
+              awslogs-group: !Sub ${LogGroupPrefix}/${DeploymentName}/frontend
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: true
+              awslogs-region: !Ref AWS::Region
 
-  ECSExecutionRole:
+  ExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      Description: Grant the Fargate and ECS container agents permissions to make AWS API calls and access ECR
       PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
+      ManagedPolicyArns: [ arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy ]
       AssumeRolePolicyDocument:
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Action: sts:AssumeRole
             Principal:
-              Service: [ ecs-tasks.amazonaws.com ]
-      ManagedPolicyArns: [ arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy ]
+              Service: ecs-tasks.amazonaws.com
+      Policies:
+        - PolicyName: CreateLogGroup
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: logs:CreateLogGroup
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${LogGroupPrefix}/${DeploymentName}/frontend*
 
-  TaskExecutionPolicy:
-    # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
-    Type: AWS::IAM::Policy
-    Properties:
-      Roles: [ !Ref ECSExecutionRole ]
-      PolicyName: TaskExecutionPolicy
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: logs:CreateLogGroup
-            Resource: "*"
-
-  ECSTaskRole:
+  TaskRole:
     Type: AWS::IAM::Role
     Properties:
+      Description: Allow the Frontend application tasks to access AWS services
       PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
       AssumeRolePolicyDocument:
         Statement:
@@ -117,67 +129,163 @@ Resources:
                 aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
       Policies:
         # https://github.com/ca98am79/connect-dynamodb#iam-permissions
-        - PolicyName: SessionStorageTableAccess
+        - PolicyName: SessionStorageTable
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - dynamodb:DescribeTable
+                  - dynamodb:Scan
                   - dynamodb:GetItem
                   - dynamodb:PutItem
                   - dynamodb:UpdateItem
                   - dynamodb:DeleteItem
-                  - dynamodb:Scan
+                  - dynamodb:DescribeTable
                 Resource:
                   Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableARN
+        - PolicyName: Cognito
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-idp:AdminCreateUser
+                  - cognito-idp:AdminInitiateAuth
+                  - cognito-idp:AdminUpdateUserAttributes
+                  - cognito-idp:AdminSetUserMFAPreference
+                  - cognito-idp:AdminRespondToAuthChallenge
+                Resource:
+                  Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolARN
 
-  TaskDefinition:
-    Type: AWS::ECS::TaskDefinition
+  FargateCluster:
+    Type: AWS::ECS::Cluster
     Properties:
-      RequiresCompatibilities: [ FARGATE ]
-      ExecutionRoleArn: !GetAtt ECSExecutionRole.Arn
-      TaskRoleArn: !GetAtt ECSTaskRole.Arn
-      Cpu: 256
-      Memory: 512
-      Family: !Ref DeploymentName
-      NetworkMode: awsvpc
-      ContainerDefinitions:
-        - Name: frontend
-          Image: CONTAINER-IMAGE-PLACEHOLDER
-          MemoryReservation: 256
-          Memory: 512
-          PortMappings:
-            - ContainerPort: 3000
-              Protocol: tcp
-          Essential: true
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group: /self-service
-              awslogs-stream-prefix: frontend
-              awslogs-region: !Ref AWS::Region
-              awslogs-create-group: true
-          Environment:
-            - Name: SESSION_SECRET
-              Value: "{{resolve:secretsmanager:/self-service/frontend/session-secret:SecretString}}"
+      ClusterName: !Ref DeploymentName
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  ContainerService:
+    Type: AWS::ECS::Service
+    DependsOn: ApplicationLoadBalancerListener
+    Properties:
+      ServiceName: self-service-frontend
+      Cluster: !GetAtt FargateCluster.Arn
+      TaskDefinition: !Ref TaskDefinition
+      PropagateTags: SERVICE
+      LaunchType: FARGATE
+      DesiredCount: 1
+      LoadBalancers:
+        - ContainerName: self-service-frontend
+          ContainerPort: !Ref ContainerPort
+          TargetGroupArn: !Ref ApplicationTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          SecurityGroups:
+            - !GetAtt ContainerServiceSecurityGroup.GroupId
+          Subnets: !Split
+            - ","
+            - Fn::ImportValue: VPC-ProtectedSubnets
+
+  ContainerServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Frontend container service access
+      SecurityGroupIngress:
+        - Description: Allow traffic from the application load balancer
+          SourceSecurityGroupId: !GetAtt ApplicationSecurityGroup.GroupId
+          IpProtocol: tcp
+          FromPort: !Ref ContainerPort
+          ToPort: !Ref ContainerPort
+      VpcId:
+        Fn::ImportValue: VPC-ID
+      Tags:
+        - Key: Name
+          Value: !Sub ${DeploymentName}-frontend-container-service
+
+  #--- Application load balancing ---#
+
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: internal
+      Name: !Sub ${DeploymentName}-frontend
+      SecurityGroups:
+        - !Ref ApplicationSecurityGroup
+      Subnets: !Split
+        - ","
+        - Fn::ImportValue: VPC-ProtectedSubnets
+      LoadBalancerAttributes:
+        - Key: routing.http.drop_invalid_header_fields.enabled
+          Value: true
+        - Key: access_logs.s3.enabled
+          Value: true
+        - Key: access_logs.s3.bucket
+          Value: !Ref AccessLogsBucket
+
+  ApplicationTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${DeploymentName}-app
+      Port: !Ref ContainerPort
+      Protocol: HTTP
+      TargetType: ip
+      VpcId:
+        Fn::ImportValue: VPC-ID
+
+  ApplicationLoadBalancerListener:
+    # checkov:skip=CKV_AWS_2:Certificate generation must be resolved before the listener can use HTTPS
+    # checkov:skip=CKV_AWS_103:The load balancer cannot use TLS v1.2 until HTTPS is enabled
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ApplicationTargetGroup
+
+  ApplicationSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Frontend application load balancer
+      SecurityGroupIngress:
+        - Description: Allow traffic from the VPC
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp:
+            Fn::ImportValue: VPC-CIDR
+      VpcId:
+        Fn::ImportValue: VPC-ID
+      Tags:
+        - Key: Name
+          Value: !Sub ${DeploymentName}-frontend-application-load-balancer
+
+  ApplicationSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !GetAtt ApplicationSecurityGroup.GroupId
+      Description: Allow traffic to the frontend container service
+      DestinationSecurityGroupId: !GetAtt ContainerServiceSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: !Ref ContainerPort
+      ToPort: !Ref ContainerPort
 
   AccessLogsBucket:
     # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
+    # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
     Type: AWS::S3::Bucket
     Properties:
-      VersioningConfiguration:
-        Status: Enabled
+      BucketName: !Sub ${DeploymentName}-frontend-alb-logs
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
 
+  # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
   AccessLogsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -186,174 +294,91 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Principal:
-              AWS: !Sub
-                - arn:aws:iam::${ElbAccountId}:root
-                - ElbAccountId: !FindInMap [ ElasticLoadBalancerAccountIds, !Ref AWS::Region, AccountId ]
             Action: s3:PutObject
-            Resource: !Sub arn:aws:s3:::${AccessLogsBucket}/sse-front-alb/AWSLogs/${AWS::AccountId}/*
+            Resource: !Sub ${AccessLogsBucket.Arn}/AWSLogs/${AWS::AccountId}/*
+            Principal:
+              AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
 
-  ApplicationLoadBalancer:
-    # checkov:skip=CKV_AWS_91:Ensure the ELBv2 (Application/Network) has access logging enabled
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties:
-      Scheme: internal
-      SecurityGroups: [ !GetAtt ApplicationLoadBalancerSecurityGroup.GroupId ]
-      Subnets:
-        - Fn::ImportValue:
-            !Sub ${VpcStackName}-PrivateSubnetIdA
-        - Fn::ImportValue:
-            !Sub ${VpcStackName}-PrivateSubnetIdB
-      LoadBalancerAttributes:
-        - Key: access_logs.s3.enabled
-          Value: true
-        - Key: access_logs.s3.bucket
-          Value: !Ref AccessLogsBucket
-        - Key: access_logs.s3.prefix
-          Value: sse-front-alb
-        - Key: routing.http.drop_invalid_header_fields.enabled
-          Value: true
+  #--- Network load balancing ---#
 
-  ApplicationLoadBalancerTargetGroup:
+  NetworkLoadBalancerTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      HealthCheckPort: 3000
-      HealthCheckProtocol: HTTP
-      HealthCheckPath: /
+      Name: !Sub ${DeploymentName}-net
       Port: 80
-      Protocol: HTTP
-      ProtocolVersion: HTTP1
-      Matcher:
-        HttpCode: "200-499" # might be 200
-      TargetType: ip
+      Protocol: TCP
+      TargetType: alb
+      Targets:
+        - Id: !Ref ApplicationLoadBalancer
       VpcId:
-        Fn::ImportValue:
-          !Sub ${VpcStackName}-VpcId
-
-  ApplicationLoadBalancerListener:
-    # checkov:skip=CKV_AWS_2:Certificate generation must be resolved before the listener can use HTTPS.
-    # checkov:skip=CKV_AWS_103:The load balancer cannot use TLS v1.2 until HTTPS is enabled.
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      DefaultActions:
-        - TargetGroupArn: !Ref ApplicationLoadBalancerTargetGroup
-          Type: forward
-      LoadBalancerArn: !Ref ApplicationLoadBalancer
-      Port: 80
-      Protocol: HTTP
-
-  ApplicationLoadBalancerSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security Group for the application load balancer
-      GroupName: !Sub ${AWS::StackName}-ApplicationLoadBalancer
-      VpcId:
-        Fn::ImportValue:
-          !Sub ${VpcStackName}-VpcId
-
-  ApplicationLoadBalancerSecurityGroupIngress:
-    # checkov:skip=CKV_AWS_260:Ensure no security groups allow ingress from 0.0.0.0:0 to port 80
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !GetAtt ApplicationLoadBalancerSecurityGroup.GroupId
-      CidrIp: "0.0.0.0/0"
-      # CidrIp:
-      #   Fn::ImportValue:
-      #     !Sub "${VpcStackName}-VpcCidr"
-      Description: Allow traffic from the VPC / outside
-      IpProtocol: tcp
-      FromPort: 80
-      ToPort: 80
-
-  ApplicationLoadBalancerSecurityGroupEgress:
-    Type: AWS::EC2::SecurityGroupEgress
-    Properties:
-      GroupId: !GetAtt ApplicationLoadBalancerSecurityGroup.GroupId
-      DestinationSecurityGroupId: !GetAtt ContainerServiceSecurityGroup.GroupId
-      Description: Allow traffic to the container service
-      IpProtocol: -1
-      FromPort: 0
-      ToPort: 65535
-
-  APIGatewayEndpoint:
-    Type: AWS::ApiGatewayV2::Api
-    Properties:
-      Name: !Sub ${AWS::StackName}
-      ProtocolType: HTTP
-
-  APIGatewayEndpointIntegration:
-    Type: AWS::ApiGatewayV2::Integration
-    Properties:
-      ApiId: !Ref APIGatewayEndpoint
-      IntegrationType: HTTP_PROXY
-      ConnectionId:
-        Fn::ImportValue:
-          !Sub ${VpcStackName}-VpcLinkId
-      ConnectionType: VPC_LINK
-      IntegrationMethod: ANY
-      IntegrationUri: !Ref NetworkLoadBalancerListener
-      PayloadFormatVersion: 1.0
-
-  APIGatewayRoute:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref APIGatewayEndpoint
-      RouteKey: ANY /{proxy+}
-      Target: !Sub integrations/${APIGatewayEndpointIntegration}
-
-  APIStage:
-    Type: AWS::ApiGatewayV2::Stage
-    Properties:
-      ApiId: !Ref APIGatewayEndpoint
-      StageName: $default
-      AutoDeploy: true
-      AccessLogSettings:
-        DestinationArn: !GetAtt APIGWAccessLogsGroup.Arn
-        Format:
-          Fn::ToJsonString:
-            requestId: $context.requestId
-            ip: $context.identity.sourceIp
-            requestTime: $context.requestTime
-            httpMethod: $context.httpMethod
-            path: $context.path"
-            routeKey: $context.routeKey
-            status: $context.status
-            protocol: $context.protocol
-            responseLength: $context.responseLength
-
-  APIGWAccessLogsGroup:
-    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/apigateway/${AWS::StackName}-sseFront-API-GW-AccessLogs
-      RetentionInDays: 14
+        Fn::ImportValue: VPC-ID
 
   NetworkLoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
+      Port: 80
+      Protocol: TCP
+      LoadBalancerArn:
+        Fn::ImportValue: VPC-NetworkLoadBalancerARN
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref NetworkLoadBalancerTargetGroup
-      LoadBalancerArn:
-        Fn::ImportValue:
-          !Sub ${VpcStackName}-ApiGatewayVpcLinkTargetNLB
-      Port: 80
-      Protocol: TCP
 
-  NetworkLoadBalancerTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    DependsOn: ApplicationLoadBalancerListener
+  #--- Public access / API Gateway ---#
+
+  PublicAPI:
+    Type: AWS::ApiGatewayV2::Api
     Properties:
-      Name: !Sub ${AWS::StackName}-NLBTarGrp
-      Port: 80
-      Protocol: TCP
-      Targets:
-        - Id: !Ref ApplicationLoadBalancer
-      TargetType: alb
-      VpcId:
-        Fn::ImportValue:
-          !Sub ${VpcStackName}-VpcId
+      Name: !Sub ${DeploymentName}-frontend
+      ProtocolType: HTTP
 
-Outputs:
-  AdminToolURL:
-    Value: !GetAtt APIGatewayEndpoint.ApiEndpoint
+  APIProxy:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref PublicAPI
+      RouteKey: ANY /{proxy+}
+      Target: !Sub integrations/${VPCLinkIntegration}
+
+  APIStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref PublicAPI
+      StageName: $default
+      AutoDeploy: true
+      DefaultRouteSettings:
+        DetailedMetricsEnabled: true
+      AccessLogSettings:
+        DestinationArn: !GetAtt APIAccessLogsGroup.Arn
+        Format:
+          Fn::ToJsonString:
+            path: $context.path
+            status: $context.status
+            protocol: $context.protocol
+            routeKey: $context.routeKey
+            requestId: $context.requestId
+            requestTime: $context.requestTime
+            httpMethod: $context.httpMethod
+            responseLength: $context.responseLength
+            extendedRequestId: $context.extendedRequestId
+            integrationStatus: $context.integration.status
+            integrationError: $context.integration.error
+            customDomainPath: $context.customDomain.basePathMatched
+
+  APIAccessLogsGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/frontend/api-gateway
+      RetentionInDays: 14
+
+  VPCLinkIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref PublicAPI
+      PayloadFormatVersion: 1.0
+      IntegrationMethod: ANY
+      IntegrationType: HTTP_PROXY
+      IntegrationUri: !Ref NetworkLoadBalancerListener
+      ConnectionType: VPC_LINK
+      ConnectionId:
+        Fn::ImportValue: VPC-LinkID
