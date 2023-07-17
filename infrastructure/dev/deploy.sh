@@ -96,7 +96,7 @@ function cognito {
 }
 
 function api {
-  deploy-backend-component api --build --base-dir "$REPO_ROOT" --params LogGroupNamePrefix=$LOG_PREFIX
+  deploy-backend-component api --build --base-dir "$REPO_ROOT" --params LogGroupPrefix=$LOG_PREFIX PrivateAPI=false
 }
 
 function all {

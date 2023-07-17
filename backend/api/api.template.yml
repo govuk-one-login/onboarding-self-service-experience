@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: DI Self-Service API
-Transform:
-  - AWS::Serverless-2016-10-31
-  - AWS::LanguageExtensions
+Transform: [ AWS::LanguageExtensions, AWS::Serverless-2016-10-31 ]
 
 Parameters:
   AuthRegistrationBaseUrl:
@@ -23,6 +21,10 @@ Parameters:
     AllowedPattern: ^.*[^-]$
     Default: self-service
     Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
+  PrivateAPI:
+    Type: String
+    AllowedValues: [ Yes, No ]
+    Default: Yes
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -33,6 +35,7 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+  PrivateAPI: !Equals [ !Ref PrivateAPI, Yes ]
 
 Globals:
   Function:
@@ -45,32 +48,66 @@ Globals:
 
 Resources:
 
-  SelfServiceApi:
-    Type: AWS::Serverless::HttpApi
+  # https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html
+  API:
+    # checkov:skip=CKV_AWS_120:Ensure API Gateway caching is enabled
+    Type: AWS::Serverless::Api
     Properties:
-      FailOnWarnings: true
+      Name: !Sub ${DeploymentName}-api
       StageName: self-service-api
-      AccessLogSettings:
-        DestinationArn: !GetAtt HttpApiLogGroup.Arn
+      TracingEnabled: true
+      FailOnWarnings: true
+      OpenApiVersion: 3.0.1
+      Auth:
+        ResourcePolicy: !If
+          - PrivateAPI
+          - # https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies-examples.html#apigateway-resource-policies-source-vpc-example
+            CustomStatements:
+              - Effect: Allow
+                Resource: execute-api:/*
+                Action: execute-api:Invoke
+                Principal: "*"
+                Condition:
+                  StringEquals:
+                    aws:SourceVpce:
+                      Fn::ImportValue: VPC-ExecuteAPIGatewayEndpointID
+          - !Ref AWS::NoValue
+      EndpointConfiguration:
+        Type: !If [ PrivateAPI, PRIVATE, !Ref AWS::NoValue ]
+        VpcEndpointIds: !If [ PrivateAPI, Fn::ImportValue: VPC-ExecuteAPIGatewayEndpointID, !Ref AWS::NoValue ]
+      MethodSettings:
+        - HttpMethod: "*"
+          ResourcePath: /*
+          LoggingLevel: INFO
+          MetricsEnabled: true
+      AccessLogSetting:
+        DestinationArn: !GetAtt APIAccessLogsGroup.Arn
         Format:
           Fn::ToJsonString:
-            requestId: $context.requestId
-            ip: $context.identity.sourceIp
-            requestTime: $context.requestTime
-            httpMethod: $context.httpMethod
-            path: $context.path"
-            routeKey: $context.routeKey
+            path: $context.path
             status: $context.status
             protocol: $context.protocol
+            routeKey: $context.routeKey
+            requestId: $context.requestId
+            requestTime: $context.requestTime
+            httpMethod: $context.httpMethod
             responseLength: $context.responseLength
+            extendedRequestId: $context.extendedRequestId
+
+  APIAccessLogsGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api
+      RetentionInDays: 14
 
   #--- Users ---#
 
   GetUserFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -81,25 +118,25 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: 
+            TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
-          TABLE: 
-              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
-            ApiId: !Ref SelfServiceApi
+            RestApiId: !Ref API
             Path: /get-user
             Method: POST
 
   PutUserFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -110,25 +147,25 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: 
+            TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
-          TABLE: 
-              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
-            ApiId: !Ref SelfServiceApi
+            RestApiId: !Ref API
             Path: /put-user
             Method: POST
 
   UpdateUserFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -140,27 +177,27 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: 
+            TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
-          TABLE: 
-              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
-            ApiId: !Ref SelfServiceApi
+            RestApiId: !Ref API
             Path: /update-user
             Method: POST
 
   #--- Services ---#
 
   GetServicesFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -176,20 +213,20 @@ Resources:
       Environment:
         Variables:
           TABLE:
-              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
-            ApiId: !Ref SelfServiceApi
+            RestApiId: !Ref API
             Path: /get-services/{userId}
             Method: GET
 
   PutServiceFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -204,16 +241,16 @@ Resources:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
-          TABLE: 
-              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
 
   #--- Service clients ---#
 
   GetServiceClientsFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -224,25 +261,25 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: 
+            TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
-          TABLE: 
-              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
-            ApiId: !Ref SelfServiceApi
+            RestApiId: !Ref API
             Path: /get-service-clients/{serviceId}
             Method: GET
 
   PutServiceClientFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -253,18 +290,18 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: 
+            TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
-          TABLE: 
-              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
 
   UpdateServiceClientFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -275,20 +312,20 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: 
+            TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
-          TABLE: 
-              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
 
   #--- Service users ---#
 
   PutServiceUserFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -299,20 +336,20 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: 
+            TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           TABLE:
-              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
 
   #--- Auth clients ---#
 
   RegisterAuthClientFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -328,10 +365,10 @@ Resources:
           AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/auth-api-key}}"
 
   UpdateAuthClientFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -349,10 +386,10 @@ Resources:
   #--- Step Functions ---#
 
   NewServiceHandler:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -372,17 +409,17 @@ Resources:
             Resource: !Ref NewServiceStepFunction
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
-            ApiId: !Ref SelfServiceApi
+            RestApiId: !Ref API
             Path: /new-service
             Method: POST
 
   NewClientHandler:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -402,17 +439,17 @@ Resources:
             Resource: !Ref NewClientStepFunction
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
-            ApiId: !Ref SelfServiceApi
+            RestApiId: !Ref API
             Path: /new-client
             Method: POST
 
   UpdateClientHandler:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -432,9 +469,9 @@ Resources:
             Resource: !Ref UpdateClientStepFunction
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
-            ApiId: !Ref SelfServiceApi
+            RestApiId: !Ref API
             Path: /update-client
             Method: POST
 
@@ -530,25 +567,19 @@ Resources:
         UpdateServiceClientFunctionArn: !GetAtt UpdateServiceClientFunction.Arn
 
   StepFunctionsLogGroup:
-    # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/step-functions
       RetentionInDays: 14
 
-  HttpApiLogGroup:
-    # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/http-api/${AWS::StackName}
-      RetentionInDays: 14
   #--- Notifications ---#
 
   PrivateBetaNotificationFunction:
-    # checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
-    # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
-    # checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-    # checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild
@@ -566,26 +597,32 @@ Resources:
             TopicName: !GetAtt NotificationsSnsTopic.TopicName
       Events:
         Api:
-          Type: HttpApi
+          Type: Api
           Properties:
-            ApiId: !Ref SelfServiceApi
+            RestApiId: !Ref API
             Path: /send-private-beta-request-notification
             Method: POST
 
   NotificationsSnsTopic:
     Type: AWS::SNS::Topic
     Properties:
-      KmsMasterKeyId: "alias/aws/sns"
-      DisplayName: DI Admin Tool
+      DisplayName: DI Admin Tool Internal
       TopicName: !Sub ${DeploymentName}-internal-notifications
+      KmsMasterKeyId: alias/aws/sns
       Subscription:
         - Protocol: email
           Endpoint: !Ref NotificationEmail
 
 Outputs:
-  # SAM Serverless Function implicit API resources
+  # SAM Serverless Function implicit API resources | Invoking private APIs
   # https://github.com/aws/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  # https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-api-test-invoke-url.html#apigateway-private-api-route53-alias
   APIBaseURL:
-    Value: !Sub ${SelfServiceApi.ApiEndpoint}/${SelfServiceApi.Stage}
+    Value: !Sub
+      - https://${EndpointID}.execute-api.${AWS::Region}.amazonaws.com/${API.Stage}
+      - EndpointID: !Join
+          - "-"
+          - - !Ref API
+            - !If [ PrivateAPI, Fn::ImportValue: VPC-ExecuteAPIGatewayEndpointID, !Ref AWS::NoValue ]
     Export:
       Name: !Sub ${DeploymentName}-API-BaseURL
