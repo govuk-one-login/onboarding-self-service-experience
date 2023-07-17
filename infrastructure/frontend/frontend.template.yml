@@ -195,7 +195,6 @@ Resources:
 
   ApplicationLoadBalancer:
     # checkov:skip=CKV_AWS_91:Ensure the ELBv2 (Application/Network) has access logging enabled
-    # checkov:skip=CKV_AWS_131:Ensure that ALB drops HTTP headers
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Scheme: internal
@@ -212,6 +211,8 @@ Resources:
           Value: !Ref AccessLogsBucket
         - Key: access_logs.s3.prefix
           Value: sse-front-alb
+        - Key: routing.http.drop_invalid_header_fields.enabled
+          Value: true
 
   ApplicationLoadBalancerTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -301,7 +302,6 @@ Resources:
       Target: !Sub integrations/${APIGatewayEndpointIntegration}
 
   APIStage:
-    # checkov:skip=CKV_AWS_95:Ensure API Gateway V2 has Access Logging enabled
     Type: AWS::ApiGatewayV2::Stage
     Properties:
       ApiId: !Ref APIGatewayEndpoint
@@ -323,10 +323,10 @@ Resources:
 
   APIGWAccessLogsGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
-    # checkov:skip=CKV_AWS_66:Ensure that CloudWatch Log Group specifies retention days
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/apigateway/${AWS::StackName}-sseFront-API-GW-AccessLogs
+      RetentionInDays: 14
 
   NetworkLoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
