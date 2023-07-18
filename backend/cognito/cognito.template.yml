@@ -31,7 +31,18 @@ Parameters:
     Type: String
     Default: ""
 
+Mappings:
+  Account:
+    Subdomain:
+      "494650018671": development.
+      "399055180839": build.
+      "325730373996": staging.
+      "663985455444": integration.
+      "389946456390": "" # production
+
 Conditions:
+  Subdomain: !Not [ !Condition TopNode ]
+  TopNode: !Equals [ !FindInMap [ Account, Subdomain, !Ref AWS::AccountId ], "" ]
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
 
@@ -666,6 +677,20 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref SecurityCodeTextMessageSender
       Principal: cognito-idp.amazonaws.com
+
+  SubdomainHostedZone:
+    Type: AWS::Shield::Protection
+    Condition: Subdomain
+    Properties:
+      Name: 'SubdomainHostedZoneProtection'
+      ResourceArn: arn:aws:route53:::hostedzone/Z03674982M87OQKN51BWI
+
+  ApexHostedZoneProtection:
+    Type: AWS::Shield::Protection
+    Condition: TopNode
+    Properties:
+      Name: 'ApexHostedZoneProtection'
+      ResourceArn: arn:aws:route53:::hostedzone/Z03674982M87OQKN51BWI
 
 Outputs:
   UserPoolID:
