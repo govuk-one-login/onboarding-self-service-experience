@@ -718,6 +718,12 @@ Resources:
               AggregateKeyType: IP
               Limit: 2000
 
+  AlbShieldProtectionWebACLAssociation:
+    Type: 'AWS::WAFv2::WebACLAssociation'
+    Properties:
+      WebACLArn: !GetAtt AlbShieldProtectionWebACL.Arn
+      ResourceArn: arn:aws:elasticloadbalancing:eu-west-2:494650018671:loadbalancer/app/test-admin-tool-frontend/512489fbdbf998b5
+
 Outputs:
   UserPoolID:
     Value: !Ref UserPool
