@@ -692,6 +692,33 @@ Resources:
       Name: 'ApexHostedZoneProtection'
       ResourceArn: arn:aws:route53:::hostedzone/Z03674982M87OQKN51BWI
 
+  AlbShieldProtectionWebACL:
+    Type: 'AWS::WAFv2::WebACL'
+    Properties:
+      Name: AlbShieldProtectionWebACL
+      Scope: REGIONAL
+      Description: This is WebACL to protect ALB
+      DefaultAction:
+        Allow: {}
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: AlbShieldProtectionWebACLMetric
+      Rules:
+        - Name: RuleWithAWSManagedRules
+          Priority: 0
+          OverrideAction:
+            Count: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RuleWithAlbShieldProtectionWebACLMetric
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+              ExcludedRules: []
+
 Outputs:
   UserPoolID:
     Value: !Ref UserPool
