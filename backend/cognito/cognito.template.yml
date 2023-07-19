@@ -705,6 +705,19 @@ Resources:
         CloudWatchMetricsEnabled: true
         MetricName: AlbShieldProtectionWebACLMetric
       Rules:
+        # This rule fixes CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
+        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 0
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RuleWithAlbShieldProtectionWebACLBadInputMetric
         - Name: RuleWithRateLimit
           Priority: 0
           Action:
