@@ -705,19 +705,18 @@ Resources:
         CloudWatchMetricsEnabled: true
         MetricName: AlbShieldProtectionWebACLMetric
       Rules:
-        - Name: RuleWithAWSManagedRules
+        - Name: RuleWithRateLimit
           Priority: 0
-          OverrideAction:
+          Action:
             Count: {}
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
             MetricName: RuleWithAlbShieldProtectionWebACLMetric
           Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesCommonRuleSet
-              ExcludedRules: []
+            RateBasedStatement:
+              AggregateKeyType: IP
+              Limit: 2000
 
 Outputs:
   UserPoolID:
