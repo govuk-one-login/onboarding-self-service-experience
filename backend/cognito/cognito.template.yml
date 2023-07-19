@@ -678,7 +678,7 @@ Resources:
       FunctionName: !Ref SecurityCodeTextMessageSender
       Principal: cognito-idp.amazonaws.com
 
-  SubdomainHostedZone:
+  SubdomainHostedZoneProtection:
     Type: AWS::Shield::Protection
     Condition: Subdomain
     Properties:
@@ -723,6 +723,16 @@ Resources:
     Properties:
       WebACLArn: !GetAtt AlbShieldProtectionWebACL.Arn
       ResourceArn: arn:aws:elasticloadbalancing:eu-west-2:494650018671:loadbalancer/app/test-admin-tool-frontend/512489fbdbf998b5
+
+  AlbShieldProtection:
+    Type: AWS::Shield::Protection
+    Properties:
+      Name: 'AlbShieldProtection'
+      ResourceArn: arn:aws:elasticloadbalancing:eu-west-2:494650018671:loadbalancer/app/test-admin-tool-frontend/512489fbdbf998b5
+      ApplicationLayerAutomaticResponseConfiguration:
+        Status: ENABLED
+        Action:
+          Count: { }
 
 Outputs:
   UserPoolID:
