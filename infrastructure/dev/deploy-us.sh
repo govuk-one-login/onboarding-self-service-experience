@@ -10,7 +10,7 @@ declare -A ENV=(
   [COGNITO_CLIENT_ID]=Cognito-UserPoolClientID
 )
 
-COMPONENTS=(cognito dynamodb api)
+COMPONENTS=(cognito-us dynamodb api)
 DEPLOY_CMDS=("${COMPONENTS[@]}" all admin-tool)
 COMMANDS=("${DEPLOY_CMDS[@]}" run list delete help)
 
@@ -91,8 +91,8 @@ function dynamodb {
   deploy-backend-component dynamodb
 }
 
-function cognito {
-  deploy-backend-component cognito --build
+function cognito-us {
+  deploy-backend-component cognito-us --build
 }
 
 function api {
@@ -101,7 +101,7 @@ function api {
 
 function all {
   echo "Deploying the Admin Tool stack set"
-  cognito
+  cognito-us
 #  dynamodb
 #  api
 }

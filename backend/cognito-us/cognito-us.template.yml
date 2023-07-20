@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Cognito UserPool and Client for the Admin Tool
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: nodejs18.x
+    Environment:
+      Variables:
+        NODE_OPTIONS: --enable-source-maps
+
+Resources:
+
+  CloudFrontShieldProtectionWebACL:
+    Type: 'AWS::WAFv2::WebACL'
+    Properties:
+      Name: CloudFrontShieldProtectionWebACL
+      Scope: CLOUDFRONT
+      Description: This is WebACL to protect CloudFront
+      DefaultAction:
+        Allow: {}
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: CloudFrontShieldProtectionWebACLMetric
+      Rules:
+        - Name: CloudFrontRuleWithRateLimit
+          Priority: 0
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RuleWithCloudFrontShieldProtectionWebACLMetric
+          Statement:
+            RateBasedStatement:
+              AggregateKeyType: IP
+              Limit: 1000
+        # This rule fixes CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
+        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 1
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RuleWithAlbShieldProtectionWebACLBadInputMetric
+
+  CloudFrontShieldProtection:
+    Type: AWS::Shield::Protection
+    Properties:
+      Name: 'CloudFrontShieldProtection'
+      ResourceArn: arn:aws:cloudfront::494650018671:distribution/E3TEKHJ0PG2YFU
+      ApplicationLayerAutomaticResponseConfiguration:
+        Status: ENABLED
+        Action:
+          Block: { }
+
