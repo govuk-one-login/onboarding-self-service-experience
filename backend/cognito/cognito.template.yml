@@ -678,18 +678,18 @@ Resources:
       FunctionName: !Ref SecurityCodeTextMessageSender
       Principal: cognito-idp.amazonaws.com
 
-  SubdomainHostedZoneProtection:
+  SubdomainHostedZoneShieldProtection:
     Type: AWS::Shield::Protection
     Condition: Subdomain
     Properties:
-      Name: 'SubdomainHostedZoneProtection'
+      Name: 'SubdomainHostedZoneShieldProtection'
       ResourceArn: arn:aws:route53:::hostedzone/Z03674982M87OQKN51BWI
 
-  ApexHostedZoneProtection:
+  ApexHostedZoneShieldProtection:
     Type: AWS::Shield::Protection
     Condition: TopNode
     Properties:
-      Name: 'ApexHostedZoneProtection'
+      Name: 'ApexHostedZoneShieldProtection'
       ResourceArn: arn:aws:route53:::hostedzone/Z03674982M87OQKN51BWI
 
   AlbShieldProtectionWebACL:
