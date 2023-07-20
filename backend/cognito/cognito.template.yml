@@ -707,19 +707,19 @@ Resources:
       Rules:
         # This rule fixes CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
         - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
-          Priority: 0
+          Priority: 1
           Statement:
             ManagedRuleGroupStatement:
               VendorName: AWS
               Name: AWSManagedRulesKnownBadInputsRuleSet
           OverrideAction:
-            None: {}
+            Count: {}
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
             MetricName: RuleWithAlbShieldProtectionWebACLBadInputMetric
         - Name: RuleWithRateLimit
-          Priority: 1
+          Priority: 0
           Action:
             Count: {}
           VisibilityConfig:
@@ -747,6 +747,18 @@ Resources:
         Status: ENABLED
         Action:
           Count: { }
+
+  NatGatewayZoneAEIPShieldProtection:
+    Type: AWS::Shield::Protection
+    Properties:
+      Name: 'NatGatewayZoneAEIPShieldProtection'
+      ResourceArn: arn:aws:ec2:eu-west-2:494650018671:eip-allocation/eipalloc-0133898bcfb9dd11c
+
+  NatGatewayZoneBEIPShieldProtection:
+    Type: AWS::Shield::Protection
+    Properties:
+      Name: 'NatGatewayZoneAEIPShieldProtection'
+      ResourceArn: arn:aws:ec2:eu-west-2:494650018671:eip-allocation/eipalloc-008d4d53f8af10be6
 
 Outputs:
   UserPoolID:
