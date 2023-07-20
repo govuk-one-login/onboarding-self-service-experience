@@ -705,7 +705,7 @@ Resources:
         CloudWatchMetricsEnabled: true
         MetricName: AlbShieldProtectionWebACLMetric
       Rules:
-        - Name: RuleWithRateLimit
+        - Name: AlbRuleWithRateLimit
           Priority: 0
           Action:
             Block: {}
@@ -746,7 +746,7 @@ Resources:
       ApplicationLayerAutomaticResponseConfiguration:
         Status: ENABLED
         Action:
-          Count: { }
+          Block: { }
 
   NatGatewayZoneAEIPShieldProtection:
     Type: AWS::Shield::Protection
