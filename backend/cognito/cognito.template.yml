@@ -667,7 +667,7 @@ Resources:
       FunctionName: !Ref SecurityCodeTextMessageSender
       Principal: cognito-idp.amazonaws.com
 
-  CognitoWebACLAssociation:
+  CognitoUserPoolWebACLAssociation:
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
       WebACLArn: !ImportValue wafrOwaspACL
