@@ -30,6 +30,10 @@ Parameters:
     Type: String
     Default: ""
     Description: The ARN of the permissions boundary to apply when creating IAM roles
+  Environment:
+    Type: String
+    Default: development
+    AllowedPattern: development|build|staging|integration|production
 
 Mappings:
   # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
@@ -276,6 +280,10 @@ Resources:
     Type: AWS::Shield::Protection
     DependsOn: AlbShieldProtectionWebACLAssociation
     Properties:
+      HealthCheckArns:
+        - !Sub
+          - 'arn:${AWS::Partition}:route53:::healthcheck/${healthCheckId}'
+          - healthCheckId: !Ref AlbHealthCheck
       Name: !Sub ${AWS::StackName}-${Environment}-AlbShieldProtection
       ResourceArn: !Ref ApplicationLoadBalancer
       ApplicationLayerAutomaticResponseConfiguration:
@@ -490,18 +498,6 @@ Resources:
           QueryStringsConfig:
             QueryStringBehavior: all
 
-  CloudFrontShieldProtection:
-    Type: AWS::Shield::Protection
-    Properties:
-      Name: !Sub '${AWS::StackName}-${Environment}-CloudFrontShieldProtection'
-      ResourceArn: !Sub
-        - 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${distributionId}'
-        - distributionId: !Ref FrontendAppCF
-      ApplicationLayerAutomaticResponseConfiguration:
-        Status: ENABLED
-        Action:
-          Block: { }
-
   CloudFrontAccessLogsBucket:
     # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
     # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
@@ -534,6 +530,50 @@ Resources:
               - s3:PutBucketAcl
             Principal:
               AWS: !Ref AWS::AccountId
+
+  DRTAccess:
+    Type: AWS::Shield::DRTAccess
+    Properties:
+      LogBucketList:
+        - !Ref AccessLogsBucket
+        - !Ref CloudFrontAccessLogsBucket
+      RoleArn: !GetAtt DRTAccessRole.Arn
+
+  DRTAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSShieldDRTAccessPolicy'
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - 'drt.shield.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+
+  ProactiveEngagement:
+    DeletionPolicy: Delete
+    Type: AWS::Shield::ProactiveEngagement
+    Properties:
+      ProactiveEngagementStatus: ENABLED
+      EmergencyContactList:
+        - EmailAddress: !Sub 'report@digital.cabinet-office.gov.uk'
+          ContactNotes: !Sub 'Cyber security team 24/7'
+          PhoneNumber: '+441857341102'
+
+  AlbHealthCheck:
+    Type: 'AWS::Route53::HealthCheck'
+    Properties:
+      HealthCheckConfig:
+        Type: HTTPS
+        FullyQualifiedDomainName: !GetAtt ApplicationLoadBalancer.DNSName
+      HealthCheckTags:
+        -
+          Key: Name
+          Value: !Sub ${DeploymentName}-Alb-HealthCheck
 
 Outputs:
   APIGatewayURL:
