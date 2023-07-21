@@ -235,6 +235,62 @@ Resources:
         - TargetGroupArn: !Ref ApplicationTargetGroup
           Type: forward
 
+  AlbShieldProtectionWebACL:
+    Type: 'AWS::WAFv2::WebACL'
+    Properties:
+      Name: !Sub ${AWS::StackName}-${Environment}-AlbShieldProtectionWebACL
+      Scope: REGIONAL
+      Description: This is WebACL to protect ALB
+      DefaultAction:
+        Allow: {}
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: !Sub ${AWS::StackName}-${Environment}-AlbShieldProtectionWebACLMetric
+      Rules:
+        - Name: AlbRuleWithRateLimit
+          Priority: 0
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-RuleWithRateMetric
+          Statement:
+            RateBasedStatement:
+              AggregateKeyType: IP
+              Limit: 1000
+        # This rule fixes CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
+        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 1
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-BadInputMetric
+
+  AlbShieldProtectionWebACLAssociation:
+    Type: 'AWS::WAFv2::WebACLAssociation'
+    Properties:
+      WebACLArn: !GetAtt AlbShieldProtectionWebACL.Arn
+      ResourceArn: !Ref ApplicationLoadBalancer
+
+  AlbShieldProtection:
+    Type: AWS::Shield::Protection
+    DependsOn: AlbShieldProtectionWebACLAssociation
+    Properties:
+      Name: !Sub ${AWS::StackName}-${Environment}-AlbShieldProtection
+      ResourceArn: !Ref ApplicationLoadBalancer
+      ApplicationLayerAutomaticResponseConfiguration:
+        Status: ENABLED
+        Action:
+          Block: { }
+
   ApplicationTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
