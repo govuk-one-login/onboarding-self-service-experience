@@ -31,6 +31,10 @@ Parameters:
   CodeSigningConfigArn:
     Type: String
     Default: ""
+  VpcStackName:
+    Description: VPC Stack name
+    Type: String
+    Default: "vpc"
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
@@ -45,6 +49,13 @@ Globals:
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
+
+    VpcConfig:
+      SecurityGroupIds:
+        - Fn::ImportValue: !Sub "${VpcStackName}-AWSServicesEndpointSecurityGroupId"
+      SubnetIds:
+        - Fn::ImportValue: !Sub "${VpcStackName}-PrivateSubnetIdA"
+        - Fn::ImportValue: !Sub "${VpcStackName}-PrivateSubnetIdB"
 
 Resources:
 
@@ -120,6 +131,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - Effect: Allow # VPC Configuration
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DeleteNetworkInterface"
+          Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -149,6 +166,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - Effect: Allow # VPC Configuration
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DeleteNetworkInterface"
+          Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -179,6 +202,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - Effect: Allow # VPC Configuration
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DeleteNetworkInterface"
+          Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -210,6 +239,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - Effect: Allow # VPC Configuration
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DeleteNetworkInterface"
+          Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -239,6 +274,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - Effect: Allow # VPC Configuration
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DeleteNetworkInterface"
+          Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -263,6 +304,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - Effect: Allow # VPC Configuration
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DeleteNetworkInterface"
+          Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -292,6 +339,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - Effect: Allow # VPC Configuration
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DeleteNetworkInterface"
+          Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -314,6 +367,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - Effect: Allow # VPC Configuration
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DeleteNetworkInterface"
+          Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -338,6 +397,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - Effect: Allow # VPC Configuration
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DeleteNetworkInterface"
+          Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -359,6 +424,15 @@ Resources:
       Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
       Description: Assumes a cross-account role and invokes the Auth register Lambda
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
@@ -378,6 +452,15 @@ Resources:
       Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
       Description: Updates a client using an HTTP endpoint
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
@@ -407,6 +490,12 @@ Resources:
           - Effect: Allow
             Action: states:StartSyncExecution
             Resource: !Ref NewServiceStepFunction
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Events:
         Api:
           Type: Api
@@ -437,6 +526,12 @@ Resources:
           - Effect: Allow
             Action: states:StartSyncExecution
             Resource: !Ref NewClientStepFunction
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Events:
         Api:
           Type: Api
@@ -467,6 +562,12 @@ Resources:
           - Effect: Allow
             Action: states:StartSyncExecution
             Resource: !Ref UpdateClientStepFunction
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Events:
         Api:
           Type: Api
