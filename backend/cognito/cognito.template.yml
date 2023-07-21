@@ -667,6 +667,12 @@ Resources:
       FunctionName: !Ref SecurityCodeTextMessageSender
       Principal: cognito-idp.amazonaws.com
 
+  CognitoWebACLAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      WebACLArn: !ImportValue wafrOwaspACL
+      ResourceArn: !GetAtt UserPool.Arn
+
 Outputs:
   UserPoolID:
     Value: !Ref UserPool
