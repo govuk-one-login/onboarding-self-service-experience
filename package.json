@@ -12,6 +12,7 @@
     "build-docker": "npm run build-docker -w express --",
     "build": "infrastructure/dev/deploy.sh --no-deploy",
     "deploy": "infrastructure/dev/deploy.sh",
+    "deploy-us": "infrastructure/dev/deploy-us.sh",
     "docker": "npm run docker -w express --",
     "local": "npm run local -w express",
     "dev": "npm run dev -w express",

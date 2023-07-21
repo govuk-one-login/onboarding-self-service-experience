@@ -31,7 +31,18 @@ Parameters:
     Type: String
     Default: ""
 
+Mappings:
+  Account:
+    Subdomain:
+      "494650018671": development.
+      "399055180839": build.
+      "325730373996": staging.
+      "663985455444": integration.
+      "389946456390": "" # production
+
 Conditions:
+  Subdomain: !Not [ !Condition TopNode ]
+  TopNode: !Equals [ !FindInMap [ Account, Subdomain, !Ref AWS::AccountId ], "" ]
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
 
@@ -666,6 +677,88 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref SecurityCodeTextMessageSender
       Principal: cognito-idp.amazonaws.com
+
+  SubdomainHostedZoneShieldProtection:
+    Type: AWS::Shield::Protection
+    Condition: Subdomain
+    Properties:
+      Name: 'SubdomainHostedZoneShieldProtection'
+      ResourceArn: arn:aws:route53:::hostedzone/Z03674982M87OQKN51BWI
+
+  ApexHostedZoneShieldProtection:
+    Type: AWS::Shield::Protection
+    Condition: TopNode
+    Properties:
+      Name: 'ApexHostedZoneShieldProtection'
+      ResourceArn: arn:aws:route53:::hostedzone/Z03674982M87OQKN51BWI
+
+  AlbShieldProtectionWebACL:
+    Type: 'AWS::WAFv2::WebACL'
+    Properties:
+      Name: AlbShieldProtectionWebACL
+      Scope: REGIONAL
+      Description: This is WebACL to protect ALB
+      DefaultAction:
+        Allow: {}
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: AlbShieldProtectionWebACLMetric
+      Rules:
+        - Name: AlbRuleWithRateLimit
+          Priority: 0
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RuleWithAlbShieldProtectionWebACLMetric
+          Statement:
+            RateBasedStatement:
+              AggregateKeyType: IP
+              Limit: 1000
+        # This rule fixes CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
+        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 1
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RuleWithAlbShieldProtectionWebACLBadInputMetric
+
+  AlbShieldProtectionWebACLAssociation:
+    Type: 'AWS::WAFv2::WebACLAssociation'
+    Properties:
+      WebACLArn: !GetAtt AlbShieldProtectionWebACL.Arn
+      ResourceArn: arn:aws:elasticloadbalancing:eu-west-2:494650018671:loadbalancer/app/test-admin-tool-frontend/512489fbdbf998b5
+
+  AlbShieldProtection:
+    Type: AWS::Shield::Protection
+    DependsOn: AlbShieldProtectionWebACLAssociation
+    Properties:
+      Name: 'AlbShieldProtection'
+      ResourceArn: arn:aws:elasticloadbalancing:eu-west-2:494650018671:loadbalancer/app/test-admin-tool-frontend/512489fbdbf998b5
+      ApplicationLayerAutomaticResponseConfiguration:
+        Status: ENABLED
+        Action:
+          Block: { }
+
+  NatGatewayZoneAEIPShieldProtection:
+    Type: AWS::Shield::Protection
+    Properties:
+      Name: 'NatGatewayZoneAEIPShieldProtection'
+      ResourceArn: arn:aws:ec2:eu-west-2:494650018671:eip-allocation/eipalloc-0133898bcfb9dd11c
+
+  NatGatewayZoneBEIPShieldProtection:
+    Type: AWS::Shield::Protection
+    Properties:
+      Name: 'NatGatewayZoneBEIPShieldProtection'
+      ResourceArn: arn:aws:ec2:eu-west-2:494650018671:eip-allocation/eipalloc-008d4d53f8af10be6
 
   CognitoUserPoolWebACLAssociation:
     Type: AWS::WAFv2::WebACLAssociation

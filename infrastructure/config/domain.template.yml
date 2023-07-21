@@ -54,6 +54,20 @@ Resources:
     Properties:
       Name: !Sub [ "${Name}${SignInServiceDomain}", { Name: !FindInMap [ Account, Subdomain, !Ref AWS::AccountId ] } ]
 
+  ApexHostedZoneProtection:
+    Type: AWS::Shield::Protection
+    Condition: TopNode
+    Properties:
+      Name: 'ApexHostedZoneProtection'
+      ResourceArn: !Ref ApexHostedZone
+
+  SubdomainHostedZoneProtection:
+    Type: AWS::Shield::Protection
+    Condition: Subdomain
+    Properties:
+      Name: 'SubdomainHostedZoneProtection'
+      ResourceArn: !Ref SubdomainHostedZone
+
   EmailIdentity:
     Type: AWS::SES::EmailIdentity
     Properties:
