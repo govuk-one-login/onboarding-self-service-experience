@@ -434,6 +434,18 @@ Resources:
           QueryStringsConfig:
             QueryStringBehavior: all
 
+  CloudFrontShieldProtection:
+    Type: AWS::Shield::Protection
+    Properties:
+      Name: !Sub '${AWS::StackName}-${Environment}-CloudFrontShieldProtection'
+      ResourceArn: !Sub
+        - 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${distributionId}'
+        - distributionId: !Ref FrontendAppCF
+      ApplicationLayerAutomaticResponseConfiguration:
+        Status: ENABLED
+        Action:
+          Block: { }
+
   CloudFrontAccessLogsBucket:
     # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
     # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
