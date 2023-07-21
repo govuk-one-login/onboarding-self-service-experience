@@ -1,29 +1,23 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Cognito UserPool and Client for the Admin Tool
-Transform: AWS::Serverless-2016-10-31
+Description:  frontend WAF
+Transform: AWS::LanguageExtensions
 
-Globals:
-  Function:
-    Timeout: 10
-    Runtime: nodejs18.x
-    Environment:
-      Variables:
-        NODE_OPTIONS: --enable-source-maps
+Parameters:
+  Environment:
+    Type: String
+    Default: development
+    AllowedPattern: development|build|staging|integration|production
 
 Resources:
 
-  CloudFrontShieldProtectionWebACL:
+  FrontendWebAcl:
     Type: 'AWS::WAFv2::WebACL'
     Properties:
-      Name: CloudFrontShieldProtectionWebACL
-      Scope: CLOUDFRONT
-      Description: This is WebACL to protect CloudFront
+      Description: Web ACL for Frontend API Gateway
+      Name: !Sub '${AWS::StackName}-${Environment}-acl'
       DefaultAction:
         Allow: {}
-      VisibilityConfig:
-        SampledRequestsEnabled: true
-        CloudWatchMetricsEnabled: true
-        MetricName: CloudFrontShieldProtectionWebACLMetric
+
       Rules:
         - Name: CloudFrontRuleWithRateLimit
           Priority: 0
@@ -36,20 +30,122 @@ Resources:
           Statement:
             RateBasedStatement:
               AggregateKeyType: IP
-              Limit: 1000
-        # This rule fixes CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
-        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
+              Limit: 1002
+
+        - Name: AWS-CRS
           Priority: 1
           Statement:
             ManagedRuleGroupStatement:
               VendorName: AWS
-              Name: AWSManagedRulesKnownBadInputsRuleSet
+              Name: AWSManagedRulesCommonRuleSet
+              ExcludedRules:
+                - Name: CrossSiteScripting_BODY
+                - Name: CrossSiteScripting_COOKIE
+                - Name: CrossSiteScripting_QUERYARGUMENTS
+                - Name: CrossSiteScripting_URIPATH
+                - Name: EC2MetaDataSSRF_BODY
+                - Name: EC2MetaDataSSRF_COOKIE
+                - Name: EC2MetaDataSSRF_QUERYARGUMENTS
+                - Name: EC2MetaDataSSRF_URIPATH
+                - Name: GenericLFI_BODY
+                - Name: GenericLFI_QUERYARGUMENTS
+                - Name: GenericLFI_URIPATH
+                - Name: GenericRFI_BODY
+                - Name: GenericRFI_QUERYARGUMENTS
+                - Name: GenericRFI_URIPATH
+                - Name: NoUserAgent_HEADER
+                - Name: RestrictedExtensions_QUERYARGUMENTS
+                - Name: RestrictedExtensions_URIPATH
+                - Name: SizeRestrictions_BODY
+                - Name: SizeRestrictions_Cookie_HEADER
+                - Name: SizeRestrictions_QUERYSTRING
+                - Name: SizeRestrictions_URIPATH
+                - Name: UserAgent_BadBots_HEADER
           OverrideAction:
             None: {}
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
-            MetricName: RuleWithAlbShieldProtectionWebACLBadInputMetric
+            MetricName: !Sub '${AWS::StackName}-${Environment}-aws-crs-metric'
+
+        - Name: Bad-Inputs
+          Priority: 2
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+              ExcludedRules:
+                - Name: ExploitablePaths_URIPATH
+                - Name: Host_localhost_HEADER
+                - Name: JavaDeserializationRCE_BODY
+                - Name: JavaDeserializationRCE_HEADER
+                - Name: JavaDeserializationRCE_QUERYSTRING
+                - Name: JavaDeserializationRCE_URIPATH
+                # - Name: Log4JRCE
+                - Name: PROPFIND_METHOD
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${AWS::StackName}-${Environment}-bad-inputs-metric'
+
+        - Name: Anonymous-IpList
+          Priority: 3
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAnonymousIpList
+              ExcludedRules:
+                - Name: AnonymousIPList
+                - Name: HostingProviderIPList
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${AWS::StackName}-${Environment}-anonymous-iplist-metric'
+
+        - Name: SQLInject-RuleSet
+          Priority: 4
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesSQLiRuleSet
+              ExcludedRules:
+                - Name: SQLiExtendedPatterns_QUERYARGUMENTS
+                - Name: SQLi_BODY
+                - Name: SQLi_COOKIE
+                - Name: SQLi_QUERYARGUMENTS
+                - Name: SQLi_URIPATH
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${AWS::StackName}-${Environment}-SQLinjection-ruleset-metric'
+
+        - Name: RateBased-CountIpRule
+          Priority: 5
+          Statement:
+            RateBasedStatement:
+              Limit: 100
+              AggregateKeyType: IP
+          Action:
+            Count: { }
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub "${AWS::StackName}-${Environment}-RateBased-CountIp-ruleset-metric"
+            SampledRequestsEnabled: true
+
+      Scope: CLOUDFRONT
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-${Environment}'
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: !Sub '${AWS::StackName}-${Environment}-metric'
 
   CloudFrontShieldProtection:
     Type: AWS::Shield::Protection
