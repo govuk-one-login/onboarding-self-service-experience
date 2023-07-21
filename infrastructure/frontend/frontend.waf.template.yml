@@ -19,8 +19,21 @@ Resources:
         Allow: {}
 
       Rules:
-        - Name: AWS-CRS
+        - Name: CloudFrontRuleWithRateLimit
           Priority: 0
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RuleWithCloudFrontShieldProtectionWebACLMetric
+          Statement:
+            RateBasedStatement:
+              AggregateKeyType: IP
+              Limit: 1000
+
+        - Name: AWS-CRS
+          Priority: 1
           Statement:
             ManagedRuleGroupStatement:
               VendorName: AWS
@@ -56,7 +69,7 @@ Resources:
             MetricName: !Sub '${AWS::StackName}-${Environment}-aws-crs-metric'
 
         - Name: Bad-Inputs
-          Priority: 1
+          Priority: 2
           Statement:
             ManagedRuleGroupStatement:
               VendorName: AWS
@@ -78,7 +91,7 @@ Resources:
             MetricName: !Sub '${AWS::StackName}-${Environment}-bad-inputs-metric'
 
         - Name: Anonymous-IpList
-          Priority: 2
+          Priority: 3
           Statement:
             ManagedRuleGroupStatement:
               VendorName: AWS
@@ -94,7 +107,7 @@ Resources:
             MetricName: !Sub '${AWS::StackName}-${Environment}-anonymous-iplist-metric'
 
         - Name: SQLInject-RuleSet
-          Priority: 3
+          Priority: 4
           Statement:
             ManagedRuleGroupStatement:
               VendorName: AWS
@@ -113,7 +126,7 @@ Resources:
             MetricName: !Sub '${AWS::StackName}-${Environment}-SQLinjection-ruleset-metric'
 
         - Name: RateBased-CountIpRule
-          Priority: 4
+          Priority: 5
           Statement:
             RateBasedStatement:
               Limit: 100
