@@ -53,7 +53,7 @@ Resources:
     Type: AWS::Shield::Protection
     Condition: TopNode
     Properties:
-      Name: !Sub ${SignInServiceDomain}-protection
+      Name: !Sub ${Subdomain}-hostedzone-protection
       ResourceArn: !Sub
         - 'arn:aws:route53:::hostedzone/${hostedZoneId}'
         - hostedZoneId: !Ref ApexHostedZone
@@ -62,7 +62,7 @@ Resources:
     Type: AWS::Shield::Protection
     Condition: Subdomain
     Properties:
-      Name: !Sub [ "${Name}${SignInServiceDomain}-protection", { Name: !FindInMap [ Account, Subdomain, !Ref AWS::AccountId ] } ]
+      Name: !Sub ${Subdomain}-hostedzone-protection
       ResourceArn: !Sub
         - 'arn:aws:route53:::hostedzone/${hostedZoneId}'
         - hostedZoneId: !Ref SubdomainHostedZone
