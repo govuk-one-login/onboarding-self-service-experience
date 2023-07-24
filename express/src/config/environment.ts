@@ -5,7 +5,6 @@ export const googleTagId = process.env.GOOGLE_TAG_ID;
 export const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
 
 export const allowedEmailDomainsSource = process.env.ALLOWED_EMAIL_DOMAINS_SOURCE || "allowed-test-domains";
-
 export const sessionSecret = process.env.SESSION_SECRET;
 
 export const cognito = {
