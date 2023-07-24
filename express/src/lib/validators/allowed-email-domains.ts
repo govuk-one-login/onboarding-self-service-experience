@@ -13,11 +13,12 @@ function getEmailDomain(email: string) {
     return email.split("@")[1];
 }
 
-async function loadAllowedEmailDomains() {
+async function loadAllowedEmailDomains(): Promise<string[]> {
     console.log("Loading allowed email domains....");
-    const domains = await readFile(resources.validDomains, {encoding: "utf8"});
-    return domains
+    return (await readFile(resources.validDomains, {encoding: "utf8"}))
         .trim()
         .split("\n")
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
         .filter(line => !line.startsWith("#"));
 }
