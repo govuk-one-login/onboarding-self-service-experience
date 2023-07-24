@@ -64,6 +64,8 @@ Resources:
               Value: !Ref ShowTestBanner
             - Name: GOOGLE_TAG_ID
               Value: !Ref GoogleTagID
+            - Name: SESSION_SECRET
+              Value: "{{resolve:secretsmanager:/self-service/frontend/session-secret}}"
             - Name: SESSIONS_TABLE
               Value:
                 Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
@@ -207,6 +209,7 @@ Resources:
 
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    DependsOn: AccessLogsBucketPolicy
     Properties:
       Type: application
       Scheme: internal
@@ -278,7 +281,9 @@ Resources:
     # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${DeploymentName}-frontend-alb-logs
+      BucketName: !Sub
+        - ${DeploymentName}-application-access-logs-${ID}
+        - ID: !Select [ 0, !Split [ "-", !Select [ 2, !Split [ "/", !Ref AWS::StackId ] ] ] ]
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -382,3 +387,88 @@ Resources:
       ConnectionType: VPC_LINK
       ConnectionId:
         Fn::ImportValue: VPC-LinkID
+
+  #--- CDN ---#
+
+  CloudFrontDistribution:
+    # checkov:skip=CKV_AWS_68:CloudFront Distribution should have WAF enabled
+    # checkov:skip=CKV_AWS_174:Verify CloudFront Distribution Viewer Certificate is using TLS v1.2
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        HttpVersion: http2
+        Comment: !Ref DeploymentName
+        Logging:
+          Prefix: CloudFront
+          Bucket: !GetAtt CloudFrontAccessLogsBucket.DomainName
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+        DefaultCacheBehavior:
+          CachePolicyId: !Ref CachePolicy
+          ViewerProtocolPolicy: redirect-to-https
+          TargetOriginId: !Sub ${DeploymentName}-frontend
+          AllowedMethods: [ GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS ]
+        Origins:
+          - Id: !Sub ${DeploymentName}-frontend
+            DomainName: !Sub ${PublicAPI}.execute-api.${AWS::Region}.amazonaws.com
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: [ TLSv1.2 ]
+
+  CachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub ${DeploymentName}-NoHeaders
+        MinTTL: 1
+        MaxTTL: 31536000
+        DefaultTTL: 86400
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingBrotli: true
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: none
+          CookiesConfig:
+            CookieBehavior: all
+          QueryStringsConfig:
+            QueryStringBehavior: all
+
+  CloudFrontAccessLogsBucket:
+    # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
+    # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub
+        - ${DeploymentName}-cloudfront-access-logs-${ID}
+        - ID: !Select [ 0, !Split [ "-", !Select [ 2, !Split [ "/", !Ref AWS::StackId ] ] ] ]
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
+  CloudFrontAccessLogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CloudFrontAccessLogsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: !GetAtt CloudFrontAccessLogsBucket.Arn
+            Action:
+              - s3:GetBucketAcl
+              - s3:PutBucketAcl
+            Principal:
+              AWS: !Ref AWS::AccountId
+
+Outputs:
+  APIGatewayURL:
+    Value: !GetAtt PublicAPI.ApiEndpoint
+  CloudFrontURL:
+    Value: !GetAtt CloudFrontDistribution.DomainName
