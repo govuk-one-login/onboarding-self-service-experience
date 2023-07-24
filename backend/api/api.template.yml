@@ -131,12 +131,13 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Effect: Allow # VPC Configuration
-          Action:
-            - "ec2:CreateNetworkInterface"
-            - "ec2:DescribeNetworkInterfaces"
-            - "ec2:DeleteNetworkInterface"
-          Resource: "*"
+        - Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -166,12 +167,13 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Effect: Allow # VPC Configuration
-          Action:
-            - "ec2:CreateNetworkInterface"
-            - "ec2:DescribeNetworkInterfaces"
-            - "ec2:DeleteNetworkInterface"
-          Resource: "*"
+        - Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -202,12 +204,13 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Effect: Allow # VPC Configuration
-          Action:
-            - "ec2:CreateNetworkInterface"
-            - "ec2:DescribeNetworkInterfaces"
-            - "ec2:DeleteNetworkInterface"
-          Resource: "*"
+        - Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -239,12 +242,13 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Effect: Allow # VPC Configuration
-          Action:
-            - "ec2:CreateNetworkInterface"
-            - "ec2:DescribeNetworkInterfaces"
-            - "ec2:DeleteNetworkInterface"
-          Resource: "*"
+        - Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -274,12 +278,13 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Effect: Allow # VPC Configuration
-          Action:
-            - "ec2:CreateNetworkInterface"
-            - "ec2:DescribeNetworkInterfaces"
-            - "ec2:DeleteNetworkInterface"
-          Resource: "*"
+        - Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -304,12 +309,13 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Effect: Allow # VPC Configuration
-          Action:
-            - "ec2:CreateNetworkInterface"
-            - "ec2:DescribeNetworkInterfaces"
-            - "ec2:DeleteNetworkInterface"
-          Resource: "*"
+        - Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -339,12 +345,13 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Effect: Allow # VPC Configuration
-          Action:
-            - "ec2:CreateNetworkInterface"
-            - "ec2:DescribeNetworkInterfaces"
-            - "ec2:DeleteNetworkInterface"
-          Resource: "*"
+        - Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -367,12 +374,13 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Effect: Allow # VPC Configuration
-          Action:
-            - "ec2:CreateNetworkInterface"
-            - "ec2:DescribeNetworkInterfaces"
-            - "ec2:DeleteNetworkInterface"
-          Resource: "*"
+        - Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -397,12 +405,13 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Effect: Allow # VPC Configuration
-          Action:
-            - "ec2:CreateNetworkInterface"
-            - "ec2:DescribeNetworkInterfaces"
-            - "ec2:DeleteNetworkInterface"
-          Resource: "*"
+        - Statement:
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
       Environment:
         Variables:
           TABLE:
