@@ -10,6 +10,10 @@ declare -A ENV=(
   [COGNITO_CLIENT_ID]=Cognito-UserPoolClientID
 )
 
+declare -A SECRETS=(
+  [SESSION_SECRET]=frontend/session-secret
+)
+
 COMPONENTS=(cognito dynamodb api)
 DEPLOY_CMDS=("${COMPONENTS[@]}" all admin-tool)
 COMMANDS=("${DEPLOY_CMDS[@]}" run list delete help)
@@ -29,6 +33,10 @@ function get-export {
   jq --exit-status --raw-output --arg name "$STACK_PREFIX-$1" '.[] | select(.Name == $name) | .Value' <<< "$exports"
 }
 
+function get-secret {
+  aws secretsmanager get-secret-value --secret-id "/self-service/$1" --query SecretString --output text
+}
+
 function set-prefix {
   [[ ${STACK_PREFIX:-} ]] && return || STACK_PREFIX=${1:-}
 
@@ -41,13 +49,18 @@ function set-prefix {
 }
 
 function get-env-vars {
+  local exports var secret
   exports=$(aws cloudformation list-exports --query "Exports[?starts_with(Name, '$STACK_PREFIX-')]")
   [[ $exports == "[]" ]] && echo "No exports found for stack prefix '$STACK_PREFIX'" && exit
 
-  local var
   for var in "${!ENV[@]}"; do
     env+=("$var=$(get-export "${ENV[$var]}")") && continue
     echo "𝙭 Export '${ENV[$var]}' not found" >&2 && return 1
+  done
+
+  for secret in "${!SECRETS[@]}"; do
+    env+=("$secret=$(get-secret "${SECRETS[$secret]}")") && continue
+    echo "𝙭 Secret '${SECRETS[$secret]}' not found" >&2 && return 1
   done
 }
 
