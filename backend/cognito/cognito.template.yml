@@ -30,6 +30,10 @@ Parameters:
   CodeSigningConfigArn:
     Type: String
     Default: ""
+  VpcStackName:
+    Description: VPC Stack name
+    Type: String
+    Default: "vpc"
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
@@ -43,6 +47,13 @@ Globals:
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
+
+    VpcConfig:
+      SecurityGroupIds:
+        - Fn::ImportValue: !Sub "${VpcStackName}-AWSServicesEndpointSecurityGroupId"
+      SubnetIds:
+        - Fn::ImportValue: !Sub "${VpcStackName}-PrivateSubnetIdA"
+        - Fn::ImportValue: !Sub "${VpcStackName}-PrivateSubnetIdB"
 
 Resources:
   # https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-default.html#key-policy-default-allow-root-enable-iam
@@ -90,14 +101,20 @@ Resources:
       Policies:
         - Version: 2012-10-17
           Statement:
-            Effect: Allow
-            Action:
-              - ses:SendEmail
-              - ses:SendRawEmail
-            Resource: !ImportValue EmailIdentityARN
-            Condition:
-              StringEquals:
-                ses:FromAddress: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
+            - Effect: Allow
+              Action:
+                - ses:SendEmail
+                - ses:SendRawEmail
+              Resource: !ImportValue EmailIdentityARN
+              Condition:
+                StringEquals:
+                  ses:FromAddress: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
+            - Effect: Allow # VPC Configuration
+              Action:
+                - "ec2:CreateNetworkInterface"
+                - "ec2:DescribeNetworkInterfaces"
+                - "ec2:DeleteNetworkInterface"
+              Resource: "*"
       Events:
         Cognito:
           Type: Cognito
@@ -125,6 +142,15 @@ Resources:
           Properties:
             Trigger: CustomMessage
             UserPool: !Ref UserPool
+      Policies:
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow # VPC Configuration
+              Action:
+                - "ec2:CreateNetworkInterface"
+                - "ec2:DescribeNetworkInterfaces"
+                - "ec2:DeleteNetworkInterface"
+              Resource: "*"
 
   SecurityCodeTextMessageSender:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
@@ -147,9 +173,15 @@ Resources:
           DECRYPTION_KEY_ARN: !GetAtt SecurityCodeEncryptionKey.Arn
       Policies:
         Statement:
-          Effect: Allow
-          Action: kms:Decrypt
-          Resource: !GetAtt SecurityCodeEncryptionKey.Arn
+          - Effect: Allow
+            Action: kms:Decrypt
+            Resource: !GetAtt SecurityCodeEncryptionKey.Arn
+          - Effect: Allow # VPC Configuration
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
 
   UserPool:
     Type: AWS::Cognito::UserPool
