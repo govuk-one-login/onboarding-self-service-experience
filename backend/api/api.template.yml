@@ -112,6 +112,22 @@ Resources:
       LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api
       RetentionInDays: 14
 
+
+  ApiLambdaVpcAccessPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for api lambda vpc access
+      Path: /
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
+
   #--- Users ---#
 
   GetUserFunction:
@@ -128,16 +144,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/get-user.getUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
+        - !Ref ApiLambdaVpcAccessPolicy
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -164,16 +174,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-user.putUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
+        - !Ref ApiLambdaVpcAccessPolicy
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -201,16 +205,10 @@ Resources:
       Description: Updates user data in DynamoDB
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
+        - !Ref ApiLambdaVpcAccessPolicy
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -239,16 +237,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/get-services.getServicesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
+        - !Ref ApiLambdaVpcAccessPolicy
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -275,16 +267,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-service.putServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
+        - !Ref ApiLambdaVpcAccessPolicy
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -306,16 +292,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/get-service-clients.getServiceClientsHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
+        - !Ref ApiLambdaVpcAccessPolicy
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -342,16 +322,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-service-client.putServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
+        - !Ref ApiLambdaVpcAccessPolicy
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -371,16 +345,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/update-service-client.updateServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
+        - !Ref ApiLambdaVpcAccessPolicy
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -402,16 +370,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-service-user.putServiceUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
+        - !Ref ApiLambdaVpcAccessPolicy
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Environment:
         Variables:
           TABLE:
@@ -434,14 +396,7 @@ Resources:
       Description: Assumes a cross-account role and invokes the Auth register Lambda
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
+        - !Ref ApiLambdaVpcAccessPolicy
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
@@ -462,14 +417,7 @@ Resources:
       Description: Updates a client using an HTTP endpoint
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
+        - !Ref ApiLambdaVpcAccessPolicy
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
@@ -494,17 +442,11 @@ Resources:
         Variables:
           STATE_MACHINE_ARN: !Ref NewServiceStepFunction
       Policies:
-        Version: 2012-10-17
-        Statement:
+        - !Ref ApiLambdaVpcAccessPolicy
+        - Statement:
           - Effect: Allow
             Action: states:StartSyncExecution
             Resource: !Ref NewServiceStepFunction
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Events:
         Api:
           Type: Api
@@ -530,17 +472,11 @@ Resources:
         Variables:
           STATE_MACHINE_ARN: !Ref NewClientStepFunction
       Policies:
-        Version: 2012-10-17
-        Statement:
+        - !Ref ApiLambdaVpcAccessPolicy
+        - Statement:
           - Effect: Allow
             Action: states:StartSyncExecution
             Resource: !Ref NewClientStepFunction
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
       Events:
         Api:
           Type: Api

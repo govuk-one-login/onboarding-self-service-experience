@@ -81,6 +81,21 @@ Resources:
               ArnLike:
                 aws:SourceArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
 
+  CognitoLambdaVpcAccessPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for cognito lambda vpc access
+      Path: /
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "ec2:DeleteNetworkInterface"
+            Resource: "*"
+
   SendPasswordChangedEmailFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
     # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
@@ -99,22 +114,17 @@ Resources:
         Variables:
           FROM_ADDRESS: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
       Policies:
-        - Version: 2012-10-17
-          Statement:
-            - Effect: Allow
-              Action:
-                - ses:SendEmail
-                - ses:SendRawEmail
-              Resource: !ImportValue EmailIdentityARN
-              Condition:
-                StringEquals:
-                  ses:FromAddress: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
-            - Effect: Allow # VPC Configuration
-              Action:
-                - "ec2:CreateNetworkInterface"
-                - "ec2:DescribeNetworkInterfaces"
-                - "ec2:DeleteNetworkInterface"
-              Resource: "*"
+        - !Ref CognitoLambdaVpcAccessPolicy
+        - Statement:
+          - Effect: Allow
+            Action:
+              - ses:SendEmail
+              - ses:SendRawEmail
+            Resource: !ImportValue EmailIdentityARN
+            Condition:
+              StringEquals:
+                ses:FromAddress: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
+
       Events:
         Cognito:
           Type: Cognito
@@ -143,14 +153,7 @@ Resources:
             Trigger: CustomMessage
             UserPool: !Ref UserPool
       Policies:
-        - Version: 2012-10-17
-          Statement:
-            - Effect: Allow # VPC Configuration
-              Action:
-                - "ec2:CreateNetworkInterface"
-                - "ec2:DescribeNetworkInterfaces"
-                - "ec2:DeleteNetworkInterface"
-              Resource: "*"
+        - !Ref CognitoLambdaVpcAccessPolicy
 
   SecurityCodeTextMessageSender:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
@@ -172,16 +175,11 @@ Resources:
           SECURITY_CODE_TEXT_MESSAGE_TEMPLATE: !Ref SecurityCodeTextMessageTemplate
           DECRYPTION_KEY_ARN: !GetAtt SecurityCodeEncryptionKey.Arn
       Policies:
-        Statement:
+        - !Ref CognitoLambdaVpcAccessPolicy
+        - Statement:
           - Effect: Allow
             Action: kms:Decrypt
             Resource: !GetAtt SecurityCodeEncryptionKey.Arn
-          - Effect: Allow # VPC Configuration
-            Action:
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DeleteNetworkInterface"
-            Resource: "*"
 
   UserPool:
     Type: AWS::Cognito::UserPool
