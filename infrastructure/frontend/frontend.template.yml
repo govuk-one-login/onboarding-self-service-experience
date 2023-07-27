@@ -299,6 +299,12 @@ Resources:
             Principal:
               AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
 
+  ApplicationLoadBalancerACLAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      WebACLArn: !ImportValue wafWebACL
+      ResourceArn: !Ref ApplicationLoadBalancer
+
   #--- Network load balancing ---#
 
   NetworkLoadBalancerTargetGroup:
