@@ -2,10 +2,14 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Self-Service DNS and domain configuration
 
 Parameters:
-  SignInServiceDomain:
+  Domain:
     Type: String
     AllowedPattern: ^.*[^.]$
     Default: sign-in.service.gov.uk
+  Subdomain:
+    Type: String
+    AllowedPattern: ^(development|build|staging|integration)\.$|^$
+    Default: ""
   DevelopmentNameServers:
     Type: CommaDelimitedList
     Default: ""
@@ -19,18 +23,9 @@ Parameters:
     Type: CommaDelimitedList
     Default: ""
 
-Mappings:
-  Account:
-    Subdomain:
-      "494650018671": development.
-      "399055180839": build.
-      "325730373996": staging.
-      "663985455444": integration.
-      "389946456390": "" # production
-
 Conditions:
   Subdomain: !Not [ !Condition TopNode ]
-  TopNode: !Equals [ !FindInMap [ Account, Subdomain, !Ref AWS::AccountId ], "" ]
+  TopNode: !Equals [ !Ref Subdomain, "" ]
   DevelopmentNameServers: !Not [ !Equals [ !Join [ "", !Ref DevelopmentNameServers ], "" ] ]
   BuildNameServers: !Not [ !Equals [ !Join [ "", !Ref BuildNameServers ], "" ] ]
   StagingNameServers: !Not [ !Equals [ !Join [ "", !Ref StagingNameServers ], "" ] ]
@@ -46,20 +41,39 @@ Resources:
     UpdateReplacePolicy: Retain
     Condition: TopNode
     Properties:
-      Name: !Sub ${SignInServiceDomain}
+      Name: !Sub ${Domain}
 
   SubdomainHostedZone:
     Type: AWS::Route53::HostedZone
     Condition: Subdomain
     Properties:
-      Name: !Sub [ "${Name}${SignInServiceDomain}", { Name: !FindInMap [ Account, Subdomain, !Ref AWS::AccountId ] } ]
+      Name: !Sub ${Subdomain}${Domain}
 
   EmailIdentity:
     Type: AWS::SES::EmailIdentity
     Properties:
-      EmailIdentity: !Sub [ "${Name}${SignInServiceDomain}", { Name: !FindInMap [ Account, Subdomain, !Ref AWS::AccountId ] } ]
+      EmailIdentity: !Sub admin.${Subdomain}${Domain}
       DkimAttributes:
         SigningEnabled: true
+
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Sub "admin.${Subdomain}${Domain}"
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Sub "admin.${Subdomain}${Domain}"
+          HostedZoneId: !If [ TopNode, !Ref ApexHostedZone, !Ref SubdomainHostedZone ]
+
+  WildcardCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Condition: Subdomain
+    Properties:
+      DomainName: !Sub "*.admin.${Subdomain}${Domain}"
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Sub "*.admin.${Subdomain}${Domain}"
+          HostedZoneId: !If [ TopNode, !Ref ApexHostedZone, !Ref SubdomainHostedZone ]
 
   # The GOV.UK nameservers for service.gov.uk route traffic for
   # sign-in.service.gov.uk and all its subdomains to its zone apex.
@@ -72,7 +86,7 @@ Resources:
     Properties:
       HostedZoneId: !Ref ApexHostedZone
       RecordSets:
-        - Name: !Ref SignInServiceDomain
+        - Name: !Ref Domain
           Type: A
           AliasTarget:
             # Z2FDTNDATAQYW2 is the hosted zone for CloudFront
@@ -87,7 +101,7 @@ Resources:
           TTL: 172800 # 48h
 
         # WWW alias
-        - Name: !Sub www.${SignInServiceDomain}
+        - Name: !Sub www.${Domain}
           ResourceRecords: [ dbd28k6th0aos.cloudfront.net ]
           Type: CNAME
           TTL: 172800
@@ -98,7 +112,7 @@ Resources:
           TTL: 172800
 
         # Docs
-        - Name: !Sub docs.${SignInServiceDomain}
+        - Name: !Sub docs.${Domain}
           ResourceRecords: [ d308hhopufamea.cloudfront.net ]  # PaaS CDN
           Type: CNAME
           TTL: 172800
@@ -118,7 +132,7 @@ Resources:
       RecordSets:
         - !If
           - DevelopmentNameServers
-          - Name: !Sub development.${SignInServiceDomain}
+          - Name: !Sub development.${Domain}
             ResourceRecords: !Ref DevelopmentNameServers
             Type: NS
             TTL: 172800
@@ -126,7 +140,7 @@ Resources:
 
         - !If
           - BuildNameServers
-          - Name: !Sub build.${SignInServiceDomain}
+          - Name: !Sub build.${Domain}
             ResourceRecords: !Ref BuildNameServers
             Type: NS
             TTL: 172800
@@ -134,7 +148,7 @@ Resources:
 
         - !If
           - StagingNameServers
-          - Name: !Sub staging.${SignInServiceDomain}
+          - Name: !Sub staging.${Domain}
             ResourceRecords: !Ref StagingNameServers
             Type: NS
             TTL: 172800
@@ -142,7 +156,7 @@ Resources:
 
         - !If
           - IntegrationNameServers
-          - Name: !Sub integration.${SignInServiceDomain}
+          - Name: !Sub integration.${Domain}
             ResourceRecords: !Ref IntegrationNameServers
             Type: NS
             TTL: 172800
@@ -168,20 +182,27 @@ Resources:
           TTL: 172800
 
 Outputs:
+  Domain:
+    Value: !Sub admin.${Subdomain}${Domain}
+    Export:
+      Name: DNS-Domain
+  CertificateARN:
+    Value: !Ref Certificate
+    Export:
+      Name: DNS-CertificateARN
+  WildcardCertificateARN:
+    Condition: Subdomain
+    Value: !Ref WildcardCertificate
+    Export:
+      Name: DNS-SubdomainCertificateARN
+  EmailIdentityARN:
+    Value: !Sub arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/admin.${Subdomain}${Domain}
+    Export:
+      Name: DNS-EmailIdentityARN
   HostedZoneID:
     Value: !If [ TopNode, !Ref ApexHostedZone, !Ref SubdomainHostedZone ]
     Export:
-      Name: HostedZoneID
+      Name: DNS-HostedZoneID
   HostedZoneNameServers:
     Condition: Subdomain
     Value: !Join [ ",", !GetAtt SubdomainHostedZone.NameServers ]
-  EmailDomain:
-    Value: !Sub [ "${Name}${SignInServiceDomain}", { Name: !FindInMap [ Account, Subdomain, !Ref AWS::AccountId ] } ]
-    Export:
-      Name: EmailDomain
-  EmailIdentityARN:
-    Value: !Sub
-      - arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${Subdomain}${SignInServiceDomain}
-      - Subdomain: !FindInMap [ Account, Subdomain, !Ref AWS::AccountId ]
-    Export:
-      Name: EmailIdentityARN

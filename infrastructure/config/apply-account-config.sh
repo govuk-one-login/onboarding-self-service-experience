@@ -23,6 +23,7 @@ function network {
 
 function domain {
   local account servers params
+  account=$(../aws.sh get-current-account-name)
 
   if [[ $(../aws.sh get-current-account-name) == production ]]; then
     echo "Getting subdomain name servers..."
@@ -30,6 +31,8 @@ function domain {
       servers=$(gds aws di-onboarding-$account -- ../aws.sh get-stack-outputs domain-config HostedZoneNameServers) || continue
       params+=("${account@u}NameServers=$(jq --raw-output ".value" <<< "$servers")")
     done
+  else
+    params=(Subdomain="$account.")
   fi
 
   deploy-config-stack domain --tags sse:stack-role=dns ${params:+--parameters ${params[@]}} "$@"
