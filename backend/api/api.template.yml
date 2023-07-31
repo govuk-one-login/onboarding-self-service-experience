@@ -33,9 +33,9 @@ Parameters:
     Default: ""
 
 Conditions:
+  PrivateAPI: !Equals [ !Ref PrivateAPI, Yes ]
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  PrivateAPI: !Equals [ !Ref PrivateAPI, Yes ]
 
 Globals:
   Function:

@@ -38,6 +38,7 @@ Mappings:
       AccountID: 652711504416
 
 Conditions:
+  Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
 
 Resources:
@@ -183,15 +184,13 @@ Resources:
           TargetGroupArn: !Ref ApplicationTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
-          SecurityGroups:
-            - !GetAtt ContainerServiceSecurityGroup.GroupId
-          Subnets: !Split
-            - ","
-            - Fn::ImportValue: VPC-ProtectedSubnets
+          Subnets: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
+          SecurityGroups: [ !GetAtt ContainerServiceSecurityGroup.GroupId ]
 
   ContainerServiceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      VpcId: !ImportValue VPC-ID
       GroupDescription: Frontend container service access
       SecurityGroupIngress:
         - Description: Allow traffic from the application load balancer
@@ -199,8 +198,6 @@ Resources:
           IpProtocol: tcp
           FromPort: !Ref ContainerPort
           ToPort: !Ref ContainerPort
-      VpcId:
-        Fn::ImportValue: VPC-ID
       Tags:
         - Key: Name
           Value: !Sub ${DeploymentName}-frontend-container-service
@@ -212,13 +209,10 @@ Resources:
     DependsOn: AccessLogsBucketPolicy
     Properties:
       Type: application
-      Scheme: internal
+      Scheme: internet-facing
       Name: !Sub ${DeploymentName}-frontend
-      SecurityGroups:
-        - !Ref ApplicationSecurityGroup
-      Subnets: !Split
-        - ","
-        - Fn::ImportValue: VPC-ProtectedSubnets
+      Subnets: !Split [ ",", !ImportValue VPC-InternetSubnets ]
+      SecurityGroups: [ !Ref ApplicationSecurityGroup ]
       LoadBalancerAttributes:
         - Key: routing.http.drop_invalid_header_fields.enabled
           Value: true
@@ -227,41 +221,40 @@ Resources:
         - Key: access_logs.s3.bucket
           Value: !Ref AccessLogsBucket
 
+  ApplicationLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Certificates:
+        - CertificateArn:
+            Fn::ImportValue: !If [ Subdomain, DNS-SubdomainCertificateARN, DNS-CertificateARN ]
+      DefaultActions:
+        - TargetGroupArn: !Ref ApplicationTargetGroup
+          Type: forward
+
   ApplicationTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: !Sub ${DeploymentName}-app
+      VpcId: !ImportValue VPC-ID
       Port: !Ref ContainerPort
       Protocol: HTTP
       TargetType: ip
-      VpcId:
-        Fn::ImportValue: VPC-ID
-
-  ApplicationLoadBalancerListener:
-    # checkov:skip=CKV_AWS_2:Certificate generation must be resolved before the listener can use HTTPS
-    # checkov:skip=CKV_AWS_103:The load balancer cannot use TLS v1.2 until HTTPS is enabled
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      Port: 80
-      Protocol: HTTP
-      LoadBalancerArn: !Ref ApplicationLoadBalancer
-      DefaultActions:
-        - Type: forward
-          TargetGroupArn: !Ref ApplicationTargetGroup
 
   ApplicationSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      VpcId: !ImportValue VPC-ID
       GroupDescription: Frontend application load balancer
       SecurityGroupIngress:
-        - Description: Allow traffic from the VPC
+        - Description: Allow secure traffic from the internet
+          CidrIp: 0.0.0.0/0     # Any IPv4 address
           IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp:
-            Fn::ImportValue: VPC-CIDR
-      VpcId:
-        Fn::ImportValue: VPC-ID
+          FromPort: 443         # HTTPS
+          ToPort: 443
       Tags:
         - Key: Name
           Value: !Sub ${DeploymentName}-frontend-application-load-balancer
@@ -275,6 +268,8 @@ Resources:
       IpProtocol: tcp
       FromPort: !Ref ContainerPort
       ToPort: !Ref ContainerPort
+
+  #--- Logging ---#
 
   AccessLogsBucket:
     # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
@@ -304,171 +299,22 @@ Resources:
             Principal:
               AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
 
-  #--- Network load balancing ---#
+  #--- DNS ---#
 
-  NetworkLoadBalancerTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+  DNSRecord:
+    Type: AWS::Route53::RecordSet
     Properties:
-      Name: !Sub ${DeploymentName}-net
-      Port: 80
-      Protocol: TCP
-      TargetType: alb
-      Targets:
-        - Id: !Ref ApplicationLoadBalancer
-      VpcId:
-        Fn::ImportValue: VPC-ID
-
-  NetworkLoadBalancerListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      Port: 80
-      Protocol: TCP
-      LoadBalancerArn:
-        Fn::ImportValue: VPC-NetworkLoadBalancerARN
-      DefaultActions:
-        - Type: forward
-          TargetGroupArn: !Ref NetworkLoadBalancerTargetGroup
-
-  #--- Public access / API Gateway ---#
-
-  PublicAPI:
-    Type: AWS::ApiGatewayV2::Api
-    Properties:
-      Name: !Sub ${DeploymentName}-frontend
-      ProtocolType: HTTP
-
-  APIProxy:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref PublicAPI
-      RouteKey: ANY /{proxy+}
-      Target: !Sub integrations/${VPCLinkIntegration}
-
-  APIStage:
-    Type: AWS::ApiGatewayV2::Stage
-    Properties:
-      ApiId: !Ref PublicAPI
-      StageName: $default
-      AutoDeploy: true
-      DefaultRouteSettings:
-        DetailedMetricsEnabled: true
-      AccessLogSettings:
-        DestinationArn: !GetAtt APIAccessLogsGroup.Arn
-        Format:
-          Fn::ToJsonString:
-            path: $context.path
-            status: $context.status
-            protocol: $context.protocol
-            routeKey: $context.routeKey
-            requestId: $context.requestId
-            requestTime: $context.requestTime
-            httpMethod: $context.httpMethod
-            responseLength: $context.responseLength
-            extendedRequestId: $context.extendedRequestId
-            integrationStatus: $context.integration.status
-            integrationError: $context.integration.error
-            customDomainPath: $context.customDomain.basePathMatched
-
-  APIAccessLogsGroup:
-    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/frontend/api-gateway
-      RetentionInDays: 14
-
-  VPCLinkIntegration:
-    Type: AWS::ApiGatewayV2::Integration
-    Properties:
-      ApiId: !Ref PublicAPI
-      PayloadFormatVersion: 1.0
-      IntegrationMethod: ANY
-      IntegrationType: HTTP_PROXY
-      IntegrationUri: !Ref NetworkLoadBalancerListener
-      ConnectionType: VPC_LINK
-      ConnectionId:
-        Fn::ImportValue: VPC-LinkID
-
-  #--- CDN ---#
-
-  CloudFrontDistribution:
-    # checkov:skip=CKV_AWS_68:CloudFront Distribution should have WAF enabled
-    # checkov:skip=CKV_AWS_174:Verify CloudFront Distribution Viewer Certificate is using TLS v1.2
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Enabled: true
-        HttpVersion: http2
-        Comment: !Ref DeploymentName
-        Logging:
-          Prefix: CloudFront
-          Bucket: !GetAtt CloudFrontAccessLogsBucket.DomainName
-        ViewerCertificate:
-          CloudFrontDefaultCertificate: true
-        DefaultCacheBehavior:
-          CachePolicyId: !Ref CachePolicy
-          ViewerProtocolPolicy: redirect-to-https
-          TargetOriginId: !Sub ${DeploymentName}-frontend
-          AllowedMethods: [ GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS ]
-        Origins:
-          - Id: !Sub ${DeploymentName}-frontend
-            DomainName: !Sub ${PublicAPI}.execute-api.${AWS::Region}.amazonaws.com
-            CustomOriginConfig:
-              OriginProtocolPolicy: https-only
-              OriginSSLProtocols: [ TLSv1.2 ]
-
-  CachePolicy:
-    Type: AWS::CloudFront::CachePolicy
-    Properties:
-      CachePolicyConfig:
-        Name: !Sub ${DeploymentName}-NoHeaders
-        MinTTL: 1
-        MaxTTL: 31536000
-        DefaultTTL: 86400
-        ParametersInCacheKeyAndForwardedToOrigin:
-          EnableAcceptEncodingBrotli: true
-          EnableAcceptEncodingGzip: true
-          HeadersConfig:
-            HeaderBehavior: none
-          CookiesConfig:
-            CookieBehavior: all
-          QueryStringsConfig:
-            QueryStringBehavior: all
-
-  CloudFrontAccessLogsBucket:
-    # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
-    # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub
-        - ${DeploymentName}-cloudfront-access-logs-${ID}
-        - ID: !Select [ 0, !Split [ "-", !Select [ 2, !Split [ "/", !Ref AWS::StackId ] ] ] ]
-      OwnershipControls:
-        Rules:
-          - ObjectOwnership: BucketOwnerPreferred
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-
-  # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
-  CloudFrontAccessLogsBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref CloudFrontAccessLogsBucket
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Resource: !GetAtt CloudFrontAccessLogsBucket.Arn
-            Action:
-              - s3:GetBucketAcl
-              - s3:PutBucketAcl
-            Principal:
-              AWS: !Ref AWS::AccountId
+      Type: A
+      Name: !Sub
+        - ${Name}${Domain}
+        - Name: !If [ Subdomain, !Sub "${DeploymentName}.", !Ref AWS::NoValue ]
+          Domain: !ImportValue DNS-Domain
+      HostedZoneId: !ImportValue DNS-HostedZoneID
+      AliasTarget:
+        DNSName: !GetAtt ApplicationLoadBalancer.DNSName
+        HostedZoneId: !GetAtt ApplicationLoadBalancer.CanonicalHostedZoneID
+        EvaluateTargetHealth: false
 
 Outputs:
-  APIGatewayURL:
-    Value: !GetAtt PublicAPI.ApiEndpoint
-  CloudFrontURL:
-    Value: !GetAtt CloudFrontDistribution.DomainName
+  AdminToolURL:
+    Value: !Ref DNSRecord
