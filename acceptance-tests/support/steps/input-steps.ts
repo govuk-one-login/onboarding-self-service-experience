@@ -12,7 +12,9 @@ const fields = {
     "mobile phone number": "mobileNumber",
     "service name": "serviceName",
     "new password": "newPassword",
-    "current password": "currentPassword"
+    "current password": "currentPassword",
+    "redirect uris": "redirectUris",
+    "post logout redirect uris": "redirectUris"
 };
 
 When("they submit the {} {string}", async function (fieldName, value) {
@@ -52,4 +54,11 @@ Then("they can see the content in the {} field", async function (this: TestConte
 Then("they can not see the content in the {} field", async function (this: TestContext, fieldName) {
     const inputTypeValue = await this.page.$eval(`#${fields[fieldName as keyof typeof fields]}`, element => element.getAttribute("type"));
     assert.equal(inputTypeValue, "password");
+});
+
+Then("the value of the text field {} should be {string}", async function (this: TestContext, fieldName, attributeValueToCheck: string) {
+    const elementAttributeValue = await this.page.$eval(`#${fields[fieldName as keyof typeof fields]}`, element =>
+        element.getAttribute("value")
+    );
+    assert.equal(elementAttributeValue, attributeValueToCheck);
 });
