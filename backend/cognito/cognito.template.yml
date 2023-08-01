@@ -112,7 +112,7 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Environment:
         Variables:
-          FROM_ADDRESS: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
+          FROM_ADDRESS: !Sub [ "${EmailSenderID} <${DeploymentName}@${Domain}>", { Domain: !ImportValue DNS-Domain } ]
       Policies:
         - !Ref CognitoLambdaVpcAccessPolicy
         - Statement:
@@ -120,10 +120,10 @@ Resources:
             Action:
               - ses:SendEmail
               - ses:SendRawEmail
-            Resource: !ImportValue EmailIdentityARN
+            Resource: !ImportValue DNS-EmailIdentityARN
             Condition:
               StringEquals:
-                ses:FromAddress: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
+                ses:FromAddress: !Sub [ "${EmailSenderID} <${DeploymentName}@${Domain}>", { Domain: !ImportValue DNS-Domain } ]
 
       Events:
         Cognito:
@@ -171,7 +171,7 @@ Resources:
       MemorySize: 1024
       Environment:
         Variables:
-          NOTIFY_API_KEY: "{{resolve:secretsmanager:/self-service/cognito/notify-api-key:SecretString}}"
+          NOTIFY_API_KEY: "{{resolve:secretsmanager:/self-service/cognito/notify-api-key}}"
           SECURITY_CODE_TEXT_MESSAGE_TEMPLATE: !Ref SecurityCodeTextMessageTemplate
           DECRYPTION_KEY_ARN: !GetAtt SecurityCodeEncryptionKey.Arn
       Policies:
@@ -501,8 +501,8 @@ Resources:
         SnsRegion: !Ref AWS::Region
       EmailConfiguration:
         EmailSendingAccount: DEVELOPER
-        SourceArn: !ImportValue EmailIdentityARN
-        From: !Sub [ "${EmailSenderID} <admin-tool@${emailDomain}>", { emailDomain: !ImportValue EmailDomain } ]
+        SourceArn: !ImportValue DNS-EmailIdentityARN
+        From: !Sub [ "${EmailSenderID} <${DeploymentName}@${Domain}>", { Domain: !ImportValue DNS-Domain } ]
       # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
       LambdaConfig:
         CustomSMSSender:

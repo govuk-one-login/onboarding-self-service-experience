@@ -73,8 +73,7 @@ Resources:
         SigningProfileVersionArn: !Ref SigningProfileVersionARN
         SigningProfileArn: !Ref SigningProfileARN
         # TODO confirm the API stacks needs this param
-        VpcStackName:
-          Fn::ImportValue: !Sub ${ExportNamePrefix}-VPCStackName
+        VpcStackName: !ImportValue VPC-StackName
         BuildNotificationStackName:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
         SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
@@ -169,8 +168,7 @@ Resources:
         ContainerSignerKmsKeyArn: !Ref ContainerSigningKeyARN
         SigningProfileVersionArn: !Ref SigningProfileVersionARN
         SigningProfileArn: !Ref SigningProfileARN
-        VpcStackName:
-          Fn::ImportValue: !Sub ${ExportNamePrefix}-VPCStackName
+        VpcStackName: !ImportValue VPC-StackName
         BuildNotificationStackName:
           Fn::ImportValue: !Sub ${ExportNamePrefix}-SlackNotificationsStackName
         SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
