@@ -22,11 +22,18 @@ Resources:
         ExecuteApiGatewayEnabled: "Yes"
         AccessLogsCustomBucketNameEnabled: "No"
         AvailabilityZoneCount: 2
-        AllowedDomains: !Join [ ",", [
-          !Sub "cognito-idp.${AWS::Region}.amazonaws.com" ] ]
+        AllowedDomains: !Join [ ",",
+          [ !Sub "cognito-idp.${AWS::Region}.amazonaws.com",
+            "api.notifications.service.gov.uk",
+            "oidc.integration.account.gov.uk" ]
+         ]
         AllowRules: !Sub >
           pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:"cognito-idp.${AWS::Region}.amazonaws.com";
           startswith; endswith; msg:"Pass TLS to Cognito"; flow:established; sid:2001; rev:1;)
+          pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:"api.notifications.service.gov.uk";
+          startswith; endswith; msg:"Pass TLS to api.notifications.service.gov.uk"; flow:established; sid:2002; rev:1;)
+          pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:"oidc.integration.account.gov.uk";
+          startswith; endswith; msg:"Pass TLS to oidc.integration.account.gov.uk"; flow:established; sid:2003; rev:1;)
 
 Outputs:
   VPCID:
