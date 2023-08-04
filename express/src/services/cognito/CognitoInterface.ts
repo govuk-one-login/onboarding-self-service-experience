@@ -1,4 +1,5 @@
 import {
+    AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
     AdminRespondToAuthChallengeCommandOutput,
     RespondToAuthChallengeCommandOutput
@@ -6,6 +7,8 @@ import {
 
 export default interface CognitoInterface {
     createUser(email: string): Promise<void>;
+
+    getUser(email: string): Promise<AdminGetUserCommandOutput>;
 
     resendEmailAuthCode(email: string): Promise<void>;
 

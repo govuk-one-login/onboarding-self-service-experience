@@ -1,4 +1,9 @@
-import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
+import {
+    CodeMismatchException,
+    NotAuthorizedException,
+    UsernameExistsException,
+    UserStatusType
+} from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
 import {RequestHandler} from "express";
 import {Service} from "../../@types/Service";
@@ -17,8 +22,16 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
     try {
         await s4.createUser(emailAddress);
     } catch (error) {
+        // we need to check whether email is confirmed
         if (error instanceof UsernameExistsException) {
-            return res.redirect("/register/account-exists");
+            let user = await s4.getUser(emailAddress);
+            console.log('User status: '+user.UserStatus);
+            console.log('User: '+JSON.stringify(user));
+            if(user.UserStatus == UserStatusType.CONFIRMED) {
+                return res.redirect("/register/account-exists");
+            } else {
+                return res.redirect("/register/resend-email-code");
+            }
         }
 
         throw error;

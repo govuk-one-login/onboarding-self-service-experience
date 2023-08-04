@@ -6,6 +6,8 @@ import {
     AdminRespondToAuthChallengeCommandOutput,
     AdminSetUserMFAPreferenceCommand,
     AdminUpdateUserAttributesCommand,
+    AdminGetUserCommand,
+    AdminGetUserCommandOutput,
     ChangePasswordCommand,
     CognitoIdentityProviderClient,
     CognitoIdentityProviderClientResolvedConfig,
@@ -56,6 +58,13 @@ export default class CognitoClient implements CognitoInterface {
                 .padStart(6, "0"),
             UserAttributes: [{Name: "email", Value: email}]
         });
+    }
+
+    getUser(email: string): Promise<AdminGetUserCommandOutput> {
+        return this.sendCommand(AdminGetUserCommand, {
+            Username: email,
+            UserPoolId: this.userPoolId
+        }) as Promise<AdminGetUserCommandOutput>;
     }
 
     async resendEmailAuthCode(email: string): Promise<void> {

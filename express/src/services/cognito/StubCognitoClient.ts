@@ -1,4 +1,5 @@
 import {
+    AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
     AdminRespondToAuthChallengeCommandOutput,
     CodeMismatchException,
@@ -95,6 +96,10 @@ export default class StubCognitoClient implements CognitoInterface {
 
     constructor() {
         console.log("Creating stub Cognito client...");
+    }
+
+    getUser(email: string): Promise<AdminGetUserCommandOutput> {
+        return new Promise(() => {});
     }
 
     async createUser(email: string): Promise<void> {

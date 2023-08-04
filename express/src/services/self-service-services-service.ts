@@ -1,4 +1,8 @@
-import {AdminInitiateAuthCommandOutput, AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import {
+    AdminGetUserCommandOutput,
+    AdminInitiateAuthCommandOutput,
+    AuthenticationResultType
+} from "@aws-sdk/client-cognito-identity-provider";
 import {unmarshall} from "@aws-sdk/util-dynamodb";
 import {AxiosResponse} from "axios";
 import {Client, ClientFromDynamo} from "../../@types/client";
@@ -86,6 +90,10 @@ export default class SelfServiceServicesService {
 
     createUser(emailAddress: string): Promise<void> {
         return this.cognito.createUser(emailAddress);
+    }
+
+    getUser(emailAddress: string): Promise<AdminGetUserCommandOutput> {
+        return this.cognito.getUser(emailAddress);
     }
 
     resendEmailAuthCode(emailAddress: string): Promise<void> {
