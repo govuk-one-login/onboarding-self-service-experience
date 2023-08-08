@@ -3,10 +3,10 @@ Description: DI Self-Service API
 Transform: [ AWS::LanguageExtensions, AWS::Serverless-2016-10-31 ]
 
 Parameters:
-  AuthRegistrationBaseUrl:
+  ClientRegistryEndpoint:
     Type: String
     Default: https://oidc.integration.account.gov.uk
-    Description: API Gateway endpoint for client registration
+    Description: Auth client registration endpoint
   NotificationEmail:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/api/notifications-email
@@ -361,8 +361,8 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Environment:
         Variables:
-          AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
-          AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/auth-api-key}}"
+          AUTH_REGISTRATION_BASE_URL: !Ref ClientRegistryEndpoint
+          AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/client-registry-api-key}}"
 
   UpdateAuthClientFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
@@ -380,8 +380,8 @@ Resources:
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Environment:
         Variables:
-          AUTH_REGISTRATION_BASE_URL: !Ref AuthRegistrationBaseUrl
-          AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/auth-api-key}}"
+          AUTH_REGISTRATION_BASE_URL: !Ref ClientRegistryEndpoint
+          AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/client-registry-api-key}}"
 
   #--- Step Functions ---#
 
