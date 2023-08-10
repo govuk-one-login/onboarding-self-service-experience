@@ -30,7 +30,7 @@ jest.mock("@aws-crypto/client-node", () => {
 process.env.SECURITY_CODE_TEXT_MESSAGE_TEMPLATE = "ac38449b-efba-4e05-911a-83648caa8de5";
 process.env.KEY_ALIAS = "key-alias-01";
 
-import {lambdaHandler} from "../../src/handlers/security-code-text-message-sender";
+import {lambdaHandler} from "../../src/handlers/send-security-code-text-message";
 
 describe("Custom SMS sender", () => {
     it("should send sms for valid trigger", () => {
