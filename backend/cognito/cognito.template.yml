@@ -137,7 +137,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
     Properties:
-      Handler: src/handlers/security-code-text-message-sender.lambdaHandler
+      Handler: src/handlers/send-security-code-text-message.lambdaHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       MemorySize: 1024
       Environment:
