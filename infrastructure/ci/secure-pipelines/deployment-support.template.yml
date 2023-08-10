@@ -120,6 +120,11 @@ Resources:
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/lambda-audit-hook/template.yaml
 
+  CheckovHook:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateStorageBucket}/checkov-hook/template.yaml
+
   InfrastructureAuditHook:
     Type: AWS::CloudFormation::Stack
     Properties:
