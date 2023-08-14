@@ -17,6 +17,7 @@ Resources:
       TemplateURL: !Sub ${TemplateStorageBucket}/vpc/template.yaml
       Parameters:
         ECRApiEnabled: "Yes"
+        KMSApiEnabled: "Yes"
         LogsApiEnabled: "Yes"
         DynamoDBApiEnabled: "Yes"
         ExecuteApiGatewayEnabled: "Yes"
