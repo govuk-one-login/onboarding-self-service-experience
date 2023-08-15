@@ -139,6 +139,19 @@ export default class CognitoClient implements CognitoInterface {
         });
     }
 
+    async setSignUpStatus(username: string, status: string): Promise<void> {
+        await this.sendCommand(AdminUpdateUserAttributesCommand, {
+            UserPoolId: this.userPoolId,
+            Username: username,
+            UserAttributes: [
+                {
+                    Name: "signup_status",
+                    Value: status
+                }
+            ]
+        });
+    }
+
     async setMobilePhoneAsVerified(username: string): Promise<void> {
         await this.sendCommand(AdminUpdateUserAttributesCommand, {
             UserPoolId: this.userPoolId,

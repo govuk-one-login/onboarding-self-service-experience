@@ -120,6 +120,10 @@ export default class SelfServiceServicesService {
         return this.cognito.setMobilePhoneAsVerified(emailAddress);
     }
 
+    setSignUpStatus(emailAddress: string, signUpStatus: string): Promise<void> {
+        return this.cognito.setSignUpStatus(emailAddress, signUpStatus);
+    }
+
     async newService(service: Service, userId: string, authenticationResult: AuthenticationResultType): Promise<void> {
         return this.lambda.newService(
             service,

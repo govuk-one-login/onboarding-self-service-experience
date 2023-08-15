@@ -34,4 +34,6 @@ export default interface CognitoInterface {
     respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput>;
 
     useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput>;
-}
+
+    setSignUpStatus(username: string, status: string);
+ }

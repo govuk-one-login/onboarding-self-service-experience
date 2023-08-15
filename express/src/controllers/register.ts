@@ -10,6 +10,14 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 
+export const enum signUpStatus {
+  upToEnterEmailCode = "1",
+  upToCreatePassword = "2",
+  upToEnterPhoneNumber = "3",
+  upToEnterTextCode = "4",
+  signUpCompleted = "5"
+}
+
 export const processGetEmailForm: RequestHandler = async (req, res) => {
     const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
@@ -18,7 +26,16 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
         await s4.createUser(emailAddress);
     } catch (error) {
         if (error instanceof UsernameExistsException) {
-            return res.redirect("/register/account-exists");
+            const authenticationResult = nonNull(req.session.authenticationResult);
+            const signUpStatus = AuthenticationResultParser.getSignUpStatus(authenticationResult);
+
+            switch(signUpStatus) {
+                case signUpStatus.upToEnterEmailCode:   return res.redirect("/register/enter-email-code");
+                case signUpStatus.upToCreatePassword:   return res.redirect("/register/create-password");
+                case signUpStatus.upToEnterPhoneNumber: return res.redirect("/register/enter-phone-number");
+                case signUpStatus.upToEnterTextCode:    return res.redirect("/register/enter-text-code");
+                default:                                return res.redirect("/register/account-exists");
+            }
         }
 
         throw error;
@@ -32,6 +49,9 @@ export const showCheckEmailForm: RequestHandler = (req, res) => {
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
+
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    s4.setsignUpStatus(req.session.emailAddress, signUpStatus.upToEnterEmailCode);
 
     res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
@@ -59,6 +79,8 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         throw error;
     }
 
+    s4.setsignUpStatus(req.session.emailAddress, signUpStatus.upToCreatePassword);
+
     res.redirect("/register/create-password");
 };
 
@@ -78,11 +100,14 @@ export const updatePassword: RequestHandler = async (req, res) => {
     req.session.authenticationResult = await s4.setNewPassword(emailAddress, req.body["password"], nonNull(req.session.cognitoSession));
 
     await s4.setEmailAsVerified(emailAddress);
-
+    s4.setsignUpStatus(req.session.emailAddress, signUpStatus.upToEnterPhoneNumber);
     res.redirect("/register/enter-phone-number");
 };
 
 export const showEnterMobileForm: RequestHandler = (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    s4.setsignUpStatus(req.session.emailAddress, signUpStatus.upToEnterTextCode);
+
     res.render("register/enter-phone-number.njk", {
         value: {mobileNumber: req.session.mobileNumber}
     });
@@ -169,7 +194,7 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     });
 
     await s4.putUser(user, accessToken);
-
+    s4.setsignUpStatus(req.session.emailAddress, signUpStatus.journeyCompleted);
     req.session.isSignedIn = true;
     res.redirect("/register/create-service");
 };
@@ -179,6 +204,7 @@ export const showResendEmailCodeForm = render("register/resend-email-code.njk");
 
 export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
+
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
     res.redirect("/register/enter-email-code");
 };
