@@ -10,7 +10,7 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 
-export const enum signUpStatus {
+export const enum SignUpStatus {
   upToEnterEmailCode = "1",
   upToCreatePassword = "2",
   upToEnterPhoneNumber = "3",
@@ -30,10 +30,10 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
             const signUpStatus = AuthenticationResultParser.getSignUpStatus(authenticationResult);
 
             switch(signUpStatus) {
-                case signUpStatus.upToEnterEmailCode:   return res.redirect("/register/enter-email-code");
-                case signUpStatus.upToCreatePassword:   return res.redirect("/register/create-password");
-                case signUpStatus.upToEnterPhoneNumber: return res.redirect("/register/enter-phone-number");
-                case signUpStatus.upToEnterTextCode:    return res.redirect("/register/enter-text-code");
+                case SignUpStatus.upToEnterEmailCode:   return res.redirect("/register/enter-email-code");
+                case SignUpStatus.upToCreatePassword:   return res.redirect("/register/create-password");
+                case SignUpStatus.upToEnterPhoneNumber: return res.redirect("/register/enter-phone-number");
+                case SignUpStatus.upToEnterTextCode:    return res.redirect("/register/enter-text-code");
                 default:                                return res.redirect("/register/account-exists");
             }
         }
@@ -51,7 +51,7 @@ export const showCheckEmailForm: RequestHandler = (req, res) => {
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    s4.setsignUpStatus(req.session.emailAddress, signUpStatus.upToEnterEmailCode);
+    s4.setSignUpStatus(req.session.emailAddress, signUpStatus.upToEnterEmailCode);
 
     res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
@@ -79,7 +79,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         throw error;
     }
 
-    s4.setsignUpStatus(req.session.emailAddress, signUpStatus.upToCreatePassword);
+    s4.setSignUpStatus(req.session.emailAddress, signUpStatus.upToCreatePassword);
 
     res.redirect("/register/create-password");
 };
@@ -100,13 +100,13 @@ export const updatePassword: RequestHandler = async (req, res) => {
     req.session.authenticationResult = await s4.setNewPassword(emailAddress, req.body["password"], nonNull(req.session.cognitoSession));
 
     await s4.setEmailAsVerified(emailAddress);
-    s4.setsignUpStatus(req.session.emailAddress, signUpStatus.upToEnterPhoneNumber);
+    s4.setSignUpStatus(req.session.emailAddress, signUpStatus.upToEnterPhoneNumber);
     res.redirect("/register/enter-phone-number");
 };
 
 export const showEnterMobileForm: RequestHandler = (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    s4.setsignUpStatus(req.session.emailAddress, signUpStatus.upToEnterTextCode);
+    s4.setSignUpStatus(req.session.emailAddress, signUpStatus.upToEnterTextCode);
 
     res.render("register/enter-phone-number.njk", {
         value: {mobileNumber: req.session.mobileNumber}
@@ -194,7 +194,7 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     });
 
     await s4.putUser(user, accessToken);
-    s4.setsignUpStatus(req.session.emailAddress, signUpStatus.journeyCompleted);
+    s4.setSignUpStatus(req.session.emailAddress, signUpStatus.journeyCompleted);
     req.session.isSignedIn = true;
     res.redirect("/register/create-service");
 };
