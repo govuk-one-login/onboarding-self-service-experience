@@ -2,6 +2,11 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Admin Tool VPC and networking components to provide security controls and public access to the app
 
 Parameters:
+  # ADR in review https://github.com/alphagov/digital-identity-architecture/pull/491
+  InternetSubnets:
+    Type: List<String>
+    Default: ""
+    Description: Temporary param to export the firewall subnet IDs until they're exported from the VPC stack
   ExportPrefix:
     Type: String
     AllowedPattern: ^.*[^-]$
@@ -17,16 +22,26 @@ Resources:
       TemplateURL: !Sub ${TemplateStorageBucket}/vpc/template.yaml
       Parameters:
         ECRApiEnabled: "Yes"
+        KMSApiEnabled: "Yes"
         LogsApiEnabled: "Yes"
         DynamoDBApiEnabled: "Yes"
         ExecuteApiGatewayEnabled: "Yes"
         AccessLogsCustomBucketNameEnabled: "No"
         AvailabilityZoneCount: 2
         AllowedDomains: !Join [ ",", [
-          !Sub "cognito-idp.${AWS::Region}.amazonaws.com" ] ]
+          !Sub "cognito-idp.${AWS::Region}.amazonaws.com",
+          api.notifications.service.gov.uk,
+          "*.cloudfront.net"
+        ] ]
         AllowRules: !Sub >
           pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:"cognito-idp.${AWS::Region}.amazonaws.com";
-          startswith; endswith; msg:"Pass TLS to Cognito"; flow:established; sid:2001; rev:1;)
+          startswith; endswith; msg:"Pass TLS to Cognito"; flow:established; rev:1; sid:2001;)
+          
+          pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:"api.notifications.service.gov.uk";
+          startswith; endswith; msg:"Pass TLS to Notify API"; flow:established; rev:1; sid:2002;)
+          
+          pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:".cloudfront.net";
+          endswith; msg:"Pass TLS to CloudFront"; flow:established; rev:1; sid:2003;)
 
 Outputs:
   VPCID:
@@ -46,7 +61,7 @@ Outputs:
     Export:
       Name: !Sub ${ExportPrefix}-ProtectedSubnets
   InternetSubnets:
-    Value: !Join [ ",", [ subnet-080611e508d16afa7, subnet-0078deb0ea9800a7b ] ]
+    Value: !Join [ ",", !Ref InternetSubnets ]
     Export:
       Name: !Sub ${ExportPrefix}-InternetSubnets
   ExecuteAPIGatewayVPCEndpointID:
