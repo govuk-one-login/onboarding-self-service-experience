@@ -31,12 +31,6 @@ Parameters:
     Default: ""
     Description: The ARN of the permissions boundary to apply when creating IAM roles
 
-Mappings:
-  # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
-  ElasticLoadBalancer:
-    eu-west-2:
-      AccountID: 652711504416
-
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
@@ -206,7 +200,6 @@ Resources:
 
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    DependsOn: AccessLogsBucketPolicy
     Properties:
       Type: application
       Scheme: internet-facing
@@ -219,7 +212,7 @@ Resources:
         - Key: access_logs.s3.enabled
           Value: true
         - Key: access_logs.s3.bucket
-          Value: !Ref AccessLogsBucket
+          Value: !ImportValue ELB-AccessLogsBucket
 
   ApplicationLoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -268,36 +261,6 @@ Resources:
       IpProtocol: tcp
       FromPort: !Ref ContainerPort
       ToPort: !Ref ContainerPort
-
-  #--- Logging ---#
-
-  AccessLogsBucket:
-    # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
-    # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub
-        - ${DeploymentName}-application-access-logs-${ID}
-        - ID: !Select [ 0, !Split [ "-", !Select [ 2, !Split [ "/", !Ref AWS::StackId ] ] ] ]
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-
-  # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
-  AccessLogsBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref AccessLogsBucket
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: s3:PutObject
-            Resource: !Sub ${AccessLogsBucket.Arn}/AWSLogs/${AWS::AccountId}/*
-            Principal:
-              AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
 
   #--- DNS ---#
 
