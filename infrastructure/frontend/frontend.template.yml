@@ -31,12 +31,6 @@ Parameters:
     Default: ""
     Description: The ARN of the permissions boundary to apply when creating IAM roles
 
-Mappings:
-  # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
-  ElasticLoadBalancer:
-    eu-west-2:
-      AccountID: 652711504416
-
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
@@ -53,7 +47,7 @@ Resources:
       ExecutionRoleArn: !GetAtt ExecutionRole.Arn
       Cpu: 256
       Memory: 512
-      Family: !Sub ${DeploymentName}
+      Family: !Sub ${DeploymentName}-frontend
       NetworkMode: awsvpc
       ContainerDefinitions:
         - Name: self-service-frontend
@@ -163,7 +157,7 @@ Resources:
   FargateCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Ref DeploymentName
+      ClusterName: !Sub ${DeploymentName}-frontend
       ClusterSettings:
         - Name: containerInsights
           Value: enabled
@@ -206,11 +200,10 @@ Resources:
 
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    DependsOn: AccessLogsBucketPolicy
     Properties:
       Type: application
       Scheme: internet-facing
-      Name: !Sub ${DeploymentName}-frontend
+      Name: !Sub ${DeploymentName}-app
       Subnets: !Split [ ",", !ImportValue VPC-InternetSubnets ]
       SecurityGroups: [ !Ref ApplicationSecurityGroup ]
       LoadBalancerAttributes:
@@ -219,7 +212,7 @@ Resources:
         - Key: access_logs.s3.enabled
           Value: true
         - Key: access_logs.s3.bucket
-          Value: !Ref AccessLogsBucket
+          Value: !ImportValue ELB-AccessLogsBucket
 
   ApplicationLoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -238,7 +231,7 @@ Resources:
   ApplicationTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: !Sub ${DeploymentName}-app
+      Name: !Sub ${DeploymentName}-ecs
       VpcId: !ImportValue VPC-ID
       Port: !Ref ContainerPort
       Protocol: HTTP
@@ -268,36 +261,6 @@ Resources:
       IpProtocol: tcp
       FromPort: !Ref ContainerPort
       ToPort: !Ref ContainerPort
-
-  #--- Logging ---#
-
-  AccessLogsBucket:
-    # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
-    # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub
-        - ${DeploymentName}-application-access-logs-${ID}
-        - ID: !Select [ 0, !Split [ "-", !Select [ 2, !Split [ "/", !Ref AWS::StackId ] ] ] ]
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-
-  # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
-  AccessLogsBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref AccessLogsBucket
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: s3:PutObject
-            Resource: !Sub ${AccessLogsBucket.Arn}/AWSLogs/${AWS::AccountId}/*
-            Principal:
-              AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
 
   #--- DNS ---#
 

@@ -9,11 +9,18 @@ Parameters:
     Description: Temporary param to export the firewall subnet IDs until they're exported from the VPC stack
   ExportPrefix:
     Type: String
-    AllowedPattern: ^.*[^-]$
-    Default: VPC
+    AllowedPattern: ^.*-$|^$
+    Default: ""
+    Description: Optional prefix to apply to the exports
   TemplateStorageBucket:
     Type: String
     Default: https://template-storage-templatebucket-1upzyw6v9cs42.s3.amazonaws.com
+
+Mappings:
+  # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+  ElasticLoadBalancer:
+    eu-west-2:
+      AccountID: 652711504416
 
 Resources:
   VPC:
@@ -43,32 +50,60 @@ Resources:
           pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:".cloudfront.net";
           endswith; msg:"Pass TLS to CloudFront"; flow:established; rev:1; sid:2003;)
 
+  AccessLogsBucket:
+    # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
+    # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub
+        - admin-tool-elb-access-logs-${ID}
+        - ID: !Select [ 0, !Split [ "-", !Select [ 2, !Split [ "/", !Ref AWS::StackId ] ] ] ]
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+  AccessLogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AccessLogsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: s3:PutObject
+            Resource: !Sub ${AccessLogsBucket.Arn}/AWSLogs/${AWS::AccountId}/*
+            Principal:
+              AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
+
 Outputs:
   VPCID:
     Value: !GetAtt VPC.Outputs.VpcId
     Export:
-      Name: !Sub ${ExportPrefix}-ID
+      Name: !Sub ${ExportPrefix}VPC-ID
   VPCStackName:
     Value: !Select [ 1, !Split [ "/", !Ref VPC ] ]
     Export:
-      Name: !Sub ${ExportPrefix}-StackName
+      Name: !Sub ${ExportPrefix}VPC-StackName
   PrivateSubnets:
     Value: !Join [ ",", [ !GetAtt VPC.Outputs.PrivateSubnetIdA, !GetAtt VPC.Outputs.PrivateSubnetIdB ] ]
     Export:
-      Name: !Sub ${ExportPrefix}-PrivateSubnets
+      Name: !Sub ${ExportPrefix}VPC-PrivateSubnets
   ProtectedSubnets:
     Value: !Join [ ",", [ !GetAtt VPC.Outputs.ProtectedSubnetIdA, !GetAtt VPC.Outputs.ProtectedSubnetIdB ] ]
     Export:
-      Name: !Sub ${ExportPrefix}-ProtectedSubnets
+      Name: !Sub ${ExportPrefix}VPC-ProtectedSubnets
   InternetSubnets:
     Value: !Join [ ",", !Ref InternetSubnets ]
     Export:
-      Name: !Sub ${ExportPrefix}-InternetSubnets
+      Name: !Sub ${ExportPrefix}VPC-InternetSubnets
   ExecuteAPIGatewayVPCEndpointID:
     Value: !GetAtt VPC.Outputs.ExecuteApiGatewayVpcEndpointId
     Export:
-      Name: !Sub ${ExportPrefix}-ExecuteAPIGatewayEndpointID
-  VPCEndpointsSecurityGroupID:
-    Value: !GetAtt VPC.Outputs.AWSServicesEndpointSecurityGroupId
+      Name: !Sub ${ExportPrefix}VPC-ExecuteAPIGatewayEndpointID
+  AccessLogsBucket:
+    Value: !Ref AccessLogsBucket
     Export:
-      Name: !Sub ${ExportPrefix}-EndpointsSecurityGroupID
+      Name: !Sub ${ExportPrefix}ELB-AccessLogsBucket
