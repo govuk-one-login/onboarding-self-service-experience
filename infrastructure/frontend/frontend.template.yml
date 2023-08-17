@@ -280,4 +280,4 @@ Resources:
 
 Outputs:
   AdminToolURL:
-    Value: !Ref DNSRecord
+    Value: !Sub https://${DNSRecord}
