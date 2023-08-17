@@ -11,12 +11,6 @@ Feature: Joining private beta
     When they click on the "Joining private beta" link
     Then they should be redirected to a page with the title "Joining private beta - GOV.UK One Login"
 
-  Rule: Getting private beta information
-    Scenario: The user wants to find out more about private beta
-      When they click on the "private beta guidance (opens in new tab)" link that opens in a new tab
-      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/getting-started/private-beta"
-      And they should see the text "Find out more about private beta"
-
   Rule: Applying for private beta
     Scenario: The user does not enter any characters into the Your name field
       When they submit the name ""
