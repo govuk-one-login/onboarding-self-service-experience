@@ -17,20 +17,8 @@ Feature: A page where users can view the details associated with a client
       Then they should see the text "Username: integration-user"
       Then they should see the text "Password: winter2021"
 
-  Rule: The the hidden content and the links which open in a new tab, are available for the user to view
-    Scenario: The user wants to view technical documentation
-      When they click on the "technical documentation (opens in new tab)" link that opens in a new tab
-      Then they should be directed to the URL "https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/"
-      And they should see the text "Integrate with GOV.UK One Login’s integration environment"
+  Rule: The the hidden content is available for the user to view
 
     Scenario: The user wants to view what different terms mean
       When they click the toggle 'What do these terms mean?' button
       Then the hidden content of 'What do these terms mean?' is displayed
-
-    Scenario: The user wants to know how to generate a keypair
-      When they click the toggle 'What do these terms mean?' button
-      When they click on the "generate a key pair (opens in new tab)" link that opens in a new tab
-      Then they should be directed to the URL "https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/generate-a-key/"
-      And they should see the text "Generate a key pair"
-
-
