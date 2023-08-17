@@ -7,6 +7,7 @@ on:
       template: { required: false, type: string }
       artifact: { required: false, type: string }
       parameters: { required: false, type: string }
+      disable-rollback: { required: false, type: boolean, default: false }
     outputs:
       stack-name:
         description: "The deployed stack name"
@@ -44,11 +45,12 @@ jobs:
         with:
           aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
           sam-deployment-bucket: ${{ vars.DEPLOYMENT_ARTIFACTS_BUCKET }}
+          delete-failed-stack: ${{ !inputs.disable-rollback }}
+          disable-rollback: ${{ inputs.disable-rollback }}
           stack-name-prefix: preview-${{ inputs.name }}
-          s3-prefix: sse-preview
-          template: ${{ inputs.template }}
           artifact-name: ${{ inputs.artifact }}
-          delete-failed-stack: true
+          template: ${{ inputs.template }}
+          s3-prefix: sse-preview
           tags: |-
             sse:component=${{ inputs.name }}
             sse:stack-type=preview

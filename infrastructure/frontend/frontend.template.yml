@@ -53,7 +53,7 @@ Resources:
       ExecutionRoleArn: !GetAtt ExecutionRole.Arn
       Cpu: 256
       Memory: 512
-      Family: !Sub ${DeploymentName}
+      Family: !Sub ${DeploymentName}-frontend
       NetworkMode: awsvpc
       ContainerDefinitions:
         - Name: self-service-frontend
@@ -163,7 +163,7 @@ Resources:
   FargateCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Ref DeploymentName
+      ClusterName: !Sub ${DeploymentName}-frontend
       ClusterSettings:
         - Name: containerInsights
           Value: enabled
@@ -210,7 +210,7 @@ Resources:
     Properties:
       Type: application
       Scheme: internet-facing
-      Name: !Sub ${DeploymentName}-frontend
+      Name: !Sub ${DeploymentName}-app
       Subnets: !Split [ ",", !ImportValue VPC-InternetSubnets ]
       SecurityGroups: [ !Ref ApplicationSecurityGroup ]
       LoadBalancerAttributes:
@@ -238,7 +238,7 @@ Resources:
   ApplicationTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: !Sub ${DeploymentName}-app
+      Name: !Sub ${DeploymentName}-ecs
       VpcId: !ImportValue VPC-ID
       Port: !Ref ContainerPort
       Protocol: HTTP

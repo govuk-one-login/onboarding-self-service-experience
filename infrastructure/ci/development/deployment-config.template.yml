@@ -79,6 +79,7 @@ Resources:
                   - ssm:GetParametersByPath
 
   FrontendDeploymentPolicy:
+    # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
     Type: AWS::IAM::Policy
     Properties:
       Roles: [ !Ref GitHubActionsRole ]
@@ -89,13 +90,20 @@ Resources:
           - Effect: Allow
             Resource: "*"
             Action:
-              - ecs:CreateCluster
               - ecr:DescribeRegistry
               - ecr:GetAuthorizationToken
+              - ec2:DescribeSecurityGroups
+              - ec2:CreateSecurityGroup
+              - ecs:CreateCluster
               - ecs:ListTaskDefinitions
               - ecs:DescribeTaskDefinition
               - ecs:RegisterTaskDefinition
               - ecs:DeregisterTaskDefinition
+              - elasticloadbalancing:DescribeListeners
+              - elasticloadbalancing:DescribeTargetGroups
+              - elasticloadbalancing:DescribeLoadBalancers
+              - route53:GetHostedZone
+              - route53:GetChange
 
           - Effect: Allow
             Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ServiceName}/frontend
@@ -141,6 +149,51 @@ Resources:
               - ecs:DescribeServices
               - ecs:DescribeClusters
               - ecs:DeleteCluster
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
+            Action:
+              - ec2:CreateTags
+              - ec2:DeleteSecurityGroup
+              - ec2:RevokeSecurityGroupEgress
+              - ec2:AuthorizeSecurityGroupEgress
+              - ec2:AuthorizeSecurityGroupIngress
+            Condition:
+              StringLike:
+                aws:ResourceTag/aws:cloudformation:stack-name: !Sub ${PreviewStacksPrefix}-frontend-*
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/${PreviewStacksPrefix}-*-ecs/*
+            Action:
+              - elasticloadbalancing:AddTags
+              - elasticloadbalancing:CreateTargetGroup
+              - elasticloadbalancing:DeleteTargetGroup
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/${PreviewStacksPrefix}-*-app/*
+            Action:
+              - elasticloadbalancing:AddTags
+              - elasticloadbalancing:CreateListener
+              - elasticloadbalancing:CreateLoadBalancer
+              - elasticloadbalancing:DeleteLoadBalancer
+              - elasticloadbalancing:ModifyLoadBalancerAttributes
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/app/${PreviewStacksPrefix}-*-app/*
+            Action: elasticloadbalancing:DeleteListener
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/frontend/session-secret-*
+            Action: secretsmanager:GetSecretValue
+
+          - Effect: Allow
+            Resource: arn:aws:route53:::hostedzone/*
+            Action: route53:ChangeResourceRecordSets
+            Condition:
+              ForAllValues:StringEquals:
+                route53:ChangeResourceRecordSetsRecordTypes: A
+              ForAllValues:StringLike:
+                route53:ChangeResourceRecordSetsNormalizedRecordNames: !Sub [ "*.${Domain}", { Domain: !ImportValue DNS-Domain } ]
 
   ApiDeploymentPolicy:
     Type: AWS::IAM::Policy
@@ -214,11 +267,12 @@ Resources:
                 lambda:Principal: apigateway.amazonaws.com
 
           - Effect: Allow
-            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api/step-functions:log-stream:*
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api*:log-stream:*
             Action:
+              - logs:TagResource
               - logs:CreateLogGroup
               - logs:DeleteLogGroup
-              - logs:TagResource
+              - logs:PutRetentionPolicy
 
           - Effect: Allow
             Resource: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*
@@ -239,43 +293,20 @@ Resources:
           - Effect: Allow
             Resource:
               - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
-              - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
-            Action: apigateway:GET
-
-          - Effect: Allow
-            Resource:
-              - !Sub arn:aws:apigateway:${AWS::Region}::/apis
-              - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
-            Action: apigateway:PUT
-            Condition:
-              StringLike:
-                apigateway:Request/ApiName: !Sub ${PreviewStacksPrefix}-api-*
-
-          - Effect: Allow
-            Resource: !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
-            Action: apigateway:DELETE
-            Condition:
-              StringLike:
-                apigateway:Resource/ApiName: !Sub ${PreviewStacksPrefix}-api-*
-
-          - Effect: Allow
-            Resource:
-              - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
-              - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*/stages
+              - !Sub arn:aws:apigateway:${AWS::Region}::/restapis
+              - !Sub arn:aws:apigateway:${AWS::Region}::/restapis/*
             Action:
+              - apigateway:GET
+              - apigateway:PUT
               - apigateway:POST
+              - apigateway:PATCH
               - apigateway:DELETE
               - apigateway:TagResource
               - apigateway:UntagResource
+              - apigateway:UpdateRestApiPolicy
             Condition:
-              StringLike:
+              StringLikeIfExists:
                 aws:RequestTag/aws:cloudformation:stack-name: !Sub ${PreviewStacksPrefix}-api-*
-
-          - Effect: Allow
-            Resource: !Sub arn:aws:apigateway:${AWS::Region}::/apis/*/stages/${ServiceName}-api
-            Action:
-              - apigateway:PATCH
-              - apigateway:DELETE
 
   CognitoDeploymentPolicy:
     # checkov:skip=CKV_AWS_109:Ensure IAM policies does not allow permissions management without constraints

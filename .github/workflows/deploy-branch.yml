@@ -13,12 +13,23 @@ jobs:
     permissions: { }
     uses: ./.github/workflows/build-frontend.yml
 
-  build-frontend-image:
+  push-frontend-image:
     name: Frontend
     needs: build-frontend
     uses: ./.github/workflows/build-frontend-image.yml
     with:
       artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
+
+  deploy-frontend:
+    name: Frontend
+    needs: [ push-frontend-image, deploy-api, deploy-cognito, deploy-dynamodb ]
+    uses: ./.github/workflows/deploy-component.yml
+    with:
+      name: Frontend
+      template: infrastructure/frontend/frontend.template.yml
+      parameters: |
+        ImageURI=${{ needs.push-frontend-image.outputs.image-uri }}
+        LogGroupPrefix=/self-service/preview
 
   build-cognito:
     name: Cognito
@@ -33,18 +44,18 @@ jobs:
       name: ${{ needs.build-cognito.outputs.component }}
       artifact: ${{ needs.build-cognito.outputs.artifact-name }}
 
-  build-sse-api:
+  build-api:
     name: API
     permissions: { }
     uses: ./.github/workflows/build-api.yml
 
-  deploy-sse-api:
+  deploy-api:
     name: API
-    needs: [ build-sse-api, deploy-dynamodb ]
+    needs: [ build-api, deploy-dynamodb ]
     uses: ./.github/workflows/deploy-component.yml
     with:
-      name: ${{ needs.build-sse-api.outputs.component }}
-      artifact: ${{ needs.build-sse-api.outputs.artifact-name }}
+      name: ${{ needs.build-api.outputs.component }}
+      artifact: ${{ needs.build-api.outputs.artifact-name }}
       parameters: LogGroupPrefix=/self-service/preview
 
   deploy-dynamodb:
