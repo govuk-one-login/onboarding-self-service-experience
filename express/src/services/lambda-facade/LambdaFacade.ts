@@ -5,7 +5,7 @@ import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {api} from "../../config/environment";
 import AuthenticationResultParser from "../../lib/authentication-result-parser";
-import LambdaFacadeInterface, {ClientUpdates, UserUpdates} from "./LambdaFacadeInterface";
+import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./LambdaFacadeInterface";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export default class LambdaFacade implements LambdaFacadeInterface {
@@ -65,6 +65,16 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         };
 
         await this.post(`/update-client`, JSON.stringify(body), accessToken);
+    }
+
+    async updateService(serviceId: string, updates: ServiceNameUpdates, accessToken: string): Promise<void> {
+        // TODO constrain type later
+        const body = {
+            serviceId: serviceId,
+            updates: updates
+        };
+
+        await this.post(`/update-service`, JSON.stringify(body), accessToken);
     }
 
     listServices(userId: string): Promise<AxiosResponse> {
