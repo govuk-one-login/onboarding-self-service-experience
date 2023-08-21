@@ -13,7 +13,7 @@ jobs:
   delete-paas-deployments:
     name: Clean up PaaS apps
     runs-on: ubuntu-latest
-    environment: preview
+    environment: PaaS
     concurrency: deploy-paas-preview-${{ github.head_ref || github.ref_name }}
     steps:
       - name: PaaS login
