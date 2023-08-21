@@ -42,12 +42,14 @@ Globals:
     Timeout: 10
     Runtime: nodejs18.x
     PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
+    VpcConfig:
+      SecurityGroupIds: [ !ImportValue VPC-VPCEndpointsSecurityGroup ]
+      SubnetIds: !Split [ ",", !ImportValue VPC-PrivateSubnets ]
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
 
 Resources:
-
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html
   API:
     # checkov:skip=CKV_AWS_120:Ensure API Gateway caching is enabled
@@ -117,7 +119,8 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/get-user.getUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        - DynamoDBCrudPolicy:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
@@ -146,7 +149,8 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-user.putUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        - DynamoDBCrudPolicy:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
@@ -176,7 +180,8 @@ Resources:
       Description: Updates user data in DynamoDB
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        - DynamoDBCrudPolicy:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
@@ -207,7 +212,8 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/get-services.getServicesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        - DynamoDBCrudPolicy:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
@@ -236,7 +242,8 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-service.putServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        - DynamoDBCrudPolicy:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
@@ -260,7 +267,8 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/get-service-clients.getServiceClientsHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        - DynamoDBCrudPolicy:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
@@ -289,7 +297,8 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-service-client.putServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        - DynamoDBCrudPolicy:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
@@ -311,7 +320,8 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/update-service-client.updateServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        - DynamoDBCrudPolicy:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
@@ -335,7 +345,8 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/put-service-user.putServiceUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
-        - DynamoDBCrudPolicy:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
@@ -356,9 +367,12 @@ Resources:
       BuildProperties:
         Sourcemap: true
     Properties:
-      Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
       Description: Assumes a cross-account role and invokes the Auth register Lambda
+      Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies: [ AWSLambdaVPCAccessExecutionRole ]
+      VpcConfig:
+        SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref ClientRegistryEndpoint
@@ -375,9 +389,12 @@ Resources:
       BuildProperties:
         Sourcemap: true
     Properties:
-      Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
       Description: Updates a client using an HTTP endpoint
+      Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies: [ AWSLambdaVPCAccessExecutionRole ]
+      VpcConfig:
+        SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref ClientRegistryEndpoint
@@ -398,15 +415,16 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/step-functions/new-service.newServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: states:StartSyncExecution
+              Resource: !Ref NewServiceStepFunction
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref NewServiceStepFunction
-      Policies:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: states:StartSyncExecution
-            Resource: !Ref NewServiceStepFunction
       Events:
         Api:
           Type: Api
@@ -428,15 +446,16 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/step-functions/new-client.newClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: states:StartSyncExecution
+              Resource: !Ref NewClientStepFunction
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref NewClientStepFunction
-      Policies:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: states:StartSyncExecution
-            Resource: !Ref NewClientStepFunction
       Events:
         Api:
           Type: Api
@@ -458,15 +477,16 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/step-functions/update-client.doUpdateClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: states:StartSyncExecution
+              Resource: !Ref UpdateClientStepFunction
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref UpdateClientStepFunction
-      Policies:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: states:StartSyncExecution
-            Resource: !Ref UpdateClientStepFunction
       Events:
         Api:
           Type: Api
@@ -487,7 +507,7 @@ Resources:
               Service: !Sub states.${AWS::Region}.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: StepFunctionExecutionPolicy
+        - PolicyName: StepFunctionExecution
           PolicyDocument:
             Version: 2012-10-17
             Statement:
@@ -589,12 +609,12 @@ Resources:
       Handler: backend/api/src/handlers/notifications/send-private-beta-notification.privateBetaRequestHandler
       Description: Publish a message to the private beta request notification topic
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      Environment:
-        Variables:
-          SNS_TOPIC_ARN: !Ref NotificationsSnsTopic
       Policies:
         - SNSPublishMessagePolicy:
             TopicName: !GetAtt NotificationsSnsTopic.TopicName
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref NotificationsSnsTopic
       Events:
         Api:
           Type: Api
