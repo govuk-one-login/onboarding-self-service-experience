@@ -40,6 +40,9 @@ Globals:
     Timeout: 10
     Runtime: nodejs18.x
     PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
+    VpcConfig:
+      SecurityGroupIds: [ !ImportValue VPC-VPCEndpointsSecurityGroup ]
+      SubnetIds: !Split [ ",", !ImportValue VPC-PrivateSubnets ]
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
@@ -84,10 +87,8 @@ Resources:
       Handler: src/handlers/send-password-changed-email.handler
       Description: Send an email to confirm the user's password has been changed
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      Environment:
-        Variables:
-          FROM_ADDRESS: !Sub [ "${EmailSenderID} <${DeploymentName}@${Domain}>", { Domain: !ImportValue DNS-Domain } ]
       Policies:
+        - AWSLambdaVPCAccessExecutionRole
         - Version: 2012-10-17
           Statement:
             Effect: Allow
@@ -98,6 +99,9 @@ Resources:
             Condition:
               StringEquals:
                 ses:FromAddress: !Sub [ "${EmailSenderID} <${DeploymentName}@${Domain}>", { Domain: !ImportValue DNS-Domain } ]
+      Environment:
+        Variables:
+          FROM_ADDRESS: !Sub [ "${EmailSenderID} <${DeploymentName}@${Domain}>", { Domain: !ImportValue DNS-Domain } ]
       Events:
         Cognito:
           Type: Cognito
@@ -119,6 +123,7 @@ Resources:
       Handler: src/handlers/create-password-reset-message.handler
       Description: Create a customised email message to send when resetting the user's password
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies: [ AWSLambdaVPCAccessExecutionRole ]
       Events:
         Cognito:
           Type: Cognito
@@ -126,7 +131,7 @@ Resources:
             Trigger: CustomMessage
             UserPool: !Ref UserPool
 
-  SecurityCodeTextMessageSender:
+  SendSecurityCodeTextMessageFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
     # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
     # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
@@ -140,16 +145,20 @@ Resources:
       Handler: src/handlers/send-security-code-text-message.lambdaHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       MemorySize: 1024
+      VpcConfig:
+        SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            Effect: Allow
+            Action: kms:Decrypt
+            Resource: !GetAtt SecurityCodeEncryptionKey.Arn
       Environment:
         Variables:
           NOTIFY_API_KEY: "{{resolve:secretsmanager:/self-service/cognito/notify-api-key}}"
           SECURITY_CODE_TEXT_MESSAGE_TEMPLATE: !Ref SecurityCodeTextMessageTemplate
           DECRYPTION_KEY_ARN: !GetAtt SecurityCodeEncryptionKey.Arn
-      Policies:
-        Statement:
-          Effect: Allow
-          Action: kms:Decrypt
-          Resource: !GetAtt SecurityCodeEncryptionKey.Arn
 
   UserPool:
     Type: AWS::Cognito::UserPool
@@ -476,7 +485,7 @@ Resources:
       # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
       LambdaConfig:
         CustomSMSSender:
-          LambdaArn: !GetAtt SecurityCodeTextMessageSender.Arn
+          LambdaArn: !GetAtt SendSecurityCodeTextMessageFunction.Arn
           LambdaVersion: V1_0
         KMSKeyID: !GetAtt SecurityCodeEncryptionKey.Arn
       AdminCreateUserConfig:
@@ -660,11 +669,11 @@ Resources:
         - ALLOW_ADMIN_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
 
-  CognitoInvokeSecurityCodeTextMessageSenderPermission:
+  SendSecurityCodeTextMessageFunctionPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Ref SecurityCodeTextMessageSender
+      FunctionName: !Ref SendSecurityCodeTextMessageFunction
       Principal: cognito-idp.amazonaws.com
 
 Outputs:

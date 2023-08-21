@@ -20,6 +20,8 @@ Parameters:
     Default: /self-service/api/notifications-email
 
 Resources:
+  # Service authorisation reference - Actions, resources, and condition keys for AWS services
+  # https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html
   GitHubActionsRole:
     Type: AWS::IAM::Role
     Properties:
@@ -40,7 +42,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Resource: "*"
-                Action: iam:ListPolicies
+                Action:
+                  - iam:ListPolicies
+                  - ec2:DescribeVpcs
+                  - ec2:DescribeSubnets
 
               - Effect: Allow
                 Resource: !GetAtt GitHubDeploymentArtifactsBucket.Arn
@@ -261,6 +266,7 @@ Resources:
               - lambda:AddPermission
               - lambda:RemovePermission
               - lambda:UpdateFunctionCode
+              - lambda:UpdateFunctionConfiguration
               - lambda:ListTags
             Condition:
               StringEqualsIfExists:
@@ -378,6 +384,7 @@ Resources:
               - lambda:AddPermission
               - lambda:RemovePermission
               - lambda:UpdateFunctionCode
+              - lambda:UpdateFunctionConfiguration
 
           - Effect: Allow
             Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/cognito/notify-api-key-*
