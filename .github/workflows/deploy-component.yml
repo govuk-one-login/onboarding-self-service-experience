@@ -7,6 +7,7 @@ on:
       template: { required: false, type: string }
       artifact: { required: false, type: string }
       parameters: { required: false, type: string }
+      deployment-url-output: { required: false, type: string }
       disable-rollback: { required: false, type: boolean, default: false }
     outputs:
       stack-name:
@@ -28,19 +29,19 @@ jobs:
 
     environment:
       name: development
-      url: ${{ steps.deploy.outputs.stack-url }}
+      url: ${{ steps.get-deployment-url.outputs.url || steps.deploy.outputs.stack-url }}
 
     steps:
       - name: Get deployment name
         uses: alphagov/di-github-actions/beautify-branch-name@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
         id: get-deployment-name
         with:
-          usage: Deployment name
           length-limit: 28
           prefix: preview
+          verbose: false
 
       - name: Deploy stack
-        uses: alphagov/di-github-actions/sam/deploy-stack@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
+        uses: alphagov/di-github-actions/sam/deploy-stack@254be85cdee8fb8a57e9cdddf53e74c469925168
         id: deploy
         with:
           aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
@@ -59,3 +60,14 @@ jobs:
           parameters: |-
             DeploymentName=${{ steps.get-deployment-name.outputs.pretty-branch-name }}
             ${{ inputs.parameters }}
+
+      - name: Get deployment URL
+        id: get-deployment-url
+        if: ${{ inputs.deployment-url-output != null }}
+        env:
+          NAME: ${{ inputs.deployment-url-output }}
+          OUTPUTS: ${{ steps.deploy.outputs.stack-outputs }}
+        run: |
+          url=$(jq --raw-output ".$NAME" <<< "$OUTPUTS")
+          printf "🌐 Deployment URL\n%s" "$url" >> "$GITHUB_STEP_SUMMARY"
+          echo "url=$url" >> "$GITHUB_OUTPUT"

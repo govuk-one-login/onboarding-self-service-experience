@@ -12,9 +12,9 @@ permissions:
 
 jobs:
   delete-frontend-paas:
-    name: Delete app preview
+    name: Delete frontend PaaS
     runs-on: ubuntu-latest
-    environment: preview
+    environment: PaaS
     concurrency: deploy-paas-preview-${{ github.head_ref || github.ref_name }}
     permissions: { }
     steps:

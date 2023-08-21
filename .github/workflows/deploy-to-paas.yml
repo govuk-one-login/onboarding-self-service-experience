@@ -1,4 +1,4 @@
-name: Deploy to PaaS
+name: Deploy frontend to PaaS
 
 on:
   workflow_call:
@@ -27,7 +27,7 @@ concurrency: deploy-paas-${{ inputs.environment }}-${{ github.head_ref || github
 
 jobs:
   deploy:
-    name: Deploy to PaaS
+    name: Deploy frontend
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}

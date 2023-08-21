@@ -17,11 +17,11 @@ jobs:
     uses: ./.github/workflows/run-unit-tests.yml
 
   deploy-preview-frontend:
-    name: Preview
+    name: PaaS
     needs: build-frontend
     uses: ./.github/workflows/deploy-to-paas.yml
     with:
-      environment: preview
+      environment: PaaS
       app-name-prefix: di-sse-prev
       cf-space-name: self-service-preview
       artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
