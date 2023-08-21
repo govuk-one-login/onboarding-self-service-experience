@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Get deployment name
-        uses: alphagov/di-github-actions/beautify-branch-name@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
+        uses: alphagov/di-github-actions/beautify-branch-name@62863904d9aef239c1214f8e2d58577f38c9bb76
         id: get-deployment-name
         with:
           length-limit: 28
@@ -41,7 +41,7 @@ jobs:
           verbose: false
 
       - name: Deploy stack
-        uses: alphagov/di-github-actions/sam/deploy-stack@254be85cdee8fb8a57e9cdddf53e74c469925168
+        uses: alphagov/di-github-actions/sam/deploy-stack@62863904d9aef239c1214f8e2d58577f38c9bb76
         id: deploy
         with:
           aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}

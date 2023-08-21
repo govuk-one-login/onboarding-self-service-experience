@@ -103,6 +103,10 @@ Outputs:
     Value: !GetAtt VPC.Outputs.ExecuteApiGatewayVpcEndpointId
     Export:
       Name: !Sub ${ExportPrefix}VPC-ExecuteAPIGatewayEndpointID
+  VPCEndpointsSecurityGroup:
+    Value: !GetAtt VPC.Outputs.AWSServicesEndpointSecurityGroupId
+    Export:
+      Name: !Sub ${ExportPrefix}VPC-VPCEndpointsSecurityGroup
   AccessLogsBucket:
     Value: !Ref AccessLogsBucket
     Export:
