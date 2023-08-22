@@ -17,19 +17,16 @@ export class SignupStatus {
         stages.forEach(stage => {
             switch (stage) {
                 case "HasEmail":
-                    this.state.push(SignupStatusStage.HasEmail);
+                    this.setStage(SignupStatusStage.HasEmail);
                     break;
                 case "HasPassword":
-                    this.state.push(SignupStatusStage.HasPassword);
+                    this.setStage(SignupStatusStage.HasPassword);
                     break;
                 case "HasPhoneNumber":
-                    this.state.push(SignupStatusStage.HasPhoneNumber);
+                    this.setStage(SignupStatusStage.HasPhoneNumber);
                     break;
                 case "HasTextCode":
-                    this.state.push(SignupStatusStage.HasTextCode);
-                    break;
-                case "HasCompleted":
-                    this.state.push(SignupStatusStage.HasCompleted);
+                    this.setStage(SignupStatusStage.HasTextCode);
                     break;
             }
         });
@@ -54,9 +51,6 @@ export class SignupStatus {
                 case SignupStatusStage.HasTextCode:
                     stages.push("HasTextCode");
                     break;
-                case SignupStatusStage.HasCompleted:
-                    stages.push("HasCompleted");
-                    break;
             }
         });
 
@@ -69,7 +63,7 @@ export class SignupStatus {
      */
     public hasStage(checkStage: SignupStatusStage): boolean {
         this.state.forEach(stage => {
-            if (stage == checkStage) return true;
+            if (stage === checkStage) return true;
         });
 
         return false;
@@ -80,7 +74,7 @@ export class SignupStatus {
      * @param stage SignupStatusStage
      * @param isReached boolean
      */
-    public setStage(stage: SignupStatusStage, isReached: boolean): void {
+    public setStage(stage: SignupStatusStage, isReached = true): void {
         const hasStage: boolean = this.hasStage(stage);
         if ((hasStage && isReached) || (!hasStage && !isReached)) {
             // We're where we want to be already
@@ -93,12 +87,23 @@ export class SignupStatus {
             this.state.push(stage);
         }
     }
+
+    /**
+     * Return true all configured stages have been set
+     */
+    public hasAllStages(): boolean {
+        return (
+            this.hasStage(SignupStatusStage.HasEmail) &&
+            this.hasStage(SignupStatusStage.HasPassword) &&
+            this.hasStage(SignupStatusStage.HasPhoneNumber) &&
+            this.hasStage(SignupStatusStage.HasTextCode)
+        );
+    }
 }
 
 export enum SignupStatusStage {
     HasEmail,
     HasPassword,
     HasPhoneNumber,
-    HasTextCode,
-    HasCompleted
+    HasTextCode
 }
