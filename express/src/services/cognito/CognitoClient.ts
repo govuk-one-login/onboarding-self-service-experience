@@ -1,5 +1,7 @@
 import {
     AdminCreateUserCommand,
+    AdminGetUserCommand,
+    AdminGetUserCommandOutput,
     AdminInitiateAuthCommand,
     AdminInitiateAuthCommandOutput,
     AdminRespondToAuthChallengeCommand,
@@ -54,7 +56,7 @@ export default class CognitoClient implements CognitoInterface {
             TemporaryPassword: Math.floor(Math.random() * 100_000)
                 .toString()
                 .padStart(6, "0"),
-            UserAttributes: [{Name: "email", Value: email}]
+            UserAttributes: [{Name: "email", Value: email}, {Name: "custom:signup_status", Value: "0,0,0,0"}]
         });
     }
 
@@ -145,10 +147,18 @@ export default class CognitoClient implements CognitoInterface {
             Username: username,
             UserAttributes: [
                 {
-                    Name: "signup_status",
+                    Name: "custom:signup_status",
                     Value: status
                 }
             ]
+        });
+    }
+
+    async getSignUpStatus(userName: string): Promise<AdminGetUserCommandOutput> {
+        // @ts-ignore
+        return await this.sendCommand(AdminGetUserCommand, {
+            UserPoolId: this.userPoolId,
+            Username: userName
         });
     }
 

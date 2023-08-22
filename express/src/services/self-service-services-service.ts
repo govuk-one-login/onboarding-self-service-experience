@@ -1,4 +1,8 @@
-import {AdminInitiateAuthCommandOutput, AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
+import {
+    AdminGetUserCommandOutput,
+    AdminInitiateAuthCommandOutput,
+    AuthenticationResultType
+} from "@aws-sdk/client-cognito-identity-provider";
 import {unmarshall} from "@aws-sdk/util-dynamodb";
 import {AxiosResponse} from "axios";
 import {Client, ClientFromDynamo} from "../../@types/client";
@@ -120,8 +124,35 @@ export default class SelfServiceServicesService {
         return this.cognito.setMobilePhoneAsVerified(emailAddress);
     }
 
-    setSignUpStatus(emailAddress: string, signUpStatus: string): Promise<void> {
-        return this.cognito.setSignUpStatus(emailAddress, signUpStatus);
+    async setSignUpStatus(emailAddress: string, signUpStatusToSet: number): Promise<void> {
+        const adminGetUserCommandOutput= await this.getSignUpStatus(emailAddress);
+        const userAttributes = adminGetUserCommandOutput.UserAttributes;
+
+        if(userAttributes == null) {
+            throw new Error('Unable to get Sign Up Status Custom Attribute')
+        }
+        else {
+            let currentSignUpStatus: string = "0";
+
+            userAttributes.forEach(attribute => {
+                if (attribute.Name == 'custom:signup_status') {
+                    currentSignUpStatus = attribute.Value as string
+                }
+            })
+
+            if (currentSignUpStatus == null) {
+                throw new Error('Sign Up Status Custom Attribute not Set');
+            } else {
+                console.log('Current Status =>' + currentSignUpStatus);
+                const newSignUpStatus = currentSignUpStatus.substring(0, signUpStatusToSet) + "1" + currentSignUpStatus.substring(signUpStatusToSet);
+                console.log('New Status =>' + newSignUpStatus);
+                return this.cognito.setSignUpStatus(emailAddress, newSignUpStatus);
+            }
+        }
+    }
+
+    async getSignUpStatus(userName: string): Promise<AdminGetUserCommandOutput> {
+        return this.cognito.getSignUpStatus(userName);
     }
 
     async newService(service: Service, userId: string, authenticationResult: AuthenticationResultType): Promise<void> {

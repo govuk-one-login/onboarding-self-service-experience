@@ -1,4 +1,8 @@
-import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
+import {
+    CodeMismatchException,
+    NotAuthorizedException,
+    UsernameExistsException
+} from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
 import {RequestHandler} from "express";
 import {Service} from "../../@types/Service";
@@ -7,15 +11,15 @@ import {domainUserToDynamoUser} from "../lib/models/user-utils";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import * as console from "console";
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 
 export const enum SignUpStatus {
-  upToEnterEmailCode = "1",
-  upToCreatePassword = "2",
-  upToEnterPhoneNumber = "3",
-  upToEnterTextCode = "4",
-  signUpCompleted = "5"
+  upToEnterEmailCode = 0,
+  upToCreatePassword = 2,
+  upToEnterPhoneNumber = 4,
+  upToEnterTextCode = 6,
 }
 
 export const processGetEmailForm: RequestHandler = async (req, res) => {
@@ -26,15 +30,35 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
         await s4.createUser(emailAddress);
     } catch (error) {
         if (error instanceof UsernameExistsException) {
-            const authenticationResult = nonNull(req.session.authenticationResult);
-            const signUpStatus = AuthenticationResultParser.getSignUpStatus(authenticationResult);
+            const adminGetUserCommandOutput= await s4.getSignUpStatus(emailAddress);
+            const userAttributes = adminGetUserCommandOutput.UserAttributes;
 
-            switch(signUpStatus) {
-                case SignUpStatus.upToEnterEmailCode:   return res.redirect("/register/enter-email-code");
-                case SignUpStatus.upToCreatePassword:   return res.redirect("/register/create-password");
-                case SignUpStatus.upToEnterPhoneNumber: return res.redirect("/register/enter-phone-number");
-                case SignUpStatus.upToEnterTextCode:    return res.redirect("/register/enter-text-code");
-                default:                                return res.redirect("/register/account-exists");
+            if(userAttributes == null) {
+                throw new Error('Unable to get Sign Up Status Custom Attribute')
+            }
+            else {
+                let signUpStatus: string = "0";
+
+                userAttributes.forEach(attribute => {
+                    if (attribute.Name == 'custom:signup_status') {
+                        signUpStatus = attribute.Value as string
+                    }
+                })
+
+                if (signUpStatus == null) {
+                    throw new Error('Sign Up Status Custom Attribute not Set');
+                }
+                else {
+                    console.log(signUpStatus);
+
+                    switch (signUpStatus.indexOf('0')) {
+                        case SignUpStatus.upToEnterEmailCode:   return res.redirect("/register/enter-email-code");
+                        case SignUpStatus.upToCreatePassword:   return res.redirect("/register/create-password");
+                        case SignUpStatus.upToEnterPhoneNumber: return res.redirect("/register/enter-phone-number");
+                        case SignUpStatus.upToEnterTextCode:    return res.redirect("/register/enter-text-code");
+                        default:                                return res.redirect("/register/account-exists");
+                    }
+                }
             }
         }
 
@@ -51,7 +75,7 @@ export const showCheckEmailForm: RequestHandler = (req, res) => {
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    s4.setSignUpStatus(req.session.emailAddress, signUpStatus.upToEnterEmailCode);
+    s4.setSignUpStatus(req.session.emailAddress, SignUpStatus.upToEnterEmailCode);
 
     res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
@@ -79,7 +103,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         throw error;
     }
 
-    s4.setSignUpStatus(req.session.emailAddress, signUpStatus.upToCreatePassword);
+    s4.setSignUpStatus(req.session.emailAddress, SignUpStatus.upToCreatePassword);
 
     res.redirect("/register/create-password");
 };
@@ -100,13 +124,15 @@ export const updatePassword: RequestHandler = async (req, res) => {
     req.session.authenticationResult = await s4.setNewPassword(emailAddress, req.body["password"], nonNull(req.session.cognitoSession));
 
     await s4.setEmailAsVerified(emailAddress);
-    s4.setSignUpStatus(req.session.emailAddress, signUpStatus.upToEnterPhoneNumber);
+    s4.setSignUpStatus(emailAddress, SignUpStatus.upToEnterPhoneNumber);
     res.redirect("/register/enter-phone-number");
 };
 
 export const showEnterMobileForm: RequestHandler = (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    s4.setSignUpStatus(req.session.emailAddress, signUpStatus.upToEnterTextCode);
+    const emailAddress = nonNull(req.session.emailAddress);
+
+    s4.setSignUpStatus(emailAddress, SignUpStatus.upToEnterTextCode);
 
     res.render("register/enter-phone-number.njk", {
         value: {mobileNumber: req.session.mobileNumber}
@@ -181,6 +207,8 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     }
 
     const cognitoId = AuthenticationResultParser.getCognitoId(authenticationResult);
+    const emailAddress = AuthenticationResultParser.getEmail(authenticationResult);
+
     await s4.setMfaPreference(cognitoId);
 
     const user = domainUserToDynamoUser({
@@ -188,13 +216,12 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
         fullName: "we haven't collected this full name",
         firstName: "we haven't collected this first name",
         lastName: "we haven't collected this last name",
-        email: AuthenticationResultParser.getEmail(authenticationResult),
+        email: emailAddress,
         mobileNumber: nonNull(req.session.enteredMobileNumber),
         passwordLastUpdated: new Date().toLocaleDateString()
     });
 
     await s4.putUser(user, accessToken);
-    s4.setSignUpStatus(req.session.emailAddress, signUpStatus.journeyCompleted);
     req.session.isSignedIn = true;
     res.redirect("/register/create-service");
 };
