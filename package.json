@@ -19,6 +19,7 @@
     "remote": "infrastructure/dev/deploy.sh run",
     "delete": "infrastructure/dev/deploy.sh delete",
     "list": "infrastructure/dev/deploy.sh list",
+    "open": "infrastructure/dev/deploy.sh open",
     "creds": "infrastructure/aws.sh",
     "test": "jest --silent",
     "lint": "eslint '*.ts' --quiet --fix",

@@ -1,7 +1,7 @@
 name: Unit tests
 
 on: workflow_call
-permissions: read-all
+permissions: { }
 
 concurrency:
   group: unit-tests-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}

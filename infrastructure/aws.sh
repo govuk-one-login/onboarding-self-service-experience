@@ -15,6 +15,10 @@ function get-account-group-name {
   jq --raw-output --arg name "$1" 'to_entries | .[] | select(.value | contains([{name: $name}])) | .key' aws-accounts.json
 }
 
+function get-accounts-in-group {
+  jq --raw-output ".$1[].number" aws-accounts.json 2> /dev/null
+}
+
 function get-account-number {
   jq --exit-status --arg name "$1" 'select(.name == $name) | .number' < <(get-all-accounts)
 }
@@ -25,8 +29,8 @@ function get-initial-account {
 
 function is-initial-account {
   local name=${1:-$(get-current-account-name)}
-  [[ $name == $(get-initial-account "$name") ]]
   [[ ${1:-} ]] || echo "$name"
+  [[ $name == $(get-initial-account "$name") ]]
 }
 
 function get-next-account {
@@ -41,8 +45,7 @@ function get-previous-account-name {
 }
 
 function get-downstream-accounts {
-  local name=$1
-  [[ $name == $(get-initial-account "$name") ]] && get-higher-accounts-in-group "$name"
+  is-initial-account "$1" && get-higher-accounts-in-group "$1"
 }
 
 function get-account-index-in-group {

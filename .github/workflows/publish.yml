@@ -5,11 +5,12 @@ on:
   push:
     branches: [ main ]
 
-permissions: read-all
+permissions: { }
 
 jobs:
   build-frontend:
-    name: Build
+    name: Frontend
+    permissions: { }
     uses: ./.github/workflows/build-frontend.yml
 
   run-unit-tests:
@@ -20,6 +21,9 @@ jobs:
     name: Test
     needs: [ build-frontend, run-unit-tests ]
     uses: ./.github/workflows/deploy-to-paas.yml
+    permissions:
+      id-token: write
+      contents: read
     with:
       environment: test
       cf-space-name: self-service-test
@@ -33,6 +37,62 @@ jobs:
     name: Run tests
     needs: deploy-test-frontend
     uses: ./.github/workflows/run-acceptance-tests.yml
+    permissions:
+      id-token: write
+      contents: read
     with:
       host: ${{ needs.deploy-test-frontend.outputs.deployment-url }}
       environment: ${{ needs.deploy-test-frontend.outputs.environment }}
+
+  deploy-dynamodb:
+    name: DynamoDB
+    needs: run-acceptance-tests
+    uses: ./.github/workflows/upload-dynamodb-package.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: development-secure-pipelines
+
+  build-api:
+    name: API
+    needs: run-acceptance-tests
+    uses: ./.github/workflows/build-api.yml
+
+  deploy-api:
+    name: API
+    needs: [ run-acceptance-tests, build-api, deploy-dynamodb ]
+    uses: ./.github/workflows/upload-api-package.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: development-secure-pipelines
+      artifact-name: ${{ needs.build-api.outputs.artifact-name }}
+
+  build-cognito:
+    name: Cognito
+    needs: run-acceptance-tests
+    uses: ./.github/workflows/build-cognito.yml
+
+  deploy-cognito:
+    name: Cognito
+    needs: [ run-acceptance-tests, build-cognito ]
+    uses: ./.github/workflows/upload-cognito-package.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: development-secure-pipelines
+      artifact-name: ${{ needs.build-cognito.outputs.artifact-name }}
+
+  deploy-frontend:
+    name: Frontend
+    needs: [ run-acceptance-tests, build-frontend, deploy-cognito, deploy-dynamodb, deploy-api ]
+    uses: ./.github/workflows/upload-frontend-package.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: development-secure-pipelines
+      artifact-name: ${{ needs.build-frontend.outputs.artifact-name || inputs.frontend-artifact }}

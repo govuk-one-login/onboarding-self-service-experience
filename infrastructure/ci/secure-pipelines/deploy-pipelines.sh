@@ -28,12 +28,11 @@ function get-source-config {
 }
 
 ACCOUNT=$(../../aws.sh get-current-account-name)
-NEXT_ACCOUNT=$(../../aws.sh get-next-account "$ACCOUNT")
 INITIAL_ACCOUNT=$(../../aws.sh get-initial-account "$ACCOUNT")
 STACK_NAME=secure-pipelines
 
-[[ $ACCOUNT != "$INITIAL_ACCOUNT" ]] && get-source-config || ENV=build
-[[ $ACCOUNT == development ]] && ENV=dev
+[[ $ACCOUNT == "$INITIAL_ACCOUNT" ]] || get-source-config
+[[ $ACCOUNT == development ]] && ENV=dev || NEXT_ACCOUNT=$(../../aws.sh get-next-account "$ACCOUNT")
 : ${ENV:=$ACCOUNT}
 
 get-signing-config
