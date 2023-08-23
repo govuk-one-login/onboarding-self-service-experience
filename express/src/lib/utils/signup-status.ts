@@ -62,11 +62,14 @@ export class SignupStatus {
      * @param checkStage stageSignupStatusStage
      */
     public hasStage(checkStage: SignupStatusStage): boolean {
+        let matched = false;
         this.state.forEach(stage => {
-            if (stage === checkStage) return true;
+            if ((stage as SignupStatusStage) === (checkStage as SignupStatusStage)) {
+                matched = true;
+            }
         });
 
-        return false;
+        return matched;
     }
 
     /**
