@@ -46,6 +46,7 @@ jobs:
 
   build-frontend:
     name: Frontend
+    if: ${{ inputs.frontend-artifact == null }}
     uses: ./.github/workflows/build-frontend.yml
 
   deploy-frontend:
@@ -54,4 +55,4 @@ jobs:
     uses: ./.github/workflows/upload-frontend-package.yml
     with:
       environment: development-secure-pipelines
-      artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
+      artifact-name: ${{ needs.build-frontend.outputs.artifact-name || inputs.frontend-artifact }}

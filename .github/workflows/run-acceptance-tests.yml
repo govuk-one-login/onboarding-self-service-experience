@@ -6,7 +6,7 @@ on:
       host: { required: true, type: string }
       environment: { required: true, type: string }
 
-permissions: read-all
+permissions: { }
 concurrency: deploy-paas-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
 
 defaults:
