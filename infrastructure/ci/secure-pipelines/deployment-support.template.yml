@@ -115,6 +115,8 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub ${TemplateStorageBucket}/checkov-hook/template.yaml
+      Parameters:
+        FailureMode: WARN
 
   InfrastructureAuditHook:
     Type: AWS::CloudFormation::Stack

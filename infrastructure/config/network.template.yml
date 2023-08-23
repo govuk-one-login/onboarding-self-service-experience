@@ -22,6 +22,9 @@ Mappings:
     eu-west-2:
       AccountID: 652711504416
 
+Conditions:
+  FirewallSubnets: !Not [ !Equals [ !Join [ "", !Ref InternetSubnets ], "" ] ]
+
 Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
@@ -97,6 +100,7 @@ Outputs:
     Export:
       Name: !Sub ${ExportPrefix}VPC-ProtectedSubnets
   InternetSubnets:
+    Condition: FirewallSubnets
     Value: !Join [ ",", !Ref InternetSubnets ]
     Export:
       Name: !Sub ${ExportPrefix}VPC-InternetSubnets
