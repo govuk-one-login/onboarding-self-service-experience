@@ -24,10 +24,10 @@ export default router;
 // TODO This should have the param /:clientId but at the moment we're abusing the fact that each service only has one client
 router.get("/", showClient);
 
-// TODO This shouldn't use the clientId - private beta is per service
-router.route("/:clientId/:selfServiceClientId/private-beta").get(showPrivateBetaForm).post(processPrivateBetaForm);
+// TODO This shouldn't use the clientId - public beta is per service
+router.route("/:clientId/:selfServiceClientId/public-beta").get(showPrivateBetaForm).post(processPrivateBetaForm);
 
-router.route("/:clientId/:selfServiceClientId/private-beta/submitted").get(showPrivateBetaFormSubmitted);
+router.route("/:clientId/:selfServiceClientId/public-beta/submitted").get(showPrivateBetaFormSubmitted);
 
 // TODO This shouldn't use the clientId - we're changing the service name
 router.route("/:clientId/:selfServiceClientId/change-service-name").get(showChangeServiceNameForm).post(processChangeServiceNameForm);

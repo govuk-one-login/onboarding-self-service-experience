@@ -2,35 +2,35 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set sidebarActiveItem = "private-beta" %}
-{% set pageTitle = "Joining private beta" %}
+{% set sidebarActiveItem = "public-beta" %}
+{% set pageTitle = "Joining public beta" %}
 {% set formButtonText = "Submit" %}
 {% set formCancelUrl = "" %}
-{% set hideForm = true if privateBetaRequestSubmitted %}
+{% set hideForm = true if publicBetaRequestSubmitted %}
 
 {% block beforeForm %}
-  <h1 class="govuk-heading-l govuk-!-margin-top-3">Joining private beta</h1>
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Joining public beta</h1>
 
-  <p class="govuk-body">If you want to go live with GOV.UK One Login and offer it to your users, you need to join our private beta.</p>
+  <p class="govuk-body">If you want to go live with GOV.UK One Login and offer it to your users, you need to join our public beta.</p>
   <p class="govuk-body">Discuss our
     <a class="govuk-link" rel="noreferrer noopener" target="_blank"
-       href="https://www.sign-in.service.gov.uk/getting-started/private-beta">
-      private beta guidance (opens in new tab)</a> with your team to see if it’s right for you.
+       href="https://www.sign-in.service.gov.uk/getting-started/public-beta">
+      public beta guidance (opens in new tab)</a> with your team to see if it’s right for you.
   </p>
 
-  <h2 class="govuk-heading-m">Speak to us about joining private beta</h2>
+  <h2 class="govuk-heading-m">Speak to us about joining public beta</h2>
 
-  <p class="govuk-body">Submit your details and we’ll get in touch with you about joining the private beta.</p>
-  <p class="govuk-body">We’ll arrange to talk more with your team about your service and what the private beta involves.</p>
+  <p class="govuk-body">Submit your details and we’ll get in touch with you about joining the public beta.</p>
+  <p class="govuk-body">We’ll arrange to talk more with your team about your service and what the public beta involves.</p>
 
-  {% if privateBetaRequestSubmitted %}
+  {% if publicBetaRequestSubmitted %}
     <div class="govuk-inset-text">
       You submitted your details on {{ dateRequestSubmitted }}.
     </div>
   {% endif %}
 {% endblock %}
 
-{% if not privateBetaRequestSubmitted %}
+{% if not publicBetaRequestSubmitted %}
   {% block formInputs %}
     {{ form.textInput("Your name", "userName") }}
     {{ form.textInput("Department", "department") }}

@@ -195,10 +195,10 @@ router.get("/account-success-screen-test", (req, res) => {
     });
 });
 
-// Testing route for testing when the private beta request has already been submitted.
-router.get("/private-beta-submitted", (req, res) => {
-    res.render("clients/private-beta.njk", {
-        privateBetaRequestSubmitted: true,
+// Testing route for testing when the public beta request has already been submitted.
+router.get("/public-beta-submitted", (req, res) => {
+    res.render("clients/public-beta.njk", {
+        publicBetaRequestSubmitted: true,
         dateRequestSubmitted: "10 May 2022",
         serviceName: "My juggling license"
     });
@@ -323,7 +323,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
                     "Manage team members": true,
                     "Change integration client details": true,
                     "Change service name": true,
-                    "Request to join private beta": true
+                    "Request to join public beta": true
                 }
             },
             {
@@ -334,7 +334,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
                     "Manage team members": true,
                     "Change integration client details": false,
                     "Change service name": false,
-                    "Request to join private beta": true
+                    "Request to join public beta": true
                 }
             },
             {
@@ -345,7 +345,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
                     "Manage team members": false,
                     "Change integration client details": true,
                     "Change service name": true,
-                    "Request to join private beta": false
+                    "Request to join public beta": false
                 }
             },
             {
@@ -356,7 +356,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
                     "Manage team members": false,
                     "Change integration client details": true,
                     "Change service name": true,
-                    "Request to join private beta": false
+                    "Request to join public beta": false
                 }
             },
             {
@@ -367,7 +367,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
                     "Manage team members": false,
                     "Change integration client details": false,
                     "Change service name": false,
-                    "Request to join private beta": false
+                    "Request to join public beta": false
                 }
             },
             {
@@ -378,7 +378,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
                     "Manage team members": false,
                     "Change integration client details": true,
                     "Change service name": false,
-                    "Request to join private beta": false
+                    "Request to join public beta": false
                 }
             }
         ],
@@ -389,7 +389,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
                     "Manage team members": false,
                     "Change integration client details": false,
                     "Change service name": true,
-                    "Request to join private beta": false
+                    "Request to join public beta": false
                 }
             },
             {
@@ -398,7 +398,7 @@ router.get("/team-members/:serviceId/:selfServiceClientId/:clientId", (req, res)
                     "Manage team members": true,
                     "Change integration client details": true,
                     "Change service name": true,
-                    "Request to join private beta": true
+                    "Request to join public beta": true
                 }
             }
         ]
