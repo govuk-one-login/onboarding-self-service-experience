@@ -82,6 +82,18 @@ export default class DynamoDbClient {
         return this.dynamodb.send(command);
     }
 
+    async getServicesById(serviceId: string): Promise<QueryCommandOutput> {
+        const params = {
+            TableName: this.tableName,
+            ExpressionAttributeNames: {"#serviceId": "pk"},
+            ExpressionAttributeValues: {":serviceId": {S: `service#${serviceId}`}},
+            KeyConditionExpression: "#serviceId = :serviceId"
+        };
+
+        const command = new QueryCommand(params);
+        return this.dynamodb.send(command);
+    }
+
     async getClients(serviceId: string): Promise<QueryCommandOutput> {
         const params = {
             TableName: this.tableName,
@@ -102,6 +114,27 @@ export default class DynamoDbClient {
         return this.update("user", userId, "user", userId, updates);
     }
 
+    async updateService(serviceId: string, updates: Updates): Promise<{message: string}> {
+        const startTime = Date.now();
+        const dynamodbUpdates: Promise<UpdateItemCommandOutput>[] = [];
+        await this.getServicesById(serviceId).then(output => {
+            if (output.Items) {
+                output.Items.forEach(row => {
+                    dynamodbUpdates.push(this.updateByKey({pk: row.pk, sk: row.sk}, updates));
+                });
+            }
+        });
+        for (const dynamodbUpdate of dynamodbUpdates) {
+            await dynamodbUpdate.catch(err => {
+                throw new Error(err);
+            });
+        }
+        console.log(`updateService() - Updated ${dynamodbUpdates.length} records in ${Date.now() - startTime} ms`);
+        return new Promise(resolve => {
+            resolve({message: "All records updated successfully"});
+        });
+    }
+
     private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: Updates): Promise<UpdateItemCommandOutput> {
         const attributeNames = Object.keys(updates);
 
@@ -111,6 +144,22 @@ export default class DynamoDbClient {
                 pk: {S: `${pkPrefix}#${pk}`},
                 sk: {S: `${skPrefix}#${sk}`}
             },
+            UpdateExpression: this.generateUpdateExpression(attributeNames),
+            ExpressionAttributeNames: this.generateExpressionAttributeNames(attributeNames),
+            ExpressionAttributeValues: this.generateExpressionAttributeValues(attributeNames, updates),
+            ReturnValues: "ALL_NEW"
+        };
+
+        const command = new UpdateItemCommand(params);
+        return this.dynamodb.send(command);
+    }
+
+    private async updateByKey(Key: Record<string, AttributeValue>, updates: Updates): Promise<UpdateItemCommandOutput> {
+        const attributeNames = Object.keys(updates);
+
+        const params: UpdateItemCommandInput = {
+            TableName: this.tableName,
+            Key,
             UpdateExpression: this.generateUpdateExpression(attributeNames),
             ExpressionAttributeNames: this.generateExpressionAttributeNames(attributeNames),
             ExpressionAttributeValues: this.generateExpressionAttributeValues(attributeNames, updates),

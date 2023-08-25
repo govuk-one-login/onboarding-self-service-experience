@@ -12,7 +12,7 @@ import {dynamoServicesToDomainServices} from "../lib/models/service-utils";
 import {userToDomainUser} from "../lib/models/user-utils";
 import MfaResponse from "../types/mfa-response";
 import CognitoInterface from "./cognito/CognitoInterface";
-import LambdaFacadeInterface, {ClientUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface";
+import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -141,6 +141,10 @@ export default class SelfServiceServicesService {
         accessToken: string
     ): Promise<void> {
         return this.lambda.updateClient(serviceId, selfServiceClientId, clientId, updates, accessToken);
+    }
+
+    updateService(serviceId: string, updates: ServiceNameUpdates, accessToken: string): Promise<void> {
+        return this.lambda.updateService(serviceId, updates, accessToken);
     }
 
     privateBetaRequest(userName: string, department: string, serviceName: string, emailAddress: string): Promise<void> {

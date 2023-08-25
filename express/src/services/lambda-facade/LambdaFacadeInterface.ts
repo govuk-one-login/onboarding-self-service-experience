@@ -6,6 +6,7 @@ import {Service} from "../../../@types/Service";
 
 export type UserUpdates = Record<string, string | Date>;
 export type ClientUpdates = Record<string, string | string[]>;
+export type ServiceNameUpdates = {service_name: string};
 
 export default interface LambdaFacadeInterface {
     putUser(user: OnboardingTableItem, accessToken: string): Promise<void>;
@@ -32,4 +33,6 @@ export default interface LambdaFacadeInterface {
         updates: ClientUpdates,
         accessToken: string
     ): Promise<void>;
+
+    updateService(serviceId: string, updates: ServiceNameUpdates, accessToken: string): Promise<void>;
 }

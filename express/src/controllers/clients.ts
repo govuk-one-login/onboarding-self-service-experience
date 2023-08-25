@@ -131,19 +131,9 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
         });
     }
 
-    const selfServiceClientId = req.params.selfServiceClientId;
-    const clientId = req.params.clientId;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    // TODO service_name is the db layer leaking into the domain
-    // TODO is this correct? Don't we also need to update the pk:service sk:service entry? We need an updateService call
-    await s4.updateClient(
-        serviceId,
-        selfServiceClientId,
-        clientId,
-        {service_name: newServiceName},
-        nonNull(req.session.authenticationResult?.AccessToken)
-    );
+    await s4.updateService(serviceId, {service_name: newServiceName}, nonNull(req.session.authenticationResult?.AccessToken));
 
     req.session.updatedField = "service name";
     req.session.serviceName = newServiceName;
