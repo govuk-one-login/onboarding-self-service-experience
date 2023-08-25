@@ -1,5 +1,6 @@
 import {RequestHandler} from "express";
 import validate from "../../lib/validators/email-validator";
+import * as console from "console";
 
 export default function validateEmail(template: string): RequestHandler {
     return async (req, res, next) => {
@@ -8,6 +9,7 @@ export default function validateEmail(template: string): RequestHandler {
 
         if (result.isValid) {
             req.session.emailAddress = emailAddress;
+            console.log("Email Validated");
             return next();
         }
 
