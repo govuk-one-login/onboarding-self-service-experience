@@ -163,4 +163,8 @@ export default class SelfServiceServicesService {
         const clients = await this.lambda.listClients(serviceId);
         return clients.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? [];
     }
+
+    sendTxMALog(body: any): Promise<void> {
+        return this.lambda.sendTxMALog(JSON.stringify(body));
+    }
 }

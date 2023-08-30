@@ -142,4 +142,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     async privateBetaRequest(): Promise<void> {
         return;
     }
+
+    async sendTxMALog(message: string): Promise<void> {
+        return;
+    }
 }

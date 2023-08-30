@@ -35,4 +35,6 @@ export default interface LambdaFacadeInterface {
     ): Promise<void>;
 
     updateService(serviceId: string, updates: ServiceNameUpdates, accessToken: string): Promise<void>;
+
+    sendTxMALog(message: string): Promise<void>;
 }
