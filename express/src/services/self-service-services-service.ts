@@ -1,8 +1,4 @@
-import {
-    AdminGetUserCommandOutput,
-    AdminInitiateAuthCommandOutput,
-    AuthenticationResultType
-} from "@aws-sdk/client-cognito-identity-provider";
+import {AdminInitiateAuthCommandOutput, AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {unmarshall} from "@aws-sdk/util-dynamodb";
 import {AxiosResponse} from "axios";
 import {Client, ClientFromDynamo} from "../../@types/client";
@@ -17,6 +13,8 @@ import {userToDomainUser} from "../lib/models/user-utils";
 import MfaResponse from "../types/mfa-response";
 import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
+import console from "console";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -124,35 +122,54 @@ export default class SelfServiceServicesService {
         return this.cognito.setMobilePhoneAsVerified(emailAddress);
     }
 
-    async setSignUpStatus(emailAddress: string, signUpStatusToSet: number): Promise<void> {
-        const adminGetUserCommandOutput= await this.getSignUpStatus(emailAddress);
+    async setSignUpStatus(userName: string, signUpStatusStage: SignupStatusStage): Promise<void> {
+        console.log("Setting Sign Up Status Stage =>" + signUpStatusStage);
+
+        const signUpStatus: SignupStatus = await this.getSignUpStatus(userName);
+        signUpStatus.setStage(signUpStatusStage, true);
+
+        return await this.cognito.setSignUpStatus(userName, signUpStatus.getState());
+    }
+
+    async getSignUpStatus(userName: string): Promise<SignupStatus> {
+        const adminGetUserCommandOutput = await this.cognito.getUserCommandOutput(userName);
         const userAttributes = adminGetUserCommandOutput.UserAttributes;
 
-        if(userAttributes == null) {
-            throw new Error('Unable to get Sign Up Status Custom Attribute')
-        }
-        else {
-            let currentSignUpStatus: string = "0";
+        if (userAttributes == null) {
+            throw new Error("Unable to get Sign Up Status Custom Attribute");
+        } else {
+            let signUpStatusAttributeValue = "";
 
             userAttributes.forEach(attribute => {
-                if (attribute.Name == 'custom:signup_status') {
-                    currentSignUpStatus = attribute.Value as string
+                if (attribute.Name == "custom:signup_status") {
+                    signUpStatusAttributeValue = attribute.Value as string;
                 }
-            })
+            });
 
-            if (currentSignUpStatus == null) {
-                throw new Error('Sign Up Status Custom Attribute not Set');
-            } else {
-                console.log('Current Status =>' + currentSignUpStatus);
-                const newSignUpStatus = currentSignUpStatus.substring(0, signUpStatusToSet) + "1" + currentSignUpStatus.substring(signUpStatusToSet);
-                console.log('New Status =>' + newSignUpStatus);
-                return this.cognito.setSignUpStatus(emailAddress, newSignUpStatus);
-            }
+            const signUpStatus = new SignupStatus();
+            signUpStatus.setState(signUpStatusAttributeValue);
+
+            return signUpStatus;
         }
     }
 
-    async getSignUpStatus(userName: string): Promise<AdminGetUserCommandOutput> {
-        return this.cognito.getSignUpStatus(userName);
+    async getMobilePhoneNumber(userName: string): Promise<string> {
+        const adminGetUserCommandOutput = await this.cognito.getUserCommandOutput(userName);
+        const userAttributes = adminGetUserCommandOutput.UserAttributes;
+
+        if (userAttributes == null) {
+            throw new Error("Unable to get Sign Up Mobile Phone Number");
+        } else {
+            let mobilePhoneNumber = "";
+
+            userAttributes.forEach(attribute => {
+                if (attribute.Name == "phone_number") {
+                    mobilePhoneNumber = attribute.Value as string;
+                }
+            });
+
+            return mobilePhoneNumber;
+        }
     }
 
     async newService(service: Service, userId: string, authenticationResult: AuthenticationResultType): Promise<void> {

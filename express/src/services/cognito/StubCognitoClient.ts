@@ -148,12 +148,9 @@ export default class StubCognitoClient implements CognitoInterface {
         return;
     }
 
-
-    async getSignUpStatus(userName: string): Promise<AdminGetUserCommandOutput> {
-        const password: string = "Heelo";
-        const returnValue = await this.getOverriddenReturnValue("setNewPassword", "password", password);
-        // @ts-ignore
-        return Promise.resolve(returnValue ?? {$metadata: {}});
+    async getUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput> {
+        // Same reasons as per Cognito Client had to override standard behaviour here.
+        return this.getUserCommandOutput(userName);
     }
 
     async setSignUpStatus(username: string, status: string): Promise<void> {
