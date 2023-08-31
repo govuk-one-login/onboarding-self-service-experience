@@ -157,6 +157,9 @@ export default class StubCognitoClient implements CognitoInterface {
     }
 
     async setSignUpStatus(username: string, status: string): Promise<void> {
+        console.log(username);
+        console.log(status);
+
         return;
     }
 
