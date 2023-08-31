@@ -270,7 +270,7 @@ Resources:
       Type: A
       Name: !Sub
         - ${Name}${Domain}
-        - Name: !If [ Subdomain, !Sub "${DeploymentName}.", !Ref AWS::NoValue ]
+        - Name: !If [ Subdomain, !Sub "${DeploymentName}.", ""
           Domain: !ImportValue DNS-Domain
       HostedZoneId: !ImportValue DNS-HostedZoneID
       AliasTarget:
