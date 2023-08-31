@@ -1,4 +1,4 @@
-Feature: Joining private beta
+Feature: Joining public beta
 
   Background:
     Given the user is on the "/sign-in" page
@@ -8,10 +8,15 @@ Feature: Joining private beta
     Then they should be redirected to a page with the title "Your services - GOV.UK One Login"
     When they click on the "Test Service" link
     Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
-    When they click on the "Joining private beta" link
-    Then they should be redirected to a page with the title "Joining private beta - GOV.UK One Login"
+    When they click on the "Joining public beta" link
+    Then they should be redirected to a page with the title "Joining public beta - GOV.UK One Login"
 
-  Rule: Applying for private beta
+  Rule: Getting public beta information
+    Scenario: The user wants to find out more about public beta
+      When they click on the "public beta guidance (opens in new tab)" link that opens in a new tab
+      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/getting-started/public-beta"
+
+  Rule: Applying for public beta
     Scenario: The user does not enter any characters into the Your name field
       When they submit the name ""
       Then the error message "Enter your name" must be displayed for the name field
@@ -24,16 +29,16 @@ Feature: Joining private beta
       Then they should see the text "registered@test.gov.uk"
       Then they should see the text "Test Service"
 
-    Scenario: The user submits their private beta request
+    Scenario: The user submits their public beta request
       When they enter the name "Test User"
       And they submit the department name "Test Department"
-      Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
+      Then they should be redirected to a page with the title "Public beta form submitted - GOV.UK One Login"
 
   Rule: The user wants to contact the team
     Background:
       When they enter the name "Test User"
       And they submit the department name "Test Department"
-      Then they should be redirected to a page with the title "Private beta form submitted - GOV.UK One Login"
+      Then they should be redirected to a page with the title "Public beta form submitted - GOV.UK One Login"
 
     Scenario: Via slack
       When they click on the "Slack channel" external link
