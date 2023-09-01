@@ -8,10 +8,10 @@ on:
 permissions: { }
 
 jobs:
-  # build-frontend:
-  #   name: Build Frontend
-  #   permissions: { }
-  #   uses: ./.github/workflows/build-frontend.yml
+  build-frontend:
+    name: Build Frontend
+    permissions: { }
+    uses: ./.github/workflows/build-frontend.yml
 
   # run-unit-tests:
   #   name: Run Unit tests
@@ -62,6 +62,7 @@ jobs:
   deploy-api:
     name: Deploy API
     # needs: [ run-acceptance-tests, build-api, deploy-dynamodb ]
+    needs: [ build-api, deploy-dynamodb ]
     uses: ./.github/workflows/upload-api-package.yml
     permissions:
       id-token: write
@@ -77,7 +78,7 @@ jobs:
 
   deploy-cognito:
     name: Deploy Cognito
-    # needs: [ run-acceptance-tests, build-cognito ]
+    needs: [ build-cognito ]
     uses: ./.github/workflows/upload-cognito-package.yml
     permissions:
       id-token: write
@@ -88,7 +89,7 @@ jobs:
 
   deploy-frontend:
     name: Frontend
-    # needs: [ run-acceptance-tests, build-frontend, deploy-cognito, deploy-dynamodb, deploy-api ]
+    needs: [ build-frontend, deploy-cognito, deploy-dynamodb, deploy-api ]
     uses: ./.github/workflows/upload-frontend-package.yml
     permissions:
       id-token: write
