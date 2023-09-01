@@ -159,11 +159,12 @@ export default class CognitoClient implements CognitoInterface {
         });
     }
 
-    async getUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput> {
+    async adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput> {
         const command = new AdminGetUserCommand({
             UserPoolId: this.userPoolId,
             Username: userName
         });
+
         return this.client.send(command);
     }
 
@@ -246,16 +247,6 @@ export default class CognitoClient implements CognitoInterface {
         });
     }
 
-    async getUser(userName: string): Promise<AdminGetUserCommandOutput> {
-        // This Method calls direct (rather than indirectly through sendCommand) due to TS complaining about
-        // AdminGetUserCommandOutput not being in ServiceOutputTypes (when it actually is).
-        const command = new AdminGetUserCommand({
-            UserPoolId: this.userPoolId,
-            Username: userName
-        });
-
-        return this.client.send(command);
-    }
     private sendCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes>(
         commandConstructor: new (input: Input) => CognitoCommand<Input, Output>,
         commandInput: Input
