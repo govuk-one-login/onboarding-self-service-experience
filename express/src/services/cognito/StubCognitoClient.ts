@@ -149,8 +149,10 @@ export default class StubCognitoClient implements CognitoInterface {
     }
 
     async getUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput> {
-        // Same reasons as per Cognito Client had to override standard behaviour here.
-        return this.getUserCommandOutput(userName);
+        const adminGetUserCommandOutput: AdminGetUserCommandOutput = await this.getUserCommandOutput(userName);
+        adminGetUserCommandOutput.UserAttributes = JSON.parse('["custom:signup_status", "0,1,2,3"]');
+
+        return adminGetUserCommandOutput;
     }
 
     async setSignUpStatus(username: string, status: string): Promise<void> {
