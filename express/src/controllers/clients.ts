@@ -53,7 +53,7 @@ export const showClient: RequestHandler = async (req, res) => {
 };
 
 export const showPrivateBetaForm: RequestHandler = (req, res) => {
-    res.render("clients/public-beta.njk", {
+    res.render("clients/private-beta.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
@@ -81,7 +81,7 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
     }
 
     if (errorMessages.size > 0) {
-        return res.render("clients/public-beta.njk", {
+        return res.render("clients/private-beta.njk", {
             serviceId: serviceId,
             selfServiceClientId: selfServiceClientId,
             clientId: clientId,
@@ -98,11 +98,11 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     await s4.privateBetaRequest(userName, department, serviceName, emailAddress);
 
-    res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/public-beta/submitted`);
+    res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/private-beta/submitted`);
 };
 
 export const showPrivateBetaFormSubmitted: RequestHandler = (req, res) => {
-    res.render("clients/public-beta-form-submitted.njk", {
+    res.render("clients/private-beta-form-submitted.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId

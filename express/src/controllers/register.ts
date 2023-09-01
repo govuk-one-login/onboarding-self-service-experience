@@ -1,8 +1,4 @@
-import {
-    CodeMismatchException,
-    NotAuthorizedException,
-    UsernameExistsException
-} from "@aws-sdk/client-cognito-identity-provider";
+import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
 import {RequestHandler} from "express";
 import {Service} from "../../@types/Service";
@@ -12,60 +8,51 @@ import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import * as console from "console";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
-
-export const enum SignUpStatus {
-  upToEnterEmailCode = 0,
-  upToCreatePassword = 2,
-  upToEnterPhoneNumber = 4,
-  upToEnterTextCode = 6,
-}
 
 export const processGetEmailForm: RequestHandler = async (req, res) => {
     const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+    console.log("In ProcessGetEmailForm");
+
+    req.session.emailAddress = emailAddress;
 
     try {
+        console.log("Trying to Create User");
         await s4.createUser(emailAddress);
+        console.log("Created User");
     } catch (error) {
         if (error instanceof UsernameExistsException) {
-            const adminGetUserCommandOutput= await s4.getSignUpStatus(emailAddress);
-            const userAttributes = adminGetUserCommandOutput.UserAttributes;
+            const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
 
-            if(userAttributes == null) {
-                throw new Error('Unable to get Sign Up Status Custom Attribute')
+            console.log("In UserNameExistException");
+
+            if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
+                console.log("Processing No HasEMail");
+                return res.redirect("resume-before-password");
             }
-            else {
-                let signUpStatus: string = "0";
-
-                userAttributes.forEach(attribute => {
-                    if (attribute.Name == 'custom:signup_status') {
-                        signUpStatus = attribute.Value as string
-                    }
-                })
-
-                if (signUpStatus == null) {
-                    throw new Error('Sign Up Status Custom Attribute not Set');
-                }
-                else {
-                    console.log(signUpStatus);
-
-                    switch (signUpStatus.indexOf('0')) {
-                        case SignUpStatus.upToEnterEmailCode:   return res.redirect("/register/enter-email-code");
-                        case SignUpStatus.upToCreatePassword:   return res.redirect("/register/create-password");
-                        case SignUpStatus.upToEnterPhoneNumber: return res.redirect("/register/enter-phone-number");
-                        case SignUpStatus.upToEnterTextCode:    return res.redirect("/register/enter-text-code");
-                        default:                                return res.redirect("/register/account-exists");
-                    }
-                }
+            if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
+                console.log("Processing No HasPassword");
+                return res.redirect("resume-before-password");
             }
+            if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
+                console.log("Processing No HasPhoneNumber");
+                return res.redirect("resume-after-password");
+            }
+            if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
+                console.log("Processing No HasTextCode");
+                return res.redirect("resume-after-password");
+            }
+
+            console.log("Redirecting to Default");
+            return res.redirect("/register/account-exists");
         }
 
         throw error;
     }
 
-    req.session.emailAddress = emailAddress;
     res.redirect("/register/enter-email-code");
 };
 
@@ -74,9 +61,6 @@ export const showCheckEmailForm: RequestHandler = (req, res) => {
         return res.redirect("/register");
     }
 
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
-    s4.setSignUpStatus(req.session.emailAddress, SignUpStatus.upToEnterEmailCode);
-
     res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
 
@@ -84,7 +68,6 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
-
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
@@ -103,8 +86,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         throw error;
     }
 
-    s4.setSignUpStatus(req.session.emailAddress, SignUpStatus.upToCreatePassword);
-
+    await s4.setSignUpStatus(req.session.emailAddress, SignupStatusStage.HasEmail);
     res.redirect("/register/create-password");
 };
 
@@ -124,16 +106,12 @@ export const updatePassword: RequestHandler = async (req, res) => {
     req.session.authenticationResult = await s4.setNewPassword(emailAddress, req.body["password"], nonNull(req.session.cognitoSession));
 
     await s4.setEmailAsVerified(emailAddress);
-    s4.setSignUpStatus(emailAddress, SignUpStatus.upToEnterPhoneNumber);
+    await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPassword);
+
     res.redirect("/register/enter-phone-number");
 };
 
 export const showEnterMobileForm: RequestHandler = (req, res) => {
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const emailAddress = nonNull(req.session.emailAddress);
-
-    s4.setSignUpStatus(emailAddress, SignUpStatus.upToEnterTextCode);
-
     res.render("register/enter-phone-number.njk", {
         value: {mobileNumber: req.session.mobileNumber}
     });
@@ -154,6 +132,10 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
 
     req.session.mobileNumber = mobileNumber;
     req.session.enteredMobileNumber = req.body.mobileNumber;
+
+    const emailAddress = nonNull(req.session.emailAddress);
+    await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPhoneNumber);
+
     res.redirect("/register/enter-text-code");
 };
 
@@ -229,6 +211,9 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
 export const showResendPhoneCodeForm = render("register/resend-text-code.njk");
 export const showResendEmailCodeForm = render("register/resend-email-code.njk");
 
+export const resumeBeforePassword = render("/enter-email-code.njk");
+export const resumeAfterPassword = render("register/resume-after-password.njk");
+
 export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
@@ -275,4 +260,28 @@ export const accountExists: RequestHandler = (req, res) => {
             emailAddress: req.session.emailAddress
         }
     });
+};
+
+export const resumeUserJourneyAfterPassword: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    console.log("In resumeUserJourney");
+    const userName = nonNull(req.session.emailAddress);
+    const userPassword = nonNull(req.body["password"]);
+    console.log("User Name => " + userName);
+    console.log("User Password => " + userPassword);
+
+    const response = await s4.submitUsernamePassword(userName, userPassword);
+    req.session.cognitoSession = response.Session;
+    req.session.authenticationResult = response.AuthenticationResult;
+    //req.session.mobileNumber = await s4.getMobilePhoneNumber(userName);
+
+    // Keith Hart has requested even if User has already entered their phone number we 'resume' from re-entering their Phone number again.
+    // This is to allow for the fact that they may have entered an incorrect number.
+    //console.log("Mobile Number => " + req.session.mobileNumber);
+    //const signUpStatus: SignupStatus = await s4.getSignUpStatus(userName);
+    //if(!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {console.log("Resuming at Enter Phone Number"); return res.redirect("enter-phone-number");}
+    //if(!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {console.log("Resuming at Enter Text Number"); return res.redirect("enter-text-code");}
+
+    return res.redirect("enter-phone-number");
 };

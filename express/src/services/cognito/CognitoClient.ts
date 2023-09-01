@@ -49,6 +49,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async createUser(email: string): Promise<void> {
+        console.log("In createUser");
         await this.sendCommand(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
             Username: email,
@@ -56,8 +57,12 @@ export default class CognitoClient implements CognitoInterface {
             TemporaryPassword: Math.floor(Math.random() * 100_000)
                 .toString()
                 .padStart(6, "0"),
-            UserAttributes: [{Name: "email", Value: email}, {Name: "custom:signup_status", Value: "0,0,0,0"}]
+            UserAttributes: [
+                {Name: "email", Value: email},
+                {Name: "custom:signup_status", Value: ""}
+            ]
         });
+        console.log("Exit createUser");
     }
 
     async resendEmailAuthCode(email: string): Promise<void> {
@@ -154,12 +159,12 @@ export default class CognitoClient implements CognitoInterface {
         });
     }
 
-    async getSignUpStatus(userName: string): Promise<AdminGetUserCommandOutput> {
-        // @ts-ignore
-        return await this.sendCommand(AdminGetUserCommand, {
+    async getUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput> {
+        const command = new AdminGetUserCommand({
             UserPoolId: this.userPoolId,
             Username: userName
         });
+        return this.client.send(command);
     }
 
     async setMobilePhoneAsVerified(username: string): Promise<void> {
@@ -241,6 +246,16 @@ export default class CognitoClient implements CognitoInterface {
         });
     }
 
+    async getUser(userName: string): Promise<AdminGetUserCommandOutput> {
+        // This Method calls direct (rather than indirectly through sendCommand) due to TS complaining about
+        // AdminGetUserCommandOutput not being in ServiceOutputTypes (when it actually is).
+        const command = new AdminGetUserCommand({
+            UserPoolId: this.userPoolId,
+            Username: userName
+        });
+
+        return this.client.send(command);
+    }
     private sendCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes>(
         commandConstructor: new (input: Input) => CognitoCommand<Input, Output>,
         commandInput: Input

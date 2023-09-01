@@ -104,7 +104,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             emailAddress: emailAddress
         };
 
-        await this.post("/send-public-beta-request-notification", JSON.stringify(body));
+        await this.post("/send-private-beta-request-notification", JSON.stringify(body));
     }
 
     private get(endpoint: string): Promise<AxiosResponse> {

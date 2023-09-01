@@ -23,10 +23,6 @@ export default class AuthenticationResultParser {
         return AuthenticationResultParser.getIdClaim("email", authenticationResult);
     }
 
-    static getSignUpStatus(authenticationResult: AuthenticationResultType): string {
-        return AuthenticationResultParser.getIdClaim("signup_status", authenticationResult);
-    }
-
     private static getIdClaim(claim: string, authenticationResult: AuthenticationResultType): string {
         return this.getIdClaims(authenticationResult)[claim];
     }
