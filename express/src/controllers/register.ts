@@ -33,14 +33,17 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
                 console.log("Processing No HasEMail");
                 return res.redirect("resume-before-password");
             }
+
             if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
                 console.log("Processing No HasPassword");
                 return res.redirect("resume-before-password");
             }
+
             if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
                 console.log("Processing No HasPhoneNumber");
                 return res.redirect("resume-after-password");
             }
+
             if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
                 console.log("Processing No HasTextCode");
                 return res.redirect("resume-after-password");
