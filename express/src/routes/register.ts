@@ -7,6 +7,8 @@ import {
     processGetEmailForm,
     resendEmailVerificationCode,
     resendMobileVerificationCode,
+    resumeAfterPassword,
+    resumeUserJourneyAfterPassword,
     showAddServiceForm,
     showCheckEmailForm,
     showEnterMobileForm,
@@ -60,3 +62,6 @@ router
 
 router.route("/resend-text-code").get(showResendPhoneCodeForm).post(resendMobileVerificationCode);
 router.route("/create-service").get(showAddServiceForm).post(validateServiceName, processAddServiceForm);
+
+router.route("/resume-before-password").get(showCheckEmailForm).post(validateEmailSecurityCode, submitEmailSecurityCode);
+router.route("/resume-after-password").get(resumeAfterPassword).post(resumeUserJourneyAfterPassword);
