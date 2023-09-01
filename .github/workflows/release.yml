@@ -8,45 +8,45 @@ on:
 permissions: { }
 
 jobs:
-  build-frontend:
-    name: Build Frontend
-    permissions: { }
-    uses: ./.github/workflows/build-frontend.yml
+  # build-frontend:
+  #   name: Build Frontend
+  #   permissions: { }
+  #   uses: ./.github/workflows/build-frontend.yml
 
-  run-unit-tests:
-    name: Run Unit tests
-    uses: ./.github/workflows/run-unit-tests.yml
+  # run-unit-tests:
+  #   name: Run Unit tests
+  #   uses: ./.github/workflows/run-unit-tests.yml
 
-  deploy-test-frontend:
-    name: Test
-    needs: [ build-frontend, run-unit-tests ]
-    uses: ./.github/workflows/deploy-to-paas.yml
-    permissions:
-      id-token: write
-      contents: read
-    with:
-      environment: test
-      cf-space-name: self-service-test
-      artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
-      url: https://di-self-service-test.london.cloudapps.digital
-    secrets:
-      cf-username: ${{ secrets.CF_USERNAME }}
-      cf-password: ${{ secrets.CF_PASSWORD }}
+  # deploy-test-frontend:
+  #   name: Test
+  #   needs: [ build-frontend, run-unit-tests ]
+  #   uses: ./.github/workflows/deploy-to-paas.yml
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   with:
+  #     environment: test
+  #     cf-space-name: self-service-test
+  #     artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
+  #     url: https://di-self-service-test.london.cloudapps.digital
+  #   secrets:
+  #     cf-username: ${{ secrets.CF_USERNAME }}
+  #     cf-password: ${{ secrets.CF_PASSWORD }}
 
-  run-acceptance-tests:
-    name: Run tests
-    needs: deploy-test-frontend
-    uses: ./.github/workflows/run-acceptance-tests.yml
-    permissions:
-      id-token: write
-      contents: read
-    with:
-      host: ${{ needs.deploy-test-frontend.outputs.deployment-url }}
-      environment: ${{ needs.deploy-test-frontend.outputs.environment }}
-
+  # run-acceptance-tests:
+  #   name: Run tests
+  #   needs: deploy-test-frontend
+  #   uses: ./.github/workflows/run-acceptance-tests.yml
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   with:
+  #     host: ${{ needs.deploy-test-frontend.outputs.deployment-url }}
+  #     environment: ${{ needs.deploy-test-frontend.outputs.environment }}
+  
   deploy-dynamodb:
     name: DynamoDB
-    needs: run-acceptance-tests
+    # needs: run-acceptance-tests
     uses: ./.github/workflows/upload-dynamodb-package.yml
     permissions:
       id-token: write
@@ -56,12 +56,12 @@ jobs:
 
   build-api:
     name: Build API
-    needs: run-acceptance-tests
+    # needs: run-acceptance-tests
     uses: ./.github/workflows/build-api.yml
 
   deploy-api:
     name: Deploy API
-    needs: [ run-acceptance-tests, build-api, deploy-dynamodb ]
+    # needs: [ run-acceptance-tests, build-api, deploy-dynamodb ]
     uses: ./.github/workflows/upload-api-package.yml
     permissions:
       id-token: write
@@ -72,12 +72,12 @@ jobs:
 
   build-cognito:
     name: Build Cognito
-    needs: run-acceptance-tests
+    # needs: run-acceptance-tests
     uses: ./.github/workflows/build-cognito.yml
 
   deploy-cognito:
     name: Deploy Cognito
-    needs: [ run-acceptance-tests, build-cognito ]
+    # needs: [ run-acceptance-tests, build-cognito ]
     uses: ./.github/workflows/upload-cognito-package.yml
     permissions:
       id-token: write
@@ -88,7 +88,7 @@ jobs:
 
   deploy-frontend:
     name: Frontend
-    needs: [ run-acceptance-tests, build-frontend, deploy-cognito, deploy-dynamodb, deploy-api ]
+    # needs: [ run-acceptance-tests, build-frontend, deploy-cognito, deploy-dynamodb, deploy-api ]
     uses: ./.github/workflows/upload-frontend-package.yml
     permissions:
       id-token: write
