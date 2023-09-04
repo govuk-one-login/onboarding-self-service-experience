@@ -152,6 +152,7 @@ Resources:
                   - cognito-idp:AdminSetUserMFAPreference
                   - cognito-idp:AdminRespondToAuthChallenge
                   - cognito-idp:AdminGetUser
+                  - cognito-idp:AddCustomAttributes
                 Resource:
                   Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolARN
 
