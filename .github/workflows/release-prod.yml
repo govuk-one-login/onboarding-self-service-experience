@@ -3,7 +3,7 @@ run-name: Upload to AWS for prod release [${{ github.head_ref || github.ref_name
 on:
   workflow_dispatch:
   push:
-    # branches: [ release ]
+    branches: [ release ]
 
 permissions: { }
 
