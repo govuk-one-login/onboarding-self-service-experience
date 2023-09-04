@@ -151,6 +151,8 @@ export default class StubCognitoClient implements CognitoInterface {
     async adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput> {
         const adminGetUserCommandOutput: AdminGetUserCommandOutput = <AdminGetUserCommandOutput>{};
 
+        console.log("Setting AdminGetUserCommandOutput for => " + userName);
+
         adminGetUserCommandOutput.UserAttributes = [
             JSON.parse('{"Name":"custom:signup_status", "Value":"HasEmail,HasPassword,HasPhoneNumber,HasTextCode"}')
         ];
