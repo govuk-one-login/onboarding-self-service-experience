@@ -1,0 +1,17 @@
+{% extends "layouts/base.njk" %}
+
+{% set headerActiveItem = "sign-in" %}
+{% set pageTitle = "You are signed in to another device" %}
+{% set backLinkPath = "/sign-in" %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-l">You are signed in to another device</h1>
+  <p class="govuk-body">If you have previously signed in to GOV.UK One Login admin tool on another device, you can continue to your account.</p>
+
+  {{ govukButton({ text: "Continue", href: "/services" }) }}
+
+  <p class="govuk-body">If you have not signed in on any other devices, you can
+    <a class="govuk-link" href="/sign-in/global-sign-out">sign out of all devices</a>.
+  </p>
+  <p class="govuk-body">You will need to sign in again on this device.</p>
+{% endblock %}

@@ -218,6 +218,16 @@ export default class StubCognitoClient implements CognitoInterface {
     useRefreshToken(): Promise<AdminInitiateAuthCommandOutput> {
         return Promise.resolve({AuthenticationResult: authenticationResult, $metadata: {}});
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    globalSignOut(accessToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        return Promise.resolve({AuthenticationResult: authenticationResult, $metadata: {}});
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    getUser(accessToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        return Promise.resolve({AuthenticationResult: authenticationResult, $metadata: {httpStatusCode: 200}});
+    }
 }
 
 function getIdToken(): string {

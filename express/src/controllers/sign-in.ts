@@ -11,6 +11,7 @@ import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
+export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
 export const showCheckPhonePage: RequestHandler = (req, res) => {
@@ -49,7 +50,31 @@ export const finishSignIn: RequestHandler = async (req, res) => {
     }
 
     req.session.isSignedIn = true;
-    res.redirect("/services");
+    if (await signedInToAnotherDevice(user.email, s4)) {
+        res.redirect("/sign-in/signed-in-to-another-device");
+    } else {
+        res.redirect("/services");
+    }
+};
+
+async function signedInToAnotherDevice(email: string, s4: SelfServiceServicesService) {
+    const sessions = await s4.sessionCount(email);
+    console.log(`Found ${sessions} sessioon(s)`);
+    return sessions > 1;
+}
+
+export const globalSignOut: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const authenticationResult = nonNull(req.session.authenticationResult);
+    const accessToken = authenticationResult.AccessToken;
+
+    if (accessToken) {
+        const user = await s4.getSelfServiceUser(authenticationResult);
+        const output = await s4.globalSignOut(user.email, accessToken);
+        console.log(`globalSignOut() Session invalidated, Response HTTP Status Code: ${output.status}`);
+    }
+
+    req.session.destroy(() => res.redirect("/sign-in/enter-email-address-global-sign-out"));
 };
 
 export const processEmailAddress: RequestHandler = (req, res) => {
