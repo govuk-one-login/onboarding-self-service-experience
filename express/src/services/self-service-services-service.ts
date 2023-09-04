@@ -132,8 +132,11 @@ export default class SelfServiceServicesService {
     }
 
     async getSignUpStatus(userName: string): Promise<SignupStatus> {
-        const adminGetUserCommandOutput = await this.cognito.getUserCommandOutput(userName);
+        const adminGetUserCommandOutput = await this.cognito.adminGetUserCommandOutput(userName);
         const userAttributes = adminGetUserCommandOutput.UserAttributes;
+
+        console.log(JSON.stringify(adminGetUserCommandOutput));
+        console.log(JSON.stringify(adminGetUserCommandOutput.UserAttributes));
 
         if (userAttributes == null) {
             throw new Error("Unable to get Sign Up Status Custom Attribute");
@@ -150,25 +153,6 @@ export default class SelfServiceServicesService {
             signUpStatus.setState(signUpStatusAttributeValue);
 
             return signUpStatus;
-        }
-    }
-
-    async getMobilePhoneNumber(userName: string): Promise<string> {
-        const adminGetUserCommandOutput = await this.cognito.getUserCommandOutput(userName);
-        const userAttributes = adminGetUserCommandOutput.UserAttributes;
-
-        if (userAttributes == null) {
-            throw new Error("Unable to get Sign Up Mobile Phone Number");
-        } else {
-            let mobilePhoneNumber = "";
-
-            userAttributes.forEach(attribute => {
-                if (attribute.Name == "phone_number") {
-                    mobilePhoneNumber = attribute.Value as string;
-                }
-            });
-
-            return mobilePhoneNumber;
         }
     }
 

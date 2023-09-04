@@ -36,7 +36,7 @@ export default interface CognitoInterface {
 
     useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput>;
 
-    getUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput>;
+    adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput>;
 
     setSignUpStatus(username: string, status: string): Promise<void>;
 }

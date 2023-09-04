@@ -33,14 +33,17 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
                 console.log("Processing No HasEMail");
                 return res.redirect("resume-before-password");
             }
+
             if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
                 console.log("Processing No HasPassword");
                 return res.redirect("resume-before-password");
             }
+
             if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
                 console.log("Processing No HasPhoneNumber");
                 return res.redirect("resume-after-password");
             }
+
             if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
                 console.log("Processing No HasTextCode");
                 return res.redirect("resume-after-password");
@@ -274,14 +277,8 @@ export const resumeUserJourneyAfterPassword: RequestHandler = async (req, res) =
     const response = await s4.submitUsernamePassword(userName, userPassword);
     req.session.cognitoSession = response.Session;
     req.session.authenticationResult = response.AuthenticationResult;
-    //req.session.mobileNumber = await s4.getMobilePhoneNumber(userName);
 
-    // Keith Hart has requested even if User has already entered their phone number we 'resume' from re-entering their Phone number again.
+    // if User has already entered their phone number we 'resume' from re-entering their Phone number again.
     // This is to allow for the fact that they may have entered an incorrect number.
-    //console.log("Mobile Number => " + req.session.mobileNumber);
-    //const signUpStatus: SignupStatus = await s4.getSignUpStatus(userName);
-    //if(!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {console.log("Resuming at Enter Phone Number"); return res.redirect("enter-phone-number");}
-    //if(!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {console.log("Resuming at Enter Text Number"); return res.redirect("enter-text-code");}
-
     return res.redirect("enter-phone-number");
 };
