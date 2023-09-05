@@ -285,6 +285,5 @@ export const resumeUserJourneyAfterPassword: RequestHandler = async (req, res) =
     //const signUpStatus: SignupStatus = await s4.getSignUpStatus(userName);
     //if(!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {console.log("Resuming at Enter Phone Number"); return res.redirect("enter-phone-number");}
     //if(!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {console.log("Resuming at Enter Text Number"); return res.redirect("enter-text-code");}
-
     return res.redirect("enter-phone-number");
 };
