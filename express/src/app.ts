@@ -15,8 +15,6 @@ import testingRoutes from "./routes/testing";
 
 const app = Express();
 
-const helmet = Helmet();
-
 app.use((req, res, next) => {
     res.append("Access-Control-Allow-Origin", ["*"]);
     res.append("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
@@ -24,7 +22,22 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(helmet);
+app.use(
+    Helmet({
+        referrerPolicy: {
+            policy: ["origin", "unsafe-url"]
+        },
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+                connectSrc: ["*"],
+                styleSrc: ["'self'", "'unsafe-inline'"],
+                imgSrc: ["'self'"]
+            }
+        }
+    })
+);
 
 app.use("/assets", serveStatic(distribution.assets));
 app.use("/assets/images", serveStatic(distribution.images));
