@@ -2,7 +2,7 @@ import helmet from "helmet";
 export default function Helmet() {
     return helmet({
         referrerPolicy: {
-            policy: ["origin", "unsafe-url"]
+            policy: ["strict-origin"]
         },
         contentSecurityPolicy: {
             directives: {
@@ -10,7 +10,8 @@ export default function Helmet() {
                 scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
                 connectSrc: ["*"],
                 styleSrc: ["'self'", "'unsafe-inline'"],
-                imgSrc: ["'self'"]
+                imgSrc: ["'self'"],
+                formAction: ["'self'"]
             }
         }
     });
