@@ -338,6 +338,7 @@ Resources:
               - cognito-idp:SetUserPoolMfaConfig
               - cognito-idp:ListTagsForResource
               - cognito-idp:DescribeUserPool
+              - cognito-idp:AddCustomAttributes
 
           - Effect: Allow
             Resource: "*"
