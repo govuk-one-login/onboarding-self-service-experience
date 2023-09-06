@@ -335,6 +335,7 @@ Resources:
               - cognito-idp:CreateUserPoolClient
               - cognito-idp:DeleteUserPoolClient
               - cognito-idp:SetUserPoolMfaConfig
+              - cognito-idp:DescribeUserPool
 
           - Effect: Allow
             Resource: "*"
