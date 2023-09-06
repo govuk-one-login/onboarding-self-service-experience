@@ -1,7 +1,7 @@
 import {static as serveStatic, urlencoded} from "express";
 import {googleTagId, port, showTestBanner} from "./config/environment";
 import Express from "./config/express";
-import Helmet from "helmet";
+import Helmet from "./config/helmet";
 import {distribution} from "./config/resources";
 import sessionStorage from "./config/session-storage";
 import {errorHandler, notFoundHandler} from "./middleware/errors";
@@ -22,22 +22,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(
-    Helmet({
-        referrerPolicy: {
-            policy: ["origin", "unsafe-url"]
-        },
-        contentSecurityPolicy: {
-            directives: {
-                defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-                connectSrc: ["*"],
-                styleSrc: ["'self'", "'unsafe-inline'"],
-                imgSrc: ["'self'"]
-            }
-        }
-    })
-);
+app.use(Helmet());
 
 app.use("/assets", serveStatic(distribution.assets));
 app.use("/assets/images", serveStatic(distribution.images));
