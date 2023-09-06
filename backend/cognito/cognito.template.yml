@@ -198,6 +198,11 @@ Resources:
           StringAttributeConstraints:
             MinLength: 0
             MaxLength: 2048
+        - Name: signup_status
+          AttributeDataType: String
+          DeveloperOnlyAttribute: false
+          Mutable: true
+          Required: false
       AutoVerifiedAttributes: [ email ]
       UsernameAttributes: [ email ]
       EmailVerificationMessage: !Sub |-
