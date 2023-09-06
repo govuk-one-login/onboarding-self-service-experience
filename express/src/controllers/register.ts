@@ -208,6 +208,8 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
 
     await s4.putUser(user, accessToken);
     req.session.isSignedIn = true;
+
+    await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasTextCode);
     res.redirect("/register/create-service");
 };
 
