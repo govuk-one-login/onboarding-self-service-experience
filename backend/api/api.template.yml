@@ -675,8 +675,8 @@ Resources:
       BuildProperties:
         Sourcemap: true
     Properties:
-      Handler: backend/api/src/handlers/notifications/send-private-beta-notification.privateBetaRequestHandler
-      Description: Publish a message to the private beta request notification topic
+      Handler: backend/api/src/handlers/notifications/send-public-beta-notification.privateBetaRequestHandler
+      Description: Publish a message to the public beta request notification topic
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
         - SNSPublishMessagePolicy:
@@ -689,7 +689,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref API
-            Path: /send-private-beta-request-notification
+            Path: /send-public-beta-request-notification
             Method: POST
 
   NotificationsSnsTopic:

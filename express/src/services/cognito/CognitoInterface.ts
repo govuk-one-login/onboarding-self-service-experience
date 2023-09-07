@@ -1,4 +1,5 @@
 import {
+    AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
     AdminRespondToAuthChallengeCommandOutput,
     RespondToAuthChallengeCommandOutput
@@ -34,4 +35,8 @@ export default interface CognitoInterface {
     respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput>;
 
     useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput>;
+
+    adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput>;
+
+    setSignUpStatus(username: string, status: string): Promise<void>;
 }

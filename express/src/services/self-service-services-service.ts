@@ -13,6 +13,8 @@ import {userToDomainUser} from "../lib/models/user-utils";
 import MfaResponse from "../types/mfa-response";
 import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
+import console from "console";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -118,6 +120,40 @@ export default class SelfServiceServicesService {
 
     setMobilePhoneAsVerified(emailAddress: string): Promise<void> {
         return this.cognito.setMobilePhoneAsVerified(emailAddress);
+    }
+
+    async setSignUpStatus(userName: string, signUpStatusStage: SignupStatusStage): Promise<void> {
+        console.log("Setting Sign Up Status Stage =>" + signUpStatusStage);
+
+        const signUpStatus: SignupStatus = await this.getSignUpStatus(userName);
+        signUpStatus.setStage(signUpStatusStage, true);
+
+        return await this.cognito.setSignUpStatus(userName, signUpStatus.getState());
+    }
+
+    async getSignUpStatus(userName: string): Promise<SignupStatus> {
+        const adminGetUserCommandOutput = await this.cognito.adminGetUserCommandOutput(userName);
+        const userAttributes = adminGetUserCommandOutput.UserAttributes;
+
+        console.log(JSON.stringify(adminGetUserCommandOutput));
+        console.log(JSON.stringify(adminGetUserCommandOutput.UserAttributes));
+
+        if (userAttributes == null) {
+            throw new Error("Unable to get Sign Up Status Custom Attribute");
+        } else {
+            let signUpStatusAttributeValue = "";
+
+            userAttributes.forEach(attribute => {
+                if (attribute.Name == "custom:signup_status") {
+                    signUpStatusAttributeValue = attribute.Value as string;
+                }
+            });
+
+            const signUpStatus = new SignupStatus();
+            signUpStatus.setState(signUpStatusAttributeValue);
+
+            return signUpStatus;
+        }
     }
 
     async newService(service: Service, userId: string, authenticationResult: AuthenticationResultType): Promise<void> {

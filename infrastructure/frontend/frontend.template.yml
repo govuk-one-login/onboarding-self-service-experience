@@ -175,6 +175,8 @@ Resources:
                   - cognito-idp:AdminUpdateUserAttributes
                   - cognito-idp:AdminSetUserMFAPreference
                   - cognito-idp:AdminRespondToAuthChallenge
+                  - cognito-idp:AdminGetUser
+                  - cognito-idp:AddCustomAttributes
                 Resource:
                   Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolARN
 
@@ -480,7 +482,7 @@ Resources:
       Type: A
       Name: !Sub
         - ${Name}${Domain}
-        - Name: !If [ Subdomain, !Sub "${DeploymentName}.", !Ref AWS::NoValue ]
+        - Name: !If [ Subdomain, !Sub "${DeploymentName}.", ""]
           Domain: !ImportValue DNS-Domain
       HostedZoneId: !ImportValue DNS-HostedZoneID
       AliasTarget:

@@ -7,14 +7,14 @@ export const privateBetaRequestHandler = async (event: APIGatewayProxyEvent): Pr
     const payload = event?.body ? JSON.parse(event.body as string) : event;
 
     const emailContent =
-        "Request to join GOV.UK One Login private beta form submitted\n\n" +
+        "Request to join GOV.UK One Login public beta form submitted\n\n" +
         `Name: ${payload.name}\n` +
         `Email address: ${payload.emailAddress} \n` +
         `Service name: ${payload.serviceName} \n` +
         `Department: ${payload.department}  \n`;
 
     const params = {
-        Subject: "GOV.UK One Login private beta request form submitted",
+        Subject: "GOV.UK One Login public beta request form submitted",
         Message: emailContent,
         TopicArn: process.env.SNS_TOPIC_ARN
     };
@@ -30,7 +30,7 @@ export const privateBetaRequestHandler = async (event: APIGatewayProxyEvent): Pr
         .catch(sendOutput => {
             response.statusCode = 500;
             response.body = JSON.stringify(sendOutput);
-            console.error("Error occurred in sending message to request to join private beta topic: " + response);
+            console.error("Error occurred in sending message to request to join public beta topic: " + response);
         });
 
     return response;

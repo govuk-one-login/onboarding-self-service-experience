@@ -34,9 +34,9 @@
             <li class="side-navigation__item{% if sidebarActiveItem == 'client-details' %} side-navigation__item--active{% endif %}">
               <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}/clients">Client details</a>
             </li>
-            <li class="side-navigation__item{% if sidebarActiveItem == 'private-beta' %} side-navigation__item--active{% endif %}">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}/clients/{{ clientId }}/{{ selfServiceClientId }}/private-beta">
-                Joining private beta
+            <li class="side-navigation__item{% if sidebarActiveItem == 'public-beta' %} side-navigation__item--active{% endif %}">
+              <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}/clients/{{ clientId }}/{{ selfServiceClientId }}/public-beta">
+                Joining public beta
               </a>
             </li>
           </ul>

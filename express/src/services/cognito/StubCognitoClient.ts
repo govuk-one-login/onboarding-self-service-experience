@@ -1,4 +1,5 @@
 import {
+    AdminGetUserCommandOutput,
     AdminInitiateAuthCommandOutput,
     AdminRespondToAuthChallengeCommandOutput,
     CodeMismatchException,
@@ -144,6 +145,25 @@ export default class StubCognitoClient implements CognitoInterface {
     }
 
     async setMfaPreference(): Promise<void> {
+        return;
+    }
+
+    async adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput> {
+        const adminGetUserCommandOutput: AdminGetUserCommandOutput = <AdminGetUserCommandOutput>{};
+
+        console.log("Setting AdminGetUserCommandOutput for => " + userName);
+
+        adminGetUserCommandOutput.UserAttributes = [
+            {Name: "custom:signup_status", Value: "HasEmail,HasPassword,HasPhoneNumber,HasTextCode"}
+        ];
+
+        return adminGetUserCommandOutput;
+    }
+
+    async setSignUpStatus(username: string, status: string): Promise<void> {
+        console.log(username);
+        console.log(status);
+
         return;
     }
 

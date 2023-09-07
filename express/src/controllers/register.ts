@@ -7,24 +7,55 @@ import {domainUserToDynamoUser} from "../lib/models/user-utils";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import * as console from "console";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 
 export const processGetEmailForm: RequestHandler = async (req, res) => {
     const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+    console.log("In ProcessGetEmailForm");
+
+    req.session.emailAddress = emailAddress;
 
     try {
+        console.log("Trying to Create User");
         await s4.createUser(emailAddress);
+        console.log("Created User");
     } catch (error) {
         if (error instanceof UsernameExistsException) {
+            const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
+
+            console.log("In UserNameExistException");
+
+            if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
+                console.log("Processing No HasEMail");
+                return res.redirect("resume-before-password");
+            }
+
+            if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
+                console.log("Processing No HasPassword");
+                return res.redirect("resume-before-password");
+            }
+
+            if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
+                console.log("Processing No HasPhoneNumber");
+                return res.redirect("resume-after-password");
+            }
+
+            if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
+                console.log("Processing No HasTextCode");
+                return res.redirect("resume-after-password");
+            }
+
+            console.log("Redirecting to Default");
             return res.redirect("/register/account-exists");
         }
 
         throw error;
     }
 
-    req.session.emailAddress = emailAddress;
     res.redirect("/register/enter-email-code");
 };
 
@@ -49,7 +80,6 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
-
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
@@ -76,6 +106,8 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
 
         throw error;
     }
+
+    await s4.setSignUpStatus(req.session.emailAddress, SignupStatusStage.HasEmail);
 
     await s4.sendTxMALog({
         userIp: req.ip,
@@ -104,6 +136,7 @@ export const updatePassword: RequestHandler = async (req, res) => {
     req.session.authenticationResult = await s4.setNewPassword(emailAddress, req.body["password"], nonNull(req.session.cognitoSession));
 
     await s4.setEmailAsVerified(emailAddress);
+    await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPassword);
 
     res.redirect("/register/enter-phone-number");
 };
@@ -129,6 +162,9 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
 
     req.session.mobileNumber = mobileNumber;
     req.session.enteredMobileNumber = req.body.mobileNumber;
+
+    const emailAddress = nonNull(req.session.emailAddress);
+    await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPhoneNumber);
 
     await s4.sendTxMALog({
         userIp: req.ip,
@@ -199,6 +235,8 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     }
 
     const cognitoId = AuthenticationResultParser.getCognitoId(authenticationResult);
+    const emailAddress = AuthenticationResultParser.getEmail(authenticationResult);
+
     await s4.setMfaPreference(cognitoId);
 
     const user = domainUserToDynamoUser({
@@ -206,14 +244,15 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
         fullName: "we haven't collected this full name",
         firstName: "we haven't collected this first name",
         lastName: "we haven't collected this last name",
-        email: AuthenticationResultParser.getEmail(authenticationResult),
+        email: emailAddress,
         mobileNumber: nonNull(req.session.enteredMobileNumber),
         passwordLastUpdated: new Date().toLocaleDateString()
     });
 
     await s4.putUser(user, accessToken);
-
     req.session.isSignedIn = true;
+
+    await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasTextCode);
 
     await s4.sendTxMALog({
         userIp: req.ip,
@@ -238,8 +277,12 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
 export const showResendPhoneCodeForm = render("register/resend-text-code.njk");
 export const showResendEmailCodeForm = render("register/resend-email-code.njk");
 
+export const resumeBeforePassword = render("/enter-email-code.njk");
+export const resumeAfterPassword = render("register/resume-after-password.njk");
+
 export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
+
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
     res.redirect("/register/enter-email-code");
 };
@@ -292,4 +335,22 @@ export const accountExists: RequestHandler = (req, res) => {
             emailAddress: req.session.emailAddress
         }
     });
+};
+
+export const resumeUserJourneyAfterPassword: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    console.log("In resumeUserJourney");
+    const userName = nonNull(req.session.emailAddress);
+    const userPassword = nonNull(req.body["password"]);
+    console.log("User Name => " + userName);
+    console.log("User Password => " + userPassword);
+
+    const response = await s4.submitUsernamePassword(userName, userPassword);
+    req.session.cognitoSession = response.Session;
+    req.session.authenticationResult = response.AuthenticationResult;
+
+    // if User has already entered their phone number we 'resume' from re-entering their Phone number again.
+    // This is to allow for the fact that they may have entered an incorrect number.
+    return res.redirect("enter-phone-number");
 };
