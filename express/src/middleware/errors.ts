@@ -9,7 +9,7 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
 
     s4.sendTxMALog({
         userIp: req.ip,
-        event: 'ERROR_UNAVAILABLE',
+        event: "ERROR_UNAVAILABLE",
         journeyId: req.session.id,
         userId: userId
     });
@@ -24,7 +24,7 @@ export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, 
 
     s4.sendTxMALog({
         userIp: req.ip,
-        event: 'ERROR_PROBLEM',
+        event: "ERROR_PROBLEM",
         journeyId: req.session.id,
         userId: userId
     });

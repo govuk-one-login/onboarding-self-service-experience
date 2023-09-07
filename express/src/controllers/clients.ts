@@ -102,7 +102,7 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'PRIVATE_BETA_FORM_SUBMITTED',
+        event: "PRIVATE_BETA_FORM_SUBMITTED",
         journeyId: req.session.id,
         userId: userId
     });
@@ -150,7 +150,7 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'UPDATE_SERVICE_NAME',
+        event: "UPDATE_SERVICE_NAME",
         journeyId: req.session.id,
         service: newServiceName,
         userId: userId
@@ -182,10 +182,10 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
 
     req.session.updatedField = "public key";
 
-    if (req.params.selfServiceClientId !== '') {
+    if (req.params.selfServiceClientId !== "") {
         await s4.sendTxMALog({
             userIp: req.ip,
-            event: 'UPDATE_PUBLIC_KEY',
+            event: "UPDATE_PUBLIC_KEY",
             journeyId: req.session.id,
             service: nonNull(req.context.serviceId),
             userId: userId
@@ -193,13 +193,12 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     } else {
         await s4.sendTxMALog({
             userIp: req.ip,
-            event: 'PUBLIC_KEY_ADDED',
+            event: "PUBLIC_KEY_ADDED",
             journeyId: req.session.id,
             service: nonNull(req.context.serviceId),
             userId: userId
         });
     }
-
 
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
@@ -232,7 +231,7 @@ export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) =>
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'UPDATE_REDIRECT_URL',
+        event: "UPDATE_REDIRECT_URL",
         journeyId: req.session.id,
         service: nonNull(req.context.serviceId),
         userId: userId
@@ -300,7 +299,7 @@ export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) 
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'UPDATE_LOGOUT_REDIRECT_URL',
+        event: "UPDATE_LOGOUT_REDIRECT_URL",
         journeyId: req.session.id,
         service: nonNull(req.context.serviceId),
         userId: userId

@@ -63,9 +63,9 @@ export const changePassword: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'UPDATE_PASSWORD',
+        event: "UPDATE_PASSWORD",
         journeyId: req.session.id,
-        userId: AuthenticationResultParser.getCognitoId(authenticationResult),
+        userId: AuthenticationResultParser.getCognitoId(authenticationResult)
     });
 
     res.redirect("/account");
@@ -87,7 +87,7 @@ export const processChangePhoneNumberForm: RequestHandler = async (req, res) => 
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'UPDATE_PHONE_REQUEST',
+        event: "UPDATE_PHONE_REQUEST",
         phoneNumber: req.session.enteredMobileNumber,
         journeyId: req.session.id
     });
@@ -114,14 +114,13 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
         await s4.verifyMobileUsingSmsCode(accessToken, req.body.securityCode);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-
             await s4.sendTxMALog({
                 userIp: req.ip,
-                event: 'PHONE_VERIFICATION_COMPLETE',
+                event: "PHONE_VERIFICATION_COMPLETE",
                 phoneNumber: req.session.enteredMobileNumber,
                 journeyId: req.session.id,
                 userId: AuthenticationResultParser.getCognitoId(authenticationResult),
-                outcome: 'failed'
+                outcome: "failed"
             });
 
             return res.render("common/enter-text-code.njk", {
@@ -154,11 +153,11 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'PHONE_VERIFICATION_COMPLETE',
+        event: "PHONE_VERIFICATION_COMPLETE",
         phoneNumber: req.session.enteredMobileNumber,
         journeyId: req.session.id,
         userId: AuthenticationResultParser.getCognitoId(authenticationResult),
-        outcome: 'success'
+        outcome: "success"
     });
 
     res.redirect("/account");

@@ -12,7 +12,7 @@ export default async function checkAuthorisation(req: Request, res: Response, ne
         if (!req.session.authenticationResult?.AccessToken) {
             s4.sendTxMALog({
                 userIp: req.ip,
-                event: 'ERROR_TIMEOUT',
+                event: "ERROR_TIMEOUT",
                 journeyId: req.session.id
             });
 

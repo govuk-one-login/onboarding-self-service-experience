@@ -14,12 +14,11 @@ export default async function processSecurityCode(req: Request, res: Response, n
         req.session.authenticationResult = await s4.respondToMfaChallenge(req.session.mfaResponse, req.body.securityCode);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-
             await s4.sendTxMALog({
                 userIp: req.ip,
-                event: 'INVALID_CREDENTIAL',
+                event: "INVALID_CREDENTIAL",
                 journeyId: req.session.id,
-                credentialType: '2FA'
+                credentialType: "2FA"
             });
 
             return res.render("common/enter-text-code.njk", {

@@ -50,16 +50,16 @@ export const finishSignIn: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'PHONE_VERIFICATION_COMPLETE',
+        event: "PHONE_VERIFICATION_COMPLETE",
         phoneNumber: req.session.enteredMobileNumber,
         journeyId: req.session.id,
         userId: AuthenticationResultParser.getCognitoId(authenticationResult),
-        outcome: 'success'
+        outcome: "success"
     });
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'LOG_IN_SUCCESS',
+        event: "LOG_IN_SUCCESS",
         email: user.email,
         userId: AuthenticationResultParser.getCognitoId(authenticationResult),
         journeyId: req.session.id
@@ -86,7 +86,7 @@ export const forgotPasswordForm: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'PASSWORD_RESET_REQUESTED',
+        event: "PASSWORD_RESET_REQUESTED",
         journeyId: req.session.id
     });
 
@@ -136,7 +136,7 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
 
     await s4.sendTxMALog({
         userIp: req.ip,
-        event: 'PASSWORD_RESET_COMPLETED',
+        event: "PASSWORD_RESET_COMPLETED",
         journeyId: req.session.id
     });
 
