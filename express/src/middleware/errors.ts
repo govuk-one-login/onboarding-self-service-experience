@@ -7,12 +7,14 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
-    s4.sendTxMALog({
-        userIp: req.ip,
-        event: "ERROR_UNAVAILABLE",
-        journeyId: req.session.id,
-        userId: userId
-    });
+    s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "ERROR_UNAVAILABLE",
+            journeyId: req.session.id,
+            userId: userId
+        })
+    );
 
     res.status(404).render("404.njk");
 });
@@ -22,12 +24,14 @@ export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
-    s4.sendTxMALog({
-        userIp: req.ip,
-        event: "ERROR_PROBLEM",
-        journeyId: req.session.id,
-        userId: userId
-    });
+    s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "ERROR_PROBLEM",
+            journeyId: req.session.id,
+            userId: userId
+        })
+    );
 
     console.error(err);
     res.render("there-is-a-problem.njk");

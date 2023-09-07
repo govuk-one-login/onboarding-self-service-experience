@@ -200,7 +200,7 @@ export default class SelfServiceServicesService {
         return clients.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? [];
     }
 
-    sendTxMALog(body: any): Promise<void> {
-        return this.lambda.sendTxMALog(JSON.stringify(body));
+    sendTxMALog(body: string): Promise<void> {
+        return this.lambda.sendTxMALog(body);
     }
 }
