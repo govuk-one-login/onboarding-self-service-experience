@@ -1,6 +1,7 @@
 import {static as serveStatic, urlencoded} from "express";
 import {googleTagId, port, showTestBanner} from "./config/environment";
 import Express from "./config/express";
+import Helmet from "./config/helmet";
 import {distribution} from "./config/resources";
 import sessionStorage from "./config/session-storage";
 import {errorHandler, notFoundHandler} from "./middleware/errors";
@@ -13,6 +14,15 @@ import signIn from "./routes/sign-in";
 import testingRoutes from "./routes/testing";
 
 const app = Express();
+
+app.use((req, res, next) => {
+    res.append("Access-Control-Allow-Origin", ["*"]);
+    res.append("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+    res.append("Access-Control-Allow-Headers", "Content-Type");
+    next();
+});
+
+app.use(Helmet());
 
 app.use("/assets", serveStatic(distribution.assets));
 app.use("/assets/images", serveStatic(distribution.images));
