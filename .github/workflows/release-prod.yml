@@ -62,4 +62,5 @@ jobs:
       contents: read
     with:
       environment: build-secure-pipelines
+      
       artifact-name: ${{ needs.build-frontend.outputs.artifact-name || inputs.frontend-artifact }}
