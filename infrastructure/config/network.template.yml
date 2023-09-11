@@ -33,6 +33,7 @@ Resources:
       Parameters:
         ECRApiEnabled: "Yes"
         KMSApiEnabled: "Yes"
+        SNSApiEnabled: "Yes"
         LogsApiEnabled: "Yes"
         StatesApiEnabled: "Yes"
         DynamoDBApiEnabled: "Yes"
