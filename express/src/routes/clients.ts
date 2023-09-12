@@ -5,15 +5,15 @@ import {
     processChangeRedirectUrlsForm,
     processChangeServiceNameForm,
     processChangeUserAttributesForm,
-    processPrivateBetaForm,
+    processPublicBetaForm,
     showChangePostLogoutUrisForm,
     showChangePublicKeyForm,
     showChangeRedirectUrlsForm,
     showChangeServiceNameForm,
     showChangeUserAttributesForm,
     showClient,
-    showPrivateBetaForm,
-    showPrivateBetaFormSubmitted
+    showPublicBetaForm,
+    showPublicBetaFormSubmitted
 } from "../controllers/clients";
 import convertPublicKeyForAuth from "../middleware/convert-public-key";
 import validateUris from "../middleware/validators/uris-validator";
@@ -25,9 +25,9 @@ export default router;
 router.get("/", showClient);
 
 // TODO This shouldn't use the clientId - public beta is per service
-router.route("/:clientId/:selfServiceClientId/public-beta").get(showPrivateBetaForm).post(processPrivateBetaForm);
+router.route("/:clientId/:selfServiceClientId/public-beta").get(showPublicBetaForm).post(processPublicBetaForm);
 
-router.route("/:clientId/:selfServiceClientId/public-beta/submitted").get(showPrivateBetaFormSubmitted);
+router.route("/:clientId/:selfServiceClientId/public-beta/submitted").get(showPublicBetaFormSubmitted);
 
 // TODO This shouldn't use the clientId - we're changing the service name
 router.route("/:clientId/:selfServiceClientId/change-service-name").get(showChangeServiceNameForm).post(processChangeServiceNameForm);

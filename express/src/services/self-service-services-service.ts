@@ -183,8 +183,8 @@ export default class SelfServiceServicesService {
         return this.lambda.updateService(serviceId, updates, accessToken);
     }
 
-    privateBetaRequest(userName: string, department: string, serviceName: string, emailAddress: string): Promise<void> {
-        return this.lambda.privateBetaRequest(userName, department, serviceName, emailAddress);
+    publicBetaRequest(userName: string, department: string, serviceName: string, emailAddress: string): Promise<void> {
+        return this.lambda.publicBetaRequest(userName, department, serviceName, emailAddress);
     }
 
     async listServices(userId: string): Promise<Service[]> {
