@@ -1,7 +1,6 @@
 name: Release to Prod [secure pipelines]
 run-name: Upload to AWS for prod [${{ github.head_ref || github.ref_name }}]
 on:
-  workflow_dispatch:
   push:
     branches: [ release ]
 
