@@ -1,0 +1,66 @@
+name: Release to Prod [secure pipelines]
+run-name: Upload to AWS for prod [${{ github.head_ref || github.ref_name }}]
+on:
+  workflow_dispatch:
+  push:
+    branches: [ release ]
+
+permissions: { }
+
+jobs:
+  build-frontend:
+    name: Build Frontend
+    permissions: { }
+    uses: ./.github/workflows/build-frontend.yml
+
+  deploy-dynamodb:
+    name: DynamoDB
+    uses: ./.github/workflows/upload-dynamodb-package.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: build-secure-pipelines
+
+  build-api:
+    name: Build API
+    uses: ./.github/workflows/build-api.yml
+
+  deploy-api:
+    name: Deploy API
+    needs: [ build-api, deploy-dynamodb ]
+    uses: ./.github/workflows/upload-api-package.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: build-secure-pipelines
+      artifact-name: ${{ needs.build-api.outputs.artifact-name }}
+
+  build-cognito:
+    name: Build Cognito
+    uses: ./.github/workflows/build-cognito.yml
+
+  deploy-cognito:
+    name: Deploy Cognito
+    needs: [ build-cognito ]
+    uses: ./.github/workflows/upload-cognito-package.yml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: build-secure-pipelines
+      artifact-name: ${{ needs.build-cognito.outputs.artifact-name }}
+
+  deploy-frontend:
+    name: Frontend
+    needs: [ build-frontend, deploy-cognito, deploy-dynamodb, deploy-api ]
+    uses: ./.github/workflows/upload-frontend-package.yml
+    
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: build-secure-pipelines
+      
+      artifact-name: ${{ needs.build-frontend.outputs.artifact-name || inputs.frontend-artifact }}
