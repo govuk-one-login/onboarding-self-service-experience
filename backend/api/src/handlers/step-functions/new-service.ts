@@ -1,10 +1,11 @@
-import {SFNClient, StartSyncExecutionCommand} from "@aws-sdk/client-sfn";
+import {SFNClient, StartSyncExecutionCommand, SyncExecutionStatus} from "@aws-sdk/client-sfn";
 import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from "aws-lambda";
 import * as process from "process";
 
 const stepFunctionsClient = new SFNClient({region: "eu-west-2"});
 
 export const newServiceHandler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+    console.info("In newServiceHandler() callback from step function. Event(" + event + ") Context (" + context + ")");
     const payload = event?.body ? JSON.parse(event.body as string) : event;
     const stateMachineArn = process.env.STATE_MACHINE_ARN as string;
     const input = JSON.stringify(payload);
@@ -15,5 +16,20 @@ export const newServiceHandler = async (event: APIGatewayProxyEvent, context: Co
 
     const invokeCommand = new StartSyncExecutionCommand(params);
     const result = await stepFunctionsClient.send(invokeCommand);
-    return {statusCode: 200, body: JSON.stringify(result)};
+
+    let statusCode = 200;
+    let resultBody: string;
+    if (result.status == SyncExecutionStatus.SUCCEEDED) {
+        resultBody = JSON.stringify(result);
+    } else if (result.status == SyncExecutionStatus.TIMED_OUT) {
+        statusCode = 408;
+        resultBody = "Function timed out";
+        console.error(resultBody);
+    } else {
+        statusCode = 400;
+        resultBody = "Function returned error: " + result.error + ", cause: " + result.cause;
+        console.error(resultBody);
+    }
+
+    return {statusCode: statusCode, body: resultBody};
 };
