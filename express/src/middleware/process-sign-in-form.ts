@@ -3,6 +3,8 @@ import {RequestHandler} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export default function processSignInForm(template: string): RequestHandler {
+    console.info("In processSignInForm()");
+
     return async (req, res) => {
         const email = req.session.emailAddress as string;
         const password = req.body.password;

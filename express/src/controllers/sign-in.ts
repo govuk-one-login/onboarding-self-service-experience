@@ -39,6 +39,8 @@ export const finishSignIn: RequestHandler = async (req, res) => {
     }
 
     if (req.session.updatedField === "password") {
+        console.info("Finishing Sign-In");
+
         await s4.updateUser(
             AuthenticationResultParser.getCognitoId(authenticationResult),
             {password_last_updated: new Date()},
@@ -92,6 +94,8 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
         await s4.confirmForgotPassword(loginName as string, password as string, confirmationCode as string);
     } catch (error) {
         if (error instanceof LimitExceededException) {
+            console.info("Tried to change password too many times. Advised to try again in 15 minutes.");
+
             return res.render("sign-in/create-new-password.njk", {
                 errorMessages: {
                     password: "You have tried to change your password too many times. Try again in 15 minutes."
@@ -121,8 +125,10 @@ const forgotPassword: RequestHandler = async (req, res) => {
             const options: Record<string, Record<string, string | undefined>> = {values: {emailAddress: req.session.emailAddress}};
 
             if (error instanceof UserNotFoundException) {
+                console.info("User does not exist.");
                 options.errorMessages.emailAddress = "User does not exist.";
             } else if (error instanceof LimitExceededException) {
+                console.info("Tried to change password too many times. Advised to try again in 15 minutes.");
                 options.errorMessages.emailAddress = "You have tried to change your password too many times. Try again in 15 minutes.";
             } else {
                 throw error;
