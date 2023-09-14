@@ -2,6 +2,8 @@ import {RequestHandler} from "express";
 import validate from "../../lib/validators/uris-validator";
 
 export default function validateUris(template: string): RequestHandler {
+    console.info("In validateUris()");
+
     return (req, res, next) => {
         const uris: string = req.body.redirectUris;
         const result = validate(uris.split(" ").filter(url => url.length > 0));

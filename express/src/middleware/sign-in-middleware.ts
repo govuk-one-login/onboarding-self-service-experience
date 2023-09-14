@@ -3,6 +3,8 @@ import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
 
 export default async function processSecurityCode(req: Request, res: Response, next: NextFunction) {
+    console.info("In processSecurityCode()");
+
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     // TODO figure out error handling, maybe throw?

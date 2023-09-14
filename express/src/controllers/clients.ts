@@ -152,6 +152,7 @@ export const showChangePublicKeyForm: RequestHandler = (req, res) => {
 export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
+    console.info("Process Change of Public Key Form");
     await s4.updateClient(
         nonNull(req.context.serviceId),
         req.params.selfServiceClientId,

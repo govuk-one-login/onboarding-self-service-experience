@@ -26,18 +26,26 @@ export default class SelfServiceServicesService {
     }
 
     changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<void> {
+        console.info("In self-service-services-service:changePassword()");
+
         return this.cognito.changePassword(accessToken, previousPassword, proposedPassword);
     }
 
     forgotPassword(email: string, uri: string): Promise<void> {
+        console.info("In self-service-services-service:forgotPassword()");
+
         return this.cognito.forgotPassword(email, uri);
     }
 
     confirmForgotPassword(username: string, password: string, confirmationCode: string): Promise<void> {
+        console.info("In self-service-services-service:confirmForgotPassword()");
+
         return this.cognito.confirmForgotPassword(username, password, confirmationCode);
     }
 
     async respondToMfaChallenge(mfaResponse: MfaResponse, mfaCode: string): Promise<AuthenticationResultType> {
+        console.info("In self-service-services-service:respondToMfaChallenge()");
+
         const response = await this.cognito.respondToMfaChallenge(mfaResponse.cognitoId, mfaCode, mfaResponse.cognitoSession);
 
         if (!response.AuthenticationResult) {
@@ -48,6 +56,8 @@ export default class SelfServiceServicesService {
     }
 
     async getSelfServiceUser(authenticationResult: AuthenticationResultType): Promise<User> {
+        console.info("In self-service-services-service:getSelfServiceUser()");
+
         if (!authenticationResult.IdToken) {
             throw new SelfServiceError("IdToken not present");
         }
@@ -65,6 +75,8 @@ export default class SelfServiceServicesService {
     }
 
     async login(email: string, password: string): Promise<MfaResponse> {
+        console.info("In self-service-services-service:login()");
+
         const response = await this.cognito.login(email, password);
 
         return {
@@ -75,50 +87,74 @@ export default class SelfServiceServicesService {
     }
 
     putUser(user: OnboardingTableItem, accessToken: string): Promise<void> {
+        console.info("In self-service-services-service:putUser()");
+
         return this.lambda.putUser(user, accessToken);
     }
 
     async setNewPassword(emailAddress: string, password: string, cognitoSession: string): Promise<AuthenticationResultType> {
+        console.info("In self-service-services-service:setNewPassword()");
+
         return nonNull((await this.cognito.setNewPassword(emailAddress, password, cognitoSession)).AuthenticationResult);
     }
 
     setEmailAsVerified(emailAddress: string): Promise<void> {
+        console.info("In self-service-services-service:setEmailAsVerified()");
+
         return this.cognito.setEmailAsVerified(emailAddress);
     }
 
     createUser(emailAddress: string): Promise<void> {
+        console.info("In self-service-services-service:createUser()");
+
         return this.cognito.createUser(emailAddress);
     }
 
     resendEmailAuthCode(emailAddress: string): Promise<void> {
+        console.info("In self-service-services-service:resendEmailAuthCode()");
+
         return this.cognito.resendEmailAuthCode(emailAddress);
     }
 
     submitUsernamePassword(emailAddress: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
+        console.info("In self-service-services-service:submitUsernamePassword()");
+
         return this.cognito.login(emailAddress, password);
     }
 
     setPhoneNumber(emailAddress: string, mobileNumber: string): Promise<void> {
+        console.info("In self-service-services-service:setPhoneNumber()");
+
         return this.cognito.setPhoneNumber(emailAddress, mobileNumber);
     }
 
     setMfaPreference(cognitoId: string): Promise<void> {
+        console.info("In self-service-services-service:setMfaPreference()");
+
         return this.cognito.setMfaPreference(cognitoId);
     }
 
     sendMobileNumberVerificationCode(accessToken: string): Promise<void> {
+        console.info("In self-service-services-service:sendMobileVerificationCode()");
+
         return this.cognito.sendMobileNumberVerificationCode(accessToken);
     }
 
     useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        console.info("In self-service-services-service:useRefreshToken()");
+
         return this.cognito.useRefreshToken(refreshToken);
     }
 
     verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<void> {
+        console.info("In self-service-services-service:verifyMobileUsingSmsCode()");
+
         return this.cognito.verifyMobileUsingSmsCode(accessToken, code);
     }
 
     setMobilePhoneAsVerified(emailAddress: string): Promise<void> {
+        console.info("In self-service-services-service:setMobilePhoneAsVerified()");
+
         return this.cognito.setMobilePhoneAsVerified(emailAddress);
     }
 
@@ -132,6 +168,8 @@ export default class SelfServiceServicesService {
     }
 
     async getSignUpStatus(userName: string): Promise<SignupStatus> {
+        console.info("In self-service-services-service:getSignUpStatus()");
+
         const adminGetUserCommandOutput = await this.cognito.adminGetUserCommandOutput(userName);
         const userAttributes = adminGetUserCommandOutput.UserAttributes;
 
@@ -157,6 +195,8 @@ export default class SelfServiceServicesService {
     }
 
     async newService(service: Service, userId: string, authenticationResult: AuthenticationResultType): Promise<void> {
+        console.info("In self-service-services-service:newService()");
+
         return this.lambda.newService(
             service,
             userId,
@@ -166,6 +206,8 @@ export default class SelfServiceServicesService {
     }
 
     generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse> {
+        console.info("In self-service-services-service:generateClient");
+
         return this.lambda.generateClient(service, authenticationResult);
     }
 
@@ -176,26 +218,37 @@ export default class SelfServiceServicesService {
         updates: ClientUpdates,
         accessToken: string
     ): Promise<void> {
+        console.info("In self-service-services-service:updateClient()");
+
         return this.lambda.updateClient(serviceId, selfServiceClientId, clientId, updates, accessToken);
     }
 
     updateService(serviceId: string, updates: ServiceNameUpdates, accessToken: string): Promise<void> {
+        console.info("In self-service-services-service:updateService()");
+
         return this.lambda.updateService(serviceId, updates, accessToken);
     }
 
     publicBetaRequest(userName: string, department: string, serviceName: string, emailAddress: string): Promise<void> {
+        console.info("In self-service-services-service:betaRequest()");
         return this.lambda.publicBetaRequest(userName, department, serviceName, emailAddress);
     }
 
     async listServices(userId: string): Promise<Service[]> {
+        console.info("In self-service-services-service:listServices()");
+
         return dynamoServicesToDomainServices((await this.lambda.listServices(userId)).data.Items);
     }
 
     updateUser(userId: string, updates: UserUpdates, accessToken: string): Promise<void> {
+        console.info("In self-service-services-service:updateUser()");
+
         return this.lambda.updateUser(userId, updates, accessToken);
     }
 
     async listClients(serviceId: string): Promise<Client[]> {
+        console.info("In self-service-services-service:listClients()");
+
         const clients = await this.lambda.listClients(serviceId);
         return clients.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? [];
     }
