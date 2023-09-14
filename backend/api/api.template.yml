@@ -76,7 +76,7 @@ Resources:
           - !Ref AWS::NoValue
       EndpointConfiguration:
         Type: !If [ PrivateAPI, PRIVATE, !Ref AWS::NoValue ]
-        VpcEndpointIds: !If [ PrivateAPI, Fn::ImportValue: VPC-ExecuteAPIGatewayEndpointID, !Ref AWS::NoValue ]
+        VpcEndpointIds: !If [ PrivateAPI, [ Fn::ImportValue: VPC-ExecuteAPIGatewayEndpointID ], !Ref AWS::NoValue ]
       MethodSettings:
         - HttpMethod: "*"
           ResourcePath: /*
