@@ -230,6 +230,7 @@ Resources:
               - iam:DetachRolePolicy
               - iam:PutRolePolicy
               - iam:DeleteRolePolicy
+              - iam:CreatePolicy
             Condition:
               StringEqualsIfExists:
                 iam:PassedToService:
