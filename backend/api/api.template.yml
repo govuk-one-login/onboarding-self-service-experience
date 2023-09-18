@@ -228,6 +228,66 @@ Resources:
             Path: /get-services/{userId}
             Method: GET
 
+  GetSessionCountFunction:
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+    Properties:
+      Handler: backend/api/src/handlers/dynamodb/get-session-count.getSessionCountHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBReadPolicy:
+            TableName:
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
+      Environment:
+        Variables:
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /get-session-count/{userEmail}
+            Method: GET
+
+  GlobalSignOutFunction:
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+    Properties:
+      Handler: backend/api/src/handlers/dynamodb/global-sign-out.globalSignOutHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - DynamoDBCrudPolicy:
+            TableName:
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
+      Environment:
+        Variables:
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /global-sign-out/{userEmail}
+            Method: GET
+
   PutServiceFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
     # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC

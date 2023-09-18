@@ -140,6 +140,11 @@ export default class StubCognitoClient implements CognitoInterface {
         loggedInIdTokenPayload.phone_number = convertToCountryPrefixFormat(phoneNumber);
     }
 
+    async forceVerifyMobileNumber(userName: string, phoneNumber: string, isVerified: boolean): Promise<void> {
+        loggedInIdTokenPayload.phone_number = convertToCountryPrefixFormat(phoneNumber);
+        loggedInIdTokenPayload.phone_number_verified = isVerified;
+    }
+
     async verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<void> {
         await this.getOverriddenReturnValue("verifySmsCode", "code", code);
     }
@@ -217,6 +222,16 @@ export default class StubCognitoClient implements CognitoInterface {
 
     useRefreshToken(): Promise<AdminInitiateAuthCommandOutput> {
         return Promise.resolve({AuthenticationResult: authenticationResult, $metadata: {}});
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    globalSignOut(accessToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        return Promise.resolve({AuthenticationResult: authenticationResult, $metadata: {}});
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    getUser(accessToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        return Promise.resolve({AuthenticationResult: authenticationResult, $metadata: {httpStatusCode: 200}});
     }
 }
 

@@ -35,4 +35,8 @@ export default interface LambdaFacadeInterface {
     ): Promise<void>;
 
     updateService(serviceId: string, updates: ServiceNameUpdates, accessToken: string): Promise<void>;
+
+    sessionCount(userEmail: string): Promise<AxiosResponse>;
+
+    globalSignOut(userEmail: string): Promise<AxiosResponse>;
 }

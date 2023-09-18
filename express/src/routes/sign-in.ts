@@ -12,7 +12,12 @@ import {
     processResendPhoneCodePage,
     showSignInFormEmail,
     showSignInFormPassword,
-    showSignInPasswordResendTextCode
+    showSignInPasswordResendTextCode,
+    globalSignOut,
+    showSignInFormEmailGlobalSignOut,
+    processEnterMobileForm,
+    showEnterMobileForm,
+    showSubmitMobileVerificationCode
 } from "../controllers/sign-in";
 import processSignInForm from "../middleware/process-sign-in-form";
 import {render} from "../middleware/request-handler";
@@ -21,6 +26,7 @@ import checkPasswordAllowed from "../middleware/validators/common-password-valid
 import checkEmailInSession from "../middleware/validators/email-present-in-session";
 import validateEmail from "../middleware/validators/email-validator";
 import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator";
+import validateMobileNumber from "../middleware/validators/mobile-number-validator";
 
 const router = Router();
 export default router;
@@ -30,6 +36,11 @@ router.get("/", (req, res) => {
 });
 
 router.route("/enter-email-address").get(showSignInFormEmail).post(validateEmail("sign-in/enter-email-address.njk"), processEmailAddress);
+
+router
+    .route("/enter-email-address-global-sign-out")
+    .get(showSignInFormEmailGlobalSignOut)
+    .post(validateEmail("sign-in/enter-email-address-global-sign-out.njk"), processEmailAddress);
 
 router
     .route("/enter-password")
@@ -66,8 +77,20 @@ router
         finishSignIn
     );
 
+router
+    .route("/re-enter-text-code")
+    .get(showSubmitMobileVerificationCode)
+    .post(validateMobileSecurityCode("resend-text-code"), processSecurityCode, finishSignIn);
+
+router
+    .route("/enter-phone-number")
+    .get(showEnterMobileForm)
+    .post(validateMobileNumber("sign-in/enter-phone-number.njk"), processEnterMobileForm);
+
 router.route("/resend-text-code").get(showResendPhoneCodePage).post(processResendPhoneCodePage);
 router.route("/account-not-found").get(render("sign-in/account-not-found.njk"));
+router.route("/signed-in-to-another-device").get(render("sign-in/signed-in-to-another-device.njk"));
+router.route("/global-sign-out").get(globalSignOut);
 
 router
     .route("/forgot-password")

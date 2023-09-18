@@ -3,7 +3,7 @@ run-name: Upload to AWS [${{ github.head_ref || github.ref_name }}]
 
 on:
   workflow_dispatch:
-  pull_request:
+  # pull_request:
 
 concurrency:
   group: deploy-secure-pipelines-development

@@ -6,23 +6,64 @@ import {
 import {RequestHandler} from "express";
 import {port} from "../config/environment";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
-import {obscureNumber} from "../lib/mobile-number";
+import {convertToCountryPrefixFormat, obscureNumber} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
+import console from "console";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
+export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
-export const showCheckPhonePage: RequestHandler = (req, res) => {
+export const showCheckPhonePage: RequestHandler = async (req, res) => {
     // TODO we should probably throw here or use middleware to validate the required values
-    if (!req.session.emailAddress || !req.session.mfaResponse) {
-        return res.redirect("/sign-in");
-    }
 
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const emailAddress = nonNull(req.session.emailAddress);
+    const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
+    if (!signUpStatus.hasAllStages()) {
+        console.log("DEBUG::: Redirecting to enter-phone-number");
+        return res.redirect("/sign-in/enter-phone-number");
+    } else if (!req.session.emailAddress || !req.session.mfaResponse) {
+        return res.redirect("/sign-in");
+    } else {
+        res.render("common/enter-text-code.njk", {
+            headerActiveItem: "sign-in",
+            values: {
+                mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo),
+                textMessageNotReceivedUrl: "/sign-in/resend-text-code"
+            }
+        });
+    }
+};
+
+export const showEnterMobileForm: RequestHandler = (req, res) => {
+    console.log("DEBUG::: in showEnterMobileForm");
+    res.render("sign-in/enter-phone-number.njk", {
+        value: {mobileNumber: req.session.mobileNumber}
+    });
+};
+
+export const processEnterMobileForm: RequestHandler = async (req, res) => {
+    const mobileNumber = convertToCountryPrefixFormat(req.body.mobileNumber);
+    const s4: SelfServiceServicesService = res.app.get("backing-service");
+
+    const emailAddress = nonNull(req.session.emailAddress);
+    req.session.mobileNumber = mobileNumber;
+    req.session.enteredMobileNumber = req.body.mobileNumber;
+    req.session.updatedField = "mobile phone number";
+
+    await s4.setPhoneNumber(emailAddress, mobileNumber);
+
+    res.redirect("/sign-in/re-enter-text-code");
+};
+
+export const showSubmitMobileVerificationCode: RequestHandler = async (req, res) => {
+    console.log("DEBUG::: in showSubmitMobileVerificationCode");
     res.render("common/enter-text-code.njk", {
-        headerActiveItem: "sign-in",
         values: {
-            mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo),
+            mobileNumber: req.session.enteredMobileNumber,
             textMessageNotReceivedUrl: "/sign-in/resend-text-code"
         }
     });
@@ -39,7 +80,7 @@ export const finishSignIn: RequestHandler = async (req, res) => {
     }
 
     if (req.session.updatedField === "password") {
-        console.info("Finishing Sign-In");
+        console.info("Finishing Sign-In after password change");
 
         await s4.updateUser(
             AuthenticationResultParser.getCognitoId(authenticationResult),
@@ -48,8 +89,39 @@ export const finishSignIn: RequestHandler = async (req, res) => {
         );
     }
 
+    if (req.session.updatedField === "mobile phone number") {
+        console.info("Finishing Sign-In after mobile phone number change");
+
+        const emailAddress = nonNull(req.session.emailAddress);
+        await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasTextCode);
+    }
+
     req.session.isSignedIn = true;
-    res.redirect("/services");
+    if (await signedInToAnotherDevice(user.email, s4)) {
+        res.redirect("/sign-in/signed-in-to-another-device");
+    } else {
+        res.redirect("/services");
+    }
+};
+
+async function signedInToAnotherDevice(email: string, s4: SelfServiceServicesService) {
+    const sessions = await s4.sessionCount(email);
+    console.log(`Found ${sessions} session(s)`);
+    return sessions > 1;
+}
+
+export const globalSignOut: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const authenticationResult = nonNull(req.session.authenticationResult);
+    const accessToken = authenticationResult.AccessToken;
+
+    if (accessToken) {
+        const user = await s4.getSelfServiceUser(authenticationResult);
+        const output = await s4.globalSignOut(user.email, accessToken);
+        console.log(`globalSignOut() Session invalidated, Response HTTP Status Code: ${output.status}`);
+    }
+
+    req.session.destroy(() => res.redirect("/sign-in/enter-email-address-global-sign-out"));
 };
 
 export const processEmailAddress: RequestHandler = (req, res) => {
@@ -61,8 +133,15 @@ export const showResendPhoneCodePage = render("sign-in/resend-text-code.njk");
 
 export const showSignInPasswordResendTextCode = render("sign-in/resend-text-code/enter-password.njk");
 
-export const processResendPhoneCodePage: RequestHandler = (req, res) => {
-    res.redirect("/sign-in/resend-text-code/enter-password");
+export const processResendPhoneCodePage: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const emailAddress = nonNull(req.session.emailAddress);
+    const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
+    if (signUpStatus.hasAllStages()) {
+        res.redirect("/sign-in/resend-text-code/enter-password");
+    } else {
+        res.redirect("/sign-in/enter-text-code");
+    }
 };
 
 export const forgotPasswordForm: RequestHandler = (req, res) => {
@@ -116,7 +195,12 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
 
 const forgotPassword: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
-    const uri = `${req.protocol}://${req.hostname}:${port}`;
+    let uri;
+    if (req.hostname === "localhost") {
+        uri = `${req.protocol}://${req.hostname}:${port}`;
+    } else {
+        uri = `${req.protocol}://${req.hostname}`;
+    }
 
     try {
         await s4.forgotPassword(nonNull(req.session.emailAddress), uri);

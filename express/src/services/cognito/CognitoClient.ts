@@ -18,7 +18,10 @@ import {
     RespondToAuthChallengeCommandOutput,
     ServiceInputTypes,
     ServiceOutputTypes,
-    VerifyUserAttributeCommand
+    GlobalSignOutCommand,
+    GetUserCommand,
+    VerifyUserAttributeCommand,
+    UpdateUserPoolClientCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Command} from "@aws-sdk/types";
 import {cognito, region} from "../../config/environment";
@@ -46,6 +49,16 @@ export default class CognitoClient implements CognitoInterface {
         this.clientId = nonNull(cognito.clientId);
         this.userPoolId = nonNull(cognito.userPoolId);
         this.client = new CognitoIdentityProviderClient({region: region});
+
+        // Update the MFA Duration Status from default of 3 Minutes to 15 Minutes (the maximum)
+        const updateUserPoolClientCommand = new UpdateUserPoolClientCommand({
+            ClientId: this.clientId,
+            UserPoolId: this.userPoolId,
+            AuthSessionValidity: 15,
+            ExplicitAuthFlows: ["ALLOW_ADMIN_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+        });
+
+        this.client.send(updateUserPoolClientCommand);
     }
 
     async createUser(email: string): Promise<void> {
@@ -91,6 +104,18 @@ export default class CognitoClient implements CognitoInterface {
                 USERNAME: email,
                 PASSWORD: password
             }
+        });
+    }
+
+    async globalSignOut(accessToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        return await this.sendCommand(GlobalSignOutCommand, {
+            AccessToken: accessToken
+        });
+    }
+
+    async getUser(accessToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        return await this.sendCommand(GetUserCommand, {
+            AccessToken: accessToken
         });
     }
 
@@ -212,6 +237,25 @@ export default class CognitoClient implements CognitoInterface {
                 {
                     Name: "phone_number",
                     Value: phoneNumber
+                }
+            ]
+        });
+    }
+
+    async forceVerifyMobileNumber(userName: string, phoneNumber: string, isVerified: boolean): Promise<void> {
+        console.info("In CognitoClient:forceVerifyMobileNumber()");
+
+        await this.sendCommand(AdminUpdateUserAttributesCommand, {
+            UserPoolId: this.userPoolId,
+            Username: userName,
+            UserAttributes: [
+                {
+                    Name: "phone_number",
+                    Value: phoneNumber
+                },
+                {
+                    Name: "phone_number_verified",
+                    Value: String(isVerified)
                 }
             ]
         });

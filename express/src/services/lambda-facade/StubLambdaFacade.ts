@@ -98,6 +98,18 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         } as AxiosResponse);
     }
 
+    sessionCount(): Promise<AxiosResponse> {
+        return Promise.resolve({
+            data: 5
+        } as AxiosResponse);
+    }
+
+    globalSignOut(): Promise<AxiosResponse> {
+        return Promise.resolve({
+            status: 200
+        } as AxiosResponse);
+    }
+
     listClients(): Promise<AxiosResponse<QueryCommandOutput>> {
         return Promise.resolve({
             data: {

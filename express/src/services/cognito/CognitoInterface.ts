@@ -26,6 +26,8 @@ export default interface CognitoInterface {
 
     setPhoneNumber(username: string, phoneNumber: string): Promise<void>;
 
+    forceVerifyMobileNumber(userName: string, phoneNumber: string, isVerified: boolean): Promise<void>;
+
     sendMobileNumberVerificationCode(accessToken: string): Promise<void>;
 
     verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<void>;
@@ -39,4 +41,8 @@ export default interface CognitoInterface {
     adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput>;
 
     setSignUpStatus(username: string, status: string): Promise<void>;
+
+    globalSignOut(accessToken: string): Promise<AdminInitiateAuthCommandOutput>;
+
+    getUser(accessToken: string): Promise<AdminInitiateAuthCommandOutput>;
 }

@@ -44,4 +44,4 @@ app.use(errorHandler);
 app.locals.googleTagId = googleTagId;
 app.locals.showTestBanner = showTestBanner;
 
-app.listen(port, () => console.log(`Server running; listening on port ${port}`));
+app.listen(port, () => console.log(`Server running; listening on port ${port}, current time: ${new Date().toLocaleTimeString()}`));

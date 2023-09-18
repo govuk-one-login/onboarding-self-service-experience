@@ -9,11 +9,12 @@ import AuthenticationResultParser from "../lib/authentication-result-parser";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 
 export const showChangePasswordForm = render("account/change-password.njk");
 
 export const showAccount: RequestHandler = async (req, res) => {
-    const authenticationResult = nonNull(req.session.authenticationResult);
+    const authenticationResult = nonNull(req.session?.authenticationResult);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const user = await s4.getSelfServiceUser(authenticationResult);
 
@@ -71,10 +72,12 @@ export const showChangePhoneNumberForm = render("account/change-phone-number.njk
 export const processChangePhoneNumberForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    await s4.setPhoneNumber(
-        AuthenticationResultParser.getEmail(nonNull(req.session.authenticationResult)),
-        convertToCountryPrefixFormat(req.body.mobileNumber)
-    );
+    const emailAddress = AuthenticationResultParser.getEmail(nonNull(req.session.authenticationResult));
+    await s4.setPhoneNumber(emailAddress, convertToCountryPrefixFormat(req.body.mobileNumber));
+
+    const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
+    signUpStatus.setStage(SignupStatusStage.HasTextCode, false);
+    await s4.resetSignUpStatus(emailAddress, signUpStatus);
 
     console.info("Sending Mobile Phone Verification Code");
     await s4.sendMobileNumberVerificationCode(nonNull(req.session.authenticationResult?.AccessToken));
@@ -100,6 +103,10 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
 
     try {
         await s4.verifyMobileUsingSmsCode(accessToken, req.body.securityCode);
+        const emailAddress = AuthenticationResultParser.getEmail(authenticationResult);
+        const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
+        signUpStatus.setStage(SignupStatusStage.HasTextCode, true);
+        await s4.resetSignUpStatus(emailAddress, signUpStatus);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             return res.render("common/enter-text-code.njk", {

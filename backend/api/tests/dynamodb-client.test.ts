@@ -1,5 +1,6 @@
 const send = jest.fn();
 const queryCommand = jest.fn();
+const scanCommand = jest.fn();
 const updateItemCommand = jest.fn();
 
 jest.mock("@aws-sdk/client-dynamodb", () => {
@@ -10,6 +11,7 @@ jest.mock("@aws-sdk/client-dynamodb", () => {
             };
         }),
         QueryCommand: queryCommand,
+        ScanCommand: scanCommand,
         UpdateItemCommand: updateItemCommand
     };
 });
@@ -27,6 +29,20 @@ const queryCommandParams = {
         }
     },
     KeyConditionExpression: "#serviceId = :serviceId"
+};
+
+const scanCommandParams = {
+    TableName: "identities",
+    ExpressionAttributeNames: {
+        "#userEmail": "id"
+    },
+    ExpressionAttributeValues: {
+        ":userEmail": {
+            S: "97dfebf4098c0f5c16bca61e2b76c373:"
+        }
+    },
+    FilterExpression: "begins_with(#userEmail, :userEmail)",
+    ProjectionExpression: "id"
 };
 
 const updateCommandParams01 = {
@@ -126,6 +142,13 @@ describe("DynamoDB client", () => {
             await client.getServicesById("423423ada-32123892");
             expect(queryCommand).toBeCalledTimes(1);
             expect(queryCommand.mock.calls[0][0]).toStrictEqual(queryCommandParams);
+            expect(send).toBeCalledTimes(1);
+        });
+
+        it("should invoke getSessions successfully", async () => {
+            await client.getSessions("test@mail.com");
+            expect(scanCommand).toBeCalledTimes(1);
+            expect(scanCommand.mock.calls[0][0]).toStrictEqual(scanCommandParams);
             expect(send).toBeCalledTimes(1);
         });
 

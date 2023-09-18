@@ -66,6 +66,7 @@ export default class SelfServiceServicesService {
             throw new SelfServiceError("AccessToken not present");
         }
 
+        await this.validateToken(authenticationResult.AccessToken, "getSelfServiceUser");
         const response = await this.lambda.getUserByCognitoId(
             AuthenticationResultParser.getCognitoId(authenticationResult),
             authenticationResult.AccessToken
@@ -86,9 +87,9 @@ export default class SelfServiceServicesService {
         };
     }
 
-    putUser(user: OnboardingTableItem, accessToken: string): Promise<void> {
+    async putUser(user: OnboardingTableItem, accessToken: string): Promise<void> {
         console.info("In self-service-services-service:putUser()");
-
+        await this.validateToken(accessToken, "putUser");
         return this.lambda.putUser(user, accessToken);
     }
 
@@ -126,6 +127,12 @@ export default class SelfServiceServicesService {
         console.info("In self-service-services-service:setPhoneNumber()");
 
         return this.cognito.setPhoneNumber(emailAddress, mobileNumber);
+    }
+
+    forceVerifyMobileNumber(userName: string, phoneNumber: string, isVerified: boolean): Promise<void> {
+        console.info("In self-service-services-service:forceVerifyMobileNumber()");
+
+        return this.cognito.forceVerifyMobileNumber(userName, phoneNumber, isVerified);
     }
 
     setMfaPreference(cognitoId: string): Promise<void> {
@@ -167,14 +174,17 @@ export default class SelfServiceServicesService {
         return await this.cognito.setSignUpStatus(userName, signUpStatus.getState());
     }
 
+    async resetSignUpStatus(userName: string, signUpStatus: SignupStatus): Promise<void> {
+        const newState = signUpStatus.getState();
+        console.log("Resetting Sign Up Status =>" + newState);
+        return await this.cognito.setSignUpStatus(userName, newState);
+    }
+
     async getSignUpStatus(userName: string): Promise<SignupStatus> {
         console.info("In self-service-services-service:getSignUpStatus()");
 
         const adminGetUserCommandOutput = await this.cognito.adminGetUserCommandOutput(userName);
         const userAttributes = adminGetUserCommandOutput.UserAttributes;
-
-        console.log(JSON.stringify(adminGetUserCommandOutput));
-        console.log(JSON.stringify(adminGetUserCommandOutput.UserAttributes));
 
         if (userAttributes == null) {
             throw new Error("Unable to get Sign Up Status Custom Attribute");
@@ -196,6 +206,7 @@ export default class SelfServiceServicesService {
 
     async newService(service: Service, userId: string, authenticationResult: AuthenticationResultType): Promise<void> {
         console.info("In self-service-services-service:newService()");
+        await this.validateToken(nonNull(authenticationResult.AccessToken), "newService");
 
         return this.lambda.newService(
             service,
@@ -205,13 +216,13 @@ export default class SelfServiceServicesService {
         );
     }
 
-    generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse> {
+    async generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse> {
         console.info("In self-service-services-service:generateClient");
-
+        await this.validateToken(nonNull(authenticationResult.AccessToken), "generateClient");
         return this.lambda.generateClient(service, authenticationResult);
     }
 
-    updateClient(
+    async updateClient(
         serviceId: string,
         selfServiceClientId: string,
         clientId: string,
@@ -219,37 +230,67 @@ export default class SelfServiceServicesService {
         accessToken: string
     ): Promise<void> {
         console.info("In self-service-services-service:updateClient()");
-
+        await this.validateToken(accessToken, "updateClient");
         return this.lambda.updateClient(serviceId, selfServiceClientId, clientId, updates, accessToken);
     }
 
-    updateService(serviceId: string, updates: ServiceNameUpdates, accessToken: string): Promise<void> {
+    async updateService(serviceId: string, updates: ServiceNameUpdates, accessToken: string): Promise<void> {
         console.info("In self-service-services-service:updateService()");
-
+        await this.validateToken(accessToken, "updateService");
         return this.lambda.updateService(serviceId, updates, accessToken);
     }
 
-    publicBetaRequest(userName: string, department: string, serviceName: string, emailAddress: string): Promise<void> {
+    private async validateToken(accessToken: string, message: string) {
+        try {
+            const userData = await this.cognito.getUser(accessToken);
+            if (userData.$metadata.httpStatusCode != 200) {
+                console.log(`validateToken() ${message} - Invalid token, HTTP response code: ` + userData.$metadata.httpStatusCode);
+                throw new Error(`validateToken() ${message} - Invalid token, HTTP response code: ` + userData.$metadata.httpStatusCode);
+            }
+            console.log(`validateToken() ${message}  - token is valid`);
+        } catch (e) {
+            console.log(`validateToken() ${message} - invalid token, exception ` + JSON.stringify(e, null, 4));
+            throw e;
+        }
+    }
+
+    async publicBetaRequest(
+        userName: string,
+        department: string,
+        serviceName: string,
+        emailAddress: string,
+        accessToken: string
+    ): Promise<void> {
         console.info("In self-service-services-service:betaRequest()");
+        await this.validateToken(accessToken, "privateBetaRequest");
         return this.lambda.publicBetaRequest(userName, department, serviceName, emailAddress);
     }
 
-    async listServices(userId: string): Promise<Service[]> {
+    async listServices(userId: string, accessToken: string): Promise<Service[]> {
         console.info("In self-service-services-service:listServices()");
-
+        await this.validateToken(accessToken, "listServices");
         return dynamoServicesToDomainServices((await this.lambda.listServices(userId)).data.Items);
     }
 
-    updateUser(userId: string, updates: UserUpdates, accessToken: string): Promise<void> {
+    async updateUser(userId: string, updates: UserUpdates, accessToken: string): Promise<void> {
         console.info("In self-service-services-service:updateUser()");
-
+        await this.validateToken(accessToken, "updateUser");
         return this.lambda.updateUser(userId, updates, accessToken);
     }
 
-    async listClients(serviceId: string): Promise<Client[]> {
+    async listClients(serviceId: string, accessToken: string): Promise<Client[]> {
         console.info("In self-service-services-service:listClients()");
-
+        await this.validateToken(accessToken, "listClients");
         const clients = await this.lambda.listClients(serviceId);
         return clients.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? [];
+    }
+
+    async globalSignOut(userEmail: string, accessToken: string): Promise<AxiosResponse> {
+        await this.cognito.globalSignOut(accessToken);
+        return this.lambda.globalSignOut(userEmail);
+    }
+
+    async sessionCount(userEmail: string): Promise<number> {
+        return (await this.lambda.sessionCount(userEmail)).data.sessionCount;
     }
 }
