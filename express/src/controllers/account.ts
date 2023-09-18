@@ -13,9 +13,13 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 export const showChangePasswordForm = render("account/change-password.njk");
 
 export const showAccount: RequestHandler = async (req, res) => {
+    console.info("In showAccount()");
+
     const authenticationResult = nonNull(req.session.authenticationResult);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const user = await s4.getSelfServiceUser(authenticationResult);
+
+    console.info("showAccount(): about to Render View => account/account.njk");
 
     res.render("account/account.njk", {
         emailAddress: user.email,
@@ -24,6 +28,8 @@ export const showAccount: RequestHandler = async (req, res) => {
         serviceName: "My juggling service",
         updatedField: req.session.updatedField
     });
+
+    console.info("showAccount(): View Rendered");
 
     req.session.mobileNumber = AuthenticationResultParser.getPhoneNumber(authenticationResult);
     req.session.updatedField = undefined;

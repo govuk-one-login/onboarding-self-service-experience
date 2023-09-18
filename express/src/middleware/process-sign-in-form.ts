@@ -23,6 +23,7 @@ export default function processSignInForm(template: string): RequestHandler {
         }
 
         try {
+            await s4.setMFADuration();
             req.session.mfaResponse = await s4.login(email, password);
         } catch (error) {
             if (error instanceof NotAuthorizedException) {

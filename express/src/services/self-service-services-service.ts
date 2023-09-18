@@ -59,18 +59,22 @@ export default class SelfServiceServicesService {
         console.info("In self-service-services-service:getSelfServiceUser()");
 
         if (!authenticationResult.IdToken) {
+            console.error("self-service-services-service:getSelfServiceUser() - No IdToken");
             throw new SelfServiceError("IdToken not present");
         }
 
         if (!authenticationResult.AccessToken) {
+            console.error("self-service-services-service:getSelfServiceUser() - No AccessToken");
             throw new SelfServiceError("AccessToken not present");
         }
 
+        console.log("self-service-services-service:getSelfServiceUser() - Calling getUserByCognitoId");
         const response = await this.lambda.getUserByCognitoId(
             AuthenticationResultParser.getCognitoId(authenticationResult),
             authenticationResult.AccessToken
         );
 
+        console.log("self-service-services-service:getSelfServiceUser() - userToDomain");
         return userToDomainUser(response.data.Item as DynamoUser);
     }
 
@@ -251,5 +255,11 @@ export default class SelfServiceServicesService {
 
         const clients = await this.lambda.listClients(serviceId);
         return clients.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? [];
+    }
+
+    async setMFADuration() {
+        console.info("In self-service-services-service:setMFADuration()");
+
+        await this.cognito.setMFADuration();
     }
 }

@@ -18,6 +18,7 @@ import {
     RespondToAuthChallengeCommandOutput,
     ServiceInputTypes,
     ServiceOutputTypes,
+    UpdateUserPoolClientCommand,
     VerifyUserAttributeCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Command} from "@aws-sdk/types";
@@ -46,6 +47,15 @@ export default class CognitoClient implements CognitoInterface {
         this.clientId = nonNull(cognito.clientId);
         this.userPoolId = nonNull(cognito.userPoolId);
         this.client = new CognitoIdentityProviderClient({region: region});
+
+        const updateUserPoolClientCommand = new UpdateUserPoolClientCommand({
+            ClientId: this.clientId,
+            UserPoolId: this.userPoolId,
+            AuthSessionValidity: 15,
+            ExplicitAuthFlows: ["ALLOW_ADMIN_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+        });
+
+        this.client.send(updateUserPoolClientCommand);
     }
 
     async createUser(email: string): Promise<void> {
@@ -278,6 +288,19 @@ export default class CognitoClient implements CognitoInterface {
                 REFRESH_TOKEN: refreshToken
             }
         });
+    }
+
+    async setMFADuration(): Promise<void> {
+        console.info("In CognitoClient:setMFADuration()");
+
+        const updateUserPoolClientCommand = new UpdateUserPoolClientCommand({
+            ClientId: this.clientId,
+            UserPoolId: this.userPoolId,
+            AuthSessionValidity: 15,
+            ExplicitAuthFlows: ["ALLOW_ADMIN_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+        });
+
+        await this.client.send(updateUserPoolClientCommand);
     }
 
     private sendCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes>(
