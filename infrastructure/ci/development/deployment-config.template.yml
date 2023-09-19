@@ -44,6 +44,7 @@ Resources:
                 Resource: "*"
                 Action:
                   - iam:ListPolicies
+                  - iam:CreatePolicy
                   - ec2:DescribeVpcs
                   - ec2:DescribeSubnets
 
@@ -137,6 +138,7 @@ Resources:
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
               - iam:DeleteRolePolicy
+              - iam:CreatePolicy
             Condition:
               StringEqualsIfExists:
                 iam:PassedToService: ecs-tasks.amazonaws.com
@@ -368,6 +370,7 @@ Resources:
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
               - iam:DeleteRolePolicy
+              - iam:CreatePolicy
             Condition:
               StringEqualsIfExists:
                 iam:PassedToService: lambda.amazonaws.com
