@@ -15,41 +15,41 @@ export const showGetEmailForm = render("register/enter-email-address.njk");
 export const processGetEmailForm: RequestHandler = async (req, res) => {
     const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    console.log("In ProcessGetEmailForm");
+    console.info("In ProcessGetEmailForm");
 
     req.session.emailAddress = emailAddress;
 
     try {
-        console.log("Trying to Create User");
+        console.info("Trying to Create User");
         await s4.createUser(emailAddress);
-        console.log("Created User");
+        console.info("Created User");
     } catch (error) {
         if (error instanceof UsernameExistsException) {
             const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
 
-            console.log("In UserNameExistException");
+            console.info("In UserNameExistException");
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
-                console.log("Processing No HasEMail");
+                console.info("Processing No HasEMail");
                 return res.redirect("resume-before-password");
             }
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
-                console.log("Processing No HasPassword");
+                console.info("Processing No HasPassword");
                 return res.redirect("resume-before-password");
             }
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
-                console.log("Processing No HasPhoneNumber");
+                console.info("Processing No HasPhoneNumber");
                 return res.redirect("resume-after-password");
             }
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
-                console.log("Processing No HasTextCode");
+                console.info("Processing No HasTextCode");
                 return res.redirect("resume-after-password");
             }
 
-            console.log("Redirecting to Default");
+            console.info("Redirecting to Default");
             return res.redirect("/register/account-exists");
         }
 
@@ -215,13 +215,12 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
 
 export const showResendPhoneCodeForm = render("register/resend-text-code.njk");
 export const showResendEmailCodeForm = render("register/resend-email-code.njk");
-
-export const resumeBeforePassword = render("/enter-email-code.njk");
 export const resumeAfterPassword = render("register/resume-after-password.njk");
 
 export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
+    console.info("Resending E-Mail Verification Code");
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
     res.redirect("/register/enter-email-code");
 };
@@ -238,13 +237,14 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
     if (!userId) {
-        console.log("Can't get CognitoId from authenticationResult in session");
+        console.info("Can't get CognitoId from authenticationResult in session");
         return res.render("there-is-a-problem.njk");
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
+        console.info("Adding Service:" + service.serviceName);
         await s4.newService(service, userId, nonNull(req.session.authenticationResult));
     } catch (error) {
         console.error(error);
@@ -270,11 +270,9 @@ export const accountExists: RequestHandler = (req, res) => {
 export const resumeUserJourneyAfterPassword: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    console.log("In resumeUserJourney");
+    console.info("In resumeUserJourney");
     const userName = nonNull(req.session.emailAddress);
     const userPassword = nonNull(req.body["password"]);
-    console.log("User Name => " + userName);
-    console.log("User Password => " + userPassword);
 
     const response = await s4.submitUsernamePassword(userName, userPassword);
     req.session.cognitoSession = response.Session;

@@ -76,7 +76,7 @@ Resources:
           - !Ref AWS::NoValue
       EndpointConfiguration:
         Type: !If [ PrivateAPI, PRIVATE, !Ref AWS::NoValue ]
-        VpcEndpointIds: !If [ PrivateAPI, Fn::ImportValue: VPC-ExecuteAPIGatewayEndpointID, !Ref AWS::NoValue ]
+        VpcEndpointIds: !If [ PrivateAPI, [ Fn::ImportValue: VPC-ExecuteAPIGatewayEndpointID ], !Ref AWS::NoValue ]
       MethodSettings:
         - HttpMethod: "*"
           ResourcePath: /*
@@ -683,7 +683,7 @@ Resources:
 
   #--- Notifications ---#
 
-  PrivateBetaNotificationFunction:
+  PublicBetaNotificationFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
     # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
     # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
@@ -694,7 +694,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
     Properties:
-      Handler: backend/api/src/handlers/notifications/send-public-beta-notification.privateBetaRequestHandler
+      Handler: backend/api/src/handlers/notifications/send-public-beta-notification.publicBetaRequestHandler
       Description: Publish a message to the public beta request notification topic
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:

@@ -49,7 +49,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async createUser(email: string): Promise<void> {
-        console.log("In createUser");
+        console.log("In CognitoClient:createUser");
         await this.sendCommand(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
             Username: email,
@@ -66,6 +66,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async resendEmailAuthCode(email: string): Promise<void> {
+        console.info("In CognitoClient:resendEmailAuthCode()");
+
         await this.sendCommand(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
             Username: email,
@@ -79,6 +81,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
+        console.info("In CognitoClient:login()");
+
         return this.sendCommand(AdminInitiateAuthCommand, {
             UserPoolId: this.userPoolId,
             ClientId: this.clientId,
@@ -91,6 +95,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
+        console.info("In CognitoClient:setNewPassword()");
+
         return this.sendCommand(RespondToAuthChallengeCommand, {
             ChallengeName: "NEW_PASSWORD_REQUIRED",
             ChallengeResponses: {
@@ -103,6 +109,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<void> {
+        console.info("In CognitoClient:changePassword()");
+
         await this.sendCommand(ChangePasswordCommand, {
             AccessToken: accessToken,
             PreviousPassword: previousPassword,
@@ -111,6 +119,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async forgotPassword(email: string, uri: string): Promise<void> {
+        console.info("In CognitoClient:forgotPassword()");
+
         await this.sendCommand(ForgotPasswordCommand, {
             ClientId: this.clientId,
             Username: email,
@@ -122,6 +132,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async confirmForgotPassword(username: string, password: string, confirmationCode: string): Promise<void> {
+        console.info("In CognitoClient:confirmForgotPassword()");
+
         await this.sendCommand(ConfirmForgotPasswordCommand, {
             ClientId: this.clientId,
             Username: username,
@@ -134,6 +146,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setEmailAsVerified(username: string): Promise<void> {
+        console.info("In CognitoClient:setEmailVerified()");
+
         await this.sendCommand(AdminUpdateUserAttributesCommand, {
             UserPoolId: this.userPoolId,
             Username: username,
@@ -147,6 +161,9 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setSignUpStatus(username: string, status: string): Promise<void> {
+        console.info("In CognitoClient:setSignUpStatus()");
+        console.info("Setting Status => " + status);
+
         await this.sendCommand(AdminUpdateUserAttributesCommand, {
             UserPoolId: this.userPoolId,
             Username: username,
@@ -160,6 +177,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput> {
+        console.info("In CognitoClient:adminGetUserCommandOutput()");
+
         const command = new AdminGetUserCommand({
             UserPoolId: this.userPoolId,
             Username: userName
@@ -169,6 +188,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setMobilePhoneAsVerified(username: string): Promise<void> {
+        console.info("In CognitoClient:setMobilePhoneAsVerified()");
+
         await this.sendCommand(AdminUpdateUserAttributesCommand, {
             UserPoolId: this.userPoolId,
             Username: username,
@@ -182,6 +203,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setPhoneNumber(username: string, phoneNumber: string): Promise<void> {
+        console.info("In CognitoClient:setPhoneNumber()");
+
         await this.sendCommand(AdminUpdateUserAttributesCommand, {
             UserPoolId: this.userPoolId,
             Username: username,
@@ -195,6 +218,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async sendMobileNumberVerificationCode(accessToken: string): Promise<void> {
+        console.info("In CognitoClient:sendMobileNumberVerification()");
+
         await this.sendCommand(GetUserAttributeVerificationCodeCommand, {
             AccessToken: accessToken,
             AttributeName: "phone_number"
@@ -205,6 +230,8 @@ export default class CognitoClient implements CognitoInterface {
      * {@link https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_VerifyUserAttribute.html VerifyUserAttribute}
      */
     async verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<void> {
+        console.info("In CognitoClient:verifyMobileUsingSmsCode()");
+
         await this.sendCommand(VerifyUserAttributeCommand, {
             AccessToken: accessToken,
             AttributeName: "phone_number",
@@ -213,6 +240,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setMfaPreference(cognitoUsername: string): Promise<void> {
+        console.info("In CognitoClient:setMfaPreference()");
+
         await this.sendCommand(AdminSetUserMFAPreferenceCommand, {
             SMSMfaSettings: {
                 Enabled: true,
@@ -224,6 +253,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
+        console.info("In CognitoClient:respondToMfaChallenge()");
+
         return this.sendCommand(AdminRespondToAuthChallengeCommand, {
             ChallengeName: "SMS_MFA",
             ChallengeResponses: {
@@ -237,6 +268,8 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        console.info("In CognitoClient:useRefreshToken()");
+
         return this.sendCommand(AdminInitiateAuthCommand, {
             UserPoolId: this.userPoolId,
             ClientId: this.clientId,

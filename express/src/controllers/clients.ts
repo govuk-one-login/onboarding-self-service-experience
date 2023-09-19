@@ -52,7 +52,7 @@ export const showClient: RequestHandler = async (req, res) => {
     req.session.updatedField = undefined;
 };
 
-export const showPrivateBetaForm: RequestHandler = (req, res) => {
+export const showPublicBetaForm: RequestHandler = (req, res) => {
     res.render("clients/public-beta.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -62,7 +62,7 @@ export const showPrivateBetaForm: RequestHandler = (req, res) => {
     });
 };
 
-export const processPrivateBetaForm: RequestHandler = async (req, res) => {
+export const processPublicBetaForm: RequestHandler = async (req, res) => {
     const userName = req.body.userName;
     const department = req.body.department;
     const serviceName = req.body.serviceName;
@@ -96,12 +96,12 @@ export const processPrivateBetaForm: RequestHandler = async (req, res) => {
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    await s4.privateBetaRequest(userName, department, serviceName, emailAddress);
+    await s4.publicBetaRequest(userName, department, serviceName, emailAddress);
 
     res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/public-beta/submitted`);
 };
 
-export const showPrivateBetaFormSubmitted: RequestHandler = (req, res) => {
+export const showPublicBetaFormSubmitted: RequestHandler = (req, res) => {
     res.render("clients/public-beta-form-submitted.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
@@ -152,6 +152,7 @@ export const showChangePublicKeyForm: RequestHandler = (req, res) => {
 export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
+    console.info("Process Change of Public Key Form");
     await s4.updateClient(
         nonNull(req.context.serviceId),
         req.params.selfServiceClientId,
