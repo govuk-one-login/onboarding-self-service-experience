@@ -3,7 +3,7 @@ import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 
 const snsClient = new SNSClient({region: "eu-west-2"});
 
-export const privateBetaRequestHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const publicBetaRequestHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const payload = event?.body ? JSON.parse(event.body as string) : event;
 
     const emailContent =
@@ -18,9 +18,7 @@ export const privateBetaRequestHandler = async (event: APIGatewayProxyEvent): Pr
         Message: emailContent,
         TopicArn: process.env.SNS_TOPIC_ARN
     };
-
     const response = {statusCode: 200, body: JSON.stringify("OK")};
-
     await snsClient
         .send(new PublishCommand(params))
         .then(sendOutput => {
@@ -32,6 +30,5 @@ export const privateBetaRequestHandler = async (event: APIGatewayProxyEvent): Pr
             response.body = JSON.stringify(sendOutput);
             console.error("Error occurred in sending message to request to join public beta topic: " + response);
         });
-
     return response;
 };

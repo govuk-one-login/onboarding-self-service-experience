@@ -96,7 +96,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         await this.post("/update-user", JSON.stringify(body), accessToken);
     }
 
-    async privateBetaRequest(name: string, department: string, serviceName: string, emailAddress: string): Promise<void> {
+    async publicBetaRequest(name: string, department: string, serviceName: string, emailAddress: string): Promise<void> {
         const body = {
             name: name,
             department: department,

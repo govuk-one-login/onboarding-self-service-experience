@@ -1,6 +1,8 @@
 import {NextFunction, Request, Response} from "express";
 
 export default function validateServiceName(req: Request, res: Response, next: NextFunction) {
+    console.info("In validateServiceName()");
+
     const serviceName: string = req.body.serviceName.trim();
 
     if (serviceName.length === 0) {

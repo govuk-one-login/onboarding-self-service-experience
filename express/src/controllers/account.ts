@@ -45,9 +45,12 @@ export const changePassword: RequestHandler = async (req, res) => {
             if (error instanceof LimitExceededException) {
                 options.errorMessages.newPassword = "You have tried to change your password too many times. Try again in 15 minutes.";
                 options.values.currentPassword = currentPassword;
+                console.info("Error Changing Password => Too many times (advised to re-try after 15 minutes)");
             } else if (error instanceof NotAuthorizedException) {
                 options.errorMessages.newPassword = "Your current password is incorrect";
+                console.info("Error Changing Password => Current password entered incorrect");
             } else {
+                console.info("Error Changing Password => Unhandled Error:" + error.message);
                 throw error;
             }
 
@@ -83,6 +86,7 @@ export const processChangePhoneNumberForm: RequestHandler = async (req, res) => 
         convertToCountryPrefixFormat(req.body.mobileNumber)
     );
 
+    console.info("Sending Mobile Phone Verification Code");
     await s4.sendMobileNumberVerificationCode(nonNull(req.session.authenticationResult?.AccessToken));
 
     req.session.enteredMobileNumber = req.body.mobileNumber;
@@ -145,6 +149,7 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
         throw error;
     }
 
+    console.info("Setting Mobile Phone Number as verified");
     await s4.setMobilePhoneAsVerified(AuthenticationResultParser.getEmail(nonNull(req.session.authenticationResult)));
 
     await s4.updateUser(
@@ -153,6 +158,7 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
         accessToken
     );
 
+    console.info("Update user as Mobile Phone verification");
     req.session.mobileNumber = req.session.enteredMobileNumber;
     req.session.enteredMobileNumber = undefined;
     req.session.updatedField = "mobile phone number";
