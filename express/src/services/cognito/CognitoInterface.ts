@@ -39,4 +39,6 @@ export default interface CognitoInterface {
     adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput>;
 
     setSignUpStatus(username: string, status: string): Promise<void>;
+
+    setMFADuration(): Promise<void>;
 }

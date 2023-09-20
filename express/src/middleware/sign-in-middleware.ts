@@ -1,6 +1,7 @@
-import {CodeMismatchException} from "@aws-sdk/client-cognito-identity-provider";
+import {CodeMismatchException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import console from "console";
 
 export default async function processSecurityCode(req: Request, res: Response, next: NextFunction) {
     console.info("In processSecurityCode()");
@@ -16,6 +17,21 @@ export default async function processSecurityCode(req: Request, res: Response, n
         req.session.authenticationResult = await s4.respondToMfaChallenge(req.session.mfaResponse, req.body.securityCode);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
+            console.info("processSecurityCode:Caught Code Mismatch Exception => Prompting User to re-Enter");
+
+            return res.render("common/enter-text-code.njk", {
+                headerActiveItem: "sign-in",
+                errorMessages: {
+                    securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
+                },
+                values: {
+                    securityCode: req.body.securityCode,
+                    mobileNumber: req.session.mobileNumber
+                }
+            });
+        } else if (error instanceof NotAuthorizedException) {
+            console.info("processSecurityCode:Caught Not Authorised Exception => Prompting User to re-Enter");
+
             return res.render("common/enter-text-code.njk", {
                 headerActiveItem: "sign-in",
                 errorMessages: {

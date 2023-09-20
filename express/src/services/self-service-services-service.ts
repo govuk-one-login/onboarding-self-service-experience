@@ -252,4 +252,10 @@ export default class SelfServiceServicesService {
         const clients = await this.lambda.listClients(serviceId);
         return clients.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? [];
     }
+
+    async setMFADuration() {
+        console.info("In self-service-services-service:setMFADuration()");
+
+        await this.cognito.setMFADuration();
+    }
 }

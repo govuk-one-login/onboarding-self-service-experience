@@ -215,6 +215,11 @@ export default class StubCognitoClient implements CognitoInterface {
         return;
     }
 
+    async setMFADuration(): Promise<void> {
+        console.log("In StubCognitoClient:setMFADuration()");
+        return;
+    }
+
     useRefreshToken(): Promise<AdminInitiateAuthCommandOutput> {
         return Promise.resolve({AuthenticationResult: authenticationResult, $metadata: {}});
     }
