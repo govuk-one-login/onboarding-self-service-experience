@@ -6,14 +6,20 @@ import {
     PutItemCommand,
     PutItemCommandOutput,
     QueryCommand,
+    ScanCommand,
+    DeleteItemCommand,
     QueryCommandOutput,
+    ScanCommandOutput,
+    ScanCommandInput,
     UpdateItemCommand,
     UpdateItemCommandInput,
-    UpdateItemCommandOutput
+    UpdateItemCommandOutput,
+    DeleteItemInput
 } from "@aws-sdk/client-dynamodb";
 import {convertToAttr, marshall} from "@aws-sdk/util-dynamodb";
 import * as process from "process";
 import {OnboardingTableItem} from "./onboarding-table-item";
+import {createHash} from "crypto";
 
 type AttributeData = number | boolean | string | string[];
 type AttributeNames = {[nameToken: string]: string};
@@ -80,6 +86,48 @@ export default class DynamoDbClient {
 
         const command = new QueryCommand(params);
         return this.dynamodb.send(command);
+    }
+
+    async getSessions(userEmail: string): Promise<ScanCommandOutput> {
+        const emailHash = this.createMd5Hash(userEmail);
+        console.log(`dynamodb-client getSessions(), emailHash: ${emailHash}`);
+        const params: ScanCommandInput = {
+            TableName: this.tableName,
+            ProjectionExpression: "id",
+            ExpressionAttributeNames: {"#userEmail": "id"},
+            ExpressionAttributeValues: {":userEmail": {S: `${emailHash}:`}},
+            FilterExpression: "begins_with(#userEmail, :userEmail)"
+        };
+
+        const command = new ScanCommand(params);
+        return this.dynamodb.send(command);
+    }
+
+    async deleteSessions(userEmail: string): Promise<{deletedItemCount: number}> {
+        const activeSessions = (await this.getSessions(userEmail)).Items;
+
+        if (!activeSessions || activeSessions.length == 0) return {deletedItemCount: 0};
+
+        console.log(`Number of items to delete: ${activeSessions.length}`);
+
+        let deletedItemsCount = 0;
+
+        for (const activeSession of activeSessions) {
+            const key = "" + activeSession.id.S;
+            console.log(`Deleting item with key: ${key}`);
+            const params: DeleteItemInput = {
+                TableName: this.tableName,
+                Key: {id: {S: key}}
+            };
+            const command = new DeleteItemCommand(params);
+            const response = await this.dynamodb.send(command);
+            console.log(`Deleted item with key: ${key}, HTTP Status code: ${response.$metadata.httpStatusCode}`);
+            deletedItemsCount++;
+        }
+
+        console.log(`Number of deleted items: ${deletedItemsCount}`);
+
+        return {deletedItemCount: deletedItemsCount};
     }
 
     async getServicesById(serviceId: string): Promise<QueryCommandOutput> {
@@ -191,5 +239,12 @@ export default class DynamoDbClient {
 
     private getAttributeValueLabel(attributeName: string) {
         return `:${attributeName}`;
+    }
+
+    private createMd5Hash(text: string) {
+        const hash = createHash("md5")
+            .update(!!text ? text : "")
+            .digest("hex");
+        return hash;
     }
 }

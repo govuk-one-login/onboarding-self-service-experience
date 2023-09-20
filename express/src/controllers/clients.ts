@@ -9,7 +9,7 @@ export const showClient: RequestHandler = async (req, res) => {
     // TODO make S4 instances static in all controllers
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const serviceId = nonNull(req.context.serviceId);
-    const clients = await s4.listClients(serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
     const client = clients[0];
     const selfServiceClientId = client.dynamoServiceId;
     const authClientId = client.authClientId;
@@ -96,7 +96,7 @@ export const processPublicBetaForm: RequestHandler = async (req, res) => {
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    await s4.publicBetaRequest(userName, department, serviceName, emailAddress);
+    await s4.publicBetaRequest(userName, department, serviceName, emailAddress, nonNull(req.session.authenticationResult?.AccessToken));
 
     res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/public-beta/submitted`);
 };

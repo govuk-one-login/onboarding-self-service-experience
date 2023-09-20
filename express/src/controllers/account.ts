@@ -13,7 +13,7 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 export const showChangePasswordForm = render("account/change-password.njk");
 
 export const showAccount: RequestHandler = async (req, res) => {
-    const authenticationResult = nonNull(req.session.authenticationResult);
+    const authenticationResult = nonNull(req.session?.authenticationResult);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const user = await s4.getSelfServiceUser(authenticationResult);
 

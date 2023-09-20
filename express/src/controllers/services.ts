@@ -10,7 +10,7 @@ export const listServices: RequestHandler = async (req, res) => {
         return res.render("there-is-a-problem.njk");
     }
 
-    const services = await s4.listServices(userId);
+    const services = await s4.listServices(userId, nonNull(req.session.authenticationResult?.AccessToken));
 
     if (services.length === 0) {
         return res.redirect(`/register/create-service`);

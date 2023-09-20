@@ -12,7 +12,9 @@ import {
     processResendPhoneCodePage,
     showSignInFormEmail,
     showSignInFormPassword,
-    showSignInPasswordResendTextCode
+    showSignInPasswordResendTextCode,
+    globalSignOut,
+    showSignInFormEmailGlobalSignOut
 } from "../controllers/sign-in";
 import processSignInForm from "../middleware/process-sign-in-form";
 import {render} from "../middleware/request-handler";
@@ -30,6 +32,11 @@ router.get("/", (req, res) => {
 });
 
 router.route("/enter-email-address").get(showSignInFormEmail).post(validateEmail("sign-in/enter-email-address.njk"), processEmailAddress);
+
+router
+    .route("/enter-email-address-global-sign-out")
+    .get(showSignInFormEmailGlobalSignOut)
+    .post(validateEmail("sign-in/enter-email-address-global-sign-out.njk"), processEmailAddress);
 
 router
     .route("/enter-password")
@@ -68,6 +75,8 @@ router
 
 router.route("/resend-text-code").get(showResendPhoneCodePage).post(processResendPhoneCodePage);
 router.route("/account-not-found").get(render("sign-in/account-not-found.njk"));
+router.route("/signed-in-to-another-device").get(render("sign-in/signed-in-to-another-device.njk"));
+router.route("/global-sign-out").get(globalSignOut);
 
 router
     .route("/forgot-password")
