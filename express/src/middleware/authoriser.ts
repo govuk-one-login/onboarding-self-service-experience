@@ -7,7 +7,7 @@ export default async function checkAuthorisation(req: Request, res: Response, ne
 
     // For 'resume-before-password' and 'resume-after-password' Authorisation is re-instigated following re-entry of
     // required authoristation codes on Pages (i.e. EMail Code or Password) and therefore checking can be bypassed here.
-    if (req.path !== "/resume-before-password" && req.path !== "/resume-after-password" && req.method === "POST") {
+    if (req.path !== "/resume-before-password" && req.path !== "/resume-after-password") {
         // TODO only redirect to /session-timeout if the session is timed out - we need to have a way of checking this
         // TODO Otherwise, redirect to /sign-in
         if (!req.session.authenticationResult?.AccessToken) {

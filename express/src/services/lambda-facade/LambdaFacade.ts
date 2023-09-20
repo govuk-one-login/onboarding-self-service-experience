@@ -118,4 +118,11 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             }
         });
     }
+    sessionCount(userEmail: string): Promise<AxiosResponse> {
+        return this.get(`/get-session-count/${userEmail}`);
+    }
+
+    globalSignOut(userEmail: string): Promise<AxiosResponse> {
+        return this.get(`/global-sign-out/${userEmail}`);
+    }
 }

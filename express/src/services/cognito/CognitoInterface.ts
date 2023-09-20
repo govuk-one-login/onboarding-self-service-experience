@@ -39,4 +39,8 @@ export default interface CognitoInterface {
     adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput>;
 
     setSignUpStatus(username: string, status: string): Promise<void>;
+
+    globalSignOut(accessToken: string): Promise<AdminInitiateAuthCommandOutput>;
+
+    getUser(accessToken: string): Promise<AdminInitiateAuthCommandOutput>;
 }

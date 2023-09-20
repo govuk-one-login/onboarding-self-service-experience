@@ -18,6 +18,8 @@ import {
     RespondToAuthChallengeCommandOutput,
     ServiceInputTypes,
     ServiceOutputTypes,
+    GlobalSignOutCommand,
+    GetUserCommand,
     VerifyUserAttributeCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Command} from "@aws-sdk/types";
@@ -91,6 +93,18 @@ export default class CognitoClient implements CognitoInterface {
                 USERNAME: email,
                 PASSWORD: password
             }
+        });
+    }
+
+    async globalSignOut(accessToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        return await this.sendCommand(GlobalSignOutCommand, {
+            AccessToken: accessToken
+        });
+    }
+
+    async getUser(accessToken: string): Promise<AdminInitiateAuthCommandOutput> {
+        return await this.sendCommand(GetUserCommand, {
+            AccessToken: accessToken
         });
     }
 
