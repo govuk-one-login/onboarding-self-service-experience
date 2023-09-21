@@ -123,7 +123,7 @@ function build-frontend-image {
 
   echo "» Building frontend"
   npm run build-express --include-workspace-root &> /dev/null
-  
+
   # TODO not sure on how DYNATRACE_PAAS_TOKEN will be received as a input?
   # docker login khw46367.live.dynatrace.com -u khw46367 -p $DYNATRACE_PAAS_TOKEN
 
