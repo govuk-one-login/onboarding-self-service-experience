@@ -263,11 +263,11 @@ Resources:
             Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${FrontendECRRepository.Outputs.ContainerRepositoryName}
           - Effect: Allow
             Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
-            Actions:
+            Action:
               - secretsmanager:GetSecretValue  
           - Effect: Allow
             Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
-            Actions:
+            Action:
               - secretsmanager:GetSecretValue
           - Effect: Allow
             Action:
