@@ -109,3 +109,6 @@ dist
 # SAM
 **/.aws-sam
 **/samconfig.toml
+
+# vscode
+.vscode
