@@ -1,0 +1,38 @@
+name: Sonarcloud
+
+permissions: read-all
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        types: [opened, synchronize, reopened]
+
+jobs:
+    sonarcloud:
+        if: startsWith(github.head_ref, 'dependabot') != true
+        name: SonarCloud
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: Install Node
+              uses: actions/setup-node@v3
+              with:
+                  cache: npm
+
+            - name: Install Node dependencies
+              run: npm install
+
+            - name: Generate coverage report
+              run: npm run test:cov
+
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarcloud-github-action@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
