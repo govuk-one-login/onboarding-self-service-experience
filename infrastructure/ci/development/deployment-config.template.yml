@@ -215,7 +215,6 @@ Resources:
             Resource: "*"
             Action: 
               - logs:DescribeLogGroups
-              - logs:PutDataProtectionPolicy
 
           - Effect: Allow
             Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/api/client-registry-api-key-*
@@ -300,6 +299,7 @@ Resources:
               - logs:DeleteLogGroup
               - logs:PutRetentionPolicy
               - logs:DeleteDataProtectionPolicy
+              - logs:PutDataProtectionPolicy
 
           - Effect: Allow
             Resource: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*
