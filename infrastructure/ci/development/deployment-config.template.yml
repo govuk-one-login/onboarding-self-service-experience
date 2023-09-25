@@ -110,6 +110,7 @@ Resources:
               - route53:GetHostedZone
               - route53:GetChange
               - s3:CreateBucket
+              - s3:PutPublicAccessBlock
 
 
           - Effect: Allow
@@ -212,7 +213,9 @@ Resources:
         Statement:
           - Effect: Allow
             Resource: "*"
-            Action: logs:DescribeLogGroups
+            Action: 
+              - logs:DescribeLogGroups
+              - logs:PutDataProtectionPolicy
 
           - Effect: Allow
             Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/api/client-registry-api-key-*
