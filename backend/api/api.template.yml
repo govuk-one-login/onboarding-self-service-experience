@@ -96,6 +96,13 @@ Resources:
             responseLength: $context.responseLength
             extendedRequestId: $context.extendedRequestId
 
+  LogAuditLogGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/audit
+      RetentionInDays: 14
+
   APIAccessLogsGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
@@ -687,13 +694,6 @@ Resources:
             Operation:
               Deidentify:
                 MaskConfig: { }
-
-  LogAuditLogGroup:
-    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/audit
-      RetentionInDays: 14
 
   #--- Notifications ---#
 
