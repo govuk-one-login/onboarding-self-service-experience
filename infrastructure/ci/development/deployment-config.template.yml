@@ -213,7 +213,11 @@ Resources:
         Statement:
           - Effect: Allow
             Resource: "*"
-            Action: 
+            Action:
+              - logs:PutAccountPolicy
+              - logs:CreateLogDelivery
+              - logs:PutResourcePolicy
+              - logs:DescribeResourcePolicies
               - logs:DescribeLogGroups
 
           - Effect: Allow
