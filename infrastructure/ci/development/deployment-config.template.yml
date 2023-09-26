@@ -215,6 +215,7 @@ Resources:
             Resource: "*"
             Action:
               - logs:PutAccountPolicy
+              - logs:GetDataProtectionPolicy
               - logs:CreateLogDelivery
               - logs:PutResourcePolicy
               - logs:DescribeResourcePolicies
