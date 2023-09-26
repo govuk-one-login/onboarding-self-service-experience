@@ -33,8 +33,7 @@ jobs:
         with:
           registry: khw46367.live.dynatrace.com
           username: khw46367
-          password: dt0c01.I3T5VY3BDKLDCRY5XTSOLWTS.2US3P3ZRREY2YV4NW2X25DP7PFPGCGWUC4BPI5MPYH3Y4MWD6QIUXBABQFAZXRBF
-          #password: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
+          password: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
       - name: Push Docker image
         uses: alphagov/di-github-actions/aws/ecr/build-docker-image@081ce732d75690781b1eb82d85ee11b45934c51e
         id: push-image
