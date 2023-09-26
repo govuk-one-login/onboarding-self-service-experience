@@ -300,6 +300,10 @@ Resources:
               - logs:PutRetentionPolicy
               - logs:DeleteDataProtectionPolicy
               - logs:PutDataProtectionPolicy
+              - logs:PutAccountPolicy
+              - logs:CreateLogDelivery
+              - logs:PutResourcePolicy
+              - logs:DescribeResourcePolicies
 
           - Effect: Allow
             Resource: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*
