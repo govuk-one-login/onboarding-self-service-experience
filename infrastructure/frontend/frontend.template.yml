@@ -153,6 +153,7 @@ Resources:
                   - cognito-idp:AdminRespondToAuthChallenge
                   - cognito-idp:AdminGetUser
                   - cognito-idp:AddCustomAttributes
+                  - cognito-idp:UpdateUserPoolClient
                 Resource:
                   Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolARN
 
