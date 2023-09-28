@@ -22,7 +22,7 @@ export default interface CognitoInterface {
 
     setEmailAsVerified(username: string): Promise<void>;
 
-    setMobilePhoneAsVerified(username: string): Promise<void>;
+    setMobilePhoneAsVerified(username: string, isVerified: boolean): Promise<void>;
 
     setPhoneNumber(username: string, phoneNumber: string): Promise<void>;
 

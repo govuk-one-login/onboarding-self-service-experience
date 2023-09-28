@@ -153,10 +153,10 @@ export default class SelfServiceServicesService {
         return this.cognito.verifyMobileUsingSmsCode(accessToken, code);
     }
 
-    setMobilePhoneAsVerified(emailAddress: string): Promise<void> {
+    setMobilePhoneAsVerified(emailAddress: string, isVerified: boolean): Promise<void> {
         console.info("In self-service-services-service:setMobilePhoneAsVerified()");
 
-        return this.cognito.setMobilePhoneAsVerified(emailAddress);
+        return this.cognito.setMobilePhoneAsVerified(emailAddress, isVerified);
     }
 
     async setSignUpStatus(userName: string, signUpStatusStage: SignupStatusStage): Promise<void> {
@@ -166,6 +166,17 @@ export default class SelfServiceServicesService {
         signUpStatus.setStage(signUpStatusStage, true);
 
         return await this.cognito.setSignUpStatus(userName, signUpStatus.getState());
+    }
+
+    async resetSignUpStatus(userName: string, signUpStatus: SignupStatus): Promise<void> {
+        console.log("Resetting Sign Up Status =>" + signUpStatus);
+        return await this.cognito.setSignUpStatus(userName, signUpStatus.getState());
+    }
+
+    async userNameExists(userName: string): Promise<boolean> {
+        console.info("In self-service-services-service:userNameExists()");
+        const adminGetUserCommandOutput = await this.cognito.adminGetUserCommandOutput(userName);
+        return !!adminGetUserCommandOutput;
     }
 
     async getSignUpStatus(userName: string): Promise<SignupStatus> {

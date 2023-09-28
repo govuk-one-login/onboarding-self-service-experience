@@ -6,27 +6,59 @@ import {
 import {RequestHandler} from "express";
 import {port} from "../config/environment";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
-import {obscureNumber} from "../lib/mobile-number";
+import {convertToCountryPrefixFormat, obscureNumber} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
+import console from "console";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
 export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
-export const showCheckPhonePage: RequestHandler = (req, res) => {
+export const showCheckPhonePage: RequestHandler = async (req, res) => {
+    console.log("DEBUG::: showCheckPhonePage mfaResponse: " + JSON.stringify(req.session.mfaResponse));
     // TODO we should probably throw here or use middleware to validate the required values
-    if (!req.session.emailAddress || !req.session.mfaResponse) {
-        return res.redirect("/sign-in");
+
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const signUpStatus: SignupStatus = await s4.getSignUpStatus(nonNull(req.session.emailAddress));
+
+    if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
+        console.log("DEBUG::: Redirecting to reenter phone number dialogue");
+        await s4.setMobilePhoneAsVerified(nonNull(req.session.emailAddress), true);
+        await s4.setPhoneNumber(nonNull(req.session.emailAddress), "");
+        return res.redirect("/sign-in/reenter-phone-number");
     }
 
-    res.render("common/enter-text-code.njk", {
-        headerActiveItem: "sign-in",
-        values: {
-            mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo),
-            textMessageNotReceivedUrl: "/sign-in/resend-text-code"
-        }
-    });
+    if (!req.session.emailAddress || !req.session.mfaResponse) {
+        return res.redirect("/sign-in");
+    } else {
+        res.render("common/enter-text-code.njk", {
+            headerActiveItem: "sign-in",
+            values: {
+                mobileNumber: obscureNumber(req.session.mfaResponse.codeSentTo),
+                textMessageNotReceivedUrl: "/sign-in/resend-text-code"
+            }
+        });
+    }
+};
+
+export const showReEnterPhoneNumberForm: RequestHandler = (req, res) => {
+    console.log("DEBUG::: in showReEnterPhoneNumberForm");
+    res.render("sign-in/reenter-phone-number.njk", {});
+};
+
+export const processReEnterPhoneNumberForm: RequestHandler = async (req, res) => {
+    console.log("DEBUG::: in processReEnterPhoneNumberForm. New mobile no: " + req.body.mobileNumber);
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    req.session.mobileNumber = req.body.mobileNumber;
+    req.session.enteredMobileNumber = req.body.mobileNumber;
+    req.session.updatedField = "mobile phone number";
+    await s4.setPhoneNumber(nonNull(req.session.emailAddress), convertToCountryPrefixFormat(req.body.mobileNumber));
+    await s4.setMobilePhoneAsVerified(nonNull(req.session.emailAddress), false);
+    await s4.setSignUpStatus(nonNull(req.session.emailAddress), SignupStatusStage.HasPhoneNumber);
+
+    return res.redirect("/sign-in/enter-text-code");
 };
 
 export const finishSignIn: RequestHandler = async (req, res) => {
@@ -40,13 +72,20 @@ export const finishSignIn: RequestHandler = async (req, res) => {
     }
 
     if (req.session.updatedField === "password") {
-        console.info("Finishing Sign-In");
+        console.info("Finishing Sign-In after password change");
 
         await s4.updateUser(
             AuthenticationResultParser.getCognitoId(authenticationResult),
             {password_last_updated: new Date()},
             nonNull(req.session?.authenticationResult?.AccessToken)
         );
+    }
+
+    if (req.session.updatedField === "mobile phone number") {
+        console.info("Finishing Sign-In after mobile phone number change");
+
+        const emailAddress = nonNull(req.session.emailAddress);
+        await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasTextCode);
     }
 
     req.session.isSignedIn = true;
@@ -59,7 +98,7 @@ export const finishSignIn: RequestHandler = async (req, res) => {
 
 async function signedInToAnotherDevice(email: string, s4: SelfServiceServicesService) {
     const sessions = await s4.sessionCount(email);
-    console.log(`Found ${sessions} sessioon(s)`);
+    console.log(`Found ${sessions} session(s)`);
     return sessions > 1;
 }
 
@@ -86,8 +125,15 @@ export const showResendPhoneCodePage = render("sign-in/resend-text-code.njk");
 
 export const showSignInPasswordResendTextCode = render("sign-in/resend-text-code/enter-password.njk");
 
-export const processResendPhoneCodePage: RequestHandler = (req, res) => {
-    res.redirect("/sign-in/resend-text-code/enter-password");
+export const processResendPhoneCodePage: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const emailAddress = nonNull(req.session.emailAddress);
+    const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
+    if (signUpStatus.hasAllStages()) {
+        res.redirect("/sign-in/resend-text-code/enter-password");
+    } else {
+        res.redirect("/sign-in/enter-text-code");
+    }
 };
 
 export const forgotPasswordForm: RequestHandler = (req, res) => {

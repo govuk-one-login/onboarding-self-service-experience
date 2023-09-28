@@ -14,7 +14,9 @@ import {
     showSignInFormPassword,
     showSignInPasswordResendTextCode,
     globalSignOut,
-    showSignInFormEmailGlobalSignOut
+    showSignInFormEmailGlobalSignOut,
+    showReEnterPhoneNumberForm,
+    processReEnterPhoneNumberForm
 } from "../controllers/sign-in";
 import processSignInForm from "../middleware/process-sign-in-form";
 import {render} from "../middleware/request-handler";
@@ -72,6 +74,8 @@ router
         processSecurityCode,
         finishSignIn
     );
+
+router.route("/reenter-phone-number").get(showReEnterPhoneNumberForm).post(processReEnterPhoneNumberForm);
 
 router.route("/resend-text-code").get(showResendPhoneCodePage).post(processResendPhoneCodePage);
 router.route("/account-not-found").get(render("sign-in/account-not-found.njk"));

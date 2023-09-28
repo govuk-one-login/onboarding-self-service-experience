@@ -212,7 +212,7 @@ export default class CognitoClient implements CognitoInterface {
         return this.client.send(command);
     }
 
-    async setMobilePhoneAsVerified(username: string): Promise<void> {
+    async setMobilePhoneAsVerified(username: string, isVerified: boolean): Promise<void> {
         console.info("In CognitoClient:setMobilePhoneAsVerified()");
 
         await this.sendCommand(AdminUpdateUserAttributesCommand, {
@@ -221,7 +221,7 @@ export default class CognitoClient implements CognitoInterface {
             UserAttributes: [
                 {
                     Name: "phone_number_verified",
-                    Value: "true"
+                    Value: String(isVerified)
                 }
             ]
         });
