@@ -105,6 +105,34 @@ Resources:
 
   #--- Users ---#
 
+  EnvironmentVariablesEncryptionKey:
+    # checkov:skip=CKV_AWS_7:Ensure rotation for customer created CMKs is enabled
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Resource: "*"
+            Action: kms:*
+            Principal:
+              AWS: !Ref AWS::AccountId
+          - Effect: Allow
+            Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+            Action:
+              - kms:ListAliases
+              - kms:CreateGrant
+              - kms:Encrypt
+              - kms:Decrypt
+            Principal:
+              Service: lambda.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function/*
+
   GetUserFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
     # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
@@ -118,8 +146,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-user.getUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
@@ -148,8 +178,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-user.putUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
@@ -179,8 +211,10 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/update-user.updateUserHandler
       Description: Updates user data in DynamoDB
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
@@ -211,8 +245,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-services.getServicesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
@@ -241,8 +277,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-session-count.getSessionCountHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
@@ -271,8 +309,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/dynamodb/global-sign-out.globalSignOutHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
@@ -301,8 +341,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service.putServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
@@ -326,8 +368,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-service-clients.getServiceClientsHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
@@ -356,8 +400,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service-client.putServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
@@ -379,8 +425,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/dynamodb/update-service-client.updateServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
@@ -404,8 +452,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service-user.putServiceUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
@@ -430,13 +480,15 @@ Resources:
       Description: Assumes a cross-account role and invokes the Auth register Lambda
       Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      Policies: [ AWSLambdaVPCAccessExecutionRole ]
+      Tracing: Active
+      Policies: [ AWSLambdaVPCAccessExecutionRole, AWSXrayWriteOnlyAccess ]
       VpcConfig:
         SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref ClientRegistryEndpoint
           AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/client-registry-api-key}}"
+      KmsKeyArn: !GetAtt EnvironmentVariablesEncryptionKey.Arn
 
   UpdateAuthClientFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
@@ -452,13 +504,15 @@ Resources:
       Description: Updates a client using an HTTP endpoint
       Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      Policies: [ AWSLambdaVPCAccessExecutionRole ]
+      Tracing: Active
+      Policies: [ AWSLambdaVPCAccessExecutionRole, AWSXrayWriteOnlyAccess ]
       VpcConfig:
         SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
       Environment:
         Variables:
           AUTH_REGISTRATION_BASE_URL: !Ref ClientRegistryEndpoint
           AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/client-registry-api-key}}"
+      KmsKeyArn: !GetAtt EnvironmentVariablesEncryptionKey.Arn
 
   #--- Step Functions ---#
 
@@ -475,8 +529,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/step-functions/new-service.newServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - Version: 2012-10-17
           Statement:
             - Effect: Allow
@@ -506,8 +562,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/step-functions/new-client.newClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - Version: 2012-10-17
           Statement:
             - Effect: Allow
@@ -537,8 +595,10 @@ Resources:
     Properties:
       Handler: backend/api/src/handlers/step-functions/update-client.doUpdateClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - Version: 2012-10-17
           Statement:
             - Effect: Allow
@@ -569,7 +629,9 @@ Resources:
       Handler: backend/api/src/handlers/dynamodb/update-service.updateServiceHandler
       Description: Updates service data in DynamoDB
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
+        - AWSXrayWriteOnlyAccess
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
@@ -627,6 +689,13 @@ Resources:
                   - !GetAtt UpdateServiceClientFunction.Arn
                   - !GetAtt RegisterAuthClientFunction.Arn
                   - !GetAtt UpdateAuthClientFunction.Arn
+              - Effect: Allow
+                Action:
+                  - xray:PutTraceSegments
+                  - xray:PutTelemetryRecords
+                  - xray:GetSamplingRules
+                  - xray:GetSamplingTargets
+                Resource: "*"
 
   NewServiceStepFunction:
     Type: AWS::Serverless::StateMachine
@@ -643,6 +712,8 @@ Resources:
       DefinitionSubstitutions:
         PutServiceFunctionArn: !GetAtt PutServiceFunction.Arn
         PutServiceUserFunctionArn: !GetAtt PutServiceUserFunction.Arn
+      Tracing:
+        Enabled: true
 
   NewClientStepFunction:
     Type: AWS::Serverless::StateMachine
@@ -659,6 +730,8 @@ Resources:
       DefinitionSubstitutions:
         RegisterClientFunctionArn: !GetAtt RegisterAuthClientFunction.Arn
         PutServiceClientFunctionArn: !GetAtt PutServiceClientFunction.Arn
+      Tracing:
+        Enabled: true
 
   UpdateClientStepFunction:
     Type: AWS::Serverless::StateMachine
@@ -675,6 +748,8 @@ Resources:
       DefinitionSubstitutions:
         UpdateClientInRegistryFunctionArn: !GetAtt UpdateAuthClientFunction.Arn
         UpdateServiceClientFunctionArn: !GetAtt UpdateServiceClientFunction.Arn
+      Tracing:
+        Enabled: true
 
   StepFunctionsLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
@@ -699,7 +774,9 @@ Resources:
       Handler: backend/api/src/handlers/notifications/send-public-beta-notification.publicBetaRequestHandler
       Description: Publish a message to the public beta request notification topic
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
+        - AWSXrayWriteOnlyAccess
         - SNSPublishMessagePolicy:
             TopicName: !GetAtt NotificationsSnsTopic.TopicName
       Environment:

@@ -83,6 +83,11 @@ Resources:
                   - ssm:GetParameters
                   - ssm:GetParametersByPath
 
+              - Effect: Allow
+                Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+                Action:
+                  - kms:Encrypt
+
   FrontendDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
     Type: AWS::IAM::Policy
@@ -213,7 +218,7 @@ Resources:
         Statement:
           - Effect: Allow
             Resource: "*"
-            Action: 
+            Action:
               - logs:DescribeLogGroups
 
           - Effect: Allow

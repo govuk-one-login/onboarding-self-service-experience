@@ -73,6 +73,34 @@ Resources:
               ArnLike:
                 aws:SourceArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
 
+  EnvironmentVariablesEncryptionKey:
+    # checkov:skip=CKV_AWS_7:Ensure rotation for customer created CMKs is enabled
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Resource: "*"
+            Action: kms:*
+            Principal:
+              AWS: !Ref AWS::AccountId
+          - Effect: Allow
+            Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+            Action:
+              - kms:ListAliases
+              - kms:CreateGrant
+              - kms:Encrypt
+              - kms:Decrypt
+            Principal:
+              Service: lambda.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function/*
+
   SendPasswordChangedEmailFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
     # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
@@ -87,8 +115,10 @@ Resources:
       Handler: src/handlers/send-password-changed-email.handler
       Description: Send an email to confirm the user's password has been changed
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - Version: 2012-10-17
           Statement:
             Effect: Allow
@@ -123,7 +153,8 @@ Resources:
       Handler: src/handlers/create-password-reset-message.handler
       Description: Create a customised email message to send when resetting the user's password
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      Policies: [ AWSLambdaVPCAccessExecutionRole ]
+      Tracing: Active
+      Policies: [ AWSLambdaVPCAccessExecutionRole, AWSXrayWriteOnlyAccess ]
       Events:
         Cognito:
           Type: Cognito
@@ -147,8 +178,10 @@ Resources:
       MemorySize: 1024
       VpcConfig:
         SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
+      Tracing: Active
       Policies:
         - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
         - Version: 2012-10-17
           Statement:
             Effect: Allow
@@ -159,6 +192,7 @@ Resources:
           NOTIFY_API_KEY: "{{resolve:secretsmanager:/self-service/cognito/notify-api-key}}"
           SECURITY_CODE_TEXT_MESSAGE_TEMPLATE: !Ref SecurityCodeTextMessageTemplate
           DECRYPTION_KEY_ARN: !GetAtt SecurityCodeEncryptionKey.Arn
+      KmsKeyArn: !GetAtt EnvironmentVariablesEncryptionKey.Arn
 
   UserPool:
     Type: AWS::Cognito::UserPool
