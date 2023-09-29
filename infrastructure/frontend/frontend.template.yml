@@ -112,17 +112,20 @@ Resources:
               awslogs-region: !Ref AWS::Region
           Secrets:
             - Name: DT_TENANT
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_TENANT}}'
-                - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+              ValueFrom: !Join
+                - ''
+                - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                  - ':DT_TENANT::'
             - Name: DT_TENANTTOKEN
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_TENANTTOKEN}}'
-                - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+              ValueFrom: !Join
+                - ''
+                - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                  - ':DT_TENANTTOKEN::'
             - Name: DT_CONNECTION_POINT
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_CONNECTION_POINT}}'
-                - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+              ValueFrom: !Join
+              - ''
+              - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                - ':DT_CONNECTION_POINT::'
 
   ExecutionRole:
     Type: AWS::IAM::Role
