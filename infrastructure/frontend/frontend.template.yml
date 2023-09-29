@@ -96,6 +96,8 @@ Resources:
             - Name: COGNITO_CLIENT_ID
               Value:
                 Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolClientID
+            - Name: DT_LOGLEVELCON
+              Value: INFO
           PortMappings:
             - ContainerPort: !Ref ContainerPort
           HealthCheck:
