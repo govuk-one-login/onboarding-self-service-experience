@@ -25,6 +25,8 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       TableName: !Sub ${DeploymentName}-data
       DeletionProtectionEnabled: !If [ DeletionProtectionEnabled, true, false ]
+      PointInTimeRecoverySpecification:
+       PointInTimeRecoveryEnabled: true
       AttributeDefinitions:
         - AttributeName: pk
           AttributeType: S
@@ -46,8 +48,6 @@ Resources:
             ProjectionType: ALL
       SSESpecification:
         SSEEnabled: true
-      PointInTimeRecoverySpecification:
-       PointInTimeRecoveryEnabled: true       
   SessionsTable:
     # https://github.com/ca98am79/connect-dynamodb#options
     # checkov:skip=CKV_AWS_28:Ensure Dynamodb point in time recovery (backup) is enabled
