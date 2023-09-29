@@ -44,10 +44,10 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
-      PointInTimeRecoveryEnabled: true
       SSESpecification:
         SSEEnabled: true
-
+      PointInTimeRecoverySpecification:
+       PointInTimeRecoveryEnabled: true       
   SessionsTable:
     # https://github.com/ca98am79/connect-dynamodb#options
     # checkov:skip=CKV_AWS_28:Ensure Dynamodb point in time recovery (backup) is enabled
