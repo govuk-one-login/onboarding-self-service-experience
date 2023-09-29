@@ -126,7 +126,7 @@ function build-frontend-image {
 
   # You need to provide a DYNATRACE_PAAS_TOKEN environment variable which is your 
   # dynatrace paas token.
-  docker login khw46367.live.dynatrace.com -u khw46367 -p $DYNATRACE_PAAS_TOKEN
+  docker login khw46367.live.dynatrace.com -u khw46367 -p "$DYNATRACE_PAAS_TOKEN"
 
   echo "» Building Docker image"
   docker build --quiet --platform linux/amd64 --tag "$repo:$branch" --tag "$image_uri" \
