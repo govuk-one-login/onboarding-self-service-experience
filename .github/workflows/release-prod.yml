@@ -61,5 +61,7 @@ jobs:
       contents: read
     with:
       environment: build-secure-pipelines
+    secrets:
+      dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
       
       artifact-name: ${{ needs.build-frontend.outputs.artifact-name || inputs.frontend-artifact }}
