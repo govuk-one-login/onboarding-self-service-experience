@@ -258,18 +258,6 @@ Resources:
 
   #--- WAF ---#
 
-  AWSTemplateFormatVersion: "2010-09-09"
-  Description: frontend WAF
-  Transform: AWS::LanguageExtensions
-
-  Parameters:
-    Environment:
-      Type: String
-      Default: development
-      AllowedPattern: development|build|staging|integration|production
-
-  Resources:
-
     FrontendWebAcl:
       Type: 'AWS::WAFv2::WebACL'
       Properties:
