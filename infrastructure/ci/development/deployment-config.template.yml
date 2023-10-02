@@ -103,6 +103,11 @@ Resources:
                   - kms:Decrypt
                 Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'    
 
+              - Effect: Allow
+                Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+                Action:
+                  - kms:Encrypt
+
   FrontendDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
     Type: AWS::IAM::Policy
@@ -129,6 +134,9 @@ Resources:
               - elasticloadbalancing:DescribeLoadBalancers
               - route53:GetHostedZone
               - route53:GetChange
+              - s3:CreateBucket
+              - s3:PutPublicAccessBlock
+
 
           - Effect: Allow
             Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ServiceName}/frontend
@@ -230,11 +238,26 @@ Resources:
         Statement:
           - Effect: Allow
             Resource: "*"
-            Action: logs:DescribeLogGroups
+            Action:
+              - logs:DescribeLogGroups
 
           - Effect: Allow
             Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/api/client-registry-api-key-*
             Action: secretsmanager:GetSecretValue
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:iam::${AWS::AccountId}:policy/${PreviewStacksPrefix}-api-*
+            Action:
+              - iam:CreatePolicy
+            Condition:
+              StringEqualsIfExists:
+                iam:PassedToService:
+                  - lambda.amazonaws.com
+                  - states.amazonaws.com
+              ArnLikeIfExists:
+                iam:AssociatedResourceARN:
+                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${PreviewStacksPrefix}-api-*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine*
 
           - Effect: Allow
             Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${PreviewStacksPrefix}-api-*
@@ -300,6 +323,8 @@ Resources:
               - logs:CreateLogGroup
               - logs:DeleteLogGroup
               - logs:PutRetentionPolicy
+              - logs:DeleteDataProtectionPolicy
+              - logs:PutDataProtectionPolicy
 
           - Effect: Allow
             Resource: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*
