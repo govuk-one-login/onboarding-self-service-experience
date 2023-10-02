@@ -385,14 +385,6 @@ Resources:
               MetricName: !Sub "${AWS::StackName}-${Environment}-RateBased-CountIp-ruleset-metric"
               SampledRequestsEnabled: true
 
-        Scope: CLOUDFRONT
-        Tags:
-          - Key: Name
-            Value: !Sub '${AWS::StackName}-${Environment}'
-        VisibilityConfig:
-          SampledRequestsEnabled: true
-          CloudWatchMetricsEnabled: true
-          MetricName: !Sub '${AWS::StackName}-${Environment}-metric'
 
   #--- Application load balancing ---#
 
