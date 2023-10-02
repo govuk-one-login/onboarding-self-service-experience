@@ -82,6 +82,26 @@ Resources:
                   - ssm:GetParameter
                   - ssm:GetParameters
                   - ssm:GetParametersByPath
+              
+              - Effect: Allow
+                Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+                Action:
+                  - secretsmanager:GetSecretValue
+              
+              - Effect: Allow
+                Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+                Action:
+                  - secretsmanager:GetSecretValue
+              
+              - Effect: Allow
+                Action:
+                  - secretsmanager:ListSecrets
+                Resource: 'arn:aws:secretsmanager:eu-west-2:216552277552:secret:*'
+
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'    
 
               - Effect: Allow
                 Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
