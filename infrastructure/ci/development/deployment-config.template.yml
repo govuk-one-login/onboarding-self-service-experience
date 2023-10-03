@@ -429,13 +429,13 @@ Resources:
               - dynamodb:CreateTable
               - dynamodb:DeleteTable      
               - dynamodb:UpdateContinuousBackups
+              - dynamodb:DescribeContinuousBackups  
 
           - Effect: Allow
             Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${PreviewStacksPrefix}-*-sessions
             Action:
               - dynamodb:UpdateTimeToLive
               - dynamodb:DescribeTimeToLive
-              - dynamodb:UpdateContinuousBackups
                                                    
 
   GitHubOIDCProvider:
