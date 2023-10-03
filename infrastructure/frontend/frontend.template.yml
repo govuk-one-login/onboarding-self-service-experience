@@ -373,7 +373,7 @@ Resources:
             MetricName: !Sub "${AWS::StackName}-${Environment}-RateBased-CountIp-ruleset-metric"
             SampledRequestsEnabled: true
 
-      Scope: CLOUDFRONT
+      Scope: REGIONAL
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-${Environment}'
@@ -382,6 +382,10 @@ Resources:
         CloudWatchMetricsEnabled: true
         MetricName: !Sub '${AWS::StackName}-${Environment}-metric'
 
+  Type: AWS::WAFv2::WebACLAssociation
+  Properties:
+    ResourceArn: !Sub ${DeploymentName}-app
+    WebACLArn: !Sub '${AWS::StackName}-${Environment}'
 
   #--- Application load balancing ---#
 
