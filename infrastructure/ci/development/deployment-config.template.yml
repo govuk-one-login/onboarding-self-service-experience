@@ -422,6 +422,7 @@ Resources:
               - dynamodb:DescribeTable
               - dynamodb:CreateTable
               - dynamodb:DeleteTable
+              - dynamodb:UpdateContinuousBackups      
 
           - Effect: Allow
             Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${PreviewStacksPrefix}-*-sessions
