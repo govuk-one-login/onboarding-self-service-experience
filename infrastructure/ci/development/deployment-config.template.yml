@@ -65,6 +65,12 @@ Resources:
                 Action: cloudformation:CreateChangeSet
 
               - Effect: Allow
+                Resource:
+                  - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${PreviewStacksPrefix}-*
+                Action:
+                  - dynamodb:UpdateContinuousBackups 
+
+              - Effect: Allow
                 Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${PreviewStacksPrefix}-*
                 Action:
                   - cloudformation:DescribeStacks
