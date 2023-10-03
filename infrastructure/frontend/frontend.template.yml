@@ -261,7 +261,7 @@ Resources:
   FrontendWebAcl:
     Type: 'AWS::WAFv2::WebACL'
     Properties:
-      Name: !Sub ${AWS::StackName}-${Environment}-CognitoWebACL
+      Name: !Sub ${AWS::StackName}-${Environment}-FrontendWebAcl
       Scope: REGIONAL
       Description: This is WebACL to protect Cognito
       DefaultAction:
@@ -269,7 +269,7 @@ Resources:
       VisibilityConfig:
         SampledRequestsEnabled: true
         CloudWatchMetricsEnabled: true
-        MetricName: !Sub ${AWS::StackName}-${Environment}-CognitoWebACLMetric
+        MetricName: !Sub ${AWS::StackName}-${Environment}-FrontendWebAclMetric
       Rules:
         - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
           Priority: 1
@@ -332,11 +332,11 @@ Resources:
             CloudWatchMetricsEnabled: true
             MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAdminProtectionRuleSet
 
-  CognitoWebACLAssociation:
-    Type: 'AWS::WAFv2::WebACLAssociation'
-    Properties:
-      WebACLArn: !GetAtt CognitoWebACL.Arn
-      ResourceArn: !GetAtt ApplicationLoadBalancer.Arn
+#  FrontendWebAclAssociation:
+#    Type: 'AWS::WAFv2::WebACLAssociation'
+#    Properties:
+#      WebACLArn: !GetAtt FrontendWebAcl.Arn
+#      ResourceArn: !GetAtt ApplicationLoadBalancer.Arn
 
   #--- Application load balancing ---#
 
