@@ -108,7 +108,7 @@ Resources:
                 Action:
                   - kms:Encrypt
 
-  FrontendDeploymentPolicy:
+  FrontendDeploymentPolicy1:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
     Type: AWS::IAM::Policy
     Properties:
@@ -171,6 +171,15 @@ Resources:
               ArnLikeIfExists:
                 iam:AssociatedResourceARN: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/${PreviewStacksPrefix}-*
 
+  FrontendDeploymentPolicy2:
+    # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !Ref GitHubActionsRole ]
+      PolicyName: DeployFrontend
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
           - Effect: Allow
             Resource:
               - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${PreviewStacksPrefix}-*
@@ -227,6 +236,7 @@ Resources:
                 route53:ChangeResourceRecordSetsRecordTypes: A
               ForAllValues:StringLike:
                 route53:ChangeResourceRecordSetsNormalizedRecordNames: !Sub [ "*.${Domain}", { Domain: !ImportValue DNS-Domain } ]
+
 
   ApiDeploymentPolicy:
     Type: AWS::IAM::Policy
