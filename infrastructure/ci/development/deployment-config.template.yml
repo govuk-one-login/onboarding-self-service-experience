@@ -82,17 +82,17 @@ Resources:
                   - ssm:GetParameter
                   - ssm:GetParameters
                   - ssm:GetParametersByPath
-              
+
               - Effect: Allow
                 Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
                 Action:
                   - secretsmanager:GetSecretValue
-              
+
               - Effect: Allow
                 Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
                 Action:
                   - secretsmanager:GetSecretValue
-              
+
               - Effect: Allow
                 Action:
                   - secretsmanager:ListSecrets
@@ -101,19 +101,19 @@ Resources:
               - Effect: Allow
                 Action:
                   - kms:Decrypt
-                Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'    
+                Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'
 
               - Effect: Allow
                 Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
                 Action:
                   - kms:Encrypt
 
-  FrontendDeploymentPolicy:
+  FrontendDeploymentPolicy1:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
     Type: AWS::IAM::Policy
     Properties:
       Roles: [ !Ref GitHubActionsRole ]
-      PolicyName: DeployFrontend
+      PolicyName: DeployFrontend1
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -171,6 +171,15 @@ Resources:
               ArnLikeIfExists:
                 iam:AssociatedResourceARN: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/${PreviewStacksPrefix}-*
 
+  FrontendDeploymentPolicy2:
+    # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !Ref GitHubActionsRole ]
+      PolicyName: DeployFrontend2
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
           - Effect: Allow
             Resource:
               - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${PreviewStacksPrefix}-*
@@ -195,6 +204,15 @@ Resources:
               StringLike:
                 aws:ResourceTag/aws:cloudformation:stack-name: !Sub ${PreviewStacksPrefix}-frontend-*
 
+  FrontendDeploymentPolicy3:
+    # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles: [ !Ref GitHubActionsRole ]
+      PolicyName: DeployFrontend3
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
           - Effect: Allow
             Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/${PreviewStacksPrefix}-*-ecs/*
             Action:
