@@ -16,16 +16,13 @@ jobs:
     name: Frontend
     permissions: { }
     uses: ./.github/workflows/build-frontend.yml
-  
+
   push-frontend-image:
     name: Frontend
     needs: build-frontend
     uses: ./.github/workflows/build-frontend-image.yml
     with:
       artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
-      environment: development
-    secrets:
-      dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
 
   deploy-frontend:
     name: Frontend
