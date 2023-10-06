@@ -48,6 +48,14 @@ Resources:
                   - ec2:DescribeSubnets
 
               - Effect: Allow
+                Resource: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
+                Action:
+                  - cognito-idp:AssociateWebACL
+                  - cognito-idp:DisassociateWebACL
+                  - cognito-idp:GetWebACLForResource
+                  - cognito-idp:ListResourcesForWebACL
+
+              - Effect: Allow
                 Resource: !GetAtt GitHubDeploymentArtifactsBucket.Arn
                 Action: s3:ListBucket
 
@@ -87,6 +95,11 @@ Resources:
                 Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
                 Action:
                   - kms:Encrypt
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:wafv2:${AWS::Region}:${AWS::AccountId}:regional/*
+                Action:
+                  - wafv2:*
 
   FrontendDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
