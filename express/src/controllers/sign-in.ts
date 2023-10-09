@@ -141,15 +141,15 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
 
 const forgotPassword: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
-    let uri;
+    let host;
     if (req.hostname === "localhost") {
-        uri = `${req.protocol}://${req.hostname}:${port}`;
+        host = `${req.hostname}:${port}`;
     } else {
-        uri = `${req.protocol}://${req.hostname}`;
+        host = `${req.hostname}`;
     }
 
     try {
-        await s4.forgotPassword(nonNull(req.session.emailAddress), uri);
+        await s4.forgotPassword(nonNull(req.session.emailAddress), req.protocol, host);
     } catch (error) {
         if (error instanceof CognitoIdentityProviderServiceException) {
             const options: Record<string, Record<string, string | undefined>> = {values: {emailAddress: req.session.emailAddress}};
