@@ -530,3 +530,4 @@ Outputs:
     Value: !Ref GitHubOIDCProvider
     Export:
       Name: GitHubIdentityProviderArn
+
