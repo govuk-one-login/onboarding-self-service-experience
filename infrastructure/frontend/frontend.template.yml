@@ -73,6 +73,8 @@ Resources:
             - Name: COGNITO_CLIENT_ID
               Value:
                 Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolClientID
+            - Name: DT_LOGLEVELCON
+              Value: INFO
           PortMappings:
             - ContainerPort: !Ref ContainerPort
           HealthCheck:
@@ -109,6 +111,21 @@ Resources:
               - Effect: Allow
                 Action: logs:CreateLogGroup
                 Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${LogGroupPrefix}/${DeploymentName}/frontend*
+        - PolicyName: GetDynatraceSecret
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:*
+              - Effect: Allow
+                Action: secretsmanager:ListSecrets
+                Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:*
+              - Effect: Allow
+                Action: kms:Decrypt
+                Resource: arn:aws:kms:eu-west-2:216552277552:key/*
+
+            
 
   TaskRole:
     Type: AWS::IAM::Role
@@ -153,6 +170,7 @@ Resources:
                   - cognito-idp:AdminRespondToAuthChallenge
                   - cognito-idp:AdminGetUser
                   - cognito-idp:AddCustomAttributes
+                  - cognito-idp:UpdateUserPoolClient
                 Resource:
                   Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolARN
 

@@ -1,7 +1,6 @@
 # Self-Service Experience
 
-The Admin Tool is a self-service product that allows government
-service teams to onboard and test their integration
+The Admin Tool is a self-service product that allows government service teams to onboard and test their integration
 with the GOV.UK One Login service
 
 See the [product page](https://sign-in.service.gov.uk/) for details and features, and
