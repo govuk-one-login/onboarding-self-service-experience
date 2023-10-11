@@ -1,7 +1,19 @@
-import {SendEmailCommand, SESClient} from "@aws-sdk/client-ses";
 import {PostConfirmationConfirmForgotPassword} from "aws-lambda";
+import {createTransport} from "nodemailer";
 
-const client = new SESClient({region: "eu-west-2"});
+const smtpServer = "email-smtp.eu-west-2.amazonaws.com";
+const smtpPort = 587;
+
+const smtpTransporter = createTransport({
+    host: smtpServer,
+    port: smtpPort,
+    secure: false, // true for 465, false for other ports
+    auth: {
+        user: process.env.AWS_ACCESS_KEY_ID,
+        pass: process.env.AWS_SECRET_ACCESS_KEY
+    },
+    debug: true
+});
 
 exports.handler = async (event: PostConfirmationConfirmForgotPassword): Promise<PostConfirmationConfirmForgotPassword> => {
     const toAddress = event.request.clientMetadata?.email;
@@ -10,53 +22,36 @@ exports.handler = async (event: PostConfirmationConfirmForgotPassword): Promise<
         throw new Error("Destination email address is missing from the event");
     }
 
+    console.log("ConfirmForgotPasswordEmailHandler:handler :: sending email to: ", toAddress);
     await run(toAddress);
     return event;
 };
 
 async function run(toAddress: string) {
-    const sendEmailCommand = createSendEmailCommand(toAddress, process.env.FROM_ADDRESS as string);
+    const fromAddress = process.env.FROM_ADDRESS as string;
+    console.debug("ConfirmForgotPasswordEmailHandler:run :: toAddress: ", toAddress);
+    const body = generateEmailBody();
+
+    const mailOptions = {
+        from: "GOV.UK One Login <".concat(fromAddress).concat(">"),
+        to: toAddress,
+        subject: "Your password has been changed for the GOV.UK One Login admin tool",
+        text: body
+    };
 
     try {
-        return await client.send(sendEmailCommand);
-    } catch (err) {
-        console.error("ConfirmForgotPasswordEmailHandler :: Failed to send email.", err);
-        throw err;
-    }
-}
-
-function createSendEmailCommand(toAddress: string, fromAddress: string) {
-    return new SendEmailCommand({
-        Destination: {
-            /* required */
-            CcAddresses: [
-                /* more items */
-            ],
-            ToAddresses: [
-                toAddress
-                /* more To-email addresses */
-            ]
-        },
-        Message: {
-            /* required */
-            Body: {
-                /* required */
-                Html: {
-                    Charset: "UTF-8",
-                    Data: generateEmailBody()
-                }
-            },
-            Subject: {
-                Charset: "UTF-8",
-                Data: "Your password has been changed for the GOV.UK One Login admin tool"
+        smtpTransporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                throw error;
+            } else {
+                throw "Message sent" + info.response;
             }
-        },
-        // SENDER_ADDRESS
-        Source: "GOV.UK One Login <".concat(fromAddress).concat(">"),
-        ReplyToAddresses: [
-            /* more items */
-        ]
-    });
+        });
+    } catch (error) {
+        console.log("Message returned: " + error);
+    }
+
+    console.debug("ConfirmForgotPasswordEmailHandler:run :: completed");
 }
 
 function generateEmailBody() {

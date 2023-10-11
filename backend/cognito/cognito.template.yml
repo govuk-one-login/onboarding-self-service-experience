@@ -799,11 +799,11 @@ Resources:
             CloudWatchMetricsEnabled: true
             MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAdminProtectionRuleSet
 
-  CognitoWebACLAssociation:
-    Type: 'AWS::WAFv2::WebACLAssociation'
-    Properties:
-      WebACLArn: !GetAtt CognitoWebACL.Arn
-      ResourceArn: !GetAtt UserPool.Arn
+#  CognitoWebACLAssociation:
+#    Type: 'AWS::WAFv2::WebACLAssociation'
+#    Properties:
+#      WebACLArn: !GetAtt CognitoWebACL.Arn
+#      ResourceArn: !GetAtt UserPool.Arn
 
 Outputs:
   UserPoolID:
