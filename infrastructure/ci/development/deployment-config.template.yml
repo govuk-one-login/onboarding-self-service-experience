@@ -23,6 +23,8 @@ Resources:
   # Service authorisation reference - Actions, resources, and condition keys for AWS services
   # https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html
   GitHubActionsRole:
+    # checkov:skip=CKV_AWS_109:Ensure IAM policies does not allow permissions management without constraints
+    # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -46,6 +48,12 @@ Resources:
                   - iam:ListPolicies
                   - ec2:DescribeVpcs
                   - ec2:DescribeSubnets
+                  - s3:CreateBucket
+                  - s3:GetBucketPolicy
+                  - s3:PutBucketPolicy
+                  - s3:PutPublicAccessBlock
+                  - s3:PutBucketPublicAccessBlock
+                  - s3:DeleteBucket
 
               - Effect: Allow
                 Resource: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
@@ -85,6 +93,22 @@ Resources:
                   - cloudformation:DeleteStack
 
               - Effect: Allow
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${PreviewStacksPrefix}-*
+                Action:
+                  - ssm:PutParameter
+                  - ssm:DeleteParameter
+                  - ssm:AddTagsToResource
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${PreviewStacksPrefix}-*
+                Action:
+                  - sqs:CreateQueue
+                  - sqs:DeleteQueue
+                  - sqs:TagQueue
+                  - sqs:GetQueueAttributes
+                  - sqs:SetQueueAttributes
+
+              - Effect: Allow
                 Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ServiceName}/*
                 Action:
                   - ssm:GetParameter
@@ -95,18 +119,38 @@ Resources:
                 Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
                 Action:
                   - kms:Encrypt
+                  - kms:CreateKey
+                  - kms:EnableKeyRotation
+                  - kms:DescribeKey
+                  - kms:PutKeyPolicy
+                  - kms:TagResource
+                  - kms:CreateGrant
+                  - kms:ScheduleKeyDeletion
+                  - kms:CreateAlias
+                  - kms:DeleteAlias
 
               - Effect: Allow
                 Resource: !Sub arn:aws:wafv2:${AWS::Region}:${AWS::AccountId}:regional/*
                 Action:
-                  - wafv2:*
+                  - wafv2:CreateWebACL
+                  - wafv2:DeleteWebACL
+                  - wafv2:AssociateWebACL
+                  - wafv2:GetWebACL
+                  - wafv2:ListWebACLs
+                  - wafv2:ListTagsForResource
+                  - wafv2:GetWebACLForResource
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/*
+                Action:
+                  - elasticloadbalancing:SetWebACL
 
   FrontendDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
-    Type: AWS::IAM::Policy
+    Type: AWS::IAM::ManagedPolicy
     Properties:
       Roles: [ !Ref GitHubActionsRole ]
-      PolicyName: DeployFrontend
+      ManagedPolicyName: DeployFrontend
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -117,6 +161,7 @@ Resources:
               - ecr:GetAuthorizationToken
               - ec2:DescribeSecurityGroups
               - ec2:CreateSecurityGroup
+              - ec2:DeleteSecurityGroup
               - ecs:CreateCluster
               - ecs:ListTaskDefinitions
               - ecs:DescribeTaskDefinition
@@ -127,9 +172,7 @@ Resources:
               - elasticloadbalancing:DescribeLoadBalancers
               - route53:GetHostedZone
               - route53:GetChange
-              - s3:CreateBucket
-              - s3:PutPublicAccessBlock
-
+              - kms:CreateAlias
 
           - Effect: Allow
             Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ServiceName}/frontend
@@ -222,10 +265,10 @@ Resources:
                 route53:ChangeResourceRecordSetsNormalizedRecordNames: !Sub [ "*.${Domain}", { Domain: !ImportValue DNS-Domain } ]
 
   ApiDeploymentPolicy:
-    Type: AWS::IAM::Policy
+    Type: AWS::IAM::ManagedPolicy
     Properties:
       Roles: [ !Ref GitHubActionsRole ]
-      PolicyName: DeployAPI
+      ManagedPolicyName: DeployAPI
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -356,10 +399,10 @@ Resources:
   CognitoDeploymentPolicy:
     # checkov:skip=CKV_AWS_109:Ensure IAM policies does not allow permissions management without constraints
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
-    Type: AWS::IAM::Policy
+    Type: AWS::IAM::ManagedPolicy
     Properties:
       Roles: [ !Ref GitHubActionsRole ]
-      PolicyName: DeployCognito
+      ManagedPolicyName: DeployCognito
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -430,10 +473,10 @@ Resources:
             Action: secretsmanager:GetSecretValue
 
   DynamoDBDeploymentPolicy:
-    Type: AWS::IAM::Policy
+    Type: AWS::IAM::ManagedPolicy
     Properties:
       Roles: [ !Ref GitHubActionsRole ]
-      PolicyName: DeployDynamoDB
+      ManagedPolicyName: DeployDynamoDB
       PolicyDocument:
         Version: 2012-10-17
         Statement:
