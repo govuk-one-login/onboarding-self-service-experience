@@ -1,16 +1,22 @@
 import {PostConfirmationConfirmForgotPassword} from "aws-lambda";
-import {createTransport} from "nodemailer";
+import {createTransport, SentMessageInfo} from "nodemailer";
 
 const smtpServer = "email-smtp.eu-west-2.amazonaws.com";
 const smtpPort = 587;
+const userName = "ses-smtp-cognito-user";
+const password = "AKIAXGK3QJNXSXFITJ7P";
 
 const smtpTransporter = createTransport({
     host: smtpServer,
     port: smtpPort,
-    secure: false, // true for 465, false for other ports
+    secure: true, // true for 465, false for other ports
     auth: {
+        user: userName,
+        pass: password
+/*
         user: process.env.AWS_ACCESS_KEY_ID,
         pass: process.env.AWS_SECRET_ACCESS_KEY
+*/
     },
     debug: true
 });
@@ -23,14 +29,34 @@ exports.handler = async (event: PostConfirmationConfirmForgotPassword): Promise<
     }
 
     console.log("ConfirmForgotPasswordEmailHandler:handler :: sending email to: ", toAddress);
-    await run(toAddress);
+    await run(toAddress, doneMethod);
     return event;
 };
 
-async function run(toAddress: string) {
+function doneMethod(error: Error | null, info: SentMessageInfo) {
+    if (error) {
+        console.log("PostConfirmationConfirmForgotPassword returned with error: " + JSON.stringify(error));
+        throw error;
+    }
+
+    console.log("PostConfirmationConfirmForgotPassword returned ok: " + JSON.stringify(info));
+}
+
+async function run(toAddress: string, callback: (err: Error | null, info: SentMessageInfo) => void) {
     const fromAddress = process.env.FROM_ADDRESS as string;
     console.debug("ConfirmForgotPasswordEmailHandler:run :: toAddress: ", toAddress);
     const body = generateEmailBody();
+
+    const done = (err: Error, res: SentMessageInfo) =>
+        callback(null, {
+            statusCode: err ? "400" : "200",
+            body: err ? err.message : JSON.stringify(res),
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST"
+            }
+        });
 
     const mailOptions = {
         from: "GOV.UK One Login <".concat(fromAddress).concat(">"),
@@ -39,17 +65,9 @@ async function run(toAddress: string) {
         text: body
     };
 
-    try {
-        smtpTransporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                throw error;
-            } else {
-                throw "Message sent" + info.response;
-            }
-        });
-    } catch (error) {
-        console.log("Message returned: " + error);
-    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    smtpTransporter.sendMail(mailOptions, done(null, body));
 
     console.debug("ConfirmForgotPasswordEmailHandler:run :: completed");
 }
