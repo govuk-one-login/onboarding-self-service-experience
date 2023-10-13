@@ -20,7 +20,8 @@ import {
     ServiceOutputTypes,
     GlobalSignOutCommand,
     GetUserCommand,
-    VerifyUserAttributeCommand
+    VerifyUserAttributeCommand,
+    UpdateUserPoolClientCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Command} from "@aws-sdk/types";
 import {cognito, region} from "../../config/environment";
@@ -48,6 +49,16 @@ export default class CognitoClient implements CognitoInterface {
         this.clientId = nonNull(cognito.clientId);
         this.userPoolId = nonNull(cognito.userPoolId);
         this.client = new CognitoIdentityProviderClient({region: region});
+
+        // Update the MFA Duration Status from default of 3 Minutes to 15 Minutes (the maximum)
+        const updateUserPoolClientCommand = new UpdateUserPoolClientCommand({
+            ClientId: this.clientId,
+            UserPoolId: this.userPoolId,
+            AuthSessionValidity: 15,
+            ExplicitAuthFlows: ["ALLOW_ADMIN_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+        });
+
+        this.client.send(updateUserPoolClientCommand);
     }
 
     async createUser(email: string): Promise<void> {

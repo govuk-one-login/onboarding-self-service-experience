@@ -93,7 +93,7 @@ Feature: Users can sign up to the self-service experience
 
     Scenario: The user does not receive their email security and wants to contact the service via support form
       When they click on the "support form" link
-      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us"
+      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us?adminTool"
 
   Rule: The user tries to set a password when creating an account
     Background:
@@ -202,7 +202,7 @@ Feature: Users can sign up to the self-service experience
     Scenario: The user wants to contact the service
       When they click on the "Problems receiving a text message?" link
       And they click on the "support form" link
-      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us"
+      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us?adminTool"
 
     Scenario: The user wants the app to resend their code
       When they click on the "Problems receiving a text message?" link

@@ -46,4 +46,4 @@ Feature: Joining public beta
 
     Scenario: Via the support form
       When they click on the "support form" link
-      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us"
+      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us?adminTool"

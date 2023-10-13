@@ -13,7 +13,7 @@
 {% if not showTestBanner %}
   {% set phaseBannerHtml %}
     This is a new service – your
-    <a href="https://www.sign-in.service.gov.uk/contact-us" class="govuk-link" rel="noreferrer noopener" target="_blank">feedback (opens in a new tab)</a> will help us improve it.
+    <a href="https://www.sign-in.service.gov.uk/contact-us?adminTool" class="govuk-link" rel="noreferrer noopener" target="_blank">feedback (opens in a new tab)</a> will help us improve it.
   {% endset %}
 {% endif %}
 
@@ -69,7 +69,7 @@
                 <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/documentation">Documentation</a>
               </li>
               <li class="govuk-header__navigation-item{% if headerActiveItem == "support" %} govuk-header__navigation-item--active{% endif %}">
-                <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/contact-us">Support</a>
+                <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/contact-us?adminTool">Support</a>
               </li>
 
               {% if isSignedIn %}
