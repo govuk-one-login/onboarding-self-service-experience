@@ -10,7 +10,7 @@ export default function processSignInForm(template: string): RequestHandler {
         const password = req.body.password;
         const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-        if (password.length === 0) {
+        if (password == null || password.length === 0) {
             return res.render(template, {
                 values: {
                     password: password,
