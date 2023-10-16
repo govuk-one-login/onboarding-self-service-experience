@@ -128,7 +128,7 @@ function generateEmailBody() {
                                         <tbody>
                                         <tr>
                                             <td width="70" bgcolor="#0b0c0c" valign="middle">
-                                                <a href="https://www.gov.uk" title="Go to the GOV.UK homepage" style="text-decoration:none" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://www.gov.uk&amp;source=gmail&amp;ust=1655759894745000&amp;usg=AOvVaw3YX7ZnOa7uia318p4Azv4u">
+                                                <a href="https://admin.sign-in.service.gov.uk/services" title="Go to GOV.UK One Login Admin Tool services" style="text-decoration:none" target="_blank">
                                                     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">
                                                         <tbody>
                                                         <tr>
