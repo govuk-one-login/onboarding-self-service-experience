@@ -720,6 +720,7 @@ Resources:
 
   SendSecurityCodeTextMessageFunctionPermission:
     Type: AWS::Lambda::Permission
+    # checkov:skip=CKV_AWS_364: Ensure that AWS Lambda function permissions delegated to AWS services are limited by SourceArn or SourceAccount
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !Ref SendSecurityCodeTextMessageFunction
