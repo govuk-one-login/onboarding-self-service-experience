@@ -62,6 +62,7 @@ Resources:
       ContainerDefinitions:
         - Name: self-service-frontend
           Image: !Ref ImageURI
+          ReadonlyRootFilesystem: true
           Environment:
             - Name: PORT
               Value: !Ref ContainerPort
