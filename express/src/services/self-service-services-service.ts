@@ -31,10 +31,10 @@ export default class SelfServiceServicesService {
         return this.cognito.changePassword(accessToken, previousPassword, proposedPassword);
     }
 
-    forgotPassword(email: string, uri: string): Promise<void> {
+    forgotPassword(email: string, protocol: string, host: string): Promise<void> {
         console.info("In self-service-services-service:forgotPassword()");
 
-        return this.cognito.forgotPassword(email, uri);
+        return this.cognito.forgotPassword(email, protocol, host);
     }
 
     confirmForgotPassword(username: string, password: string, confirmationCode: string): Promise<void> {

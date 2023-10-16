@@ -16,7 +16,7 @@ export default interface CognitoInterface {
 
     changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<void>;
 
-    forgotPassword(email: string, uri: string): Promise<void>;
+    forgotPassword(email: string, protocol: string, host: string): Promise<void>;
 
     confirmForgotPassword(username: string, password: string, confirmationCode: string): Promise<void>;
 
