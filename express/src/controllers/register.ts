@@ -59,10 +59,21 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
     res.redirect("/register/enter-email-code");
 };
 
-export const showCheckEmailForm: RequestHandler = (req, res) => {
+export const showCheckEmailForm: RequestHandler = async (req, res) => {
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
+
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "EMAIL_VERIFICATION_REQUEST",
+            email: req.session.emailAddress,
+            journeyId: req.session.id
+        })
+    );
 
     res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
@@ -78,6 +89,16 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         req.session.cognitoSession = response.Session;
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
+            await s4.sendTxMALog(
+                JSON.stringify({
+                    userIp: req.ip,
+                    event: "EMAIL_VERIFICATION_COMPLETE",
+                    email: req.session.emailAddress,
+                    journeyId: req.session.id,
+                    outcome: "failed"
+                })
+            );
+
             return res.render("register/enter-email-code.njk", {
                 values: {emailAddress: req.session.emailAddress},
                 errorMessages: {
@@ -90,6 +111,17 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     }
 
     await s4.setSignUpStatus(req.session.emailAddress, SignupStatusStage.HasEmail);
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "EMAIL_VERIFICATION_COMPLETE",
+            email: req.session.emailAddress,
+            journeyId: req.session.id,
+            outcome: "success"
+        })
+    );
+
     res.redirect("/register/create-password");
 };
 
@@ -139,6 +171,15 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
     const emailAddress = nonNull(req.session.emailAddress);
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPhoneNumber);
 
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "PHONE_VERIFICATION_REQUEST",
+            phoneNumber: req.session.enteredMobileNumber,
+            journeyId: req.session.id
+        })
+    );
+
     res.redirect("/register/enter-text-code");
 };
 
@@ -176,6 +217,16 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
         await s4.verifyMobileUsingSmsCode(accessToken, securityCode);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
+            await s4.sendTxMALog(
+                JSON.stringify({
+                    userIp: req.ip,
+                    event: "PHONE_VERIFICATION_COMPLETE",
+                    phoneNumber: req.session.enteredMobileNumber,
+                    journeyId: req.session.id,
+                    outcome: "failed"
+                })
+            );
+
             return res.render("common/enter-text-code.njk", {
                 values: {
                     securityCode: req.body.securityCode,
@@ -210,6 +261,28 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     req.session.isSignedIn = true;
 
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasTextCode);
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "PHONE_VERIFICATION_COMPLETE",
+            phoneNumber: user.mobileNumber,
+            journeyId: req.session.id,
+            userId: cognitoId,
+            outcome: "success"
+        })
+    );
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "CREATE_ACCOUNT",
+            email: AuthenticationResultParser.getEmail(authenticationResult),
+            userId: cognitoId,
+            journeyId: req.session.id
+        })
+    );
+
     res.redirect("/register/create-service");
 };
 
@@ -256,6 +329,17 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
     const serviceId = JSON.parse(body).pk;
 
     req.session.serviceName = req.body.serviceName;
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "SERVICE_ADDED",
+            service: req.session.serviceName,
+            userId: userId,
+            journeyId: req.session.id
+        })
+    );
+
     res.redirect(`/services/${serviceId.substring(8)}/clients`);
 };
 

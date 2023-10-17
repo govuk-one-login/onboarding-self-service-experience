@@ -44,4 +44,6 @@ app.use(errorHandler);
 app.locals.googleTagId = googleTagId;
 app.locals.showTestBanner = showTestBanner;
 
+app.set("trust proxy", true);
+
 app.listen(port, () => console.log(`Server running; listening on port ${port}, current time: ${new Date().toLocaleTimeString()}`));

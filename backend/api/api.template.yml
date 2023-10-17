@@ -647,6 +647,47 @@ Resources:
             Path: /update-service
             Method: POST
 
+  KMSDecryptAccessPolicy:
+    # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy for decrypting KMS
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - kms:GenerateDataKey
+              - kms:Decrypt
+            Resource: "*"
+
+  SendSQSMessageToTxMAHandler:
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+    Properties:
+      Handler: backend/api/src/handlers/logging/sqs-service.sendSQSMessageToTxMAHandler
+      Description: Sends a message to the TxMA SQS
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Policies: [ AWSLambdaVPCAccessExecutionRole, AmazonSQSFullAccess, !Ref KMSDecryptAccessPolicy ]
+      Environment:
+        Variables:
+          QUEUEURL: !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/${DeploymentName}-frontend-AuditEventQueue
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /txma-logging
+            Method: POST
+
   StepFunctionExecutionRole:
     Type: AWS::IAM::Role
     Properties:

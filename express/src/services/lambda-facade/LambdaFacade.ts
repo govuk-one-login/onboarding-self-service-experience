@@ -107,6 +107,10 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         await this.post("/send-public-beta-request-notification", JSON.stringify(body));
     }
 
+    async sendTxMALog(message: string) {
+        await this.post("/txma-logging", JSON.stringify(message));
+    }
+
     private get(endpoint: string): Promise<AxiosResponse> {
         return this.client.get(endpoint);
     }

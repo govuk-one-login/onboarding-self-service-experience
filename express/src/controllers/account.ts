@@ -63,6 +63,16 @@ export const changePassword: RequestHandler = async (req, res) => {
     await s4.updateUser(AuthenticationResultParser.getCognitoId(authenticationResult), {password_last_updated: new Date()}, accessToken);
 
     req.session.updatedField = "password";
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "UPDATE_PASSWORD",
+            journeyId: req.session.id,
+            userId: AuthenticationResultParser.getCognitoId(authenticationResult)
+        })
+    );
+
     res.redirect("/account");
 };
 
@@ -89,6 +99,16 @@ export const processChangePhoneNumberForm: RequestHandler = async (req, res) => 
     await s4.sendMobileNumberVerificationCode(accessToken);
 
     req.session.enteredMobileNumber = enteredMobileNumber;
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "UPDATE_PHONE_REQUEST",
+            phoneNumber: req.session.enteredMobileNumber,
+            journeyId: req.session.id
+        })
+    );
+
     res.redirect("/account/change-phone-number/enter-text-code");
 };
 
@@ -111,6 +131,17 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
         await s4.verifyMobileUsingSmsCode(accessToken, req.body.securityCode);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
+            await s4.sendTxMALog(
+                JSON.stringify({
+                    userIp: req.ip,
+                    event: "PHONE_VERIFICATION_COMPLETE",
+                    phoneNumber: req.session.enteredMobileNumber,
+                    journeyId: req.session.id,
+                    userId: AuthenticationResultParser.getCognitoId(authenticationResult),
+                    outcome: "failed"
+                })
+            );
+
             return res.render("common/enter-text-code.njk", {
                 headerActiveItem: "your-account",
                 values: {
@@ -134,6 +165,18 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
     req.session.mobileNumber = req.session.enteredMobileNumber;
     req.session.enteredMobileNumber = undefined;
     req.session.updatedField = "mobile phone number";
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "PHONE_VERIFICATION_COMPLETE",
+            phoneNumber: req.session.enteredMobileNumber,
+            journeyId: req.session.id,
+            userId: AuthenticationResultParser.getCognitoId(authenticationResult),
+            outcome: "success"
+        })
+    );
+
     res.redirect("/account");
 };
 
