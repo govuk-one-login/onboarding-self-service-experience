@@ -6,7 +6,7 @@ const router = Router();
 export default router;
 
 router.get("/", (req, res) => {
-    res.render("index.njk", {headerActiveItem: "get-started"});
+    res.redirect(303, "/sign-in/enter-email-address");
 });
 
 router.get("/sign-out", signOut);
