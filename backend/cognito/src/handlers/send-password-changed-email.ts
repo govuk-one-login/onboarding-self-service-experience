@@ -1,7 +1,19 @@
-import {SendEmailCommand, SESClient} from "@aws-sdk/client-ses";
 import {PostConfirmationConfirmForgotPassword} from "aws-lambda";
+import {createTransport, SentMessageInfo} from "nodemailer";
 
-const client = new SESClient({region: "eu-west-2"});
+const smtpServer = "email-smtp.eu-west-2.amazonaws.com";
+const smtpPort = 587;
+
+const smtpTransporter = createTransport({
+    host: smtpServer,
+    port: smtpPort,
+    secure: true, // true for 465, false for other ports
+    auth: {
+        user: process.env.AWS_ACCESS_KEY_ID,
+        pass: process.env.AWS_SECRET_ACCESS_KEY
+    },
+    debug: true
+});
 
 exports.handler = async (event: PostConfirmationConfirmForgotPassword): Promise<PostConfirmationConfirmForgotPassword> => {
     const toAddress = event.request.clientMetadata?.email;
@@ -10,53 +22,46 @@ exports.handler = async (event: PostConfirmationConfirmForgotPassword): Promise<
         throw new Error("Destination email address is missing from the event");
     }
 
-    await run(toAddress);
+    await run(toAddress, doneMethod);
     return event;
 };
 
-async function run(toAddress: string) {
-    const sendEmailCommand = createSendEmailCommand(toAddress, process.env.FROM_ADDRESS as string);
-
-    try {
-        return await client.send(sendEmailCommand);
-    } catch (err) {
-        console.error("ConfirmForgotPasswordEmailHandler :: Failed to send email.", err);
-        throw err;
+function doneMethod(error: Error | null, info: SentMessageInfo) {
+    if (error) {
+        console.log("PostConfirmationConfirmForgotPassword returned with error: " + JSON.stringify(error));
+        throw error;
     }
+
+    console.log("PostConfirmationConfirmForgotPassword returned ok: " + JSON.stringify(info));
 }
 
-function createSendEmailCommand(toAddress: string, fromAddress: string) {
-    return new SendEmailCommand({
-        Destination: {
-            /* required */
-            CcAddresses: [
-                /* more items */
-            ],
-            ToAddresses: [
-                toAddress
-                /* more To-email addresses */
-            ]
-        },
-        Message: {
-            /* required */
-            Body: {
-                /* required */
-                Html: {
-                    Charset: "UTF-8",
-                    Data: generateEmailBody()
-                }
-            },
-            Subject: {
-                Charset: "UTF-8",
-                Data: "Your password has been changed for the GOV.UK One Login admin tool"
+async function run(toAddress: string, callback: (err: Error | null, info: SentMessageInfo) => void) {
+    const fromAddress = process.env.FROM_ADDRESS as string;
+    const body = generateEmailBody();
+
+    const done = (err: Error, res: SentMessageInfo) =>
+        callback(null, {
+            statusCode: err ? "400" : "200",
+            body: err ? err.message : JSON.stringify(res),
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST"
             }
-        },
-        // SENDER_ADDRESS
-        Source: "GOV.UK One Login <".concat(fromAddress).concat(">"),
-        ReplyToAddresses: [
-            /* more items */
-        ]
-    });
+        });
+
+    const mailOptions = {
+        from: fromAddress,
+        to: toAddress,
+        subject: "Your password has been changed for the GOV.UK One Login admin tool",
+        text: body
+    };
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    smtpTransporter.sendMail(mailOptions, done(null, body));
+
+    console.debug("ConfirmForgotPasswordEmailHandler:run :: completed");
 }
 
 function generateEmailBody() {
