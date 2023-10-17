@@ -57,6 +57,7 @@ Mappings:
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+  IsNotDev: !Not [ !Equals [ !FindInMap [ TxMAAccountARN, Environment, !Ref 'Environment' ], 'unused' ]]
 
 Resources:
 
@@ -336,6 +337,7 @@ Resources:
               AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
 
   TxMASQSProducerAuditEventQueue:
+    Condition: IsNotDev
     Type: AWS::SQS::Queue
     Properties:
       MessageRetentionPeriod: 1209600 # 14 days in seconds
@@ -353,6 +355,7 @@ Resources:
           Value: 'SQS'
 
   TxMASQSProducerAuditEventQueuePolicy:
+    Condition: IsNotDev
     Type: AWS::SQS::QueuePolicy
     Properties:
       Queues:
@@ -371,6 +374,7 @@ Resources:
             Resource: !GetAtt TxMASQSProducerAuditEventQueue.Arn
 
   TxMASQSAllowQueuePolicy:
+    Condition: IsNotDev
     Type: AWS::SQS::QueuePolicy
     Properties:
       Queues:
@@ -391,6 +395,7 @@ Resources:
             Resource: !GetAtt TxMASQSProducerAuditEventQueue.Arn
 
   TxMAAuditEventDeadLetterQueue:
+    Condition: IsNotDev
     Type: AWS::SQS::Queue
     Properties:
       MessageRetentionPeriod: 1209600 # 14 days in seconds
@@ -403,6 +408,7 @@ Resources:
           Value: 'SQS'
 
   TxMASQSProducerAuditEventQueueEncryptionKey:
+    Condition: IsNotDev
     Type: AWS::KMS::Key
     Properties:
       Description: Symmetric key used to encrypt TxMA audit messages at rest in SQS
@@ -442,12 +448,14 @@ Resources:
           Value: 'SQS'
 
   TxMASQSProducerAuditEventQueueEncryptionKeyAlias:
+    Condition: IsNotDev
     Type: AWS::KMS::Alias
     Properties:
       AliasName: !Sub alias/${AWS::StackName}/AuditEventEncryptionKey
       TargetKeyId: !Ref TxMASQSProducerAuditEventQueueEncryptionKey
 
   KMSARNParameter:
+    Condition: IsNotDev
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub '/${AWS::StackName}/KMSARN'
@@ -459,6 +467,7 @@ Resources:
         ProducerType: SQS
 
   SQSQueueARNParameter:
+    Condition: IsNotDev
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub '/${AWS::StackName}/QueueARN'
@@ -470,6 +479,7 @@ Resources:
         ProducerType: SQS
 
   SQSQueueNameParameter:
+    Condition: IsNotDev
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub '/${AWS::StackName}/QueueName'
@@ -481,6 +491,7 @@ Resources:
         ProducerType: SQS
 
   SQSQueueURLParameter:
+    Condition: IsNotDev
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub '/${AWS::StackName}/QueueURL'
@@ -643,21 +654,25 @@ Outputs:
   AdminToolURL:
     Value: !Sub https://${DNSRecord}
   KMSARN:
+    Condition: IsNotDev
     Description: 'ARN of the KMS key used for encryption.'
     Value: !Sub '${TxMASQSProducerAuditEventQueueEncryptionKey.Arn}'
     Export:
       Name: !Sub '${AWS::StackName}-KMSARN'
   QueueARN:
+    Condition: IsNotDev
     Description: 'ARN of the queue to submit events to.'
     Value: !Sub '${TxMASQSProducerAuditEventQueue.Arn}'
     Export:
       Name: !Sub '${AWS::StackName}-QueueARN'
   QueueName:
+    Condition: IsNotDev
     Description: 'Name of the queue to submit events to.'
     Value: !Sub '${TxMASQSProducerAuditEventQueue.QueueName}'
     Export:
       Name: !Sub '${AWS::StackName}-QueueName'
   QueueURL:
+    Condition: IsNotDev
     Description: 'URL of the queue to submit events to.'
     Value: !Sub '${TxMASQSProducerAuditEventQueue.QueueUrl}'
     Export:
