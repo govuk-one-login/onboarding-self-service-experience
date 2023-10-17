@@ -41,6 +41,19 @@ Parameters:
       - "integration"
       - "production"
 
+Mappings:
+  # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+  ElasticLoadBalancer:
+    eu-west-2:
+      AccountID: 652711504416
+  TxMAAccountARN:
+    Environment:
+      dev: 'unused'
+      build: 'unused'
+      staging: 'arn:aws:iam::178023842775:root'
+      integration: 'arn:aws:iam::729485541398:root'
+      production: 'arn:aws:iam::451773080033:root'
+
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
@@ -292,6 +305,192 @@ Resources:
       FromPort: !Ref ContainerPort
       ToPort: !Ref ContainerPort
 
+  #--- Logging ---#
+
+  AccessLogsBucket:
+    # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
+    # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub
+        - ${DeploymentName}-application-access-logs-${ID}
+        - ID: !Select [ 0, !Split [ "-", !Select [ 2, !Split [ "/", !Ref AWS::StackId ] ] ] ]
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+  AccessLogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AccessLogsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: s3:PutObject
+            Resource: !Sub ${AccessLogsBucket.Arn}/AWSLogs/${AWS::AccountId}/*
+            Principal:
+              AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
+
+  TxMASQSProducerAuditEventQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600 # 14 days in seconds
+      QueueName: !Sub '${AWS::StackName}-AuditEventQueue'
+      KmsMasterKeyId: !Ref TxMASQSProducerAuditEventQueueEncryptionKeyAlias
+      RedriveAllowPolicy:
+        redrivePermission: denyAll
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt TxMAAuditEventDeadLetterQueue.Arn
+        maxReceiveCount: 10
+      Tags:
+        - Key: 'AuthoredBy'
+          Value: 'TxMA'
+        - Key: 'ProducerType'
+          Value: 'SQS'
+
+  TxMASQSProducerAuditEventQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref TxMASQSProducerAuditEventQueue
+      PolicyDocument:
+        Statement:
+          - Sid: 'AllowReadByTxMAAccount'
+            Effect: Allow
+            Principal:
+              AWS: !FindInMap [ TxMAAccountARN, Environment, !Ref 'Environment' ]
+            Action:
+              - 'sqs:ChangeMessageVisibility'
+              - 'sqs:ReceiveMessage'
+              - 'sqs:DeleteMessage'
+              - 'sqs:GetQueueAttributes'
+            Resource: !GetAtt TxMASQSProducerAuditEventQueue.Arn
+
+  TxMASQSAllowQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref TxMASQSProducerAuditEventQueue
+      PolicyDocument:
+        Statement:
+          - Sid: 'AllowAccessToAdmin'
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action:
+              - 'sqs:ChangeMessageVisibility'
+              - 'sqs:ReceiveMessage'
+              - 'sqs:DeleteMessage'
+              - 'sqs:GetQueueAttributes'
+              - 'sqs:SendMessage'
+              - 'sqs:GetQueueUrl'
+            Resource: !GetAtt TxMASQSProducerAuditEventQueue.Arn
+
+  TxMAAuditEventDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600 # 14 days in seconds
+      QueueName: !Sub '${AWS::StackName}-AuditEventDeadLetterQueue'
+      KmsMasterKeyId: !Ref TxMASQSProducerAuditEventQueueEncryptionKeyAlias
+      Tags:
+        - Key: 'AuthoredBy'
+          Value: 'TxMA'
+        - Key: 'ProducerType'
+          Value: 'SQS'
+
+  TxMASQSProducerAuditEventQueueEncryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Symmetric key used to encrypt TxMA audit messages at rest in SQS
+      EnableKeyRotation: true
+      KeySpec: SYMMETRIC_DEFAULT
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: 'Enable root account access'
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action:
+              - 'kms:*'
+            Resource: '*'
+          - Sid: 'Allow Lambda Access'
+            Effect: Allow
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt
+              - kms:GenerateDataKey
+            Resource: '*'
+          - Sid: 'Allow decryption of events by TxMA'
+            Effect: Allow
+            Principal:
+              AWS: !FindInMap [ TxMAAccountARN, Environment, !Ref 'Environment' ]
+            Action:
+              - 'kms:decrypt'
+            Resource: '*'
+      Tags:
+        - Key: 'AuthoredBy'
+          Value: 'TxMA'
+        - Key: 'ProducerType'
+          Value: 'SQS'
+
+  TxMASQSProducerAuditEventQueueEncryptionKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${AWS::StackName}/AuditEventEncryptionKey
+      TargetKeyId: !Ref TxMASQSProducerAuditEventQueueEncryptionKey
+
+  KMSARNParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub '/${AWS::StackName}/KMSARN'
+      Type: String
+      Value: !Sub '${TxMASQSProducerAuditEventQueueEncryptionKey.Arn}'
+      Description: ARN of the KMS key used for encryption.
+      Tags:
+        AuthoredBy: TxMA
+        ProducerType: SQS
+
+  SQSQueueARNParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub '/${AWS::StackName}/QueueARN'
+      Type: String
+      Value: !Sub '${TxMASQSProducerAuditEventQueue.Arn}'
+      Description: ARN of the queue to submit events to.
+      Tags:
+        AuthoredBy: TxMA
+        ProducerType: SQS
+
+  SQSQueueNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub '/${AWS::StackName}/QueueName'
+      Type: String
+      Value: !Sub '${TxMASQSProducerAuditEventQueue.QueueName}'
+      Description: Name of the queue to submit events to.
+      Tags:
+        AuthoredBy: TxMA
+        ProducerType: SQS
+
+  SQSQueueURLParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub '/${AWS::StackName}/QueueURL'
+      Type: String
+      Value: !Sub '${TxMASQSProducerAuditEventQueue.QueueUrl}'
+      Description: URL of the queue to submit events to.
+      Tags:
+        AuthoredBy: TxMA
+        ProducerType: SQS
+
   FrontendWebAcl:
     Type: 'AWS::WAFv2::WebACL'
     Properties:
@@ -443,3 +642,24 @@ Resources:
 Outputs:
   AdminToolURL:
     Value: !Sub https://${DNSRecord}
+  KMSARN:
+    Description: 'ARN of the KMS key used for encryption.'
+    Value: !Sub '${TxMASQSProducerAuditEventQueueEncryptionKey.Arn}'
+    Export:
+      Name: !Sub '${AWS::StackName}-KMSARN'
+  QueueARN:
+    Description: 'ARN of the queue to submit events to.'
+    Value: !Sub '${TxMASQSProducerAuditEventQueue.Arn}'
+    Export:
+      Name: !Sub '${AWS::StackName}-QueueARN'
+  QueueName:
+    Description: 'Name of the queue to submit events to.'
+    Value: !Sub '${TxMASQSProducerAuditEventQueue.QueueName}'
+    Export:
+      Name: !Sub '${AWS::StackName}-QueueName'
+  QueueURL:
+    Description: 'URL of the queue to submit events to.'
+    Value: !Sub '${TxMASQSProducerAuditEventQueue.QueueUrl}'
+    Export:
+      Name: !Sub '${AWS::StackName}-QueueURL'
+

@@ -281,4 +281,8 @@ export default class SelfServiceServicesService {
     async sessionCount(userEmail: string): Promise<number> {
         return (await this.lambda.sessionCount(userEmail)).data.sessionCount;
     }
+
+    sendTxMALog(body: string): Promise<void> {
+        return this.lambda.sendTxMALog(body);
+    }
 }

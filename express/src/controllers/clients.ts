@@ -1,6 +1,7 @@
 import {RequestHandler} from "express";
 import getAuthApiCompliantPublicKey from "../lib/public-key";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import AuthenticationResultParser from "../lib/authentication-result-parser";
 
 const defaultPublicKey =
     "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
@@ -96,7 +97,18 @@ export const processPublicBetaForm: RequestHandler = async (req, res) => {
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+
     await s4.publicBetaRequest(userName, department, serviceName, emailAddress, nonNull(req.session.authenticationResult?.AccessToken));
+    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "PUBLIC_BETA_FORM_SUBMITTED",
+            journeyId: req.session.id,
+            userId: userId
+        })
+    );
 
     res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/public-beta/submitted`);
 };
@@ -132,11 +144,23 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
     await s4.updateService(serviceId, {service_name: newServiceName}, nonNull(req.session.authenticationResult?.AccessToken));
 
     req.session.updatedField = "service name";
     req.session.serviceName = newServiceName;
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "UPDATE_SERVICE_NAME",
+            journeyId: req.session.id,
+            service: newServiceName,
+            userId: userId
+        })
+    );
+
     res.redirect(`/services/${serviceId}/clients`);
 };
 
@@ -151,6 +175,7 @@ export const showChangePublicKeyForm: RequestHandler = (req, res) => {
 
 export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
     console.info("Process Change of Public Key Form");
     await s4.updateClient(
@@ -162,6 +187,29 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     );
 
     req.session.updatedField = "public key";
+
+    if (req.params.selfServiceClientId !== "") {
+        await s4.sendTxMALog(
+            JSON.stringify({
+                userIp: req.ip,
+                event: "UPDATE_PUBLIC_KEY",
+                journeyId: req.session.id,
+                service: nonNull(req.context.serviceId),
+                userId: userId
+            })
+        );
+    } else {
+        await s4.sendTxMALog(
+            JSON.stringify({
+                userIp: req.ip,
+                event: "PUBLIC_KEY_ADDED",
+                journeyId: req.session.id,
+                service: nonNull(req.context.serviceId),
+                userId: userId
+            })
+        );
+    }
+
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
 
@@ -179,6 +227,7 @@ export const showChangeRedirectUrlsForm: RequestHandler = (req, res) => {
 export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) => {
     const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url.trim().length > 0);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
@@ -189,6 +238,17 @@ export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) =>
     );
 
     req.session.updatedField = "redirect URIs";
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "UPDATE_REDIRECT_URL",
+            journeyId: req.session.id,
+            service: nonNull(req.context.serviceId),
+            userId: userId
+        })
+    );
+
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
 
@@ -237,6 +297,7 @@ export const showChangePostLogoutUrisForm: RequestHandler = (req, res) => {
 export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) => {
     const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url.trim().length > 0);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
@@ -247,5 +308,16 @@ export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) 
     );
 
     req.session.updatedField = "post-logout redirect URIs";
+
+    await s4.sendTxMALog(
+        JSON.stringify({
+            userIp: req.ip,
+            event: "UPDATE_LOGOUT_REDIRECT_URL",
+            journeyId: req.session.id,
+            service: nonNull(req.context.serviceId),
+            userId: userId
+        })
+    );
+
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };

@@ -39,4 +39,6 @@ export default interface LambdaFacadeInterface {
     sessionCount(userEmail: string): Promise<AxiosResponse>;
 
     globalSignOut(userEmail: string): Promise<AxiosResponse>;
+
+    sendTxMALog(message: string): Promise<void>;
 }
