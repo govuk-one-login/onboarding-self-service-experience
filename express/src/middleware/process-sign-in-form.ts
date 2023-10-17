@@ -10,7 +10,7 @@ export default function processSignInForm(template: string): RequestHandler {
         const password = req.body.password;
         const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-        if (password.length === 0) {
+        if (password == null || password.length === 0) {
             return res.render(template, {
                 values: {
                     password: password,
@@ -26,6 +26,15 @@ export default function processSignInForm(template: string): RequestHandler {
             req.session.mfaResponse = await s4.login(email, password);
         } catch (error) {
             if (error instanceof NotAuthorizedException) {
+                await s4.sendTxMALog(
+                    JSON.stringify({
+                        userIp: req.ip,
+                        event: "INVALID_CREDENTIAL",
+                        journeyId: req.session.id,
+                        credentialType: "password"
+                    })
+                );
+
                 return res.render(template, {
                     values: {
                         password: password,

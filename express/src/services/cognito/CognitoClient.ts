@@ -143,14 +143,15 @@ export default class CognitoClient implements CognitoInterface {
         });
     }
 
-    async forgotPassword(email: string, uri: string): Promise<void> {
+    async forgotPassword(email: string, protocol: string, host: string): Promise<void> {
         console.info("In CognitoClient:forgotPassword()");
 
         await this.sendCommand(ForgotPasswordCommand, {
             ClientId: this.clientId,
             Username: email,
             ClientMetadata: {
-                uri: uri,
+                protocol,
+                host: host.split("").join("/"),
                 username: email
             }
         });
