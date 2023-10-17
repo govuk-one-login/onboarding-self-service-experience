@@ -31,6 +31,16 @@ Parameters:
   CodeSigningConfigArn:
     Type: String
     Default: ""
+  Environment:
+    Description: "The name of the environment to deploy to."
+    Type: "String"
+    Default: dev
+    AllowedValues:
+      - "dev"
+      - "build"
+      - "staging"
+      - "integration"
+      - "production"
 
 Conditions:
   PrivateAPI: !Equals [ !Ref PrivateAPI, Yes ]
@@ -799,6 +809,138 @@ Resources:
       Subscription:
         - Protocol: email
           Endpoint: !Ref NotificationEmail
+
+  ApiGatewayWebAcl:
+    Type: 'AWS::WAFv2::WebACL'
+    Properties:
+      Name: !Sub '${AWS::StackName}-${Environment}-acl'
+      Scope: REGIONAL
+      Description: Web ACL for API Gateway
+      DefaultAction:
+        Allow:
+          CustomRequestHandling:
+            InsertHeaders:
+              - Name: info
+                Value: waf-allowed
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: !Sub '${AWS::StackName}-${Environment}-metric'
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-${Environment}'
+      Rules:
+        - Name: AWS-CRS
+          Priority: 0
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+              ExcludedRules:
+                - Name: CrossSiteScripting_BODY
+                - Name: CrossSiteScripting_COOKIE
+                - Name: CrossSiteScripting_QUERYARGUMENTS
+                - Name: CrossSiteScripting_URIPATH
+                - Name: EC2MetaDataSSRF_BODY
+                - Name: EC2MetaDataSSRF_COOKIE
+                - Name: EC2MetaDataSSRF_QUERYARGUMENTS
+                - Name: EC2MetaDataSSRF_URIPATH
+                - Name: GenericLFI_BODY
+                - Name: GenericLFI_QUERYARGUMENTS
+                - Name: GenericLFI_URIPATH
+                - Name: GenericRFI_BODY
+                - Name: GenericRFI_QUERYARGUMENTS
+                - Name: GenericRFI_URIPATH
+                - Name: NoUserAgent_HEADER
+                - Name: RestrictedExtensions_QUERYARGUMENTS
+                - Name: RestrictedExtensions_URIPATH
+                - Name: SizeRestrictions_BODY
+                - Name: SizeRestrictions_Cookie_HEADER
+                - Name: SizeRestrictions_QUERYSTRING
+                - Name: SizeRestrictions_URIPATH
+                - Name: UserAgent_BadBots_HEADER
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${AWS::StackName}-${Environment}-aws-crs-metric'
+        - Name: Bad-Inputs
+          Priority: 1
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+              ExcludedRules:
+                - Name: ExploitablePaths_URIPATH
+                - Name: Host_localhost_HEADER
+                - Name: JavaDeserializationRCE_BODY
+                - Name: JavaDeserializationRCE_HEADER
+                - Name: JavaDeserializationRCE_QUERYSTRING
+                - Name: JavaDeserializationRCE_URIPATH
+                # - Name: Log4JRCE
+                - Name: PROPFIND_METHOD
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${AWS::StackName}-${Environment}-bad-inputs-metric'
+        - Name: Anonymous-IpList
+          Priority: 2
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAnonymousIpList
+              ExcludedRules:
+                - Name: AnonymousIPList
+                - Name: HostingProviderIPList
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${AWS::StackName}-${Environment}-anonymous-iplist-metric'
+        - Name: SQLInject-RuleSet
+          Priority: 3
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesSQLiRuleSet
+              ExcludedRules:
+                - Name: SQLiExtendedPatterns_QUERYARGUMENTS
+                - Name: SQLi_BODY
+                - Name: SQLi_COOKIE
+                - Name: SQLi_QUERYARGUMENTS
+                - Name: SQLi_URIPATH
+          OverrideAction:
+            None: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${AWS::StackName}-${Environment}-SQLinjection-ruleset-metric'
+        - Name: RateBased-CountIpRule
+          Priority: 4
+          Statement:
+            RateBasedStatement:
+              Limit: 100
+              AggregateKeyType: IP
+          Action:
+            Count: { }
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub "${AWS::StackName}-${Environment}-RateBased-CountIp-ruleset-metric"
+            SampledRequestsEnabled: true
+
+  ApiGatewayWebACLAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      ResourceArn: !Sub
+        - 'arn:aws:apigateway:${AWS::Region}::/restapis/${ResourceArn}/stages/${API.Stage}'
+        - ResourceArn: !Ref API
+      WebACLArn: !Sub
+        - '${WebACLArn}'
+        - WebACLArn: !GetAtt ApiGatewayWebAcl.Arn
 
 Outputs:
   # SAM Serverless Function implicit API resources | Invoking private APIs
