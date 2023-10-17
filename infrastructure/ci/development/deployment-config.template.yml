@@ -418,6 +418,8 @@ Resources:
               - cognito-idp:CreateUserPoolClient
               - cognito-idp:DeleteUserPoolClient
               - cognito-idp:SetUserPoolMfaConfig
+              - cognito-idp:UpdateUserPool
+              - cognito-idp:ListTagsForResource
 
           - Effect: Allow
             Resource: "*"
