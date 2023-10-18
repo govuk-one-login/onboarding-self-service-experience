@@ -679,7 +679,7 @@ Resources:
       Policies: [ AWSLambdaVPCAccessExecutionRole, AmazonSQSFullAccess, !Ref KMSDecryptAccessPolicy ]
       Environment:
         Variables:
-          QUEUEURL: !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/${DeploymentName}-frontend-AuditEventQueue
+          QUEUEURL: !Join [ '', [!Sub 'https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/', !Join ["frontend", !Split ["api", !Sub '${AWS::StackName}' ] ], "-AuditEventQueue"]]
       Events:
         Api:
           Type: Api
