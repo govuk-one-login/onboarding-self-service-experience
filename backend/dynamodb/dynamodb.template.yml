@@ -12,8 +12,27 @@ Parameters:
     Default: self-service
     Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
 
+  # to be removed from this file
+  CidrBlock:
+    Description: >
+      The CIDR block that defines the IP range that the VPC will use. Defaults
+      to 10.0.0.0/16 and there is no specific reason to change this unless you
+      have multiple VPCs that are going to be peered or connected via a Transit
+      Gateway. Must be a /16.
+    Type: "String"
+    Default: "10.1.0.0/16"
+    AllowedPattern: "([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/16)?"
+
 Conditions:
   DeletionProtectionEnabled: !Equals [ !Ref DeletionProtection, ACTIVE ]
+
+# to be removed from this file
+Mappings:
+  SubnetZoneIds:
+    eu-west-2:
+      "a": "euw2-az1"
+      "b": "euw2-az2"
+      "c": "euw2-az3"
 
 Resources:
   DataTable:
@@ -67,6 +86,61 @@ Resources:
         Enabled: true
       SSESpecification:
         SSEEnabled: true
+
+  # to be removed from this file
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref CidrBlock
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-Vpc"
+        - Key: "Source"
+          Value: "rafal test VPC"
+
+  # to be removed from this file
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZoneId: !FindInMap [ SubnetZoneIds, !Ref AWS::Region, "a"]
+      CidrBlock: !Select [5, !Cidr [!Ref CidrBlock, 8, 9]]
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-PrivateSubnetA"
+        - Key: "Service"
+          Value: "ci/cd"
+        - Key: "Source"
+          Value: "alphagov/di-devplatform-deploy/vpc/template.yaml"
+
+  # to be moved to dev-platform-deploy
+  BlockSshRule:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !GetAtt Vpc.DefaultNetworkAcl
+      RuleNumber: 30
+      Protocol: 6
+      RuleAction: deny
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 22
+        To: 22
+
+  # to be moved to dev-platform-deploy
+  BlockRdpRule:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !GetAtt Vpc.DefaultNetworkAcl
+      RuleNumber: 60
+      Protocol: 6
+      RuleAction: deny
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3389
+        To: 3389
 
 Outputs:
   DataTableName:
