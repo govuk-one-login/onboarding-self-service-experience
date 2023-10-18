@@ -60,8 +60,8 @@
             <ul id="navigation" class="govuk-header__navigation-list">
 
               {% if not isSignedIn %}
-                <li class="govuk-header__navigation-item{% if headerActiveItem == "features" %} govuk-header__navigation-item--active{% endif %}">
-                  <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/features">Features</a>
+                <li class="govuk-header__navigation-item{% if headerActiveItem == "about" %} govuk-header__navigation-item--active{% endif %}">
+                  <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/about">About</a>
                 </li>
               {% endif %}
 
@@ -81,7 +81,7 @@
                 </li>
               {% else %}
                 <li class="govuk-header__navigation-item{% if headerActiveItem == "get-started" %} govuk-header__navigation-item--active{% endif %}">
-                  <a class="govuk-header__link" href="/">Get started</a>
+                  <a class="govuk-header__link" href="https://www.sign-in.service.gov.uk/getting-started">Get started</a>
                 </li>
                 <li class="govuk-header__navigation-item{% if headerActiveItem == "sign-in" %} govuk-header__navigation-item--active{% endif %}">
                   <a class="govuk-header__link" href="/sign-in">Sign in</a>
