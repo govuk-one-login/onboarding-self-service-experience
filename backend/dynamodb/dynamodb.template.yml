@@ -23,6 +23,23 @@ Parameters:
     Default: "10.1.0.0/16"
     AllowedPattern: "([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/16)?"
 
+  # to be moved to dev-platform-deploy
+  FlowLogRetentionInDays:
+    Description: 'Specifies the number of days you want to retain log events.'
+    Type: Number
+    Default: 14
+    AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653]
+
+  # to be moved to dev-platform-deploy
+  FlowLogTrafficType:
+    Description: 'The type of traffic to log.'
+    Type: String
+    Default: ALL
+    AllowedValues:
+      - ACCEPT
+      - REJECT
+      - ALL
+
 Conditions:
   DeletionProtectionEnabled: !Equals [ !Ref DeletionProtection, ACTIVE ]
 
@@ -141,6 +158,46 @@ Resources:
       PortRange:
         From: 3389
         To: 3389
+
+  # to be moved to dev-platform-deploy
+  FlowLogRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'vpc-flow-logs.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'flowlogs-policy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                  - 'logs:DescribeLogGroups'
+                  - 'logs:DescribeLogStreams'
+                Resource: !GetAtt 'FlowLogLogGroup.Arn'
+
+  # to be moved to dev-platform-deploy
+  FlowLogLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: !Ref FlowLogRetentionInDays
+
+  # to be moved to dev-platform-deploy
+  FlowLog:
+    Type: 'AWS::EC2::FlowLog'
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt 'FlowLogRole.Arn'
+      LogGroupName: !Ref FlowLogLogGroup
+      ResourceId: !Ref Vpc
+      ResourceType: 'VPC'
+      TrafficType: !Ref FlowLogTrafficType
 
 Outputs:
   DataTableName:
