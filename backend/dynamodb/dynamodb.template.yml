@@ -95,7 +95,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
       GroupId: !GetAtt Vpc.DefaultSecurityGroup
-      CidrIp: 127.0.0.1/32     # Any IPv4 address
+      CidrIp: 127.0.0.1/32
       IpProtocol: -1
 
 Outputs:
