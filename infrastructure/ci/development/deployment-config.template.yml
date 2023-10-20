@@ -5,7 +5,7 @@ Transform: AWS::LanguageExtensions
 Parameters:
   GitHubOrg:
     Type: String
-    Default: alphagov
+    Default: govuk-one-login
   GitHubRepo:
     Type: String
     Default: di-onboarding-self-service-experience
