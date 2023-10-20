@@ -1,19 +1,24 @@
+/*
 import {SendEmailCommand, SESClient} from "@aws-sdk/client-ses";
+*/
 import {PostConfirmationConfirmForgotPassword} from "aws-lambda";
 
+/*
 const client = new SESClient({region: "eu-west-2"});
+*/
 
 exports.handler = async (event: PostConfirmationConfirmForgotPassword): Promise<PostConfirmationConfirmForgotPassword> => {
-    const toAddress = event.request.clientMetadata?.email;
+    /*const toAddress = event.request.clientMetadata?.email;
 
     if (!toAddress) {
         throw new Error("Destination email address is missing from the event");
     }
 
-    await run(toAddress);
+    await run(toAddress);*/
     return event;
 };
 
+/*
 async function run(toAddress: string) {
     const sendEmailCommand = createSendEmailCommand(toAddress, process.env.FROM_ADDRESS as string);
 
@@ -24,23 +29,25 @@ async function run(toAddress: string) {
         throw err;
     }
 }
+*/
 
+/*
 function createSendEmailCommand(toAddress: string, fromAddress: string) {
     return new SendEmailCommand({
         Destination: {
-            /* required */
+            /!* required *!/
             CcAddresses: [
-                /* more items */
+                /!* more items *!/
             ],
             ToAddresses: [
                 toAddress
-                /* more To-email addresses */
+                /!* more To-email addresses *!/
             ]
         },
         Message: {
-            /* required */
+            /!* required *!/
             Body: {
-                /* required */
+                /!* required *!/
                 Html: {
                     Charset: "UTF-8",
                     Data: generateEmailBody()
@@ -54,11 +61,13 @@ function createSendEmailCommand(toAddress: string, fromAddress: string) {
         // SENDER_ADDRESS
         Source: "GOV.UK One Login <".concat(fromAddress).concat(">"),
         ReplyToAddresses: [
-            /* more items */
+            /!* more items *!/
         ]
     });
 }
+*/
 
+/*
 function generateEmailBody() {
     return `
     <html>
@@ -193,3 +202,4 @@ function generateEmailBody() {
     </html>
 `;
 }
+*/
