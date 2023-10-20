@@ -26,6 +26,9 @@ Parameters:
   GoogleTagID:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/google-tag-id
+  AllowedEmailDomainsSource:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/allowed-email-domains-source
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -81,6 +84,8 @@ Resources:
               Value: !Ref ContainerPort
             - Name: TEST_BANNER
               Value: !Ref ShowTestBanner
+            - Name: ALLOWED_EMAIL_DOMAINS_SOURCE
+              Value: !Ref AllowedEmailDomainsSource
             - Name: GOOGLE_TAG_ID
               Value: !Ref GoogleTagID
             - Name: SESSION_SECRET
