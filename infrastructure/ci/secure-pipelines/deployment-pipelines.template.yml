@@ -88,6 +88,8 @@ Resources:
         AllowedServiceTwo: DynamoDB
         AllowedServiceThree: SNS
         AllowedServiceFour: StepFunctions
+        AllowedServiceFive: EC2
+        AllowedServiceSix: SQS
 
   CognitoDeployer:
     Type: AWS::CloudFormation::Stack
@@ -119,6 +121,7 @@ Resources:
         AllowedServiceOne: Cognito
         AllowedServiceTwo: Lambda
         AllowedServiceThree: SNS
+        AllowedServiceFour: EC2
 
   DynamoDBDeployer:
     Type: AWS::CloudFormation::Stack
@@ -180,6 +183,8 @@ Resources:
         ProgrammaticPermissionsBoundary: "True"
         PipelineEnvironmentNameEnabled: "Yes"
         AllowedServiceOne: ECR & ECS
+        AllowedServiceTwo: Cognito
+        AllowedServiceThree: DynamoDB
 
   FrontendECRRepository:
     Type: AWS::CloudFormation::Stack
