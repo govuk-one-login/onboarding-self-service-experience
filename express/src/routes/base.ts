@@ -5,9 +5,7 @@ import {render} from "../middleware/request-handler";
 const router = Router();
 export default router;
 
-router.get("/", (req, res) => {
-    res.render("index.njk", {headerActiveItem: "get-started"});
-});
+router.get("/", render("sign-in/enter-email-address.njk"));
 
 router.get("/sign-out", signOut);
 
