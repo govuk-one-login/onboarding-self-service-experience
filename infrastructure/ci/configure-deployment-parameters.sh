@@ -127,7 +127,7 @@ function check-deployment-parameters {
   check-manual-secrets
 
   check-allowd-email-domains-source
-  
+
   print-parameters
   print-secrets
 }
