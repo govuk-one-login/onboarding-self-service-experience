@@ -14,6 +14,7 @@ declare -A PARAMETERS=(
   [cognito_external_id]=$PARAMETER_NAME_PREFIX/cognito/external-id
   [deletion_protection]=$PARAMETER_NAME_PREFIX/config/deletion-protection-enabled
   [api_notification_email]=$PARAMETER_NAME_PREFIX/api/notifications-email
+  [allowed_email_domains_source]=$PARAMETER_NAME_PREFIX/frontend/allowed-email-domains-source
 )
 
 declare -A SECRETS=(
@@ -92,6 +93,12 @@ function check-test-banner {
     write-parameter-value "$parameter" "$([[ $ACCOUNT == production ]] && echo false || echo true)"
 }
 
+function check-allowd-email-domains-source {
+  local parameter=${PARAMETERS[allowed_email_domains_source]}
+  check-parameter-set "$parameter" ||
+    write-parameter-value "$parameter" "$([[ $ACCOUNT == production ]] && echo 'allowed-email-domains' || echo 'allowed-test-domains')"
+}
+
 function print-parameters {
   local parameter
   echo "--- Deployment parameters ---"
@@ -119,6 +126,8 @@ function check-deployment-parameters {
   check-session-secret
   check-manual-secrets
 
+  check-allowd-email-domains-source
+  
   print-parameters
   print-secrets
 }
