@@ -26,6 +26,9 @@ Parameters:
   GoogleTagID:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/google-tag-id
+  AllowedEmailDomainsSource:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/allowed-email-domains-source
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -85,6 +88,8 @@ Resources:
               Value: !Ref GoogleTagID
             - Name: SESSION_SECRET
               Value: "{{resolve:secretsmanager:/self-service/frontend/session-secret}}"
+            - Name: ALLOWED_EMAIL_DOMAINS_SOURCE
+              Value: !Ref AllowedEmailDomainsSource
             - Name: SESSIONS_TABLE
               Value:
                 Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
