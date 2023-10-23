@@ -89,7 +89,7 @@ Resources:
         AllowedServiceThree: SNS
         AllowedServiceFour: StepFunctions
         AllowedServiceFive: EC2
-         AllowedServiceSix: SQS
+        AllowedServiceSix: SQS
 
   CognitoDeployer:
     Type: AWS::CloudFormation::Stack
