@@ -106,6 +106,7 @@ Resources:
   APIAccessLogsGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
+    DependsOn: LogAuditLogGroup
     Properties:
       LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api
       RetentionInDays: 14
@@ -834,6 +835,7 @@ Resources:
   StepFunctionsLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
+    DependsOn: LogAuditLogGroup
     Properties:
       LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/step-functions
       RetentionInDays: 14
