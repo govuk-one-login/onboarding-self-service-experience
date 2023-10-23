@@ -38,6 +38,7 @@ Resources:
         StatesApiEnabled: "Yes"
         DynamoDBApiEnabled: "Yes"
         ExecuteApiGatewayEnabled: "Yes"
+        SQSApiEnabled: "Yes"
         AccessLogsCustomBucketNameEnabled: "No"
         AvailabilityZoneCount: 2
         AllowedDomains: !Join [ ",", [
