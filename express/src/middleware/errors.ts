@@ -5,15 +5,32 @@ import AuthenticationResultParser from "../lib/authentication-result-parser";
 
 export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+
+    let userId = "unknown"; // Some errors may occur before a user or session is established
+    let sessionId = "unknown";
+
+    try {
+        sessionId = req.session.id;
+        userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+    } catch {
+        console.debug("RequestHandler: unable to establish identifiers from session.");
+    }
 
     s4.sendTxMALog(
         JSON.stringify({
             userIp: req.ip,
             event: "ERROR_UNAVAILABLE",
-            journeyId: req.session.id,
+            journeyId: sessionId,
             userId: userId
         })
+    ).then(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        result => {
+            return;
+        },
+        error => {
+            console.log("RequestHandler: sendTxMALog errored: " + error);
+        }
     );
 
     res.status(404).render("404.njk");
@@ -21,18 +38,36 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
 export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, res, next) => {
+    console.error("ErrorRequestHandler: error info: " + err);
+
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+
+    let userId = "unknown"; // Some errors may occur before a user or session is established
+    let sessionId = "unknown";
+
+    try {
+        sessionId = req.session.id;
+        userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+    } catch {
+        console.debug("ErrorRequestHandler: unable to establish identifiers from session.");
+    }
 
     s4.sendTxMALog(
         JSON.stringify({
             userIp: req.ip,
             event: "ERROR_PROBLEM",
-            journeyId: req.session.id,
+            journeyId: sessionId,
             userId: userId
         })
+    ).then(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        result => {
+            return;
+        },
+        error => {
+            console.log("ErrorRequestHandler: sendTxMALog errored: " + error);
+        }
     );
 
-    console.error(err);
     res.render("there-is-a-problem.njk");
 });
