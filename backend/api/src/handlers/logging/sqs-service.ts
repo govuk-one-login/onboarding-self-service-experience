@@ -7,7 +7,7 @@ const client = new SQSClient({region: "eu-west-2"});
 export const sendSQSMessageToTxMAHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     let payload: string;
     let response = {
-        statusCode: 500,
+        statusCode: 200,
         body: JSON.stringify("Error")
     };
 
@@ -31,13 +31,13 @@ export const sendSQSMessageToTxMAHandler = async (event: APIGatewayProxyEvent): 
                 };
             } else {
                 response = {
-                    statusCode: 500,
+                    statusCode: 200,
                     body: JSON.stringify("Error")
                 };
             }
             return response;
-        } catch (err) {
-            console.log("Error", err);
+        } catch (error) {
+            console.log("Error", error);
         }
     }
 
