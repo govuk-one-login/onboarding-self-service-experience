@@ -46,6 +46,7 @@ Resources:
                 Resource: "*"
                 Action:
                   - iam:ListPolicies
+                  - iam:GetPolicy
                   - ec2:DescribeVpcs
                   - ec2:DescribeSubnets
                   - s3:CreateBucket
