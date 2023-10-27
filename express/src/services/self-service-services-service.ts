@@ -282,6 +282,7 @@ export default class SelfServiceServicesService {
         return (await this.lambda.sessionCount(userEmail)).data.sessionCount;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
     sendTxMALog(body: string) {
         this.lambda.sendTxMALog(body).then(
             result => {
