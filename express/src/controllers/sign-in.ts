@@ -53,25 +53,23 @@ export const finishSignIn: RequestHandler = async (req, res) => {
     if (await signedInToAnotherDevice(user.email, s4)) {
         res.redirect("/sign-in/signed-in-to-another-device");
     } else {
-        await s4.sendTxMALog(
-            JSON.stringify({
-                userIp: req.ip,
-                event: "LOG_IN_SUCCESS",
-                email: user.email,
-                userId: AuthenticationResultParser.getCognitoId(authenticationResult),
-                journeyId: req.session.id
-            })
-        );
+        s4.sendTxMALog("LOG_IN_SUCCESS", req.session.id, {
+            ip_address: req.ip,
+            user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+            email: user.email
+        });
 
-        await s4.sendTxMALog(
-            JSON.stringify({
-                userIp: req.ip,
-                event: "PHONE_VERIFICATION_COMPLETE",
-                phoneNumber: req.session.enteredMobileNumber,
-                journeyId: req.session.id,
-                userId: AuthenticationResultParser.getCognitoId(authenticationResult),
+        s4.sendTxMALog(
+            "PHONE_VERIFICATION_COMPLETE",
+            req.session.id,
+            {
+                ip_address: req.ip,
+                user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+                email: user.email
+            },
+            {
                 outcome: "success"
-            })
+            }
         );
 
         res.redirect("/services");
@@ -114,13 +112,9 @@ export const processResendPhoneCodePage: RequestHandler = (req, res) => {
 export const forgotPasswordForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    await s4.sendTxMALog(
-        JSON.stringify({
-            userIp: req.ip,
-            event: "PASSWORD_RESET_REQUESTED",
-            journeyId: req.session.id
-        })
-    );
+    s4.sendTxMALog("PASSWORD_RESET_REQUESTED", req.session.id, {
+        ip_address: req.ip
+    });
 
     res.render("sign-in/forgot-password.njk", {
         values: {
@@ -168,13 +162,9 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
     req.session.emailAddress = req.body.loginName;
     req.session.updatedField = "password";
 
-    await s4.sendTxMALog(
-        JSON.stringify({
-            userIp: req.ip,
-            event: "PASSWORD_RESET_COMPLETED",
-            journeyId: req.session.id
-        })
-    );
+    s4.sendTxMALog("PASSWORD_RESET_COMPLETED", req.session.id, {
+        ip_address: req.ip
+    });
 
     next();
 };

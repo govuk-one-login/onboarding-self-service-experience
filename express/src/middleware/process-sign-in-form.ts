@@ -26,13 +26,15 @@ export default function processSignInForm(template: string): RequestHandler {
             req.session.mfaResponse = await s4.login(email, password);
         } catch (error) {
             if (error instanceof NotAuthorizedException) {
-                await s4.sendTxMALog(
-                    JSON.stringify({
-                        userIp: req.ip,
-                        event: "INVALID_CREDENTIAL",
-                        journeyId: req.session.id,
-                        credentialType: "password"
-                    })
+                s4.sendTxMALog(
+                    "INVALID_CREDENTIAL",
+                    req.session.id,
+                    {
+                        ip_address: req.ip
+                    },
+                    {
+                        credential_type: "password"
+                    }
                 );
 
                 return res.render(template, {
