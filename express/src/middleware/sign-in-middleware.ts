@@ -18,10 +18,16 @@ export default async function processSecurityCode(req: Request, res: Response, n
         if (error instanceof CodeMismatchException) {
             await s4.sendTxMALog(
                 JSON.stringify({
-                    userIp: req.ip,
-                    event: "INVALID_CREDENTIAL",
-                    journeyId: req.session.id,
-                    credentialType: "2FA"
+                    timestamp: Date.now(),
+                    event_name: "INVALID_CREDENTIAL",
+                    component_id: "SSE",
+                    session_id: req.session.id,
+                    user: {
+                        ip_address: req.ip
+                    },
+                    extensions: {
+                        credential_type: "2FA"
+                    }
                 })
             );
 

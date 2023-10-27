@@ -18,10 +18,14 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
 
     s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "ERROR_UNAVAILABLE",
-            journeyId: sessionId,
-            userId: userId
+            timestamp: Date.now(),
+            event_name: "ERROR_UNAVAILABLE",
+            component_id: "SSE",
+            session_id: sessionId,
+            user: {
+                user_id: userId,
+                ip_address: req.ip
+            }
         })
     ).then(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -54,10 +58,14 @@ export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, 
 
     s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "ERROR_PROBLEM",
-            journeyId: sessionId,
-            userId: userId
+            timestamp: Date.now(),
+            event_name: "ERROR_PROBLEM",
+            component_id: "SSE",
+            session_id: sessionId,
+            user: {
+                user_id: userId,
+                ip_address: req.ip
+            }
         })
     ).then(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars

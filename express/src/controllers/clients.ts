@@ -103,10 +103,14 @@ export const processPublicBetaForm: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "PUBLIC_BETA_FORM_SUBMITTED",
-            journeyId: req.session.id,
-            userId: userId
+            timestamp: Date.now(),
+            event_name: "PUBLIC_BETA_FORM_SUBMITTED",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                user_id: userId,
+                ip_address: req.ip
+            }
         })
     );
 
@@ -153,11 +157,17 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "UPDATE_SERVICE_NAME",
-            journeyId: req.session.id,
-            service: newServiceName,
-            userId: userId
+            timestamp: Date.now(),
+            event_name: "UPDATE_SERVICE_NAME",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                user_id: userId,
+                ip_address: req.ip
+            },
+            extensions: {
+                service_name: newServiceName
+            }
         })
     );
 
@@ -191,21 +201,33 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     if (req.params.selfServiceClientId !== "") {
         await s4.sendTxMALog(
             JSON.stringify({
-                userIp: req.ip,
-                event: "UPDATE_PUBLIC_KEY",
-                journeyId: req.session.id,
-                service: nonNull(req.context.serviceId),
-                userId: userId
+                timestamp: Date.now(),
+                event_name: "UPDATE_PUBLIC_KEY",
+                component_id: "SSE",
+                session_id: req.session.id,
+                user: {
+                    user_id: userId,
+                    ip_address: req.ip
+                },
+                extensions: {
+                    service_id: nonNull(req.context.serviceId)
+                }
             })
         );
     } else {
         await s4.sendTxMALog(
             JSON.stringify({
-                userIp: req.ip,
-                event: "PUBLIC_KEY_ADDED",
-                journeyId: req.session.id,
-                service: nonNull(req.context.serviceId),
-                userId: userId
+                timestamp: Date.now(),
+                event_name: "PUBLIC_KEY_ADDED",
+                component_id: "SSE",
+                session_id: req.session.id,
+                user: {
+                    user_id: userId,
+                    ip_address: req.ip
+                },
+                extensions: {
+                    service_id: nonNull(req.context.serviceId)
+                }
             })
         );
     }
@@ -241,11 +263,17 @@ export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) =>
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "UPDATE_REDIRECT_URL",
-            journeyId: req.session.id,
-            service: nonNull(req.context.serviceId),
-            userId: userId
+            timestamp: Date.now(),
+            event_name: "UPDATE_REDIRECT_URL",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                user_id: userId,
+                ip_address: req.ip
+            },
+            extensions: {
+                service_id: nonNull(req.context.serviceId)
+            }
         })
     );
 
@@ -311,11 +339,17 @@ export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) 
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "UPDATE_LOGOUT_REDIRECT_URL",
-            journeyId: req.session.id,
-            service: nonNull(req.context.serviceId),
-            userId: userId
+            timestamp: Date.now(),
+            event_name: "UPDATE_LOGOUT_REDIRECT_URL",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                ip_address: req.ip,
+                user_id: userId
+            },
+            extensions: {
+                service_id: nonNull(req.context.serviceId)
+            }
         })
     );
 

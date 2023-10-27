@@ -28,10 +28,16 @@ export default function processSignInForm(template: string): RequestHandler {
             if (error instanceof NotAuthorizedException) {
                 await s4.sendTxMALog(
                     JSON.stringify({
-                        userIp: req.ip,
-                        event: "INVALID_CREDENTIAL",
-                        journeyId: req.session.id,
-                        credentialType: "password"
+                        timestamp: Date.now(),
+                        event_name: "INVALID_CREDENTIAL",
+                        component_id: "SSE",
+                        session_id: req.session.id,
+                        user: {
+                            ip_address: req.ip
+                        },
+                        extensions: {
+                            credential_type: "password"
+                        }
                     })
                 );
 

@@ -68,10 +68,14 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "EMAIL_VERIFICATION_REQUEST",
-            email: req.session.emailAddress,
-            journeyId: req.session.id
+            timestamp: Date.now(),
+            event_name: "EMAIL_VERIFICATION_REQUEST",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                email: req.session.emailAddress,
+                ip_address: req.ip
+            }
         })
     );
 
@@ -91,11 +95,17 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         if (error instanceof NotAuthorizedException) {
             await s4.sendTxMALog(
                 JSON.stringify({
-                    userIp: req.ip,
-                    event: "EMAIL_VERIFICATION_COMPLETE",
-                    email: req.session.emailAddress,
-                    journeyId: req.session.id,
-                    outcome: "failed"
+                    timestamp: Date.now(),
+                    event_name: "EMAIL_VERIFICATION_COMPLETE",
+                    component_id: "SSE",
+                    session_id: req.session.id,
+                    user: {
+                        email: req.session.emailAddress,
+                        ip_address: req.ip
+                    },
+                    extensions: {
+                        outcome: "failed"
+                    }
                 })
             );
 
@@ -114,11 +124,17 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "EMAIL_VERIFICATION_COMPLETE",
-            email: req.session.emailAddress,
-            journeyId: req.session.id,
-            outcome: "success"
+            timestamp: Date.now(),
+            event_name: "EMAIL_VERIFICATION_COMPLETE",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                email: req.session.emailAddress,
+                ip_address: req.ip
+            },
+            extensions: {
+                outcome: "success"
+            }
         })
     );
 
@@ -173,10 +189,14 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "PHONE_VERIFICATION_REQUEST",
-            phoneNumber: req.session.enteredMobileNumber,
-            journeyId: req.session.id
+            timestamp: Date.now(),
+            event_name: "PHONE_VERIFICATION_REQUEST",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                phone: req.session.enteredMobileNumber,
+                ip_address: req.ip
+            }
         })
     );
 
@@ -219,11 +239,17 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
         if (error instanceof CodeMismatchException) {
             await s4.sendTxMALog(
                 JSON.stringify({
-                    userIp: req.ip,
-                    event: "PHONE_VERIFICATION_COMPLETE",
-                    phoneNumber: req.session.enteredMobileNumber,
-                    journeyId: req.session.id,
-                    outcome: "failed"
+                    timestamp: Date.now(),
+                    event_name: "PHONE_VERIFICATION_COMPLETE",
+                    component_id: "SSE",
+                    session_id: req.session.id,
+                    user: {
+                        phone: req.session.enteredMobileNumber,
+                        ip_address: req.ip
+                    },
+                    extensions: {
+                        outcome: "failed"
+                    }
                 })
             );
 
@@ -264,22 +290,32 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "PHONE_VERIFICATION_COMPLETE",
-            phoneNumber: user.mobileNumber,
-            journeyId: req.session.id,
-            userId: cognitoId,
-            outcome: "success"
+            timestamp: Date.now(),
+            event_name: "PHONE_VERIFICATION_COMPLETE",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                user_id: cognitoId,
+                phone: req.session.enteredMobileNumber,
+                ip_address: req.ip
+            },
+            extensions: {
+                outcome: "success"
+            }
         })
     );
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "CREATE_ACCOUNT",
-            email: AuthenticationResultParser.getEmail(authenticationResult),
-            userId: cognitoId,
-            journeyId: req.session.id
+            timestamp: Date.now(),
+            event_name: "CREATE_ACCOUNT",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                user_id: cognitoId,
+                email: AuthenticationResultParser.getEmail(authenticationResult),
+                ip_address: req.ip
+            }
         })
     );
 
@@ -332,11 +368,17 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "SERVICE_ADDED",
-            service: req.session.serviceName,
-            userId: userId,
-            journeyId: req.session.id
+            timestamp: Date.now(),
+            event_name: "SERVICE_ADDED",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                user_id: userId,
+                ip_address: req.ip
+            },
+            extensions: {
+                service_name: req.session.serviceName
+            }
         })
     );
 

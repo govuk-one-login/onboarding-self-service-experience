@@ -66,10 +66,14 @@ export const changePassword: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "UPDATE_PASSWORD",
-            journeyId: req.session.id,
-            userId: AuthenticationResultParser.getCognitoId(authenticationResult)
+            timestamp: Date.now(),
+            event_name: "UPDATE_PASSWORD",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+                ip_address: req.ip
+            }
         })
     );
 
@@ -102,10 +106,14 @@ export const processChangePhoneNumberForm: RequestHandler = async (req, res) => 
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "UPDATE_PHONE_REQUEST",
-            phoneNumber: req.session.enteredMobileNumber,
-            journeyId: req.session.id
+            timestamp: Date.now(),
+            event_name: "UPDATE_PHONE_REQUEST",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                phone: req.session.enteredMobileNumber,
+                ip_address: req.ip
+            }
         })
     );
 
@@ -133,12 +141,18 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
         if (error instanceof CodeMismatchException) {
             await s4.sendTxMALog(
                 JSON.stringify({
-                    userIp: req.ip,
-                    event: "PHONE_VERIFICATION_COMPLETE",
-                    phoneNumber: req.session.enteredMobileNumber,
-                    journeyId: req.session.id,
-                    userId: AuthenticationResultParser.getCognitoId(authenticationResult),
-                    outcome: "failed"
+                    timestamp: Date.now(),
+                    event_name: "PHONE_VERIFICATION_COMPLETE",
+                    component_id: "SSE",
+                    session_id: req.session.id,
+                    user: {
+                        phone: req.session.enteredMobileNumber,
+                        user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+                        ip_address: req.ip
+                    },
+                    extensions: {
+                        outcome: "failed"
+                    }
                 })
             );
 
@@ -168,12 +182,18 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "PHONE_VERIFICATION_COMPLETE",
-            phoneNumber: req.session.enteredMobileNumber,
-            journeyId: req.session.id,
-            userId: AuthenticationResultParser.getCognitoId(authenticationResult),
-            outcome: "success"
+            timestamp: Date.now(),
+            event_name: "PHONE_VERIFICATION_COMPLETE",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                phone: req.session.enteredMobileNumber,
+                user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+                ip_address: req.ip
+            },
+            extensions: {
+                outcome: "success"
+            }
         })
     );
 

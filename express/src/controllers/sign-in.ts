@@ -55,22 +55,32 @@ export const finishSignIn: RequestHandler = async (req, res) => {
     } else {
         await s4.sendTxMALog(
             JSON.stringify({
-                userIp: req.ip,
-                event: "LOG_IN_SUCCESS",
-                email: user.email,
-                userId: AuthenticationResultParser.getCognitoId(authenticationResult),
-                journeyId: req.session.id
+                timestamp: Date.now(),
+                event_name: "LOG_IN_SUCCESS",
+                component_id: "SSE",
+                session_id: req.session.id,
+                user: {
+                    user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+                    email: user.email,
+                    ip_address: req.ip
+                }
             })
         );
 
         await s4.sendTxMALog(
             JSON.stringify({
-                userIp: req.ip,
-                event: "PHONE_VERIFICATION_COMPLETE",
-                phoneNumber: req.session.enteredMobileNumber,
-                journeyId: req.session.id,
-                userId: AuthenticationResultParser.getCognitoId(authenticationResult),
-                outcome: "success"
+                timestamp: Date.now(),
+                event_name: "PHONE_VERIFICATION_COMPLETE",
+                component_id: "SSE",
+                session_id: req.session.id,
+                user: {
+                    user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+                    email: user.email,
+                    ip_address: req.ip
+                },
+                extensions: {
+                    outcome: "success"
+                }
             })
         );
 
@@ -116,9 +126,13 @@ export const forgotPasswordForm: RequestHandler = async (req, res) => {
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "PASSWORD_RESET_REQUESTED",
-            journeyId: req.session.id
+            timestamp: Date.now(),
+            event_name: "PASSWORD_RESET_REQUESTED",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                ip_address: req.ip
+            }
         })
     );
 
@@ -170,9 +184,13 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
 
     await s4.sendTxMALog(
         JSON.stringify({
-            userIp: req.ip,
-            event: "PASSWORD_RESET_COMPLETED",
-            journeyId: req.session.id
+            timestamp: Date.now(),
+            event_name: "PASSWORD_RESET_COMPLETED",
+            component_id: "SSE",
+            session_id: req.session.id,
+            user: {
+                ip_address: req.ip
+            }
         })
     );
 
