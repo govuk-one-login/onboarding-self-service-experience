@@ -452,6 +452,7 @@ Resources:
               - cognito-idp:DeleteUserPoolClient
               - cognito-idp:SetUserPoolMfaConfig
               - cognito-idp:UpdateUserPool
+              - cognito-idp:DescribeUserPool
               - cognito-idp:ListTagsForResource
 
           - Effect: Allow
