@@ -26,7 +26,7 @@ export default function processSignInForm(template: string): RequestHandler {
             req.session.mfaResponse = await s4.login(email, password);
         } catch (error) {
             if (error instanceof NotAuthorizedException) {
-                await s4.sendTxMALog(
+                s4.sendTxMALog(
                     JSON.stringify({
                         timestamp: Date.now(),
                         event_name: "INVALID_CREDENTIAL",
