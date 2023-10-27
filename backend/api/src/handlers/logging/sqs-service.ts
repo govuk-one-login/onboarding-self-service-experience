@@ -1,6 +1,7 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {SendMessageCommand, SQSClient} from "@aws-sdk/client-sqs";
 import * as process from "process";
+import {TxMAEvent} from "./txma-event";
 
 const client = new SQSClient({region: "eu-west-2"});
 

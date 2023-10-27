@@ -15,6 +15,7 @@ import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import console from "console";
+import {TxMAEvent, TxMAExtension, TxMAUser} from "../types/txma-event";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;

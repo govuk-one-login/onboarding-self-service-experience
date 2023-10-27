@@ -1,4 +1,4 @@
-interface TxMAEvent {
+export interface TxMAEvent {
     timestamp: number;
     event_name: string;
     component_id: string;
@@ -7,14 +7,14 @@ interface TxMAEvent {
     extensions?: TxMAExtension;
 }
 
-interface TxMAUser {
+export interface TxMAUser {
     ip_address?: string;
     user_id?: string;
     email?: string;
     phone?: string;
 }
 
-interface TxMAExtension {
+export interface TxMAExtension {
     session_id?: string;
     session_name?: string;
     outcome?: string;
