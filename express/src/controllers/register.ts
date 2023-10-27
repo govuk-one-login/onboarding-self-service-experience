@@ -66,7 +66,7 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "EMAIL_VERIFICATION_REQUEST",
@@ -93,7 +93,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         req.session.cognitoSession = response.Session;
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
-            await s4.sendTxMALog(
+            s4.sendTxMALog(
                 JSON.stringify({
                     timestamp: Date.now(),
                     event_name: "EMAIL_VERIFICATION_COMPLETE",
@@ -122,7 +122,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
 
     await s4.setSignUpStatus(req.session.emailAddress, SignupStatusStage.HasEmail);
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "EMAIL_VERIFICATION_COMPLETE",
@@ -187,7 +187,7 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
     const emailAddress = nonNull(req.session.emailAddress);
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPhoneNumber);
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "PHONE_VERIFICATION_REQUEST",
@@ -237,7 +237,7 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
         await s4.verifyMobileUsingSmsCode(accessToken, securityCode);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
-            await s4.sendTxMALog(
+            s4.sendTxMALog(
                 JSON.stringify({
                     timestamp: Date.now(),
                     event_name: "PHONE_VERIFICATION_COMPLETE",
@@ -288,7 +288,7 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
 
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasTextCode);
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "PHONE_VERIFICATION_COMPLETE",
@@ -305,7 +305,7 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
         })
     );
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "CREATE_ACCOUNT",
@@ -366,7 +366,7 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
 
     req.session.serviceName = req.body.serviceName;
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "SERVICE_ADDED",

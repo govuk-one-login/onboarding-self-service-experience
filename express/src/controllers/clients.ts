@@ -101,7 +101,7 @@ export const processPublicBetaForm: RequestHandler = async (req, res) => {
     await s4.publicBetaRequest(userName, department, serviceName, emailAddress, nonNull(req.session.authenticationResult?.AccessToken));
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "PUBLIC_BETA_FORM_SUBMITTED",
@@ -155,7 +155,7 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
     req.session.updatedField = "service name";
     req.session.serviceName = newServiceName;
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "UPDATE_SERVICE_NAME",
@@ -199,7 +199,7 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     req.session.updatedField = "public key";
 
     if (req.params.selfServiceClientId !== "") {
-        await s4.sendTxMALog(
+        s4.sendTxMALog(
             JSON.stringify({
                 timestamp: Date.now(),
                 event_name: "UPDATE_PUBLIC_KEY",
@@ -215,7 +215,7 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
             })
         );
     } else {
-        await s4.sendTxMALog(
+        s4.sendTxMALog(
             JSON.stringify({
                 timestamp: Date.now(),
                 event_name: "PUBLIC_KEY_ADDED",
@@ -261,7 +261,7 @@ export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) =>
 
     req.session.updatedField = "redirect URIs";
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "UPDATE_REDIRECT_URL",
@@ -337,7 +337,7 @@ export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) 
 
     req.session.updatedField = "post-logout redirect URIs";
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "UPDATE_LOGOUT_REDIRECT_URL",

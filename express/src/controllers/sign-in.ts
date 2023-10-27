@@ -53,7 +53,7 @@ export const finishSignIn: RequestHandler = async (req, res) => {
     if (await signedInToAnotherDevice(user.email, s4)) {
         res.redirect("/sign-in/signed-in-to-another-device");
     } else {
-        await s4.sendTxMALog(
+        s4.sendTxMALog(
             JSON.stringify({
                 timestamp: Date.now(),
                 event_name: "LOG_IN_SUCCESS",
@@ -67,7 +67,7 @@ export const finishSignIn: RequestHandler = async (req, res) => {
             })
         );
 
-        await s4.sendTxMALog(
+        s4.sendTxMALog(
             JSON.stringify({
                 timestamp: Date.now(),
                 event_name: "PHONE_VERIFICATION_COMPLETE",
@@ -124,7 +124,7 @@ export const processResendPhoneCodePage: RequestHandler = (req, res) => {
 export const forgotPasswordForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "PASSWORD_RESET_REQUESTED",
@@ -182,7 +182,7 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
     req.session.emailAddress = req.body.loginName;
     req.session.updatedField = "password";
 
-    await s4.sendTxMALog(
+    s4.sendTxMALog(
         JSON.stringify({
             timestamp: Date.now(),
             event_name: "PASSWORD_RESET_COMPLETED",

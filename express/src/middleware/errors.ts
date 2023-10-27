@@ -27,14 +27,6 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
                 ip_address: req.ip
             }
         })
-    ).then(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        result => {
-            return;
-        },
-        error => {
-            console.log("RequestHandler: sendTxMALog errored: " + error);
-        }
     );
 
     res.status(404).render("404.njk");
@@ -67,14 +59,6 @@ export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, 
                 ip_address: req.ip
             }
         })
-    ).then(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        result => {
-            return;
-        },
-        error => {
-            console.log("ErrorRequestHandler: sendTxMALog errored: " + error);
-        }
     );
 
     res.render("there-is-a-problem.njk");

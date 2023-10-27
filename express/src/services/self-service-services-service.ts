@@ -282,7 +282,14 @@ export default class SelfServiceServicesService {
         return (await this.lambda.sessionCount(userEmail)).data.sessionCount;
     }
 
-    sendTxMALog(body: string): Promise<void> {
-        return this.lambda.sendTxMALog(body);
+    sendTxMALog(body: string) {
+        this.lambda.sendTxMALog(body).then(
+            result => {
+                return;
+            },
+            error => {
+                console.error("sendTxMALog errored: " + error);
+            }
+        );
     }
 }
