@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Run checkov
-        uses: alphagov/di-github-actions/code-quality/run-checkov@5dacba941def444d69f02843feaebed79b5fca51
+        uses: alphagov/di-github-actions/code-quality/run-checkov@9c5db98832a3d5f8d27e08eb0b3d89d186c8e163
         with:
           skip-checks:
             CKV_SECRET_6

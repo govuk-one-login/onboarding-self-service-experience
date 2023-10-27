@@ -16,22 +16,10 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
         console.debug("RequestHandler: unable to establish identifiers from session.");
     }
 
-    s4.sendTxMALog(
-        JSON.stringify({
-            userIp: req.ip,
-            event: "ERROR_UNAVAILABLE",
-            journeyId: sessionId,
-            userId: userId
-        })
-    ).then(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        result => {
-            return;
-        },
-        error => {
-            console.log("RequestHandler: sendTxMALog errored: " + error);
-        }
-    );
+    s4.sendTxMALog("ERROR_UNAVAILABLE", sessionId, {
+        user_id: userId,
+        ip_address: req.ip
+    });
 
     res.status(404).render("404.njk");
 });
@@ -52,22 +40,10 @@ export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, 
         console.debug("ErrorRequestHandler: unable to establish identifiers from session.");
     }
 
-    s4.sendTxMALog(
-        JSON.stringify({
-            userIp: req.ip,
-            event: "ERROR_PROBLEM",
-            journeyId: sessionId,
-            userId: userId
-        })
-    ).then(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        result => {
-            return;
-        },
-        error => {
-            console.log("ErrorRequestHandler: sendTxMALog errored: " + error);
-        }
-    );
+    s4.sendTxMALog("ERROR_PROBLEM", sessionId, {
+        ip_address: req.ip,
+        user_id: userId
+    });
 
     res.render("there-is-a-problem.njk");
 });

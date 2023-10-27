@@ -1,11 +1,12 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {SendMessageCommand, SQSClient} from "@aws-sdk/client-sqs";
 import * as process from "process";
+import {TxMAEvent} from "./txma-event";
 
 const client = new SQSClient({region: "eu-west-2"});
 
 export const sendSQSMessageToTxMAHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    let payload: string;
+    let payload: TxMAEvent;
     let response = {
         statusCode: 200,
         body: JSON.stringify("Error")

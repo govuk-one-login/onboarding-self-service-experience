@@ -15,6 +15,7 @@ import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import console from "console";
+import {TxMAEvent, TxMAExtension, TxMAUser} from "../types/txma-event";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -282,7 +283,25 @@ export default class SelfServiceServicesService {
         return (await this.lambda.sessionCount(userEmail)).data.sessionCount;
     }
 
-    sendTxMALog(body: string): Promise<void> {
-        return this.lambda.sendTxMALog(body);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
+    sendTxMALog(eventName: string, sessionId: string, user: TxMAUser, extensions: TxMAExtension | undefined = undefined) {
+        const txmaEvent: TxMAEvent = {
+            timestamp: Date.now(),
+            event_name: eventName,
+            component_id: "SSE",
+            session_id: sessionId,
+            user: user,
+            extensions: extensions
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
+        this.lambda.sendTxMALog(JSON.stringify(txmaEvent)).then(
+            () => {
+                return;
+            },
+            error => {
+                console.error("sendTxMALog errored: " + error);
+            }
+        );
     }
 }
