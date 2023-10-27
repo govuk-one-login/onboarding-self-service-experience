@@ -101,18 +101,10 @@ export const processPublicBetaForm: RequestHandler = async (req, res) => {
     await s4.publicBetaRequest(userName, department, serviceName, emailAddress, nonNull(req.session.authenticationResult?.AccessToken));
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
-    s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "PUBLIC_BETA_FORM_SUBMITTED",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                user_id: userId,
-                ip_address: req.ip
-            }
-        })
-    );
+    s4.sendTxMALog("PUBLIC_BETA_FORM_SUBMITTED", req.session.id, {
+        ip_address: req.ip,
+        user_id: userId
+    });
 
     res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/public-beta/submitted`);
 };
@@ -156,19 +148,15 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
     req.session.serviceName = newServiceName;
 
     s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "UPDATE_SERVICE_NAME",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                user_id: userId,
-                ip_address: req.ip
-            },
-            extensions: {
-                service_name: newServiceName
-            }
-        })
+        "UPDATE_SERVICE_NAME",
+        req.session.id,
+        {
+            ip_address: req.ip,
+            user_id: userId
+        },
+        {
+            service_name: newServiceName
+        }
     );
 
     res.redirect(`/services/${serviceId}/clients`);
@@ -200,35 +188,27 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
 
     if (req.params.selfServiceClientId !== "") {
         s4.sendTxMALog(
-            JSON.stringify({
-                timestamp: Date.now(),
-                event_name: "UPDATE_PUBLIC_KEY",
-                component_id: "SSE",
-                session_id: req.session.id,
-                user: {
-                    user_id: userId,
-                    ip_address: req.ip
-                },
-                extensions: {
-                    service_id: nonNull(req.context.serviceId)
-                }
-            })
+            "UPDATE_PUBLIC_KEY",
+            req.session.id,
+            {
+                ip_address: req.ip,
+                user_id: userId
+            },
+            {
+                service_id: nonNull(req.context.serviceId)
+            }
         );
     } else {
         s4.sendTxMALog(
-            JSON.stringify({
-                timestamp: Date.now(),
-                event_name: "PUBLIC_KEY_ADDED",
-                component_id: "SSE",
-                session_id: req.session.id,
-                user: {
-                    user_id: userId,
-                    ip_address: req.ip
-                },
-                extensions: {
-                    service_id: nonNull(req.context.serviceId)
-                }
-            })
+            "PUBLIC_KEY_ADDED",
+            req.session.id,
+            {
+                ip_address: req.ip,
+                user_id: userId
+            },
+            {
+                service_id: nonNull(req.context.serviceId)
+            }
         );
     }
 
@@ -262,19 +242,15 @@ export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) =>
     req.session.updatedField = "redirect URIs";
 
     s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "UPDATE_REDIRECT_URL",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                user_id: userId,
-                ip_address: req.ip
-            },
-            extensions: {
-                service_id: nonNull(req.context.serviceId)
-            }
-        })
+        "UPDATE_REDIRECT_URL",
+        req.session.id,
+        {
+            ip_address: req.ip,
+            user_id: userId
+        },
+        {
+            service_id: nonNull(req.context.serviceId)
+        }
     );
 
     res.redirect(`/services/${req.context.serviceId}/clients`);
@@ -338,19 +314,15 @@ export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) 
     req.session.updatedField = "post-logout redirect URIs";
 
     s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "UPDATE_LOGOUT_REDIRECT_URL",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                ip_address: req.ip,
-                user_id: userId
-            },
-            extensions: {
-                service_id: nonNull(req.context.serviceId)
-            }
-        })
+        "UPDATE_LOGOUT_REDIRECT_URL",
+        req.session.id,
+        {
+            ip_address: req.ip,
+            user_id: userId
+        },
+        {
+            service_id: nonNull(req.context.serviceId)
+        }
     );
 
     res.redirect(`/services/${req.context.serviceId}/clients`);

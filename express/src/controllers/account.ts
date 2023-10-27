@@ -64,18 +64,10 @@ export const changePassword: RequestHandler = async (req, res) => {
 
     req.session.updatedField = "password";
 
-    s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "UPDATE_PASSWORD",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
-                ip_address: req.ip
-            }
-        })
-    );
+    s4.sendTxMALog("UPDATE_PASSWORD", req.session.id, {
+        user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+        ip_address: req.ip
+    });
 
     res.redirect("/account");
 };
@@ -104,18 +96,10 @@ export const processChangePhoneNumberForm: RequestHandler = async (req, res) => 
 
     req.session.enteredMobileNumber = enteredMobileNumber;
 
-    s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "UPDATE_PHONE_REQUEST",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                phone: req.session.enteredMobileNumber,
-                ip_address: req.ip
-            }
-        })
-    );
+    s4.sendTxMALog("UPDATE_PHONE_REQUEST", req.session.id, {
+        ip_address: req.ip,
+        phone: req.session.enteredMobileNumber
+    });
 
     res.redirect("/account/change-phone-number/enter-text-code");
 };
@@ -140,20 +124,16 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             s4.sendTxMALog(
-                JSON.stringify({
-                    timestamp: Date.now(),
-                    event_name: "PHONE_VERIFICATION_COMPLETE",
-                    component_id: "SSE",
-                    session_id: req.session.id,
-                    user: {
-                        phone: req.session.enteredMobileNumber,
-                        user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
-                        ip_address: req.ip
-                    },
-                    extensions: {
-                        outcome: "failed"
-                    }
-                })
+                "PHONE_VERIFICATION_COMPLETE",
+                req.session.id,
+                {
+                    ip_address: req.ip,
+                    user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+                    phone: req.session.enteredMobileNumber
+                },
+                {
+                    outcome: "failed"
+                }
             );
 
             return res.render("common/enter-text-code.njk", {
@@ -181,20 +161,16 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
     req.session.updatedField = "mobile phone number";
 
     s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "PHONE_VERIFICATION_COMPLETE",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                phone: req.session.enteredMobileNumber,
-                user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
-                ip_address: req.ip
-            },
-            extensions: {
-                outcome: "success"
-            }
-        })
+        "PHONE_VERIFICATION_COMPLETE",
+        req.session.id,
+        {
+            ip_address: req.ip,
+            user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+            phone: req.session.mobileNumber
+        },
+        {
+            outcome: "success"
+        }
     );
 
     res.redirect("/account");

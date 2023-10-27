@@ -17,18 +17,14 @@ export default async function processSecurityCode(req: Request, res: Response, n
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             s4.sendTxMALog(
-                JSON.stringify({
-                    timestamp: Date.now(),
-                    event_name: "INVALID_CREDENTIAL",
-                    component_id: "SSE",
-                    session_id: req.session.id,
-                    user: {
-                        ip_address: req.ip
-                    },
-                    extensions: {
-                        credential_type: "2FA"
-                    }
-                })
+                "INVALID_CREDENTIAL",
+                req.session.id,
+                {
+                    ip_address: req.ip
+                },
+                {
+                    credential_type: "2FA"
+                }
             );
 
             return res.render("common/enter-text-code.njk", {

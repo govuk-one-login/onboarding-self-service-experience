@@ -66,18 +66,10 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "EMAIL_VERIFICATION_REQUEST",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                email: req.session.emailAddress,
-                ip_address: req.ip
-            }
-        })
-    );
+    s4.sendTxMALog("EMAIL_VERIFICATION_REQUEST", req.session.id, {
+        ip_address: req.ip,
+        email: req.session.emailAddress
+    });
 
     res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
@@ -94,19 +86,15 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
             s4.sendTxMALog(
-                JSON.stringify({
-                    timestamp: Date.now(),
-                    event_name: "EMAIL_VERIFICATION_COMPLETE",
-                    component_id: "SSE",
-                    session_id: req.session.id,
-                    user: {
-                        email: req.session.emailAddress,
-                        ip_address: req.ip
-                    },
-                    extensions: {
-                        outcome: "failed"
-                    }
-                })
+                "EMAIL_VERIFICATION_COMPLETE",
+                req.session.id,
+                {
+                    ip_address: req.ip,
+                    email: req.session.emailAddress
+                },
+                {
+                    outcome: "failed"
+                }
             );
 
             return res.render("register/enter-email-code.njk", {
@@ -123,19 +111,15 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     await s4.setSignUpStatus(req.session.emailAddress, SignupStatusStage.HasEmail);
 
     s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "EMAIL_VERIFICATION_COMPLETE",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                email: req.session.emailAddress,
-                ip_address: req.ip
-            },
-            extensions: {
-                outcome: "success"
-            }
-        })
+        "EMAIL_VERIFICATION_COMPLETE",
+        req.session.id,
+        {
+            ip_address: req.ip,
+            email: req.session.emailAddress
+        },
+        {
+            outcome: "success"
+        }
     );
 
     res.redirect("/register/create-password");
@@ -187,18 +171,10 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
     const emailAddress = nonNull(req.session.emailAddress);
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPhoneNumber);
 
-    s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "PHONE_VERIFICATION_REQUEST",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                phone: req.session.enteredMobileNumber,
-                ip_address: req.ip
-            }
-        })
-    );
+    s4.sendTxMALog("PHONE_VERIFICATION_REQUEST", req.session.id, {
+        ip_address: req.ip,
+        phone: req.session.enteredMobileNumber
+    });
 
     res.redirect("/register/enter-text-code");
 };
@@ -238,19 +214,15 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             s4.sendTxMALog(
-                JSON.stringify({
-                    timestamp: Date.now(),
-                    event_name: "PHONE_VERIFICATION_COMPLETE",
-                    component_id: "SSE",
-                    session_id: req.session.id,
-                    user: {
-                        phone: req.session.enteredMobileNumber,
-                        ip_address: req.ip
-                    },
-                    extensions: {
-                        outcome: "failed"
-                    }
-                })
+                "PHONE_VERIFICATION_COMPLETE",
+                req.session.id,
+                {
+                    ip_address: req.ip,
+                    phone: req.session.enteredMobileNumber
+                },
+                {
+                    outcome: "failed"
+                }
             );
 
             return res.render("common/enter-text-code.njk", {
@@ -289,35 +261,23 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasTextCode);
 
     s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "PHONE_VERIFICATION_COMPLETE",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                user_id: cognitoId,
-                phone: req.session.enteredMobileNumber,
-                ip_address: req.ip
-            },
-            extensions: {
-                outcome: "success"
-            }
-        })
+        "PHONE_VERIFICATION_COMPLETE",
+        req.session.id,
+        {
+            ip_address: req.ip,
+            user_id: cognitoId,
+            phone: req.session.enteredMobileNumber
+        },
+        {
+            outcome: "success"
+        }
     );
 
-    s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "CREATE_ACCOUNT",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                user_id: cognitoId,
-                email: AuthenticationResultParser.getEmail(authenticationResult),
-                ip_address: req.ip
-            }
-        })
-    );
+    s4.sendTxMALog("CREATE_ACCOUNT", req.session.id, {
+        ip_address: req.ip,
+        user_id: cognitoId,
+        email: AuthenticationResultParser.getEmail(authenticationResult)
+    });
 
     res.redirect("/register/create-service");
 };
@@ -367,19 +327,15 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
     req.session.serviceName = req.body.serviceName;
 
     s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "SERVICE_ADDED",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                user_id: userId,
-                ip_address: req.ip
-            },
-            extensions: {
-                service_name: req.session.serviceName
-            }
-        })
+        "SERVICE_ADDED",
+        req.session.id,
+        {
+            ip_address: req.ip,
+            user_id: userId
+        },
+        {
+            service_name: req.session.serviceName
+        }
     );
 
     res.redirect(`/services/${serviceId.substring(8)}/clients`);

@@ -53,35 +53,23 @@ export const finishSignIn: RequestHandler = async (req, res) => {
     if (await signedInToAnotherDevice(user.email, s4)) {
         res.redirect("/sign-in/signed-in-to-another-device");
     } else {
-        s4.sendTxMALog(
-            JSON.stringify({
-                timestamp: Date.now(),
-                event_name: "LOG_IN_SUCCESS",
-                component_id: "SSE",
-                session_id: req.session.id,
-                user: {
-                    user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
-                    email: user.email,
-                    ip_address: req.ip
-                }
-            })
-        );
+        s4.sendTxMALog("LOG_IN_SUCCESS", req.session.id, {
+            ip_address: req.ip,
+            user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+            email: user.email
+        });
 
         s4.sendTxMALog(
-            JSON.stringify({
-                timestamp: Date.now(),
-                event_name: "PHONE_VERIFICATION_COMPLETE",
-                component_id: "SSE",
-                session_id: req.session.id,
-                user: {
-                    user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
-                    email: user.email,
-                    ip_address: req.ip
-                },
-                extensions: {
-                    outcome: "success"
-                }
-            })
+            "PHONE_VERIFICATION_COMPLETE",
+            req.session.id,
+            {
+                ip_address: req.ip,
+                user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
+                email: user.email
+            },
+            {
+                outcome: "success"
+            }
         );
 
         res.redirect("/services");
@@ -124,17 +112,9 @@ export const processResendPhoneCodePage: RequestHandler = (req, res) => {
 export const forgotPasswordForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "PASSWORD_RESET_REQUESTED",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                ip_address: req.ip
-            }
-        })
-    );
+    s4.sendTxMALog("PASSWORD_RESET_REQUESTED", req.session.id, {
+        ip_address: req.ip
+    });
 
     res.render("sign-in/forgot-password.njk", {
         values: {
@@ -182,17 +162,9 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
     req.session.emailAddress = req.body.loginName;
     req.session.updatedField = "password";
 
-    s4.sendTxMALog(
-        JSON.stringify({
-            timestamp: Date.now(),
-            event_name: "PASSWORD_RESET_COMPLETED",
-            component_id: "SSE",
-            session_id: req.session.id,
-            user: {
-                ip_address: req.ip
-            }
-        })
-    );
+    s4.sendTxMALog("PASSWORD_RESET_COMPLETED", req.session.id, {
+        ip_address: req.ip
+    });
 
     next();
 };

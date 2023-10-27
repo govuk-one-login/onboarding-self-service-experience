@@ -27,18 +27,14 @@ export default function processSignInForm(template: string): RequestHandler {
         } catch (error) {
             if (error instanceof NotAuthorizedException) {
                 s4.sendTxMALog(
-                    JSON.stringify({
-                        timestamp: Date.now(),
-                        event_name: "INVALID_CREDENTIAL",
-                        component_id: "SSE",
-                        session_id: req.session.id,
-                        user: {
-                            ip_address: req.ip
-                        },
-                        extensions: {
-                            credential_type: "password"
-                        }
-                    })
+                    "INVALID_CREDENTIAL",
+                    req.session.id,
+                    {
+                        ip_address: req.ip
+                    },
+                    {
+                        credential_type: "password"
+                    }
                 );
 
                 return res.render(template, {

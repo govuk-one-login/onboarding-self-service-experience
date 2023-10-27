@@ -283,9 +283,18 @@ export default class SelfServiceServicesService {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
-    sendTxMALog(body: string) {
+    sendTxMALog(eventName: string, sessionId: string, user: TxMAUser, extensions: TxMAExtension | undefined = undefined) {
+        let txmaEvent: TxMAEvent = {
+            timestamp: Date.now(),
+            event_name: eventName,
+            component_id: "SSE",
+            session_id: sessionId,
+            user: user,
+            extensions: extensions
+        };
+
         // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
-        this.lambda.sendTxMALog(body).then(
+        this.lambda.sendTxMALog(JSON.stringify(txmaEvent)).then(
             () => {
                 return;
             },
