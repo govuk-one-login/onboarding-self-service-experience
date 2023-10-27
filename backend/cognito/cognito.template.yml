@@ -802,6 +802,7 @@ Resources:
 
   CognitoWebACLAssociation:
     Type: 'AWS::WAFv2::WebACLAssociation'
+    DependsOn: !GetAtt CognitoWebACL.Arn
     Properties:
       WebACLArn: !GetAtt CognitoWebACL.Arn
       ResourceArn: !GetAtt UserPool.Arn
