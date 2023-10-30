@@ -16,7 +16,8 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
         console.debug("RequestHandler: unable to establish identifiers from session.");
     }
 
-    s4.sendTxMALog("ERROR_UNAVAILABLE", sessionId, {
+    s4.sendTxMALog("SSE_ERROR_UNAVAILABLE", {
+        session_id: sessionId,
         user_id: userId,
         ip_address: req.ip
     });
@@ -40,7 +41,8 @@ export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, 
         console.debug("ErrorRequestHandler: unable to establish identifiers from session.");
     }
 
-    s4.sendTxMALog("ERROR_PROBLEM", sessionId, {
+    s4.sendTxMALog("SSE_ERROR_PROBLEM", {
+        session_id: sessionId,
         ip_address: req.ip,
         user_id: userId
     });

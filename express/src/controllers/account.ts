@@ -64,7 +64,8 @@ export const changePassword: RequestHandler = async (req, res) => {
 
     req.session.updatedField = "password";
 
-    s4.sendTxMALog("UPDATE_PASSWORD", req.session.id, {
+    s4.sendTxMALog("SSE_UPDATE_PASSWORD", {
+        session_id: req.session.id,
         user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
         ip_address: req.ip
     });
@@ -96,7 +97,8 @@ export const processChangePhoneNumberForm: RequestHandler = async (req, res) => 
 
     req.session.enteredMobileNumber = enteredMobileNumber;
 
-    s4.sendTxMALog("UPDATE_PHONE_REQUEST", req.session.id, {
+    s4.sendTxMALog("SSE_UPDATE_PHONE_REQUEST", {
+        session_id: req.session.id,
         ip_address: req.ip,
         phone: req.session.enteredMobileNumber
     });
@@ -124,9 +126,9 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             s4.sendTxMALog(
-                "PHONE_VERIFICATION_COMPLETE",
-                req.session.id,
+                "SSE_PHONE_VERIFICATION_COMPLETE",
                 {
+                    session_id: req.session.id,
                     ip_address: req.ip,
                     user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
                     phone: req.session.enteredMobileNumber
@@ -161,9 +163,9 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
     req.session.updatedField = "mobile phone number";
 
     s4.sendTxMALog(
-        "PHONE_VERIFICATION_COMPLETE",
-        req.session.id,
+        "SSE_PHONE_VERIFICATION_COMPLETE",
         {
+            session_id: req.session.id,
             ip_address: req.ip,
             user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
             phone: req.session.mobileNumber
