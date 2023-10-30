@@ -101,7 +101,8 @@ export const processPublicBetaForm: RequestHandler = async (req, res) => {
     await s4.publicBetaRequest(userName, department, serviceName, emailAddress, nonNull(req.session.authenticationResult?.AccessToken));
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
-    s4.sendTxMALog("PUBLIC_BETA_FORM_SUBMITTED", req.session.id, {
+    s4.sendTxMALog("SSE_PUBLIC_BETA_FORM_SUBMITTED", {
+        session_id: req.session.id,
         ip_address: req.ip,
         user_id: userId
     });
@@ -148,9 +149,9 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
     req.session.serviceName = newServiceName;
 
     s4.sendTxMALog(
-        "UPDATE_SERVICE_NAME",
-        req.session.id,
+        "SSE_UPDATE_SERVICE_NAME",
         {
+            session_id: req.session.id,
             ip_address: req.ip,
             user_id: userId
         },
@@ -188,9 +189,9 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
 
     if (req.params.selfServiceClientId !== "") {
         s4.sendTxMALog(
-            "UPDATE_PUBLIC_KEY",
-            req.session.id,
+            "SSE_UPDATE_PUBLIC_KEY",
             {
+                session_id: req.session.id,
                 ip_address: req.ip,
                 user_id: userId
             },
@@ -200,9 +201,9 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
         );
     } else {
         s4.sendTxMALog(
-            "PUBLIC_KEY_ADDED",
-            req.session.id,
+            "SSE_PUBLIC_KEY_ADDED",
             {
+                session_id: req.session.id,
                 ip_address: req.ip,
                 user_id: userId
             },
@@ -242,9 +243,9 @@ export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) =>
     req.session.updatedField = "redirect URIs";
 
     s4.sendTxMALog(
-        "UPDATE_REDIRECT_URL",
-        req.session.id,
+        "SSE_UPDATE_REDIRECT_URL",
         {
+            session_id: req.session.id,
             ip_address: req.ip,
             user_id: userId
         },
@@ -314,9 +315,9 @@ export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) 
     req.session.updatedField = "post-logout redirect URIs";
 
     s4.sendTxMALog(
-        "UPDATE_LOGOUT_REDIRECT_URL",
-        req.session.id,
+        "SSE_UPDATE_LOGOUT_REDIRECT_URL",
         {
+            session_id: req.session.id,
             ip_address: req.ip,
             user_id: userId
         },
