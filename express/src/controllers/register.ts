@@ -66,7 +66,8 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    s4.sendTxMALog("EMAIL_VERIFICATION_REQUEST", req.session.id, {
+    s4.sendTxMALog("SSE_EMAIL_VERIFICATION_REQUEST", {
+        session_id: req.session.id,
         ip_address: req.ip,
         email: req.session.emailAddress
     });
@@ -86,9 +87,9 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
             s4.sendTxMALog(
-                "EMAIL_VERIFICATION_COMPLETE",
-                req.session.id,
+                "SSE_EMAIL_VERIFICATION_COMPLETE",
                 {
+                    session_id: req.session.id,
                     ip_address: req.ip,
                     email: req.session.emailAddress
                 },
@@ -111,9 +112,9 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     await s4.setSignUpStatus(req.session.emailAddress, SignupStatusStage.HasEmail);
 
     s4.sendTxMALog(
-        "EMAIL_VERIFICATION_COMPLETE",
-        req.session.id,
+        "SSE_EMAIL_VERIFICATION_COMPLETE",
         {
+            session_id: req.session.id,
             ip_address: req.ip,
             email: req.session.emailAddress
         },
@@ -171,7 +172,8 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
     const emailAddress = nonNull(req.session.emailAddress);
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPhoneNumber);
 
-    s4.sendTxMALog("PHONE_VERIFICATION_REQUEST", req.session.id, {
+    s4.sendTxMALog("SSE_PHONE_VERIFICATION_REQUEST", {
+        session_id: req.session.id,
         ip_address: req.ip,
         phone: req.session.enteredMobileNumber
     });
@@ -214,9 +216,9 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             s4.sendTxMALog(
-                "PHONE_VERIFICATION_COMPLETE",
-                req.session.id,
+                "SSE_PHONE_VERIFICATION_COMPLETE",
                 {
+                    session_id: req.session.id,
                     ip_address: req.ip,
                     phone: req.session.enteredMobileNumber
                 },
@@ -261,9 +263,9 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasTextCode);
 
     s4.sendTxMALog(
-        "PHONE_VERIFICATION_COMPLETE",
-        req.session.id,
+        "SSE_PHONE_VERIFICATION_COMPLETE",
         {
+            session_id: req.session.id,
             ip_address: req.ip,
             user_id: cognitoId,
             phone: req.session.enteredMobileNumber
@@ -273,7 +275,8 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
         }
     );
 
-    s4.sendTxMALog("CREATE_ACCOUNT", req.session.id, {
+    s4.sendTxMALog("SSE_CREATE_ACCOUNT", {
+        session_id: req.session.id,
         ip_address: req.ip,
         user_id: cognitoId,
         email: AuthenticationResultParser.getEmail(authenticationResult)
@@ -327,9 +330,9 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
     req.session.serviceName = req.body.serviceName;
 
     s4.sendTxMALog(
-        "SERVICE_ADDED",
-        req.session.id,
+        "SSE_SERVICE_ADDED",
         {
+            session_id: req.session.id,
             ip_address: req.ip,
             user_id: userId
         },

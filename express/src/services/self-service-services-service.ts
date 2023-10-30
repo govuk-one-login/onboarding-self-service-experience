@@ -284,12 +284,11 @@ export default class SelfServiceServicesService {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
-    sendTxMALog(eventName: string, sessionId: string, user: TxMAUser, extensions: TxMAExtension | undefined = undefined) {
+    sendTxMALog(eventName: string, user: TxMAUser, extensions: TxMAExtension | undefined = undefined) {
         const txmaEvent: TxMAEvent = {
             timestamp: Date.now(),
             event_name: eventName,
             component_id: "SSE",
-            session_id: sessionId,
             user: user,
             extensions: extensions
         };

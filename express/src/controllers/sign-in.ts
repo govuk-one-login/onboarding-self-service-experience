@@ -53,16 +53,17 @@ export const finishSignIn: RequestHandler = async (req, res) => {
     if (await signedInToAnotherDevice(user.email, s4)) {
         res.redirect("/sign-in/signed-in-to-another-device");
     } else {
-        s4.sendTxMALog("LOG_IN_SUCCESS", req.session.id, {
+        s4.sendTxMALog("SSE_LOG_IN_SUCCESS", {
+            session_id: req.session.id,
             ip_address: req.ip,
             user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
             email: user.email
         });
 
         s4.sendTxMALog(
-            "PHONE_VERIFICATION_COMPLETE",
-            req.session.id,
+            "SSE_PHONE_VERIFICATION_COMPLETE",
             {
+                session_id: req.session.id,
                 ip_address: req.ip,
                 user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
                 email: user.email
@@ -112,7 +113,8 @@ export const processResendPhoneCodePage: RequestHandler = (req, res) => {
 export const forgotPasswordForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    s4.sendTxMALog("PASSWORD_RESET_REQUESTED", req.session.id, {
+    s4.sendTxMALog("SSE_PASSWORD_RESET_REQUESTED", {
+        session_id: req.session.id,
         ip_address: req.ip
     });
 
@@ -162,7 +164,8 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
     req.session.emailAddress = req.body.loginName;
     req.session.updatedField = "password";
 
-    s4.sendTxMALog("PASSWORD_RESET_COMPLETED", req.session.id, {
+    s4.sendTxMALog("SSE_PASSWORD_RESET_COMPLETED", {
+        session_id: req.session.id,
         ip_address: req.ip
     });
 
