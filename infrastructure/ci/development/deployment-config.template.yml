@@ -46,6 +46,7 @@ Resources:
                 Resource: "*"
                 Action:
                   - iam:ListPolicies
+                  - iam:GetPolicy
                   - ec2:DescribeVpcs
                   - ec2:DescribeSubnets
                   - s3:CreateBucket
@@ -54,6 +55,8 @@ Resources:
                   - s3:PutPublicAccessBlock
                   - s3:PutBucketPublicAccessBlock
                   - s3:DeleteBucket
+                  - s3:DeleteBucketPolicy
+                  - kms:DeleteAlias
                   - wafv2:DisassociateWebACL
 
               - Effect: Allow
@@ -63,6 +66,7 @@ Resources:
                   - cognito-idp:DisassociateWebACL
                   - cognito-idp:GetWebACLForResource
                   - cognito-idp:ListResourcesForWebACL
+                  - cognito-idp:DescribeUserPool
 
               - Effect: Allow
                 Resource: !GetAtt GitHubDeploymentArtifactsBucket.Arn
