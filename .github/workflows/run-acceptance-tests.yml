@@ -37,7 +37,6 @@ jobs:
         timeout-minutes: 10
         env:
           REPORT: ${{ runner.temp }}/acceptance-tests.report
-          HOST: http://localhost:3000
         run: |
           shopt -s globstar
           features=(features/**/*.feature)
@@ -51,7 +50,7 @@ jobs:
           for feature in "${features[@]}"; do
             [[ ${idx:-} ]] && idx=$((idx + 1)) && echo | tee heading || idx=1
             echo "#--- [$idx/${#features[@]}] ${feature#*/} ---#" | tee -a heading && echo >> heading
-            npm run cucumber -- --format summary:results "$feature" || cat heading results >> "$REPORT"
+            HOST=http://localhost:3000 npm run cucumber -- --format summary:results "$feature" || cat heading results >> "$REPORT"
           done
           
           [[ -s $REPORT ]] && exit 1 || exit 0
