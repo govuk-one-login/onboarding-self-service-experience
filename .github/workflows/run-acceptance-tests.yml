@@ -3,11 +3,10 @@ name: Acceptance tests
 on:
   workflow_call:
     inputs:
-      host: { required: true, type: string }
       environment: { required: true, type: string }
 
 permissions: { }
-concurrency: deploy-paas-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
+concurrency: acceptance-test-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
 
 defaults:
   run:
@@ -37,11 +36,18 @@ jobs:
         shell: bash
         timeout-minutes: 10
         env:
-          HOST: ${{ inputs.host }}
           REPORT: ${{ runner.temp }}/acceptance-tests.report
+          HOST: http://localhost:3000
+          STUB_API: true
         run: |
           shopt -s globstar
           features=(features/**/*.feature)
+          
+          cd ../express && npm install && cd .. && npm run build-express && cd acceptance-tests
+          
+          cd .. && npm run local > /dev/null &
+          
+          while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
           
           for feature in "${features[@]}"; do
             [[ ${idx:-} ]] && idx=$((idx + 1)) && echo | tee heading || idx=1

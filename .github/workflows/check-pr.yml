@@ -16,23 +16,9 @@ jobs:
     name: Run tests
     uses: ./.github/workflows/run-unit-tests.yml
 
-  deploy-preview-frontend:
-    name: PaaS
-    needs: build-frontend
-    uses: ./.github/workflows/deploy-to-paas.yml
-    with:
-      environment: PaaS
-      app-name-prefix: di-sse-prev
-      cf-space-name: self-service-preview
-      artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
-    secrets:
-      cf-username: ${{ secrets.CF_USERNAME }}
-      cf-password: ${{ secrets.CF_PASSWORD }}
-
   run-acceptance-tests:
     name: Run tests
-    needs: deploy-preview-frontend
     uses: ./.github/workflows/run-acceptance-tests.yml
     with:
-      host: ${{ needs.deploy-preview-frontend.outputs.deployment-url }}
       environment: ${{ needs.deploy-preview-frontend.outputs.environment }}
+
