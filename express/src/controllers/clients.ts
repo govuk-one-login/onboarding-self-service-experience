@@ -101,11 +101,17 @@ export const processPublicBetaForm: RequestHandler = async (req, res) => {
     await s4.publicBetaRequest(userName, department, serviceName, emailAddress, nonNull(req.session.authenticationResult?.AccessToken));
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
-    s4.sendTxMALog("SSE_PUBLIC_BETA_FORM_SUBMITTED", {
-        session_id: req.session.id,
-        ip_address: req.ip,
-        user_id: userId
-    });
+    s4.sendTxMALog(
+        "SSE_PUBLIC_BETA_FORM_SUBMITTED",
+        {
+            session_id: req.session.id,
+            ip_address: req.ip,
+            user_id: userId
+        },
+        {
+            service_id: serviceId
+        }
+    );
 
     res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/public-beta/submitted`);
 };
