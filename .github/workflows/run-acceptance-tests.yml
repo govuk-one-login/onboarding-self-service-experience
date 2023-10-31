@@ -41,7 +41,7 @@ jobs:
           shopt -s globstar
           features=(features/**/*.feature)
           
-          cd ../express && npm install && cd ../acceptance-tests
+          cd ../express && npm install && cd .. && npm run build-express && cd acceptance-tests
           
           cd .. && STUB_API=true npm run local &
           
@@ -52,6 +52,8 @@ jobs:
             echo "#--- [$idx/${#features[@]}] ${feature#*/} ---#" | tee -a heading && echo >> heading
             HOST=http://localhost:3000 npm run cucumber -- --format summary:results "$feature" || cat heading results >> "$REPORT"
           done
+          
+          curl http://localhost:3000
           
           [[ -s $REPORT ]] && exit 1 || exit 0
 
