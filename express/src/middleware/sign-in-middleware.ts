@@ -19,6 +19,7 @@ export default async function processSecurityCode(req: Request, res: Response, n
             s4.sendTxMALog(
                 "SSE_INVALID_CREDENTIAL",
                 {
+                    email: req.session.emailAddress,
                     session_id: req.session.id,
                     ip_address: req.ip
                 },

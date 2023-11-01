@@ -173,6 +173,7 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPhoneNumber);
 
     s4.sendTxMALog("SSE_PHONE_VERIFICATION_REQUEST", {
+        email: req.session.emailAddress,
         session_id: req.session.id,
         ip_address: req.ip,
         phone: req.session.enteredMobileNumber
@@ -337,6 +338,7 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
             user_id: userId
         },
         {
+            service_id: serviceId,
             service_name: req.session.serviceName
         }
     );

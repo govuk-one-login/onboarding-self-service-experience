@@ -98,6 +98,7 @@ export const processChangePhoneNumberForm: RequestHandler = async (req, res) => 
     req.session.enteredMobileNumber = enteredMobileNumber;
 
     s4.sendTxMALog("SSE_UPDATE_PHONE_REQUEST", {
+        user_id: AuthenticationResultParser.getCognitoId(authenticationResult),
         session_id: req.session.id,
         ip_address: req.ip,
         phone: req.session.enteredMobileNumber
