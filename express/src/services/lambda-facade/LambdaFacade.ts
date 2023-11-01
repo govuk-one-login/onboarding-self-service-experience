@@ -6,6 +6,7 @@ import {Service} from "../../../@types/Service";
 import {api} from "../../config/environment";
 import AuthenticationResultParser from "../../lib/authentication-result-parser";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./LambdaFacadeInterface";
+import {TxMAEvent} from "../../types/txma-event";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export default class LambdaFacade implements LambdaFacadeInterface {
@@ -107,8 +108,8 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         await this.post("/send-public-beta-request-notification", JSON.stringify(body));
     }
 
-    async sendTxMALog(message: string) {
-        await this.post("/txma-logging", JSON.stringify(message));
+    async sendTxMALog(message: TxMAEvent) {
+        await this.post("/txma-logging", message);
     }
 
     private get(endpoint: string): Promise<AxiosResponse> {
