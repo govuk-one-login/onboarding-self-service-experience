@@ -3,6 +3,7 @@ import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
+import {TxMAEvent} from "../../types/txma-event";
 
 export type UserUpdates = Record<string, string | Date>;
 export type ClientUpdates = Record<string, string | string[]>;
@@ -40,5 +41,5 @@ export default interface LambdaFacadeInterface {
 
     globalSignOut(userEmail: string): Promise<AxiosResponse>;
 
-    sendTxMALog(message: string): Promise<void>;
+    sendTxMALog(message: TxMAEvent): Promise<void>;
 }

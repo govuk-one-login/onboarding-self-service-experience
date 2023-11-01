@@ -294,7 +294,7 @@ export default class SelfServiceServicesService {
         };
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
-        this.lambda.sendTxMALog(JSON.stringify(txmaEvent)).then(
+        this.lambda.sendTxMALog(txmaEvent).then(
             () => {
                 return;
             },
