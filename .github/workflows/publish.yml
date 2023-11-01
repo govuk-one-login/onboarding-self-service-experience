@@ -41,7 +41,6 @@ jobs:
       id-token: write
       contents: read
     with:
-      host: ${{ needs.deploy-test-frontend.outputs.deployment-url }}
       environment: ${{ needs.deploy-test-frontend.outputs.environment }}
 
   deploy-dynamodb:
