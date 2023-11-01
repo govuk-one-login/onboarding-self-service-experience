@@ -358,24 +358,6 @@ Resources:
         - Key: 'ProducerType'
           Value: 'SQS'
 
-  TxMASQSProducerAuditEventQueuePolicy:
-    Type: AWS::SQS::QueuePolicy
-    Properties:
-      Queues:
-        - !Ref TxMASQSProducerAuditEventQueue
-      PolicyDocument:
-        Statement:
-          - Sid: 'AllowReadByTxMAAccount'
-            Effect: Allow
-            Principal:
-              AWS: !FindInMap [ TxMAAccountARN, Environment, !Ref 'Environment' ]
-            Action:
-              - 'sqs:ChangeMessageVisibility'
-              - 'sqs:ReceiveMessage'
-              - 'sqs:DeleteMessage'
-              - 'sqs:GetQueueAttributes'
-            Resource: !GetAtt TxMASQSProducerAuditEventQueue.Arn
-
   TxMASQSAllowQueuePolicy:
     Type: AWS::SQS::QueuePolicy
     Properties:
@@ -394,6 +376,16 @@ Resources:
               - 'sqs:GetQueueAttributes'
               - 'sqs:SendMessage'
               - 'sqs:GetQueueUrl'
+            Resource: !GetAtt TxMASQSProducerAuditEventQueue.Arn
+          - Sid: 'AllowReadByTxMAAccount'
+            Effect: Allow
+            Principal:
+              AWS: !FindInMap [ TxMAAccountARN, Environment, !Ref 'Environment' ]
+            Action:
+              - 'sqs:ChangeMessageVisibility'
+              - 'sqs:ReceiveMessage'
+              - 'sqs:DeleteMessage'
+              - 'sqs:GetQueueAttributes'
             Resource: !GetAtt TxMASQSProducerAuditEventQueue.Arn
 
   TxMAAuditEventDeadLetterQueue:

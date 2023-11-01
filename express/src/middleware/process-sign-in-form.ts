@@ -29,6 +29,7 @@ export default function processSignInForm(template: string): RequestHandler {
                 s4.sendTxMALog(
                     "SSE_INVALID_CREDENTIAL",
                     {
+                        email: email,
                         session_id: req.session.id,
                         ip_address: req.ip
                     },

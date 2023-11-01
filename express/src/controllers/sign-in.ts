@@ -114,6 +114,7 @@ export const forgotPasswordForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     s4.sendTxMALog("SSE_PASSWORD_RESET_REQUESTED", {
+        email: req.session.emailAddress,
         session_id: req.session.id,
         ip_address: req.ip
     });
@@ -165,6 +166,7 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
     req.session.updatedField = "password";
 
     s4.sendTxMALog("SSE_PASSWORD_RESET_COMPLETED", {
+        email: req.session.emailAddress,
         session_id: req.session.id,
         ip_address: req.ip
     });
