@@ -16,6 +16,8 @@ import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} f
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import console from "console";
 import {TxMAEvent, TxMAExtension, TxMAUser} from "../types/txma-event";
+import SheetsService from "../lib/sheets/SheetsService";
+import {v4 as uuid_4} from "uuid";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -281,6 +283,33 @@ export default class SelfServiceServicesService {
 
     async sessionCount(userEmail: string): Promise<number> {
         return (await this.lambda.sessionCount(userEmail)).data.sessionCount;
+    }
+
+    private getTimestamp(): string {
+        const pad = (n: number, s = 2) => `${new Array(s).fill(0)}${n}`.slice(-s);
+        const d = new Date();
+
+        return `${pad(d.getFullYear(), 4)}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(
+            d.getSeconds()
+        )}.${pad(d.getMilliseconds(), 3)}`;
+    }
+
+    async updateUserSpreadsheet(userEmail: string, userPhone: string, serviceName: string): Promise<void> {
+        const values = new Map<string, string>();
+        values.set("id", uuid_4());
+        values.set("submission-date", this.getTimestamp());
+        values.set("user-email", userEmail);
+        values.set("user-phone", userPhone);
+        values.set("service-name", serviceName);
+
+        const sheetsService: SheetsService = new SheetsService(process.env.REGISTER_SPREADSHEET_ID as string);
+        await sheetsService.init().catch(error => console.error("updateUserSpreadsheet: " + error));
+        await sheetsService
+            .appendValues(values, process.env.REGISTER_SHEET_DATA_RANGE as string, process.env.REGISTER_SHEET_HEADER_RANGE as string)
+            .then(() => console.log("Saved to sheets"))
+            .catch(reason => {
+                console.error("updateUserSpreadsheet: " + reason);
+            });
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments

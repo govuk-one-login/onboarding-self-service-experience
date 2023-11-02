@@ -330,6 +330,8 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
 
     req.session.serviceName = req.body.serviceName;
 
+    await s4.updateUserSpreadsheet(nonNull(req.session.emailAddress), nonNull(req.session.mobileNumber), nonNull(req.session.serviceName));
+
     s4.sendTxMALog(
         "SSE_SERVICE_ADDED",
         {

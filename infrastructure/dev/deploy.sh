@@ -12,6 +12,12 @@ declare -A ENV=(
 
 declare -A SECRETS=(
   [SESSION_SECRET]=frontend/session-secret
+  [GOOGLE_SHEET_CREDENTIALS]=frontend/google-sheet-credentials
+)
+
+declare -A PARAMETERS=(
+  [USE_STUB_SHEETS]=frontend/use-stub-sheets
+  [REGISTER_SPREADSHEET_ID]=frontend/register-spreadsheet-id
 )
 
 COMPONENTS=(frontend cognito dynamodb api)
@@ -38,6 +44,10 @@ function get-secret {
   aws secretsmanager get-secret-value --secret-id "/self-service/$1" --query SecretString --output text
 }
 
+function get-parameter {
+  aws ssm get-parameter --name "/self-service/$1" --query "Parameter.Value" --output text
+}
+
 function set-prefix {
   [[ ${STACK_PREFIX:-} ]] && return || STACK_PREFIX=${1:-}
 
@@ -59,9 +69,9 @@ function get-env-vars {
     echo "𝙭 Export '${ENV[$var]}' not found" >&2 && return 1
   done
 
-  for secret in "${!SECRETS[@]}"; do
-    env+=("$secret=$(get-secret "${SECRETS[$secret]}")") && continue
-    echo "𝙭 Secret '${SECRETS[$secret]}' not found" >&2 && return 1
+  for param in "${!PARAMETERS[@]}"; do
+    env+=("$param=$(get-parameter "${PARAMETERS[$param]}")") && continue
+    echo "𝙭 Param '${PARAMETERS[$param]}' not found" >&2 && return 1
   done
 }
 
@@ -134,6 +144,10 @@ function build-frontend-image {
 
 function run {
   get-env-vars && (IFS=$'\n' && echo "${env[*]}") || exit
+  echo eval "${env[*]}" STUB_API=false npm run dev
+  for secret in "${!SECRETS[@]}"; do
+    export "$secret=$(get-secret "${SECRETS[$secret]}")"
+  done
   eval "${env[*]}" STUB_API=false npm run dev
 }
 

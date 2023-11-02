@@ -29,6 +29,13 @@ Parameters:
   AllowedEmailDomainsSource:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/allowed-email-domains-source
+  RegisterSpreadsheetId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/register-spreadsheet-id
+  UseStubSheets:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/use-stub-sheets
+    Description: Set to false for production or testing Google Sheets, otherwise true
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -104,6 +111,17 @@ Resources:
                 Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolClientID
             - Name: DT_LOGLEVELCON
               Value: INFO
+            - Name: GOOGLE_SHEET_CREDENTIALS
+              Value: "{{resolve:secretsmanager:/self-service/frontend/google-sheet-credentials}}"
+            - Name: REGISTER_SPREADSHEET_ID
+              Value: !Ref RegisterSpreadsheetId
+            - Name: REGISTER_SHEET_DATA_RANGE
+              Value: "Users!A1"
+            - Name: REGISTER_SHEET_HEADER_RANGE
+              Value: "Users!A1:Y1"
+            - Name: USE_STUB_SHEETS
+              Value: !Ref UseStubSheets
+
           PortMappings:
             - ContainerPort: !Ref ContainerPort
           HealthCheck:
@@ -153,7 +171,6 @@ Resources:
               - Effect: Allow
                 Action: kms:Decrypt
                 Resource: arn:aws:kms:eu-west-2:216552277552:key/*
-
 
 
   TaskRole:
