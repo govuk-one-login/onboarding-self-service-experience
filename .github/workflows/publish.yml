@@ -17,22 +17,6 @@ jobs:
     name: Run tests
     uses: ./.github/workflows/run-unit-tests.yml
 
-  deploy-test-frontend:
-    name: Test
-    needs: [ build-frontend, run-unit-tests ]
-    uses: ./.github/workflows/deploy-to-paas.yml
-    permissions:
-      id-token: write
-      contents: read
-    with:
-      environment: test
-      cf-space-name: self-service-test
-      artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
-      url: https://di-self-service-test.london.cloudapps.digital
-    secrets:
-      cf-username: ${{ secrets.CF_USERNAME }}
-      cf-password: ${{ secrets.CF_PASSWORD }}
-
   run-acceptance-tests:
     name: Run tests
     needs: deploy-test-frontend
@@ -41,7 +25,7 @@ jobs:
       id-token: write
       contents: read
     with:
-      environment: ${{ needs.deploy-test-frontend.outputs.environment }}
+      environment: test
 
   deploy-dynamodb:
     name: DynamoDB
