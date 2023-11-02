@@ -19,7 +19,6 @@ jobs:
 
   run-acceptance-tests:
     name: Run tests
-    needs: deploy-test-frontend
     uses: ./.github/workflows/run-acceptance-tests.yml
     permissions:
       id-token: write
