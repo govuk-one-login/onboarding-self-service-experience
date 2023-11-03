@@ -24,7 +24,7 @@ runs:
   using: composite
   steps:
     - name: Build SAM application
-      uses: alphagov/di-github-actions/sam/build-application@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
+      uses: govuk-one-login/github-actions/sam/build-application@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
       id: build
       with:
         template: ${{ inputs.template }}
