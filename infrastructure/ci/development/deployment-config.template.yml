@@ -8,7 +8,7 @@ Parameters:
     Default: govuk-one-login
   GitHubRepo:
     Type: String
-    Default: di-onboarding-self-service-experience
+    Default: onboarding-self-service-experience
   PreviewStacksPrefix:
     Type: String
     Default: preview
