@@ -24,7 +24,7 @@ Parameters:
     Default: ""
   GitHubRepositoryName:
     Type: String
-    Default: di-onboarding-self-service-experience
+    Default: none
   OneLoginRepositoryName:
     Type: String
     Default: onboarding-self-service-experience
