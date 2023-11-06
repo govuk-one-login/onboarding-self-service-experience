@@ -62,7 +62,7 @@ Feature: Users can sign up to the self-service experience
       Then the error message "Incorrect password" must be displayed for the password field
 
   Rule: The user tries to verify email security code when creating an account
-    Background:
+    Background: test
       Given they submit the email "registering-successfully@test.gov.uk"
       Then they should be redirected to the "/register/enter-email-code" page
 
