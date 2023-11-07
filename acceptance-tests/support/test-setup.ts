@@ -6,7 +6,7 @@ import puppeteer, {Browser, Page} from "puppeteer";
 const {World} = require("@cucumber/cucumber");
 
 let browser: Browser;
-const isBrowserEnabled = process.env.SHOW_BROWSER === "false";
+const isBrowserDisplayed = process.env.SHOW_BROWSER === "false";
 export class TestContext extends World {
     private browserPage: Page | undefined;
 
@@ -42,13 +42,13 @@ Before(async function (this: TestContext) {
 });
 
 After(async function (this: TestContext) {
-    if (isBrowserEnabled) {
+    if (isBrowserDisplayed) {
         await this.page.close();
     }
 });
 
 AfterAll(async function () {
-    if (isBrowserEnabled) {
+    if (isBrowserDisplayed) {
         await browser.close();
     }
 });
