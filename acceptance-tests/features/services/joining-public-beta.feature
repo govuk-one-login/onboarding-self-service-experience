@@ -1,6 +1,6 @@
 Feature: Joining public beta
 
-  Background:
+  Background:test
     Given the user is on the "/sign-in" page
     And they submit the email "registered@test.gov.uk"
     And they submit a valid password
