@@ -42,15 +42,11 @@ Before(async function (this: TestContext) {
 });
 
 After(async function (this: TestContext) {
-    if (!process.env.SHOW_BROWSER) {
-        await this.page.close();
-    }
+    await this.page.close();
 });
 
 AfterAll(async function () {
-    if (!process.env.SHOW_BROWSER) {
-        await browser.close();
-    }
+    await browser.close();
 });
 
 setWorldConstructor(TestContext);
