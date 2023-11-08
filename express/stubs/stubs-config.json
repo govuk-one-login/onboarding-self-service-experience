@@ -23,6 +23,28 @@
   "login": [
     {
       "parameter": "email",
+      "value": "registered_sms@test.gov.uk",
+      "return": {
+        "$metadata": {
+          "httpStatusCode": 200,
+          "requestId": "4ba44c7c-c2d2-4a88-97bb-c1eddf7abefd",
+          "extendedRequestId": null,
+          "cfId": null,
+          "attempts": 1,
+          "totalRetryDelay": 0
+        },
+        "AuthenticationResult": null,
+        "ChallengeName": "SMS_MFA",
+        "ChallengeParameters": {
+          "CODE_DELIVERY_DELIVERY_MEDIUM": "SMS",
+          "CODE_DELIVERY_DESTINATION": "+********0123",
+          "USER_ID_FOR_SRP": "2XYZ1a2e-72fd-4270-bb25-7b1a16d16ABD"
+        },
+        "Session": "AYABeKssn4g2bVsP3r-cgXWgBhoAHQABAAdTZXJ2aWNlABBDb2duaXRvVXNlclBvb2xzAAEAB2F3cy1rbXMAS2Fybjphd3M6a21zOmV1LXdlc3QtMjo1MDA3OTI3NjA3NTc6a2V5LzBhNjgxMWMyLThjY2YtNDBkMi04NjU0LTExNzM2Y2YyZmM0NQC4AQIBAHiP2eApfhd4PfRyGVo7Yej9TAxEbL9L0joTocVtXQ2mHQGBZjyMa_zMO5mzPJrzJVu4AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMeBp_jRxobC9Dlu6LAgEQgDvwv3OSp13IjHAAVSsWOzTHFOGZNnIrjU10qpS5F_xA3DXmGNLQ_QFf9WRrpslyQxX5nX3Nu-8w6bWjigIAAAAADAAAEAAAAAAAAAAAAAAAAAB1ezZchXjI0QinRZcwfzHy_____wAAAAEAAAAAAAAAAAAAAAEAAAIAvOtzF8axzq_xuyT5LdHzGCFUH4q3cqCvW9JAzcMpGJA-3CN1VFgXOd-VzSL0IbDPOfu-CZfv-uVYd8okMttHxXh_zGPGBjXSwAa4xG3LWkbHITIF25l-2ljiH9PMgtKzblDa75_HDwuVs3L3Sf4rFTaJ413D0mGQ6nqz3iWzhffEcF84cYa0foGj-u4PfstkPusqXUt7UvWlcr65Sgpl0IrSSkkOZ9B-R6QX97j2WWdghmcv-tF7kX41VP5Tzs_hetZnypHIy-n8dDwnH_THAEYx8l1wUwk1ZBKbKAfdJrvi-TRxIEhOgEWwbAc8PYYzrxQ33RONfawnl4Z19pJhQlR5mR9mGBS-_cQ__fAtW8S0QZqwyIIRcINUSjehFXJh6CcNpFzEr6iFeSXWs05Ckklv0Cws24LmSr8p6yWj6IY0Dk4N4yeDi8AA3c7CAHBeud4dnhLAYrKmAdH9dmelJVluDpiKWv-dKjADN0umH35jPh0_wwG_yenoAn6b713IpJ7auNA-yeh8PGADgE_9gB5G4YmkTWsC8WP-4IkFBJjLMHMj1ck0TnyFwtcvtU0q3FCTr8N-2lazkq2PjASTK-MpIa_v48S0slS9IVJOwIYj6_BW-nGKystyhEs-he9gfNrHkMUP7DWlaaYU6zeaaFRfty-PK0ba5h-o7ueH1qpxwh7ef2VC5wGee79XEin8"
+      }
+    },
+    {
+      "parameter": "email",
       "value": "registered@test.gov.uk",
       "return": {
         "$metadata": {
@@ -98,6 +120,11 @@
           "IdToken": "eyJraWQiOiJYWVpFRXVCT2FUSUNKeHNDOE9qRUJBeWxLd2tUTzl5MWhcL3J3MEpOVkJwRT0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJYWVpjZDQ5Yy03ODkzLTRmYTctOTJmNi00YTc0MzgwMTg4M2UiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmV1LXdlc3QtMi5hbWF6b25hd3MuY29tXC9ldS13ZXN0LTJfWFlaIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjp0cnVlLCJjb2duaXRvOnVzZXJuYW1lIjoiWFlaY2Q0OWMtQUJDMy00ZmE3LUxNTjYtT1A3NDM4MDE4ODNlIiwib3JpZ2luX2p0aSI6IlhZWjgxZDI5LTRkNmItSElKSy1hMDJkLWM0NzQxMTVhMmY0MyIsImF1ZCI6IlhZWnVqdmtya09PT3F1bGJxMjNzMXZoNWN0IiwiZXZlbnRfaWQiOiJYWVo3MTZmYi0wNjNlLTRBQmYtQ0QyYy00NzhmYjE4ZDY1WloiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTY1NTQ2MjQyNCwicGhvbmVfbnVtYmVyIjoiKzQ0NzcwMDkwMDEyMyIsImV4cCI6MTY1NTQ2NjAyNCwiaWF0IjoxNjU1NDYyNDI0LCJqdGkiOiJYWVphOGYxYS1lMDk4LTQ3M2EtOWFlZS1iYTEzOTM5OGU4MzEiLCJlbWFpbCI6InJlZ2lzdGVyZWRAZ2RzLmdvdi51ayJ9.Li6+ccrRLsc9O9wKLi5RIKwuV0MuvTguvnYuLi7XpEsuLvmhLi5acS5tV1Z9zC6r00MtcHIxrKouXlHzay9bLv2kXS5O3PIubdbqLrxMLujDLjFJLli/LnRIp+N51uFIYMwueiqrU/ulalJqTbVUsqVY4twuNynTLE0uT1lVM7u8IS5OLtq8y2kuaUBRMO8uwi7BomBgODCwv2xDqS6nxS4uLi4iLmRzOC4uM0/g4+oKVqV4LsE7RqoxcS5eLi4uLrOotO1k+cMu9PC4J+kx/S4u8zUuLkMrLtXuLi602i4nNlt7LkzNLi7rXOgtwH2yOjHjzi4uLi7B"
         }
       }
+    },
+    {
+      "parameter": "username",
+      "value": "2XYZ1a2e-72fd-4270-bb25-7b1a16d16ABD",
+      "throw": "CodeMismatchException"
     }
   ],
   "setNewPassword": [
