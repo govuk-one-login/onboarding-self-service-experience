@@ -20,7 +20,7 @@ export const registerClientHandler = async (event: APIGatewayProxyEvent): Promis
     const scopes = ["openid", "email", "phone"];
     const subject_type = "pairwise";
     const service_type = "MANDATORY";
-    const sector_identifier_uri = "http://localhost/";
+    const sector_identifier_uri = "http://gov.uk";
 
     const clientConfig = {
         client_name: payload.service.serviceName,
