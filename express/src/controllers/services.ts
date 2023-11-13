@@ -1,6 +1,7 @@
 import {RequestHandler} from "express";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import {render} from "../middleware/request-handler";
 
 export const listServices: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
@@ -19,3 +20,5 @@ export const listServices: RequestHandler = async (req, res) => {
     req.session.serviceName = undefined;
     res.render("services/services.njk", {services: services});
 };
+
+export const showAddNewServiceForm = render("services/add-new-service.njk");
