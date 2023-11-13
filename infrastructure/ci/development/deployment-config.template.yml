@@ -273,6 +273,10 @@ Resources:
             Action: secretsmanager:GetSecretValue
 
           - Effect: Allow
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/frontend/google-sheet-credentials-*
+            Action: secretsmanager:GetSecretValue
+
+          - Effect: Allow
             Resource: arn:aws:route53:::hostedzone/*
             Action: route53:ChangeResourceRecordSets
             Condition:
