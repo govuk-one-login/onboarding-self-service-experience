@@ -21,6 +21,7 @@ declare -A SECRETS=(
   [auth_api_key]=$PARAMETER_NAME_PREFIX/api/client-registry-api-key
   [notify_api_key]=$PARAMETER_NAME_PREFIX/cognito/notify-api-key
   [session_secret]=$PARAMETER_NAME_PREFIX/frontend/session-secret
+  [google_sheet_credentials]=$PARAMETER_NAME_PREFIX/frontend/google-sheet-credentials
 )
 
 function check-parameter-set {
@@ -76,6 +77,11 @@ function check-session-secret {
   check-secret-set "$secret" || write-secret-value "$secret" "$(uuidgen)"
 }
 
+function check-google-sheet-credentials {
+  local secret=${SECRETS[google_sheet_credentials]}
+  check-secret-set "$secret" || write-secret-value "$secret" "$(uuidgen)"
+}
+
 function check-cognito-external-id {
   local parameter=${PARAMETERS[cognito_external_id]}
   check-parameter-set "$parameter" || write-parameter-value "$parameter" "$(uuidgen)"
@@ -124,6 +130,7 @@ function check-deployment-parameters {
   check-manual-parameters
 
   check-session-secret
+  check-google-sheet-credentials
   check-manual-secrets
 
   check-allowd-email-domains-source
