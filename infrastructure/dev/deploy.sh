@@ -12,6 +12,7 @@ declare -A ENV=(
 
 declare -A SECRETS=(
   [SESSION_SECRET]=frontend/session-secret
+  [GOOGLE_SHEET_CREDENTIALS]=frontend/google-sheet-credentials
 )
 
 COMPONENTS=(frontend cognito dynamodb api)
