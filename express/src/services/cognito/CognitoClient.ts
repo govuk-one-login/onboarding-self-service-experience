@@ -21,7 +21,8 @@ import {
     GlobalSignOutCommand,
     GetUserCommand,
     VerifyUserAttributeCommand,
-    UpdateUserPoolClientCommand
+    UpdateUserPoolClientCommand,
+    AdminSetUserPasswordCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Command} from "@aws-sdk/types";
 import {cognito, region} from "../../config/environment";
@@ -76,6 +77,24 @@ export default class CognitoClient implements CognitoInterface {
             ]
         });
         console.log("Exit createUser");
+    }
+
+    async recoverUser(email: string): Promise<void> {
+        console.log("In CognitoClient:recoverUser");
+
+        await this.sendCommand(AdminCreateUserCommand, {
+            DesiredDeliveryMediums: ["EMAIL"],
+            MessageAction: "SUPPRESS",
+            Username: email,
+            UserPoolId: this.userPoolId,
+            TemporaryPassword: Math.floor(Math.random() * 100_000)
+                .toString()
+                .padStart(6, "0"),
+            UserAttributes: [
+                {Name: "email", Value: email},
+                {Name: "custom:signup_status", Value: "HasEmail,HasPassword,HasPhoneNumber,HasTextCode"}
+            ]
+        });
     }
 
     async resendEmailAuthCode(email: string): Promise<void> {
@@ -168,6 +187,17 @@ export default class CognitoClient implements CognitoInterface {
             ClientMetadata: {
                 email: username
             }
+        });
+    }
+
+    async setUserPassword(userName: string, password: string): Promise<void> {
+        console.info("In CognitoClient:setUserPassword()");
+
+        await this.sendCommand(AdminSetUserPasswordCommand, {
+            Password: password,
+            Permanent: true,
+            Username: userName,
+            UserPoolId: this.userPoolId
         });
     }
 

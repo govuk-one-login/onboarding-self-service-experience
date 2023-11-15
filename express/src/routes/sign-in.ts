@@ -14,7 +14,8 @@ import {
     showSignInFormPassword,
     showSignInPasswordResendTextCode,
     globalSignOut,
-    showSignInFormEmailGlobalSignOut
+    showSignInFormEmailGlobalSignOut,
+    organiseDynamoDBForRecoveredUser
 } from "../controllers/sign-in";
 import processSignInForm from "../middleware/process-sign-in-form";
 import {render} from "../middleware/request-handler";
@@ -70,6 +71,20 @@ router
         },
         validateMobileSecurityCode("resend-text-code"),
         processSecurityCode,
+        finishSignIn
+    );
+
+router
+    .route("/enter-text-code-then-continue-recovery")
+    .get(showCheckPhonePage)
+    .post(
+        (req, res, next) => {
+            res.locals.headerActiveItem = "sign-in";
+            next();
+        },
+        validateMobileSecurityCode("resend-text-code"),
+        processSecurityCode,
+        organiseDynamoDBForRecoveredUser,
         finishSignIn
     );
 
