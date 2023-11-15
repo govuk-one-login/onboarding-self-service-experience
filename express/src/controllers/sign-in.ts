@@ -9,6 +9,8 @@ import AuthenticationResultParser from "../lib/authentication-result-parser";
 import {obscureNumber} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
+import console from "console";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
 export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
@@ -97,7 +99,35 @@ export const globalSignOut: RequestHandler = async (req, res) => {
     req.session.destroy(() => res.redirect("/sign-in/enter-email-address-global-sign-out"));
 };
 
-export const processEmailAddress: RequestHandler = (req, res) => {
+export const processEmailAddress: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    try {
+        const email = req.session.emailAddress as string;
+        const signUpStatus: SignupStatus = await s4.getSignUpStatus(email);
+
+        if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
+            console.info("Processing No HasEMail");
+            return res.redirect("/register/resume-before-password");
+        }
+
+        if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
+            console.info("Processing No HasPassword");
+            return res.redirect("/register/resume-before-password");
+        }
+
+        if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
+            console.info("Processing No HasPhoneNumber");
+            return res.redirect("/register/resume-after-password");
+        }
+
+        if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
+            console.info("Processing No HasTextCode");
+            return res.redirect("/register/resume-after-password");
+        }
+    } catch (UserNotFoundException) {
+        // If a user doesn't exist, carry on like normal
+    }
+
     res.redirect("/sign-in/enter-password");
 };
 
