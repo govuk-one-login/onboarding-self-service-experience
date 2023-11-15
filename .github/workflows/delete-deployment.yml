@@ -11,34 +11,6 @@ permissions:
   contents: read
 
 jobs:
-  delete-frontend-paas:
-    name: Delete frontend PaaS
-    runs-on: ubuntu-latest
-    environment: PaaS
-    concurrency: deploy-paas-preview-${{ github.head_ref || github.ref_name }}
-    permissions: { }
-    steps:
-      - name: PaaS login
-        uses: alphagov/di-github-actions/paas/log-in-to-paas@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
-        with:
-          cf-org-name: gds-digital-identity-onboarding
-          cf-space-name: self-service-preview
-          cf-username: ${{ secrets.CF_USERNAME }}
-          cf-password: ${{ secrets.CF_PASSWORD }}
-
-      - name: Get app name
-        uses: alphagov/di-github-actions/beautify-branch-name@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
-        with:
-          downcase: true
-          length-limit: 63
-          underscores-to-hyphens: true
-          prefix: di-sse-prev
-          set-env-var: APP_NAME
-          usage: App name
-
-      - name: Delete app
-        run: cf delete "$APP_NAME" -rf
-
   delete-frontend-image:
     name: Delete frontend image
     needs: delete-frontend
@@ -47,7 +19,7 @@ jobs:
     concurrency: push-frontend-image-development-${{ github.head_ref || github.ref_name }}
     steps:
       - name: Delete docker image
-        uses: alphagov/di-github-actions/aws/ecr/delete-docker-images@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
+        uses: govuk-one-login/github-actions/aws/ecr/delete-docker-images@299bdda5b093a5d13c76e4d0f97f59bc727b4e03
         with:
           aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
           repository: ${{ vars.FRONTEND_CONTAINER_IMAGE_REPOSITORY }}

@@ -58,6 +58,7 @@ Resources:
       TableClass: STANDARD
       BillingMode: PAY_PER_REQUEST
       TableName: !Sub ${DeploymentName}-sessions
+      DeletionProtectionEnabled: !If [ DeletionProtectionEnabled, true, false ]
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
