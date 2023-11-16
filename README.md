@@ -10,7 +10,7 @@ onboarding instructions.
 ## Developer tools
 
 Install SAM if it's not already installed.
-
+ 
 ```shell
 brew tap aws/tap
 brew install aws-sam-cli
