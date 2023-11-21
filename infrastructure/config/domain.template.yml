@@ -26,6 +26,7 @@ Parameters:
 Conditions:
   Subdomain: !Not [ !Condition TopNode ]
   TopNode: !Equals [ !Ref Subdomain, "" ]
+  DevEnv: !Equals [ !Ref Subdomain, "development." ]
   DevelopmentNameServers: !Not [ !Equals [ !Join [ "", !Ref DevelopmentNameServers ], "" ] ]
   BuildNameServers: !Not [ !Equals [ !Join [ "", !Ref BuildNameServers ], "" ] ]
   StagingNameServers: !Not [ !Equals [ !Join [ "", !Ref StagingNameServers ], "" ] ]
@@ -74,6 +75,17 @@ Resources:
       DomainValidationOptions:
         - DomainName: !Sub "*.admin.${Subdomain}${Domain}"
           HostedZoneId: !If [ TopNode, !Ref ApexHostedZone, !Ref SubdomainHostedZone ]
+
+  WwwDomainCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !If [ DevEnv, !Sub "*.${Subdomain}${Domain}", !Sub "www.${Subdomain}${Domain}" ]
+      SubjectAlternativeNames: [ !Sub "${Subdomain}${Domain}" ]
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Sub "www.${Subdomain}${Domain}"
+          HostedZoneId: !If [ TopNode, !Ref ApexHostedZone, !Ref SubdomainHostedZone ]
+
 
   # The GOV.UK nameservers for service.gov.uk route traffic for
   # sign-in.service.gov.uk and all its subdomains to its zone apex.
@@ -186,6 +198,14 @@ Outputs:
     Value: !Sub admin.${Subdomain}${Domain}
     Export:
       Name: DNS-Domain
+  SignInDomain:
+    Value: !Sub ${Subdomain}${Domain}
+    Export:
+      Name: DNS-SignIn-Domain
+  WwwDomainCertificateARN:
+    Value: !Ref WwwDomainCertificate
+    Export:
+      Name: DNS-wwwDomainCertificateARN
   CertificateARN:
     Value: !Ref Certificate
     Export:
