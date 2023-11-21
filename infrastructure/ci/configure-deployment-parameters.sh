@@ -15,6 +15,8 @@ declare -A PARAMETERS=(
   [deletion_protection]=$PARAMETER_NAME_PREFIX/config/deletion-protection-enabled
   [api_notification_email]=$PARAMETER_NAME_PREFIX/api/notifications-email
   [allowed_email_domains_source]=$PARAMETER_NAME_PREFIX/frontend/allowed-email-domains-source
+  [user_signup_sheet_data_range]=$PARAMETER_NAME_PREFIX/frontend/user-signup-sheet-data-range
+  [user_signup_sheet_header_range]=$PARAMETER_NAME_PREFIX/frontend/user-signup-sheet-header-range
 )
 
 declare -A SECRETS=(
@@ -22,6 +24,7 @@ declare -A SECRETS=(
   [notify_api_key]=$PARAMETER_NAME_PREFIX/cognito/notify-api-key
   [session_secret]=$PARAMETER_NAME_PREFIX/frontend/session-secret
   [google_sheet_credentials]=$PARAMETER_NAME_PREFIX/frontend/google-sheet-credentials
+  [user_signup_sheet_id]=$PARAMETER_NAME_PREFIX/frontend/user-signup-sheet-id
 )
 
 function check-parameter-set {
@@ -82,6 +85,11 @@ function check-google-sheet-credentials {
   check-secret-set "$secret" || write-secret-value "$secret" "$(uuidgen)"
 }
 
+function check-user-signup-sheet-id {
+  local secret=${SECRETS[user_signup_sheet_id]}
+  check-secret-set "$secret" || write-secret-value "$secret" "$(uuidgen)"
+}
+
 function check-cognito-external-id {
   local parameter=${PARAMETERS[cognito_external_id]}
   check-parameter-set "$parameter" || write-parameter-value "$parameter" "$(uuidgen)"
@@ -99,7 +107,7 @@ function check-test-banner {
     write-parameter-value "$parameter" "$([[ $ACCOUNT == production ]] && echo false || echo true)"
 }
 
-function check-allowd-email-domains-source {
+function check-allowed-email-domains-source {
   local parameter=${PARAMETERS[allowed_email_domains_source]}
   check-parameter-set "$parameter" ||
     write-parameter-value "$parameter" "$([[ $ACCOUNT == production ]] && echo 'allowed-email-domains' || echo 'allowed-test-domains')"
@@ -131,9 +139,10 @@ function check-deployment-parameters {
 
   check-session-secret
   check-google-sheet-credentials
+  check-user-signup-sheet-id
   check-manual-secrets
 
-  check-allowd-email-domains-source
+  check-allowed-email-domains-source
 
   print-parameters
   print-secrets

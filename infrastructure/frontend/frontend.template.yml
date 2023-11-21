@@ -29,6 +29,12 @@ Parameters:
   AllowedEmailDomainsSource:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/allowed-email-domains-source
+  UserSignupSheetDataRange:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/user-signup-sheet-data-range
+  UserSignupSheetHeaderRange:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/user-signup-sheet-header-range
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -104,6 +110,15 @@ Resources:
                 Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolClientID
             - Name: DT_LOGLEVELCON
               Value: INFO
+            - Name: GOOGLE_SHEET_CREDENTIALS
+              Value: "{{resolve:secretsmanager:/self-service/frontend/google-sheet-credentials}}"
+            - Name: USER_SIGNUP_SHEET_ID
+              Value: "{{resolve:secretsmanager:/self-service/frontend/user-signup-sheet-id}}"
+            - Name: USER_SIGNUP_SHEET_DATA_RANGE
+              Value: !Ref UserSignupSheetDataRange
+            - Name: USER_SIGNUP_SHEET_HEADER_RANGE
+              Value: !Ref UserSignupSheetHeaderRange
+
           PortMappings:
             - ContainerPort: !Ref ContainerPort
           HealthCheck:

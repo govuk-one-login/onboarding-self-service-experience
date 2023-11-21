@@ -324,11 +324,13 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
         return res.render("there-is-a-problem.njk");
     }
 
+    req.session.serviceName = req.body.serviceName;
+
+    await s4.updateUserSpreadsheet(nonNull(req.session.emailAddress), nonNull(req.session.mobileNumber), nonNull(req.session.serviceName));
+
     const generatedClient = await s4.generateClient(service, nonNull(req.session.authenticationResult));
     const body = JSON.parse(generatedClient.data.output).body;
     const serviceId = JSON.parse(body).pk;
-
-    req.session.serviceName = req.body.serviceName;
 
     s4.sendTxMALog(
         "SSE_SERVICE_ADDED",
