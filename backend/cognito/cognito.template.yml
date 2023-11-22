@@ -50,6 +50,7 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, production ], !Equals [ !Ref Environment, integration ]]
 
 Globals:
   Function:
@@ -828,6 +829,7 @@ Resources:
 
   SubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
+    Condition: SplunkLoggingEnabled
     Properties:
       LogGroupName: !Ref WafLogGroup
       FilterName: "subscription_for_splunk"
