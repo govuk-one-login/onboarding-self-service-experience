@@ -806,6 +806,20 @@ Resources:
       WebACLArn: !GetAtt CognitoWebACL.Arn
       ResourceArn: !GetAtt UserPool.Arn
 
+  WafLogGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: 'aws-waf-logs-self-service-api-acl'
+      RetentionInDays: 30
+
+  WafLoggingConfiguration:
+    Type: AWS::WAFv2::LoggingConfiguration
+    Properties:
+      ResourceArn: !GetAtt CognitoWebACL.Arn
+      LogDestinationConfigs:
+        - !GetAtt WafLogGroup.Arn
+
 Outputs:
   UserPoolID:
     Value: !Ref UserPool
