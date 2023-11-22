@@ -47,6 +47,7 @@ Resources:
           "*.cloudfront.net",
           "*.googleapis.com",
           "*.google.com",
+          "govuk.zendesk.com"
         ] ]
         AllowRules: !Sub >
           pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:"cognito-idp.${AWS::Region}.amazonaws.com";
@@ -63,6 +64,9 @@ Resources:
           
           pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:".google.com";
           endswith; msg:"Pass TLS to google"; flow:established; rev:1; sid:2005;)
+          
+          pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:"govuk.zendesk.com";
+          endswith; msg:"Pass TLS to zendesk"; flow:established; rev:1; sid:2006;)
 
   AccessLogsBucket:
     # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
