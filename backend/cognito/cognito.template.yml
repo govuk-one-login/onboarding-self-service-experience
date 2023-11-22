@@ -820,6 +820,14 @@ Resources:
       LogDestinationConfigs:
         - !GetAtt WafLogGroup.Arn
 
+  SubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      LogGroupName: !Ref WafLogGroup
+      FilterName: "log_subscription"
+      FilterPattern: ""
+      DestinationArn: "arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2"
+
 Outputs:
   UserPoolID:
     Value: !Ref UserPool
