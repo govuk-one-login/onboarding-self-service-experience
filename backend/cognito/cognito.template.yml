@@ -40,6 +40,12 @@ Parameters:
       - "staging"
       - "integration"
       - "production"
+  WafLogGroupName:
+    Type: String
+    Default: aws-waf-logs-self-service-api-acl
+  SubscriptionFilterDestinationArn:
+    Type: String
+    Default: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
@@ -810,7 +816,7 @@ Resources:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: 'aws-waf-logs-self-service-api-acl'
+      LogGroupName: !Ref WafLogGroupName
       RetentionInDays: 30
 
   WafLoggingConfiguration:
@@ -824,9 +830,9 @@ Resources:
     Type: AWS::Logs::SubscriptionFilter
     Properties:
       LogGroupName: !Ref WafLogGroup
-      FilterName: "log_subscription"
+      FilterName: "subscription_for_splunk"
       FilterPattern: ""
-      DestinationArn: "arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2"
+      DestinationArn: !Ref SubscriptionFilterDestinationArn
 
 Outputs:
   UserPoolID:
