@@ -162,6 +162,13 @@ Resources:
                 Action:
                   - apigateway:SetWebACL
 
+              - Effect: Allow
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
+                Action:
+                  - logs:DeleteSubscriptionFilter
+                  - logs:DescribeSubscriptionFilters
+                  - logs:PutSubscriptionFilter
+
   FrontendDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
     Type: AWS::IAM::ManagedPolicy
