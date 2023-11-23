@@ -300,7 +300,7 @@ export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
 
 export const showAddServiceForm = render("register/add-service-name.njk");
 
-export const processAddServiceForm: RequestHandler = async (req, res) => {
+export const processAddServiceForm: RequestHandler = async (req, res, next) => {
     const uuid = randomUUID();
     const service: Service = {
         id: `service#${uuid}`,
@@ -324,11 +324,13 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
         return res.render("there-is-a-problem.njk");
     }
 
+    req.session.serviceName = req.body.serviceName;
+
     const generatedClient = await s4.generateClient(service, nonNull(req.session.authenticationResult));
     const body = JSON.parse(generatedClient.data.output).body;
     const serviceId = JSON.parse(body).pk;
 
-    req.session.serviceName = req.body.serviceName;
+    req.session.serviceId = serviceId;
 
     s4.sendTxMALog(
         "SSE_SERVICE_ADDED",
@@ -343,6 +345,22 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
         }
     );
 
+    next();
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const sendDataToUserSpreadsheet: RequestHandler = async (req, res, next) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    const {mobileNumber, emailAddress, serviceName} = req.session;
+    const effectiveMobileNumber = mobileNumber || " ";
+
+    await s4.updateUserSpreadsheet(nonNull(emailAddress), effectiveMobileNumber, nonNull(serviceName));
+    next();
+};
+
+export const redirectToServicesList: RequestHandler = (req, res) => {
+    const serviceId = String(req.session.serviceId);
     res.redirect(`/services/${serviceId.substring(8)}/clients`);
 };
 
