@@ -187,9 +187,9 @@ function api {
 
 function all {
   echo "Deploying the Admin Tool stack set"
-#  dynamodb
+  dynamodb
   cognito
-#  api
+  api
 }
 
 function admin-tool {
