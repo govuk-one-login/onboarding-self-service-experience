@@ -150,6 +150,9 @@ Resources:
                   - wafv2:ListWebACLs
                   - wafv2:ListTagsForResource
                   - wafv2:GetWebACLForResource
+                  - wafv2:GetLoggingConfiguration
+                  - wafv2:DeleteLoggingConfiguration
+                  - wafv2:PutLoggingConfiguration
 
               - Effect: Allow
                 Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/*
@@ -168,6 +171,16 @@ Resources:
                   - logs:DeleteSubscriptionFilter
                   - logs:DescribeSubscriptionFilters
                   - logs:PutSubscriptionFilter
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:logs:*
+                Action:
+                  - "*"
+
+#             This works
+#              - Effect: Allow
+#                Resource: "*"
+#                Action: "*"
 
   FrontendDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
@@ -381,9 +394,11 @@ Resources:
             Action: secretsmanager:GetSecretValue
 
           - Effect: Allow
-            Resource: !Sub arn:aws:iam::${AWS::AccountId}:policy/${PreviewStacksPrefix}-api-*
+            Resource: !Sub arn:aws:iam::${AWS::AccountId}:policy/${PreviewStacksPrefix}-*
             Action:
               - iam:CreatePolicy
+              - iam:ListPolicyVersions
+#              - iam:DeletePolicy   # this is stopping whole pipeline to execute - just for debugging now
             Condition:
               StringEqualsIfExists:
                 iam:PassedToService:
