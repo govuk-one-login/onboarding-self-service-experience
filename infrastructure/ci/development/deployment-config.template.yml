@@ -289,6 +289,57 @@ Resources:
               ForAllValues:StringLike:
                 route53:ChangeResourceRecordSetsNormalizedRecordNames: !Sub [ "*.${Domain}", { Domain: !ImportValue DNS-Domain } ]
 
+  ProductPagesFrontendDeploymentPolicy:
+    # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Roles: [ !Ref GitHubActionsRole ]
+      ManagedPolicyName: DeployProductPagesFrontend
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/product-pages/frontend/*
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Resource: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/*
+            Action:
+              - ecs:CreateService
+              - ecs:UpdateService
+              - ecs:DeleteService
+              - ecs:DescribeServices
+              - ecs:DescribeClusters
+              - ecs:DeleteCluster
+          - Effect: Allow
+            Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/product-pages/*
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
+              - ssm:GetParametersByPath
+          - Effect: Allow
+            Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/*
+            Action:
+              - elasticloadbalancing:SetWebACL
+              - elasticloadbalancing:CreateLoadBalancer
+              - elasticloadbalancing:DeleteLoadBalancer
+              - elasticloadbalancing:AddTags
+              - elasticloadbalancing:CreateListener
+              - elasticloadbalancing:DeleteListener
+          - Effect: Allow
+            Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/*
+            Action:
+              - elasticloadbalancing:CreateTargetGroup
+              - elasticloadbalancing:DeleteTargetGroup
+              - elasticloadbalancing:AddTags
+          - Effect: Allow
+            Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/app/*
+            Action:
+              - elasticloadbalancing:DeleteListener
+              - elasticloadbalancing:CreateListener
+              - elasticloadbalancing:AddTags
+
+
   ApiDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
     Type: AWS::IAM::ManagedPolicy
