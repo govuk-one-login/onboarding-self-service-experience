@@ -18,6 +18,9 @@ Parameters:
   NotificationsEmail:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/api/notifications-email
+  SplunkLiveAccountId:
+    Type: String
+    Default: 885513274347
 
 Resources:
   # Service authorisation reference - Actions, resources, and condition keys for AWS services
@@ -173,7 +176,7 @@ Resources:
                   - logs:PutSubscriptionFilter
 
               - Effect: Allow
-                Resource: !Sub arn:aws:logs:${AWS::Region}:885513274347:destination:*
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${SplunkLiveAccountId}:destination:*
                 Action:
                   - logs:PutSubscriptionFilter
 
