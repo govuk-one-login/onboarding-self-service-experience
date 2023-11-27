@@ -173,14 +173,9 @@ Resources:
                   - logs:PutSubscriptionFilter
 
               - Effect: Allow
-                Resource: !Sub arn:aws:logs:*
+                Resource: !Sub arn:aws:logs:${AWS::Region}:885513274347:destination:*
                 Action:
-                  - "*"
-
-#             This works
-#              - Effect: Allow
-#                Resource: "*"
-#                Action: "*"
+                  - logs:PutSubscriptionFilter
 
   FrontendDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
