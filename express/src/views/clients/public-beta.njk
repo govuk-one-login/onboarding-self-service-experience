@@ -3,54 +3,59 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set sidebarActiveItem = "public-beta" %}
-{% set pageTitle = "Joining public beta" %}
+{% set pageTitle = "Register to join public beta" %}
 {% set formButtonText = "Submit" %}
 {% set formCancelUrl = "" %}
-{% set hideForm = true if publicBetaRequestSubmitted %}
 
 {% block beforeForm %}
-  <h1 class="govuk-heading-l govuk-!-margin-top-3">Joining public beta</h1>
-
-  <p class="govuk-body">If you want to go live with GOV.UK One Login and offer it to your users, you need to join our public beta.</p>
-  <p class="govuk-body">Discuss our
-    <a class="govuk-link" rel="noreferrer noopener" target="_blank"
-       href="https://www.sign-in.service.gov.uk/getting-started/public-beta">
-      public beta guidance (opens in new tab)</a> with your team to see if it’s right for you.
-  </p>
-
-  <h2 class="govuk-heading-m">Speak to us about joining public beta</h2>
-
-  <p class="govuk-body">Submit your details and we’ll get in touch with you about joining the public beta.</p>
-  <p class="govuk-body">We’ll arrange to talk more with your team about your service and what the public beta involves.</p>
-
-  {% if publicBetaRequestSubmitted %}
-    <div class="govuk-inset-text">
-      You submitted your details on {{ dateRequestSubmitted }}.
-    </div>
-  {% endif %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Register to join public beta</h1>
+  <p class="govuk-body">There are a few steps to getting your service live with GOV.UK One Login.</p>
+  <p class="govuk-body">These include:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>telling us more about your service, using the form below</li>
+    <li>agreeing to the Memorandum of Understanding - this needs to be done by a deputy director or above and may need to go to your legal department first </li>
+    <li>setting up in our production environment</li>
+    <li>agreeing a go-live date with us</li>
+  </ul>
+  <p class="govuk-body">We'll then talk more with your team about getting ready to join public beta.</p>
+  <h2 class="govuk-heading-m">Tell us more about your service</h2>
 {% endblock %}
 
-{% if not publicBetaRequestSubmitted %}
-  {% block formInputs %}
-    {{ form.textInput("Your name", "userName") }}
-    {{ form.textInput("Department", "department") }}
-    {{ form.hiddenInput("serviceName", serviceName) }}
-  {% endblock %}
+{% block formInputs %}
+  {{ form.textInput("Your full name", "userName") }}
+  {{ form.emailInput("Email address", value = emailAddress, disabled = true) }}
+  {{ form.textInput("Role ", "role") }}
+  {{ form.textInput("Organisation name", "organisationName") }}
+  {{ form.textInput("Service name", "serviceNameDisplayOnly", value = serviceName, disabled = true) }}
+  {{ form.textInput("Service URL, if live", "serviceUrl") }}
+  {{ form.textAreaInput("Service description", "serviceDescription", "Include who uses it and what they use it for") }}
+  {{ form.radiosInput("How will your service use GOV.UK One Login?", name = "serviceUse",
+    items = [
+      {text: "To sign users in", value: "signUsersIn"},
+      {text: "To sign users in and check their identity", value: "signUsersInAndCheckIdentity"}
+    ])
+  }}
+  {{ form.radiosInput("Do you need to migrate existing user accounts?", name = "migrateExistingAccounts",
+    items = [
+      {text: "Yes", value: "yes"},
+      {text: "No", value: "no"},
+      {text: "Not sure", value: "notSure"}
+    ])
+  }}
+  {{ form.radiosInput("Number of users each year", name = "numberOfUsersEachYear",
+    items = [
+      {text: "1 to 1,000", value: "range1To1000"},
+      {text: "1,001 to 50,000", value: "range1001To50000"},
+      {text: "50,001 to 250,000", value: "range50001To250000"},
+      {text: "250,001 to 1 million", value: "range250001To1Million"},
+      {text: "Over 1 million users", value: "rangeOver1Million"},
+      {text: "Not sure", value: "notSure"}
+    ])
+  }}
+  {{ form.dateInput("What's your target date to go live with GOV.UK One Login?", "targetDate") }}
 
-  {% block afterformInputs %}
-    <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">Information we already have</p>
 
-    {{ govukSummaryList({
-      rows: [
-        {
-          key: {text: "Email address"},
-          value: {text: emailAddress}
-        },
-        {
-          key: {text: "Service name"},
-          value: {text: serviceName}
-        }
-      ]
-    }) }}
-  {% endblock %}
-{% endif %}
+
+  {{ form.hiddenInput("serviceName", serviceName) }}
+{% endblock %}
+
