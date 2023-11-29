@@ -102,6 +102,10 @@ export default class StubCognitoClient implements CognitoInterface {
         await this.getOverriddenReturnValue("createUser", "email", email);
     }
 
+    async recoverUser(email: string): Promise<void> {
+        await this.getOverriddenReturnValue("createUser", "email", email);
+    }
+
     async resendEmailAuthCode(email: string): Promise<void> {
         await this.getOverriddenReturnValue("login", "email", email);
     }
@@ -148,10 +152,8 @@ export default class StubCognitoClient implements CognitoInterface {
         return;
     }
 
-    async adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput> {
+    async adminGetUserCommandOutput(): Promise<AdminGetUserCommandOutput> {
         const adminGetUserCommandOutput: AdminGetUserCommandOutput = <AdminGetUserCommandOutput>{};
-
-        console.log("Setting AdminGetUserCommandOutput for => " + userName);
 
         adminGetUserCommandOutput.UserAttributes = [
             {Name: "custom:signup_status", Value: "HasEmail,HasPassword,HasPhoneNumber,HasTextCode"}
@@ -212,6 +214,10 @@ export default class StubCognitoClient implements CognitoInterface {
     }
 
     async setMobilePhoneAsVerified(): Promise<void> {
+        return;
+    }
+
+    async setUserPassword(): Promise<void> {
         return;
     }
 
