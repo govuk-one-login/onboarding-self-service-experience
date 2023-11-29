@@ -9,16 +9,16 @@ export default function Helmet() {
                 defaultSrc: ["'self'"],
                 scriptSrc: [
                     "'self'",
-                    "'unsafe-inline'",
                     "https://www.googletagmanager.com",
                     "https://www.google-analytics.com",
                     "https://ssl.google-analytics.com"
                 ],
-                styleSrc: ["'self'", "'unsafe-inline'"],
+                styleSrc: ["'self'"],
                 imgSrc: ["'self'", "data:", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
                 objectSrc: ["'none'"],
                 connectSrc: ["'self'", "https://www.google-analytics.com"],
-                formAction: ["'self'"]
+                formAction: ["'self'"],
+                fontSrc: ["'self'"]
             }
         },
         dnsPrefetchControl: {

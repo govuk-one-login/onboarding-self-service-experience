@@ -88,6 +88,10 @@ const cookieBanner = function () {
         return "; Secure";
     }
 
+    function getCookiesSameSiteAttribute() {
+        return "; SameSite=Lax";
+    }
+
     function setCookie(name, value) {
         const currentDate = new Date();
         const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + 12));
@@ -97,7 +101,8 @@ const cookieBanner = function () {
             `${getCookiesDomainAttribute()}; ` +
             `expires=${expiryDate}; ` +
             "path=/" +
-            `${getCookiesSecureAttribute()}`;
+            `${getCookiesSecureAttribute()}` +
+            `${getCookiesSameSiteAttribute()}`;
     }
 
     function hideElement(el) {
