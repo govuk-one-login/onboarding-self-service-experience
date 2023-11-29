@@ -14,7 +14,9 @@ import {
     showSignInFormPassword,
     showSignInPasswordResendTextCode,
     globalSignOut,
-    showSignInFormEmailGlobalSignOut
+    showSignInFormEmailGlobalSignOut,
+    organiseDynamoDBForRecoveredUser,
+    confirmPasswordContinueRecovery
 } from "../controllers/sign-in";
 import processSignInForm from "../middleware/process-sign-in-form";
 import {render} from "../middleware/request-handler";
@@ -73,6 +75,20 @@ router
         finishSignIn
     );
 
+router
+    .route("/enter-text-code-then-continue-recovery")
+    .get(showCheckPhonePage)
+    .post(
+        (req, res, next) => {
+            res.locals.headerActiveItem = "sign-in";
+            next();
+        },
+        validateMobileSecurityCode("resend-text-code"),
+        processSecurityCode,
+        organiseDynamoDBForRecoveredUser,
+        finishSignIn
+    );
+
 router.route("/resend-text-code").get(showResendPhoneCodePage).post(processResendPhoneCodePage);
 router.route("/account-not-found").get(render("sign-in/account-not-found.njk"));
 router.route("/signed-in-to-another-device").get(render("sign-in/signed-in-to-another-device.njk"));
@@ -104,4 +120,23 @@ router
         checkPasswordAllowed("sign-in/create-new-password.njk"),
         confirmForgotPassword,
         processSignInForm("sign-in/create-new-password.njk")
+    );
+
+router
+    .route("/forgot-password/create-new-password-then-continue-recovery")
+    .get(confirmForgotPasswordForm)
+    .post(checkPasswordAllowed("sign-in/create-new-password.njk"), confirmForgotPassword, confirmPasswordContinueRecovery);
+
+router
+    .route("/forgot-password/continue-recovery")
+    .get(showCheckPhonePage)
+    .post(
+        (req, res, next) => {
+            res.locals.headerActiveItem = "sign-in";
+            next();
+        },
+        validateMobileSecurityCode("resend-text-code"),
+        processSecurityCode,
+        organiseDynamoDBForRecoveredUser,
+        finishSignIn
     );

@@ -13,9 +13,14 @@ async function forgotPassword(event: CustomMessageForgotPasswordTriggerEvent): P
 
     const code = event.request.codeParameter;
     const username = encodeURIComponent(clientMetadata.username);
+    const recoveredURLAppendix: string = JSON.parse(clientMetadata.use_recovered_account_url) ? "-then-continue-recovery" : "";
+
     const link = `${clientMetadata.protocol}://${clientMetadata.host
         .split("/")
-        .join("")}/sign-in/forgot-password/create-new-password?loginName=${username}&confirmationCode=${code}`;
+        .join("")}/sign-in/forgot-password/create-new-password${recoveredURLAppendix}?loginName=${username}&confirmationCode=${code}`;
+
+    console.log("Meta Data:use_recovered_url => " + clientMetadata.use_recovered_account_url);
+    console.log("Translation => " + recoveredURLAppendix);
 
     event.response = {
         smsMessage: "",
