@@ -660,6 +660,7 @@ Resources:
             Resource:
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/*
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/dev/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-*
             Action:
               - logs:CreateLogStream
               - logs:PutLogEvents
