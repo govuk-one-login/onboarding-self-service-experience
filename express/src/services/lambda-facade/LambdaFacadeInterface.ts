@@ -42,4 +42,8 @@ export default interface LambdaFacadeInterface {
     globalSignOut(userEmail: string): Promise<AxiosResponse>;
 
     sendTxMALog(message: TxMAEvent): Promise<void>;
+
+    getDynamoDBEntries(email: string): Promise<AxiosResponse>;
+
+    deleteClientEntries(oldUserID: string, serviceID: string): Promise<void>;
 }

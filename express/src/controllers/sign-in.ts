@@ -6,7 +6,7 @@ import {
 import {RequestHandler} from "express";
 import {port} from "../config/environment";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
-import {obscureNumber} from "../lib/mobile-number";
+import {convertToCountryPrefixFormat, obscureNumber} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
@@ -17,11 +17,15 @@ export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-addr
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
 export const showCheckPhonePage: RequestHandler = (req, res) => {
+    console.log("In controllers/sign-in-showCheckPhonePage");
+
     // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
+        console.log("Redirecting to Sign-In");
         return res.redirect("/sign-in");
     }
 
+    console.log("Redirecting to Enter Text Code");
     res.render("common/enter-text-code.njk", {
         headerActiveItem: "sign-in",
         values: {
@@ -31,10 +35,20 @@ export const showCheckPhonePage: RequestHandler = (req, res) => {
     });
 };
 
+export const confirmPasswordContinueRecovery: RequestHandler = async (req, res) => {
+    console.log("In controllers/sign-in:confirmPasswordContinueRecovery()");
+
+    return res.redirect("/sign-in/forgot-password/continue-recovery");
+};
+
 export const finishSignIn: RequestHandler = async (req, res) => {
+    console.log("In controllers/sign-in:finishSignIn()");
+
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const authenticationResult = nonNull(req.session.authenticationResult);
+    console.log("Calling getSelfServiceUser");
     const user = await s4.getSelfServiceUser(authenticationResult);
+    console.log("Back from getSelfServiceUser");
 
     // TODO this should probably be an error
     if (!user) {
@@ -75,13 +89,14 @@ export const finishSignIn: RequestHandler = async (req, res) => {
             }
         );
 
+        console.log("Redirecting to Services");
         res.redirect("/services");
     }
 };
 
 async function signedInToAnotherDevice(email: string, s4: SelfServiceServicesService) {
     const sessions = await s4.sessionCount(email);
-    console.log(`Found ${sessions} sessioon(s)`);
+    console.log(`Found ${sessions} session(s)`);
     return sessions > 1;
 }
 
@@ -204,9 +219,26 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
     next();
 };
 
+export const organiseDynamoDBForRecoveredUser: RequestHandler = async (req, res, next) => {
+    console.log("In controllers/sign-in:organiseDynamoDBForRecoveredUser");
+    console.log("*** Authentication Result => " + req.session.authenticationResult);
+
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    const authenticationResult = nonNull(req.session.authenticationResult);
+    const userID = req.session.cognitoID as string;
+
+    await s4.recreateDynamoDBAccountLinks(authenticationResult, userID);
+
+    next();
+};
+
 const forgotPassword: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
+    const email = nonNull(req.session.emailAddress);
+
     let host;
+
     if (req.hostname === "localhost") {
         host = `${req.hostname}:${port}`;
     } else {
@@ -214,8 +246,31 @@ const forgotPassword: RequestHandler = async (req, res) => {
     }
 
     try {
-        await s4.forgotPassword(nonNull(req.session.emailAddress), req.protocol, host);
+        await s4.forgotPassword(email, req.protocol, host, false);
     } catch (error) {
+        if (error instanceof UserNotFoundException) {
+            console.log("UserNotFoundException");
+
+            const dynamoDBEntryResponse = await s4.getDynamoDBEntries(email);
+            const dynamoDBEntry = JSON.stringify(dynamoDBEntryResponse.data);
+
+            if (dynamoDBEntry != undefined && dynamoDBEntry.length > 2) {
+                const clientDetails = JSON.parse(dynamoDBEntry);
+                const mobileNumber = convertToCountryPrefixFormat(clientDetails.phone.S);
+                const password = "recovered";
+                const userID = clientDetails.pk.S.substring(5); // Skip over 'user#' prefix
+
+                await s4.recoverCognitoAccount(req, email, password, mobileNumber);
+                req.session.cognitoID = userID;
+                await s4.forgotPassword(email, req.protocol, host, true);
+
+                return res.render("sign-in/enter-email-code.njk");
+            }
+
+            req.session.emailAddress = email;
+            return res.redirect("/sign-in/account-not-found");
+        }
+
         if (error instanceof CognitoIdentityProviderServiceException) {
             const options: Record<string, Record<string, string | undefined>> = {values: {emailAddress: req.session.emailAddress}};
 

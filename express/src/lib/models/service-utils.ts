@@ -5,5 +5,6 @@ export function dynamoServiceToDomainService(service: ServiceFromDynamo): Servic
 }
 
 export function dynamoServicesToDomainServices(services: ServiceFromDynamo[]): Service[] {
+    console.log("Services => " + services);
     return services.map(service => dynamoServiceToDomainService(service));
 }

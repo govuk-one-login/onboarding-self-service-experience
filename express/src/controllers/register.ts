@@ -60,6 +60,8 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
 };
 
 export const showCheckEmailForm: RequestHandler = async (req, res) => {
+    console.log("In register-showCheckEmailForm");
+
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
@@ -76,6 +78,8 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 };
 
 export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
+    console.log("In register-submitEmailSecurityCode");
+
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }

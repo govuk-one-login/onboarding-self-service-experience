@@ -218,6 +218,7 @@ Resources:
                   - cognito-idp:AdminGetUser
                   - cognito-idp:AddCustomAttributes
                   - cognito-idp:UpdateUserPoolClient
+                  - cognito-idp:AdminSetUserPassword
                 Resource:
                   Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolARN
 
@@ -701,4 +702,3 @@ Outputs:
     Value: !Sub '${TxMASQSProducerAuditEventQueue.QueueUrl}'
     Export:
       Name: !Sub '${AWS::StackName}-QueueURL'
-
