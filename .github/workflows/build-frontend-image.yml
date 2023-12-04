@@ -28,6 +28,12 @@ jobs:
       url: ${{ steps.push-image.outputs.image-url }}
 
     steps:
+      - name: Login to GDS Dev Dynatrace Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: khw46367.live.dynatrace.com
+          username: khw46367
+          password: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
       - name: Push Docker image
         uses: govuk-one-login/github-actions/aws/ecr/build-docker-image@081ce732d75690781b1eb82d85ee11b45934c51e
         id: push-image

@@ -65,6 +65,17 @@ Mappings:
       staging: 'arn:aws:iam::178023842775:root'
       integration: 'arn:aws:iam::729485541398:root'
       production: 'arn:aws:iam::451773080033:root'
+  EnvironmentConfiguration:
+    dev:
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    build:
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    staging:
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    integration:
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    production:
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
 
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
@@ -137,6 +148,19 @@ Resources:
               awslogs-stream-prefix: ecs
               awslogs-create-group: true
               awslogs-region: !Ref AWS::Region
+          Secrets:
+            - Name: DT_TENANT
+              ValueFrom: !Sub
+                - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_TENANT}}'
+                - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+            - Name: DT_TENANTTOKEN
+              ValueFrom: !Sub
+                - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_TENANTTOKEN}}'
+                - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+            - Name: DT_CONNECTION_POINT
+              ValueFrom: !Sub
+                - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_CONNECTION_POINT}}'
+                - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
 
   ExecutionRole:
     Type: AWS::IAM::Role
