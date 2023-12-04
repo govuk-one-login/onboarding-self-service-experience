@@ -71,17 +71,30 @@ Rules:
 Mappings:
   EnvironmentConfiguration:
     local:
-      logGroupPrefix: /self-service/admin-tool/frontend
+      logGroupPrefix: /self-service/admin-tool/backend-api
+      # Local builds do not support dynatrace
+      dynatraceLoggingEnabled: false
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     dev:
-      logGroupPrefix: /self-service/admin-tool/frontend
+      logGroupPrefix: /self-service/admin-tool/backend-api
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     build:
-      logGroupPrefix: /self-service/admin-tool/frontend
+      logGroupPrefix: /self-service/admin-tool/backend-api
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     staging:
-      logGroupPrefix: /self-service/admin-tool/frontend
+      logGroupPrefix: /self-service/admin-tool/backend-api
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     integration:
-      logGroupPrefix: /self-service/admin-tool/frontend
+      logGroupPrefix: /self-service/admin-tool/backend-api
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     production:
-      logGroupPrefix: /self-service/admin-tool/frontend
+      logGroupPrefix: /self-service/admin-tool/backend-api
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
 
   # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
   ElasticLoadBalancer:
@@ -100,6 +113,7 @@ Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
   IsLocal: !Equals [ !Ref Environment, "local" ]
+  DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
 
 Resources:
 
@@ -170,6 +184,28 @@ Resources:
               awslogs-group: !Ref FrontendLogsGroup
               awslogs-stream-prefix: ecs
               awslogs-region: !Ref AWS::Region
+          Secrets:
+            - Name: DT_TENANT
+              ValueFrom: !If
+                - DynatraceLoggingEnabled
+                - !Sub
+                  - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_TENANT}}'
+                  - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                - !Ref AWS::NoValue
+            - Name: DT_TENANTTOKEN
+              ValueFrom: !If
+                - DynatraceLoggingEnabled
+                - !Sub
+                  - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_TENANTTOKEN}}'
+                  - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                - !Ref AWS::NoValue
+            - Name: DT_CONNECTION_POINT
+              ValueFrom: !If
+                - DynatraceLoggingEnabled
+                - !Sub
+                  - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_CONNECTION_POINT}}'
+                  - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                - !Ref AWS::NoValue
 
   LogAuditLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
