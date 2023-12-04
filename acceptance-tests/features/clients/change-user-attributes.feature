@@ -54,3 +54,10 @@ Feature: Users can change their user attributes
       Then they should see the exact value "OpenID" in the user attributes field
       When they click on the link that points to "/change-user-attributes"
       Then they should see that Email option is not checked
+
+
+    @accessible
+    Rule: The user validate accessibility issues in user-attributes page
+    Scenario: User verifying the accessibility of /clients page
+      When they click on the link that points to "/change-user-attributes"
+      Then there should be no accessibility violations

@@ -31,3 +31,8 @@ Feature: A page where users can view the details associated with a client
       When they click the toggle 'What do these terms mean?' button
       And they click on the "generate a key pair (opens in new tab)" link that opens in a new tab
       Then they should be directed to the URL "https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/generate-a-key/"
+
+  @accessible
+  Rule: The user validating the accessibility issues in Client details page
+    Scenario: User verifying the accessibility of /clients page
+      Then there should be no accessibility violations
