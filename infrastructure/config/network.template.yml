@@ -39,8 +39,9 @@ Resources:
         DynamoDBApiEnabled: "Yes"
         ExecuteApiGatewayEnabled: "Yes"
         SQSApiEnabled: "Yes"
-        AccessLogsCustomBucketNameEnabled: "No"
+        SecretsManagerApiEnabled: "Yes"
         DynatraceApiEnabled: "Yes"
+        AccessLogsCustomBucketNameEnabled: "No"
         AvailabilityZoneCount: 2
         AllowedDomains: !Join [ ",", [
           !Sub "cognito-idp.${AWS::Region}.amazonaws.com",
