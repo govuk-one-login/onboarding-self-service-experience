@@ -78,3 +78,5 @@ jobs:
     with:
       environment: development-secure-pipelines
       artifact-name: ${{ needs.build-frontend.outputs.artifact-name || inputs.frontend-artifact }}
+    secrets:
+      dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
