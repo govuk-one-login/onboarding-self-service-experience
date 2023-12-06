@@ -69,7 +69,7 @@ Mappings:
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, production ], !Equals [ !Ref Environment, integration ]]
+  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, production ], !Equals [ !Ref Environment, dev ]]
 
 Resources:
 
