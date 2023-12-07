@@ -1,5 +1,5 @@
 import {Request} from "express";
-import validatePassword from "middleware/validators/password-validator";
+import validatePassword from "../../../src/middleware/validators/password-validator";
 import {request, response} from "../../mocks";
 
 let req: Request;

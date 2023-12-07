@@ -32,7 +32,7 @@ const templateId = "template-id";
 process.env.SECURITY_CODE_TEXT_MESSAGE_TEMPLATE = templateId;
 
 import {toByteArray} from "base64-js";
-import {lambdaHandler} from "handlers/send-security-code-text-message";
+import {lambdaHandler} from "../../src/handlers/send-security-code-text-message";
 import {smsSenderTrigger} from "../mocks";
 
 describe("Custom SMS sender", () => {

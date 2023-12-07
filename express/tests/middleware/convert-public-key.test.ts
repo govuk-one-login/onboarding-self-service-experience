@@ -1,4 +1,4 @@
-import convertPublicKeyForAuth from "middleware/convert-public-key";
+import convertPublicKeyForAuth from "../../src/middleware/convert-public-key";
 import {publicKeyCompact, publicKeyWithHeaders} from "../lib/public-key.test";
 import {request, response} from "../mocks";
 
