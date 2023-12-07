@@ -1,6 +1,6 @@
 import "config/session-data";
 import {Request} from "express";
-import checkEmailIsPresentInSession from "middleware/validators/email-present-in-session";
+import checkEmailIsPresentInSession from "../../../src/middleware/validators/email-present-in-session";
 import {request, response} from "../../mocks";
 
 let req: Request;

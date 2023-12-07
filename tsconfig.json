@@ -13,9 +13,12 @@
     "moduleResolution": "Node",
     "removeComments": true,
     "noUnusedLocals": true,
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "rootDir": "."
   },
   "files": [],
+  "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules"],
   "references": [
     {

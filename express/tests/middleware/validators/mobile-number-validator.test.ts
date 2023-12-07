@@ -1,5 +1,5 @@
 import {Request} from "express";
-import validateMobileNumber from "middleware/validators/mobile-number-validator";
+import validateMobileNumber from "../../../src/middleware/validators/mobile-number-validator";
 import {request, response} from "../../mocks";
 
 let req: Request;
