@@ -18,6 +18,9 @@ Parameters:
   NotificationsEmail:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/api/notifications-email
+  SplunkLiveAccountId:
+    Type: String
+    Default: 885513274347
 
 Resources:
   # Service authorisation reference - Actions, resources, and condition keys for AWS services
@@ -150,6 +153,9 @@ Resources:
                   - wafv2:ListWebACLs
                   - wafv2:ListTagsForResource
                   - wafv2:GetWebACLForResource
+                  - wafv2:GetLoggingConfiguration
+                  - wafv2:DeleteLoggingConfiguration
+                  - wafv2:PutLoggingConfiguration
 
               - Effect: Allow
                 Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/*
@@ -161,6 +167,18 @@ Resources:
                   - !Sub arn:aws:apigateway:${AWS::Region}::/restapis/*
                 Action:
                   - apigateway:SetWebACL
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
+                Action:
+                  - logs:DeleteSubscriptionFilter
+                  - logs:DescribeSubscriptionFilters
+                  - logs:PutSubscriptionFilter
+
+              - Effect: Allow
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${SplunkLiveAccountId}:destination:*
+                Action:
+                  - logs:PutSubscriptionFilter
 
   FrontendDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
@@ -315,9 +333,11 @@ Resources:
             Action: secretsmanager:GetSecretValue
 
           - Effect: Allow
-            Resource: !Sub arn:aws:iam::${AWS::AccountId}:policy/${PreviewStacksPrefix}-api-*
+            Resource: !Sub arn:aws:iam::${AWS::AccountId}:policy/${PreviewStacksPrefix}-*
             Action:
               - iam:CreatePolicy
+              - iam:ListPolicyVersions
+              - iam:DeletePolicy
             Condition:
               StringEqualsIfExists:
                 iam:PassedToService:
@@ -581,6 +601,7 @@ Resources:
             Resource:
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/*
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/dev/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-*
             Action:
               - logs:CreateLogStream
               - logs:PutLogEvents
