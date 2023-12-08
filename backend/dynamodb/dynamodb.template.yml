@@ -11,9 +11,16 @@ Parameters:
     AllowedPattern: ^.*[^-]$
     Default: self-service
     Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
+  PermissionsBoundary:
+    Type: String
+    Default: ""
+  ExternalId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/cognito/external-id
 
 Conditions:
   DeletionProtectionEnabled: !Equals [ !Ref DeletionProtection, ACTIVE ]
+  UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
 
 Resources:
   DataTable:
@@ -71,6 +78,33 @@ Resources:
       SSESpecification:
         SSEEnabled: true
 
+  # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
+  SmsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: cognito-idp.amazonaws.com
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref ExternalId
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
+      Policies:
+        - PolicyName: SnsPublish
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              Effect: Allow
+              Action: sns:publish
+              Resource: "*"
+
 Outputs:
   DataTableName:
     Value: !Ref DataTable
@@ -84,3 +118,7 @@ Outputs:
     Value: !GetAtt SessionsTable.Arn
     Export:
       Name: !Sub ${DeploymentName}-DynamoDB-SessionsTableARN
+  SmsRoleARN:
+    Value: !GetAtt SmsRole.Arn
+    Export:
+      Name: !Sub ${DeploymentName}-DynamoDB-SmsRole
