@@ -1,4 +1,4 @@
-import hasAllowedDomain from "lib/validators/allowed-email-domains";
+import hasAllowedDomain from "../../../src/lib/validators/allowed-email-domains";
 
 jest.mock("fs/promises", () => {
     return {

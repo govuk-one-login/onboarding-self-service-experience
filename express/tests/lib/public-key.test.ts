@@ -1,4 +1,4 @@
-import getAuthApiCompliantPublicKey from "lib/public-key";
+import getAuthApiCompliantPublicKey from "../../src/lib/public-key";
 
 const header = "-----BEGIN PUBLIC KEY-----";
 const footer = "-----END PUBLIC KEY-----";

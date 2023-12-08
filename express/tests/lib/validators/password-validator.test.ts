@@ -1,4 +1,4 @@
-import validatePassword from "lib/validators/password-validator";
+import validatePassword from "../../../src/lib/validators/password-validator";
 
 const password8Chars = "12345678";
 

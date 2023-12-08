@@ -1,5 +1,5 @@
 import {Request} from "express";
-import setSignInStatus from "middleware/sign-in-status";
+import setSignInStatus from "../../src/middleware/sign-in-status";
 import {request, response} from "../mocks";
 
 let req: Request;
