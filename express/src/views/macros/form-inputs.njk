@@ -4,6 +4,7 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
 {% macro generate(action, buttonText, buttonClasses, cancelUrl) %}
   <form class="form" method="post"{% if action %} action="{{ action }}"{% endif %} novalidate="novalidate">
@@ -23,7 +24,7 @@
   </form>
 {% endmacro %}
 
-{% macro textInput(label, id, classes, hint, type, autocomplete, inputmode, value, labelClasses, isPageHeading) %}
+{% macro textInput(label, id, classes, hint, type, autocomplete, inputmode, value, labelClasses, isPageHeading, disabled) %}
   {{ govukInput({
     label: {
       text: label,
@@ -37,6 +38,7 @@
     name: id,
     type: type if type,
     spellcheck: false,
+    disabled: disabled if disabled,
     classes: classes | default("govuk-!-width-full"),
     autocomplete: autocomplete if autocomplete,
     inputmode: inputmode if inputmode,
@@ -47,8 +49,8 @@
   }) }}
 {% endmacro %}
 
-{% macro emailInput(label, hint, classes = "govuk-!-width-three-quarters") %}
-  {{ textInput(label | default("Email address"), "emailAddress", classes, hint, "email", "email") }}
+{% macro emailInput(label, hint, classes = "govuk-!-width-three-quarters", value, disabled) %}
+  {{ textInput(label | default("Email address"), "emailAddress", classes, hint, "email", "email", value = value, disabled = disabled) }}
 {% endmacro %}
 
 {% macro passwordInput(label, id, hint, autocomplete = "current-password") %}
@@ -136,7 +138,7 @@
     hint: {
       text: hint
     } if hint,
-    value: values[id] if values and values.hasOwnProperty(id),
+    value: values[name] if values and values.hasOwnProperty(name),
     items: items,
     errorMessage: {
       text: errorMessages[id]
@@ -157,5 +159,38 @@
     errorMessage: {
       text: errorMessages[id]
     } if errorMessages and errorMessages.hasOwnProperty(id)
+  }) }}
+{% endmacro %}
+
+{% macro dateInput(legend, id , hint) %}
+  {{ govukDateInput({
+    id: id,
+    namePrefix: id,
+    fieldset: {
+      legend: {
+        text: legend
+      }
+    },
+    hint: {
+      text: hint | default("For example, 12 3 2024")
+    },
+    items: [
+      {
+        classes: "govuk-input--width-2",
+        name: "day",
+        value: values[id+"Day"] if values and values.hasOwnProperty(id+"Day")
+      },
+      {
+        classes: "govuk-input--width-2",
+        name: "month",
+        value: values[id+"Month"] if values and values.hasOwnProperty(id+"Month")
+      },
+      {
+        classes: "govuk-input--width-4",
+        name: "year",
+        value: values[id+"Year"] if values and values.hasOwnProperty(id+"Year")
+      }
+    ]
+
   }) }}
 {% endmacro %}
