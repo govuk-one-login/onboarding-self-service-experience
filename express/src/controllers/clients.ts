@@ -64,54 +64,86 @@ export const showPublicBetaForm: RequestHandler = (req, res) => {
 };
 
 export const processPublicBetaForm: RequestHandler = async (req, res) => {
-    const userName = req.body.userName;
-    const department = req.body.department;
-    const serviceName = req.body.serviceName;
-    const emailAddress = nonNull(req.session.emailAddress);
-    const serviceId = req.context.serviceId;
-    const selfServiceClientId = req.params.selfServiceClientId;
-    const clientId = req.params.clientId;
-    const errorMessages = new Map<string, string>();
+    const {
+        userName,
+        role,
+        organisationName,
+        serviceName,
+        serviceUrl,
+        serviceDescription,
+        serviceUse,
+        migrateExistingAccounts,
+        numberOfUsersEachYear,
+        "targetDate-day": targetDateDay,
+        "targetDate-month": targetDateMonth,
+        "targetDate-year": targetDateYear
+    } = req.body;
 
-    if (userName === "") {
-        errorMessages.set("userName", "Enter your name");
+    const {emailAddress} = req.session;
+    const {serviceId} = req.context;
+    const {selfServiceClientId, clientId} = req.params;
+
+    const errorMessages = new Map<string, string>();
+    const requiredFields = [
+        {key: "userName", message: "Enter your name"},
+        {key: "organisationName", message: "Enter your organisation name"}
+    ];
+
+    for (const {key, message} of requiredFields) {
+        if (req.body[key] === "") {
+            errorMessages.set(key, message);
+        }
     }
 
-    if (department === "") {
-        errorMessages.set("department", "Enter your department");
+    if (!serviceUse) {
+        errorMessages.set("serviceUse-options", "Service use is required");
+    }
+
+    if (!migrateExistingAccounts) {
+        errorMessages.set("migrateExistingAccounts-options", "Migration of existing accounts is required");
     }
 
     if (errorMessages.size > 0) {
         return res.render("clients/public-beta.njk", {
-            serviceId: serviceId,
-            selfServiceClientId: selfServiceClientId,
-            clientId: clientId,
-            serviceName: serviceName,
-            emailAddress: emailAddress,
+            serviceId,
+            selfServiceClientId,
+            clientId,
+            serviceName,
+            emailAddress,
             errorMessages: Object.fromEntries(errorMessages),
             values: {
-                userName: userName,
-                department: department
+                userName,
+                role,
+                organisationName,
+                serviceName,
+                serviceUrl,
+                serviceDescription,
+                serviceUse,
+                migrateExistingAccounts,
+                numberOfUsersEachYear,
+                targetDateDay,
+                targetDateMonth,
+                targetDateYear
             }
         });
     }
 
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
-
-    await s4.publicBetaRequest(userName, department, serviceName, emailAddress, nonNull(req.session.authenticationResult?.AccessToken));
-    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
-
-    s4.sendTxMALog(
-        "SSE_PUBLIC_BETA_FORM_SUBMITTED",
-        {
-            session_id: req.session.id,
-            ip_address: req.ip,
-            user_id: userId
-        },
-        {
-            service_id: serviceId
-        }
-    );
+    // const s4: SelfServiceServicesService = req.app.get("backing-service");
+    //
+    // await s4.publicBetaRequest(userName, department, serviceName, emailAddress, nonNull(req.session.authenticationResult?.AccessToken));
+    // const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+    //
+    // s4.sendTxMALog(
+    //     "SSE_PUBLIC_BETA_FORM_SUBMITTED",
+    //     {
+    //         session_id: req.session.id,
+    //         ip_address: req.ip,
+    //         user_id: userId
+    //     },
+    //     {
+    //         service_id: serviceId
+    //     }
+    // );
 
     res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/public-beta/submitted`);
 };
