@@ -35,6 +35,12 @@ Parameters:
   UserSignupSheetHeaderRange:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/user-signup-sheet-header-range
+  PublicBetaSheetDataRange:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/public-beta-sheet-data-range
+  PublicBetaSheetHeaderRange:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/public-beta-sheet-header-range
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -122,6 +128,10 @@ Resources:
               Value: !Ref UserSignupSheetDataRange
             - Name: USER_SIGNUP_SHEET_HEADER_RANGE
               Value: !Ref UserSignupSheetHeaderRange
+            - Name: PUBLIC_BETA_SHEET_DATA_RANGE
+              Value: !Ref PublicBetaSheetDataRange
+            - Name: PUBLIC_BETA_SHEET_HEADER_RANGE
+              Value: !Ref PublicBetaSheetHeaderRange
 
           PortMappings:
             - ContainerPort: !Ref ContainerPort
