@@ -8,7 +8,7 @@ const fields = {
     email: "emailAddress",
     password: "password",
     "security code": "securityCode",
-    "department name": "department",
+    "organisation name": "organisationName",
     "mobile phone number": "mobileNumber",
     "service name": "serviceName",
     "new password": "newPassword",

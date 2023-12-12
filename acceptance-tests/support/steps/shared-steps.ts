@@ -109,7 +109,7 @@ Then("their data is saved in the spreadsheet", async function () {
 });
 
 Then("the error message {string} must be displayed for the {string} radios", async function (errorMessage, field) {
-    const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${field}-error"]`);
+    const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${field}-options"]`);
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, field);
 });
 
@@ -139,4 +139,13 @@ When("they click on the forgot password link in their email", async function () 
 
 When("they click Your account link in the left side navigation", async function () {
     await clickYourAccountSubnavLink(this.page);
+});
+
+When("they try to submit the form without selecting any value from the radio button", async function () {
+    await clickSubmitButton(this.page);
+});
+
+When("they select the {string} radio button", async function (labelText) {
+    const el = await this.page.$x(`//label[contains(text(), "${labelText}")]`);
+    await el[0].click();
 });
