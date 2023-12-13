@@ -49,7 +49,7 @@ Conditions:
   PrivateAPI: !Equals [ !Ref PrivateAPI, Yes ]
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, production ], !Equals [ !Ref Environment, integration ]]
+  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, dev ], !Equals [ !Ref Environment, build ]]
 
 Globals:
   Function:
@@ -1083,7 +1083,7 @@ Resources:
       FilterName: "subscription_for_splunk"
       FilterPattern: ""
       DestinationArn: !Ref SubscriptionFilterDestinationArn
-      
+
   #--- DynamoDB Functions ---#
   GetDynamoDBEntriesFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit

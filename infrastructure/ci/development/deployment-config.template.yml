@@ -180,6 +180,10 @@ Resources:
                 Action:
                   - logs:PutSubscriptionFilter
 
+              - Effect: Allow
+                Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/frontend/google-sheet-credentials-*
+                Action: secretsmanager:GetSecretValue
+
   FrontendDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
     Type: AWS::IAM::ManagedPolicy
@@ -660,7 +664,7 @@ Resources:
             Resource:
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/*
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/dev/*
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-*-dev:log-stream:*
             Action:
               - logs:CreateLogStream
               - logs:PutLogEvents
