@@ -30,13 +30,10 @@ declare -A SECRETS=(
 )
 
 function set-paramswith-values {
-
-  # allowed_email_domains_source
   local parameter=${PARAMETERS[public_beta_sheet_data_range]}
   check-parameter-set "$parameter" ||
     write-parameter-value "$parameter" "Publicbeta!A1"
 
-  # public_beta_sheet_header_range
   local parameter=${PARAMETERS[public_beta_sheet_header_range]}
   check-parameter-set "$parameter" ||
     write-parameter-value "$parameter" "Publicbeta!A1:Y1"
