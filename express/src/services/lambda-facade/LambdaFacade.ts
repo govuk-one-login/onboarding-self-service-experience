@@ -98,17 +98,6 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         await this.post("/update-user", JSON.stringify(body), accessToken);
     }
 
-    async publicBetaRequest(name: string, department: string, serviceName: string, emailAddress: string): Promise<void> {
-        const body = {
-            name: name,
-            department: department,
-            serviceName: serviceName,
-            emailAddress: emailAddress
-        };
-
-        await this.post("/send-public-beta-request-notification", JSON.stringify(body));
-    }
-
     async sendTxMALog(message: TxMAEvent) {
         await this.post("/txma-logging", message);
     }

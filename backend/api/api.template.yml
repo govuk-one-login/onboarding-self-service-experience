@@ -889,36 +889,6 @@ Resources:
 
   #--- Notifications ---#
 
-  PublicBetaNotificationFunction:
-    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
-    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
-    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
-    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
-    Type: AWS::Serverless::Function
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Sourcemap: true
-    Properties:
-      Handler: backend/api/src/handlers/notifications/send-public-beta-notification.publicBetaRequestHandler
-      Description: Publish a message to the public beta request notification topic
-      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      Tracing: Active
-      Policies:
-        - AWSXrayWriteOnlyAccess
-        - SNSPublishMessagePolicy:
-            TopicName: !GetAtt NotificationsSnsTopic.TopicName
-      Environment:
-        Variables:
-          SNS_TOPIC_ARN: !Ref NotificationsSnsTopic
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            RestApiId: !Ref API
-            Path: /send-public-beta-request-notification
-            Method: POST
-
   NotificationsSnsTopic:
     Type: AWS::SNS::Topic
     Properties:
