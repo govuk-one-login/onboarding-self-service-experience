@@ -82,6 +82,9 @@ Resources:
   SmsRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: !Sub
+        - ${DeploymentName}-cognito-SmsRole-${AWS::Region}-${ID}
+        - ID: !Select [ 0, !Split [ "-", !Select [ 2, !Split [ "/", !Ref AWS::StackId ] ] ] ]
       PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
       AssumeRolePolicyDocument:
         Version: 2012-10-17

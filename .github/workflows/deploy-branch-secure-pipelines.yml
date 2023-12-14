@@ -38,7 +38,7 @@ jobs:
 
   deploy-cognito:
     name: Cognito
-    needs: build-cognito
+    needs: [ build-cognito, deploy-dynamodb ]
     uses: ./.github/workflows/upload-cognito-package.yml
     with:
       environment: development-secure-pipelines
