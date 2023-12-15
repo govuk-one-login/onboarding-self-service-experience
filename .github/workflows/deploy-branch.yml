@@ -43,7 +43,7 @@ jobs:
 
   deploy-cognito:
     name: Cognito
-    needs: [ build-cognito, deploy-dynamodb ]
+    needs: build-cognito
     uses: ./.github/workflows/deploy-component.yml
     with:
       name: ${{ needs.build-cognito.outputs.component }}

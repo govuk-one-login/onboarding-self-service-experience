@@ -47,7 +47,7 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, dev ], !Equals [ !Ref Environment, build ]]
+  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, none ], !Equals [ !Ref Environment, none ]]
 
 Globals:
   Function:
@@ -528,8 +528,7 @@ Resources:
       MfaConfiguration: OPTIONAL
       EnabledMfas: [ SMS_MFA ]
       SmsConfiguration:
-        SnsCallerArn:
-          Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SmsRole
+        SnsCallerArn: !GetAtt SmsRole.Arn
         ExternalId: !Ref ExternalId
         SnsRegion: !Ref AWS::Region
       EmailConfiguration:
@@ -687,6 +686,33 @@ Resources:
         RecoveryMechanisms:
           - Priority: 1
             Name: verified_email
+
+  # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
+  SmsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: cognito-idp.amazonaws.com
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref ExternalId
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
+      Policies:
+        - PolicyName: SnsPublish
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              Effect: Allow
+              Action: sns:publish
+              Resource: "*"
 
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient

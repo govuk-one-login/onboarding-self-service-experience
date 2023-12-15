@@ -49,7 +49,7 @@ Conditions:
   PrivateAPI: !Equals [ !Ref PrivateAPI, Yes ]
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, dev ], !Equals [ !Ref Environment, build ]]
+  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, none ], !Equals [ !Ref Environment, none ]]
 
 Globals:
   Function:
