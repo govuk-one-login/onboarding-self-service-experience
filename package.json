@@ -24,7 +24,10 @@
     "test": "jest --silent",
     "test:cov": "jest --silent --coverage",
     "lint": "eslint '*.ts' --quiet --fix",
-    "cucumber": "npm run cucumber -w acceptance-tests --"
+    "cucumber": "npm run cucumber -w acceptance-tests --",
+    "cov:run": "npm run acc:cov -w express && npm run test:cov && npm run cov:combine",
+    "cov:combine": "cp coverage/coverage-final.json express/coverage/coverage-final.jest.json && cd express && npx nyc report --reporter html --reporter text -t coverage --report-dir coverage",
+    "cov:clear": "rm -rf express/coverage express/.nyc_output coverage"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.354.0",
@@ -48,6 +51,7 @@
     "prettier": "2.8.8",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "nyc": "^15.1.0"
   }
 }

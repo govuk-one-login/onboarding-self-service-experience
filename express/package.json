@@ -3,7 +3,8 @@
   "description": "DI Self-Service frontend",
   "scripts": {
     "start": "node dist/app.js",
-    "local": "npm run buildts && STUB_API=true node --inspect dist/app.js",
+    "local": "npm run buildts && STUB_API=true node --inspect dist/app.js --",
+    "localSilent": "npm run local > /dev/null",
     "dev": "STUB_API=${STUB_API:-true} nodemon --config nodemon.json --inspect -r 'dotenv/config' src/app.ts",
     "docker": "docker run --rm --publish 3000:3000 self-service-frontend",
     "minifyjs": "for script in dist/assets/javascripts/*.js; do uglifyjs $script -cmo $script $(${CI:-false} || echo --source-map includeSources,url=${script##*/}.map); done",
@@ -15,7 +16,8 @@
     "coverage": "jest --coverage --coverageDirectory coverage --silent",
     "test": "jest --silent",
     "cucumber": "npm run cucumber -w ../acceptance-tests --",
-    "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile .."
+    "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile ..",
+    "acc:cov": "nyc start-server-and-test localSilent http://localhost:3000 cucumber && nyc report --reporter=json"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.354.0",
@@ -36,6 +38,7 @@
     "dotenv": "^16.0.3",
     "nodemon": "^3.0.1",
     "sass": "^1.60.0",
+    "start-server-and-test": "^2.0.3",
     "typescript": "^5.2.2",
     "uglify-js": "^3.17.4"
   }
