@@ -618,26 +618,6 @@ Resources:
               - dynamodb:UpdateTimeToLive
               - dynamodb:DescribeTimeToLive
 
-          - Effect: Allow
-            Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/${PreviewStacksPrefix}-*-cognito-*
-            Action:
-              - iam:GetRole
-              - iam:TagRole
-              - iam:UntagRole
-              - iam:PassRole
-              - iam:CreateRole
-              - iam:DeleteRole
-              - iam:GetRolePolicy
-              - iam:PutRolePolicy
-              - iam:AttachRolePolicy
-              - iam:DetachRolePolicy
-              - iam:DeleteRolePolicy
-            Condition:
-              StringEqualsIfExists:
-                iam:PassedToService: lambda.amazonaws.com
-              ArnLikeIfExists:
-                iam:AssociatedResourceARN: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${PreviewStacksPrefix}-dynamodb-*
-
   GitHubOIDCProvider:
     Type: AWS::IAM::OIDCProvider
     DeletionPolicy: Retain
