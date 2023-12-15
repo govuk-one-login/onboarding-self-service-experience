@@ -528,7 +528,8 @@ Resources:
       MfaConfiguration: OPTIONAL
       EnabledMfas: [ SMS_MFA ]
       SmsConfiguration:
-        SnsCallerArn: !GetAtt SmsRole.Arn
+        SnsCallerArn:
+          Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SmsRole
         ExternalId: !Ref ExternalId
         SnsRegion: !Ref AWS::Region
       EmailConfiguration:
@@ -686,33 +687,6 @@ Resources:
         RecoveryMechanisms:
           - Priority: 1
             Name: verified_email
-
-  # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
-  SmsRole:
-    Type: AWS::IAM::Role
-    Properties:
-      PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: cognito-idp.amazonaws.com
-            Condition:
-              StringEquals:
-                sts:ExternalId: !Ref ExternalId
-                aws:SourceAccount: !Ref AWS::AccountId
-              ArnLike:
-                aws:SourceArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
-      Policies:
-        - PolicyName: SnsPublish
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              Effect: Allow
-              Action: sns:publish
-              Resource: "*"
 
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
