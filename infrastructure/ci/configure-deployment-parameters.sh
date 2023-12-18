@@ -17,6 +17,8 @@ declare -A PARAMETERS=(
   [allowed_email_domains_source]=$PARAMETER_NAME_PREFIX/frontend/allowed-email-domains-source
   [user_signup_sheet_data_range]=$PARAMETER_NAME_PREFIX/frontend/user-signup-sheet-data-range
   [user_signup_sheet_header_range]=$PARAMETER_NAME_PREFIX/frontend/user-signup-sheet-header-range
+  [public_beta_sheet_data_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-data-range
+  [public_beta_sheet_header_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-header-range
 )
 
 declare -A SECRETS=(
@@ -26,6 +28,16 @@ declare -A SECRETS=(
   [google_sheet_credentials]=$PARAMETER_NAME_PREFIX/frontend/google-sheet-credentials
   [user_signup_sheet_id]=$PARAMETER_NAME_PREFIX/frontend/user-signup-sheet-id
 )
+
+function set-paramswith-values {
+  local parameter=${PARAMETERS[public_beta_sheet_data_range]}
+  check-parameter-set "$parameter" ||
+    write-parameter-value "$parameter" "Publicbeta!A1"
+
+  local parameter=${PARAMETERS[public_beta_sheet_header_range]}
+  check-parameter-set "$parameter" ||
+    write-parameter-value "$parameter" "Publicbeta!A1:Y1"
+}
 
 function check-parameter-set {
   [[ $(xargs < <(get-parameter-value "$1")) ]]
@@ -143,6 +155,8 @@ function check-deployment-parameters {
   check-manual-secrets
 
   check-allowed-email-domains-source
+
+  set-paramswith-values
 
   print-parameters
   print-secrets

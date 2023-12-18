@@ -19,6 +19,8 @@ declare -A SECRETS=(
 declare -A PARAMETERS=(
   [USER_SIGNUP_SHEET_DATA_RANGE]=frontend/user-signup-sheet-data-range
   [USER_SIGNUP_SHEET_HEADER_RANGE]=frontend/user-signup-sheet-header-range
+  [PUBLIC_BETA_SHEET_DATA_RANGE]=frontend/public-beta-sheet-data-range
+  [PUBLIC_BETA_SHEET_HEADER_RANGE]=frontend/public-beta-sheet-header-range
 )
 
 COMPONENTS=(frontend cognito dynamodb api)

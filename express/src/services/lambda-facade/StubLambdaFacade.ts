@@ -164,10 +164,6 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         Object.keys(updates).forEach(key => (this.user[key as keyof DynamoUser] = {S: updates[key] as string}));
     }
 
-    async publicBetaRequest(): Promise<void> {
-        return;
-    }
-
     async sendTxMALog(message: TxMAEvent): Promise<void> {
         console.log(JSON.stringify(message));
         return;

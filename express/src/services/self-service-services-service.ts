@@ -246,18 +246,6 @@ export default class SelfServiceServicesService {
         }
     }
 
-    async publicBetaRequest(
-        userName: string,
-        department: string,
-        serviceName: string,
-        emailAddress: string,
-        accessToken: string
-    ): Promise<void> {
-        console.info("In self-service-services-service:betaRequest()");
-        await this.validateToken(accessToken, "privateBetaRequest");
-        return this.lambda.publicBetaRequest(userName, department, serviceName, emailAddress);
-    }
-
     async listServices(userId: string, accessToken: string): Promise<Service[]> {
         console.info("In self-service-services-service:listServices()");
         await this.validateToken(accessToken, "listServices");
