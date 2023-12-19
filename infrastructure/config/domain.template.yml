@@ -134,6 +134,11 @@ Resources:
           Type: CNAME
           TTL: 172800
 
+        - Name: _09be405dc2b5adec088624d0262b3d01.docs.sign-in.service.gov.uk.
+          ResourceRecords: [ _259f445b82d1d01a4da6570701f09f91.mhbtsbpdnt.acm-validations.aws ]
+          Type: CNAME
+          TTL: 172800
+
   # Delegating responsibility for subdomains to hosted zones
   # https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-routing-traffic-for-subdomains.html
   SubdomainDelegationRecords:
