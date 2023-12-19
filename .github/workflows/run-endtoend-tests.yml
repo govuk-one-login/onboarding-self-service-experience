@@ -1,4 +1,4 @@
-name: Acceptance tests
+name: endtoend tests
 
 on:
   workflow_call:
@@ -6,18 +6,18 @@ on:
       environment: { required: true, type: string }
 
 permissions: { }
-concurrency: acceptance-test-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
+concurrency: endtoend-test-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
 
 defaults:
   run:
     shell: bash
 
 jobs:
-  run-acceptance-tests:
-    name: Acceptance
+  run-endtoend-tests:
+    name: endtoend
     runs-on: ubuntu-latest
     defaults:
-      run: { working-directory: acceptance-tests }
+      run: { working-directory: endtoend-tests }
 
     steps:
       - name: Pull repository
@@ -29,24 +29,24 @@ jobs:
           cache: npm
 
       - name: Install Node dependencies
-        run: npm ci --include-workspace-root
+        run: npm install --include-workspace-root
 
       - name: Run cucumber tests
         id: run-tests
         shell: bash
         timeout-minutes: 10
         env:
-          REPORT: ${{ runner.temp }}/acceptance-tests.report
+          REPORT: ${{ runner.temp }}/endtoend-tests.report
           HOST: http://localhost:3000
-          STUB_API: true
-          NODE_OPTIONS: --max-old-space-size=2048
+          STUB_API: false
         run: |
           shopt -s globstar
           features=(features/**/*.feature)
           
-          cd ../express && npm install && cd .. && npm run build-express && cd acceptance-tests
           
-          cd .. && npm run --silent local &
+          cd ../express && npm install && cd .. && npm run build-express && cd endtoend-tests
+          
+          cd .. && npm run local > /dev/null &
           
           while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
           
@@ -62,6 +62,6 @@ jobs:
         if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
         uses: govuk-one-login/github-actions/report-step-result/print-file@5dacba941def444d69f02843feaebed79b5fca51
         with:
-          title: Acceptance tests
+          title: endtoend tests
           language: shell
-          file-path: ${{ runner.temp }}/acceptance-tests.report
+          file-path: ${{ runner.temp }}/endtoend-tests.report

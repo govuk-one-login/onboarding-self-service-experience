@@ -13,13 +13,19 @@
     "moduleResolution": "Node",
     "removeComments": true,
     "noUnusedLocals": true,
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "rootDir": "."
   },
   "files": [],
+  "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules"],
   "references": [
     {
       "path": "acceptance-tests"
+    },
+    {
+      "path": "endtoend-tests"
     },
     {
       "path": "backend/api"
