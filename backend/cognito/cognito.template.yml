@@ -40,10 +40,14 @@ Parameters:
       - "staging"
       - "integration"
       - "production"
+  SubscriptionFilterDestinationArn:
+    Type: String
+    Default: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, dev ], !Equals [ !Ref Environment, build ]]
 
 Globals:
   Function:
@@ -805,6 +809,29 @@ Resources:
     Properties:
       WebACLArn: !GetAtt CognitoWebACL.Arn
       ResourceArn: !GetAtt UserPool.Arn
+
+  WafLogGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub aws-waf-logs-${AWS::StackName}-${Environment}
+      RetentionInDays: 30
+
+  WafLoggingConfiguration:
+    Type: AWS::WAFv2::LoggingConfiguration
+    Properties:
+      ResourceArn: !GetAtt CognitoWebACL.Arn
+      LogDestinationConfigs:
+        - !GetAtt WafLogGroup.Arn
+
+  SubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: SplunkLoggingEnabled
+    Properties:
+      LogGroupName: !Ref WafLogGroup
+      FilterName: "subscription_for_splunk"
+      FilterPattern: ""
+      DestinationArn: !Ref SubscriptionFilterDestinationArn
 
 Outputs:
   UserPoolID:
