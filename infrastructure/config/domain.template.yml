@@ -125,9 +125,14 @@ Resources:
 
         # Docs
         - Name: !Sub docs.${Domain}
-          ResourceRecords: [ d308hhopufamea.cloudfront.net ]  # PaaS CDN
-          Type: CNAME
-          TTL: 172800
+          ResourceRecords: [
+              ns-108.awsdns-13.com,
+              ns-1335.awsdns-38.org,
+              ns-1711.awsdns-21.co.uk,
+              ns-823.awsdns-38.net
+          ]
+          Type: NS
+          TTL: 3600
 
         - Name: _ea1fbf73402e0d458573ae1eacf1ced2.docs.sign-in.service.gov.uk.
           ResourceRecords: [ _9711df122153a4efd1b7d26b7853eecf.fpkndhgbpx.acm-validations.aws ]
@@ -137,7 +142,7 @@ Resources:
         - Name: _09be405dc2b5adec088624d0262b3d01.docs.sign-in.service.gov.uk.
           ResourceRecords: [ _259f445b82d1d01a4da6570701f09f91.mhbtsbpdnt.acm-validations.aws ]
           Type: CNAME
-          TTL: 172800
+          TTL: 300
 
   # Delegating responsibility for subdomains to hosted zones
   # https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-routing-traffic-for-subdomains.html
