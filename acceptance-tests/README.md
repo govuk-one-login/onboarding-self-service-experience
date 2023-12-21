@@ -36,6 +36,6 @@ The outcome in a `Then` statement should be measurable and should not require in
 
 Use a directory structure if needed.
 
-Use scenario outlines to reduce duplication in features.
+Use scenario outlines to reduce duplication in the features.
 
 If possible test success scenarios in the error scenarios for the steps that come after.
