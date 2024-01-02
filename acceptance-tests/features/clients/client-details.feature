@@ -21,7 +21,7 @@ Feature: A page where users can view the details associated with a client
   Rule: The the hidden content and the links which open in a new tab, are available for the user to view
     Scenario: The user wants to view technical documentation
       When they click on the "technical documentation (opens in new tab)" link that opens in a new tab
-      Then they should be directed to the URL "https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/"
+      Then they should be directed to the URL "https://docs.sign-in.service.gov.uk/integrate-with-integration-environment"
 
     Scenario: The user wants to view what different terms mean
       When they click the toggle 'What do these terms mean?' button
