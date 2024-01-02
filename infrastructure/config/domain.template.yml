@@ -123,7 +123,7 @@ Resources:
           Type: CNAME
           TTL: 172800
 
-        # Docs
+        # Docs delegated to di-documentation #203073707786
         - Name: !Sub docs.${Domain}
           ResourceRecords: [
               ns-108.awsdns-13.com,
