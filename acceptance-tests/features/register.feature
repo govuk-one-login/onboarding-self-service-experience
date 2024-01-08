@@ -76,6 +76,11 @@ Feature: Users can sign up to the self-service experience
       Then the error message "Your security code should only include numbers" must be displayed for the security code field
       And they should see the text "We have sent an email to: registering-successfully@test.gov.uk"
 
+    Scenario: The user enters a security code that has expired
+      When they submit the security code "000000"
+      Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
+      And they should see the text "We have sent an email to: registering-successfully@test.gov.uk"
+
   Rule: The user does not receive their email security code and clicks 'Not received an email?' link
     Background:
       When they submit the email "registering-successfully@test.gov.uk"
