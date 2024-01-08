@@ -62,3 +62,9 @@ Then("the value of the text field {} should be {string}", async function (this: 
     );
     assert.equal(elementAttributeValue, attributeValueToCheck);
 });
+
+// eslint-disable-next-line
+When("they submit the value of {} {string} that {}", async function (fieldName, value, condition) {
+    await enterTextIntoTextInput(this.page, value, fields[fieldName as keyof typeof fields]);
+    await clickSubmitButton(this.page);
+});
