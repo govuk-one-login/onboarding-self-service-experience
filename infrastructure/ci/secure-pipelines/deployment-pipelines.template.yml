@@ -220,6 +220,22 @@ Resources:
               - codepipeline:EnableStageTransition
               - codepipeline:DisableStageTransition
             Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${APIDeployer.Outputs.PipelineName}/Deploy
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Action:
+              - secretsmanager:ListSecrets
+            Resource: 'arn:aws:secretsmanager:eu-west-2:216552277552:secret:*'
+          - Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'
 
   CognitoDeploymentPolicy:
     Type: AWS::IAM::Policy
@@ -240,6 +256,22 @@ Resources:
               - codepipeline:EnableStageTransition
               - codepipeline:DisableStageTransition
             Resource: !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CognitoDeployer.Outputs.PipelineName}/Deploy
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Action:
+              - secretsmanager:ListSecrets
+            Resource: 'arn:aws:secretsmanager:eu-west-2:216552277552:secret:*'
+          - Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'
 
   DynamoDBDeploymentPolicy:
     Type: AWS::IAM::Policy
