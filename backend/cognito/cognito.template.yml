@@ -180,7 +180,7 @@ Resources:
       Policies:
         - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
-        - !If [ DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref AWS::NoValue ]
+        - !Ref DynatraceSecretsAccessPolicy
         - Version: 2012-10-17
           Statement:
             Effect: Allow
@@ -219,7 +219,7 @@ Resources:
       Policies:
         - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
-        - !If [ DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref AWS::NoValue ]
+        - !Ref DynatraceSecretsAccessPolicy
       Events:
         Cognito:
           Type: Cognito
@@ -247,7 +247,7 @@ Resources:
       Policies:
         - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
-        - !If [ DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref AWS::NoValue ]
+        - !Ref DynatraceSecretsAccessPolicy
         - Version: 2012-10-17
           Statement:
             Effect: Allow
