@@ -85,8 +85,6 @@ Globals:
           - '{{resolve:secretsmanager:${SecretArn}:SecretString:NODEJS_LAYER}}'
           - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
         - !Ref AWS::NoValue
-    Policies:
-      - !If [ DynatraceLoggingEnabled, DynatraceSecretsAccessPolicy, !Ref AWS::NoValue ]
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
@@ -182,6 +180,7 @@ Resources:
       Policies:
         - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
+        - !If [ DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref AWS::NoValue ]
         - Version: 2012-10-17
           Statement:
             Effect: Allow
@@ -217,7 +216,10 @@ Resources:
       Description: Create a customised email message to send when resetting the user's password
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
-      Policies: [ AWSLambdaVPCAccessExecutionRole, AWSXrayWriteOnlyAccess ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - !If [ DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref AWS::NoValue ]
       Events:
         Cognito:
           Type: Cognito
@@ -245,6 +247,7 @@ Resources:
       Policies:
         - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
+        - !If [ DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref AWS::NoValue ]
         - Version: 2012-10-17
           Statement:
             Effect: Allow
