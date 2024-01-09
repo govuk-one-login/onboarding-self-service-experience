@@ -87,6 +87,8 @@ Globals:
           - '{{resolve:secretsmanager:${SecretArn}:SecretString:NODEJS_LAYER}}'
           - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
         - !Ref AWS::NoValue
+    Policies:
+      - !If [ DynatraceLoggingEnabled, DynatraceSecretsAccessPolicy, !Ref AWS::NoValue ]
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
@@ -762,6 +764,31 @@ Resources:
               - kms:GenerateDataKey
               - kms:Decrypt
             Resource: "*"
+
+  DynatraceSecretsAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy for accessing Dynatrace secrets
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Action:
+              - secretsmanager:ListSecrets
+            Resource: 'arn:aws:secretsmanager:eu-west-2:216552277552:secret:*'
+          - Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'
 
   SendSQSMessageToTxMAHandler:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit

@@ -85,6 +85,8 @@ Globals:
           - '{{resolve:secretsmanager:${SecretArn}:SecretString:NODEJS_LAYER}}'
           - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
         - !Ref AWS::NoValue
+    Policies:
+      - !If [ DynatraceLoggingEnabled, DynatraceSecretsAccessPolicy, !Ref AWS::NoValue ]
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
@@ -760,6 +762,31 @@ Resources:
               Effect: Allow
               Action: "sns:Publish"
               Resource: "*"
+
+  DynatraceSecretsAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy for accessing Dynatrace secrets
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Action:
+              - secretsmanager:ListSecrets
+            Resource: 'arn:aws:secretsmanager:eu-west-2:216552277552:secret:*'
+          - Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'
 
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
