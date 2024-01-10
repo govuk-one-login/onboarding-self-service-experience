@@ -75,7 +75,6 @@ Mappings:
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, dev ], !Equals [ !Ref Environment, build ]]
 
 Resources:
 
@@ -518,6 +517,7 @@ Resources:
         AuthoredBy: TxMA
         ProducerType: SQS
 
+
   #--- DNS ---#
 
   DNSRecord:
@@ -540,22 +540,6 @@ Resources:
     Properties:
       LogGroupName: !Sub aws-waf-logs-${AWS::StackName}-${Environment}
       RetentionInDays: 30
-
-  WafLoggingConfiguration:
-    Type: AWS::WAFv2::LoggingConfiguration
-    Properties:
-      ResourceArn: !GetAtt FrontendWebAcl.Arn
-      LogDestinationConfigs:
-        - !GetAtt WafLogGroup.Arn
-
-  SubscriptionFilter:
-    Type: AWS::Logs::SubscriptionFilter
-    Condition: SplunkLoggingEnabled
-    Properties:
-      LogGroupName: !Ref WafLogGroup
-      FilterName: "subscription_for_splunk"
-      FilterPattern: ""
-      DestinationArn: !Ref SubscriptionFilterDestinationArn
 
 Outputs:
   AdminToolURL:
