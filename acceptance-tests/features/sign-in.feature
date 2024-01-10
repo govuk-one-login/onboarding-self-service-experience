@@ -42,6 +42,27 @@ Feature: Users can sign in to the self-service experience
       And they see the toggle link "Show" on the field "password"
       Then they can not see the content in the password field
 
+  Rule: The user tries to submit SMS security code
+    Background:
+      When they submit the email "registered@test.gov.uk"
+      And they submit a valid password
+      Then they should be redirected to the "/sign-in/enter-text-code" page
+
+    Scenario Outline: User submits a security code with invalid format
+      When they submit the value of security code "<code>" that <condition>
+      Then they should be redirected to the "/sign-in/enter-text-code" page
+      And the error message "<error_message>" must be displayed for the security code field
+      And they should see the text "We sent a code to:"
+
+      Examples:
+        | condition                   | code    | error_message |
+        | is empty                    |         | Enter the 6 digit security code |
+        | has more than 6 digits      | 1234567 | Enter the security code using only 6 digits |
+        | has fewer than 6 digits     | 12345   | Enter the security code using only 6 digits |
+        | contains letters            | 12345A  | Your security code should only include numbers |
+        | contains special characters | 12345$  | Your security code should only include numbers |
+        | is incorrect or expired     | 000000  | The code you entered is not correct or has expired - enter it again or request a new code |
+
   Rule: The user tries to sign in with account which is not registered
     Scenario: The user submits email and password but account is not registered
       When they submit the email "not-registered@test.gov.uk"

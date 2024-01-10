@@ -110,7 +110,13 @@ export default class StubCognitoClient implements CognitoInterface {
         await this.getOverriddenReturnValue("login", "email", email);
     }
 
-    async login(email: string): Promise<AdminInitiateAuthCommandOutput> {
+    async login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
+        /* A password of 000000 is passed to indicate an invalid security code, so we need to throw appropriate error */
+        if (password == "000000") {
+            // Manually throw NotAuthorizedException
+            throw this.getException("NotAuthorizedException");
+        }
+
         const returnValue = await this.getOverriddenReturnValue("login", "email", email);
         return Promise.resolve(returnValue ?? {$metadata: {}});
     }
@@ -208,7 +214,13 @@ export default class StubCognitoClient implements CognitoInterface {
         throw new Error("Unknown exception");
     }
 
-    async respondToMfaChallenge(username: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
+    async respondToMfaChallenge(username: string, mfaCode: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
+        /* An MFA Code of 000000 is passed to indicate an invalid security code, so we need to throw appropriate error */
+        if (mfaCode == "000000") {
+            // Manually throw CodeMismatchException
+            throw this.getException("CodeMismatchException");
+        }
+
         const returnValue = await this.getOverriddenReturnValue("respondToMfaChallenge", "username", username);
         return Promise.resolve(returnValue ?? {$metadata: {}});
     }
