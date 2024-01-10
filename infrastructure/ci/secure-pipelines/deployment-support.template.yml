@@ -80,7 +80,7 @@ Resources:
 
   # Setting up Grafana key rotation
   # https://govukverify.atlassian.net/wiki/spaces/PLAT/pages/3467509761/Grafana+key+rotation
-  # https://di-team-manual.london.cloudapps.digital/development-standards-processes/aws-environment-grafana/
+  # https://team-manual.account.gov.uk/development-standards-processes/aws-environment-grafana/
   GrafanaKeyRotator:
     Type: AWS::CloudFormation::Stack
     DependsOn: InfrastructureAuditHook
