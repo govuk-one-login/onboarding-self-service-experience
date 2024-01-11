@@ -43,9 +43,6 @@ Parameters:
       - "staging"
       - "integration"
       - "production"
-  SubscriptionFilterDestinationArn:
-    Type: String
-    Default: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
 
 Mappings:
   # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
@@ -63,7 +60,7 @@ Mappings:
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, none ], !Equals [ !Ref Environment, build ]]
+  CustomWafEnabled: !Not [ !Equals [ !Ref Environment, build ] ]
 
 Resources:
 
@@ -493,6 +490,7 @@ Resources:
         ProducerType: SQS
 
   FrontendWebAcl:
+    Condition: CustomWafEnabled
     Type: 'AWS::WAFv2::WebACL'
     Properties:
       Name: !Sub '${AWS::StackName}-${Environment}-acl'
@@ -615,6 +613,7 @@ Resources:
             SampledRequestsEnabled: true
 
   FrontendWebACLAssociation:
+    Condition: CustomWafEnabled
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
       ResourceArn: !Sub
@@ -648,20 +647,12 @@ Resources:
       RetentionInDays: 30
 
   WafLoggingConfiguration:
+    Condition: CustomWafEnabled
     Type: AWS::WAFv2::LoggingConfiguration
     Properties:
       ResourceArn: !GetAtt FrontendWebAcl.Arn
       LogDestinationConfigs:
         - !GetAtt WafLogGroup.Arn
-
-  SubscriptionFilter:
-    Type: AWS::Logs::SubscriptionFilter
-    Condition: SplunkLoggingEnabled
-    Properties:
-      LogGroupName: !Ref WafLogGroup
-      FilterName: "subscription_for_splunk"
-      FilterPattern: ""
-      DestinationArn: !Ref SubscriptionFilterDestinationArn
 
 Outputs:
   AdminToolURL:
