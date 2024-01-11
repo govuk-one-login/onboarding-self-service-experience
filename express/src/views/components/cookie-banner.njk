@@ -14,9 +14,7 @@
 
 {{ govukCookieBanner({
   ariaLabel: "Cookies on GOV.UK One Login",
-  attributes: {
-    style: "display: none"
-  },
+  classes: "govuk-!-display-none",
   messages: [
     {
       headingText: "Cookies on GOV.UK One Login",
@@ -48,7 +46,7 @@
     {
       html: acceptMessageHtml,
       role: "alert",
-      hidden: true,
+      classes: "govuk-!-display-none",
       attributes: {
         id: "cookies-accepted"
       },
@@ -62,7 +60,7 @@
     {
       html: rejectMessageHtml,
       role: "alert",
-      hidden: true,
+      classes: "govuk-!-display-none",
         attributes: {
         id: "cookies-rejected"
       },
