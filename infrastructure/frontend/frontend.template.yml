@@ -60,7 +60,6 @@ Mappings:
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-#  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, none ], !Equals [ !Ref Environment, build ]]
   CustomWafEnabled: !Not [ !Equals [ !Ref Environment, build ] ]
 
 Resources:
