@@ -55,7 +55,7 @@ Resources:
                   - s3:CreateBucket
                   - s3:GetBucketPolicy
                   - s3:PutBucketPolicy
-                  - s3:PutPublicAccessBlock
+                  - s3:PutAccountPublicAccessBlock
                   - s3:PutBucketPublicAccessBlock
                   - s3:DeleteBucket
                   - s3:DeleteBucketPolicy
@@ -183,6 +183,23 @@ Resources:
               - Effect: Allow
                 Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/frontend/google-sheet-credentials-*
                 Action: secretsmanager:GetSecretValue
+              - Effect: Allow
+                Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+                Action:
+                  - secretsmanager:GetSecretValue
+              - Effect: Allow
+                Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+                Action:
+                  - secretsmanager:GetSecretValue
+              - Effect: Allow
+                Action:
+                  - secretsmanager:ListSecrets
+                Resource: 'arn:aws:secretsmanager:eu-west-2:216552277552:secret:*'
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'
+
 
   FrontendDeploymentPolicy:
     # checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
