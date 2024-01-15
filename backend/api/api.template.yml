@@ -49,7 +49,7 @@ Conditions:
   PrivateAPI: !Equals [ !Ref PrivateAPI, Yes ]
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, none ], !Equals [ !Ref Environment, build ]]
+  CustomWafEnabled: !Not [ !Equals [ !Ref Environment, build ] ]
 
 Globals:
   Function:
@@ -930,6 +930,7 @@ Resources:
           Endpoint: !Ref NotificationEmail
 
   ApiGatewayWebAcl:
+    Condition: CustomWafEnabled
     Type: 'AWS::WAFv2::WebACL'
     Properties:
       Name: !Sub '${AWS::StackName}-${Environment}-acl'
@@ -1052,6 +1053,7 @@ Resources:
             SampledRequestsEnabled: true
 
   ApiGatewayWebACLAssociation:
+    Condition: CustomWafEnabled
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
       ResourceArn: !Sub
@@ -1063,12 +1065,14 @@ Resources:
 
   WafLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Condition: CustomWafEnabled
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub aws-waf-logs-${AWS::StackName}-${Environment}
       RetentionInDays: 30
 
   WafLoggingConfiguration:
+    Condition: CustomWafEnabled
     Type: AWS::WAFv2::LoggingConfiguration
     Properties:
       ResourceArn: !GetAtt ApiGatewayWebAcl.Arn
@@ -1076,8 +1080,8 @@ Resources:
         - !GetAtt WafLogGroup.Arn
 
   SubscriptionFilter:
+    Condition: CustomWafEnabled
     Type: AWS::Logs::SubscriptionFilter
-    Condition: SplunkLoggingEnabled
     Properties:
       LogGroupName: !Ref WafLogGroup
       FilterName: "subscription_for_splunk"
