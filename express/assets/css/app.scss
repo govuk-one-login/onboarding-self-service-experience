@@ -181,10 +181,6 @@ code {
 }
 
 #publicKeyContainer {
-  #publicKeyLong {
-    display: none;
-  }
-
   #togglePublicKey {
     border: none;
     background: none;
@@ -266,4 +262,8 @@ code {
   .govuk-header__container {
     border-bottom: 10px solid govuk-colour("yellow");
   }
+}
+
+.white-space-nowrap {
+  white-space: nowrap;
 }
