@@ -641,6 +641,7 @@ Resources:
 
   WafLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Condition: CustomWafEnabled
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub aws-waf-logs-${AWS::StackName}-${Environment}
