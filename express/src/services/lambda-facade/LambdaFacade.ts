@@ -122,6 +122,16 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         await this.post("/delete-dynamodb-client-entries/", JSON.stringify(body));
     }
 
+    async deleteServiceEntries(serviceID: string): Promise<void> {
+        console.log("In LambdaFacade-deleteServiceEntries");
+
+        const body = {
+            serviceId: serviceID
+        };
+
+        await this.post("/delete-dynamodb-service-entries/", JSON.stringify(body));
+    }
+
     globalSignOut(userEmail: string): Promise<AxiosResponse> {
         return this.get(`/global-sign-out/${userEmail}`);
     }
