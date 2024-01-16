@@ -183,12 +183,9 @@ Resources:
               - Effect: Allow
                 Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/frontend/google-sheet-credentials-*
                 Action: secretsmanager:GetSecretValue
+
               - Effect: Allow
                 Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
-                Action:
-                  - secretsmanager:GetSecretValue
-              - Effect: Allow
-                Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
                 Action:
                   - secretsmanager:GetSecretValue
               - Effect: Allow
