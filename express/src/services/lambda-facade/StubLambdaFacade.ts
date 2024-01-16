@@ -154,6 +154,11 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         return;
     }
 
+    async deleteServiceEntries(serviceID: string): Promise<void> {
+        console.log("Stubbing Deletion of Service Entries for: ServiceID => " + serviceID);
+        return;
+    }
+
     async getDynamoDBEntries(): Promise<AxiosResponse> {
         return Promise.resolve({
             status: 200

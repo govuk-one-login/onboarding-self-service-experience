@@ -1119,6 +1119,38 @@ Resources:
             Path: /delete-dynamodb-client-entries
             Method: POST
 
+  DeleteDynamoDBServiceEntriesFunction:
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+    Properties:
+      Handler: backend/api/src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBServiceEntriesHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - DynamoDBCrudPolicy:
+            TableName:
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+      Environment:
+        Variables:
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /delete-dynamodb-service-entries
+            Method: POST
+
 Outputs:
   # SAM Serverless Function implicit API resources | Invoking private APIs
   # https://github.com/aws/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
