@@ -60,7 +60,6 @@ Mappings:
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  CustomWafEnabled: !Not [ !Equals [ !Ref Environment, build ] ]
 
 Resources:
 
@@ -489,140 +488,6 @@ Resources:
         AuthoredBy: TxMA
         ProducerType: SQS
 
-  FrontendWebAcl:
-    Condition: CustomWafEnabled
-    Type: 'AWS::WAFv2::WebACL'
-    Properties:
-      Name: !Sub '${AWS::StackName}-${Environment}-acl'
-      Scope: REGIONAL
-      Description: Web ACL for Application Load Balancer
-      DefaultAction:
-        Allow:
-          CustomRequestHandling:
-            InsertHeaders:
-              - Name: info
-                Value: waf-allowed
-      VisibilityConfig:
-        SampledRequestsEnabled: true
-        CloudWatchMetricsEnabled: true
-        MetricName: !Sub '${AWS::StackName}-${Environment}-metric'
-      Tags:
-        - Key: Name
-          Value: !Sub '${AWS::StackName}-${Environment}'
-      Rules:
-        - Name: AWS-CRS
-          Priority: 0
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesCommonRuleSet
-              ExcludedRules:
-                - Name: CrossSiteScripting_BODY
-                - Name: CrossSiteScripting_COOKIE
-                - Name: CrossSiteScripting_QUERYARGUMENTS
-                - Name: CrossSiteScripting_URIPATH
-                - Name: EC2MetaDataSSRF_BODY
-                - Name: EC2MetaDataSSRF_COOKIE
-                - Name: EC2MetaDataSSRF_QUERYARGUMENTS
-                - Name: EC2MetaDataSSRF_URIPATH
-                - Name: GenericLFI_BODY
-                - Name: GenericLFI_QUERYARGUMENTS
-                - Name: GenericLFI_URIPATH
-                - Name: GenericRFI_BODY
-                - Name: GenericRFI_QUERYARGUMENTS
-                - Name: GenericRFI_URIPATH
-                - Name: NoUserAgent_HEADER
-                - Name: RestrictedExtensions_QUERYARGUMENTS
-                - Name: RestrictedExtensions_URIPATH
-                - Name: SizeRestrictions_BODY
-                - Name: SizeRestrictions_Cookie_HEADER
-                - Name: SizeRestrictions_QUERYSTRING
-                - Name: SizeRestrictions_URIPATH
-                - Name: UserAgent_BadBots_HEADER
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub '${AWS::StackName}-${Environment}-aws-crs-metric'
-        - Name: Bad-Inputs
-          Priority: 1
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesKnownBadInputsRuleSet
-              ExcludedRules:
-                - Name: ExploitablePaths_URIPATH
-                - Name: Host_localhost_HEADER
-                - Name: JavaDeserializationRCE_BODY
-                - Name: JavaDeserializationRCE_HEADER
-                - Name: JavaDeserializationRCE_QUERYSTRING
-                - Name: JavaDeserializationRCE_URIPATH
-                # - Name: Log4JRCE
-                - Name: PROPFIND_METHOD
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub '${AWS::StackName}-${Environment}-bad-inputs-metric'
-        - Name: Anonymous-IpList
-          Priority: 2
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAnonymousIpList
-              ExcludedRules:
-                - Name: AnonymousIPList
-                - Name: HostingProviderIPList
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub '${AWS::StackName}-${Environment}-anonymous-iplist-metric'
-        - Name: SQLInject-RuleSet
-          Priority: 3
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesSQLiRuleSet
-              ExcludedRules:
-                - Name: SQLiExtendedPatterns_QUERYARGUMENTS
-                - Name: SQLi_BODY
-                - Name: SQLi_COOKIE
-                - Name: SQLi_QUERYARGUMENTS
-                - Name: SQLi_URIPATH
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub '${AWS::StackName}-${Environment}-SQLinjection-ruleset-metric'
-        - Name: RateBased-CountIpRule
-          Priority: 4
-          Statement:
-            RateBasedStatement:
-              Limit: 100
-              AggregateKeyType: IP
-          Action:
-            Count: { }
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub "${AWS::StackName}-${Environment}-RateBased-CountIp-ruleset-metric"
-            SampledRequestsEnabled: true
-
-  FrontendWebACLAssociation:
-    Condition: CustomWafEnabled
-    Type: AWS::WAFv2::WebACLAssociation
-    Properties:
-      ResourceArn: !Sub
-        - '${ResourceArn}'
-        - ResourceArn: !Ref ApplicationLoadBalancer
-      WebACLArn: !Sub
-        - '${WebACLArn}'
-        - WebACLArn: !GetAtt FrontendWebAcl.Arn
-
   #--- DNS ---#
 
   DNSRecord:
@@ -638,22 +503,6 @@ Resources:
         DNSName: !GetAtt ApplicationLoadBalancer.DNSName
         HostedZoneId: !GetAtt ApplicationLoadBalancer.CanonicalHostedZoneID
         EvaluateTargetHealth: false
-
-  WafLogGroup:
-    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
-    Condition: CustomWafEnabled
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub aws-waf-logs-${AWS::StackName}-${Environment}
-      RetentionInDays: 30
-
-  WafLoggingConfiguration:
-    Condition: CustomWafEnabled
-    Type: AWS::WAFv2::LoggingConfiguration
-    Properties:
-      ResourceArn: !GetAtt FrontendWebAcl.Arn
-      LogDestinationConfigs:
-        - !GetAtt WafLogGroup.Arn
 
 Outputs:
   AdminToolURL:
