@@ -373,4 +373,10 @@ export default class SelfServiceServicesService {
             await this.lambda.deleteClientEntries(oldUserID, serviceID);
         }
     }
+
+    async deleteServiceEntries(serviceID: string) {
+        console.info("In self-service-services-service:deleteServiceEntries()");
+        console.log("Service ID => " + serviceID);
+        await this.lambda.deleteServiceEntries(serviceID);
+    }
 }
