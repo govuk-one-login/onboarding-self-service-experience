@@ -83,6 +83,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
+
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
@@ -131,6 +132,8 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
 };
 
 export const showNewPasswordForm: RequestHandler = (req, res) => {
+    console.log("In register:showNewPasswordForm");
+
     // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
         return res.render("register/create-password.njk");

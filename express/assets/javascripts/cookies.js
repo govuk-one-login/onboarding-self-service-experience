@@ -101,11 +101,11 @@ const cookieBanner = function () {
     }
 
     function hideElement(el) {
-        el.style.display = "none";
+        el.classList.add("govuk-!-display-none");
     }
 
     function showElement(el) {
-        el.style.display = "block";
+        el.classList.remove("govuk-!-display-none");
     }
 
     function isOnCookiesPage() {
