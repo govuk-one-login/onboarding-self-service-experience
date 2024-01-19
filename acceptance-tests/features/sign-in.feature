@@ -12,6 +12,24 @@ Feature: Users can sign in to the self-service experience
       When they submit the email "invalid-email.com"
       Then the error message "Enter an email address in the correct format, like name@example.com" must be displayed for the email field
 
+  Rule: The user is navigating back to previous page using back link
+    Background:
+      When they submit the email "registered@test.gov.uk"
+    Scenario: User navigates back to /enter-email-address page
+      When they click on the "Back" link
+      Then they should be redirected to the "/sign-in/enter-email-address" page
+
+    Scenario: User navigates back to /enter-password page
+      When they click on the "Forgot your password?" link
+      And they click on the "Back" link
+      Then they should be redirected to the "/sign-in/enter-password" page
+
+    Scenario: User navigates back to /forgot-password page
+      When they click on the "Forgot your password?" link
+      And they click the Continue button
+      And they click on the "Back" link
+      Then they should be redirected to the "/sign-in/forgot-password" page
+
   Rule: The user tries to submit a password
     Scenario: User doesn't enter any characters into the password field
       When they submit the email "registered@test.gov.uk"
@@ -66,21 +84,21 @@ Feature: Users can sign in to the self-service experience
   Rule: The user tries to sign in with account which is not registered
     Scenario: The user submits email and password but account is not registered
       When they submit the email "not-registered@test.gov.uk"
-      When they submit a valid password
+      And they submit a valid password
       Then they should be redirected to the "/sign-in/account-not-found" page
 
   Rule: The user tries to reset their password
     Background:
       When they submit the email "registered@test.gov.uk"
       Then they click on the "Forgot your password?" link
-      Then they should be redirected to the "/sign-in/forgot-password" page
-      Then they click the Continue button
+      And they should be redirected to the "/sign-in/forgot-password" page
+      When they click the Continue button
       Then they should be redirected to the "/sign-in/forgot-password/enter-email-code" page
 
     Scenario: The user tries to use a password on the list of common passwords during password reset
       When they click on the forgot password link in their email
-      When they submit the password "Password123"
-      And they should see the text "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers."
+      And they submit the password "Password123"
+      Then they should see the text "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers."
 
     Scenario: The user wants to see or hide their password as they type it
       When they click on the forgot password link in their email
@@ -94,12 +112,12 @@ Feature: Users can sign in to the self-service experience
       Then they can not see the content in the password field
 
     Scenario: The user resends the email security code when resetting their password
-      Then they click the "Resend the email" button
+      When they click the "Resend the email" button
       Then they should be redirected to the "/sign-in/forgot-password/enter-email-code" page
 
     Scenario: The user resets their password
       When they click on the forgot password link in their email
-      When they submit a valid password
+      And they submit a valid password
       And they submit a correct security code
       Then they should be redirected to a page with the path starting with "/services"
       And they should see the text "Your services"
