@@ -18,17 +18,20 @@ Feature: Users can sign up to the self-service experience
 
   Rule: Users can only register with email addresses from certain domains
     Scenario Outline: User can register allowed email addresses
-
       When they submit the email <email>
       Then they should be redirected to the "/register/enter-email-code" page
 
       Examples:
         | email                                     |
-        | "test-user@test.gov.uk" |
-        | "test-user@digital.cabinet-office.gov.uk"      |
+        | "test-user@test.gov.uk"                   |
+        | "test-user@digital.cabinet-office.gov.uk" |
+        | "test@highwaysengland.co.uk"              |
+        | "sample@artscouncil.org.uk"               |
+        | "test@marinemanagement.org.uk"            |
+        | "test@hmcts.net"                          |
+        | "test@digital.mod.uk "                    |
 
     Scenario Outline: User tries to register with a verboten email address
-
       When they submit the email <email>
       Then the error message "Enter a government email address" must be displayed for the email field
 
@@ -36,6 +39,16 @@ Feature: Users can sign up to the self-service experience
         | email                                                            |
         | "test-user@yahoo.co.uk"                                          |
         | "the-config-file-is-broken-add-a-dot-before-gov.uk@sneakygov.uk" |
+
+  Rule: User validating the links in registration page
+    Scenario Outline:User validating links in enter-email address page
+      Given the user is on the "/register" page
+      When they click on the '<linkName>' link
+      Then they should be directed to the URL '<address>'
+      Examples:
+        | linkName       | address                                                 |
+        | Contact us     | https://www.sign-in.service.gov.uk/contact-us?adminTool |
+        | privacy notice | https://www.sign-in.service.gov.uk/privacy-policy       |
 
   Rule: The user tries to submit an email address that is already registered
     Scenario: The user is offered to sign in and signs in instead
@@ -60,6 +73,17 @@ Feature: Users can sign up to the self-service experience
       And they should see the text "An account already exists with the email address inuse-password-will-be-wrong@test.gov.uk"
       When they submit the password "WrongPa$$word"
       Then the error message "Incorrect password" must be displayed for the password field
+
+  Rule: The user is navigating back to previous page using back link
+    Scenario: User navigates back to /enter-email-address page from email code page
+      Given they submit the email "registering-successfully@test.gov.uk"
+      When they click on the "Back" link
+      Then they should be redirected to the "/register/enter-email-address" page
+
+    Scenario: User navigates back to /enter-email-address from account exists page
+      Given they submit the email "inuse@test.gov.uk"
+      When they click on the "Back" link
+      Then they should be redirected to the "/register/enter-email-address" page
 
   Rule: The user tries to verify email security code when creating an account
     Background:
