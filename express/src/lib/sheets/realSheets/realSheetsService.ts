@@ -78,7 +78,6 @@ export default class RealSheetsService implements SheetsService {
         // eslint-disable-next-line
         const row: any[] = [];
         headings[0].forEach(heading => {
-            console.log(form.get(heading));
             row.push(form.get(heading));
         });
         return row;
