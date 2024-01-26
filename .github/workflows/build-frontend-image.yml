@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Push Docker image
-        uses: govuk-one-login/github-actions/aws/ecr/build-docker-image@081ce732d75690781b1eb82d85ee11b45934c51e
+        uses: govuk-one-login/github-actions/aws/ecr/build-docker-image@081ce732d75690781b1eb82d85ee11b45934c51e # 16/08/2023
         id: push-image
         with:
           image-version: ${{ github.sha }}
