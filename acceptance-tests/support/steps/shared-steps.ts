@@ -90,6 +90,11 @@ When("they click the {string} button", async function (text: string) {
 Then("they should be redirected to the {string} page", async function (this: TestContext, expectedPath: string) {
     assert.equal(new URL(this.page.url()).pathname, expectedPath);
 });
+Then("they should be redirected to the {string}", async function (this: TestContext, expectedPath: string) {
+    const path = new URL(this.page.url());
+    const actualPath = path.pathname + path.search;
+    assert.equal(actualPath, expectedPath);
+});
 
 Then("they should be redirected to a page with the path starting with {string}", async function (this: TestContext, expectedPath: string) {
     assert.ok(new URL(this.page.url()).pathname.startsWith(expectedPath));
