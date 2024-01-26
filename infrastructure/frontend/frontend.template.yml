@@ -13,7 +13,7 @@ Parameters:
   LogGroupPrefix:
     Type: String
     AllowedPattern: ^.*[^\/]$
-    Default: /aws/vendedlogs
+    Default: /self-service/admin-tool
   DeploymentName:
     Type: String
     MaxLength: 28
@@ -139,10 +139,57 @@ Resources:
             Options:
               # Consider lines not starting with whitespace as a multi-line log message boundary
               awslogs-multiline-pattern: ^[^\s}]+.*$
-              awslogs-group: !Sub ${LogGroupPrefix}/${DeploymentName}/frontend
+              awslogs-group: !Ref FrontendLogsGroup
               awslogs-stream-prefix: ecs
-              awslogs-create-group: true
+              awslogs-create-group: false
               awslogs-region: !Ref AWS::Region
+
+  LogAuditLogGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/frontend/audit
+      RetentionInDays: 14
+
+  FrontendLogsGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/frontend
+      RetentionInDays: 14
+      DataProtectionPolicy:
+        Name: data-protection-policy-frontend
+        Description: Data Protection for Cloudwatch Logs
+        Version: '2021-06-01'
+        Statement:
+          - Sid: audit-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Audit:
+                FindingsDestination:
+                  CloudWatchLogs:
+                    LogGroup: !Ref LogAuditLogGroup
+          - Sid: redact-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Deidentify:
+                MaskConfig: { }
 
   ExecutionRole:
     Type: AWS::IAM::Role
@@ -158,13 +205,6 @@ Resources:
             Principal:
               Service: ecs-tasks.amazonaws.com
       Policies:
-        - PolicyName: CreateLogGroup
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action: logs:CreateLogGroup
-                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${LogGroupPrefix}/${DeploymentName}/frontend*
         - PolicyName: GetDynatraceSecret
           PolicyDocument:
             Version: 2012-10-17

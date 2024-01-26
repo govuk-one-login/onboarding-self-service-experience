@@ -30,7 +30,7 @@ COMMANDS=("${DEPLOY_CMDS[@]}" run open list exports delete help)
 ../aws.sh check-current-account development &> /dev/null || eval "$(gds aws di-onboarding-development -e)"
 USER_NAME=$(../aws.sh get-user-name)
 ECR_REPO=self-service/frontend
-LOG_PREFIX=/self-service/dev
+LOG_PREFIX=/self-service/admin-tool/dev
 REPO_ROOT=$(pwd)/../..
 OPTION_REGEX="^--?.*"
 DEV_PREFIX=dev

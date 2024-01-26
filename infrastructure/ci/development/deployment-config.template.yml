@@ -174,7 +174,7 @@ Resources:
                   - logs:DeleteSubscriptionFilter
                   - logs:DescribeSubscriptionFilters
                   - logs:PutSubscriptionFilter
-
+                  - logs:PutDataProtectionPolicy
               - Effect: Allow
                 Resource: !Sub arn:aws:logs:${AWS::Region}:${SplunkLiveAccountId}:destination:*
                 Action:

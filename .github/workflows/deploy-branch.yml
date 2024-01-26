@@ -34,7 +34,7 @@ jobs:
       template: infrastructure/frontend/frontend.template.yml
       parameters: |
         ImageURI=${{ needs.push-frontend-image.outputs.image-uri }}
-        LogGroupPrefix=/self-service/preview
+        LogGroupPrefix=/self-service/admin-tool/preview
 
   build-cognito:
     name: Cognito
@@ -61,7 +61,7 @@ jobs:
     with:
       name: ${{ needs.build-api.outputs.component }}
       artifact: ${{ needs.build-api.outputs.artifact-name }}
-      parameters: LogGroupPrefix=/self-service/preview
+      parameters: LogGroupPrefix=/self-service/admin-tool/preview
 
   deploy-dynamodb:
     name: DynamoDB
