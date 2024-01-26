@@ -12,6 +12,10 @@ Parameters:
   DeletionProtection:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/config/deletion-protection-enabled
+  LogGroupPrefix:
+    Type: String
+    AllowedPattern: ^.*[^\/]$
+    Default: /self-service/admin-tool
   DeploymentName:
     Type: String
     MaxLength: 28
@@ -57,6 +61,8 @@ Globals:
     VpcConfig:
       SecurityGroupIds: [ !ImportValue VPC-VPCEndpointsSecurityGroup ]
       SubnetIds: !Split [ ",", !ImportValue VPC-PrivateSubnets ]
+    LoggingConfig:
+      LogGroup: !Ref LambdaLogsGroup
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
@@ -114,6 +120,53 @@ Resources:
                 aws:SourceAccount: !Ref AWS::AccountId
               ArnLike:
                 aws:SourceArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function/*
+
+  LogAuditLogGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/cognito/audit
+      RetentionInDays: 14
+
+  LambdaLogsGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/cognito/lambda
+      RetentionInDays: 14
+      DataProtectionPolicy:
+        Name: data-protection-policy-cognito-lambda
+        Description: Data Protection for Cloudwatch Logs
+        Version: '2021-06-01'
+        Statement:
+          - Sid: audit-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Audit:
+                FindingsDestination:
+                  CloudWatchLogs:
+                    LogGroup: !Ref LogAuditLogGroup
+          - Sid: redact-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Deidentify:
+                MaskConfig: { }
 
   SendPasswordChangedEmailFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
