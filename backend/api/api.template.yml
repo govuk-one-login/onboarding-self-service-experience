@@ -14,7 +14,7 @@ Parameters:
   LogGroupPrefix:
     Type: String
     AllowedPattern: ^.*[^\/]$
-    Default: /self-service/admin-tool
+    Default: /aws/vendedlogs
   DeploymentName:
     Type: String
     MaxLength: 28
@@ -31,11 +31,44 @@ Parameters:
   CodeSigningConfigArn:
     Type: String
     Default: ""
+  Environment:
+    Description: "The name of the environment to deploy to."
+    Type: "String"
+    Default: local
+    AllowedValues:
+      - "local"
+      - "dev"
+      - "build"
+      - "staging"
+      - "integration"
+      - "production"
+
+Mappings:
+  EnvironmentConfiguration:
+    local: # Local builds do not support dynatrace
+      dynatraceLoggingEnabled: false
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    dev:
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    build:
+      dynatraceLoggingEnabled: false
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    staging:
+      dynatraceLoggingEnabled: false
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    integration:
+      dynatraceLoggingEnabled: false
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    production:
+      dynatraceLoggingEnabled: false
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
 
 Conditions:
   PrivateAPI: !Equals [ !Ref PrivateAPI, Yes ]
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+  DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
 
 Globals:
   Function:
@@ -45,11 +78,48 @@ Globals:
     VpcConfig:
       SecurityGroupIds: [ !ImportValue VPC-VPCEndpointsSecurityGroup ]
       SubnetIds: !Split [ ",", !ImportValue VPC-PrivateSubnets ]
-    LoggingConfig:
-      LogGroup: !Ref LambdaLogsGroup
+    Layers:
+      - !If
+        - DynatraceLoggingEnabled
+        - !Sub
+          - '{{resolve:secretsmanager:${SecretArn}:SecretString:NODEJS_LAYER}}'
+          - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+        - !Ref AWS::NoValue
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
+        AWS_LAMBDA_EXEC_WRAPPER: !If [ DynatraceLoggingEnabled, "/opt/dynatrace", !Ref "AWS::NoValue" ]
+        DT_CONNECTION_AUTH_TOKEN: !If
+          - DynatraceLoggingEnabled
+          - !Sub
+            - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_CONNECTION_AUTH_TOKEN}}'
+            - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+          - !Ref "AWS::NoValue"
+        DT_CONNECTION_BASE_URL: !If
+          - DynatraceLoggingEnabled
+          - !Sub
+            - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_CONNECTION_BASE_URL}}'
+            - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+          - !Ref "AWS::NoValue"
+        DT_CLUSTER_ID: !If
+          - DynatraceLoggingEnabled
+          - !Sub
+            - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_CLUSTER_ID}}'
+            - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+          - !Ref "AWS::NoValue"
+        DT_LOG_COLLECTION_AUTH_TOKEN: !If
+          - DynatraceLoggingEnabled
+          - !Sub
+            - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_LOG_COLLECTION_AUTH_TOKEN}}'
+            - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+          - !Ref "AWS::NoValue"
+        DT_TENANT: !If
+          - DynatraceLoggingEnabled
+          - !Sub
+            - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_TENANT}}'
+            - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+          - !Ref "AWS::NoValue"
+        DT_OPEN_TELEMETRY_ENABLE_INTEGRATION: !If [DynatraceLoggingEnabled, "true", !Ref "AWS::NoValue"]
 
 Resources:
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html
@@ -108,11 +178,12 @@ Resources:
   APIAccessLogsGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
+    DependsOn: LogAuditLogGroup
     Properties:
       LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api
       RetentionInDays: 14
       DataProtectionPolicy:
-        Name: data-protection-policy-api
+        Name: data-protection-policy
         Description: Data Protection for Cloudwatch Logs
         Version: '2021-06-01'
         Statement:
@@ -130,7 +201,7 @@ Resources:
               Audit:
                 FindingsDestination:
                   CloudWatchLogs:
-                    LogGroup: !Ref LogAuditLogGroup
+                    LogGroup: !Sub ${LogGroupPrefix}/${DeploymentName}/api/audit
           - Sid: redact-policy
             DataIdentifier:
               - arn:aws:dataprotection::aws:data-identifier/EmailAddress
@@ -144,47 +215,6 @@ Resources:
             Operation:
               Deidentify:
                 MaskConfig: { }
-
-  LambdaLogsGroup:
-    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/lambda
-      RetentionInDays: 14
-      DataProtectionPolicy:
-        Name: data-protection-policy-api-lambda
-        Description: Data Protection for Cloudwatch Logs
-        Version: '2021-06-01'
-        Statement:
-          - Sid: audit-policy
-            DataIdentifier:
-              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
-              - arn:aws:dataprotection::aws:data-identifier/IpAddress
-              - arn:aws:dataprotection::aws:data-identifier/Address
-              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
-              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
-            Operation:
-              Audit:
-                FindingsDestination:
-                  CloudWatchLogs:
-                    LogGroup: !Ref LogAuditLogGroup
-          - Sid: redact-policy
-            DataIdentifier:
-              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
-              - arn:aws:dataprotection::aws:data-identifier/IpAddress
-              - arn:aws:dataprotection::aws:data-identifier/Address
-              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
-              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
-            Operation:
-              Deidentify:
-                MaskConfig: { }
-
   #--- Users ---#
 
   EnvironmentVariablesEncryptionKey:
@@ -235,6 +265,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -267,6 +298,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -300,6 +332,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -334,6 +367,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -366,6 +400,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -398,6 +433,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -430,6 +466,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -457,6 +494,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -489,6 +527,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -514,6 +553,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -541,6 +581,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -563,7 +604,10 @@ Resources:
       Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
-      Policies: [ AWSLambdaVPCAccessExecutionRole, AWSXrayWriteOnlyAccess ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       VpcConfig:
         SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
       Environment:
@@ -587,7 +631,10 @@ Resources:
       Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
-      Policies: [ AWSLambdaVPCAccessExecutionRole, AWSXrayWriteOnlyAccess ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       VpcConfig:
         SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
       Environment:
@@ -615,6 +662,7 @@ Resources:
       Policies:
         - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
         - Version: 2012-10-17
           Statement:
             - Effect: Allow
@@ -648,6 +696,7 @@ Resources:
       Policies:
         - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
         - Version: 2012-10-17
           Statement:
             - Effect: Allow
@@ -717,6 +766,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -744,6 +794,32 @@ Resources:
               - kms:Decrypt
             Resource: "*"
 
+  DynatraceSecretsAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy for accessing Dynatrace secrets
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Action:
+              - secretsmanager:ListSecrets
+            Resource: 'arn:aws:secretsmanager:eu-west-2:216552277552:secret:*'
+          - Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'
+
+
   SendSQSMessageToTxMAHandler:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
     # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
@@ -758,7 +834,11 @@ Resources:
       Handler: backend/api/src/handlers/logging/sqs-service.sendSQSMessageToTxMAHandler
       Description: Sends a message to the TxMA SQS
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      Policies: [ AWSLambdaVPCAccessExecutionRole, AmazonSQSFullAccess, !Ref KMSDecryptAccessPolicy ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonSQSFullAccess
+        - !Ref KMSDecryptAccessPolicy
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           QUEUEURL: !Join [ '', [!Sub 'https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/', !Join ["frontend", !Split ["api", !Sub '${AWS::StackName}' ] ], "-AuditEventQueue"]]
@@ -877,11 +957,12 @@ Resources:
   StepFunctionsLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
+    DependsOn: LogAuditLogGroup
     Properties:
       LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/step-functions
       RetentionInDays: 14
       DataProtectionPolicy:
-        Name: data-protection-policy-api-step-functions
+        Name: data-protection-policy
         Description: Data Protection for Cloudwatch Logs
         Version: '2021-06-01'
         Statement:
@@ -899,7 +980,7 @@ Resources:
               Audit:
                 FindingsDestination:
                   CloudWatchLogs:
-                    LogGroup: !Ref LogAuditLogGroup
+                    LogGroup: !Sub ${LogGroupPrefix}/${DeploymentName}/api/audit
           - Sid: redact-policy
             DataIdentifier:
               - arn:aws:dataprotection::aws:data-identifier/EmailAddress
@@ -947,6 +1028,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -979,6 +1061,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -1011,6 +1094,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
