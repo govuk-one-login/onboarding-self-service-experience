@@ -14,7 +14,7 @@ Parameters:
   LogGroupPrefix:
     Type: String
     AllowedPattern: ^.*[^\/]$
-    Default: /aws/vendedlogs
+    Default: /self-service/admin-tool
   DeploymentName:
     Type: String
     MaxLength: 28
@@ -85,6 +85,8 @@ Globals:
           - '{{resolve:secretsmanager:${SecretArn}:SecretString:NODEJS_LAYER}}'
           - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
         - !Ref AWS::NoValue
+    LoggingConfig:
+      LogGroup: !Ref LambdaLogsGroup
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
@@ -178,12 +180,11 @@ Resources:
   APIAccessLogsGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
-    DependsOn: LogAuditLogGroup
     Properties:
       LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api
       RetentionInDays: 14
       DataProtectionPolicy:
-        Name: data-protection-policy
+        Name: data-protection-policy-api
         Description: Data Protection for Cloudwatch Logs
         Version: '2021-06-01'
         Statement:
@@ -201,7 +202,7 @@ Resources:
               Audit:
                 FindingsDestination:
                   CloudWatchLogs:
-                    LogGroup: !Sub ${LogGroupPrefix}/${DeploymentName}/api/audit
+                    LogGroup: !Ref LogAuditLogGroup
           - Sid: redact-policy
             DataIdentifier:
               - arn:aws:dataprotection::aws:data-identifier/EmailAddress
@@ -215,6 +216,47 @@ Resources:
             Operation:
               Deidentify:
                 MaskConfig: { }
+
+  LambdaLogsGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/lambda
+      RetentionInDays: 14
+      DataProtectionPolicy:
+        Name: data-protection-policy-api-lambda
+        Description: Data Protection for Cloudwatch Logs
+        Version: '2021-06-01'
+        Statement:
+          - Sid: audit-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Audit:
+                FindingsDestination:
+                  CloudWatchLogs:
+                    LogGroup: !Ref LogAuditLogGroup
+          - Sid: redact-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Deidentify:
+                MaskConfig: { }
+
   #--- Users ---#
 
   EnvironmentVariablesEncryptionKey:
@@ -957,12 +999,11 @@ Resources:
   StepFunctionsLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
-    DependsOn: LogAuditLogGroup
     Properties:
       LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/step-functions
       RetentionInDays: 14
       DataProtectionPolicy:
-        Name: data-protection-policy
+        Name: data-protection-policy-api-step-functions
         Description: Data Protection for Cloudwatch Logs
         Version: '2021-06-01'
         Statement:
@@ -980,7 +1021,7 @@ Resources:
               Audit:
                 FindingsDestination:
                   CloudWatchLogs:
-                    LogGroup: !Sub ${LogGroupPrefix}/${DeploymentName}/api/audit
+                    LogGroup: !Ref LogAuditLogGroup
           - Sid: redact-policy
             DataIdentifier:
               - arn:aws:dataprotection::aws:data-identifier/EmailAddress

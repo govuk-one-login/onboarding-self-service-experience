@@ -174,7 +174,6 @@ Resources:
                   - logs:DeleteSubscriptionFilter
                   - logs:DescribeSubscriptionFilters
                   - logs:PutSubscriptionFilter
-
               - Effect: Allow
                 Resource: !Sub arn:aws:logs:${AWS::Region}:${SplunkLiveAccountId}:destination:*
                 Action:
@@ -193,6 +192,26 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
+          - Effect: Allow
+            Resource: "*"
+            Action:
+              - logs:DescribeLogGroups
+              - logs:TagResource
+              - logs:CreateLogGroup
+              - logs:DeleteLogGroup
+              - logs:PutRetentionPolicy
+              - logs:CreateLogDelivery
+              - logs:PutResourcePolicy
+              - logs:DescribeResourcePolicies
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
+            Action:
+              - logs:PutDataProtectionPolicy
+              - logs:DeleteDataProtectionPolicy
+              - logs:GetDataProtectionPolicy
+              - logs:Unmask
+
           - Effect: Allow
             Resource: "*"
             Action:
@@ -384,7 +403,7 @@ Resources:
               - logs:DescribeResourcePolicies
 
           - Effect: Allow
-            Resource: arn:aws:logs:::log-group:*:*
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
             Action:
               - logs:PutDataProtectionPolicy
               - logs:DeleteDataProtectionPolicy
@@ -469,7 +488,10 @@ Resources:
                 lambda:Principal: apigateway.amazonaws.com
 
           - Effect: Allow
-            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api*:log-stream:*
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api*:log-stream:*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/admin-tool/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api*:log-stream:*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/product-pages/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api*:log-stream:*
             Action:
               - logs:TagResource
               - logs:CreateLogGroup
@@ -663,7 +685,11 @@ Resources:
             Effect: Allow
             Resource:
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/admin-tool/${PreviewStacksPrefix}/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/product-pages/${PreviewStacksPrefix}/*
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/dev/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/admin-tool/dev/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/product-pages/dev/*
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-*-dev:log-stream:*
             Action:
               - logs:CreateLogStream
