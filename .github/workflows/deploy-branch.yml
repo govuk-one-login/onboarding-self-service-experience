@@ -48,6 +48,7 @@ jobs:
     with:
       name: ${{ needs.build-cognito.outputs.component }}
       artifact: ${{ needs.build-cognito.outputs.artifact-name }}
+      parameters: LogGroupPrefix=/self-service/admin-tool/preview
 
   build-api:
     name: API
