@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Admin Tool VPC and networking components to provide security controls and public access to the app
+Transform: AWS::LanguageExtensions
+
+Resources:
+  CloudWatchLogsResourcePolicy:
+    Type: AWS::Logs::ResourcePolicy
+    Properties:
+      PolicyName: DeploymentStacksLogDelivery
+      PolicyDocument:
+        Fn::ToJsonString:
+          Version: 2012-10-17
+          Statement:
+            Effect: Allow
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/admin-tool/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/product-pages/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-self-service-admin-tool-*:log-stream:*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-self-service-product-pages-*:log-stream:*
+              # Legacy log group formats, can be removed once SSE-3110 is deployed through all environments.
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-*:log-stream:*
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Principal:
+              Service: delivery.logs.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
