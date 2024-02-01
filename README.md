@@ -16,7 +16,7 @@ brew tap aws/tap
 brew install aws-sam-cli
 ```
 
-Install and use the latest version of bash.
+Install and use the latest version of bash
 
 ```shell
 brew install bash
