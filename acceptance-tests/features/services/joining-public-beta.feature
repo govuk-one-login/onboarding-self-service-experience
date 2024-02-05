@@ -11,6 +11,15 @@ Feature: Joining public beta
     When they click on the "Register to join public beta" link
     Then they should be redirected to a page with the title "Register to join public beta - GOV.UK One Login"
 
+  Rule: user validating default populated fields
+    Scenario: The user verify the email
+      Then the value of the text field email should be "registered@test.gov.uk"
+      And the input text field email should be disabled
+
+    Scenario: The user verify the service name
+      Then the value of the text field serviceName should be "Test Service"
+      And the input text field serviceName should be disabled
+
   Rule: Applying for public beta
     Scenario: The user does not enter any characters into the Your full name field
       When they submit the name ""
