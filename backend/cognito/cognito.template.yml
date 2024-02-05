@@ -41,9 +41,6 @@ Parameters:
   CodeSigningConfigArn:
     Type: String
     Default: ""
-  SubscriptionFilterDestinationArn:
-    Type: String
-    Default: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
 
 Rules:
   DeploymentNameRequired:
@@ -64,35 +61,46 @@ Mappings:
   EnvironmentConfiguration:
     local:
       logGroupPrefix: /self-service/admin-tool/cognito
-      # Local builds do not support dynatrace
-      dynatraceLoggingEnabled: false
+      dynatraceLoggingEnabled: false # Local builds do not support dynatrace
+      cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     dev:
       logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: true
+      cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     build:
       logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: true
+      cslsLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     staging:
       logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: true
+      cslsLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     integration:
       logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: true
+      cslsLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     production:
       logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: true
+      cslsLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  SplunkLoggingEnabled: !Or [!Equals [ !Ref Environment, integration ], !Equals [ !Ref Environment, production ]]
   DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
+  CslsLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, cslsLoggingEnabled ], true ]
   IsLocal: !Equals [ !Ref Environment, "local" ]
 
 Globals:
@@ -257,6 +265,15 @@ Resources:
             Operation:
               Deidentify:
                 MaskConfig: { }
+
+  LambdaLogCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsLoggingEnabled
+    Properties:
+      LogGroupName: !Ref LambdaLogsGroup
+      FilterName: "Lambda logs for Cognito"
+      FilterPattern: ""
+      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
 
   SendPasswordChangedEmailFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
@@ -904,7 +921,7 @@ Resources:
       Principal: cognito-idp.amazonaws.com
 
   CognitoWebACL:
-    Type: 'AWS::WAFv2::WebACL'
+    Type: AWS::WAFv2::WebACL
     Properties:
       Name: !Sub ${AWS::StackName}-${Environment}-CognitoWebACL
       Scope: REGIONAL
@@ -978,7 +995,7 @@ Resources:
             MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAdminProtectionRuleSet
 
   CognitoWebACLAssociation:
-    Type: 'AWS::WAFv2::WebACLAssociation'
+    Type: AWS::WAFv2::WebACLAssociation
     Properties:
       WebACLArn: !GetAtt CognitoWebACL.Arn
       ResourceArn: !GetAtt UserPool.Arn
@@ -992,7 +1009,40 @@ Resources:
         - - 'aws-waf-logs'
           - !Join [ '-', !Split [ '/', !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ] ] ]
           - !If [ IsLocal, !Sub '-${DeploymentName}', !Ref AWS::NoValue ]
-      RetentionInDays: 30
+      RetentionInDays: 14
+      DataProtectionPolicy:
+        Name: data-protection-policy-cognito-lambda
+        Description: Data Protection for Cloudwatch Logs
+        Version: '2021-06-01'
+        Statement:
+          - Sid: audit-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Audit:
+                FindingsDestination:
+                  CloudWatchLogs:
+                    LogGroup: !Ref LogAuditLogGroup
+          - Sid: redact-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Deidentify:
+                MaskConfig: { }
 
   WafLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
@@ -1001,14 +1051,14 @@ Resources:
       LogDestinationConfigs:
         - !GetAtt WafLogGroup.Arn
 
-  SubscriptionFilter:
+  WafLogCslsSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
-    Condition: SplunkLoggingEnabled
+    Condition: CslsLoggingEnabled
     Properties:
       LogGroupName: !Ref WafLogGroup
-      FilterName: "subscription_for_splunk"
+      FilterName: "Waf logs for Cognito"
       FilterPattern: ""
-      DestinationArn: !Ref SubscriptionFilterDestinationArn
+      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
 
 Outputs:
   UserPoolID:
