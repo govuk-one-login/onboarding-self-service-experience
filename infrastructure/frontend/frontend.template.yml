@@ -3,6 +3,23 @@ Description: DI Admin Tool frontend
 Transform: AWS::LanguageExtensions
 
 Parameters:
+  Environment:
+    Description: "The name of the environment to deploy to."
+    Type: "String"
+    Default: local
+    AllowedValues:
+      - "local"
+      - "dev"
+      - "build"
+      - "staging"
+      - "integration"
+      - "production"
+  DeploymentName:
+    Type: String
+    MaxLength: 22
+    AllowedPattern: ^.*[^-]$
+    Default: self-service
+    Description: A unique prefix to identify the deployment; used to distinguish variation between ephemeral stacks
   ImageURI:
     Type: String
     Default: ""
@@ -10,16 +27,6 @@ Parameters:
   ContainerPort:
     Type: Number
     Default: 3000
-  LogGroupPrefix:
-    Type: String
-    AllowedPattern: ^.*[^\/]$
-    Default: /self-service/admin-tool
-  DeploymentName:
-    Type: String
-    MaxLength: 28
-    AllowedPattern: ^.*[^-]$
-    Default: self-service
-    Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
   ShowTestBanner:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/show-test-banner
@@ -45,24 +52,44 @@ Parameters:
     Type: String
     Default: ""
     Description: The ARN of the permissions boundary to apply when creating IAM roles
-  Environment:
-    Description: "The name of the environment to deploy to."
-    Type: "String"
-    Default: dev
-    AllowedValues:
-      - "dev"
-      - "build"
-      - "staging"
-      - "integration"
-      - "production"
+
+Rules:
+  DeploymentNameRequired:
+    RuleCondition: !Equals [ !Ref Environment, "local" ]
+    Assertions:
+      - Assert: !Not [ !Equals [ !Ref DeploymentName, "" ] ]
+        AssertDescription: >
+          Must specify DeploymentName parameter when Environment is "local"
+
+  DeploymentNameMustBeEmpty:
+    RuleCondition: !Not [ !Equals [ !Ref Environment, "local" ] ]
+    Assertions:
+      - Assert: !Equals [ !Ref DeploymentName, "self-service" ] # Confirm the default value is used.
+        AssertDescription: >
+          Must not specify DeploymentName parameter when Environment is not "local"
 
 Mappings:
+  EnvironmentConfiguration:
+    local:
+      logGroupPrefix: /self-service/admin-tool/frontend
+    dev:
+      logGroupPrefix: /self-service/admin-tool/frontend
+    build:
+      logGroupPrefix: /self-service/admin-tool/frontend
+    staging:
+      logGroupPrefix: /self-service/admin-tool/frontend
+    integration:
+      logGroupPrefix: /self-service/admin-tool/frontend
+    production:
+      logGroupPrefix: /self-service/admin-tool/frontend
+
   # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
   ElasticLoadBalancer:
     eu-west-2:
       AccountID: 652711504416
   TxMAAccountARN:
     Environment:
+      local: 'arn:aws:iam::494650018671:root'
       dev: 'arn:aws:iam::494650018671:root'
       build: 'arn:aws:iam::399055180839:root'
       staging: 'arn:aws:iam::178023842775:root'
@@ -72,6 +99,7 @@ Mappings:
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+  IsLocal: !Equals [ !Ref Environment, "local" ]
 
 Resources:
 
@@ -147,14 +175,22 @@ Resources:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/frontend/audit
+      LogGroupName: !Join
+        - "/"
+        - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ]
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'audit'
       RetentionInDays: 14
 
   FrontendLogsGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/frontend
+      LogGroupName: !Join
+        - "/"
+        - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ]
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'ecr'
       RetentionInDays: 14
       DataProtectionPolicy:
         Name: data-protection-policy-frontend
