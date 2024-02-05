@@ -23,6 +23,8 @@ jobs:
     uses: ./.github/workflows/build-frontend-image.yml
     with:
       artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
+    secrets:
+      dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
 
   deploy-frontend:
     name: Frontend
