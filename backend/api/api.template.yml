@@ -67,19 +67,19 @@ Mappings:
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     build:
       logGroupPrefix: /self-service/admin-tool/backend-api
-      dynatraceLoggingEnabled: false
+      dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     staging:
       logGroupPrefix: /self-service/admin-tool/backend-api
-      dynatraceLoggingEnabled: false
+      dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     integration:
       logGroupPrefix: /self-service/admin-tool/backend-api
-      dynatraceLoggingEnabled: false
+      dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     production:
       logGroupPrefix: /self-service/admin-tool/backend-api
-      dynatraceLoggingEnabled: false
+      dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
 
 Conditions:
