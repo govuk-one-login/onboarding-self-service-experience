@@ -59,6 +59,7 @@ jobs:
             sse:deployment-source=github-actions
           parameters: |-
             DeploymentName=${{ steps.get-deployment-name.outputs.pretty-branch-name }}
+            Environment=local
             ${{ inputs.parameters }}
 
       - name: Get deployment URL
