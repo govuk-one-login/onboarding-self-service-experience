@@ -3,34 +3,6 @@ Description: DI Self-Service API
 Transform: [ AWS::LanguageExtensions, AWS::Serverless-2016-10-31 ]
 
 Parameters:
-  ClientRegistryEndpoint:
-    Type: String
-    Default: https://oidc.integration.account.gov.uk
-    Description: Auth client registration endpoint
-  NotificationEmail:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /self-service/api/notifications-email
-    Description: Email address to send internal notifications
-  LogGroupPrefix:
-    Type: String
-    AllowedPattern: ^.*[^\/]$
-    Default: /self-service/admin-tool
-  DeploymentName:
-    Type: String
-    MaxLength: 28
-    AllowedPattern: ^.*[^-]$
-    Default: self-service
-    Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
-  PrivateAPI:
-    Type: String
-    AllowedValues: [ Yes, No ]
-    Default: Yes
-  PermissionsBoundary:
-    Type: String
-    Default: ""
-  CodeSigningConfigArn:
-    Type: String
-    Default: ""
   Environment:
     Description: "The name of the environment to deploy to."
     Type: "String"
@@ -42,25 +14,71 @@ Parameters:
       - "staging"
       - "integration"
       - "production"
+  DeploymentName:
+    Type: String
+    MaxLength: 22
+    AllowedPattern: ^.*[^-]$
+    Default: self-service
+    Description: A unique prefix to identify the deployment; used to distinguish variation between ephemeral stacks
+  ClientRegistryEndpoint:
+    Type: String
+    Default: https://oidc.integration.account.gov.uk
+    Description: Auth client registration endpoint
+  NotificationEmail:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/api/notifications-email
+    Description: Email address to send internal notifications
+  PrivateAPI:
+    Type: String
+    AllowedValues: [ Yes, No ]
+    Default: Yes
+  PermissionsBoundary:
+    Type: String
+    Default: ""
+  CodeSigningConfigArn:
+    Type: String
+    Default: ""
+
+Rules:
+  DeploymentNameRequired:
+    RuleCondition: !Equals [ !Ref Environment, "local" ]
+    Assertions:
+      - Assert: !Not [ !Equals [ !Ref DeploymentName, "" ] ]
+        AssertDescription: >
+          Must specify DeploymentName parameter when Environment is "local"
+
+  DeploymentNameMustBeEmpty:
+    RuleCondition: !Not [ !Equals [ !Ref Environment, "local" ] ]
+    Assertions:
+      - Assert: !Equals [ !Ref DeploymentName, "self-service" ] # Confirm the default value is used.
+        AssertDescription: >
+          Must not specify DeploymentName parameter when Environment is not "local"
 
 Mappings:
   EnvironmentConfiguration:
-    local: # Local builds do not support dynatrace
+    local:
+      logGroupPrefix: /self-service/admin-tool/backend-api
+      # Local builds do not support dynatrace
       dynatraceLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     dev:
+      logGroupPrefix: /self-service/admin-tool/backend-api
       dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     build:
+      logGroupPrefix: /self-service/admin-tool/backend-api
       dynatraceLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     staging:
+      logGroupPrefix: /self-service/admin-tool/backend-api
       dynatraceLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     integration:
+      logGroupPrefix: /self-service/admin-tool/backend-api
       dynatraceLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     production:
+      logGroupPrefix: /self-service/admin-tool/backend-api
       dynatraceLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
 
@@ -69,6 +87,7 @@ Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
   DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
+  IsLocal: !Equals [ !Ref Environment, "local" ]
 
 Globals:
   Function:
@@ -174,14 +193,22 @@ Resources:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/audit
+      LogGroupName: !Join
+        - "/"
+        - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ]
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'audit'
       RetentionInDays: 14
 
   APIAccessLogsGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api
+      LogGroupName: !Join
+        - "/"
+        - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ]
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'api'
       RetentionInDays: 14
       DataProtectionPolicy:
         Name: data-protection-policy-api
@@ -221,7 +248,11 @@ Resources:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/lambda
+      LogGroupName: !Join
+        - "/"
+        - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ]
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'lambda'
       RetentionInDays: 14
       DataProtectionPolicy:
         Name: data-protection-policy-api-lambda
@@ -1000,7 +1031,11 @@ Resources:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/step-functions
+      LogGroupName: !Join
+        - "/"
+        - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ]
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'step-functions'
       RetentionInDays: 14
       DataProtectionPolicy:
         Name: data-protection-policy-api-step-functions
