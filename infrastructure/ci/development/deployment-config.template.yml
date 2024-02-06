@@ -712,6 +712,34 @@ Resources:
             Principal:
               Federated: !Ref GitHubOIDCProvider
 
+  CloudWatchLogsResourcePolicy:
+    Type: AWS::Logs::ResourcePolicy
+    Properties:
+      PolicyName: PreviewStacksLogDelivery
+      PolicyDocument:
+        Fn::ToJsonString:
+          Version: 2012-10-17
+          Statement:
+            Effect: Allow
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/admin-tool/${PreviewStacksPrefix}/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/product-pages/${PreviewStacksPrefix}/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/dev/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/admin-tool/dev/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/product-pages/dev/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-*-dev:log-stream:*
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Principal:
+              Service: delivery.logs.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
+
   FrontendContainerImageRepository:
     Type: AWS::ECR::Repository
     Properties:

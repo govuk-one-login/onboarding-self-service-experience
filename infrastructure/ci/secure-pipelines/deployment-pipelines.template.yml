@@ -88,8 +88,6 @@ Resources:
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
         PipelineEnvironmentNameEnabled: "Yes"
-        AdditionalCodeSigningVersionArns: "arn:aws:signer:eu-west-2:216552277552:/signing-profiles/DynatraceSigner/5uwzCCGTPq"
-        CustomKmsKeyArns: "arn:aws:kms:eu-west-2:216552277552:key/4bc58ab5-c9bb-4702-a2c3-5d339604a8fe"
         AllowedServiceOne: Lambda
         AllowedServiceTwo: DynamoDB
         AllowedServiceThree: SNS
@@ -124,8 +122,7 @@ Resources:
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
-        AdditionalCodeSigningVersionArns: "arn:aws:signer:eu-west-2:216552277552:/signing-profiles/DynatraceSigner/5uwzCCGTPq"
-        CustomKmsKeyArns: "arn:aws:kms:eu-west-2:216552277552:key/4bc58ab5-c9bb-4702-a2c3-5d339604a8fe"
+        PipelineEnvironmentNameEnabled: "Yes"
         AllowedServiceOne: Cognito
         AllowedServiceTwo: Lambda
         AllowedServiceThree: SNS
