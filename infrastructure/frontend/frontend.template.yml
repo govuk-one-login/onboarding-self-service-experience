@@ -71,27 +71,21 @@ Rules:
 Mappings:
   EnvironmentConfiguration:
     local:
-      logGroupPrefix: /self-service/admin-tool/frontend
       cslsLoggingEnabled: true
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     dev:
-      logGroupPrefix: /self-service/admin-tool/frontend
       cslsLoggingEnabled: false
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     build:
-      logGroupPrefix: /self-service/admin-tool/frontend
       cslsLoggingEnabled: false
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     staging:
-      logGroupPrefix: /self-service/admin-tool/frontend
       cslsLoggingEnabled: false
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     integration:
-      logGroupPrefix: /self-service/admin-tool/frontend
       cslsLoggingEnabled: false
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     production:
-      logGroupPrefix: /self-service/admin-tool/frontend
       cslsLoggingEnabled: false
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
 
@@ -190,7 +184,7 @@ Resources:
     Properties:
       LogGroupName: !Join
         - "/"
-        - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ]
+        - - '/onboarding-self-service/frontend'
           - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
           - 'audit'
       RetentionInDays: 14
@@ -201,9 +195,9 @@ Resources:
     Properties:
       LogGroupName: !Join
         - "/"
-        - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ]
+        - - '/aws/ecs'
+          - 'onboarding-self-service/frontend'
           - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
-          - 'ecr'
       RetentionInDays: 14
       DataProtectionPolicy:
         Name: data-protection-policy-frontend
@@ -571,10 +565,10 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Join
-        - ""
+        - "-"
         - - 'aws-waf-logs'
-          - !Join [ '-', !Split [ '/', !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ] ] ]
-          - !If [ IsLocal, !Sub '-${DeploymentName}', !Ref AWS::NoValue ]
+          - 'onboarding-self-service-frontend'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
       RetentionInDays: 14
       DataProtectionPolicy:
         Name: data-protection-policy-frontend-loadbalancer
