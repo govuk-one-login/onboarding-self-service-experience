@@ -13,13 +13,15 @@ Resources:
           Statement:
             Effect: Allow
             Resource:
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/admin-tool/*
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/product-pages/*
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-self-service-admin-tool-*:log-stream:*
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-self-service-product-pages-*:log-stream:*
-              # Legacy log group formats, can be removed once SSE-3110 is deployed through all environments.
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/self-service/*
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-*:log-stream:*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/onboarding-self-service/* # Application prefix for audit log groups
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/onboarding-product-pages/* # Application prefix for audit log groups
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/onboarding-self-service/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/stepfunction/onboarding-self-service/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/api-gateway/onboarding-self-service/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/ecs/onboarding-self-service/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/ecs/onboarding-product-pages/*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-onboarding-self-service-*:log-stream:*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-onboarding-product-pages-*:log-stream:*
             Action:
               - logs:CreateLogStream
               - logs:PutLogEvents
