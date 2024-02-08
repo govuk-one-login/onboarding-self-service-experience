@@ -60,37 +60,31 @@ Rules:
 Mappings:
   EnvironmentConfiguration:
     local:
-      logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: false # Local builds do not support dynatrace
       cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     dev:
-      logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: true
       cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     build:
-      logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: true
       cslsLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     staging:
-      logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: true
       cslsLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     integration:
-      logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: true
       cslsLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     production:
-      logGroupPrefix: /self-service/admin-tool/cognito
       dynatraceLoggingEnabled: true
       cslsLoggingEnabled: false
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
@@ -217,7 +211,7 @@ Resources:
     Properties:
       LogGroupName: !Join
         - "/"
-        - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ]
+        - - '/onboarding-self-service/cognito'
           - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
           - 'audit'
       RetentionInDays: 14
@@ -228,9 +222,10 @@ Resources:
     Properties:
       LogGroupName: !Join
         - "/"
-        - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ]
+        - - '/aws/lambda'
+          - 'onboarding-self-service/cognito'
           - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
-          - 'lambda'
+          - 'all'
       RetentionInDays: 14
       DataProtectionPolicy:
         Name: data-protection-policy-cognito-lambda
@@ -1005,10 +1000,10 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Join
-        - ""
+        - "-"
         - - 'aws-waf-logs'
-          - !Join [ '-', !Split [ '/', !FindInMap [ EnvironmentConfiguration, !Ref Environment, logGroupPrefix ] ] ]
-          - !If [ IsLocal, !Sub '-${DeploymentName}', !Ref AWS::NoValue ]
+          - 'onboarding-self-service-cognito'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
       RetentionInDays: 14
       DataProtectionPolicy:
         Name: data-protection-policy-cognito-lambda
