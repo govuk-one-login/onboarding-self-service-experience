@@ -36,7 +36,7 @@ jobs:
         uses: govuk-one-login/github-actions/beautify-branch-name@62863904d9aef239c1214f8e2d58577f38c9bb76 # 21/08/2023
         id: get-deployment-name
         with:
-          length-limit: 28
+          length-limit: 22
           prefix: preview
           verbose: false
 
