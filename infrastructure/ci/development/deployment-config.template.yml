@@ -196,6 +196,26 @@ Resources:
           - Effect: Allow
             Resource: "*"
             Action:
+              - logs:DescribeLogGroups
+              - logs:TagResource
+              - logs:CreateLogGroup
+              - logs:DeleteLogGroup
+              - logs:PutRetentionPolicy
+              - logs:CreateLogDelivery
+              - logs:PutResourcePolicy
+              - logs:DescribeResourcePolicies
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
+            Action:
+              - logs:PutDataProtectionPolicy
+              - logs:DeleteDataProtectionPolicy
+              - logs:GetDataProtectionPolicy
+              - logs:Unmask
+
+          - Effect: Allow
+            Resource: "*"
+            Action:
               - ecr:DescribeRegistry
               - ecr:GetAuthorizationToken
               - ec2:DescribeSecurityGroups
@@ -321,6 +341,24 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
+            Resource: "*"
+            Action:
+              - logs:DescribeLogGroups
+              - logs:TagResource
+              - logs:CreateLogGroup
+              - logs:DeleteLogGroup
+              - logs:PutRetentionPolicy
+              - logs:CreateLogDelivery
+              - logs:PutResourcePolicy
+              - logs:DescribeResourcePolicies
+          - Effect: Allow
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
+            Action:
+              - logs:PutDataProtectionPolicy
+              - logs:DeleteDataProtectionPolicy
+              - logs:GetDataProtectionPolicy
+              - logs:Unmask
+          - Effect: Allow
             Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/product-pages/frontend/*
             Action:
               - secretsmanager:GetSecretValue
@@ -384,7 +422,7 @@ Resources:
               - logs:DescribeResourcePolicies
 
           - Effect: Allow
-            Resource: arn:aws:logs:::log-group:*:*
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
             Action:
               - logs:PutDataProtectionPolicy
               - logs:DeleteDataProtectionPolicy
@@ -469,7 +507,10 @@ Resources:
                 lambda:Principal: apigateway.amazonaws.com
 
           - Effect: Allow
-            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api*:log-stream:*
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api*:log-stream:*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/admin-tool/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api*:log-stream:*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/product-pages/${PreviewStacksPrefix}/${PreviewStacksPrefix}-*/api*:log-stream:*
             Action:
               - logs:TagResource
               - logs:CreateLogGroup
@@ -527,6 +568,26 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
+          - Effect: Allow
+            Resource: "*"
+            Action:
+              - logs:DescribeLogGroups
+              - logs:TagResource
+              - logs:CreateLogGroup
+              - logs:DeleteLogGroup
+              - logs:PutRetentionPolicy
+              - logs:CreateLogDelivery
+              - logs:PutResourcePolicy
+              - logs:DescribeResourcePolicies
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
+            Action:
+              - logs:PutDataProtectionPolicy
+              - logs:DeleteDataProtectionPolicy
+              - logs:GetDataProtectionPolicy
+              - logs:Unmask
+
           - Effect: Allow
             Resource: "*"
             Action: cognito-idp:CreateUserPool
@@ -651,30 +712,6 @@ Resources:
             Action: s3:ListBucket
             Principal:
               Federated: !Ref GitHubOIDCProvider
-
-  CloudWatchLogsResourcePolicy:
-    Type: AWS::Logs::ResourcePolicy
-    Properties:
-      PolicyName: PreviewStacksLogDelivery
-      PolicyDocument:
-        Fn::ToJsonString:
-          Version: 2012-10-17
-          Statement:
-            Effect: Allow
-            Resource:
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/${PreviewStacksPrefix}/*
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ServiceName}/dev/*
-              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:aws-waf-logs-*-dev:log-stream:*
-            Action:
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-            Principal:
-              Service: delivery.logs.amazonaws.com
-            Condition:
-              StringEquals:
-                aws:SourceAccount: !Ref AWS::AccountId
-              ArnLike:
-                aws:SourceArn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
 
   FrontendContainerImageRepository:
     Type: AWS::ECR::Repository

@@ -44,4 +44,5 @@ export default interface LambdaFacadeInterface {
     getDynamoDBEntries(email: string): Promise<AxiosResponse>;
 
     deleteClientEntries(oldUserID: string, serviceID: string): Promise<void>;
+    deleteServiceEntries(serviceID: string): Promise<void>;
 }

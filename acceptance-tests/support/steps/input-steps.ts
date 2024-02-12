@@ -7,6 +7,7 @@ const fields = {
     name: "userName",
     email: "emailAddress",
     password: "password",
+    serviceName: "serviceNameDisplayOnly",
     "security code": "securityCode",
     "organisation name": "organisationName",
     "mobile phone number": "mobileNumber",
@@ -14,7 +15,8 @@ const fields = {
     "new password": "newPassword",
     "current password": "currentPassword",
     "redirect uris": "redirectUris",
-    "post logout redirect uris": "redirectUris"
+    "post logout redirect uris": "redirectUris",
+    "change your public key": "serviceUserPublicKey"
 };
 
 When("they submit the {} {string}", async function (fieldName, value) {
@@ -61,6 +63,12 @@ Then("the value of the text field {} should be {string}", async function (this: 
         element.getAttribute("value")
     );
     assert.equal(elementAttributeValue, attributeValueToCheck);
+});
+Then("the input text field {} should be disabled", async function (this: TestContext, fieldName) {
+    const isDisabled = await this.page.$eval(`#${fields[fieldName as keyof typeof fields]}[disabled]`, element => {
+        return element !== null;
+    });
+    assert.strictEqual(true, isDisabled, new TypeError(fieldName + " is not disabled"));
 });
 
 // eslint-disable-next-line

@@ -30,7 +30,6 @@ COMMANDS=("${DEPLOY_CMDS[@]}" run open list exports delete help)
 ../aws.sh check-current-account development &> /dev/null || eval "$(gds aws di-onboarding-development -e)"
 USER_NAME=$(../aws.sh get-user-name)
 ECR_REPO=self-service/frontend
-LOG_PREFIX=/self-service/dev
 REPO_ROOT=$(pwd)/../..
 OPTION_REGEX="^--?.*"
 DEV_PREFIX=dev
@@ -113,7 +112,7 @@ function deploy {
     ${template:+--template $template} \
     ${STACK_PREFIX:+--stack-name $STACK_PREFIX-$component} \
     --tags sse:component="$component" sse:stack-type=dev sse:stack-role=application sse:owner="$USER_NAME" \
-    --params ${STACK_PREFIX:+DeploymentName=$STACK_PREFIX} LogGroupPrefix=$LOG_PREFIX
+    --params ${STACK_PREFIX:+DeploymentName=$STACK_PREFIX} Environment=local
 
   popd > /dev/null
 }

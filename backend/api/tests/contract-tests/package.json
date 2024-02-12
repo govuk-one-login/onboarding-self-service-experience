@@ -1,0 +1,26 @@
+{
+  "name": "api-pact-tests",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "DI Self-Service API PACT tests",
+  "scripts": {
+    "buildts": "tsc $(${CI:-false} && echo --sourceMap false)",
+    "buildjs": "cp -r assets/javascripts dist/assets/",
+    "build": "npm run buildts && npm run buildjs",
+    "publish": "node dist/provider/publish.js",
+    "verify": "node dist/provider/verifier.js",
+    "test": "npm run publish && jest --detectOpenHandles"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws4": "^1.11.6",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
+  },
+  "dependencies": {
+    "@pact-foundation/pact-core": "^14.0.5",
+    "@pact-foundation/pact-node": "^10.17.7",
+    "mocha": "^10.2.0"
+  }
+}

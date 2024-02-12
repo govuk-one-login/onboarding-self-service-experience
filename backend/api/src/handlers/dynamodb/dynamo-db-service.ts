@@ -46,3 +46,20 @@ export const deleteDynamoDBClientEntriesHandler = async (event: APIGatewayProxyE
 
     return response;
 };
+
+export const deleteDynamoDBServiceEntriesHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    console.log("dynamo-db-inspector - In deleteDynamoDBServiceEntriesHandler");
+
+    const response = {statusCode: 500, body: JSON.stringify("")};
+    const payload = event?.body ? JSON.parse(event.body as string) : event;
+    const serviceID = payload.serviceId;
+
+    if (serviceID == null) {
+        throw new Error("No Service ID provided for DeleteDynamoDBServiceEntries");
+    } else {
+        await dynamoDBClient.deleteDynamoDBServiceEntries(serviceID);
+        response.statusCode = 200;
+    }
+
+    return response;
+};

@@ -224,6 +224,30 @@ export default class DynamoDbClient {
         await this.dynamodb.send(deleteClientRecordCommand);
     }
 
+    async deleteDynamoDBServiceEntries(serviceID: string): Promise<void> {
+        console.log("dynamodb-client - deleteDynamoDBServiceEntries()");
+
+        const deleteItemCommandInputs: DeleteItemCommandInput[] = [];
+
+        await this.getServicesById(serviceID).then(output => {
+            if (output.Items) {
+                output.Items.forEach(row => {
+                    deleteItemCommandInputs.push({
+                        TableName: this.tableName,
+                        Key: {pk: row.pk, sk: row.sk}
+                    });
+                });
+            }
+        });
+
+        console.log(JSON.stringify(deleteItemCommandInputs));
+
+        for (const deleteItemCommandInput of deleteItemCommandInputs) {
+            const deleteItemCommand = new DeleteItemCommand(deleteItemCommandInput);
+            await this.dynamodb.send(deleteItemCommand);
+        }
+    }
+
     private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: Updates): Promise<UpdateItemCommandOutput> {
         const attributeNames = Object.keys(updates);
 

@@ -333,9 +333,20 @@ export const processAddServiceForm: RequestHandler = async (req, res, next) => {
 
     req.session.serviceName = req.body.serviceName;
 
-    const generatedClient = await s4.generateClient(service, nonNull(req.session.authenticationResult));
-    const body = JSON.parse(generatedClient.data.output).body;
-    const serviceId = JSON.parse(body).pk;
+    let serviceId = "";
+    let body;
+
+    try {
+        console.info("Generating Client to Service:" + service.serviceName);
+        const generatedClient = await s4.generateClient(service, nonNull(req.session.authenticationResult));
+        body = JSON.parse(generatedClient.data.output).body;
+        serviceId = JSON.parse(body).pk;
+    } catch (error) {
+        console.error("Unable to Register Client to Service - Service Items removed");
+        console.error(error);
+        await s4.deleteServiceEntries(uuid);
+        return res.render("there-is-a-problem.njk");
+    }
 
     req.session.serviceId = serviceId;
 
