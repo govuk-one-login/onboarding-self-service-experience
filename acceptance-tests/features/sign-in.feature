@@ -73,12 +73,12 @@ Feature: Users can sign in to the self-service experience
       And they should see the text "We sent a code to:"
 
       Examples:
-        | condition                   | code    | error_message |
-        | is empty                    |         | Enter the 6 digit security code |
-        | has more than 6 digits      | 1234567 | Enter the security code using only 6 digits |
-        | has fewer than 6 digits     | 12345   | Enter the security code using only 6 digits |
-        | contains letters            | 12345A  | Your security code should only include numbers |
-        | contains special characters | 12345$  | Your security code should only include numbers |
+        | condition                   | code    | error_message                                                                             |
+        | is empty                    |         | Enter the 6 digit security code                                                           |
+        | has more than 6 digits      | 1234567 | Enter the security code using only 6 digits                                               |
+        | has fewer than 6 digits     | 12345   | Enter the security code using only 6 digits                                               |
+        | contains letters            | 12345A  | Your security code should only include numbers                                            |
+        | contains special characters | 12345$  | Your security code should only include numbers                                            |
         | is incorrect or expired     | 000000  | The code you entered is not correct or has expired - enter it again or request a new code |
 
   Rule: The user tries to sign in with account which is not registered
@@ -102,7 +102,7 @@ Feature: Users can sign in to the self-service experience
 
     Scenario: The user wants to see or hide their password as they type it
       When they click on the forgot password link in their email
-      Then they should see the text "Create a new password"
+      And they should see the text "Create a new password"
       When they toggle the "Show" link on the field "password"
       And they enter the password "PasswordIsShown"
       Then they see the toggle link "Hide" on the field "password"
@@ -124,3 +124,41 @@ Feature: Users can sign in to the self-service experience
       When they click Your account link in the left side navigation
       Then they should be redirected to the "/account" page
       And they should see the text "Last updated just now"
+
+    @accessible
+    Rule: The user validating the accessibility issues in Sign-In Journey pages
+    Scenario: User verifying the accessibility of SigIn page
+      Then there should be no accessibility violations
+
+    Scenario: User verifying the accessibility of /sign-in/enter-password page
+      When they submit the email "registered@test.gov.uk"
+      Then there should be no accessibility violations
+
+    Scenario: User verifying the accessibility of /sign-in/forgot-password page
+      When they submit the email "registered@test.gov.uk"
+      And they click on the "Forgot your password?" link
+      Then there should be no accessibility violations
+
+    Scenario: user verifying the accessibility of /forgot-password/enter-email-code page
+      When they submit the email "registered@test.gov.uk"
+      And they click on the "Forgot your password?" link
+      And they click the Continue button
+      Then there should be no accessibility violations
+
+
+    Scenario: user verifying the accessibility of /sign-in/enter-text-code page
+      When they submit the email "registered@test.gov.uk"
+      And they submit a valid password
+      Then there should be no accessibility violations
+
+    Scenario: user verifying the accessibility of /services page
+      When they submit the email "registered@test.gov.uk"
+      And they submit a valid password
+      And they submit a correct security code
+      Then there should be no accessibility violations
+
+
+
+
+
+
