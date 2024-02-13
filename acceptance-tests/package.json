@@ -8,7 +8,7 @@
     "accessible-tests": "npm run cucumber -- --tags @accessible"
   },
   "devDependencies": {
-    "@axe-core/puppeteer": "^4.8.4",
+    "@axe-core/puppeteer": "^4.8.5",
     "@cucumber/cucumber": "^9.1.0",
     "puppeteer": "^20.3.0"
   }
