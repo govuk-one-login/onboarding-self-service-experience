@@ -21,6 +21,10 @@ function network {
   deploy-config-stack network --tags sse:stack-role=vpc "$@"
 }
 
+function logging {
+  deploy-config-stack logging --tags sse:stack-role=vpc "$@"
+}
+
 function domain {
   local account servers params
   account=$(../aws.sh get-current-account-name)

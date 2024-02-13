@@ -10,6 +10,6 @@
   "devDependencies": {
     "@axe-core/puppeteer": "^4.8.4",
     "@cucumber/cucumber": "^9.1.0",
-    "puppeteer": "^20.7.2"
+    "puppeteer": "^20.3.0"
   }
 }

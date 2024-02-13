@@ -5,6 +5,8 @@ on:
     inputs:
       environment: { required: true, type: string }
       artifact-name: { required: true, type: string }
+    secrets:
+      dynatrace-pass-token: { required: true }
 
 concurrency: deploy-frontend-secure-pipelines-${{ inputs.environment }}
 
@@ -22,6 +24,13 @@ jobs:
       url: ${{ steps.deploy.outputs.pipeline-url }}
 
     steps:
+      - name: Login to GDS Dev Dynatrace Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: khw46367.live.dynatrace.com
+          username: khw46367
+          password: ${{ secrets.dynatrace-pass-token }}
+
       - name: Deploy
         id: deploy
         uses: govuk-one-login/github-actions/secure-pipelines/deploy-fargate@ed0a88449e7290e57a365db7f2f22e7eca86329a # 23/01/2024
