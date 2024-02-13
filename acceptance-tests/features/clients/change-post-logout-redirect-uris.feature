@@ -52,3 +52,11 @@ Feature: Users can change their post logout redirect uris
       And they should see the exact value "http://localhost/updated http://localhost/logged_out/updated" in the post logout redirect uris field
       When they click on the link that points to "/change-post-logout-uris"
       Then the value of the text field post logout redirect uris should be "http://localhost/updated http://localhost/logged_out/updated"
+
+
+
+  @accessible
+  Rule: The user validate accessibility issues in Change your post logout redirect URIs page
+    Scenario: User verifying the accessibility of /change-post-logout-uris page
+      When they click on the link that points to "/change-post-logout-uris"
+      Then there should be no accessibility violations

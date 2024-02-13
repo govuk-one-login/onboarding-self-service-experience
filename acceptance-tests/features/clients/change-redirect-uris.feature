@@ -48,3 +48,9 @@ Feature: Users can change their redirect uris
       And they should see the exact value "http://localhost/updated" in the first redirect uri field
       When they click on the link that points to "/change-redirect-uris"
       Then the value of the text field redirect uris should be "http://localhost/updated"
+
+  @accessible
+  Rule: The user validate accessibility issues in user-attributes page
+    Scenario: User verifying the accessibility of /clients page
+      When they click on the link that points to "/change-redirect-uris"
+      Then there should be no accessibility violations
