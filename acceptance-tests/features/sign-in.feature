@@ -125,8 +125,8 @@ Feature: Users can sign in to the self-service experience
       Then they should be redirected to the "/account" page
       And they should see the text "Last updated just now"
 
-    @accessible
-    Rule: The user validating the accessibility issues in Sign-In Journey pages
+  @accessible
+  Rule: The user validating the accessibility issues in Sign-In Journey pages
     Scenario: User verifying the accessibility of SigIn page
       Then there should be no accessibility violations
 
@@ -149,6 +149,12 @@ Feature: Users can sign in to the self-service experience
     Scenario: user verifying the accessibility of /sign-in/enter-text-code page
       When they submit the email "registered@test.gov.uk"
       And they submit a valid password
+      Then there should be no accessibility violations
+
+    Scenario: user verifying the accessibility of /sign-in/resend-text-code page
+      When they submit the email "registered@test.gov.uk"
+      And they submit a valid password
+      And they click on the 'Problems receiving a text message?' link
       Then there should be no accessibility violations
 
     Scenario: user verifying the accessibility of /services page

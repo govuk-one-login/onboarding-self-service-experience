@@ -5,7 +5,7 @@
     "cucumber": "cucumber-js",
     "cucumber-fast": "npm run cucumber -- --parallel 5",
     "cucumber-report": "npm run cucumber -- --format html:test-report.html",
-    "accessible-tests": "npm run cucumber-report -- --tags @accessible"
+    "accessible-tests": "npm run cucumber -- --tags @accessible"
   },
   "devDependencies": {
     "@axe-core/puppeteer": "^4.8.4",
