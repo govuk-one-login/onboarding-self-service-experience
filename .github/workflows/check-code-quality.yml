@@ -49,3 +49,17 @@ jobs:
         uses: govuk-one-login/github-actions/code-quality/run-security-audit@5dacba941def444d69f02843feaebed79b5fca51 # 11/04/2023
         with:
           workspaces: true
+
+  check-pii-filters:
+    name: Check PII Filters
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+      - name: Run AWS Template Scan
+        id: pii-scan
+        uses: ./.github/actions/check-pii-audit
+        with:
+          ignore-file: infrastructure/config/pii_scan_ignore.txt
+          ignore-lines: infrastructure/config/pii_scan_skip.txt
