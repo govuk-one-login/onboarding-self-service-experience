@@ -19,7 +19,7 @@ Feature: Users can change their public key, and toggle visibility
 
     Scenario: User validate the generate key pair link
       When they click on the 'generate a key pair (opens in new tab)' link that opens in a new tab
-      Then they should be directed to the URL 'https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/generate-a-key/'
+      Then they should be directed to the URL 'https://docs.sign-in.service.gov.uk/before-integrating/generate-a-key/'
 
     Scenario Outline: User submits invalid public key
       When they submit the change your public key '<keyValue>'
