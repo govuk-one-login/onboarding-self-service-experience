@@ -36,9 +36,8 @@ jobs:
 
       - name: Debug workspace directory
         run: |
-          ls -lah ${{ github.workspace }}
+          ls -lah /opt/* 2>/dev/null
 
       - name: Debug filesystem space
         run: |
-          du -hs /mnt/* 2>/dev/null
-          du -hs /opt/* 2>/dev/null
+          ls -lah /mnt/* 2>/dev/null
