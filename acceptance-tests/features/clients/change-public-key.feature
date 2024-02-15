@@ -80,3 +80,10 @@ Feature: Users can change their public key, and toggle visibility
       Then they should be redirected to a page with the path starting with "/services"
       And they should see the text "You have changed your public key"
       And they are able see the updated value for public key
+
+
+    @accessible
+    Rule: The user validate accessibility issues in public key page
+    Scenario: User verifying the accessibility of /change-public-key page
+      When they click on the link that points to "/change-public-key"
+      Then there should be no accessibility violations

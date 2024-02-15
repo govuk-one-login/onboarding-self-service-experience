@@ -4,9 +4,11 @@
   "scripts": {
     "cucumber": "cucumber-js",
     "cucumber-fast": "npm run cucumber -- --parallel 5",
-    "cucumber-report": "npm run cucumber -- --format html:test-report.html"
+    "cucumber-report": "npm run cucumber -- --format html:test-report.html",
+    "accessible-tests": "npm run cucumber -- --tags @accessible"
   },
   "devDependencies": {
+    "@axe-core/puppeteer": "^4.8.5",
     "@cucumber/cucumber": "^9.1.0",
     "puppeteer": "^20.3.0"
   }
