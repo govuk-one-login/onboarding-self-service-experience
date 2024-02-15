@@ -40,4 +40,6 @@ jobs:
 
       - name: Debug filesystem space
         run: |
-          du -hs /*
+          du -hs /home/*
+          du -hs /mnt/*
+          du -hs /opt/*
