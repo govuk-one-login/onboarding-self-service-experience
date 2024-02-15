@@ -40,6 +40,5 @@ jobs:
 
       - name: Debug filesystem space
         run: |
-          du -hs /home/runner* 2>/dev/null
           du -hs /mnt/* 2>/dev/null
           du -hs /opt/* 2>/dev/null
