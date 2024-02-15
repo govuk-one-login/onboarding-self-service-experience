@@ -30,4 +30,4 @@ Feature: A page where users can view the details associated with a client
     Scenario: The user wants to know how to generate a keypair
       When they click the toggle 'What do these terms mean?' button
       And they click on the "generate a key pair (opens in new tab)" link that opens in a new tab
-      Then they should be directed to the URL "https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/generate-a-key/"
+      Then they should be directed to the URL "https://docs.sign-in.service.gov.uk/before-integrating/generate-a-key/"
