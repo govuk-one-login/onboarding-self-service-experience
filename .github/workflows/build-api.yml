@@ -40,4 +40,4 @@ jobs:
 
       - name: Debug filesystem space
         run: |
-          du -hs ./*
+          du -hs /*
