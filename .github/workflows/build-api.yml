@@ -33,3 +33,11 @@ jobs:
           base-dir: ${{ github.workspace }}
           template: backend/api/api.template.yml
           additional-artifact-paths: backend/api/state-machines
+
+      - name: Debug workspace directory
+        run: |
+          ls -lah ${{ github.workspace }}
+
+      - name: Debug filesystem space
+        run: |
+          du -hs
