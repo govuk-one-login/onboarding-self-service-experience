@@ -16,6 +16,8 @@ import {
     clickYourAccountSubnavLink
 } from "./shared-functions";
 
+import AxePuppeteer from "@axe-core/puppeteer";
+
 Given("the user is on the home page", async function () {
     await this.goToPath("/");
 });
@@ -153,4 +155,9 @@ When("they try to submit the form without selecting any value from the radio but
 When("they select the {string} radio button", async function (labelText) {
     const el = await this.page.$x(`//label[contains(text(), "${labelText}")]`);
     await el[0].click();
+});
+
+Then(/^there should be no accessibility violations$/, async function (this: TestContext) {
+    const results = await new AxePuppeteer(this.page).withTags(["wcag21aa"]).analyze();
+    assert.equal(results.violations.length, 0, "Accessibility Violations Detected : " + JSON.stringify(results.violations));
 });
