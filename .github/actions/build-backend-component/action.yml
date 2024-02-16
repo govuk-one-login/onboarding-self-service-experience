@@ -24,11 +24,11 @@ runs:
   using: composite
   steps:
     - name: Build SAM application
-      uses: govuk-one-login/github-actions/sam/build-application@299bdda5b093a5d13c76e4d0f97f59bc727b4e03 # 28/06/2023
+      uses: govuk-one-login/github-actions/sam/build-application@0eb1972f8c0d539b3ff4c24d78b3dba917343e7c # 16/02/2024
       id: build
       with:
         template: ${{ inputs.template }}
         base-dir: ${{ inputs.base-dir }}
-        cache-key: ${{ inputs.name }}
+        cache-name: ${{ inputs.name }}
         artifact-name: ${{ inputs.name }}-SAM
         additional-artifact-paths: ${{ inputs.additional-artifact-paths }}
