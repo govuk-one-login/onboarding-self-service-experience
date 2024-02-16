@@ -38,4 +38,4 @@ jobs:
       - name: Debug workspace directory
         if: steps.build.outcome != 'failure'
         run: |
-          sudo ls -lah /home/runner/
+          sudo du -hs /home/runner/*
