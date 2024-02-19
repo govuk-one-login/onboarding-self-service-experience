@@ -22,7 +22,7 @@ function network {
 }
 
 function logging {
-  deploy-config-stack logging --tags sse:stack-role=vpc "$@"
+  deploy-config-stack logging --tags sse:stack-role=logging "$@"
 }
 
 function domain {
