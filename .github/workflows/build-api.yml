@@ -28,14 +28,8 @@ jobs:
       - name: Build SAM application
         uses: ./.github/actions/build-backend-component
         id: build
-        continue-on-error: true
         with:
           name: API
           base-dir: ${{ github.workspace }}
           template: backend/api/api.template.yml
           additional-artifact-paths: backend/api/state-machines
-
-      - name: Debug workspace directory
-        if: steps.build.outcome != 'success'
-        run: |
-          sudo df -h
