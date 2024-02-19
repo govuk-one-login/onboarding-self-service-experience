@@ -25,7 +25,7 @@
     "test:cov": "jest --silent --coverage",
     "lint": "eslint '*.ts' --quiet --fix",
     "cucumber": "npm run cucumber -w acceptance-tests --",
-    "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_ignore.txt -s infrastructure/config/pii_skip.txt"
+    "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.354.0",
