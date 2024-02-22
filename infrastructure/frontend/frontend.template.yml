@@ -177,6 +177,8 @@ Resources:
               Value: !Ref PublicBetaSheetDataRange
             - Name: PUBLIC_BETA_SHEET_HEADER_RANGE
               Value: !Ref PublicBetaSheetHeaderRange
+            - Name: USE_COGNITO_DR
+              Value: "{{resolve:ssm:/self-service/frontend/use-cognito-dr}}"
 
           PortMappings:
             - ContainerPort: !Ref ContainerPort
