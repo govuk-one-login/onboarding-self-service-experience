@@ -29,7 +29,9 @@ jobs:
         uses: ./.github/actions/build-backend-component
         id: build
         with:
-          name: API
+          name: api
           base-dir: ${{ github.workspace }}
           template: backend/api/api.template.yml
+          manifest: backend/api/package.json
+          source-dir: backend/api
           additional-artifact-paths: backend/api/state-machines

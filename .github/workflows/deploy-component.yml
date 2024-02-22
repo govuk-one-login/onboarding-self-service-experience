@@ -41,7 +41,7 @@ jobs:
           verbose: false
 
       - name: Deploy stack
-        uses: govuk-one-login/github-actions/sam/deploy-stack@62863904d9aef239c1214f8e2d58577f38c9bb76 # 21/08/2023
+        uses: govuk-one-login/github-actions/sam/deploy-stack@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
         id: deploy
         with:
           aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
