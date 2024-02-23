@@ -165,7 +165,7 @@ function check-deployment-parameters {
   check-parameter-set "${parameter}" || write-parameter-value "$parameter" "false"
 
   parameter=${PARAMETERS[use_stub_otp]}
-  check-parameter-set "${parameter}" || write-parameter-value "$parameter" "true"
+  check-parameter-set "${parameter}" || write-parameter-value "$parameter" "false"
 
   local secret=${SECRETS[fixed_otp_credentials]}
   check-secret-set "$secret" || write-secret-value "$secret" "$(get-value-from-user "$secret" secret)"
