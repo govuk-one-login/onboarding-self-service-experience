@@ -147,6 +147,7 @@ Resources:
                 Resource: !Sub arn:aws:wafv2:${AWS::Region}:${AWS::AccountId}:regional/*
                 Action:
                   - wafv2:CreateWebACL
+                  - wafv2:UpdateWebACL
                   - wafv2:DeleteWebACL
                   - wafv2:AssociateWebACL
                   - wafv2:GetWebACL
