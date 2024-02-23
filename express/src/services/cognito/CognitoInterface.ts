@@ -46,5 +46,5 @@ export default interface CognitoInterface {
 
     useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput>;
 
-  verifyMobileUsingSmsCode(accessToken: string, code: string, emailAddress: string): Promise<void>;
+    verifyMobileUsingSmsCode(accessToken: string, code: string, emailAddress: string): Promise<void>;
 }
