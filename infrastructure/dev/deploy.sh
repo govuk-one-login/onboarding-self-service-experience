@@ -14,6 +14,7 @@ declare -A SECRETS=(
   [SESSION_SECRET]=frontend/session-secret
   [GOOGLE_SHEET_CREDENTIALS]=frontend/google-sheet-credentials
   [USER_SIGNUP_SHEET_ID]=frontend/user-signup-sheet-id
+  [FIXED_OTP_CREDENTIALS]=frontebd/fixed-otp-credentials
 )
 
 declare -A PARAMETERS=(

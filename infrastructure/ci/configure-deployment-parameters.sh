@@ -20,6 +20,7 @@ declare -A PARAMETERS=(
   [public_beta_sheet_data_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-data-range
   [public_beta_sheet_header_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-header-range
   [use_cognito_dr]=$PARAMETER_NAME_PREFIX/frontend/use_cognito_dr
+  [use_stub_otp]=$PARAMETER_NAME_PREFIX/frontend/use_stub_otp
 )
 
 declare -A SECRETS=(
@@ -28,6 +29,7 @@ declare -A SECRETS=(
   [session_secret]=$PARAMETER_NAME_PREFIX/frontend/session-secret
   [google_sheet_credentials]=$PARAMETER_NAME_PREFIX/frontend/google-sheet-credentials
   [user_signup_sheet_id]=$PARAMETER_NAME_PREFIX/frontend/user-signup-sheet-id
+  [fixed_otp_credentials]=$PARAMETER_NAME_PREFIX/frontend/fixed-otp-credentials
 )
 
 function set-paramswith-values {
@@ -161,6 +163,12 @@ function check-deployment-parameters {
 
   parameter=${PARAMETERS[use_cognito_dr]}
   check-parameter-set "${parameter}" || write-parameter-value "$parameter" "false"
+
+  parameter=${PARAMETERS[use_stub_otp]}
+  check-parameter-set "${parameter}" || write-parameter-value "$parameter" "true"
+
+  local secret=${SECRETS[fixed_otp_credentials]}
+  check-secret-set "$secret" || write-secret-value "$secret" "$(get-value-from-user "$secret" secret)"
 
   print-parameters
   print-secrets

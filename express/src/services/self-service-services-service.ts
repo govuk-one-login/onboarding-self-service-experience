@@ -151,10 +151,10 @@ export default class SelfServiceServicesService {
         return this.cognito.useRefreshToken(refreshToken);
     }
 
-    verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<void> {
+    verifyMobileUsingSmsCode(accessToken: string, code: string, emailAddress: string): Promise<void> {
         console.info("In self-service-services-service:verifyMobileUsingSmsCode()");
 
-        return this.cognito.verifyMobileUsingSmsCode(accessToken, code);
+        return this.cognito.verifyMobileUsingSmsCode(accessToken, code, emailAddress);
     }
 
     setMobilePhoneAsVerified(emailAddress: string): Promise<void> {
