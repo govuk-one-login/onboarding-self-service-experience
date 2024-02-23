@@ -1,10 +1,16 @@
 import {CodeMismatchException} from "@aws-sdk/client-cognito-identity-provider";
 
-let fixedOTPCredentials: any[] = [];
+interface fixedOTPCredential {
+    Email: string;
+    EmailCode: string;
+    SMSCode: string;
+}
+
+let fixedOTPCredentials: fixedOTPCredential[] = [];
 
 function getFixedOTPCredential(emailAddress: string): number {
     for (let i = 0; i < fixedOTPCredentials.length; i++) {
-        if (fixedOTPCredentials[i].emailAddress === emailAddress) {
+        if (fixedOTPCredentials[i].Email === emailAddress) {
             console.log("verifyMobileUsingOTPCode - Found Email Address =>" + emailAddress);
             return i;
         }
@@ -19,8 +25,8 @@ export function fixedOTPInitialise(): void {
     if (process.env.USE_STUB_OTP == "true") {
         console.log("fixedOTPInitialise - USE_STUB_OTP is Set");
 
-        const otpCredentials: any = process.env.FIXED_OTP_CREDENTIALS;
-        fixedOTPCredentials = JSON.parse(otpCredentials);
+        const fixedOTPCredentialsSecret = process.env.FIXED_OTP_CREDENTIALS;
+        fixedOTPCredentials = JSON.parse(fixedOTPCredentialsSecret as string);
     }
 }
 
@@ -47,7 +53,7 @@ export function verifyMobileUsingOTPCode(emailAddress: string, smsCode: string):
     const index = getFixedOTPCredential(emailAddress);
 
     if (index > -1) {
-        if (fixedOTPCredentials[index].emailAddress === emailAddress) {
+        if (fixedOTPCredentials[index].Email === emailAddress) {
             if (fixedOTPCredentials[index].SMSCode === smsCode) {
                 console.log("verifyMobileUsingOTPCode - Found SMS Code =>" + smsCode);
                 return;
