@@ -22,7 +22,7 @@ declare -A PARAMETERS=(
   [USER_SIGNUP_SHEET_HEADER_RANGE]=frontend/user-signup-sheet-header-range
   [PUBLIC_BETA_SHEET_DATA_RANGE]=frontend/public-beta-sheet-data-range
   [PUBLIC_BETA_SHEET_HEADER_RANGE]=frontend/public-beta-sheet-header-range
-  [USE_STUB_OTP]=frontend/use-stub-otp
+  [USE_STUB_OTP]=frontend/use_stub_otp
 )
 
 COMPONENTS=(frontend cognito dynamodb api)

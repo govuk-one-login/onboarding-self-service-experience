@@ -5,8 +5,8 @@ set -eu
 
 ACCOUNT=$(../aws.sh get-current-account-name)
 PARAMETER_NAME_PREFIX=/self-service
-MANUAL_PARAMETERS=(api_notification_email google_tag_id)
-MANUAL_SECRETS=(auth_api_key notify_api_key)
+MANUAL_PARAMETERS=(api_notification_email google_tag_id use_stub_otp)
+MANUAL_SECRETS=(auth_api_key notify_api_key fixed_otp_credentials)
 
 declare -A PARAMETERS=(
   [test_banner]=$PARAMETER_NAME_PREFIX/frontend/show-test-banner
@@ -20,7 +20,7 @@ declare -A PARAMETERS=(
   [public_beta_sheet_data_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-data-range
   [public_beta_sheet_header_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-header-range
   [use_cognito_dr]=$PARAMETER_NAME_PREFIX/frontend/use_cognito_dr
-  [use_stub_otp]=$PARAMETER_NAME_PREFIX/frontend/use-stub-otp
+  [use_stub_otp]=$PARAMETER_NAME_PREFIX/frontend/use_stub_otp
 )
 
 declare -A SECRETS=(
@@ -166,9 +166,6 @@ function check-deployment-parameters {
 
   parameter=${PARAMETERS[use_stub_otp]}
   check-parameter-set "${parameter}" || write-parameter-value "$parameter" "false"
-
-  local secret=${SECRETS[fixed_otp_credentials]}
-  check-secret-set "$secret" || write-secret-value "$secret" "$(get-value-from-user "$secret" secret)"
 
   print-parameters
   print-secrets
