@@ -1,20 +1,13 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
-import axios, {Axios} from "axios"; // TODO: Until Onboarding takes over client registry / just for now
+import axios from "axios"; // TODO: Until Onboarding takes over client registry / just for now
 
-const instance: Axios = axios.create({
-    baseURL: process.env.AUTH_REGISTRATION_BASE_URL,
-    headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": process.env.AUTH_API_KEY as string
-    }
-});
+const public_key =
+    "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
 
 export const registerClientHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     // TODO remove explicit any
     // eslint-disable-next-line
     const payload: any = event;
-    const public_key =
-        "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
 
     const redirect_uris = ["http://localhost/"];
     const scopes = ["openid", "email", "phone"];
@@ -33,7 +26,13 @@ export const registerClientHandler = async (event: APIGatewayProxyEvent): Promis
         sector_identifier_uri: sector_identifier_uri
     };
 
-    const result = await (await instance).post("/connect/register", JSON.stringify(clientConfig));
+    const url = process.env.AUTH_REGISTRATION_BASE_URL + "/connect/register";
+    const result = await axios.post(url, JSON.stringify(clientConfig), {
+        headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": process.env.AUTH_API_KEY as string
+        }
+    });
     const body = {...clientConfig, ...result.data, ...payload};
 
     return {
