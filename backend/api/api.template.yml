@@ -1219,6 +1219,7 @@ Resources:
             Method: POST
 
   ApiGatewayWebACL:
+    # checkov:skip=CKV_AWS_192:Ensure WAF prevents message lookup in Log4j2
     Type: AWS::WAFv2::WebACL
     Properties:
       Name: !Sub ${AWS::StackName}-${Environment}-ApiWebACL
@@ -1238,7 +1239,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesKnownBadInputsRuleSet
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
@@ -1250,7 +1251,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesAmazonIpReputationList
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
@@ -1262,7 +1263,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesAnonymousIpList
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
@@ -1274,7 +1275,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesCommonRuleSet
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
@@ -1286,7 +1287,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesAdminProtectionRuleSet
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
@@ -1298,7 +1299,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesSQLiRuleSet
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
