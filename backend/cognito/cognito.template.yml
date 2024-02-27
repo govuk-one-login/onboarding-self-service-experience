@@ -280,6 +280,9 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Sourcemap: true
+        External:
+          # AWS SDK v3 dependencies are already included in the lambda runtime
+          - "@aws-sdk/*"
     Properties:
       Handler: src/handlers/send-password-changed-email.handler
       Description: Send an email to confirm the user's password has been changed
@@ -319,6 +322,9 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Sourcemap: true
+        External:
+          # AWS SDK v3 dependencies are already included in the lambda runtime
+          - "@aws-sdk/*"
     Properties:
       Handler: src/handlers/create-password-reset-message.handler
       Description: Create a customised email message to send when resetting the user's password
@@ -345,6 +351,9 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Sourcemap: true
+        External:
+          # AWS SDK v3 dependencies are already included in the lambda runtime
+          - "@aws-sdk/*"
     Properties:
       Handler: src/handlers/send-security-code-text-message.lambdaHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
