@@ -68,22 +68,22 @@ Mappings:
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     build:
       dynatraceLoggingEnabled: true
-      cslsLoggingEnabled: false
+      cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     staging:
       dynatraceLoggingEnabled: true
-      cslsLoggingEnabled: false
+      cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     integration:
       dynatraceLoggingEnabled: true
-      cslsLoggingEnabled: false
+      cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
     production:
       dynatraceLoggingEnabled: true
-      cslsLoggingEnabled: false
+      cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
 
@@ -1282,6 +1282,7 @@ Resources:
             Method: POST
 
   ApiGatewayWebACL:
+    # checkov:skip=CKV_AWS_192:Ensure WAF prevents message lookup in Log4j2
     Type: AWS::WAFv2::WebACL
     Properties:
       Name: !Sub ${AWS::StackName}-${Environment}-ApiWebACL
@@ -1301,7 +1302,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesKnownBadInputsRuleSet
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
@@ -1313,7 +1314,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesAmazonIpReputationList
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
@@ -1325,7 +1326,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesAnonymousIpList
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
@@ -1337,7 +1338,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesCommonRuleSet
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
@@ -1349,7 +1350,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesAdminProtectionRuleSet
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
@@ -1361,7 +1362,7 @@ Resources:
               VendorName: AWS
               Name: AWSManagedRulesSQLiRuleSet
           OverrideAction:
-            None: { }
+            Count: { }
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
