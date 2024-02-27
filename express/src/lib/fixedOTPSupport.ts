@@ -22,12 +22,8 @@ function getFixedOTPCredential(emailAddress: string): number {
 export function fixedOTPInitialise(): void {
     console.log("in fixedOTPSupport - fixedOTPInitialise");
 
-    if (process.env.USE_STUB_OTP == "true") {
-        console.log("fixedOTPInitialise - USE_STUB_OTP is Set");
-
-        const fixedOTPCredentialsSecret = process.env.FIXED_OTP_CREDENTIALS;
-        fixedOTPCredentials = JSON.parse(fixedOTPCredentialsSecret as string);
-    }
+    const fixedOTPCredentialsSecret = process.env.FIXED_OTP_CREDENTIALS;
+    fixedOTPCredentials = JSON.parse(fixedOTPCredentialsSecret as string);
 }
 
 export function isFixedCredential(emailAddress: string): boolean {

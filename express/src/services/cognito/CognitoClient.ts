@@ -64,7 +64,9 @@ export default class CognitoClient implements CognitoInterface {
         this.client.send(updateUserPoolClientCommand);
 
         // Initialise OTP Credentials
-        fixedOTPInitialise();
+        if (process.env.USE_STUB_OTP == "true") {
+            fixedOTPInitialise();
+        }
     }
 
     async createUser(email: string): Promise<void> {
