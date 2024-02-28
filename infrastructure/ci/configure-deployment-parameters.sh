@@ -20,7 +20,7 @@ declare -A PARAMETERS=(
   [public_beta_sheet_data_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-data-range
   [public_beta_sheet_header_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-header-range
   [use_cognito_dr]=$PARAMETER_NAME_PREFIX/frontend/use_cognito_dr
-  [use_stub_otp]=$PARAMETER_NAME_PREFIX/frontend/use-stub-otp
+  [use_stub_otp]=$PARAMETER_NAME_PREFIX/frontend/use_stub_otp
 )
 
 declare -A SECRETS=(

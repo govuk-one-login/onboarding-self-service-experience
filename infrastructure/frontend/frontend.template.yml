@@ -180,7 +180,7 @@ Resources:
             - Name: USE_COGNITO_DR
               Value: "{{resolve:ssm:/self-service/frontend/use-cognito-dr}}"
             - Name: USE_STUB_OTP
-              Value: "{{resolve:ssm:/self-service/frontend/use-stub-otp}}"
+              Value: "{{resolve:ssm:/self-service/frontend/use_stub_otp}}"
             - Name: FIXED-OTP-CREDENTIALS
               Value: "{{resolve:secretsmanager:/self-service/frontend/fixed-otp-credentials}}"
 
