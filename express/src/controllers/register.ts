@@ -60,6 +60,8 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
 };
 
 export const showCheckEmailForm: RequestHandler = async (req, res) => {
+    console.log("In register-showCheckEmailForm");
+
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
@@ -76,9 +78,12 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 };
 
 export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
+    console.log("In register-submitEmailSecurityCode");
+
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
+
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
@@ -127,6 +132,8 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
 };
 
 export const showNewPasswordForm: RequestHandler = (req, res) => {
+    console.log("In register:showNewPasswordForm");
+
     // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
         return res.render("register/create-password.njk");
@@ -300,7 +307,7 @@ export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
 
 export const showAddServiceForm = render("register/add-service-name.njk");
 
-export const processAddServiceForm: RequestHandler = async (req, res) => {
+export const processAddServiceForm: RequestHandler = async (req, res, next) => {
     const uuid = randomUUID();
     const service: Service = {
         id: `service#${uuid}`,
@@ -324,11 +331,24 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
         return res.render("there-is-a-problem.njk");
     }
 
-    const generatedClient = await s4.generateClient(service, nonNull(req.session.authenticationResult));
-    const body = JSON.parse(generatedClient.data.output).body;
-    const serviceId = JSON.parse(body).pk;
-
     req.session.serviceName = req.body.serviceName;
+
+    let serviceId = "";
+    let body;
+
+    try {
+        console.info("Generating Client to Service:" + service.serviceName);
+        const generatedClient = await s4.generateClient(service, nonNull(req.session.authenticationResult));
+        body = JSON.parse(generatedClient.data.output).body;
+        serviceId = JSON.parse(body).pk;
+    } catch (error) {
+        console.error("Unable to Register Client to Service - Service Items removed");
+        console.error(error);
+        await s4.deleteServiceEntries(uuid);
+        return res.render("there-is-a-problem.njk");
+    }
+
+    req.session.serviceId = serviceId;
 
     s4.sendTxMALog(
         "SSE_SERVICE_ADDED",
@@ -343,6 +363,22 @@ export const processAddServiceForm: RequestHandler = async (req, res) => {
         }
     );
 
+    next();
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const sendDataToUserSpreadsheet: RequestHandler = async (req, res, next) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    const {mobileNumber, emailAddress, serviceName} = req.session;
+    const effectiveMobileNumber = mobileNumber || " ";
+
+    await s4.updateUserSpreadsheet(nonNull(emailAddress), effectiveMobileNumber, nonNull(serviceName));
+    next();
+};
+
+export const redirectToServicesList: RequestHandler = (req, res) => {
+    const serviceId = String(req.session.serviceId);
     res.redirect(`/services/${serviceId.substring(8)}/clients`);
 };
 

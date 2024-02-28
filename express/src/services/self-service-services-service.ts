@@ -9,13 +9,16 @@ import AuthenticationResultParser from "../lib/authentication-result-parser";
 import SelfServiceError from "../lib/errors";
 import {dynamoClientToDomainClient} from "../lib/models/client-utils";
 import {dynamoServicesToDomainServices} from "../lib/models/service-utils";
-import {userToDomainUser} from "../lib/models/user-utils";
+import {domainUserToDynamoUser, userToDomainUser} from "../lib/models/user-utils";
 import MfaResponse from "../types/mfa-response";
 import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import console from "console";
+import {Request} from "express";
 import {TxMAEvent, TxMAExtension, TxMAUser} from "../types/txma-event";
+import SheetsService from "../lib/sheets/SheetsService";
+import {v4 as uuid_4} from "uuid";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -32,10 +35,10 @@ export default class SelfServiceServicesService {
         return this.cognito.changePassword(accessToken, previousPassword, proposedPassword);
     }
 
-    forgotPassword(email: string, protocol: string, host: string): Promise<void> {
+    forgotPassword(email: string, protocol: string, host: string, useRecoveredAccountURL: boolean): Promise<void> {
         console.info("In self-service-services-service:forgotPassword()");
 
-        return this.cognito.forgotPassword(email, protocol, host);
+        return this.cognito.forgotPassword(email, protocol, host, useRecoveredAccountURL);
     }
 
     confirmForgotPassword(username: string, password: string, confirmationCode: string): Promise<void> {
@@ -243,18 +246,6 @@ export default class SelfServiceServicesService {
         }
     }
 
-    async publicBetaRequest(
-        userName: string,
-        department: string,
-        serviceName: string,
-        emailAddress: string,
-        accessToken: string
-    ): Promise<void> {
-        console.info("In self-service-services-service:betaRequest()");
-        await this.validateToken(accessToken, "privateBetaRequest");
-        return this.lambda.publicBetaRequest(userName, department, serviceName, emailAddress);
-    }
-
     async listServices(userId: string, accessToken: string): Promise<Service[]> {
         console.info("In self-service-services-service:listServices()");
         await this.validateToken(accessToken, "listServices");
@@ -283,6 +274,33 @@ export default class SelfServiceServicesService {
         return (await this.lambda.sessionCount(userEmail)).data.sessionCount;
     }
 
+    private getTimestamp(): string {
+        const pad = (n: number, s = 2) => `${new Array(s).fill(0)}${n}`.slice(-s);
+        const d = new Date();
+
+        return `${pad(d.getFullYear(), 4)}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(
+            d.getSeconds()
+        )}.${pad(d.getMilliseconds(), 3)}`;
+    }
+
+    async updateUserSpreadsheet(userEmail: string, userPhone: string, serviceName: string): Promise<void> {
+        const values = new Map<string, string>();
+        values.set("id", uuid_4());
+        values.set("submission-date", this.getTimestamp());
+        values.set("user-email", userEmail);
+        values.set("user-phone", userPhone);
+        values.set("service-name", serviceName);
+
+        const sheetsService: SheetsService = new SheetsService(process.env.USER_SIGNUP_SHEET_ID as string);
+        await sheetsService.init().catch(error => console.error("updateUserSpreadsheet: " + error));
+        await sheetsService
+            .appendValues(values, process.env.USER_SIGNUP_SHEET_DATA_RANGE as string, process.env.USER_SIGNUP_SHEET_HEADER_RANGE as string)
+            .then(() => console.log("Saved to sheets"))
+            .catch(reason => {
+                console.error("updateUserSpreadsheet: " + reason);
+            });
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
     sendTxMALog(eventName: string, user: TxMAUser, extensions: TxMAExtension | undefined = undefined) {
         const txmaEvent: TxMAEvent = {
@@ -302,5 +320,63 @@ export default class SelfServiceServicesService {
                 console.error("sendTxMALog errored: " + error);
             }
         );
+    }
+
+    getDynamoDBEntries(email: string) {
+        console.log("In self-service-services-service-getDynamoDBEntries");
+        return this.lambda.getDynamoDBEntries(email);
+    }
+
+    async recoverCognitoAccount(req: Request, userEmail: string, password: string, mobileNumber: string) {
+        console.info("In self-service-services-service:recoverCognitoAccount()");
+
+        await this.cognito.recoverUser(userEmail);
+        await this.cognito.setEmailAsVerified(userEmail);
+        await this.cognito.setUserPassword(userEmail, password);
+        await this.cognito.setPhoneNumber(userEmail, mobileNumber);
+        await this.cognito.setMobilePhoneAsVerified(userEmail);
+        await this.cognito.setMfaPreference(userEmail);
+
+        req.session.mfaResponse = await this.login(userEmail, password);
+    }
+
+    async recreateDynamoDBAccountLinks(authenticationResult: AuthenticationResultType, oldUserID: string) {
+        console.info("In self-service-services-service:createNewDynamoDBAccountLinks()");
+
+        const serviceListToReplicate = dynamoServicesToDomainServices((await this.lambda.listServices(oldUserID)).data.Items);
+
+        for (const serviceItem of serviceListToReplicate) {
+            const serviceID: string = serviceItem.id;
+            const serviceName: string = serviceItem.serviceName;
+            const currentUserID = AuthenticationResultParser.getCognitoId(authenticationResult);
+            const accessToken: string = authenticationResult.AccessToken as string;
+            const emailAddress = AuthenticationResultParser.getEmail(authenticationResult);
+            const mobileNumber = AuthenticationResultParser.getPhoneNumber(authenticationResult);
+
+            const dynamoUser = domainUserToDynamoUser({
+                id: currentUserID,
+                fullName: "we haven't collected this full name",
+                firstName: "we haven't collected this first name",
+                lastName: "we haven't collected this last name",
+                email: emailAddress,
+                mobileNumber: mobileNumber,
+                passwordLastUpdated: new Date().toLocaleDateString() // This is correct as we have just created the Cognito Record with a Password.
+            });
+
+            const service: Service = {
+                id: `service#${serviceID}`,
+                serviceName: serviceName
+            };
+
+            await this.putUser(dynamoUser, accessToken);
+            await this.newService(service, currentUserID, authenticationResult);
+            await this.lambda.deleteClientEntries(oldUserID, serviceID);
+        }
+    }
+
+    async deleteServiceEntries(serviceID: string) {
+        console.info("In self-service-services-service:deleteServiceEntries()");
+        console.log("Service ID => " + serviceID);
+        await this.lambda.deleteServiceEntries(serviceID);
     }
 }

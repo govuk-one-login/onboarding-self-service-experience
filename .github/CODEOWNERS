@@ -1,22 +1,33 @@
 # Global
 *   @alphagov/di-sse-approvers
+*   @govuk-one-login/sse-approvers
 
 # Packages
-package*.json           @alphagov/di-sse-sres         @alphagov/di-sse-frontend        @alphagov/di-sse-approvers
+package*.json           @alphagov/di-sse-sres              @alphagov/di-sse-frontend               @alphagov/di-sse-approvers
+package*.json           @govuk-one-login/sse-sres          @govuk-one-login/sse-frontend           @govuk-one-login/sse-approvers
 
 # Infrastructure
-/.github/               @alphagov/di-sse-sres         @alphagov/di-sse-approvers
-/backend/               @alphagov/di-sse-sres         @alphagov/di-sse-approvers
-/infrastructure/        @alphagov/di-sse-sres         @alphagov/di-sse-approvers
+/.github/               @alphagov/di-sse-sres              @alphagov/di-sse-approvers
+/backend/               @alphagov/di-sse-sres              @alphagov/di-sse-approvers
+/infrastructure/        @alphagov/di-sse-sres              @alphagov/di-sse-approvers
+/.github/               @govuk-one-login/sse-sres          @govuk-one-login/sse-approvers
+/backend/               @govuk-one-login/sse-sres          @govuk-one-login/sse-approvers
+/infrastructure/        @govuk-one-login/sse-sres          @govuk-one-login/sse-approvers
 
 # Frontend
-/express/src/           @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
-/express/tests/         @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
-/express/assets/        @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
-/express/stubs/         @alphagov/di-sse-frontend     @alphagov/di-sse-approvers
+/express/src/           @alphagov/di-sse-frontend          @alphagov/di-sse-approvers
+/express/tests/         @alphagov/di-sse-frontend          @alphagov/di-sse-approvers
+/express/assets/        @alphagov/di-sse-frontend          @alphagov/di-sse-approvers
+/express/stubs/         @alphagov/di-sse-frontend          @alphagov/di-sse-approvers
+/express/src/           @govuk-one-login/sse-frontend      @govuk-one-login/sse-approvers
+/express/tests/         @govuk-one-login/sse-frontend      @govuk-one-login/sse-approvers
+/express/assets/        @govuk-one-login/sse-frontend      @govuk-one-login/sse-approvers
+/express/stubs/         @govuk-one-login/sse-frontend      @govuk-one-login/sse-approvers
 
 # Acceptance tests
-/acceptance-tests/     	@alphagov/di-sse-frontend     @alphagov/di-sse-approvers
+/acceptance-tests/     	@alphagov/di-sse-frontend          @alphagov/di-sse-approvers
+/acceptance-tests/     	@govuk-one-login/sse-frontend      @govuk-one-login/sse-approvers
 
 # Content
-/express/src/views/			@alphagov/di-sse-content			@alphagov/di-sse-approvers
+/express/src/views/		@alphagov/di-sse-content	       @alphagov/di-sse-approvers
+/express/src/views/		@govuk-one-login/sse-content	   @govuk-one-login/sse-approvers

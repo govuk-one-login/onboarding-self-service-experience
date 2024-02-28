@@ -16,6 +16,8 @@ import {
     clickYourAccountSubnavLink
 } from "./shared-functions";
 
+import AxePuppeteer from "@axe-core/puppeteer";
+
 Given("the user is on the home page", async function () {
     await this.goToPath("/");
 });
@@ -90,6 +92,11 @@ When("they click the {string} button", async function (text: string) {
 Then("they should be redirected to the {string} page", async function (this: TestContext, expectedPath: string) {
     assert.equal(new URL(this.page.url()).pathname, expectedPath);
 });
+Then("they should be redirected to the {string}", async function (this: TestContext, expectedPath: string) {
+    const path = new URL(this.page.url());
+    const actualPath = path.pathname + path.search;
+    assert.equal(actualPath, expectedPath);
+});
 
 Then("they should be redirected to a page with the path starting with {string}", async function (this: TestContext, expectedPath: string) {
     assert.ok(new URL(this.page.url()).pathname.startsWith(expectedPath));
@@ -109,7 +116,7 @@ Then("their data is saved in the spreadsheet", async function () {
 });
 
 Then("the error message {string} must be displayed for the {string} radios", async function (errorMessage, field) {
-    const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${field}-error"]`);
+    const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${field}-options"]`);
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, field);
 });
 
@@ -139,4 +146,18 @@ When("they click on the forgot password link in their email", async function () 
 
 When("they click Your account link in the left side navigation", async function () {
     await clickYourAccountSubnavLink(this.page);
+});
+
+When("they try to submit the form without selecting any value from the radio button", async function () {
+    await clickSubmitButton(this.page);
+});
+
+When("they select the {string} radio button", async function (labelText) {
+    const el = await this.page.$x(`//label[contains(text(), "${labelText}")]`);
+    await el[0].click();
+});
+
+Then(/^there should be no accessibility violations$/, async function (this: TestContext) {
+    const results = await new AxePuppeteer(this.page).withTags(["wcag21aa"]).analyze();
+    assert.equal(results.violations.length, 0, "Accessibility Violations Detected : " + JSON.stringify(results.violations));
 });

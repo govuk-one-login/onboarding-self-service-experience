@@ -1,5 +1,5 @@
 import {Request} from "express";
-import validator from "middleware/validators/email-code-validator";
+import validator from "../../../src/middleware/validators/email-code-validator";
 import {request, response} from "../../mocks";
 
 let req: Request;

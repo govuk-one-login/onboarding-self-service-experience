@@ -31,6 +31,11 @@ Feature: A page where users can view and change the details associated with thei
       When they submit the mobile phone number "+919465245634"
       Then the error message "Enter a UK mobile phone number, like 07700 900000" must be displayed for the mobile phone number field
 
+    Scenario: User cancels the phone number update
+      When they click on the 'Cancel' link
+      Then they should be redirected to the '/account' page
+
+
   Rule: The user tries to enter security code in the process of changing their phone number
     Background:
       When they click on the link that points to "/account/change-phone-number"
@@ -68,6 +73,10 @@ Feature: A page where users can view and change the details associated with thei
       And they submit the new password "NewTest"
       Then the error message "Your password must be 8 characters or more" must be displayed for the new password field
 
+    Scenario: User cancels the password change
+      When they click on the 'Cancel' link
+      Then they should be redirected to the '/account' page
+
     Scenario Outline: The user wants to see or hide their <password_type> as they type it
       When they toggle the "Show" link on the field "<password_field>"
       Then they see the toggle link "Hide" on the field "<password_field>"
@@ -100,3 +109,16 @@ Feature: A page where users can view and change the details associated with thei
       When they submit the new password "NewTestPa$$word"
       Then they should be redirected to the "/account" page
       And they should see the text "You have changed your password"
+
+    @accessible
+    Rule: The user validate accessibility of your account pages
+    Scenario: User verifying the accessibility of /change-post-logout-uris page
+      Then there should be no accessibility violations
+
+    Scenario: user verifying the accessibility of /change-phone-number page
+      When they click on the link that points to "/account/change-phone-number"
+      Then there should be no accessibility violations
+
+    Scenario: user verifying the accessibility of /change-password page
+      When they click on the link that points to "/account/change-password"
+      Then there should be no accessibility violations

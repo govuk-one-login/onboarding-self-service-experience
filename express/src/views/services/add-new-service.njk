@@ -1,0 +1,15 @@
+{% extends "layouts/form.njk" %}
+
+{% set formCancelUrl = "/services" %}
+{% set formButtonText = "Continue" %}
+{% set pageTitle = "Add your service name" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l">Add your service name</h1>
+  <p class="govuk-body">Add the name of the service you want to test with GOV.UK One Login.</p>
+  <p class="govuk-body">This is only seen by you. You can change it later.</p>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.textInput("Service name", "serviceName") }}
+{% endblock %}

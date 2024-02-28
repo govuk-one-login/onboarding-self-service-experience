@@ -3,7 +3,7 @@ Description: Supporting stacks for secure pipelines
 Transform: AWS::LanguageExtensions
 
 Parameters:
-  # Template reference https://github.com/alphagov/di-devplatform-deploy
+  # Template reference https://github.com/govuk-one-login/devplatform-deploy
   TemplateStorageBucket:
     Type: String
     Default: https://template-storage-templatebucket-1upzyw6v9cs42.s3.amazonaws.com
@@ -80,7 +80,7 @@ Resources:
 
   # Setting up Grafana key rotation
   # https://govukverify.atlassian.net/wiki/spaces/PLAT/pages/3467509761/Grafana+key+rotation
-  # https://di-team-manual.london.cloudapps.digital/development-standards-processes/aws-environment-grafana/
+  # https://team-manual.account.gov.uk/development-standards-processes/aws-environment-grafana/
   GrafanaKeyRotator:
     Type: AWS::CloudFormation::Stack
     DependsOn: InfrastructureAuditHook

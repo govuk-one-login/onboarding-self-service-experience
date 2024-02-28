@@ -16,7 +16,7 @@ brew tap aws/tap
 brew install aws-sam-cli
 ```
 
-Install and use the latest version of bash
+Install and use the latest version of bash.
 
 ```shell
 brew install bash
@@ -58,7 +58,23 @@ environment variables to the stub values if they're not set explicitly (see [pac
 
 `gds aws <account> -- npm start` if you don't want the application to restart.
 
+To run the application locally with stub services for S3 and Google Sheets:
+
+1. Copy .env.example to .env
+2. Run npm install
+3. Run npm run local
+
+To run the application using the actual Google Sheets services:
+
+1. Replace the placeholder values in .env with appropriate values.
+
+-   Sheets
+
+    -   Make sure a googleCredentials.json file is in the root of the project. These are the credentials for a service account which has been granted access to the spreadsheet identified by SPREADSHEET_ID
+
 ## URL Patterns
+
+This functionality is controlled via the following environment variables:
 
 **Show a list of things**
 

@@ -14,7 +14,7 @@ export default function Helmet() {
                     "https://www.google-analytics.com",
                     "https://ssl.google-analytics.com"
                 ],
-                styleSrc: ["'self'", "'unsafe-inline'"],
+                styleSrc: ["'self'"],
                 imgSrc: ["'self'", "data:", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
                 objectSrc: ["'none'"],
                 connectSrc: ["'self'", "https://www.google-analytics.com"],

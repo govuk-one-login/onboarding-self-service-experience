@@ -39,12 +39,18 @@ Resources:
         DynamoDBApiEnabled: "Yes"
         ExecuteApiGatewayEnabled: "Yes"
         SQSApiEnabled: "Yes"
+        SecretsManagerApiEnabled: "Yes"
+        DynatraceApiEnabled: "Yes"
         AccessLogsCustomBucketNameEnabled: "No"
         AvailabilityZoneCount: 2
         AllowedDomains: !Join [ ",", [
           !Sub "cognito-idp.${AWS::Region}.amazonaws.com",
           api.notifications.service.gov.uk,
-          "*.cloudfront.net"
+          "*.cloudfront.net",
+          "*.googleapis.com",
+          "*.google.com",
+          "govuk.zendesk.com",
+          "*.service-now.com"
         ] ]
         AllowRules: !Sub >
           pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:"cognito-idp.${AWS::Region}.amazonaws.com";
@@ -55,6 +61,18 @@ Resources:
           
           pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:".cloudfront.net";
           endswith; msg:"Pass TLS to CloudFront"; flow:established; rev:1; sid:2003;)
+          
+          pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:".googleapis.com";
+          endswith; msg:"Pass TLS to googleapis"; flow:established; rev:1; sid:2004;)
+          
+          pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:".google.com";
+          endswith; msg:"Pass TLS to google"; flow:established; rev:1; sid:2005;)
+          
+          pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:"govuk.zendesk.com";
+          endswith; msg:"Pass TLS to zendesk"; flow:established; rev:1; sid:2006;)
+          
+          pass tls $HOME_NET any -> $EXTERNAL_NET 443 (tls.sni; content:".service-now.com";
+          endswith; msg:"Pass TLS to service-now"; flow:established; rev:1; sid:2007;)
 
   AccessLogsBucket:
     # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled

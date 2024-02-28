@@ -1,4 +1,4 @@
-import validateEmail from "lib/validators/email-validator";
+import validateEmail from "../../../src/lib/validators/email-validator";
 
 jest.mock("fs/promises", () => {
     return {

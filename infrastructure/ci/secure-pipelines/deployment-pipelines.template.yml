@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Deployment pipelines for the Admin Tool
 
 Parameters:
-  # Template reference https://github.com/alphagov/di-devplatform-deploy
+  # Template reference https://github.com/govuk-one-login/devplatform-deploy
   TemplateStorageBucket:
     Type: String
     Default: https://template-storage-templatebucket-1upzyw6v9cs42.s3.amazonaws.com
@@ -24,7 +24,10 @@ Parameters:
     Default: ""
   GitHubRepositoryName:
     Type: String
-    Default: di-onboarding-self-service-experience
+    Default: none
+  OneLoginRepositoryName:
+    Type: String
+    Default: onboarding-self-service-experience
   SigningProfileARN:
     Type: String
   SigningProfileVersionARN:
@@ -79,11 +82,14 @@ Resources:
         SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref APISourceBucketARN
         GitHubRepositoryName: !If [ APIRepositorySource, !Ref GitHubRepositoryName, "none" ]
+        OneLoginRepositoryName: !If [ APIRepositorySource, !Ref OneLoginRepositoryName, "none" ]
         AllowedAccounts: !Ref NextAccount
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
         PipelineEnvironmentNameEnabled: "Yes"
+        AdditionalCodeSigningVersionArns: "arn:aws:signer:eu-west-2:216552277552:/signing-profiles/DynatraceSigner/5uwzCCGTPq"
+        CustomKmsKeyArns: "arn:aws:kms:eu-west-2:216552277552:key/4bc58ab5-c9bb-4702-a2c3-5d339604a8fe"
         AllowedServiceOne: Lambda
         AllowedServiceTwo: DynamoDB
         AllowedServiceThree: SNS
@@ -113,11 +119,13 @@ Resources:
         SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref CognitoSourceBucketARN
         GitHubRepositoryName: !If [ CognitoRepositorySource, !Ref GitHubRepositoryName, "none" ]
+        OneLoginRepositoryName: !If [ CognitoRepositorySource, !Ref OneLoginRepositoryName, "none" ]
         AllowedAccounts: !Ref NextAccount
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
         ProgrammaticPermissionsBoundary: "True"
-        PipelineEnvironmentNameEnabled: "Yes"
+        AdditionalCodeSigningVersionArns: "arn:aws:signer:eu-west-2:216552277552:/signing-profiles/DynatraceSigner/5uwzCCGTPq"
+        CustomKmsKeyArns: "arn:aws:kms:eu-west-2:216552277552:key/4bc58ab5-c9bb-4702-a2c3-5d339604a8fe"
         AllowedServiceOne: Cognito
         AllowedServiceTwo: Lambda
         AllowedServiceThree: SNS
@@ -145,6 +153,7 @@ Resources:
         SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref DynamoDBSourceBucketARN
         GitHubRepositoryName: !If [ DynamoDBRepositorySource, !Ref GitHubRepositoryName, "none" ]
+        OneLoginRepositoryName: !If [ DynamoDBRepositorySource, !Ref OneLoginRepositoryName, "none" ]
         AllowedAccounts: !Ref NextAccount
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"
@@ -177,6 +186,7 @@ Resources:
         SlackNotificationType: !If [ IsFinalAccount, All, Failures ]
         ArtifactSourceBucketArn: !Ref FrontendSourceBucketARN
         GitHubRepositoryName: !If [ FrontendRepositorySource, !Ref GitHubRepositoryName, "none" ]
+        OneLoginRepositoryName: !If [ FrontendRepositorySource, !Ref OneLoginRepositoryName, "none" ]
         AllowedAccounts: !Ref NextAccount
         IncludePromotion: !If [ PromotionEnabled, "Yes", "No" ]
         AccessLogsCustomBucketNameEnabled: "No"

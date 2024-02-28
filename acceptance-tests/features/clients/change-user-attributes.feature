@@ -9,6 +9,14 @@ Feature: Users can change their user attributes
     When they click on the "Test Service" link
     Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
 
+  Rule: The user want to validate the links on the page
+
+    Scenario: user validating the link user attributes (opens in new tab)
+      Given they click on the link that points to "/change-user-attributes"
+      When they click on the 'user attributes (opens in new tab)' link that opens in a new tab
+      Then they should be directed to the URL 'https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/choose-which-user-attributes-your-service-can-request/'
+
+
   Rule: The user doesn't want to save changes on Change user attributes page
 
     Scenario: The user doesn't want to change any details on Change user attributes page
@@ -26,8 +34,8 @@ Feature: Users can change their user attributes
       When they click on the link that points to "/change-user-attributes"
       Then they should be redirected to a page with the title "Change user attributes - GOV.UK One Login"
       And they should see that Email option is not checked
-      Then they click 'email' checkbox
-      When they click the Confirm button
+      When they click 'email' checkbox
+      And they click the Confirm button
       Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
       And they should see the text "You have changed your required user attributes"
       And they should see the value "Email address" in the user attributes field
@@ -46,3 +54,10 @@ Feature: Users can change their user attributes
       Then they should see the exact value "OpenID" in the user attributes field
       When they click on the link that points to "/change-user-attributes"
       Then they should see that Email option is not checked
+
+
+    @accessible
+    Rule: The user validate accessibility issues in user-attributes page
+    Scenario: User verifying the accessibility of /clients page
+      When they click on the link that points to "/change-user-attributes"
+      Then there should be no accessibility violations

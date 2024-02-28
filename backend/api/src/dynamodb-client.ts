@@ -14,7 +14,8 @@ import {
     UpdateItemCommand,
     UpdateItemCommandInput,
     UpdateItemCommandOutput,
-    DeleteItemInput
+    DeleteItemInput,
+    DeleteItemCommandInput
 } from "@aws-sdk/client-dynamodb";
 import {convertToAttr, marshall} from "@aws-sdk/util-dynamodb";
 import * as process from "process";
@@ -183,6 +184,70 @@ export default class DynamoDbClient {
         });
     }
 
+    async getListOfClients(): Promise<ScanCommandOutput> {
+        console.log(`dynamodb-client - getListOfClients()`);
+
+        const params: ScanCommandInput = {
+            TableName: this.tableName,
+            ProjectionExpression: "pk, sk, email, phone",
+            ExpressionAttributeNames: {"#userTag": "pk"},
+            ExpressionAttributeValues: {":userTag": {S: `user#`}},
+            FilterExpression: "begins_with(#userTag, :userTag)"
+        };
+
+        const command = new ScanCommand(params);
+        return await this.dynamodb.send(command);
+    }
+
+    async deleteDynamoDBClientEntries(userID: string, serviceID: string): Promise<void> {
+        console.log("dynamodb-client - deleteDynamoDBClientEntries()");
+
+        const targetServiceID = "service#" + serviceID;
+        const targetUserID: string = "user#" + userID;
+
+        // Delete Service Record for Client
+        const deleteServiceRecordParams: DeleteItemCommandInput = {
+            TableName: this.tableName,
+            Key: {pk: {S: targetServiceID}, sk: {S: targetUserID}}
+        };
+
+        const deleteServiceRecordCommand = new DeleteItemCommand(deleteServiceRecordParams);
+        await this.dynamodb.send(deleteServiceRecordCommand);
+
+        // Delete Client Record for Service
+        const deleteClientRecordParams: DeleteItemCommandInput = {
+            TableName: this.tableName,
+            Key: {pk: {S: targetUserID}, sk: {S: targetUserID}}
+        };
+
+        const deleteClientRecordCommand = new DeleteItemCommand(deleteClientRecordParams);
+        await this.dynamodb.send(deleteClientRecordCommand);
+    }
+
+    async deleteDynamoDBServiceEntries(serviceID: string): Promise<void> {
+        console.log("dynamodb-client - deleteDynamoDBServiceEntries()");
+
+        const deleteItemCommandInputs: DeleteItemCommandInput[] = [];
+
+        await this.getServicesById(serviceID).then(output => {
+            if (output.Items) {
+                output.Items.forEach(row => {
+                    deleteItemCommandInputs.push({
+                        TableName: this.tableName,
+                        Key: {pk: row.pk, sk: row.sk}
+                    });
+                });
+            }
+        });
+
+        console.log(JSON.stringify(deleteItemCommandInputs));
+
+        for (const deleteItemCommandInput of deleteItemCommandInputs) {
+            const deleteItemCommand = new DeleteItemCommand(deleteItemCommandInput);
+            await this.dynamodb.send(deleteItemCommand);
+        }
+    }
+
     private async update(pkPrefix: string, pk: string, skPrefix: string, sk: string, updates: Updates): Promise<UpdateItemCommandOutput> {
         const attributeNames = Object.keys(updates);
 
@@ -199,6 +264,7 @@ export default class DynamoDbClient {
         };
 
         const command = new UpdateItemCommand(params);
+
         return this.dynamodb.send(command);
     }
 

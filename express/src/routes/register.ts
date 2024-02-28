@@ -5,10 +5,12 @@ import {
     processAddServiceForm,
     processEnterMobileForm,
     processGetEmailForm,
+    redirectToServicesList,
     resendEmailVerificationCode,
     resendMobileVerificationCode,
     resumeAfterPassword,
     resumeUserJourneyAfterPassword,
+    sendDataToUserSpreadsheet,
     showAddServiceForm,
     showCheckEmailForm,
     showEnterMobileForm,
@@ -61,7 +63,10 @@ router
     .post(validateMobileSecurityCode("resend-text-code", false), submitMobileVerificationCode);
 
 router.route("/resend-text-code").get(showResendPhoneCodeForm).post(resendMobileVerificationCode);
-router.route("/create-service").get(showAddServiceForm).post(validateServiceName, processAddServiceForm);
+router
+    .route("/create-service")
+    .get(showAddServiceForm)
+    .post(validateServiceName("register/add-service-name.njk"), processAddServiceForm, sendDataToUserSpreadsheet, redirectToServicesList);
 
 router.route("/resume-before-password").get(showCheckEmailForm).post(validateEmailSecurityCode, submitEmailSecurityCode);
 router.route("/resume-after-password").get(resumeAfterPassword).post(resumeUserJourneyAfterPassword);

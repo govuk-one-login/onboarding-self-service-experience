@@ -15,7 +15,7 @@
     "coverage": "jest --coverage --coverageDirectory coverage --silent",
     "test": "jest --silent",
     "cucumber": "npm run cucumber -w ../acceptance-tests --",
-    "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile .."
+    "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile-dev .."
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.354.0",

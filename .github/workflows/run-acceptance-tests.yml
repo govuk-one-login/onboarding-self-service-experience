@@ -29,7 +29,7 @@ jobs:
           cache: npm
 
       - name: Install Node dependencies
-        run: npm install --include-workspace-root
+        run: npm ci --include-workspace-root
 
       - name: Run cucumber tests
         id: run-tests
@@ -39,13 +39,14 @@ jobs:
           REPORT: ${{ runner.temp }}/acceptance-tests.report
           HOST: http://localhost:3000
           STUB_API: true
+          NODE_OPTIONS: --max-old-space-size=2048
         run: |
           shopt -s globstar
           features=(features/**/*.feature)
           
           cd ../express && npm install && cd .. && npm run build-express && cd acceptance-tests
           
-          cd .. && npm run local > /dev/null &
+          cd .. && npm run --silent local &
           
           while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
           
@@ -59,7 +60,7 @@ jobs:
 
       - name: Report test results
         if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
-        uses: alphagov/di-github-actions/report-step-result/print-file@5dacba941def444d69f02843feaebed79b5fca51
+        uses: govuk-one-login/github-actions/report-step-result/print-file@5dacba941def444d69f02843feaebed79b5fca51
         with:
           title: Acceptance tests
           language: shell

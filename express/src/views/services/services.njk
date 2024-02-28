@@ -16,5 +16,12 @@
     </p>
     <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--l">
   {% endfor %}
+
+  {% if showTestBanner %}
+    {{ govukButton({
+      text: "Add a new service",
+      href: "/services/add-new-service"
+    }) }}
+  {% endif %}
   
 {% endblock %}

@@ -4,7 +4,8 @@
   "scripts": {
     "build": "../../infrastructure/dev/deploy.sh api --no-deploy",
     "deploy": "../../infrastructure/dev/deploy.sh api",
-    "test": "jest --silent",
+    "testpact": "npm --prefix tests/contract-tests run build && npm --prefix tests/contract-tests run test",
+    "test": "jest --silent && npm run testpact",
     "compile": "tsc"
   },
   "dependencies": {

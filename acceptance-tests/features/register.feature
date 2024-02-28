@@ -18,17 +18,15 @@ Feature: Users can sign up to the self-service experience
 
   Rule: Users can only register with email addresses from certain domains
     Scenario Outline: User can register allowed email addresses
-
       When they submit the email <email>
       Then they should be redirected to the "/register/enter-email-code" page
 
       Examples:
         | email                                     |
-        | "test-user@test.gov.uk" |
-        | "test-user@digital.cabinet-office.gov.uk"      |
+        | "test-user@test.gov.uk"                   |
+        | "test-user@digital.cabinet-office.gov.uk" |
 
     Scenario Outline: User tries to register with a verboten email address
-
       When they submit the email <email>
       Then the error message "Enter a government email address" must be displayed for the email field
 
@@ -36,6 +34,16 @@ Feature: Users can sign up to the self-service experience
         | email                                                            |
         | "test-user@yahoo.co.uk"                                          |
         | "the-config-file-is-broken-add-a-dot-before-gov.uk@sneakygov.uk" |
+
+  Rule: User validating the links in registration page
+    Scenario Outline:User validating links in enter-email address page
+      Given the user is on the '/register' page
+      When they click on the '<linkName>' link
+      Then they should be redirected to the '<address>'
+      Examples:
+        | linkName       | address               |
+        | Contact us     | /contact-us?adminTool |
+        | privacy notice | /privacy-policy       |
 
   Rule: The user tries to submit an email address that is already registered
     Scenario: The user is offered to sign in and signs in instead
@@ -61,6 +69,17 @@ Feature: Users can sign up to the self-service experience
       When they submit the password "WrongPa$$word"
       Then the error message "Incorrect password" must be displayed for the password field
 
+  Rule: The user is navigating back to previous page using back link
+    Scenario: User navigates back to /enter-email-address page from email code page
+      Given they submit the email "registering-successfully@test.gov.uk"
+      When they click on the "Back" link
+      Then they should be redirected to the "/register/enter-email-address" page
+
+    Scenario: User navigates back to /enter-email-address from account exists page
+      Given they submit the email "inuse@test.gov.uk"
+      When they click on the "Back" link
+      Then they should be redirected to the "/register/enter-email-address" page
+
   Rule: The user tries to verify email security code when creating an account
     Background:
       Given they submit the email "registering-successfully@test.gov.uk"
@@ -74,6 +93,11 @@ Feature: Users can sign up to the self-service experience
     Scenario: The user enters a security code in an incorrect format
       When they submit the security code "12345A"
       Then the error message "Your security code should only include numbers" must be displayed for the security code field
+      And they should see the text "We have sent an email to: registering-successfully@test.gov.uk"
+
+    Scenario: The user enters a security code that has expired
+      When they submit the security code "000000"
+      Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
       And they should see the text "We have sent an email to: registering-successfully@test.gov.uk"
 
   Rule: The user does not receive their email security code and clicks 'Not received an email?' link
@@ -93,7 +117,7 @@ Feature: Users can sign up to the self-service experience
 
     Scenario: The user does not receive their email security and wants to contact the service via support form
       When they click on the "support form" link
-      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us?adminTool"
+      Then they should be redirected to the "/contact-us?adminTool"
 
   Rule: The user tries to set a password when creating an account
     Background:
@@ -229,3 +253,51 @@ Feature: Users can sign up to the self-service experience
     Scenario: The user types everything correctly, creates an account and adds a service
       When they submit the service name "Test Service"
       Then they should be redirected to the "/services/vice-id/clients" page
+
+    @accessible
+    Rule: The user validating the accessibility issues in registration pages
+    Scenario: user verifying /register/enter-email-address page
+      Then there should be no accessibility violations
+
+    Scenario: User verifying the accessibility of /enter-email-code page
+      Given they submit the email "registering-successfully@test.gov.uk"
+      Then there should be no accessibility violations
+
+    Scenario: User verifying the accessibility of /register/resend-email-code
+      Given they submit the email "registering-successfully@test.gov.uk"
+      When they click on the "Not received an email?" link
+      Then there should be no accessibility violations
+
+    Scenario: User verifying the accessibility of /create-password page
+      Given they submit the email "registering-successfully@test.gov.uk"
+      When they submit a correct security code
+      Then there should be no accessibility violations
+
+    Scenario: User verifying the accessibility of /enter-phone-number page
+      Given they submit the email "registering-successfully@test.gov.uk"
+      When they submit a correct security code
+      And they submit a valid password
+      Then there should be no accessibility violations
+
+    Scenario: User verifying the accessibility of /register/resend-text-code
+      Given they submit the email "registering-successfully@test.gov.uk"
+      When they submit a correct security code
+      And they submit a valid password
+      And they submit a valid mobile phone number
+      And they click on the "Problems receiving a text message?" link
+      Then there should be no accessibility violations
+
+    Scenario: User verifying the accessibility of to /enter-text-code page
+      Given they submit the email "registering-successfully@test.gov.uk"
+      When they submit a correct security code
+      And they submit a valid password
+      And they submit a valid mobile phone number
+      Then there should be no accessibility violations
+
+    Scenario: User verifying the accessibility of /create-service page
+      Given they submit the email "registering-successfully@test.gov.uk"
+      When they submit a correct security code
+      And they submit a valid password
+      And they submit a valid mobile phone number
+      And they submit a correct security code
+      Then there should be no accessibility violations

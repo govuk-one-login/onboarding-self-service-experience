@@ -45,7 +45,7 @@
     <div id="publicKeyContainer" class="govuk-body">
       {% if userPublicKey %}
         <div id="publicKeyShort" aria-labelledby="public-key"><code>{{ userPublicKey.slice(0, 24) }} ...</code></div>
-        <div id="publicKeyLong"><code>{{ userPublicKey }}</code></div>
+        <div id="publicKeyLong" class="govuk-!-display-none"><code>{{ userPublicKey }}</code></div>
         <button type="button" id="togglePublicKey" class="govuk-accordion__show-all" aria-expanded="false">
             <span class="govuk-accordion__section-toggle-focus">
               <span id="toggleTextChevron" class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down"></span>
@@ -140,7 +140,7 @@
       <span class="govuk-body govuk-!-font-weight-bold">Public key</span>
       <p class="govuk-body">This lets our services securely send messages to each other. You need to
         <a class="govuk-link" rel="noreferrer noopener" target="_blank"
-           href="https://auth-tech-docs.london.cloudapps.digital/integrate-with-integration-environment/generate-a-key/">
+           href="https://docs.sign-in.service.gov.uk/before-integrating/generate-a-key/">
           generate a key pair (opens in new tab)</a>
         and add the public key.
       </p>

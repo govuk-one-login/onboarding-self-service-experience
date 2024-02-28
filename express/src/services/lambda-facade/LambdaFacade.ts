@@ -1,11 +1,12 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
-import axios, {Axios, AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
 import {api} from "../../config/environment";
 import AuthenticationResultParser from "../../lib/authentication-result-parser";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./LambdaFacadeInterface";
+import console from "console";
+import axios, {Axios, AxiosResponse} from "axios";
 import {TxMAEvent} from "../../types/txma-event";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -97,19 +98,42 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         await this.post("/update-user", JSON.stringify(body), accessToken);
     }
 
-    async publicBetaRequest(name: string, department: string, serviceName: string, emailAddress: string): Promise<void> {
-        const body = {
-            name: name,
-            department: department,
-            serviceName: serviceName,
-            emailAddress: emailAddress
-        };
-
-        await this.post("/send-public-beta-request-notification", JSON.stringify(body));
-    }
-
     async sendTxMALog(message: TxMAEvent) {
         await this.post("/txma-logging", message);
+    }
+
+    async getDynamoDBEntries(userEmail: string): Promise<AxiosResponse> {
+        console.log("In LambdaFacade-getDynamoDBEntries");
+
+        const endPoint: string = "/get-dynamodb-entries/" + userEmail;
+        console.log("EndPoint => " + endPoint);
+
+        return await this.get(endPoint);
+    }
+
+    async deleteClientEntries(userID: string, serviceID: string): Promise<void> {
+        console.log("In LambdaFacade-deleteClientEntries");
+
+        const body = {
+            userId: userID,
+            serviceId: serviceID
+        };
+
+        await this.post("/delete-dynamodb-client-entries/", JSON.stringify(body));
+    }
+
+    async deleteServiceEntries(serviceID: string): Promise<void> {
+        console.log("In LambdaFacade-deleteServiceEntries");
+
+        const body = {
+            serviceId: serviceID
+        };
+
+        await this.post("/delete-dynamodb-service-entries/", JSON.stringify(body));
+    }
+
+    globalSignOut(userEmail: string): Promise<AxiosResponse> {
+        return this.get(`/global-sign-out/${userEmail}`);
     }
 
     private get(endpoint: string): Promise<AxiosResponse> {
@@ -123,11 +147,8 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             }
         });
     }
+
     sessionCount(userEmail: string): Promise<AxiosResponse> {
         return this.get(`/get-session-count/${userEmail}`);
-    }
-
-    globalSignOut(userEmail: string): Promise<AxiosResponse> {
-        return this.get(`/global-sign-out/${userEmail}`);
     }
 }

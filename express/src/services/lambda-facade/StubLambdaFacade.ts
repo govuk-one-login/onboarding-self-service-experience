@@ -149,12 +149,24 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         } as AxiosResponse);
     }
 
-    async updateUser(selfServiceUserId: string, updates: UserUpdates): Promise<void> {
-        Object.keys(updates).forEach(key => (this.user[key as keyof DynamoUser] = {S: updates[key] as string}));
+    async deleteClientEntries(oldUserID: string, serviceID: string): Promise<void> {
+        console.log("Stubbing Deletion of Client Entries for:  Client ID =>" + oldUserID + ", ServiceID => " + serviceID);
+        return;
     }
 
-    async publicBetaRequest(): Promise<void> {
+    async deleteServiceEntries(serviceID: string): Promise<void> {
+        console.log("Stubbing Deletion of Service Entries for: ServiceID => " + serviceID);
         return;
+    }
+
+    async getDynamoDBEntries(): Promise<AxiosResponse> {
+        return Promise.resolve({
+            status: 200
+        } as AxiosResponse);
+    }
+
+    async updateUser(selfServiceUserId: string, updates: UserUpdates): Promise<void> {
+        Object.keys(updates).forEach(key => (this.user[key as keyof DynamoUser] = {S: updates[key] as string}));
     }
 
     async sendTxMALog(message: TxMAEvent): Promise<void> {

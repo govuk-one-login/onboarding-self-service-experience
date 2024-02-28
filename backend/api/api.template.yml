@@ -3,6 +3,23 @@ Description: DI Self-Service API
 Transform: [ AWS::LanguageExtensions, AWS::Serverless-2016-10-31 ]
 
 Parameters:
+  Environment:
+    Description: "The name of the environment to deploy to."
+    Type: "String"
+    Default: local
+    AllowedValues:
+      - "local"
+      - "dev"
+      - "build"
+      - "staging"
+      - "integration"
+      - "production"
+  DeploymentName:
+    Type: String
+    MaxLength: 22
+    AllowedPattern: ^.*[^-]$
+    Default: self-service
+    Description: A unique prefix to identify the deployment; used to distinguish variation between ephemeral stacks
   ClientRegistryEndpoint:
     Type: String
     Default: https://oidc.integration.account.gov.uk
@@ -11,16 +28,6 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/api/notifications-email
     Description: Email address to send internal notifications
-  LogGroupPrefix:
-    Type: String
-    AllowedPattern: ^.*[^\/]$
-    Default: /aws/vendedlogs
-  DeploymentName:
-    Type: String
-    MaxLength: 28
-    AllowedPattern: ^.*[^-]$
-    Default: self-service
-    Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
   PrivateAPI:
     Type: String
     AllowedValues: [ Yes, No ]
@@ -32,10 +39,61 @@ Parameters:
     Type: String
     Default: ""
 
+Rules:
+  DeploymentNameRequired:
+    RuleCondition: !Equals [ !Ref Environment, "local" ]
+    Assertions:
+      - Assert: !Not [ !Equals [ !Ref DeploymentName, "" ] ]
+        AssertDescription: >
+          Must specify DeploymentName parameter when Environment is "local"
+
+  DeploymentNameMustBeEmpty:
+    RuleCondition: !Not [ !Equals [ !Ref Environment, "local" ] ]
+    Assertions:
+      - Assert: !Equals [ !Ref DeploymentName, "self-service" ] # Confirm the default value is used.
+        AssertDescription: >
+          Must not specify DeploymentName parameter when Environment is not "local"
+
+Mappings:
+  EnvironmentConfiguration:
+    local:
+      dynatraceLoggingEnabled: false # Local builds do not support dynatrace
+      cslsLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+    dev:
+      dynatraceLoggingEnabled: true
+      cslsLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+    build:
+      dynatraceLoggingEnabled: true
+      cslsLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+    staging:
+      dynatraceLoggingEnabled: true
+      cslsLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+    integration:
+      dynatraceLoggingEnabled: true
+      cslsLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+    production:
+      dynatraceLoggingEnabled: true
+      cslsLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+
 Conditions:
   PrivateAPI: !Equals [ !Ref PrivateAPI, Yes ]
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+  DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
+  CslsLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, cslsLoggingEnabled ], true ]
+  IsLocal: !Equals [ !Ref Environment, "local" ]
 
 Globals:
   Function:
@@ -45,9 +103,50 @@ Globals:
     VpcConfig:
       SecurityGroupIds: [ !ImportValue VPC-VPCEndpointsSecurityGroup ]
       SubnetIds: !Split [ ",", !ImportValue VPC-PrivateSubnets ]
+    LoggingConfig:
+      LogGroup: !Ref LambdaLogsGroup
+    Layers:
+      - !If
+        - DynatraceLoggingEnabled
+        - !Sub
+          - '{{resolve:secretsmanager:${SecretArn}:SecretString:NODEJS_LAYER}}'
+          - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+        - !Ref AWS::NoValue
     Environment:
       Variables:
         NODE_OPTIONS: --enable-source-maps
+        AWS_LAMBDA_EXEC_WRAPPER: !If [ DynatraceLoggingEnabled, "/opt/dynatrace", !Ref "AWS::NoValue" ]
+        DT_CONNECTION_AUTH_TOKEN: !If
+          - DynatraceLoggingEnabled
+          - !Sub
+            - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_CONNECTION_AUTH_TOKEN}}'
+            - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+          - !Ref "AWS::NoValue"
+        DT_CONNECTION_BASE_URL: !If
+          - DynatraceLoggingEnabled
+          - !Sub
+            - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_CONNECTION_BASE_URL}}'
+            - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+          - !Ref "AWS::NoValue"
+        DT_CLUSTER_ID: !If
+          - DynatraceLoggingEnabled
+          - !Sub
+            - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_CLUSTER_ID}}'
+            - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+          - !Ref "AWS::NoValue"
+        DT_LOG_COLLECTION_AUTH_TOKEN: !If
+          - DynatraceLoggingEnabled
+          - !Sub
+            - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_LOG_COLLECTION_AUTH_TOKEN}}'
+            - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+          - !Ref "AWS::NoValue"
+        DT_TENANT: !If
+          - DynatraceLoggingEnabled
+          - !Sub
+            - '{{resolve:secretsmanager:${SecretArn}:SecretString:DT_TENANT}}'
+            - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+          - !Ref "AWS::NoValue"
+        DT_OPEN_TELEMETRY_ENABLE_INTEGRATION: !If [DynatraceLoggingEnabled, "true", !Ref "AWS::NoValue"]
 
 Resources:
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html
@@ -100,18 +199,25 @@ Resources:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/audit
+      LogGroupName: !Join
+        - "/"
+        - - '/onboarding-self-service/backend-api'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'audit'
       RetentionInDays: 14
 
   APIAccessLogsGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
-    DependsOn: LogAuditLogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api
+      LogGroupName: !Join
+        - "/"
+        - - '/aws/api-gateway'
+          - 'onboarding-self-service/backend-api'
+          - !Sub ${DeploymentName}-api
       RetentionInDays: 14
       DataProtectionPolicy:
-        Name: data-protection-policy
+        Name: data-protection-policy-api
         Description: Data Protection for Cloudwatch Logs
         Version: '2021-06-01'
         Statement:
@@ -129,7 +235,7 @@ Resources:
               Audit:
                 FindingsDestination:
                   CloudWatchLogs:
-                    LogGroup: !Sub ${LogGroupPrefix}/${DeploymentName}/api/audit
+                    LogGroup: !Ref LogAuditLogGroup
           - Sid: redact-policy
             DataIdentifier:
               - arn:aws:dataprotection::aws:data-identifier/EmailAddress
@@ -143,6 +249,70 @@ Resources:
             Operation:
               Deidentify:
                 MaskConfig: { }
+
+  ApiLogCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsLoggingEnabled
+    Properties:
+      LogGroupName: !Ref APIAccessLogsGroup
+      FilterName: "API Gateway logs for Backend API"
+      FilterPattern: ""
+      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
+
+  LambdaLogsGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join
+        - "/"
+        - - '/aws/lambda'
+          - 'onboarding-self-service/backend-api'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'all'
+      RetentionInDays: 14
+      DataProtectionPolicy:
+        Name: data-protection-policy-api-lambda
+        Description: Data Protection for Cloudwatch Logs
+        Version: '2021-06-01'
+        Statement:
+          - Sid: audit-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Audit:
+                FindingsDestination:
+                  CloudWatchLogs:
+                    LogGroup: !Ref LogAuditLogGroup
+          - Sid: redact-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Deidentify:
+                MaskConfig: { }
+
+  LambdaLogCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsLoggingEnabled
+    Properties:
+      LogGroupName: !Ref LambdaLogsGroup
+      FilterName: "Lambda logs for Backend API"
+      FilterPattern: ""
+      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
+
   #--- Users ---#
 
   EnvironmentVariablesEncryptionKey:
@@ -193,6 +363,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -225,6 +396,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -258,6 +430,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -292,6 +465,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -324,6 +498,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -356,6 +531,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-SessionsTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -388,6 +564,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -415,6 +592,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -447,6 +625,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -472,6 +651,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -499,6 +679,7 @@ Resources:
         - DynamoDBWritePolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -521,7 +702,10 @@ Resources:
       Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
-      Policies: [ AWSLambdaVPCAccessExecutionRole, AWSXrayWriteOnlyAccess ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       VpcConfig:
         SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
       Environment:
@@ -545,7 +729,10 @@ Resources:
       Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
-      Policies: [ AWSLambdaVPCAccessExecutionRole, AWSXrayWriteOnlyAccess ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       VpcConfig:
         SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
       Environment:
@@ -573,6 +760,7 @@ Resources:
       Policies:
         - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
         - Version: 2012-10-17
           Statement:
             - Effect: Allow
@@ -606,6 +794,7 @@ Resources:
       Policies:
         - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
         - Version: 2012-10-17
           Statement:
             - Effect: Allow
@@ -675,6 +864,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName:
               Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           TABLE:
@@ -702,6 +892,32 @@ Resources:
               - kms:Decrypt
             Resource: "*"
 
+  DynatraceSecretsAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy for accessing Dynatrace secrets
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+            Action:
+              - secretsmanager:GetSecretValue
+          - Effect: Allow
+            Action:
+              - secretsmanager:ListSecrets
+            Resource: 'arn:aws:secretsmanager:eu-west-2:216552277552:secret:*'
+          - Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: 'arn:aws:kms:eu-west-2:216552277552:key/*'
+
+
   SendSQSMessageToTxMAHandler:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
     # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
@@ -716,7 +932,11 @@ Resources:
       Handler: backend/api/src/handlers/logging/sqs-service.sendSQSMessageToTxMAHandler
       Description: Sends a message to the TxMA SQS
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      Policies: [ AWSLambdaVPCAccessExecutionRole, AmazonSQSFullAccess, !Ref KMSDecryptAccessPolicy ]
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonSQSFullAccess
+        - !Ref KMSDecryptAccessPolicy
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           QUEUEURL: !Join [ '', [!Sub 'https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/', !Join ["frontend", !Split ["api", !Sub '${AWS::StackName}' ] ], "-AuditEventQueue"]]
@@ -835,12 +1055,16 @@ Resources:
   StepFunctionsLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
     Type: AWS::Logs::LogGroup
-    DependsOn: LogAuditLogGroup
     Properties:
-      LogGroupName: !Sub ${LogGroupPrefix}/${DeploymentName}/api/step-functions
+      LogGroupName: !Join
+        - "/"
+        - - '/aws/stepfunction'
+          - 'onboarding-self-service/backend-api'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'all'
       RetentionInDays: 14
       DataProtectionPolicy:
-        Name: data-protection-policy
+        Name: data-protection-policy-api-step-functions
         Description: Data Protection for Cloudwatch Logs
         Version: '2021-06-01'
         Statement:
@@ -858,7 +1082,7 @@ Resources:
               Audit:
                 FindingsDestination:
                   CloudWatchLogs:
-                    LogGroup: !Sub ${LogGroupPrefix}/${DeploymentName}/api/audit
+                    LogGroup: !Ref LogAuditLogGroup
           - Sid: redact-policy
             DataIdentifier:
               - arn:aws:dataprotection::aws:data-identifier/EmailAddress
@@ -873,37 +1097,16 @@ Resources:
               Deidentify:
                 MaskConfig: { }
 
-  #--- Notifications ---#
-
-  PublicBetaNotificationFunction:
-    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
-    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
-    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
-    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
-    Type: AWS::Serverless::Function
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Sourcemap: true
+  StepFunctionLogCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsLoggingEnabled
     Properties:
-      Handler: backend/api/src/handlers/notifications/send-public-beta-notification.publicBetaRequestHandler
-      Description: Publish a message to the public beta request notification topic
-      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
-      Tracing: Active
-      Policies:
-        - AWSXrayWriteOnlyAccess
-        - SNSPublishMessagePolicy:
-            TopicName: !GetAtt NotificationsSnsTopic.TopicName
-      Environment:
-        Variables:
-          SNS_TOPIC_ARN: !Ref NotificationsSnsTopic
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            RestApiId: !Ref API
-            Path: /send-public-beta-request-notification
-            Method: POST
+      LogGroupName: !Ref StepFunctionsLogGroup
+      FilterName: "Step Functions logs for Backend API"
+      FilterPattern: ""
+      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
+
+  #--- Notifications ---#
 
   NotificationsSnsTopic:
     Type: AWS::SNS::Topic
@@ -914,6 +1117,273 @@ Resources:
       Subscription:
         - Protocol: email
           Endpoint: !Ref NotificationEmail
+
+  #--- DynamoDB Functions ---#
+  GetDynamoDBEntriesFunction:
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+    Properties:
+      Handler: backend/api/src/handlers/dynamodb/dynamo-db-service.getDynamoDBEntriesHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - DynamoDBReadPolicy:
+            TableName:
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
+      Environment:
+        Variables:
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /get-dynamodb-entries/{userEmail}
+            Method: GET
+
+  DeleteDynamoDBClientEntriesFunction:
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+    Properties:
+      Handler: backend/api/src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBClientEntriesHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - DynamoDBCrudPolicy:
+            TableName:
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
+      Environment:
+        Variables:
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /delete-dynamodb-client-entries
+            Method: POST
+
+  DeleteDynamoDBServiceEntriesFunction:
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+    Properties:
+      Handler: backend/api/src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBServiceEntriesHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - DynamoDBCrudPolicy:
+            TableName:
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
+      Environment:
+        Variables:
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /delete-dynamodb-service-entries
+            Method: POST
+
+  ApiGatewayWebACL:
+    # checkov:skip=CKV_AWS_192:Ensure WAF prevents message lookup in Log4j2
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub ${AWS::StackName}-${Environment}-ApiWebACL
+      Scope: REGIONAL
+      Description: This is WebACL to protect the API and Load Balancers
+      DefaultAction:
+        Allow: { }
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: !Sub ${AWS::StackName}-${Environment}-ApiGatewayWebACLMetric
+      Rules:
+        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 1
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesKnownBadInputsRuleSet
+        - Name: AWS-AWSManagedRulesAmazonIpReputationList
+          Priority: 2
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAmazonIpReputationList
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAmazonIpReputationList
+        - Name: AWS-AWSManagedRulesAnonymousIpList
+          Priority: 3
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAnonymousIpList
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAnonymousIpList
+        - Name: AWS-AWSManagedRulesCommonRuleSet
+          Priority: 4
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesCommonRuleSet
+        - Name: AWS-AWSManagedRulesAdminProtectionRuleSet
+          Priority: 5
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAdminProtectionRuleSet
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAdminProtectionRuleSet
+        - Name: SQLInject-RuleSet
+          Priority: 6
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesSQLiRuleSet
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${AWS::StackName}-${Environment}-SQLinjection-ruleset-metric'
+        - Name: RateBased-CountIpRule
+          Priority: 9
+          Statement:
+            RateBasedStatement:
+              Limit: 100
+              AggregateKeyType: IP
+          Action:
+            Count: { }
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub "${AWS::StackName}-${Environment}-RateBased-CountIp-ruleset-metric"
+            SampledRequestsEnabled: true
+
+  ApiGatewayWebACLAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      WebACLArn: !GetAtt ApiGatewayWebACL.Arn
+      ResourceArn: !Sub
+        - 'arn:aws:apigateway:${AWS::Region}::/restapis/${ResourceArn}/stages/${API.Stage}'
+        - ResourceArn: !Ref API
+
+  WafLoggingConfiguration:
+    Type: AWS::WAFv2::LoggingConfiguration
+    Properties:
+      ResourceArn: !GetAtt ApiGatewayWebACL.Arn
+      LogDestinationConfigs:
+        - !GetAtt WafLogGroup.Arn
+
+  WafLogGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join
+        - "-"
+        - - 'aws-waf-logs'
+          - 'onboarding-self-service-backend-api'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+      RetentionInDays: 14
+      DataProtectionPolicy:
+        Name: data-protection-policy-backend-api
+        Description: Data Protection for Cloudwatch Logs
+        Version: '2021-06-01'
+        Statement:
+          - Sid: audit-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Audit:
+                FindingsDestination:
+                  CloudWatchLogs:
+                    LogGroup: !Ref LogAuditLogGroup
+          - Sid: redact-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Deidentify:
+                MaskConfig: { }
+
+  WafLogCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsLoggingEnabled
+    Properties:
+      LogGroupName: !Ref WafLogGroup
+      FilterName: "Waf logs for Backend API"
+      FilterPattern: ""
+      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
 
 Outputs:
   # SAM Serverless Function implicit API resources | Invoking private APIs

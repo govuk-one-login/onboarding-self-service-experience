@@ -26,6 +26,7 @@ Parameters:
 Conditions:
   Subdomain: !Not [ !Condition TopNode ]
   TopNode: !Equals [ !Ref Subdomain, "" ]
+  DevEnv: !Equals [ !Ref Subdomain, "development." ]
   DevelopmentNameServers: !Not [ !Equals [ !Join [ "", !Ref DevelopmentNameServers ], "" ] ]
   BuildNameServers: !Not [ !Equals [ !Join [ "", !Ref BuildNameServers ], "" ] ]
   StagingNameServers: !Not [ !Equals [ !Join [ "", !Ref StagingNameServers ], "" ] ]
@@ -75,6 +76,17 @@ Resources:
         - DomainName: !Sub "*.admin.${Subdomain}${Domain}"
           HostedZoneId: !If [ TopNode, !Ref ApexHostedZone, !Ref SubdomainHostedZone ]
 
+  WwwDomainCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !If [ DevEnv, !Sub "*.${Subdomain}${Domain}", !Sub "www.${Subdomain}${Domain}" ]
+      SubjectAlternativeNames: [ !Sub "${Subdomain}${Domain}" ]
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Sub "www.${Subdomain}${Domain}"
+          HostedZoneId: !If [ TopNode, !Ref ApexHostedZone, !Ref SubdomainHostedZone ]
+
+
   # The GOV.UK nameservers for service.gov.uk route traffic for
   # sign-in.service.gov.uk and all its subdomains to its zone apex.
   # The zone apex then routes requests to the appropriate targets.
@@ -86,14 +98,14 @@ Resources:
     Properties:
       HostedZoneId: !Ref ApexHostedZone
       RecordSets:
-        - Name: !Ref Domain
-          Type: A
-          AliasTarget:
-            # Z2FDTNDATAQYW2 is the hosted zone for CloudFront
-            # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
-            HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: dbd28k6th0aos.cloudfront.net.  # PaaS CDN
-            EvaluateTargetHealth: false
+#        - Name: !Ref Domain
+#          Type: A
+#          AliasTarget:
+#            # Z2FDTNDATAQYW2 is the hosted zone for CloudFront
+#            # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
+#            HostedZoneId: Z2FDTNDATAQYW2
+#            DNSName: dbd28k6th0aos.cloudfront.net.  # PaaS CDN
+#            EvaluateTargetHealth: false
 
         - Name: _24e1305586ee4f8a0227e3ca0a7ae6bf.sign-in.service.gov.uk.
           ResourceRecords: [ _0dcb3493c1b4007e839f668957af9b81.nhsllhhtvj.acm-validations.aws ]
@@ -101,26 +113,36 @@ Resources:
           TTL: 172800 # 48h
 
         # WWW alias
-        - Name: !Sub www.${Domain}
-          ResourceRecords: [ dbd28k6th0aos.cloudfront.net ]
-          Type: CNAME
-          TTL: 172800
+#        - Name: !Sub www.${Domain}
+#          ResourceRecords: [ dbd28k6th0aos.cloudfront.net ]
+#          Type: CNAME
+#          TTL: 172800
 
         - Name: _e323beb1b0f2d7f9f443eb019da43e76.www.sign-in.service.gov.uk.
           ResourceRecords: [ _9f87c85959df2679f28fa044293bef2f.lblqlwmygg.acm-validations.aws ]
           Type: CNAME
           TTL: 172800
 
-        # Docs
+        # Docs delegated to di-documentation #203073707786
         - Name: !Sub docs.${Domain}
-          ResourceRecords: [ d308hhopufamea.cloudfront.net ]  # PaaS CDN
-          Type: CNAME
-          TTL: 172800
+          ResourceRecords: [
+              ns-108.awsdns-13.com,
+              ns-1335.awsdns-38.org,
+              ns-1711.awsdns-21.co.uk,
+              ns-823.awsdns-38.net
+          ]
+          Type: NS
+          TTL: 3600
 
         - Name: _ea1fbf73402e0d458573ae1eacf1ced2.docs.sign-in.service.gov.uk.
           ResourceRecords: [ _9711df122153a4efd1b7d26b7853eecf.fpkndhgbpx.acm-validations.aws ]
           Type: CNAME
           TTL: 172800
+
+        - Name: _09be405dc2b5adec088624d0262b3d01.docs.sign-in.service.gov.uk.
+          ResourceRecords: [ _259f445b82d1d01a4da6570701f09f91.mhbtsbpdnt.acm-validations.aws ]
+          Type: CNAME
+          TTL: 300
 
   # Delegating responsibility for subdomains to hosted zones
   # https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-routing-traffic-for-subdomains.html
@@ -186,6 +208,14 @@ Outputs:
     Value: !Sub admin.${Subdomain}${Domain}
     Export:
       Name: DNS-Domain
+  SignInDomain:
+    Value: !Sub ${Subdomain}${Domain}
+    Export:
+      Name: DNS-SignIn-Domain
+  WwwDomainCertificateARN:
+    Value: !Ref WwwDomainCertificate
+    Export:
+      Name: DNS-wwwDomainCertificateARN
   CertificateARN:
     Value: !Ref Certificate
     Export:

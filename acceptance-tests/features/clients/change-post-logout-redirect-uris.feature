@@ -14,6 +14,10 @@ Feature: Users can change their post logout redirect uris
       When they click on the link that points to "/change-post-logout-uris"
       Then they should be redirected to a page with the title "Change post logout redirect URIs - GOV.UK One Login"
 
+    Scenario: user validating the link  default GOV.UK sign out page
+      When they click on the 'default GOV.UK sign out page' link
+      Then they should be directed to the URL 'https://signin.account.gov.uk/signed-out'
+
     Scenario: The user doesn't enter any characters into the Post logout redirect URIs  field
       When they submit the post logout redirect uris ""
       Then the error message "Enter your redirect URIs" must be displayed for the redirect uris field
@@ -48,3 +52,9 @@ Feature: Users can change their post logout redirect uris
       And they should see the exact value "http://localhost/updated http://localhost/logged_out/updated" in the post logout redirect uris field
       When they click on the link that points to "/change-post-logout-uris"
       Then the value of the text field post logout redirect uris should be "http://localhost/updated http://localhost/logged_out/updated"
+
+    @accessible
+    Rule: The user validate accessibility issues in Change your post logout redirect URIs page
+    Scenario: User verifying the accessibility of /change-post-logout-uris page
+      When they click on the link that points to "/change-post-logout-uris"
+      Then there should be no accessibility violations

@@ -13,13 +13,13 @@
     {
       "name": "staging",
       "number": 325730373996
-    }
-  ],
-  "production": [
+    },
     {
       "name": "integration",
       "number": 663985455444
-    },
+    }
+  ],
+  "production": [
     {
       "name": "production",
       "number": 389946456390

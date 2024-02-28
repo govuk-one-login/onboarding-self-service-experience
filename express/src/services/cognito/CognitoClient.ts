@@ -21,11 +21,13 @@ import {
     GlobalSignOutCommand,
     GetUserCommand,
     VerifyUserAttributeCommand,
-    UpdateUserPoolClientCommand
+    UpdateUserPoolClientCommand,
+    AdminSetUserPasswordCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Command} from "@aws-sdk/types";
 import {cognito, region} from "../../config/environment";
 import CognitoInterface from "./CognitoInterface";
+import console from "console";
 
 type CognitoCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes> = Command<
     ServiceInputTypes,
@@ -76,6 +78,24 @@ export default class CognitoClient implements CognitoInterface {
             ]
         });
         console.log("Exit createUser");
+    }
+
+    async recoverUser(email: string): Promise<void> {
+        console.log("In CognitoClient:recoverUser");
+
+        await this.sendCommand(AdminCreateUserCommand, {
+            DesiredDeliveryMediums: ["EMAIL"],
+            MessageAction: "SUPPRESS",
+            Username: email,
+            UserPoolId: this.userPoolId,
+            TemporaryPassword: Math.floor(Math.random() * 100_000)
+                .toString()
+                .padStart(6, "0"),
+            UserAttributes: [
+                {Name: "email", Value: email},
+                {Name: "custom:signup_status", Value: "HasEmail,HasPassword,HasPhoneNumber,HasTextCode"}
+            ]
+        });
     }
 
     async resendEmailAuthCode(email: string): Promise<void> {
@@ -143,7 +163,7 @@ export default class CognitoClient implements CognitoInterface {
         });
     }
 
-    async forgotPassword(email: string, protocol: string, host: string): Promise<void> {
+    async forgotPassword(email: string, protocol: string, host: string, useRecoveredAccountURL: boolean): Promise<void> {
         console.info("In CognitoClient:forgotPassword()");
 
         await this.sendCommand(ForgotPasswordCommand, {
@@ -152,7 +172,8 @@ export default class CognitoClient implements CognitoInterface {
             ClientMetadata: {
                 protocol,
                 host: host.split("").join("/"),
-                username: email
+                username: email,
+                use_recovered_account_url: useRecoveredAccountURL ? "true" : "false"
             }
         });
     }
@@ -168,6 +189,17 @@ export default class CognitoClient implements CognitoInterface {
             ClientMetadata: {
                 email: username
             }
+        });
+    }
+
+    async setUserPassword(userName: string, password: string): Promise<void> {
+        console.info("In CognitoClient:setUserPassword()");
+
+        await this.sendCommand(AdminSetUserPasswordCommand, {
+            Password: password,
+            Permanent: true,
+            Username: userName,
+            UserPoolId: this.userPoolId
         });
     }
 

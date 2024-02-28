@@ -3,6 +3,23 @@ Description: DI Admin Tool frontend
 Transform: AWS::LanguageExtensions
 
 Parameters:
+  Environment:
+    Description: "The name of the environment to deploy to."
+    Type: "String"
+    Default: local
+    AllowedValues:
+      - "local"
+      - "dev"
+      - "build"
+      - "staging"
+      - "integration"
+      - "production"
+  DeploymentName:
+    Type: String
+    MaxLength: 22
+    AllowedPattern: ^.*[^-]$
+    Default: self-service
+    Description: A unique prefix to identify the deployment; used to distinguish variation between ephemeral stacks
   ImageURI:
     Type: String
     Default: ""
@@ -10,16 +27,6 @@ Parameters:
   ContainerPort:
     Type: Number
     Default: 3000
-  LogGroupPrefix:
-    Type: String
-    AllowedPattern: ^.*[^\/]$
-    Default: /aws/vendedlogs
-  DeploymentName:
-    Type: String
-    MaxLength: 28
-    AllowedPattern: ^.*[^-]$
-    Default: self-service
-    Description: A unique prefix to identify the deployment; used when importing or exporting values from related stacks
   ShowTestBanner:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/show-test-banner
@@ -29,28 +36,79 @@ Parameters:
   AllowedEmailDomainsSource:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/allowed-email-domains-source
+  UserSignupSheetDataRange:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/user-signup-sheet-data-range
+  UserSignupSheetHeaderRange:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/user-signup-sheet-header-range
+  PublicBetaSheetDataRange:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/public-beta-sheet-data-range
+  PublicBetaSheetHeaderRange:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/public-beta-sheet-header-range
   PermissionsBoundary:
     Type: String
     Default: ""
     Description: The ARN of the permissions boundary to apply when creating IAM roles
-  Environment:
-    Description: "The name of the environment to deploy to."
-    Type: "String"
-    Default: dev
-    AllowedValues:
-      - "dev"
-      - "build"
-      - "staging"
-      - "integration"
-      - "production"
+
+Rules:
+  DeploymentNameRequired:
+    RuleCondition: !Equals [ !Ref Environment, "local" ]
+    Assertions:
+      - Assert: !Not [ !Equals [ !Ref DeploymentName, "" ] ]
+        AssertDescription: >
+          Must specify DeploymentName parameter when Environment is "local"
+
+  DeploymentNameMustBeEmpty:
+    RuleCondition: !Not [ !Equals [ !Ref Environment, "local" ] ]
+    Assertions:
+      - Assert: !Equals [ !Ref DeploymentName, "self-service" ] # Confirm the default value is used.
+        AssertDescription: >
+          Must not specify DeploymentName parameter when Environment is not "local"
 
 Mappings:
+  EnvironmentConfiguration:
+    local:
+      cslsLoggingEnabled: true
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+      # Local builds do not support dynatrace
+      dynatraceLoggingEnabled: false
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    dev:
+      cslsLoggingEnabled: true
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    build:
+      cslsLoggingEnabled: true
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    staging:
+      cslsLoggingEnabled: true
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    integration:
+      cslsLoggingEnabled: true
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    production:
+      cslsLoggingEnabled: true
+      clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+      dynatraceLoggingEnabled: true
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+
   # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
   ElasticLoadBalancer:
     eu-west-2:
       AccountID: 652711504416
   TxMAAccountARN:
     Environment:
+      local: 'arn:aws:iam::494650018671:root'
       dev: 'arn:aws:iam::494650018671:root'
       build: 'arn:aws:iam::399055180839:root'
       staging: 'arn:aws:iam::178023842775:root'
@@ -60,6 +118,9 @@ Mappings:
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
+  CslsLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, cslsLoggingEnabled ], true ]
+  IsLocal: !Equals [ !Ref Environment, "local" ]
+  DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
 
 Resources:
 
@@ -104,6 +165,21 @@ Resources:
                 Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolClientID
             - Name: DT_LOGLEVELCON
               Value: INFO
+            - Name: GOOGLE_SHEET_CREDENTIALS
+              Value: "{{resolve:secretsmanager:/self-service/frontend/google-sheet-credentials}}"
+            - Name: USER_SIGNUP_SHEET_ID
+              Value: "{{resolve:secretsmanager:/self-service/frontend/user-signup-sheet-id}}"
+            - Name: USER_SIGNUP_SHEET_DATA_RANGE
+              Value: !Ref UserSignupSheetDataRange
+            - Name: USER_SIGNUP_SHEET_HEADER_RANGE
+              Value: !Ref UserSignupSheetHeaderRange
+            - Name: PUBLIC_BETA_SHEET_DATA_RANGE
+              Value: !Ref PublicBetaSheetDataRange
+            - Name: PUBLIC_BETA_SHEET_HEADER_RANGE
+              Value: !Ref PublicBetaSheetHeaderRange
+            - Name: USE_COGNITO_DR
+              Value: "{{resolve:ssm:/self-service/frontend/use-cognito-dr}}"
+
           PortMappings:
             - ContainerPort: !Ref ContainerPort
           HealthCheck:
@@ -114,10 +190,99 @@ Resources:
             Options:
               # Consider lines not starting with whitespace as a multi-line log message boundary
               awslogs-multiline-pattern: ^[^\s}]+.*$
-              awslogs-group: !Sub ${LogGroupPrefix}/${DeploymentName}/frontend
+              awslogs-group: !Ref FrontendLogsGroup
               awslogs-stream-prefix: ecs
-              awslogs-create-group: true
               awslogs-region: !Ref AWS::Region
+
+          Secrets:
+            - !If
+              - DynatraceLoggingEnabled
+              - Name: DT_TENANT
+                ValueFrom: !Join
+                  - ''
+                  - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                    - ':DT_TENANT::'
+              - !Ref AWS::NoValue
+            - !If
+              - DynatraceLoggingEnabled
+              - Name: DT_TENANTTOKEN
+                ValueFrom: !Join
+                  - ''
+                  - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                    - ':DT_TENANTTOKEN::'
+              - !Ref AWS::NoValue
+            - !If
+              - DynatraceLoggingEnabled
+              - Name: DT_CONNECTION_POINT
+                ValueFrom: !Join
+                  - ''
+                  - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                    - ':DT_CONNECTION_POINT::'
+              - !Ref AWS::NoValue
+
+  LogAuditLogGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join
+        - "/"
+        - - '/onboarding-self-service/frontend'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'audit'
+      RetentionInDays: 14
+
+  FrontendLogsGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join
+        - "/"
+        - - '/aws/ecs'
+          - 'onboarding-self-service/frontend'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+      RetentionInDays: 14
+      DataProtectionPolicy:
+        Name: data-protection-policy-frontend
+        Description: Data Protection for Cloudwatch Logs
+        Version: '2021-06-01'
+        Statement:
+          - Sid: audit-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Audit:
+                FindingsDestination:
+                  CloudWatchLogs:
+                    LogGroup: !Ref LogAuditLogGroup
+          - Sid: redact-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Deidentify:
+                MaskConfig: { }
+
+  FrontendLogCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsLoggingEnabled
+    Properties:
+      LogGroupName: !Ref FrontendLogsGroup
+      FilterName: "ECS logs for Frontend Service"
+      FilterPattern: ""
+      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
 
   ExecutionRole:
     Type: AWS::IAM::Role
@@ -133,13 +298,6 @@ Resources:
             Principal:
               Service: ecs-tasks.amazonaws.com
       Policies:
-        - PolicyName: CreateLogGroup
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action: logs:CreateLogGroup
-                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${LogGroupPrefix}/${DeploymentName}/frontend*
         - PolicyName: GetDynatraceSecret
           PolicyDocument:
             Version: 2012-10-17
@@ -153,7 +311,6 @@ Resources:
               - Effect: Allow
                 Action: kms:Decrypt
                 Resource: arn:aws:kms:eu-west-2:216552277552:key/*
-
 
   TaskRole:
     Type: AWS::IAM::Role
@@ -199,8 +356,22 @@ Resources:
                   - cognito-idp:AdminGetUser
                   - cognito-idp:AddCustomAttributes
                   - cognito-idp:UpdateUserPoolClient
+                  - cognito-idp:AdminSetUserPassword
                 Resource:
                   Fn::ImportValue: !Sub ${DeploymentName}-Cognito-UserPoolARN
+        - PolicyName: GetDynatraceSecret
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:*
+              - Effect: Allow
+                Action: secretsmanager:ListSecrets
+                Resource: arn:aws:secretsmanager:eu-west-2:216552277552:secret:*
+              - Effect: Allow
+                Action: kms:Decrypt
+                Resource: arn:aws:kms:eu-west-2:216552277552:key/*
 
   FargateCluster:
     Type: AWS::ECS::Cluster
@@ -339,6 +510,171 @@ Resources:
             Resource: !Sub ${AccessLogsBucket.Arn}/AWSLogs/${AWS::AccountId}/*
             Principal:
               AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
+
+  LoadBalancerWebACL:
+    # checkov:skip=CKV_AWS_192:Ensure WAF prevents message lookup in Log4j2
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub ${AWS::StackName}-${Environment}-LoadBalancerWebACL
+      Scope: REGIONAL
+      Description: This is WebACL to protect the API and Load Balancers
+      DefaultAction:
+        Allow: { }
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: !Sub ${AWS::StackName}-${Environment}-FrontendWebACLMetric
+      Rules:
+        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 1
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesKnownBadInputsRuleSet
+        - Name: AWS-AWSManagedRulesAmazonIpReputationList
+          Priority: 2
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAmazonIpReputationList
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAmazonIpReputationList
+        - Name: AWS-AWSManagedRulesAnonymousIpList
+          Priority: 3
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAnonymousIpList
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAnonymousIpList
+        - Name: AWS-AWSManagedRulesCommonRuleSet
+          Priority: 4
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesCommonRuleSet
+        - Name: AWS-AWSManagedRulesAdminProtectionRuleSet
+          Priority: 5
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesAdminProtectionRuleSet
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAdminProtectionRuleSet
+        - Name: SQLInject-RuleSet
+          Priority: 6
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesSQLiRuleSet
+          OverrideAction:
+            Count: { }
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${AWS::StackName}-${Environment}-SQLinjection-ruleset-metric'
+        - Name: RateBased-CountIpRule
+          Priority: 9
+          Statement:
+            RateBasedStatement:
+              Limit: 100
+              AggregateKeyType: IP
+          Action:
+            Count: { }
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub "${AWS::StackName}-${Environment}-RateBased-CountIp-ruleset-metric"
+            SampledRequestsEnabled: true
+
+  LoadBalancerWebACLAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      WebACLArn: !GetAtt LoadBalancerWebACL.Arn
+      ResourceArn: !Ref ApplicationLoadBalancer
+
+  WafLogGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join
+        - "-"
+        - - 'aws-waf-logs'
+          - 'onboarding-self-service-frontend'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+      RetentionInDays: 14
+      DataProtectionPolicy:
+        Name: data-protection-policy-frontend-loadbalancer
+        Description: Data Protection for Cloudwatch Logs
+        Version: '2021-06-01'
+        Statement:
+          - Sid: audit-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Audit:
+                FindingsDestination:
+                  CloudWatchLogs:
+                    LogGroup: !Ref LogAuditLogGroup
+          - Sid: redact-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Deidentify:
+                MaskConfig: { }
+
+  WafLoggingConfiguration:
+    Type: AWS::WAFv2::LoggingConfiguration
+    Properties:
+      ResourceArn: !GetAtt LoadBalancerWebACL.Arn
+      LogDestinationConfigs:
+        - !GetAtt WafLogGroup.Arn
+
+  WafLogCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsLoggingEnabled
+    Properties:
+      LogGroupName: !Ref WafLogGroup
+      FilterName: "Waf logs for Frontend"
+      FilterPattern: ""
+      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
 
   TxMASQSProducerAuditEventQueue:
     Type: AWS::SQS::Queue
@@ -487,6 +823,7 @@ Resources:
       Tags:
         AuthoredBy: TxMA
         ProducerType: SQS
+
 
   #--- DNS ---#
 

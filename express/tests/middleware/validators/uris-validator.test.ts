@@ -1,5 +1,5 @@
 import {Request} from "express";
-import validateUris from "middleware/validators/uris-validator";
+import validateUris from "../../../src/middleware/validators/uris-validator";
 import {request, response} from "../../mocks";
 
 let req: Request;

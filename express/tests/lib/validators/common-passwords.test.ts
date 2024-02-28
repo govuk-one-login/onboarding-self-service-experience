@@ -1,4 +1,4 @@
-import isCommonPassword from "lib/validators/common-passwords";
+import isCommonPassword from "../../../src/lib/validators/common-passwords";
 
 jest.mock("fs/promises", () => {
     return {

@@ -25,8 +25,6 @@ export default interface LambdaFacadeInterface {
     // TODO The QueryCommandOutput type should be replaced by a class shared between the frontend and the API (contract)
     listClients(serviceId: string): Promise<AxiosResponse<QueryCommandOutput>>;
 
-    publicBetaRequest(name: string, department: string, serviceName: string, emailAddress: string): Promise<void>;
-
     updateClient(
         serviceId: string,
         selfServiceClientId: string,
@@ -42,4 +40,9 @@ export default interface LambdaFacadeInterface {
     globalSignOut(userEmail: string): Promise<AxiosResponse>;
 
     sendTxMALog(message: TxMAEvent): Promise<void>;
+
+    getDynamoDBEntries(email: string): Promise<AxiosResponse>;
+
+    deleteClientEntries(oldUserID: string, serviceID: string): Promise<void>;
+    deleteServiceEntries(serviceID: string): Promise<void>;
 }
