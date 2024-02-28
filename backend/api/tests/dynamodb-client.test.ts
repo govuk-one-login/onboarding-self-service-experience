@@ -2,6 +2,7 @@ const send = jest.fn();
 const queryCommand = jest.fn();
 const scanCommand = jest.fn();
 const updateItemCommand = jest.fn();
+const deleteItemCommand = jest.fn();
 
 jest.mock("@aws-sdk/client-dynamodb", () => {
     return {
@@ -12,11 +13,12 @@ jest.mock("@aws-sdk/client-dynamodb", () => {
         }),
         QueryCommand: queryCommand,
         ScanCommand: scanCommand,
-        UpdateItemCommand: updateItemCommand
+        UpdateItemCommand: updateItemCommand,
+        DeleteItemCommand: deleteItemCommand
     };
 });
 
-import DynamoDbClient from "../../../src/dynamodb-client";
+import DynamoDbClient from "../src/dynamodb-client";
 
 const queryCommandParams = {
     TableName: "identities",
@@ -149,6 +151,44 @@ describe("DynamoDB client", () => {
             await client.getSessions("test@mail.com");
             expect(scanCommand).toBeCalledTimes(1);
             expect(scanCommand.mock.calls[0][0]).toStrictEqual(scanCommandParams);
+            expect(send).toBeCalledTimes(1);
+        });
+
+        it("should invoke deleteSessions successfully", async () => {
+            await client.deleteSessions("test@mail.com");
+            expect(scanCommand).toBeCalledTimes(1);
+            expect(scanCommand.mock.calls[0][0]).toStrictEqual(scanCommandParams);
+            expect(send).toBeCalledTimes(1);
+        });
+
+        it("should invoke getClients successfully", async () => {
+            await client.getClients("423423ada-32123892");
+            expect(send).toBeCalledTimes(1);
+        });
+
+        it("should invoke updateClient successfully", async () => {
+            await client.updateClient("423423ada-32123892", "c-id-0001", {Name: "Robert"});
+            expect(updateItemCommand).toBeCalledTimes(1);
+        });
+
+        it("should invoke updateUser successfully", async () => {
+            await client.updateUser("423423ada-32123892", "c-id-0001", {Name: "Robert"});
+            expect(updateItemCommand).toBeCalledTimes(1);
+        });
+
+        it("should invoke getListOfClients successfully", async () => {
+            await client.getListOfClients();
+            expect(send).toBeCalledTimes(1);
+        });
+
+        it("should invoke deleteDynamoDBClientEntries successfully", async () => {
+            await client.deleteDynamoDBClientEntries("c-id-0001", "423423ada-32123892");
+            expect(deleteItemCommand).toBeCalledTimes(2);
+            expect(send).toBeCalledTimes(2);
+        });
+
+        it("should invoke deleteDynamoDBServiceEntries successfully", async () => {
+            await client.deleteDynamoDBServiceEntries("423423ada-32123892");
             expect(send).toBeCalledTimes(1);
         });
 
