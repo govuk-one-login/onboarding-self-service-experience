@@ -5,13 +5,18 @@
     "build": "../../infrastructure/dev/deploy.sh api --no-deploy",
     "deploy": "../../infrastructure/dev/deploy.sh api",
     "testpact": "npm --prefix tests/contract-tests run build && npm --prefix tests/contract-tests run test",
-    "test": "jest --silent && npm run testpact",
+    "test": "jest --silent",
     "compile": "tsc"
   },
   "dependencies": {
     "@aws-sdk/client-sfn": "^3.354.0",
     "@aws-sdk/client-sns": "^3.354.0",
     "@aws-sdk/client-sqs": "^3.398.0",
-    "esbuild": "^0.18.4"
+    "esbuild": "^0.18.4",
+    "sinon": "^17.0.1"
+  },
+  "devDependencies": {
+    "@types/sinon": "^17.0.3",
+    "axios-mock-adapter": "^1.22.0"
   }
 }
