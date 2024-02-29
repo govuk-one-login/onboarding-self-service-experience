@@ -48,6 +48,12 @@ Parameters:
   PublicBetaSheetHeaderRange:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/public-beta-sheet-header-range
+  UseCognitoDr:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/use-cognito-dr
+  UseStubOtp:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/use-stub-otp
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -119,8 +125,9 @@ Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
   CslsLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, cslsLoggingEnabled ], true ]
-  IsLocal: !Equals [ !Ref Environment, "local" ]
   DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
+  IsLocal: !Equals [ !Ref Environment, "local" ]
+  IsProd: !Equals [ !Ref Environment, "production" ]
 
 Resources:
 
@@ -178,7 +185,9 @@ Resources:
             - Name: PUBLIC_BETA_SHEET_HEADER_RANGE
               Value: !Ref PublicBetaSheetHeaderRange
             - Name: USE_COGNITO_DR
-              Value: "{{resolve:ssm:/self-service/frontend/use-cognito-dr}}"
+              Value: !Ref UseCognitoDr
+            - Name: USE_STUB_OTP
+              Value: !If [ IsProd, 'false', !Ref UseStubOtp ]
 
           PortMappings:
             - ContainerPort: !Ref ContainerPort
