@@ -70,6 +70,8 @@ Resources:
                   - cognito-idp:GetWebACLForResource
                   - cognito-idp:ListResourcesForWebACL
                   - cognito-idp:DescribeUserPool
+                  - cognito-idp:GetLogDeliveryConfiguration
+                  - cognito-idp:SetLogDeliveryConfiguration
 
               - Effect: Allow
                 Resource: !GetAtt GitHubDeploymentArtifactsBucket.Arn
