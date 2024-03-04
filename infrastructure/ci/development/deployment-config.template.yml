@@ -70,6 +70,8 @@ Resources:
                   - cognito-idp:GetWebACLForResource
                   - cognito-idp:ListResourcesForWebACL
                   - cognito-idp:DescribeUserPool
+                  - cognito-idp:GetLogDeliveryConfiguration
+                  - cognito-idp:SetLogDeliveryConfiguration
 
               - Effect: Allow
                 Resource: !GetAtt GitHubDeploymentArtifactsBucket.Arn
@@ -147,6 +149,7 @@ Resources:
                 Resource: !Sub arn:aws:wafv2:${AWS::Region}:${AWS::AccountId}:regional/*
                 Action:
                   - wafv2:CreateWebACL
+                  - wafv2:UpdateWebACL
                   - wafv2:DeleteWebACL
                   - wafv2:AssociateWebACL
                   - wafv2:GetWebACL
@@ -320,6 +323,10 @@ Resources:
 
           - Effect: Allow
             Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/frontend/user-signup-sheet-id-*
+            Action: secretsmanager:GetSecretValue
+
+          - Effect: Allow
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${ServiceName}/frontend/fixed-otp-*
             Action: secretsmanager:GetSecretValue
 
           - Effect: Allow
