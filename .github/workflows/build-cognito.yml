@@ -29,5 +29,6 @@ jobs:
         uses: ./.github/actions/build-backend-component
         id: build
         with:
-          name: Cognito
+          name: cognito
           template: backend/cognito/cognito.template.yml
+          manifest: backend/cognito/package.json

@@ -5,7 +5,13 @@ inputs:
     description: "The name of the component to build"
     required: true
   template:
-    description: "The template to build"
+    description: "Path of the SAM template file to use"
+    required: false
+  manifest:
+    description: "Path to a custom dependency manifest file"
+    required: false
+  source-dir:
+    description: "Source code directory to use as a cache key when building the SAM application"
     required: false
   base-dir:
     description: "The SAM base directory to use when building the application"
@@ -24,11 +30,13 @@ runs:
   using: composite
   steps:
     - name: Build SAM application
-      uses: govuk-one-login/github-actions/sam/build-application@299bdda5b093a5d13c76e4d0f97f59bc727b4e03 # 28/06/2023
+      continue-on-error: true
+      uses: govuk-one-login/github-actions/sam/build-application@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
       id: build
       with:
         template: ${{ inputs.template }}
+        manifest: ${{ inputs.manifest }}
         base-dir: ${{ inputs.base-dir }}
-        cache-key: ${{ inputs.name }}
+        cache-name: ${{ inputs.name }}
         artifact-name: ${{ inputs.name }}-SAM
         additional-artifact-paths: ${{ inputs.additional-artifact-paths }}
