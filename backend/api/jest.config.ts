@@ -3,5 +3,6 @@ import baseConfig from "../../jest.config.base";
 
 export default {
     ...baseConfig,
-    displayName: "api"
+    displayName: "api",
+    setupFiles: ["./tests/setup.ts"]
 } satisfies Config;

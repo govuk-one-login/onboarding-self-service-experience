@@ -12,6 +12,8 @@ export interface ClientFromDynamo {
     service_name: string;
     service_type: string;
     subject_type: string;
+    back_channel_logout_uri?: string | null;
+    sector_identifier_uri: string;
     type: string;
 }
 
@@ -26,6 +28,8 @@ export interface Client {
     publicKey: string;
     redirectUris: string[];
     scopes: string[];
+    back_channel_logout_uri?: string | null;
+    sector_identifier_uri: string;
     serviceName: string;
     serviceType: string;
     subjectType: string;
