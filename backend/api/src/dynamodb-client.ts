@@ -105,7 +105,12 @@ export default class DynamoDbClient {
     }
 
     async deleteSessions(userEmail: string): Promise<{deletedItemCount: number}> {
-        const activeSessions = (await this.getSessions(userEmail)).Items;
+        const sessions = await this.getSessions(userEmail);
+        if (!sessions) {
+            return {deletedItemCount: 0};
+        }
+
+        const activeSessions = sessions.Items;
 
         if (!activeSessions || activeSessions.length == 0) return {deletedItemCount: 0};
 
@@ -230,7 +235,7 @@ export default class DynamoDbClient {
         const deleteItemCommandInputs: DeleteItemCommandInput[] = [];
 
         await this.getServicesById(serviceID).then(output => {
-            if (output.Items) {
+            if (output && output.Items) {
                 output.Items.forEach(row => {
                     deleteItemCommandInputs.push({
                         TableName: this.tableName,

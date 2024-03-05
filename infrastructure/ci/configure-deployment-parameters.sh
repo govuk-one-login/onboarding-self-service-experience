@@ -19,7 +19,7 @@ declare -A PARAMETERS=(
   [user_signup_sheet_header_range]=$PARAMETER_NAME_PREFIX/frontend/user-signup-sheet-header-range
   [public_beta_sheet_data_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-data-range
   [public_beta_sheet_header_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-header-range
-  [use_cognito_dr]=$PARAMETER_NAME_PREFIX/frontend/use_cognito_dr
+  [use_cognito_dr]=$PARAMETER_NAME_PREFIX/frontend/use-cognito-dr
 )
 
 declare -A SECRETS=(
