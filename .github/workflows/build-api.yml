@@ -23,7 +23,7 @@ jobs:
       artifact-name: ${{ steps.build.outputs.artifact-name }}
     steps:
       - name: Pull repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build SAM application
         uses: ./.github/actions/build-backend-component
