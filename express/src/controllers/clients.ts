@@ -31,6 +31,8 @@ export const showClient: RequestHandler = async (req, res) => {
         redirectUrls: redirectUrls,
         userAttributesRequired: client.scopes,
         userPublicKey: userPublicKey,
+        back_channel_logout_uri: client.back_channel_logout_uri,
+        sector_identifier_uri: client.sector_identifier_uri,
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         urls: {
             // TODO changeClientName is currently not used
