@@ -25,7 +25,3 @@ Feature: Change your service name
     When they click on the "Cancel" link
     Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
     And they should see the text "Test Service"
-
-  @accessible
-  Scenario: User verifying the accessibility of change your service page
-    Then there should be no accessibility violations

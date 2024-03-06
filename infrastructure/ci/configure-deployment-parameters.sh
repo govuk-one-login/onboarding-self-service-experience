@@ -5,12 +5,16 @@ set -eu
 
 ACCOUNT=$(../aws.sh get-current-account-name)
 PARAMETER_NAME_PREFIX=/self-service
-MANUAL_PARAMETERS=(api_notification_email google_tag_id)
+MANUAL_PARAMETERS=(api_notification_email google_tag_id google_analytics_gtm_container_id universal_analytics_gtm_container_id)
 MANUAL_SECRETS=(auth_api_key notify_api_key)
 
 declare -A PARAMETERS=(
   [test_banner]=$PARAMETER_NAME_PREFIX/frontend/show-test-banner
   [google_tag_id]=$PARAMETER_NAME_PREFIX/frontend/google-tag-id
+  [google_analytics_gtm_container_id]=$PARAMETER_NAME_PREFIX/frontend/google-analytics-4-gtm-container-id
+  [universal_analytics_gtm_container_id]=$PARAMETER_NAME_PREFIX/frontend/universal-analytics-gtm-container-id
+  [google_analytics_disabled]=$PARAMETER_NAME_PREFIX/frontend/google-analytics-4-disabled
+  [universal_analytics_disabled]=$PARAMETER_NAME_PREFIX/frontend/universal-analytics-disabled
   [cognito_external_id]=$PARAMETER_NAME_PREFIX/cognito/external-id
   [deletion_protection]=$PARAMETER_NAME_PREFIX/config/deletion-protection-enabled
   [api_notification_email]=$PARAMETER_NAME_PREFIX/api/notifications-email
@@ -103,6 +107,21 @@ function check-user-signup-sheet-id {
   check-secret-set "$secret" || write-secret-value "$secret" "$(uuidgen)"
 }
 
+function check-google-analytics-disabled {
+  local parameter=${PARAMETERS[google_analytics_disabled]}
+  check-parameter-set "$parameter" ||
+    write-parameter-value "$parameter" "$([[ $ACCOUNT == production ]] && echo true || echo false)"
+}
+function check-universal-analytics-disabled {
+  local parameter=${PARAMETERS[universal_analytics_disabled]}
+  check-parameter-set "$parameter" || write-parameter-value "$parameter" "false"
+}
+
+function check-cognito-dr {
+  local parameter=${PARAMETERS[use_cognito_dr]}
+  check-parameter-set "${parameter}" || write-parameter-value "$parameter" "false"
+}
+
 function check-cognito-external-id {
   local parameter=${PARAMETERS[cognito_external_id]}
   check-parameter-set "$parameter" || write-parameter-value "$parameter" "$(uuidgen)"
@@ -146,8 +165,11 @@ function check-deployment-parameters {
   ../aws.sh check-current-account
 
   check-test-banner
+  check-cognito-dr
   check-cognito-external-id
   check-deletion-protection
+  check-google-analytics-disabled
+  check-universal-analytics-disabled
   check-manual-parameters
 
   check-session-secret
@@ -158,9 +180,6 @@ function check-deployment-parameters {
   check-allowed-email-domains-source
 
   set-paramswith-values
-
-  parameter=${PARAMETERS[use_cognito_dr]}
-  check-parameter-set "${parameter}" || write-parameter-value "$parameter" "false"
 
   print-parameters
   print-secrets

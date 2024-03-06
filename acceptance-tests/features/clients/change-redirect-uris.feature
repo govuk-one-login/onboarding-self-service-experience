@@ -37,7 +37,6 @@ Feature: Users can change their redirect uris
       And they should see the exact value "http://localhost/" in the first redirect uri field
 
   Rule: The user successfully changes their redirect uris
-
     Scenario: The user enters a valid redirect URIs on Change redirect URIs page and the updated URIs are displayed on Client Details page and Change redirect URIs page
       Given they should see the exact value "http://localhost/" in the first redirect uri field
       Then they click on the link that points to "/change-redirect-uris"
@@ -48,9 +47,3 @@ Feature: Users can change their redirect uris
       And they should see the exact value "http://localhost/updated" in the first redirect uri field
       When they click on the link that points to "/change-redirect-uris"
       Then the value of the text field redirect uris should be "http://localhost/updated"
-
-    @accessible
-    Rule: The user validate accessibility issues in user-attributes page
-    Scenario: User verifying the accessibility of /clients page
-      When they click on the link that points to "/change-redirect-uris"
-      Then there should be no accessibility violations

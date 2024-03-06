@@ -158,6 +158,6 @@ When("they select the {string} radio button", async function (labelText) {
 });
 
 Then(/^there should be no accessibility violations$/, async function (this: TestContext) {
-    const results = await new AxePuppeteer(this.page).withTags(["wcag21aa"]).analyze();
+    const results = await new AxePuppeteer(this.page).withTags(["wcag21aa", "wcag22aa"]).analyze();
     assert.equal(results.violations.length, 0, "Accessibility Violations Detected : " + JSON.stringify(results.violations));
 });

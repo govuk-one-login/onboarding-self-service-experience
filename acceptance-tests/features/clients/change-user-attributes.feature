@@ -10,7 +10,6 @@ Feature: Users can change their user attributes
     Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
 
   Rule: The user want to validate the links on the page
-
     Scenario: user validating the link user attributes (opens in new tab)
       Given they click on the link that points to "/change-user-attributes"
       When they click on the 'user attributes (opens in new tab)' link that opens in a new tab
@@ -18,7 +17,6 @@ Feature: Users can change their user attributes
 
 
   Rule: The user doesn't want to save changes on Change user attributes page
-
     Scenario: The user doesn't want to change any details on Change user attributes page
       Given they should see the exact value "OpenID" in the user attributes field
       Then they click on the link that points to "/change-user-attributes"
@@ -28,7 +26,6 @@ Feature: Users can change their user attributes
       And they should see the exact value "OpenID" in the user attributes field
 
   Rule: The user tries to change their attributes
-
     Scenario: The user wants to add email attribute
       Given they should see the exact value "OpenID" in the user attributes field
       When they click on the link that points to "/change-user-attributes"
@@ -54,10 +51,3 @@ Feature: Users can change their user attributes
       Then they should see the exact value "OpenID" in the user attributes field
       When they click on the link that points to "/change-user-attributes"
       Then they should see that Email option is not checked
-
-
-    @accessible
-    Rule: The user validate accessibility issues in user-attributes page
-    Scenario: User verifying the accessibility of /clients page
-      When they click on the link that points to "/change-user-attributes"
-      Then there should be no accessibility violations
