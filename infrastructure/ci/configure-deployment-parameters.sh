@@ -24,6 +24,7 @@ declare -A PARAMETERS=(
   [public_beta_sheet_data_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-data-range
   [public_beta_sheet_header_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-header-range
   [use_cognito_dr]=$PARAMETER_NAME_PREFIX/frontend/use-cognito-dr
+  [identity_verification_enabled]=$PARAMETER_NAME_PREFIX/api/identity-verification-enabled
 )
 
 declare -A SECRETS=(
@@ -42,6 +43,10 @@ function set-paramswith-values {
   local parameter=${PARAMETERS[public_beta_sheet_header_range]}
   check-parameter-set "$parameter" ||
     write-parameter-value "$parameter" "Publicbeta!A1:Y1"
+
+  local parameter=${PARAMETERS[identity_verification_enabled]}
+  check-parameter-set "$parameter" ||
+    write-parameter-value "$parameter" "Yes"
 }
 
 function check-parameter-set {
