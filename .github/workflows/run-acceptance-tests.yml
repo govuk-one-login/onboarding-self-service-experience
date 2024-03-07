@@ -41,23 +41,14 @@ jobs:
           STUB_API: true
           NODE_OPTIONS: --max-old-space-size=2048
         run: |
-          shopt -s globstar
-          features=(features/**/*.feature)
+           cd ../express && npm install && cd .. && npm run build-express && cd acceptance-tests
           
-          cd ../express && npm install && cd .. && npm run build-express && cd acceptance-tests
+           cd .. && npm run --silent local &
           
-          cd .. && npm run --silent local &
+           while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
           
-          while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
+           npm run cucumber -- --format summary:results || cat heading results >> "$REPORT"
           
-          for feature in "${features[@]}"; do
-            [[ ${idx:-} ]] && idx=$((idx + 1)) && echo | tee heading || idx=1
-            echo "#--- [$idx/${#features[@]}] ${feature#*/} ---#" | tee -a heading && echo >> heading
-            npm run cucumber -- --format summary:results "$feature" || cat heading results >> "$REPORT"
-          done
-          
-          [[ -s $REPORT ]] && exit 1 || exit 0
-
       - name: Report test results
         if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
         uses: govuk-one-login/github-actions/report-step-result/print-file@5dacba941def444d69f02843feaebed79b5fca51

@@ -2,10 +2,11 @@
   "name": "gds-di-self-service-acceptance-tests",
   "description": "DI self-service acceptance tests",
   "scripts": {
-    "cucumber": "cucumber-js",
+    "cucumber": "cucumber-js features",
     "cucumber-fast": "npm run cucumber -- --parallel 5",
     "cucumber-report": "npm run cucumber -- --format html:test-report.html",
-    "accessible-tests": "npm run cucumber -- --tags @accessible"
+    "accessibility": "cucumber-js  accessibility-features",
+    "accessibility-report": "npm run accessibility -- --format html:test-report.html"
   },
   "devDependencies": {
     "@axe-core/puppeteer": "^4.8.5",
