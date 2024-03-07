@@ -24,6 +24,7 @@ declare -A PARAMETERS=(
   [public_beta_sheet_data_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-data-range
   [public_beta_sheet_header_range]=$PARAMETER_NAME_PREFIX/frontend/public-beta-sheet-header-range
   [use_cognito_dr]=$PARAMETER_NAME_PREFIX/frontend/use-cognito-dr
+  [use_stub_otp]=$PARAMETER_NAME_PREFIX/frontend/use-stub-otp
 )
 
 declare -A SECRETS=(
@@ -122,6 +123,11 @@ function check-cognito-dr {
   check-parameter-set "${parameter}" || write-parameter-value "$parameter" "false"
 }
 
+function check-stub-otp {
+  local parameter=${PARAMETERS[use_stub_otp]}
+  check-parameter-set "${parameter}" || write-parameter-value "$parameter" "false"
+}
+
 function check-cognito-external-id {
   local parameter=${PARAMETERS[cognito_external_id]}
   check-parameter-set "$parameter" || write-parameter-value "$parameter" "$(uuidgen)"
@@ -166,6 +172,7 @@ function check-deployment-parameters {
 
   check-test-banner
   check-cognito-dr
+  check-stub-otp
   check-cognito-external-id
   check-deletion-protection
   check-google-analytics-disabled
