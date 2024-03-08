@@ -1,5 +1,5 @@
 import {static as serveStatic, urlencoded} from "express";
-import {googleTagId, port, showTestBanner} from "./config/environment";
+import {port, showTestBanner} from "./config/environment";
 import Express from "./config/express";
 import Helmet from "./config/helmet";
 import {distribution} from "./config/resources";
@@ -26,6 +26,7 @@ app.use(Helmet());
 
 app.use("/assets", serveStatic(distribution.assets));
 app.use("/assets/images", serveStatic(distribution.images));
+app.use("/ga4-assets", serveStatic(distribution.ga4Assets));
 
 app.use(urlencoded({extended: true}));
 app.use(sessionStorage);
@@ -41,8 +42,12 @@ app.use("/test", testingRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.locals.googleTagId = googleTagId;
 app.locals.showTestBanner = showTestBanner;
+app.locals.ga4ContainerId = process.env.GOOGLE_ANALYTICS_4_GTM_CONTAINER_ID;
+app.locals.uaContainerId = process.env.UNIVERSAL_ANALYTICS_GTM_CONTAINER_ID;
+app.locals.ga4Disabled = process.env.GA4_DISABLED;
+app.locals.uaDisabled = process.env.UA_DISABLED;
+app.locals.cookieDomain = process.env.COOKIE_DOMAIN || "sign-in.service.gov.uk";
 
 app.set("trust proxy", true);
 
