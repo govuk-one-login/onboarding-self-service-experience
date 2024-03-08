@@ -14,6 +14,7 @@ declare -A SECRETS=(
   [SESSION_SECRET]=frontend/session-secret
   [GOOGLE_SHEET_CREDENTIALS]=frontend/google-sheet-credentials
   [USER_SIGNUP_SHEET_ID]=frontend/user-signup-sheet-id
+  [FIXED_OTP_CREDENTIALS]=frontend/fixed-otp-credentials
 )
 
 declare -A PARAMETERS=(
@@ -21,6 +22,14 @@ declare -A PARAMETERS=(
   [USER_SIGNUP_SHEET_HEADER_RANGE]=frontend/user-signup-sheet-header-range
   [PUBLIC_BETA_SHEET_DATA_RANGE]=frontend/public-beta-sheet-data-range
   [PUBLIC_BETA_SHEET_HEADER_RANGE]=frontend/public-beta-sheet-header-range
+  [TEST_BANNER]=frontend/show-test-banner
+  [USE_COGNITO_DR]=frontend/use-cognito-dr
+  [USE_STUB_OTP]=frontend/use-stub-otp
+  [GA4_DISABLED]=frontend/google-analytics-4-disabled
+  [UA_DISABLED]=frontend/universal-analytics-disabled
+  [GOOGLE_ANALYTICS_4_GTM_CONTAINER_ID]=frontend/google-analytics-4-gtm-container-id
+  [UNIVERSAL_ANALYTICS_GTM_CONTAINER_ID]=frontend/universal-analytics-gtm-container-id
+  [ALLOWED_EMAIL_DOMAINS_SOURCE]=frontend/allowed-email-domains-source
 )
 
 COMPONENTS=(frontend cognito dynamodb api)
