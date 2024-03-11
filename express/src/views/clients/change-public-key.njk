@@ -25,3 +25,15 @@
     "Paste in the entire public key in PEM format, including the headers"
   ) }}
 {% endblock %}
+
+ {% block scripts %}
+   {{ga4OnPageLoad({
+     statusCode:"200",
+     englishPageTitle: pageTitle,
+     taxonomyLevel1: taxonomyLevel1,
+     taxonomyLevel2: taxonomyLevel2AdminTool,
+     contentId:"786ad3d2-a7f4-4cee-a959-7e4eb000f40e",
+     loggedInStatus:true,
+     dynamic:false
+   })}}
+ {% endblock %}
