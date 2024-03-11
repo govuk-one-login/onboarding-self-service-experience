@@ -1,7 +1,7 @@
 export const port = process.env.PORT ?? 3000;
 export const useStubApi = process.env.STUB_API == "true";
 export const showTestBanner = process.env.TEST_BANNER == "true";
-export const googleTagId = process.env.GOOGLE_TAG_ID;
+
 export const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
 
 export const allowedEmailDomainsSource = process.env.ALLOWED_EMAIL_DOMAINS_SOURCE || "allowed-test-domains";

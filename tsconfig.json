@@ -22,7 +22,7 @@
   "exclude": ["node_modules"],
   "references": [
     {
-      "path": "acceptance-tests"
+      "path": "ui-automation-tests"
     },
     {
       "path": "backend/api"

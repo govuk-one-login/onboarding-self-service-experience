@@ -17,7 +17,7 @@ jobs:
     name: Acceptance
     runs-on: ubuntu-latest
     defaults:
-      run: { working-directory: acceptance-tests }
+      run: { working-directory: ui-automation-tests }
 
     steps:
       - name: Pull repository
@@ -41,14 +41,14 @@ jobs:
           STUB_API: true
           NODE_OPTIONS: --max-old-space-size=2048
         run: |
-           cd ../express && npm install && cd .. && npm run build-express && cd acceptance-tests
+           cd ../express && npm install && cd .. && npm run build-express && cd ui-automation-tests
           
            cd .. && npm run --silent local &
           
            while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
           
-           npm run cucumber -- --format summary:results || cat heading results >> "$REPORT"
-          
+           npm run acceptance-tests -- --format summary:results || cat heading results >> "$REPORT"
+
       - name: Report test results
         if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
         uses: govuk-one-login/github-actions/report-step-result/print-file@5dacba941def444d69f02843feaebed79b5fca51

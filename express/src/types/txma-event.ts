@@ -7,7 +7,7 @@ export interface TxMAEvent {
 }
 
 export interface TxMAUser {
-    ip_address: string;
+    ip_address: string | undefined;
     session_id: string;
     user_id?: string;
     email?: string;
