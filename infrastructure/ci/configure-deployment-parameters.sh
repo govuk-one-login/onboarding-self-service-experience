@@ -5,7 +5,7 @@ set -eu
 
 ACCOUNT=$(../aws.sh get-current-account-name)
 PARAMETER_NAME_PREFIX=/self-service
-MANUAL_PARAMETERS=(api_notification_email google_tag_id google_analytics_gtm_container_id universal_analytics_gtm_container_id)
+MANUAL_PARAMETERS=(auth_base_url api_notification_email google_tag_id google_analytics_gtm_container_id universal_analytics_gtm_container_id)
 MANUAL_SECRETS=(auth_api_key notify_api_key)
 
 declare -A PARAMETERS=(
@@ -26,6 +26,7 @@ declare -A PARAMETERS=(
   [use_cognito_dr]=$PARAMETER_NAME_PREFIX/frontend/use-cognito-dr
   [use_stub_otp]=$PARAMETER_NAME_PREFIX/frontend/use-stub-otp
   [identity_verification_enabled]=$PARAMETER_NAME_PREFIX/api/identity-verification-enabled
+  [auth_base_url]=$PARAMETER_NAME_PREFIX/api/auth-base-url
 )
 
 declare -A SECRETS=(
