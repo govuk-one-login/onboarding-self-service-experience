@@ -208,6 +208,11 @@ Resources:
               Value: !Ref UseCognitoDr
             - Name: USE_STUB_OTP
               Value: !If [ IsProd, 'false', !Ref UseStubOtp ]
+            - Name: FIXED_OTP_CREDENTIALS
+              Value: !If
+                - IsProd
+                - !Ref AWS::NoValue
+                - "{{resolve:secretsmanager:/self-service/frontend/fixed-otp-credentials}}"
 
           PortMappings:
             - ContainerPort: !Ref ContainerPort

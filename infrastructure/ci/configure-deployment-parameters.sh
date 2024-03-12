@@ -34,6 +34,7 @@ declare -A SECRETS=(
   [session_secret]=$PARAMETER_NAME_PREFIX/frontend/session-secret
   [google_sheet_credentials]=$PARAMETER_NAME_PREFIX/frontend/google-sheet-credentials
   [user_signup_sheet_id]=$PARAMETER_NAME_PREFIX/frontend/user-signup-sheet-id
+  [fixed_otp_credentials]=$PARAMETER_NAME_PREFIX/frontend/fixed-otp-credentials
 )
 
 function set-paramswith-values {
@@ -106,6 +107,11 @@ function check-session-secret {
 function check-google-sheet-credentials {
   local secret=${SECRETS[google_sheet_credentials]}
   check-secret-set "$secret" || write-secret-value "$secret" "$(uuidgen)"
+}
+
+function check-fixed-otp-credentials {
+  local secret=${SECRETS[fixed_otp_credentials]}
+  check-secret-set "$secret" || write-secret-value "$secret" "[{}]"
 }
 
 function check-user-signup-sheet-id {

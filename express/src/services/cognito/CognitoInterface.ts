@@ -33,6 +33,7 @@ export default interface CognitoInterface {
     setEmailAsVerified(username: string): Promise<void>;
 
     setMfaPreference(cognitoUsername: string): Promise<void>;
+    resetMfaPreference(cognitoUsername: string): Promise<void>;
 
     setMobilePhoneAsVerified(username: string): Promise<void>;
 
@@ -46,5 +47,5 @@ export default interface CognitoInterface {
 
     useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput>;
 
-    verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<void>;
+    verifyMobileUsingSmsCode(accessToken: string, code: string, emailAddress: string): Promise<void>;
 }

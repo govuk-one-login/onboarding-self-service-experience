@@ -123,7 +123,8 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
-        await s4.verifyMobileUsingSmsCode(accessToken, req.body.securityCode);
+        const emailAddress: string = AuthenticationResultParser.getEmail(nonNull(authenticationResult));
+        await s4.verifyMobileUsingSmsCode(accessToken, req.body.securityCode, emailAddress);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             s4.sendTxMALog(

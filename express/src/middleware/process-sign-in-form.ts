@@ -4,6 +4,7 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 import console from "console";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import * as process from "process";
+import {isFixedCredential} from "../lib/fixedOTPSupport";
 
 export default function processSignInForm(template: string): RequestHandler {
     console.info("In processSignInForm()");
@@ -81,6 +82,10 @@ export default function processSignInForm(template: string): RequestHandler {
 
             console.log("Unknown Error");
             throw error;
+        }
+
+        if (isFixedCredential(email)) {
+            req.session.password = password;
         }
 
         res.redirect("/sign-in/enter-text-code");
