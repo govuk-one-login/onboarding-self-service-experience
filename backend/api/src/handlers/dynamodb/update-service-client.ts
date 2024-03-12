@@ -1,15 +1,27 @@
-import {APIGatewayProxyEvent} from "aws-lambda";
 import DynamoDbClient from "../../dynamodb-client";
+import {Updates} from "../../dynamodb-client";
 
 const client = new DynamoDbClient();
 
-export const updateServiceClientHandler = async (event: APIGatewayProxyEvent): Promise<{statusCode: number; body: string}> => {
-    const body = JSON.parse(event.body as string);
+export type clientRegistryUpdateResponse = {
+    serviceId: string;
+    selfServiceClientId: string;
+    clientId: string;
+    updates: Updates;
+};
+
+export type updateServiceHandlerInvokeEvent = {
+    statusCode: number;
+    body: string;
+};
+
+export const updateServiceClientHandler = async (event: updateServiceHandlerInvokeEvent): Promise<{statusCode: number; body: string}> => {
+    const payload: clientRegistryUpdateResponse = JSON.parse(event.body);
 
     const response = {statusCode: 200, body: JSON.stringify("OK")};
 
     await client
-        .updateClient(body.serviceId, body.selfServiceClientId, body.updates)
+        .updateClient(payload.serviceId, payload.selfServiceClientId, payload.updates)
         .then(updateItemCommandOutput => {
             response.statusCode = 200;
             response.body = JSON.stringify(updateItemCommandOutput);

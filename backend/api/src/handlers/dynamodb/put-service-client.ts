@@ -1,4 +1,4 @@
-import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
+import {APIGatewayProxyResult} from "aws-lambda";
 import DynamoDbClient from "../../dynamodb-client";
 import {randomUUID} from "crypto";
 import {OnboardingTableItem} from "../../onboarding-table-item";
@@ -34,8 +34,8 @@ export type putServiceHandlerInvokeEvent = {
     body: string;
 };
 
-export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const payload = JSON.parse(event.body as string);
+export const putServiceClientHandler = async (event: putServiceHandlerInvokeEvent): Promise<APIGatewayProxyResult> => {
+    const payload: clientRegistryRegistrationResponse = JSON.parse(event.body);
 
     const record: OnboardingTableItem = {
         pk: payload.service.id,

@@ -1,8 +1,6 @@
 import {putServiceClientHandler} from "../../../src/handlers/dynamodb/put-service-client";
 import DynamoDbClient from "../../../src/dynamodb-client";
 
-const originalEnv = process.env;
-
 const randomId = "1234Random";
 jest.mock("crypto", () => ({
     randomUUID: jest.fn(() => randomId)
@@ -68,14 +66,6 @@ const expectedDynamoRecord = {
 describe("putServiceClientHandler tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        process.env = {
-            ...originalEnv,
-            IDENTITY_VERIFICATION_ENABLED: "Yes"
-        };
-    });
-
-    afterEach(() => {
-        process.env = originalEnv;
     });
 
     it("calls the dynamo client with a put command with the expected values and returns a 200 with the expected response body", async () => {
@@ -83,9 +73,8 @@ describe("putServiceClientHandler tests", () => {
             $metadata: {}
         });
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const putServiceHandlerResponse = await putServiceClientHandler({
+            statusCode: 200,
             body: JSON.stringify(testRegistrationResponse)
         });
 
@@ -100,9 +89,8 @@ describe("putServiceClientHandler tests", () => {
         const error = "SomeAwsError";
         const putItemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(error);
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const putServiceHandlerResponse = await putServiceClientHandler({
+            statusCode: 200,
             body: JSON.stringify(testRegistrationResponse)
         });
 

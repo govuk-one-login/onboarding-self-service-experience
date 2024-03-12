@@ -1,8 +1,6 @@
 import {updateServiceClientHandler} from "../../../src/handlers/dynamodb/update-service-client";
 import DynamoDbClient from "../../../src/dynamodb-client";
 
-const originalEnv = process.env;
-
 const randomId = "1234Random";
 jest.mock("crypto", () => ({
     randomUUID: jest.fn(() => randomId)
@@ -20,14 +18,6 @@ const testRegistrationResponse = {
 describe("updateServiceClientHandler tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        process.env = {
-            ...originalEnv,
-            IDENTITY_VERIFICATION_ENABLED: "Yes"
-        };
-    });
-
-    afterEach(() => {
-        process.env = originalEnv;
     });
 
     it("calls the dynamo client with a update command with the expected values and returns a 200 with the expected response body", async () => {
@@ -35,9 +25,8 @@ describe("updateServiceClientHandler tests", () => {
             $metadata: {}
         });
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const updateServiceHandlerResponse = await updateServiceClientHandler({
+            statusCode: 200,
             body: JSON.stringify(testRegistrationResponse)
         });
 
@@ -57,9 +46,8 @@ describe("updateServiceClientHandler tests", () => {
         const error = "SomeAwsError";
         const updateItemSpy = jest.spyOn(DynamoDbClient.prototype, "updateClient").mockRejectedValue(error);
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const updateServiceHandlerResponse = await updateServiceClientHandler({
+            statusCode: 200,
             body: JSON.stringify(testRegistrationResponse)
         });
 
