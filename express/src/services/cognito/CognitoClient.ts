@@ -28,6 +28,8 @@ import {Command} from "@aws-sdk/types";
 import {cognito, region} from "../../config/environment";
 import CognitoInterface from "./CognitoInterface";
 import console from "console";
+import {fixedOTPInitialise, getFixedOTPTemporaryPassword, isFixedCredential, verifyMobileUsingOTPCode} from "../../lib/fixedOTPSupport";
+import * as process from "process";
 
 type CognitoCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes> = Command<
     ServiceInputTypes,
@@ -61,17 +63,31 @@ export default class CognitoClient implements CognitoInterface {
         });
 
         this.client.send(updateUserPoolClientCommand);
+
+        // Initialise OTP Credentials
+        if (process.env.USE_STUB_OTP == "true") {
+            fixedOTPInitialise();
+        }
     }
 
     async createUser(email: string): Promise<void> {
         console.log("In CognitoClient:createUser");
+
+        let temporaryPassword: string;
+
+        if (isFixedCredential(email)) {
+            temporaryPassword = getFixedOTPTemporaryPassword(email);
+        } else {
+            temporaryPassword = Math.floor(Math.random() * 100_000)
+                .toString()
+                .padStart(6, "0");
+        }
+
         await this.sendCommand(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
             Username: email,
             UserPoolId: this.userPoolId,
-            TemporaryPassword: Math.floor(Math.random() * 100_000)
-                .toString()
-                .padStart(6, "0"),
+            TemporaryPassword: temporaryPassword,
             UserAttributes: [
                 {Name: "email", Value: email},
                 {Name: "custom:signup_status", Value: ""}
@@ -101,14 +117,22 @@ export default class CognitoClient implements CognitoInterface {
     async resendEmailAuthCode(email: string): Promise<void> {
         console.info("In CognitoClient:resendEmailAuthCode()");
 
+        let temporaryPassword: string;
+
+        if (isFixedCredential(email)) {
+            temporaryPassword = getFixedOTPTemporaryPassword(email);
+        } else {
+            temporaryPassword = Math.floor(Math.random() * 100_000)
+                .toString()
+                .padStart(6, "0");
+        }
+
         await this.sendCommand(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
             Username: email,
             UserPoolId: this.userPoolId,
             MessageAction: "RESEND",
-            TemporaryPassword: Math.floor(Math.random() * 100_000)
-                .toString()
-                .padStart(6, "0"),
+            TemporaryPassword: temporaryPassword,
             UserAttributes: [{Name: "email", Value: email}]
         });
     }
@@ -287,14 +311,18 @@ export default class CognitoClient implements CognitoInterface {
     /**
      * {@link https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_VerifyUserAttribute.html VerifyUserAttribute}
      */
-    async verifyMobileUsingSmsCode(accessToken: string, code: string): Promise<void> {
+    async verifyMobileUsingSmsCode(accessToken: string, code: string, emailAddress: string): Promise<void> {
         console.info("In CognitoClient:verifyMobileUsingSmsCode()");
 
-        await this.sendCommand(VerifyUserAttributeCommand, {
-            AccessToken: accessToken,
-            AttributeName: "phone_number",
-            Code: code
-        });
+        if (isFixedCredential(emailAddress)) {
+            verifyMobileUsingOTPCode(emailAddress, code);
+        } else {
+            await this.sendCommand(VerifyUserAttributeCommand, {
+                AccessToken: accessToken,
+                AttributeName: "phone_number",
+                Code: code
+            });
+        }
     }
 
     async setMfaPreference(cognitoUsername: string): Promise<void> {
@@ -304,6 +332,18 @@ export default class CognitoClient implements CognitoInterface {
             SMSMfaSettings: {
                 Enabled: true,
                 PreferredMfa: true
+            },
+            Username: cognitoUsername,
+            UserPoolId: this.userPoolId
+        });
+    }
+
+    async resetMfaPreference(cognitoUsername: string): Promise<void> {
+        console.info("In CognitoClient:resetMfaPreference()");
+
+        await this.sendCommand(AdminSetUserMFAPreferenceCommand, {
+            SMSMfaSettings: {
+                Enabled: false
             },
             Username: cognitoUsername,
             UserPoolId: this.userPoolId

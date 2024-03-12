@@ -220,7 +220,8 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     const accessToken = nonNull(authenticationResult.AccessToken);
 
     try {
-        await s4.verifyMobileUsingSmsCode(accessToken, securityCode);
+        const emailAddress: string = AuthenticationResultParser.getEmail(nonNull(authenticationResult));
+        await s4.verifyMobileUsingSmsCode(accessToken, securityCode, emailAddress);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             s4.sendTxMALog(
