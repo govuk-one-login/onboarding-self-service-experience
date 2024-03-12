@@ -1,4 +1,4 @@
-import {APIGatewayProxyResult} from "aws-lambda";
+import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import DynamoDbClient from "../../dynamodb-client";
 import {randomUUID} from "crypto";
 import {OnboardingTableItem} from "../../onboarding-table-item";
@@ -34,8 +34,8 @@ export type putServiceHandlerInvokeEvent = {
     body: string;
 };
 
-export const putServiceClientHandler = async (event: putServiceHandlerInvokeEvent): Promise<APIGatewayProxyResult> => {
-    const payload: clientRegistryRegistrationResponse = JSON.parse(event.body);
+export const putServiceClientHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    const payload = JSON.parse(event.body as string);
 
     const record: OnboardingTableItem = {
         pk: payload.service.id,
@@ -50,6 +50,8 @@ export const putServiceClientHandler = async (event: putServiceHandlerInvokeEven
         service_type: payload.service_type,
         client_name: "integration",
         service_name: payload.service.serviceName,
+        identity_verification_enabled: false,
+        claims: [],
         back_channel_logout_uri: payload.back_channel_logout_uri,
         sector_identifier_uri: payload.sector_identifier_uri,
         default_fields: [
@@ -60,6 +62,8 @@ export const putServiceClientHandler = async (event: putServiceHandlerInvokeEven
             "post_logout_redirect_uris",
             "subject_type",
             "service_type",
+            "identity_verification_enabled",
+            "claims",
             "sector_identifier_uri",
             "back_channel_logout_uri"
         ]

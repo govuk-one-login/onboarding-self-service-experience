@@ -15,6 +15,8 @@ export interface ClientFromDynamo {
     back_channel_logout_uri?: string | null;
     sector_identifier_uri: string;
     type: string;
+    identity_verification_enabled: boolean;
+    claims: string[];
 }
 
 export interface Client {
@@ -34,4 +36,6 @@ export interface Client {
     serviceType: string;
     subjectType: string;
     type: string;
+    identity_verification_enabled: boolean;
+    claims: string[];
 }
