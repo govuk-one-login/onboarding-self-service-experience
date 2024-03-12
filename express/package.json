@@ -14,7 +14,7 @@
     "build": "npm run buildts && npm run buildsass && npm run buildjs && npm run buildgovuk && npm run minifyjs",
     "coverage": "jest --coverage --coverageDirectory coverage --silent",
     "test": "jest --silent",
-    "cucumber": "npm run cucumber -w ../acceptance-tests --",
+    "acceptance": "npm run acceptance-tests -w ../ui-automation-tests --",
     "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile-dev .."
   },
   "dependencies": {
