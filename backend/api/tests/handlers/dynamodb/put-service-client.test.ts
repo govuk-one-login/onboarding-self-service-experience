@@ -22,7 +22,7 @@ const testRegistrationResponse = {
     token_endpoint_auth_method: "private_key_jwt",
     response_type: "code",
     jar_validation_required: false,
-    claims: [],
+    identity_verification_enabled: false,
     client_type: "web",
     service: {
         id: "service#1234Random",
@@ -44,6 +44,8 @@ const expectedDynamoRecord = {
     service_type: testRegistrationResponse.service_type,
     client_name: "integration",
     service_name: testRegistrationResponse.service.serviceName,
+    identity_verification_enabled: false,
+    claims: [],
     back_channel_logout_uri: testRegistrationResponse.back_channel_logout_uri,
     sector_identifier_uri: testRegistrationResponse.sector_identifier_uri,
     default_fields: [
@@ -54,6 +56,8 @@ const expectedDynamoRecord = {
         "post_logout_redirect_uris",
         "subject_type",
         "service_type",
+        "identity_verification_enabled",
+        "claims",
         "sector_identifier_uri",
         "back_channel_logout_uri"
     ]

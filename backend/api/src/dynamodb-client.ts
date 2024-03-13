@@ -25,7 +25,7 @@ import {createHash} from "crypto";
 type AttributeData = number | boolean | string | string[];
 type AttributeNames = {[nameToken: string]: string};
 type AttributeValues = {[valueToken: string]: AttributeValue};
-type Updates = {[attributeName: string]: AttributeData};
+export type Updates = {[attributeName: string]: AttributeData};
 
 export default class DynamoDbClient {
     private static readonly KEYWORD_SUBSTITUTES: {[name: string]: string} = {

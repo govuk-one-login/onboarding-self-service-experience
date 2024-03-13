@@ -34,6 +34,7 @@ export const showClient: RequestHandler = async (req, res) => {
         back_channel_logout_uri: client.back_channel_logout_uri,
         sector_identifier_uri: client.sector_identifier_uri,
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
+        claims: client.identity_verification_enabled && client.hasOwnProperty("claims") ? client.claims : [],
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
