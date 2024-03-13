@@ -30,5 +30,7 @@ jobs:
         id: build
         with:
           name: cognito
+          base-dir: ${{ github.workspace }}
           template: backend/cognito/cognito.template.yml
           manifest: backend/cognito/package.json
+          source-dir: backend/cognito
