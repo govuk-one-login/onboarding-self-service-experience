@@ -90,6 +90,8 @@ export function getFixedOTPTelephone(emailAddress: string): string {
         telephoneNumber = fixedOTPCredentials[index].Telephone;
     }
 
+    console.log("getFixedOTPTelephone - Telephone Number => " + telephoneNumber);
+
     return telephoneNumber;
 }
 
