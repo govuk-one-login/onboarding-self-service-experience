@@ -14,10 +14,12 @@ function verifyMFACode(emailAddress: string, securityCode: string) {
 
     if (index > -1) {
         if (fixedOTPCredentials[index].SMSCode === securityCode) {
+            console.log("verifyMFACode Code Verified => " + securityCode);
             return;
         }
     }
 
+    console.log("verifyMFACode Code *** NOT *** Verified => " + securityCode);
     throw new CodeMismatchException({message: "", $metadata: {}});
 }
 
@@ -26,9 +28,12 @@ function getFixedOTPCredential(emailAddress: string): number {
         const regEx = new RegExp(fixedOTPCredentials[i].Email, "i"); // The "i" flag makes the regex case-insensitive
 
         if (regEx.test(emailAddress)) {
+            console.log("getFixedOTPCredential email Matched => " + emailAddress);
             return i;
         }
     }
+
+    console.log("getFixedOTPCredential email *** NOT *** Matched => " + emailAddress);
 
     return -1;
 }
@@ -38,6 +43,7 @@ export function fixedOTPInitialise(): void {
 
     const fixedOTPCredentialsSecret = process.env.FIXED_OTP_CREDENTIALS;
     fixedOTPCredentials = JSON.parse(fixedOTPCredentialsSecret as string);
+    console.log("fixedOTPInitialise - Got Credentials => ", fixedOTPCredentialsSecret);
 }
 
 export function isFixedCredential(emailAddress: string): boolean {
@@ -45,9 +51,12 @@ export function isFixedCredential(emailAddress: string): boolean {
 
     if (process.env.USE_STUB_OTP == "true") {
         if (getFixedOTPCredential(emailAddress) > -1) {
+            console.log("isFixedCredential Match => " + emailAddress);
             return true;
         }
     }
+
+    console.log("isFixedCredential *** NOT *** Matched => " + emailAddress);
 
     return false;
 }
@@ -65,6 +74,7 @@ export function getFixedOTPTemporaryPassword(emailAddress: string): string {
 
     if (index > -1) {
         temporaryPassword = fixedOTPCredentials[index].EmailCode;
+        console.log("getFixedOTPTemporaryPassword - Got Temporary Password => " + temporaryPassword);
     }
 
     return temporaryPassword;
@@ -84,5 +94,6 @@ export function getFixedOTPTelephone(emailAddress: string): string {
 }
 
 export function respondToMFAChallengeForFixedOTPCredential(email: string, securityCode: string): void {
+    console.log("in fixedOTPSupport - respondToMFAChallengeForFixedOTPCredential");
     verifyMFACode(email, securityCode);
 }
