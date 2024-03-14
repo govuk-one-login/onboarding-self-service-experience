@@ -9,6 +9,7 @@ on:
       parameters: { required: false, type: string }
       deployment-url-output: { required: false, type: string }
       disable-rollback: { required: false, type: boolean, default: false }
+      artifact-path: { required: false, type: string, default: false }
     outputs:
       stack-name:
         description: "The deployed stack name"
@@ -50,6 +51,7 @@ jobs:
           disable-rollback: ${{ inputs.disable-rollback }}
           stack-name-prefix: preview-${{ inputs.name }}
           artifact-name: ${{ inputs.artifact }}
+          artifact-path: ${{ inputs.artifact-path }}
           template: ${{ inputs.template }}
           s3-prefix: sse-preview
           tags: |-
