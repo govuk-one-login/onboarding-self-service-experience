@@ -1,5 +1,6 @@
 import {putServiceClientHandler} from "../../../src/handlers/dynamodb/put-service-client";
 import DynamoDbClient from "../../../src/dynamodb-client";
+import ResolvedValue = jest.ResolvedValue;
 
 const randomId = "1234Random";
 jest.mock("crypto", () => ({
@@ -65,22 +66,24 @@ const expectedDynamoRecord = {
     ]
 };
 
+function createResolvedValue(): ResolvedValue<string> {
+    return <ResolvedValue<string>>expectedDynamoRecord;
+}
+
 describe("putServiceClientHandler tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
     it("calls the dynamo client with a put command with the expected values and returns a 200 with the expected response body", async () => {
-        const putItemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockResolvedValue({
-            $metadata: {}
-        });
+        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockResolvedValue(createResolvedValue());
 
         const putServiceHandlerResponse = await putServiceClientHandler({
             statusCode: 200,
             body: JSON.stringify(testRegistrationResponse)
         });
 
-        expect(putItemSpy).toHaveBeenCalledWith(expectedDynamoRecord);
+        expect(itemSpy).toHaveBeenCalledWith(expectedDynamoRecord);
         expect(putServiceHandlerResponse).toStrictEqual({
             statusCode: 200,
             body: JSON.stringify(expectedDynamoRecord)
@@ -89,14 +92,14 @@ describe("putServiceClientHandler tests", () => {
 
     it("calls the dynamo client with a put command with the expected values and returns a 500 when the dynamo client throws an error", async () => {
         const error = "SomeAwsError";
-        const putItemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(error);
+        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(error);
 
         const putServiceHandlerResponse = await putServiceClientHandler({
             statusCode: 200,
             body: JSON.stringify(testRegistrationResponse)
         });
 
-        expect(putItemSpy).toHaveBeenCalledWith(expectedDynamoRecord);
+        expect(itemSpy).toHaveBeenCalledWith(expectedDynamoRecord);
         expect(putServiceHandlerResponse).toStrictEqual({
             statusCode: 500,
             body: JSON.stringify(error)
