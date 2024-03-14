@@ -47,7 +47,8 @@ jobs:
     with:
       name: ${{ needs.build-cognito.outputs.component }}
       artifact: ${{ needs.build-cognito.outputs.artifact-name }}
-      template: backend/cognito/cognito.template.yml
+      artifact-path: cognito/
+      template: cognito/template.yaml
 
   build-api:
     name: API
@@ -61,7 +62,8 @@ jobs:
     with:
       name: ${{ needs.build-api.outputs.component }}
       artifact: ${{ needs.build-api.outputs.artifact-name }}
-      template: backend/api/api.template.yml
+      artifact-path: api/
+      template: api/.aws-sam/build/template.yaml
 
   deploy-dynamodb:
     name: DynamoDB
