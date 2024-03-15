@@ -29,6 +29,9 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Debug workspace directory
+      shell: bash
+      run: sudo du -hs $GITHUB_WORKSPACE
     - name: Build SAM application
       continue-on-error: true
       uses: govuk-one-login/github-actions/sam/build-application@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024

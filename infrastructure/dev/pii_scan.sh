@@ -32,7 +32,7 @@ function usage() {
   echo -e "\t-s skipfile = Has optional file containing list of Files with lines to skip over (i.e. don't scan sections of file)"
   echo -e "\t-h = Show this Help Text"
   echo ""
-  echo "e.g. pii-scan *template*.yml -i infrastructure/config/pii_ignore.txt -s infrastructure/config/pii_skip.txt"
+  echo "e.g. pii-scan *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt"
   echo ""
   echo "Ignore File Format is 'Pathname to ignore'"
   echo "e.g. ./infrastructure/ci/development/deployment-config.template.yml would not perform any scanning in the specified file at all."
