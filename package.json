@@ -2,7 +2,7 @@
   "name": "gds-di-self-service-common",
   "description": "DI Self-Service monorepo",
   "workspaces": [
-    "acceptance-tests",
+    "ui-automation-tests",
     "backend/api",
     "backend/cognito",
     "express"
@@ -24,8 +24,8 @@
     "test": "jest --silent",
     "test:cov": "jest --silent --coverage",
     "lint": "eslint '*.ts' --quiet --fix",
-    "cucumber": "npm run cucumber -w acceptance-tests --",
-    "accessibility-tests": "npm run accessibility -w acceptance-tests",
+    "acceptance": "npm run acceptance-tests -w ui-automation-tests --",
+    "accessibility": "npm run accessibility-tests -w ui-automation-tests --",
     "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_ignore.txt -s infrastructure/config/pii_skip.txt"
   },
   "dependencies": {
