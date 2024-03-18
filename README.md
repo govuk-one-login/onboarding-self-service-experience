@@ -1,5 +1,3 @@
-# Change to allow Build to be Created
-# This Branch is an exact Mirror of Main
 # Self-Service Experience
 
 The Admin Tool is a self-service product that allows government service teams to onboard and test their integration
