@@ -48,6 +48,7 @@ const expectedDynamoRecord = {
     claims: [],
     back_channel_logout_uri: testRegistrationResponse.back_channel_logout_uri,
     sector_identifier_uri: testRegistrationResponse.sector_identifier_uri,
+    token_endpoint_auth_method: testRegistrationResponse.token_endpoint_auth_method,
     default_fields: [
         "data",
         "public_key",
@@ -59,7 +60,8 @@ const expectedDynamoRecord = {
         "identity_verification_enabled",
         "claims",
         "sector_identifier_uri",
-        "back_channel_logout_uri"
+        "back_channel_logout_uri",
+        "token_endpoint_auth_method"
     ]
 };
 

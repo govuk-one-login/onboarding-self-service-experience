@@ -54,6 +54,7 @@ export const putServiceClientHandler = async (event: putServiceHandlerInvokeEven
         claims: [],
         back_channel_logout_uri: payload.back_channel_logout_uri,
         sector_identifier_uri: payload.sector_identifier_uri,
+        token_endpoint_auth_method: payload.token_endpoint_auth_method,
         default_fields: [
             "data",
             "public_key",
@@ -65,7 +66,8 @@ export const putServiceClientHandler = async (event: putServiceHandlerInvokeEven
             "identity_verification_enabled",
             "claims",
             "sector_identifier_uri",
-            "back_channel_logout_uri"
+            "back_channel_logout_uri",
+            "token_endpoint_auth_method"
         ]
     };
 
