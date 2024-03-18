@@ -67,6 +67,8 @@ export default class CognitoClient implements CognitoInterface {
         // Initialise OTP Credentials
         if (process.env.USE_STUB_OTP == "true") {
             fixedOTPInitialise();
+        } else {
+            console.log("*** USE_STUB_OTP not set ***");
         }
     }
 
