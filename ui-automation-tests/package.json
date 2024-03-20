@@ -2,8 +2,8 @@
   "name": "gds-di-self-service-acceptance-tests",
   "description": "DI self-service acceptance tests",
   "scripts": {
-    "acceptance-tests": "cucumber-js acceptance-features --",
-    "acceptance-tests-fast": "npm run cucumber -- --parallel 5",
+    "acceptance-tests": "cucumber-js acceptance-features",
+    "acceptance-tests-fast": "npm run acceptance-tests -- --parallel 5",
     "acceptance-tests-report": "npm run acceptance-tests -- --format html:test-report.html",
     "accessibility-tests": "cucumber-js  accessibility-features",
     "accessibility-report": "npm run accessibility-tests -- --format html:test-report.html"
