@@ -34,7 +34,7 @@ export const showClient: RequestHandler = async (req, res) => {
         userPublicKey: userPublicKey,
         backChannelLogoutUri: client.back_channel_logout_uri ?? "Not yet added",
         sectorIdentifierUri: userSectorIdentifierUri,
-        postLogoutRedirectUrls: client.postLogoutUris.join(" "),
+        postLogoutRedirectUrls: client.postLogoutUris.length === 0 ? "Not yet added" : client.postLogoutUris.join(" "),
         claims: client.identity_verification_enabled && client.hasOwnProperty("claims") ? client.claims : [],
         urls: {
             // TODO changeClientName is currently not used
