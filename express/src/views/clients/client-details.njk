@@ -70,22 +70,19 @@
     <div id="postLogoutRedirectUris">{{ postLogoutRedirectUrls }}</div>
   {% endset %}
 
+    {% set backChannelLogoutUriContainer %}
+    <div id="backChannelLogoutUri">{{ backChannelLogoutUri }}</div>
+  {% endset %}
+
+      {% set sectorIdentifierUriContainer %}
+    <div id="sectorIdentifierUri">{{ sectorIdentifierUri }}</div>
+  {% endset %}
+
   {{ govukSummaryList({
     rows: [
       {
         key: {text: "Client ID"},
         value: {html: clientIdContainer}
-      },
-      {
-        key: {text: "Redirect URIs"},
-        value: {html: redirectUrlsContainer},
-        actions: {
-          items: [{
-            href: urls.changeRedirectUris,
-            text: "Change",
-            visuallyHiddenText: "redirect uris"
-          }]
-        }
       },
       {
         key: {text: "User attributes required"},
@@ -108,6 +105,24 @@
             visuallyHiddenText: "public key"
           }]
         }
+      }
+    ]
+  }) }}
+
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Manage Client</h2>
+
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: {text: "Redirect URIs"},
+        value: {html: redirectUrlsContainer},
+        actions: {
+          items: [{
+            href: urls.changeRedirectUris,
+            text: "Change",
+            visuallyHiddenText: "redirect uris"
+          }]
+        }
       },
       {
         key: {text: "Post logout redirect URIs (optional)"},
@@ -117,6 +132,28 @@
             href: urls.changePostLogoutUris,
             text: "Change",
             visuallyHiddenText: "post logout redirect uris"
+          }]
+        }
+      },
+      {
+        key: {text: "Back Channel logout URI"},
+        value: {html: backChannelLogoutUriContainer},
+        actions: {
+          items: [{
+            href: urls.changeBackChannelLogoutUri,
+            text: "Change",
+            visuallyHiddenText: "Back Channel Logout URI"
+          }]
+        }
+      }, 
+      {
+        key: {text: "Sector Identfier URI"},
+        value: {html: sectorIdentifierUriContainer},
+        actions: {
+          items: [{
+            href: urls.changeSectorIdentifierUri,
+            text: "Change",
+            visuallyHiddenText: "Sector Identfier URI"
           }]
         }
       }
