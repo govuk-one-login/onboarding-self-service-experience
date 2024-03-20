@@ -39,6 +39,7 @@ jobs:
           REPORT: ${{ runner.temp }}/acceptance-tests.report
           HOST: http://localhost:3000
           STUB_API: true
+          TEST_BANNER: true
           NODE_OPTIONS: --max-old-space-size=2048
         run: |
            cd ../express && npm install && cd .. && npm run build-express && cd ui-automation-tests
