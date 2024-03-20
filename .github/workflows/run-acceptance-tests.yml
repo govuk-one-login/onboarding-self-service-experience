@@ -43,7 +43,7 @@ jobs:
         run: |
            cd ../express && npm install && cd .. && npm run build-express && cd ui-automation-tests
           
-           cd .. && npm run --silent local &
+           cd .. && TEST_BANNER=true npm run --silent local &
           
            while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
           
