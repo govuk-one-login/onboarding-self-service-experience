@@ -32,7 +32,7 @@ export const showClient: RequestHandler = async (req, res) => {
         redirectUrls: redirectUrls,
         userAttributesRequired: client.scopes,
         userPublicKey: userPublicKey,
-        back_channel_logout_uri: client.back_channel_logout_uri,
+        backChannelLogoutUri: client.back_channel_logout_uri ?? "Not yet added",
         sector_identifier_uri: client.sector_identifier_uri,
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         claims: client.identity_verification_enabled && client.hasOwnProperty("claims") ? client.claims : [],
