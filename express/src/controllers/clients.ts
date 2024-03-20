@@ -52,6 +52,10 @@ export const showClient: RequestHandler = async (req, res) => {
             )}`,
             changePostLogoutUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-post-logout-uris?redirectUris=${encodeURIComponent(
                 client.postLogoutUris.join(" ")
+            )}`,
+            changeBackChannelLogoutUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-back-channel-logout-uri?backChannelLogoutUri=${encodeURIComponent(
+                client.back_channel_logout_uri ?? "" 
+            )}`,
             )}`
         }
     });
