@@ -21,6 +21,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const serviceName = client.serviceName;
     const redirectUrls = client.redirectUris;
     const userPublicKey = client.publicKey == defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);
+    const userSectorIdentifierUri = client.sector_identifier_uri === "http://gov.uk" ? "Not yet added" : client.sector_identifier_uri;
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
