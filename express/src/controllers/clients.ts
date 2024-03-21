@@ -390,3 +390,44 @@ export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) 
 
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
+
+export const showChangeBackChannelLogoutUriForm: RequestHandler = (req, res) => {
+    res.render("clients/change-back-channel-logout-uri.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        values: {
+            backChannelLogoutUri: req.query.backChannelLogoutUri
+        }
+    });
+};
+
+export const processChangeBackChannelLogOutUriForm: RequestHandler = async (req, res) => {
+    const backChannelLogoutUri = req.body.backChannelLogoutUri;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {back_channel_logout_uri: backChannelLogoutUri},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "Back Channel logout URI";
+
+    s4.sendTxMALog(
+        "SSE_UPDATE_BACK_CHANNEL_LOG_OUT_URI",
+        {
+            session_id: req.session.id,
+            ip_address: req.ip,
+            user_id: userId
+        },
+        {
+            service_id: nonNull(req.context.serviceId)
+        }
+    );
+
+    res.redirect(`/services/${req.context.serviceId}/clients`);
+};
