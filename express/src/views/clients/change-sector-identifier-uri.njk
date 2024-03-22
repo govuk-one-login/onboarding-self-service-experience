@@ -1,0 +1,28 @@
+{% extends "layouts/client-form.njk" %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set pageTitle = "Change Sector Identifier URI" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your Sector Identifier URI</h1>
+  {{ govukWarningText({
+  text: "If you change your sector identifier URI, your users’ subject identifiers will also change.",
+  iconFallbackText: "Warning"
+}) }}
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.uriInput("", "sectorIdentifierUri") }}
+{% endblock %}
+
+ {% block scripts %}
+   {{ga4OnPageLoad({
+     statusCode:"200",
+     englishPageTitle: pageTitle,
+     taxonomyLevel1: taxonomyLevel1,
+     taxonomyLevel2: taxonomyLevel2AdminTool,
+     contentId:""{# TODO: Needs a content Id for GA4 #},
+     loggedInStatus:true,
+     dynamic:false
+   })}}
+ {% endblock %}
