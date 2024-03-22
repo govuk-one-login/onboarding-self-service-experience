@@ -37,6 +37,8 @@ export const showClient: RequestHandler = async (req, res) => {
         sector_identifier_uri: client.sector_identifier_uri,
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         claims: client.identity_verification_enabled && client.hasOwnProperty("claims") ? client.claims : [],
+        idTokenSigningAlgorithm: client.idTokenSigningAlgorithm,
+        clientLocs: client.identity_verification_enabled && client.hasOwnProperty("clientLocs") ? client.clientLocs : [],
         token_endpoint_auth_method: client.token_endpoint_auth_method,
         urls: {
             // TODO changeClientName is currently not used
