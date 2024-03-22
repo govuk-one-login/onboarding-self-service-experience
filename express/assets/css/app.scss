@@ -164,10 +164,6 @@ code {
   padding-bottom: 10px;
 }
 
-.navigation-service-change {
-  float: right;
-}
-
 .navigation-service-change-list {
   float: left;
 }
@@ -266,4 +262,17 @@ code {
 
 .white-space-nowrap {
   white-space: nowrap;
+}
+
+.enter-contacts {
+  .govuk-summary-list {
+    .govuk-summary-list__row {
+      .govuk-summary-list__key {
+        width: 80%;
+      }
+      .govuk-summary-list__actions {
+        width: 20%;
+      }
+    }
+  }
 }

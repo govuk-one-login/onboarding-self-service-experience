@@ -1,0 +1,23 @@
+{% extends "layouts/form.njk" %}
+
+{% set pageTitle = "Are you sure you want to remove this contact?" %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/{{ authClientId }}/{{ selfServiceClientId }}/enter-contact
+{% endset %}
+{% set contactToBeRemoved = contactToRemove %}
+{% set formButtonText = "Confirm" %}
+{% set gridClass = "govuk-grid-column-full" %}
+
+{% block formInputs %}
+  {{ form.radiosInput(
+    "Are you sure you want to remove this contact?",
+    "govuk-fieldset__legend--l",
+    name = "removeContact",
+    items = [
+      {text: "Yes", value: "yes"},
+      {text: "No", value: "no"}
+    ],
+    isPageHeading = true
+  ) }}
+  {{ form.hiddenInput("contactToRemove", contactToBeRemoved) }}
+{% endblock %}
