@@ -298,7 +298,9 @@ Resources:
               - elasticloadbalancing:DeleteTargetGroup
 
           - Effect: Allow
-            Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/${PreviewStacksPrefix}-*-app/*
+            Resource:
+              - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/${PreviewStacksPrefix}-*-app/*
+              - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/${PreviewStacksPrefix}-*-app-pp/*
             Action:
               - elasticloadbalancing:AddTags
               - elasticloadbalancing:CreateListener
