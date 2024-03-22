@@ -112,3 +112,6 @@ dist
 
 # Credentils
 googleCredentials.json
+
+# PACT
+pacts/

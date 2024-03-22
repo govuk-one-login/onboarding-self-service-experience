@@ -5,6 +5,8 @@ import {
     processChangeRedirectUrlsForm,
     processChangeServiceNameForm,
     processChangeUserAttributesForm,
+    processConfirmContactRemovalForm,
+    processEnterContactEmailForm,
     processPublicBetaForm,
     showChangePostLogoutUrisForm,
     showChangePublicKeyForm,
@@ -12,6 +14,9 @@ import {
     showChangeServiceNameForm,
     showChangeUserAttributesForm,
     showClient,
+    showConfirmContactRemovalForm,
+    showEnterContactEmailForm,
+    showEnterContactForm,
     showPublicBetaForm,
     showPublicBetaFormSubmitted
 } from "../controllers/clients";
@@ -51,3 +56,12 @@ router
     .route("/:clientId/:selfServiceClientId/change-post-logout-uris")
     .get(showChangePostLogoutUrisForm)
     .post(validateUris("clients/change-post-logout-uris.njk"), processChangePostLogoutUrisForm);
+
+router.route("/:clientId/:selfServiceClientId/enter-contact").get(showEnterContactForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/confirm-contact-removal")
+    .get(showConfirmContactRemovalForm)
+    .post(processConfirmContactRemovalForm);
+
+router.route("/:clientId/:selfServiceClientId/enter-contact-email").get(showEnterContactEmailForm).post(processEnterContactEmailForm);

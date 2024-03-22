@@ -24,14 +24,14 @@
     {% endcall %}
   {% endif %}
 
-  <h1 class="govuk-heading-l">Client details</h1>
-  <p class="govuk-body">This page shows the information you’ll need to make calls to the GOV.UK One Login API.</p>
+  <h1 class="govuk-heading-l">Manage {{ serviceName }}</h1>
+  <p class="govuk-body">This page shows the information you need to make calls to the GOV.UK One Login API.</p>
   <p class="govuk-body">To get started, follow the integration process in the
     <a href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment"
        class="govuk-link" target="_blank">technical documentation (opens in new tab)</a>. It will help you to update the client details below and use them to integrate.
   </p>
 
-  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Integration client</h2>
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Service details</h2>
 
   {% set clientIdContainer %}
     <code id="client-id-value">{{ clientId }}</code>
@@ -70,11 +70,49 @@
     <div id="postLogoutRedirectUris">{{ postLogoutRedirectUrls }}</div>
   {% endset %}
 
+  {% set postLogoutRedirectUrlsContainer %}
+    <div id="postLogoutRedirectUris">{{ postLogoutRedirectUrls }}</div>
+  {% endset %}
+
+  {% set changeServiceNameLink %}
+    /services/{{ serviceId }}/clients/{{ clientId }}/{{ selfServiceClientId }}/change-service-name?serviceName={{ serviceName | urlencode }}
+  {% endset %}
+
+  {% set contactsContainer %}
+    <ul class="govuk-list">
+      {% for item in contacts %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  {% endset %}
+
   {{ govukSummaryList({
     rows: [
       {
+        key: {text: "Name "},
+        value: {text: serviceName},
+        actions: {
+          items: [{
+            href: changeServiceNameLink,
+            text: "Change",
+            visuallyHiddenText: "service name"
+          }]
+        }
+      },
+      {
         key: {text: "Client ID"},
         value: {html: clientIdContainer}
+      },
+      {
+        key: {text: "Contacts"},
+        value: {html: contactsContainer},
+        actions: {
+          items: [{
+            href: urls.changeContacts,
+            text: "Change",
+            visuallyHiddenText: "contacts"
+          }]
+        }
       },
       {
         key: {text: "Redirect URIs"},

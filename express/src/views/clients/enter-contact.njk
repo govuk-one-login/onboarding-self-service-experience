@@ -1,0 +1,53 @@
+{% extends "layouts/base.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% set pageTitle = "Enter contacts" %}
+{% set mainClasses = "enter-contacts" %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients
+{% endset %}
+
+{% set enterContactEmailUrl %}
+  /services/{{ serviceId }}/clients/{{ authClientId }}/{{ selfServiceClientId }}/enter-contact-email
+{% endset %}
+
+{% block mainContent %}
+  {% if updateResult %}
+    {% if updateResult === "Contacts updated" %}
+      {% call govukNotificationBanner({type: 'success'}) %}
+        <h3 class="govuk-notification-banner__heading">{{ updateResult }}</h3>
+      {% endcall %}
+    {% else %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: updateResult,
+            href: "#"
+          }
+        ]
+      }) }}
+    {% endif %}
+  {% endif %}
+  <h1 class="govuk-heading-l">Enter contacts</h1>
+  <dl class="govuk-summary-list">
+    {% for item in contacts %}
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          {{ item }}
+        </dt>
+        <dd class="govuk-summary-list__actions">
+          {% if loop.first %}
+          {% else %}
+            <a class="govuk-link" href="/services/{{ serviceId }}/clients/{{ authClientId }}/{{ selfServiceClientId }}/confirm-contact-removal?contactToRemove={{ item | urlencode }}">Remove</a>
+          {% endif %}
+        </dd>
+      </div>
+    {% endfor %}
+  </dl>
+  {{ govukButton({
+    text: "Add another contact",
+    href: enterContactEmailUrl
+  }) }}
+{% endblock %}
