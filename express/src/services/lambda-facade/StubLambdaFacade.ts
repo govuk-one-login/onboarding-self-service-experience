@@ -16,6 +16,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private redirectUris = ["http://localhost/"];
     private postLogoutRedirectUris = ["http://localhost/", "http://localhost/logged_out"];
     private scopes = ["openid"];
+    private backChannelLogoutUri: null | string = null
+    private sectorIdentifierUri  = "http://localhost/identifier"
 
     private user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
@@ -76,6 +78,14 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         if (updates.scopes) {
             this.scopes = updates.scopes as string[];
         }
+
+        if (updates.back_channel_logout_uri) {
+            this.backChannelLogoutUri = updates.back_channel_logout_uri as string;
+        }
+
+        if (updates.sector_identifier_uri) {
+            this.sectorIdentifierUri = updates.sector_identifier_uri as string;
+        }
     }
 
     async updateService(serviceId: string, updates: ServiceNameUpdates): Promise<void> {
@@ -119,6 +129,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                     {
                         service_name: {S: this.serviceName},
                         post_logout_redirect_uris: convertToAttr(this.postLogoutRedirectUris),
+                        sector_identifier_uri: this.sectorIdentifierUri,
+                        back_channel_logout_uri: this.backChannelLogoutUri,
                         subject_type: {S: "pairwise"},
                         contacts: {L: [{S: "john.watts@test.gov.uk"}, {S: "onboarding@test.gov.uk"}]},
                         public_key: {
@@ -133,6 +145,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                                 {S: "redirect_uris"},
                                 {S: "scopes"},
                                 {S: "post_logout_redirect_uris"},
+                                {S: "sector_identifier_uri"},
+                                {S: "back_channel_logout_uri"},
                                 {S: "subject_type"},
                                 {S: "service_type"}
                             ]
