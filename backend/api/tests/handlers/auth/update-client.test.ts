@@ -1,10 +1,8 @@
 import sinon from "sinon";
 import axios from "axios";
-import {updateClientInRegistryHandler} from "../../../src/handlers/auth/update-client";
+import {UpdateClientPayload, updateClientInRegistryHandler} from "../../../src/handlers/auth/update-client";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const postRequest = async (data): string => {
+const postRequest = async (data: UpdateClientPayload): Promise<string> => {
     const result = await updateClientInRegistryHandler(data);
     return JSON.stringify(result);
 };
