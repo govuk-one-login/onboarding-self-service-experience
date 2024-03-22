@@ -16,6 +16,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private redirectUris = ["http://localhost/"];
     private postLogoutRedirectUris = ["http://localhost/", "http://localhost/logged_out"];
     private scopes = ["openid"];
+    private contacts = ["registered@test.gov.uk", "mockuser2@gov.uk", "mockuser3@gov.uk"];
 
     private user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
@@ -69,6 +70,10 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
             this.redirectUris = updates.redirect_uris as string[];
         }
 
+        if (updates.contacts) {
+            this.contacts = updates.contacts as string[];
+        }
+
         if (updates.post_logout_redirect_uris) {
             this.postLogoutRedirectUris = updates.post_logout_redirect_uris as string[];
         }
@@ -120,7 +125,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         service_name: {S: this.serviceName},
                         post_logout_redirect_uris: convertToAttr(this.postLogoutRedirectUris),
                         subject_type: {S: "pairwise"},
-                        contacts: {L: [{S: "john.watts@test.gov.uk"}, {S: "onboarding@test.gov.uk"}]},
+                        contacts: convertToAttr(this.contacts),
                         public_key: {
                             S: this.publicKey
                         },
@@ -132,6 +137,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                                 {S: "public_key"},
                                 {S: "redirect_uris"},
                                 {S: "scopes"},
+                                {S: "contacts"},
                                 {S: "post_logout_redirect_uris"},
                                 {S: "subject_type"},
                                 {S: "service_type"}

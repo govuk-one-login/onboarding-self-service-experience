@@ -6,6 +6,8 @@ import {v4 as uuid_4} from "uuid";
 import SheetsService from "../lib/sheets/SheetsService";
 import console from "console";
 import getTimestamp from "../lib/timestamp";
+import {removeContact, addContact} from "../lib/updateContacts";
+import validate from "../lib/validators/email-validator";
 
 const defaultPublicKey =
     "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
@@ -21,6 +23,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const serviceName = client.serviceName;
     const redirectUrls = client.redirectUris;
     const userPublicKey = client.publicKey == defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);
+    const contacts = client.contacts;
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
@@ -36,10 +39,10 @@ export const showClient: RequestHandler = async (req, res) => {
         back_channel_logout_uri: client.back_channel_logout_uri,
         sector_identifier_uri: client.sector_identifier_uri,
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
-        token_endpoint_auth_method: client.token_endpoint_auth_method,
         claims: client.identity_verification_enabled && client.hasOwnProperty("claims") ? client.claims : [],
         id_token_signing_algorithm: client.hasOwnProperty("id_token_signing_algorithm") ? client.id_token_signing_algorithm : "",
-        client_locs: client.identity_verification_enabled && client.hasOwnProperty("client_locs") ? client.client_locs : [],
+        contacts: contacts,
+        token_endpoint_auth_method: client.token_endpoint_auth_method,
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
@@ -56,7 +59,8 @@ export const showClient: RequestHandler = async (req, res) => {
             )}`,
             changePostLogoutUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-post-logout-uris?redirectUris=${encodeURIComponent(
                 client.postLogoutUris.join(" ")
-            )}`
+            )}`,
+            changeContacts: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-contact`
         }
     });
 
@@ -387,4 +391,127 @@ export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) 
     );
 
     res.redirect(`/services/${req.context.serviceId}/clients`);
+};
+
+export const showEnterContactForm: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const contacts = client.contacts;
+    const authClientId = client.authClientId;
+    const selfServiceClientId = client.dynamoServiceId;
+    res.render("clients/enter-contact.njk", {
+        contacts: contacts,
+        serviceId: serviceId,
+        authClientId: authClientId,
+        selfServiceClientId: selfServiceClientId,
+        updateResult: req.query.updateResult
+    });
+};
+
+export const showConfirmContactRemovalForm: RequestHandler = (req, res) => {
+    res.render("clients/confirm-contact-removal.njk", {
+        serviceId: req.context.serviceId,
+        authClientId: req.params.clientId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        contactToRemove: req.query.contactToRemove
+    });
+};
+
+export const processConfirmContactRemovalForm: RequestHandler = async (req, res) => {
+    const contactToRemove = req.body.contactToRemove;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const contacts = client.contacts;
+
+    if (req.body.removeContact === "yes") {
+        const updateContactsResult = removeContact(contacts, contactToRemove);
+        let updateMessage: string;
+        if (typeof updateContactsResult === "string") {
+            updateMessage = updateContactsResult;
+        } else {
+            await s4.updateClient(
+                nonNull(req.context.serviceId),
+                req.params.selfServiceClientId,
+                req.params.clientId,
+                {contacts: updateContactsResult},
+                nonNull(req.session.authenticationResult?.AccessToken)
+            );
+            updateMessage = "Contacts updated";
+        }
+        res.redirect(
+            `/services/${serviceId}/clients/${req.params.clientId}/${
+                req.params.selfServiceClientId
+            }/enter-contact?updateResult=${encodeURIComponent(updateMessage)}`
+        );
+    } else {
+        res.redirect(`/services/${serviceId}/clients/${req.params.clientId}/${req.params.selfServiceClientId}/enter-contact`);
+    }
+};
+
+export const showEnterContactEmailForm: RequestHandler = (req, res) => {
+    res.render("clients/enter-contact-email.njk", {
+        serviceId: req.context.serviceId,
+        authClientId: req.params.clientId,
+        selfServiceClientId: req.params.selfServiceClientId
+    });
+};
+
+export const processEnterContactEmailForm: RequestHandler = async (req, res) => {
+    const contactToAdd = req.body.emailAddress;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const contacts = client.contacts;
+
+    const emailAddress = req.body.emailAddress.trim();
+    const result = await validate(emailAddress);
+
+    if (result.isValid) {
+        const updateContactsResult = addContact(contactToAdd, contacts);
+
+        if (typeof updateContactsResult === "string" && updateContactsResult === "Contact already exists") {
+            res.render("clients/enter-contact-email.njk", {
+                values: {
+                    emailAddress: emailAddress
+                },
+                errorMessages: {
+                    emailAddress: updateContactsResult
+                },
+                serviceId: req.context.serviceId,
+                authClientId: req.params.clientId,
+                selfServiceClientId: req.params.selfServiceClientId
+            });
+        } else {
+            await s4.updateClient(
+                nonNull(req.context.serviceId),
+                req.params.selfServiceClientId,
+                req.params.clientId,
+                {contacts: updateContactsResult},
+                nonNull(req.session.authenticationResult?.AccessToken)
+            );
+
+            res.redirect(
+                `/services/${serviceId}/clients/${req.params.clientId}/${
+                    req.params.selfServiceClientId
+                }/enter-contact?updateResult=${encodeURIComponent("Contacts updated")}`
+            );
+        }
+    } else {
+        res.render("clients/enter-contact-email.njk", {
+            values: {
+                emailAddress: emailAddress
+            },
+            errorMessages: {
+                emailAddress: result.errorMessage
+            },
+            serviceId: req.context.serviceId,
+            authClientId: req.params.clientId,
+            selfServiceClientId: req.params.selfServiceClientId
+        });
+    }
 };

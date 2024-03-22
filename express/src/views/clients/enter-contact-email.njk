@@ -1,0 +1,12 @@
+{% extends "layouts/form.njk" %}
+
+{% set pageTitle = "Enter contact email address" %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/{{ authClientId }}/{{ selfServiceClientId }}/enter-contact
+{% endset %}
+{% set formCancelUrl = backLinkPath %}
+
+{% block formInputs %}
+  {{ form.emailInput("Enter contact email address", labelClasses = "govuk-label--l", isPageHeading = true) }}
+{% endblock %}
+
