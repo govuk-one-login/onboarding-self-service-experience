@@ -1,9 +1,10 @@
-import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
+import {APIGatewayProxyResult} from "aws-lambda";
 import DynamoDbClient from "../../dynamodb-client";
+import {handlerInvokeEvent} from "../handler-utils";
 
 const client = new DynamoDbClient();
 
-export const putUserHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const putUserHandler = async (event: handlerInvokeEvent): Promise<APIGatewayProxyResult> => {
     const user = JSON.parse(event.body as string);
 
     // Do whatever validation we want to do on the user
