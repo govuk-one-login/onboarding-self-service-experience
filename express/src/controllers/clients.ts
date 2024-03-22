@@ -431,3 +431,14 @@ export const processChangeBackChannelLogOutUriForm: RequestHandler = async (req,
 
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
+
+export const showChangeSectorIdentifierUriForm: RequestHandler = (req, res) => {
+    res.render("clients/change-sector-identifier-uri.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        values: {
+            sectorIdentifierUri: req.query.sectorIdentifierUri
+        }
+    });
+};
