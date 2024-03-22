@@ -29,7 +29,9 @@ const testRegistrationResponse = {
         id: "service#1234Random",
         serviceName: "Test Service"
     },
-    contactEmail: "test.test@test.gov.uk"
+    contact_email: "test.test@test.gov.uk",
+    id_token_signing_algorithm: "RSA256",
+    client_locs: ["P2"]
 };
 
 const expectedDynamoRecord = {
@@ -50,6 +52,8 @@ const expectedDynamoRecord = {
     back_channel_logout_uri: testRegistrationResponse.back_channel_logout_uri,
     sector_identifier_uri: testRegistrationResponse.sector_identifier_uri,
     token_endpoint_auth_method: testRegistrationResponse.token_endpoint_auth_method,
+    id_token_signing_algorithm: testRegistrationResponse.id_token_signing_algorithm,
+    client_locs: testRegistrationResponse.client_locs,
     default_fields: [
         "data",
         "public_key",
