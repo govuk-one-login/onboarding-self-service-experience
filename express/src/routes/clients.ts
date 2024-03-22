@@ -1,14 +1,18 @@
 import {Router} from "express";
 import {
+    processChangeBackChannelLogOutUriForm,
     processChangePostLogoutUrisForm,
     processChangePublicKeyForm,
     processChangeRedirectUrlsForm,
+    processChangeSectorIdentifierUriForm,
     processChangeServiceNameForm,
     processChangeUserAttributesForm,
     processPublicBetaForm,
+    showChangeBackChannelLogoutUriForm,
     showChangePostLogoutUrisForm,
     showChangePublicKeyForm,
     showChangeRedirectUrlsForm,
+    showChangeSectorIdentifierUriForm,
     showChangeServiceNameForm,
     showChangeUserAttributesForm,
     showClient,
@@ -56,3 +60,8 @@ router
     .route("/:clientId/:selfServiceClientId/change-back-channel-logout-uri")
     .get(showChangeBackChannelLogoutUriForm)
     .post(validateUris("clients/change-back-channel-logout-uri.njk", "backChannelLogoutUri",1), processChangeBackChannelLogOutUriForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/change-sector-identifier-uri")
+    .get(showChangeSectorIdentifierUriForm)
+    .post(validateUris("clients/change-sector-identifier-uri.njk", "sectorIdentifierUri", 1), processChangeSectorIdentifierUriForm);
