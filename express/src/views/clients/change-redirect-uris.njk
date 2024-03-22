@@ -1,14 +1,51 @@
-{% extends "layouts/client-form.njk" %}
+{% extends "layouts/form.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
-{% set pageTitle = "Change redirect URIs" %}
+{% set pageTitle = "Manage redirect URIs" %}
+{% set addRedirectUriUrl %}
+  /services/{{ serviceId }}/clients/{{ authClientId }}/{{ selfServiceClientId }}/add-redirect-uri
+{% endset %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients
+{% endset %}
 
-{% block beforeForm %}
-  <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your redirect URIs</h1>
-  <p class="govuk-body">Add the URI for the page you want your users to see after they sign in to your service.</p>
-  <p class="govuk-body">You can add multiple redirect URIs if you want different groups of users to see different pages
-    once they sign in to your service. To do this, enter the URIs separated by a space.</p>
-{% endblock %}
 
-{% block formInputs %}
-  {{ form.urlInput("Redirect URIs") }}
+{% block mainContent %}
+  {% if updateResult %}
+    {% if updateResult === "Redirect URIs updated" %}
+      {% call govukNotificationBanner({type: 'success'}) %}
+        <h3 class="govuk-notification-banner__heading">{{ updateResult }}</h3>
+      {% endcall %}
+    {% else %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: updateResult,
+            href: "#"
+          }
+        ]
+      }) }}
+    {% endif %}
+  {% endif %}
+  <h1 class="govuk-heading-l">Manage redirect URIs</h1>
+  <dl class="govuk-summary-list">
+    {% for item in redirectUris %}
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          {{ item }}
+        </dt>
+      {% if redirectUris.length > 1 %}
+        <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="/services/{{ serviceId }}/clients/{{ authClientId }}/{{ selfServiceClientId }}/confirm-redirect-uri-removal?uriToRemove={{ item | urlencode }}">Remove</a>
+        </dd>
+      {% endif %}
+      </div>
+    {% endfor %}
+  </dl>
+  {{ govukButton({
+    text: "Add another redirect URI",
+    href: addRedirectUriUrl
+  }) }}
 {% endblock %}
