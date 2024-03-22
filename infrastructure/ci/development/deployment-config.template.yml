@@ -289,9 +289,6 @@ Resources:
               - ec2:RevokeSecurityGroupEgress
               - ec2:AuthorizeSecurityGroupEgress
               - ec2:AuthorizeSecurityGroupIngress
-            Condition:
-              StringLike:
-                aws:ResourceTag/aws:cloudformation:stack-name: !Sub ${PreviewStacksPrefix}-frontend-*
 
           - Effect: Allow
             Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/${PreviewStacksPrefix}-*-ecs/*
@@ -301,7 +298,9 @@ Resources:
               - elasticloadbalancing:DeleteTargetGroup
 
           - Effect: Allow
-            Resource: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/${PreviewStacksPrefix}-*-app/*
+            Resource:
+              - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/${PreviewStacksPrefix}-*-app/*
+              - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/${PreviewStacksPrefix}-*-app-pp/*
             Action:
               - elasticloadbalancing:AddTags
               - elasticloadbalancing:CreateListener
