@@ -4,7 +4,6 @@ interface fixedOTPCredential {
     Email: string;
     EmailCode: string;
     SMSCode: string;
-    Telephone: string;
 }
 
 let fixedOTPCredentials: fixedOTPCredential[] = [];
@@ -36,7 +35,7 @@ function getFixedOTPCredential(emailAddress: string): number {
 export function fixedOTPInitialise(): void {
     console.log("in fixedOTPSupport - fixedOTPInitialise");
 
-    const fixedOTPCredentialsSecret = process.env.FIXED_OTP_CREDENTIALS;
+    const fixedOTPCredentialsSecret = process.env.FIXED_OTP_CREDENTIALS as string;
     fixedOTPCredentials = JSON.parse(fixedOTPCredentialsSecret as string);
 }
 
@@ -68,19 +67,6 @@ export function getFixedOTPTemporaryPassword(emailAddress: string): string {
     }
 
     return temporaryPassword;
-}
-
-export function getFixedOTPTelephone(emailAddress: string): string {
-    console.log("in fixedOTPSupport - getFixedOTPTelephone");
-
-    let telephoneNumber = "";
-    const index = getFixedOTPCredential(emailAddress);
-
-    if (index > -1) {
-        telephoneNumber = fixedOTPCredentials[index].Telephone;
-    }
-
-    return telephoneNumber;
 }
 
 export function respondToMFAChallengeForFixedOTPCredential(email: string, securityCode: string): void {

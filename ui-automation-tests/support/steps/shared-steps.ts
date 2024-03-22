@@ -161,3 +161,6 @@ Then(/^there should be no accessibility violations$/, async function (this: Test
     const results = await new AxePuppeteer(this.page).withTags(["wcag21aa", "wcag22aa"]).analyze();
     assert.equal(results.violations.length, 0, "Accessibility Violations Detected : " + JSON.stringify(results.violations));
 });
+
+// eslint-disable-next-line
+Then("pause whilst waiting to complete", {timeout: 1 * 5000}, async function () {});

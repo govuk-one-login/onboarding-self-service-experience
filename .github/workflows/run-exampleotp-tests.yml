@@ -1,0 +1,67 @@
+name: exampleotp tests
+
+on:
+  workflow_call:
+    inputs:
+      environment: { required: true, type: string }
+
+permissions: { }
+concurrency: exampleotp-test-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  run-exampleotp-tests:
+    name: exampleotp
+    runs-on: ubuntu-latest
+    defaults:
+      run: { working-directory: exampleotp-tests }
+
+    steps:
+      - name: Pull repository
+        uses: actions/checkout@v3
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm install --include-workspace-root
+
+      - name: Run cucumber tests
+        id: run-tests
+        shell: bash
+        timeout-minutes: 10
+        env:
+          REPORT: ${{ runner.temp }}/exampleotp-tests.report
+          HOST: http://localhost:3000
+          STUB_API: false
+        run: |
+          shopt -s globstar
+          features=(features/**/*.feature)
+          
+          
+          cd ../express && npm install && cd .. && npm run build-express && cd exampleotp-tests
+          
+          cd .. && npm run local > /dev/null &
+          
+          while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
+          
+          for feature in "${features[@]}"; do
+            [[ ${idx:-} ]] && idx=$((idx + 1)) && echo | tee heading || idx=1
+            echo "#--- [$idx/${#features[@]}] ${feature#*/} ---#" | tee -a heading && echo >> heading
+            npm run cucumber -- --format summary:results "$feature" || cat heading results >> "$REPORT"
+          done
+          
+          [[ -s $REPORT ]] && exit 1 || exit 0
+
+      - name: Report test results
+        if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
+        uses: govuk-one-login/github-actions/report-step-result/print-file@5dacba941def444d69f02843feaebed79b5fca51
+        with:
+          title: exampleotp tests
+          language: shell
+          file-path: ${{ runner.temp }}/exampleotp-tests.report
