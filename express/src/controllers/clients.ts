@@ -30,11 +30,14 @@ export const showClient: RequestHandler = async (req, res) => {
         updatedField: req.session.updatedField,
         redirectUrls: redirectUrls,
         userAttributesRequired: client.scopes,
-        userPublicKey: userPublicKey,
+        ...(client.token_endpoint_auth_method === "client_secret_post"
+            ? {client_secret: client.client_secret ?? ""}
+            : {userPublicKey: userPublicKey}),
         back_channel_logout_uri: client.back_channel_logout_uri,
         sector_identifier_uri: client.sector_identifier_uri,
         postLogoutRedirectUrls: client.postLogoutUris.join(" "),
         claims: client.identity_verification_enabled && client.hasOwnProperty("claims") ? client.claims : [],
+        token_endpoint_auth_method: client.token_endpoint_auth_method,
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
