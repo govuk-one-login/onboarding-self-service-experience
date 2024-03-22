@@ -15,26 +15,18 @@ Feature: A page where users can view and change the details associated with thei
       When they click on the link that points to "/account/change-phone-number"
       Then they should see the text "Change your mobile phone number"
 
-    Scenario: The user does not enter any characters when changing the phone number
-      When they submit the mobile phone number ""
-      Then the error message "Enter a mobile phone number" must be displayed for the mobile phone number field
-
-    Scenario: User enters an international phone number when changing phone number
-      When they submit the mobile phone number "+919465245634"
-      Then the error message "Enter a UK mobile phone number, like 07700 900000" must be displayed for the mobile phone number field
-
-    Scenario: User enters invalid characters when changing phone number
-      When they submit the mobile phone number "075ABC54$78"
-      Then the error message "Enter a UK mobile phone number using numbers only" must be displayed for the mobile phone number field
-
-    Scenario: User enters an invalid number when changing phone number
-      When they submit the mobile phone number "+919465245634"
-      Then the error message "Enter a UK mobile phone number, like 07700 900000" must be displayed for the mobile phone number field
+    Scenario Outline: The user enters an invalid phone number
+      When they submit the mobile phone number "<mobileNo>"
+      Then the error message "<errorMsg>" must be displayed for the mobile phone number field
+      Examples:
+        | mobileNo      | errorMsg                                          |
+        |               | Enter a mobile phone number                       |
+        | +919465245634 | Enter a UK mobile phone number, like 07700 900000 |
+        | 075ABC54$78   | Enter a UK mobile phone number using numbers only |
 
     Scenario: User cancels the phone number update
       When they click on the 'Cancel' link
       Then they should be redirected to the '/account' page
-
 
   Rule: The user tries to enter security code in the process of changing their phone number
     Background:
@@ -84,7 +76,6 @@ Feature: A page where users can view and change the details associated with thei
       When they toggle the "Hide" link on the field "<password_field>"
       Then they see the toggle link "Show" on the field "<password_field>"
       And they can not see the content in the <password_type> field
-
       Examples:
         | password_type    | password_field  |
         | current password | currentPassword |

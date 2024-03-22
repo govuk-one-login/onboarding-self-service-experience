@@ -13,21 +13,16 @@ Feature: Users can change their redirect uris
     Background:
       When they click on the link that points to "/change-redirect-uris"
       Then they should be redirected to a page with the title "Change redirect URIs - GOV.UK One Login"
-
-    Scenario: The user doesn't enter any characters into the Redirect URIs field
-      When they submit the redirect uris ""
-      Then the error message "Enter your redirect URIs" must be displayed for the redirect uris field
-
-    Scenario: The user tries to enter data in wrong format into the Redirect URIs field
-      When they submit the redirect uris "wrong url format"
-      Then the error message "Enter your redirect URIs in the format https://example.com" must be displayed for the redirect uris field
-
-    Scenario: The user tries to enter url, which is not localhost, without https into the Redirect URIs field
-      When they submit the redirect uris "http://test.com"
-      Then the error message "URLs must be https (except for localhost)" must be displayed for the redirect uris field
+    Scenario Outline: user enters an invalid URI
+      When they submit the redirect uris "<uri>"
+      Then the error message "<errorMsg>" must be displayed for the redirect uris field
+      Examples:
+        | uri              | errorMsg                                                   |
+        |                  | Enter your redirect URIs                                   |
+        | wrong url format | Enter your redirect URIs in the format https://example.com |
+        | http://test.com  | URLs must be https (except for localhost)                  |
 
   Rule: The user doesn't want to save changes on Change redirect URIs page
-
     Scenario: The user doesn't want to change any details on Change redirect URIs page
       Given they should see the exact value "http://localhost/" in the first redirect uri field
       Then they click on the link that points to "/change-redirect-uris"

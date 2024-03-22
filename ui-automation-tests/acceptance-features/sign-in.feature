@@ -31,24 +31,17 @@ Feature: Users can sign in to the self-service experience
       Then they should be redirected to the "/sign-in/forgot-password" page
 
   Rule: The user tries to submit a password
-    Scenario: User doesn't enter any characters into the password field
-      When they submit the email "registered@test.gov.uk"
-      Then they should be redirected to the "/sign-in/enter-password" page
-      When they submit the password ""
-      Then the error message "Enter your password" must be displayed for the password field
+    Scenario Outline: User submits invalid passwords
+      When they submit the email "<email>"
+      When they submit the password "<password>"
+      Then the error message "<errorMessage>" must be displayed for the password field
+      Examples:
+        | email                              | password         | errorMessage        |
+        | registered@test.gov.uk             |                  | Enter your password |
+        | password-will-be-wrong@test.gov.uk | Invalid-Password | Incorrect password  |
+        | password-will-be-wrong@test.gov.uk | WrongPa$$word    | Incorrect password  |
 
-    Scenario: User enters an invalid password
-      When they submit the email "password-will-be-wrong@test.gov.uk"
-      Then they should see the text "Enter your password"
-      When they submit the password "Invalid-Password"
-      Then the error message "Incorrect password" must be displayed for the password field
-
-    Scenario: The user tries to log in and submits registered email but enters wrong password
-      When they submit the email "password-will-be-wrong@test.gov.uk"
-      Then they should see the text "Enter your password"
-      When they submit the password "WrongPa$$word"
-      Then the error message "Incorrect password" must be displayed for the password field
-
+  Rule: The user toggle the show/hide to view the password in signIn process
     Scenario: The user wants to see or hide their password as they type it
       When they submit the email "registered@test.gov.uk"
       Then they should see the text "Enter your password"
@@ -102,7 +95,7 @@ Feature: Users can sign in to the self-service experience
 
     Scenario: The user wants to see or hide their password as they type it
       When they click on the forgot password link in their email
-      And they should see the text "Create a new password"
+      Then they should see the text "Create a new password"
       When they toggle the "Show" link on the field "password"
       And they enter the password "PasswordIsShown"
       Then they see the toggle link "Hide" on the field "password"

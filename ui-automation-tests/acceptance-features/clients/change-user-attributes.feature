@@ -15,7 +15,6 @@ Feature: Users can change their user attributes
       When they click on the 'user attributes (opens in new tab)' link that opens in a new tab
       Then they should be directed to the URL 'https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/choose-which-user-attributes-your-service-can-request/'
 
-
   Rule: The user doesn't want to save changes on Change user attributes page
     Scenario: The user doesn't want to change any details on Change user attributes page
       Given they should see the exact value "OpenID" in the user attributes field
