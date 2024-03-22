@@ -442,3 +442,33 @@ export const showChangeSectorIdentifierUriForm: RequestHandler = (req, res) => {
         }
     });
 };
+
+export const processChangeSectorIdentifierUriForm: RequestHandler = async (req, res) => {
+    const sectorIdentifierUri = req.body.sectorIdentifierUri;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {sector_identifier_uri: sectorIdentifierUri},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "Sector Identifier URI";
+
+    s4.sendTxMALog(
+        "SSE_UPDATE_SECTOR_IDENTIFIER_URI",
+        {
+            session_id: req.session.id,
+            ip_address: req.ip,
+            user_id: userId
+        },
+        {
+            service_id: nonNull(req.context.serviceId)
+        }
+    );
+
+    res.redirect(`/services/${req.context.serviceId}/clients`);
+};
