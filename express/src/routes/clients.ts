@@ -51,3 +51,8 @@ router
     .route("/:clientId/:selfServiceClientId/change-post-logout-uris")
     .get(showChangePostLogoutUrisForm)
     .post(validateUris("clients/change-post-logout-uris.njk"), processChangePostLogoutUrisForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/change-back-channel-logout-uri")
+    .get(showChangeBackChannelLogoutUriForm)
+    .post(validateUris("clients/change-back-channel-logout-uri.njk", "backChannelLogoutUri",1), processChangeBackChannelLogOutUriForm);
