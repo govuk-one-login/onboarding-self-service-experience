@@ -1,0 +1,23 @@
+{% extends "layouts/client-form.njk" %}
+
+{% set pageTitle = "Change back channel logout URI" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your Back Channel Logout URI</h1>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.uriInput("Back Channel Logout URI", "backChannelLogoutUri", "Enter a URL starting with https:// or a localhost URL starting with http://") }}
+{% endblock %}
+
+ {% block scripts %}
+   {{ga4OnPageLoad({
+     statusCode:"200",
+     englishPageTitle: pageTitle,
+     taxonomyLevel1: taxonomyLevel1,
+     taxonomyLevel2: taxonomyLevel2AdminTool,
+     contentId:""{# TODO: Needs a content Id for GA4 #},
+     loggedInStatus:true,
+     dynamic:false
+   })}}
+ {% endblock %}
