@@ -41,7 +41,6 @@ export const showClient: RequestHandler = async (req, res) => {
         sectorIdentifierUri: userSectorIdentifierUri,
         postLogoutRedirectUris: client.postLogoutUris,
         claims: client.identity_verification_enabled && client.hasOwnProperty("claims") ? client.claims : [],
-        id_token_signing_algorithm: client.hasOwnProperty("id_token_signing_algorithm") ? client.id_token_signing_algorithm : "",
         contacts: contacts,
         token_endpoint_auth_method: client.token_endpoint_auth_method,
         urls: {
@@ -787,7 +786,7 @@ export const processEnterContactEmailForm: RequestHandler = async (req, res) => 
     if (result.isValid) {
         const updateContactsResult = addContact(contactToAdd, contacts);
 
-        if (typeof updateContactsResult === "string" && updateContactsResult === "This contact has already been added") {
+        if (typeof updateContactsResult === "string" && updateContactsResult === "Contact already exists") {
             res.render("clients/enter-contact-email.njk", {
                 values: {
                     emailAddress: emailAddress
