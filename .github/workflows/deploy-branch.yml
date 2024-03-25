@@ -69,3 +69,4 @@ jobs:
     with:
       name: DynamoDB
       template: backend/dynamodb/dynamodb.template.yml
+      
