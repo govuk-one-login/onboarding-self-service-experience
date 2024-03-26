@@ -66,7 +66,8 @@ const expectedDynamoRecord = {
         "claims",
         "sector_identifier_uri",
         "back_channel_logout_uri",
-        "token_endpoint_auth_method"
+        "token_endpoint_auth_method",
+        "id_token_signing_algorithm"
     ]
 };
 

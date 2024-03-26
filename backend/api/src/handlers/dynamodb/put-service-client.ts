@@ -53,8 +53,8 @@ export const putServiceClientHandler = async (event: handlerInvokeEvent): Promis
         back_channel_logout_uri: payload.back_channel_logout_uri,
         sector_identifier_uri: payload.sector_identifier_uri,
         token_endpoint_auth_method: payload.token_endpoint_auth_method,
-        id_token_signing_algorithm: payload.id_token_signing_algorithm,
-        client_locs: payload.client_locs,
+        id_token_signing_algorithm: payload.hasOwnProperty("id_token_signing_algorithm") ? payload.id_token_signing_algorithm : "",
+        client_locs: payload.hasOwnProperty("client_locs") ? payload.client_locs : [],
         default_fields: [
             "data",
             "public_key",
@@ -67,7 +67,8 @@ export const putServiceClientHandler = async (event: handlerInvokeEvent): Promis
             "claims",
             "sector_identifier_uri",
             "back_channel_logout_uri",
-            "token_endpoint_auth_method"
+            "token_endpoint_auth_method",
+            "id_token_signing_algorithm"
         ]
     };
 
