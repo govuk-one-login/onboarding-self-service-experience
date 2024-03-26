@@ -2,6 +2,7 @@ import {APIGatewayProxyResult} from "aws-lambda";
 import DynamoDbClient from "../../dynamodb-client";
 import {randomUUID} from "crypto";
 import {OnboardingTableItem} from "../../onboarding-table-item";
+import {handlerInvokeEvent} from "../handler-utils";
 
 const client = new DynamoDbClient();
 
@@ -26,15 +27,12 @@ export type clientRegistryRegistrationResponse = {
         id: string;
         serviceName: string;
     };
-    contactEmail: string;
+    contact_email: string;
+    id_token_signing_algorithm: string;
+    client_locs: string[];
 };
 
-export type putServiceHandlerInvokeEvent = {
-    statusCode: number;
-    body: string;
-};
-
-export const putServiceClientHandler = async (event: putServiceHandlerInvokeEvent): Promise<APIGatewayProxyResult> => {
+export const putServiceClientHandler = async (event: handlerInvokeEvent): Promise<APIGatewayProxyResult> => {
     const payload: clientRegistryRegistrationResponse = JSON.parse(event.body);
 
     const record: OnboardingTableItem = {
@@ -55,6 +53,8 @@ export const putServiceClientHandler = async (event: putServiceHandlerInvokeEven
         back_channel_logout_uri: payload.back_channel_logout_uri,
         sector_identifier_uri: payload.sector_identifier_uri,
         token_endpoint_auth_method: payload.token_endpoint_auth_method,
+        id_token_signing_algorithm: payload.hasOwnProperty("id_token_signing_algorithm") ? payload.id_token_signing_algorithm : "",
+        client_locs: payload.hasOwnProperty("client_locs") ? payload.client_locs : [],
         default_fields: [
             "data",
             "public_key",
@@ -67,7 +67,8 @@ export const putServiceClientHandler = async (event: putServiceHandlerInvokeEven
             "claims",
             "sector_identifier_uri",
             "back_channel_logout_uri",
-            "token_endpoint_auth_method"
+            "token_endpoint_auth_method",
+            "id_token_signing_algorithm"
         ]
     };
 

@@ -20,6 +20,7 @@ export const registerClientHandler = async (event: RegisterClientPayload): Promi
     const subject_type = "pairwise";
     const service_type = "MANDATORY";
     const sector_identifier_uri = "http://gov.uk";
+    const client_locs = ["P2"];
 
     const clientConfig = {
         client_name: event.service.serviceName,
@@ -29,7 +30,8 @@ export const registerClientHandler = async (event: RegisterClientPayload): Promi
         scopes: scopes,
         subject_type: subject_type,
         service_type: service_type,
-        sector_identifier_uri: sector_identifier_uri
+        sector_identifier_uri: sector_identifier_uri,
+        client_locs: client_locs
     };
 
     const url = process.env.AUTH_REGISTRATION_BASE_URL + "/connect/register";
