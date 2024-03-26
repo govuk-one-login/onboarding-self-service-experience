@@ -115,3 +115,5 @@ export const TEST_DATA_TABLE_ITEM = {
         S: "integration"
     }
 };
+
+export const TEST_MESSAGE_ID = "1234";
