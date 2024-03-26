@@ -17,7 +17,6 @@ Feature: A page where users can view the details associated with a client
       Then they should see the text "Username: integration-user"
       And they should see the text "Password: winter2021"
 
-
   Rule: The the hidden content and the links which open in a new tab, are available for the user to view
     Scenario: The user wants to view technical documentation
       When they click on the "technical documentation (opens in new tab)" link that opens in a new tab
