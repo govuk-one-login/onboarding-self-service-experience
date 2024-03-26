@@ -22,7 +22,7 @@ export function dynamoClientToDomainClient(client: ClientFromDynamo): Client {
         back_channel_logout_uri: client.back_channel_logout_uri,
         identity_verification_enabled: client.identity_verification_enabled,
         claims: client.claims,
-        idTokenSigningAlgorithm: client.id_token_signing_algorithm,
-        clientLocs: client.client_locs
+        id_token_signing_algorithm: client.id_token_signing_algorithm,
+        client_locs: client.client_locs
     };
 }

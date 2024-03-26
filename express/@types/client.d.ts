@@ -44,6 +44,6 @@ export interface Client {
     type: string;
     identity_verification_enabled: boolean;
     claims: string[];
-    idTokenSigningAlgorithm: string;
-    clientLocs: string[];
+    id_token_signing_algorithm: string;
+    client_locs: string[];
 }
