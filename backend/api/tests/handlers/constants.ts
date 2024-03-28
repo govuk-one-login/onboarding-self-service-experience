@@ -1,6 +1,7 @@
 import {AttributeValue} from "@aws-sdk/client-dynamodb";
 
 export const TEST_USER_ID = "1ded3d65-d088-4319-9431-ea5a3323799d";
+export const TEST_USER_DYNAMO_ID = "0e5033d3-91bf-4cdc-95de-7655e85b6bb4";
 export const TEST_USER_EMAIL = "test@test.gov.uk";
 export const TEST_USER_FIRST_NAME = "Jane";
 export const TEST_USER_LAST_NAME = "Jones";
@@ -8,6 +9,7 @@ export const TEST_USER_FULL_NAME = "Jones";
 export const TEST_PASSWORD_LAST_UPDATED_DATE = "01/01/2024";
 export const TEST_USER_PHONE_NUMBER = "12345678910";
 export const TEST_CLIENT_ID = "rgCBoiWHehrb4r";
+export const TEST_SERVICE_NAME = "TEST_SERVICE";
 export const TEST_USER_CONFIG: Record<string, AttributeValue> = {
     userId: {S: TEST_USER_ID},
     fullName: {S: TEST_USER_FULL_NAME},
@@ -113,3 +115,5 @@ export const TEST_DATA_TABLE_ITEM = {
         S: "integration"
     }
 };
+
+export const TEST_MESSAGE_ID = "1234";
