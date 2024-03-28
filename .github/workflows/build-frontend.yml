@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run: { working-directory: express }
+    outputs:
+      artifact-name: ${{ inputs.artifact-name }}
 
     steps:
       - name: Pull repository
