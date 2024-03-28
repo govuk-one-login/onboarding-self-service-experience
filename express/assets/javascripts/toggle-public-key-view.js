@@ -5,7 +5,9 @@ const publicKeyShort = document.getElementById("publicKeyShort");
 const publicKeyLong = document.getElementById("publicKeyLong");
 const toggleTextChevron = document.getElementById("toggleTextChevron");
 
-togglePublicKey.addEventListener("click", showFullKey);
+if (togglePublicKey) {
+    togglePublicKey.addEventListener("click", showFullKey);
+}
 
 function showFullKey() {
     if (publicKeyContainer.className === "open") {
