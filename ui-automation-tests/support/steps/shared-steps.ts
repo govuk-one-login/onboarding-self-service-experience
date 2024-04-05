@@ -125,6 +125,11 @@ Then("they should see the text {string}", async function (this: TestContext, tex
     assert.equal(bodyText?.includes(text), true, `Body text does not contain '${text}'`);
 });
 
+Then("they should not see the text {string}", async function (this: TestContext, text) {
+    const bodyText = await this.page.$eval("body", element => element.textContent);
+    assert.equal(bodyText?.includes(text), false, `Body text does not contain '${text}'`);
+});
+
 Then("the {string} link will point to the following URL: {string}", async function (linkText, expectedUrl) {
     const link = await getLink(this.page, linkText);
     await checkUrl(this.page, link, expectedUrl);
