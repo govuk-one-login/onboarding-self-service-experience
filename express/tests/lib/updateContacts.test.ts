@@ -35,6 +35,6 @@ describe("addContact", () => {
         const contacts = ["test1@test.gov.uk", "test2@test.gov.uk", "test3@test.gov.uk"];
         const newContact = "test2@test.gov.uk";
         const result = addContact(newContact, contacts);
-        expect(result).toBe("Contact already exists");
+        expect(result).toBe("This contact has already been added");
     });
 });

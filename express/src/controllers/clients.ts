@@ -447,8 +447,18 @@ export const processConfirmContactRemovalForm: RequestHandler = async (req, res)
                 req.params.selfServiceClientId
             }/enter-contact?updateResult=${encodeURIComponent(updateMessage)}`
         );
-    } else {
+    } else if (req.body.removeContact === "no") {
         res.redirect(`/services/${serviceId}/clients/${req.params.clientId}/${req.params.selfServiceClientId}/enter-contact`);
+    } else {
+        res.render("clients/confirm-contact-removal.njk", {
+            serviceId: req.context.serviceId,
+            authClientId: req.params.clientId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            contactToRemove: req.query.contactToRemove,
+            errorMessages: {
+                "removeContact-options": "Select yes if you want to remove this contact"
+            }
+        });
     }
 };
 
@@ -474,7 +484,7 @@ export const processEnterContactEmailForm: RequestHandler = async (req, res) => 
     if (result.isValid) {
         const updateContactsResult = addContact(contactToAdd, contacts);
 
-        if (typeof updateContactsResult === "string" && updateContactsResult === "Contact already exists") {
+        if (typeof updateContactsResult === "string" && updateContactsResult === "This contact has already been added") {
             res.render("clients/enter-contact-email.njk", {
                 values: {
                     emailAddress: emailAddress
