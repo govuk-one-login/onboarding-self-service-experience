@@ -5,15 +5,3 @@
 {% set formCancelUrl = "/account" %}
 
 {% set heading = "Change your mobile phone number" %}
-
- {% block scripts %}
-   {{ga4OnPageLoad({
-     statusCode:"200",
-     englishPageTitle: pageTitle,
-     taxonomyLevel1: taxonomyLevel1,
-     taxonomyLevel2: taxonomyLevel2AdminTool,
-     contentId:"6f78914f-2a87-41f8-9fa6-b7fa3686f970",
-     loggedInStatus:true,
-     dynamic:false
-   })}}
- {% endblock %}
