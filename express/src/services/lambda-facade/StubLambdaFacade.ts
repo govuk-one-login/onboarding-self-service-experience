@@ -83,7 +83,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         }
     }
 
-    async updateService(serviceId: string, updates: ServiceNameUpdates): Promise<void> {
+    async updateService(serviceId: string, selfServiceClientId: string, clientId: string, updates: ServiceNameUpdates): Promise<void> {
         if (updates.service_name) {
             this.serviceName = updates.service_name as string;
         }

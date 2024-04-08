@@ -69,10 +69,18 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         await this.post(`/update-client`, JSON.stringify(body), accessToken);
     }
 
-    async updateService(serviceId: string, updates: ServiceNameUpdates, accessToken: string): Promise<void> {
+    async updateService(
+        serviceId: string,
+        selfServiceClientId: string,
+        clientId: string,
+        updates: ServiceNameUpdates,
+        accessToken: string
+    ): Promise<void> {
         // TODO constrain type later
         const body = {
             serviceId: serviceId,
+            selfServiceClientId: selfServiceClientId,
+            clientId: clientId,
             updates: updates
         };
 
