@@ -13,7 +13,7 @@ export function removeContact(contacts: string[], contactToRemove: string): stri
 
 export function addContact(item: string, array: string[]): string[] | string {
     if (array.includes(item)) {
-        return "Contact already exists";
+        return "This contact has already been added";
     } else {
         array.push(item);
         return array;
