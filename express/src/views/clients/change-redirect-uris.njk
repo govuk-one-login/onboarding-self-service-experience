@@ -12,3 +12,15 @@
 {% block formInputs %}
   {{ form.urlInput("Redirect URIs") }}
 {% endblock %}
+
+ {% block scripts %}
+   {{ga4OnPageLoad({
+     statusCode:"200",
+     englishPageTitle: pageTitle,
+     taxonomyLevel1: taxonomyLevel1,
+     taxonomyLevel2: taxonomyLevel2AdminTool,
+     contentId:"cb73fa6a-5925-4d97-9e6d-9a6849296489",
+     loggedInStatus:true,
+     dynamic:false
+   })}}
+ {% endblock %}

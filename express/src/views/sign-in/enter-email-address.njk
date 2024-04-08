@@ -14,3 +14,15 @@
 {% block formInputs %}
   {{ form.emailInput() }}
 {% endblock %}
+
+{% block scripts %}
+  {{ga4OnPageLoad({
+    statusCode:"200",
+    englishPageTitle: pageTitle,
+    taxonomyLevel1: taxonomyLevel1,
+    taxonomyLevel2: taxonomyLevel2Account,
+    contentId:"03276807-b687-40f5-8f6f-627f175247df",
+    loggedInStatus:false,
+    dynamic:false
+  })}}
+{% endblock %}
