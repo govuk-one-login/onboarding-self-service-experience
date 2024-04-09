@@ -1,7 +1,7 @@
-import {constructTestApiGatewayEvent} from "../utils";
-import {updateServiceHandler} from "./../../../src/handlers/dynamodb/update-service";
+import {updateServiceHandler} from "../../../src/handlers/dynamodb/update-service";
 import DynamoDbClient from "../../../src/dynamodb-client";
 import {TEST_SERVICE_ID, TEST_SERVICE_NAME} from "../constants";
+import {handlerInvokeEvent} from "../../../src/handlers/handler-utils";
 
 const TEST_SERVICE_UPDATES = {
     serviceId: TEST_SERVICE_ID,
@@ -9,7 +9,11 @@ const TEST_SERVICE_UPDATES = {
         serviceName: TEST_SERVICE_NAME
     }
 };
-const TEST_UPDATE_SERVICE_EVENT = constructTestApiGatewayEvent({body: JSON.stringify(TEST_SERVICE_UPDATES), pathParameters: {}});
+
+const TEST_UPDATE_SERVICE_EVENT: handlerInvokeEvent = {
+    statusCode: 200,
+    body: JSON.stringify(TEST_SERVICE_UPDATES)
+};
 
 describe("handlerName tests", () => {
     beforeEach(() => {
