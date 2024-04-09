@@ -1,18 +1,20 @@
-import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils";
-import {putServiceHandler} from "./../../../src/handlers/dynamodb/put-service";
+import {putServiceHandler} from "../../../src/handlers/dynamodb/put-service";
 import DynamoDbClient from "../../../src/dynamodb-client";
 import {PutItemCommandOutput} from "@aws-sdk/client-dynamodb";
 import {TEST_SERVICE_ID, TEST_SERVICE_NAME} from "../constants";
+import {handlerInvokeEvent} from "../../../src/handlers/handler-utils";
 
-const TEST_PUT_SERVICE_EVENT = constructTestApiGatewayEvent({
-    body: JSON.stringify({
-        service: {
-            id: TEST_SERVICE_ID,
-            serviceName: TEST_SERVICE_NAME
-        }
-    }),
-    pathParameters: {}
-});
+const TEST_PUT_SERVICE_PAYLOAD = {
+    service: {
+        id: TEST_SERVICE_ID,
+        serviceName: TEST_SERVICE_NAME
+    }
+};
+
+const TEST_PUT_SERVICE_EVENT: handlerInvokeEvent = {
+    statusCode: 200,
+    body: JSON.stringify(TEST_PUT_SERVICE_PAYLOAD)
+};
 
 const TEST_SERVICE_RECORD = {
     pk: TEST_SERVICE_ID,
@@ -30,7 +32,7 @@ describe("putServiceHandler tests", () => {
         const dynamoPutItemResponse: PutItemCommandOutput = {$metadata: {httpStatusCode: 200}, Attributes: {}};
         const dynamoPutSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockResolvedValue(dynamoPutItemResponse);
 
-        const response = await putServiceHandler(TEST_PUT_SERVICE_EVENT, mockLambdaContext);
+        const response = await putServiceHandler(TEST_PUT_SERVICE_EVENT);
 
         expect(dynamoPutSpy).toHaveBeenCalledWith(TEST_SERVICE_RECORD);
         expect(response).toStrictEqual({
@@ -43,7 +45,7 @@ describe("putServiceHandler tests", () => {
         const dynamoErr = "SomeDynamoError";
         const dynamoPutSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(dynamoErr);
 
-        const response = await putServiceHandler(TEST_PUT_SERVICE_EVENT, mockLambdaContext);
+        const response = await putServiceHandler(TEST_PUT_SERVICE_EVENT);
 
         expect(dynamoPutSpy).toHaveBeenCalledWith(TEST_SERVICE_RECORD);
         expect(response).toStrictEqual({
