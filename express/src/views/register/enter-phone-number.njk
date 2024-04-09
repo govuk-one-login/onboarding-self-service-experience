@@ -11,15 +11,3 @@
 {% block formInputs %}
   {{ form.mobileNumberInput() }}
 {% endblock %}
-
- {% block scripts %}
-   {{ga4OnPageLoad({
-     statusCode:"200",
-     englishPageTitle: pageTitle,
-     taxonomyLevel1: taxonomyLevel1,
-     taxonomyLevel2: taxonomyLevel2Account,
-     contentId:"12635566-f7ee-43d4-bde5-f6b67c449135",
-     loggedInStatus:false,
-     dynamic:false
-   })}}
- {% endblock %}

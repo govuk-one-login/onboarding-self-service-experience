@@ -54,18 +54,8 @@
   }}
   {{ form.dateInput("What's your target date to go live with GOV.UK One Login?", "targetDate") }}
 
+
+
   {{ form.hiddenInput("serviceName", serviceName) }}
 {% endblock %}
-
- {% block scripts %}
-   {{ga4OnPageLoad({
-     statusCode:"200",
-     englishPageTitle: pageTitle,
-     taxonomyLevel1: taxonomyLevel1,
-     taxonomyLevel2: taxonomyLevel2AdminTool,
-     contentId:"4e82ef48-2141-45a0-9993-8c4a397a06df",
-     loggedInStatus:true,
-     dynamic:false
-   })}}
- {% endblock %}
 

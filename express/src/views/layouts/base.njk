@@ -2,7 +2,6 @@
 {% from "macros/back-link.njk" import backLink %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "macros/ga4-opl.njk" import ga4OnPageLoad %}
 
 {% set assetPath = "/assets" %}
 {% set showTopNav = showTopNav | default(true) %}
@@ -11,11 +10,6 @@
 {% set phaseTagText  = "test" if showTestBanner else "beta" %}
 {% set phaseBannerClasses  = "test-banner" if showTestBanner %}
 {% set phaseBannerHtml = "This is a test environment." %}
-
-{% set taxonomyLevel1 = "adoption" %}
-{% set taxonomyLevel2Account = "account" %}
-{% set taxonomyLevel2AdminTool  = "admin tool" %}
-
 {% if not showTestBanner %}
   {% set phaseBannerHtml %}
     This is a new service – your
@@ -159,23 +153,13 @@
 {% endblock %}
 
 {% block bodyEnd %}
-  <input type="hidden" value="{{cookieDomain}}" id="ga-cookie-domain">
+  <input type="hidden" value="{{ googleTagId }}" id="ga-tracking">
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   <script src="/assets/javascripts/govuk-all.js"></script>
-  <script src="/ga4-assets/analytics.js"></script>
-  <script src="/assets/javascripts/ua.js"></script>
-  {% block analyticscripts %}{% endblock %}
+  <script src="/assets/javascripts/cookies.js"></script>
   <script>window.GOVUKFrontend.initAll();</script>
-  <script>
-    window.DI.appInit({
-      ga4ContainerId: "{{ga4ContainerId}}",
-      uaContainerId: "{{uaContainerId}}"
-    }, {
-      disableGa4Tracking: {{ga4Disabled}},
-      disableUaTracking: {{uaDisabled}},
-      cookieDomain: "{{cookieDomain}}"
-    });
-  </script>
+  <script>window.GOVUKSignIn.CookieBanner.init();</script>
+
   {% block scripts %}{% endblock %}
   {% block formScripts %}{% endblock %}
 {% endblock %}

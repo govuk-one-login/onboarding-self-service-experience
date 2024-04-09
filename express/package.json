@@ -3,7 +3,7 @@
   "description": "DI Self-Service frontend",
   "scripts": {
     "start": "node dist/app.js",
-    "local": "npm run build && STUB_API=true node --inspect -r 'dotenv/config' dist/app.js",
+    "local": "npm run buildts && STUB_API=true node --inspect dist/app.js",
     "dev": "STUB_API=${STUB_API:-true} nodemon --config nodemon.json --inspect -r 'dotenv/config' src/app.ts",
     "docker": "docker run --rm --publish 3000:3000 self-service-frontend",
     "minifyjs": "for script in dist/assets/javascripts/*.js; do uglifyjs $script -cmo $script $(${CI:-false} || echo --source-map includeSources,url=${script##*/}.map); done",
@@ -21,7 +21,6 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.354.0",
     "@aws-sdk/client-sqs": "^3.398.0",
     "connect-dynamodb": "^3.0.0",
-    "@govuk-one-login/one-login-analytics": "^0.0.9",
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "express-session": "^1.17.3",
