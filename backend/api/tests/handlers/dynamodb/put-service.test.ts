@@ -1,63 +1,54 @@
-import {putServiceHandler} from "../../../src/handlers/dynamodb/put-service";
+import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils";
+import {putServiceHandler} from "./../../../src/handlers/dynamodb/put-service";
 import DynamoDbClient from "../../../src/dynamodb-client";
-import ResolvedValue = jest.ResolvedValue;
+import {PutItemCommandOutput} from "@aws-sdk/client-dynamodb";
+import {TEST_SERVICE_ID, TEST_SERVICE_NAME} from "../constants";
 
-const randomId = "1234Random";
-jest.mock("crypto", () => ({
-    randomUUID: jest.fn(() => randomId)
-}));
+const TEST_PUT_SERVICE_EVENT = constructTestApiGatewayEvent({
+    body: JSON.stringify({
+        service: {
+            id: TEST_SERVICE_ID,
+            serviceName: TEST_SERVICE_NAME
+        }
+    }),
+    pathParameters: {}
+});
 
-const putServiceHandlerBody = {
-    service: {
-        id: "service#1234Random",
-        serviceName: "Test Service"
-    }
+const TEST_SERVICE_RECORD = {
+    pk: TEST_SERVICE_ID,
+    sk: TEST_SERVICE_ID,
+    data: TEST_SERVICE_NAME,
+    service_name: TEST_SERVICE_NAME
 };
-
-const expectedDynamoRecord = {
-    pk: putServiceHandlerBody.service.id,
-    sk: putServiceHandlerBody.service.id,
-    data: putServiceHandlerBody.service.serviceName,
-    service_name: putServiceHandlerBody.service.serviceName
-};
-
-function createResolvedValue(): ResolvedValue<string> {
-    return <ResolvedValue<string>>expectedDynamoRecord;
-}
 
 describe("putServiceHandler tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it("calls the dynamo client with a put command with the expected values and returns a 200 with the expected response body", async () => {
-        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockResolvedValue(createResolvedValue());
+    it("returns a 200 and the stringified record in the response when the dynamo put is successful", async () => {
+        const dynamoPutItemResponse: PutItemCommandOutput = {$metadata: {httpStatusCode: 200}, Attributes: {}};
+        const dynamoPutSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockResolvedValue(dynamoPutItemResponse);
 
-        const putServiceHandlerResponse = await putServiceHandler({
-            statusCode: 200,
-            body: JSON.stringify(putServiceHandlerBody)
-        });
+        const response = await putServiceHandler(TEST_PUT_SERVICE_EVENT, mockLambdaContext);
 
-        expect(itemSpy).toHaveBeenCalledWith(expectedDynamoRecord);
-        expect(putServiceHandlerResponse).toStrictEqual({
+        expect(dynamoPutSpy).toHaveBeenCalledWith(TEST_SERVICE_RECORD);
+        expect(response).toStrictEqual({
             statusCode: 200,
-            body: JSON.stringify(expectedDynamoRecord)
+            body: JSON.stringify(dynamoPutItemResponse)
         });
     });
 
-    it("calls the dynamo client with a put command with the expected values and returns a 500 when the dynamo client throws an error", async () => {
-        const error = "SomeAwsError";
-        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(error);
+    it("returns a 500 and a stringified error when the dynamo client throws an error", async () => {
+        const dynamoErr = "SomeDynamoError";
+        const dynamoPutSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(dynamoErr);
 
-        const putServiceHandlerResponse = await putServiceHandler({
-            statusCode: 200,
-            body: JSON.stringify(putServiceHandlerBody)
-        });
+        const response = await putServiceHandler(TEST_PUT_SERVICE_EVENT, mockLambdaContext);
 
-        expect(itemSpy).toHaveBeenCalledWith(expectedDynamoRecord);
-        expect(putServiceHandlerResponse).toStrictEqual({
+        expect(dynamoPutSpy).toHaveBeenCalledWith(TEST_SERVICE_RECORD);
+        expect(response).toStrictEqual({
             statusCode: 500,
-            body: JSON.stringify(error)
+            body: JSON.stringify(dynamoErr)
         });
     });
 });

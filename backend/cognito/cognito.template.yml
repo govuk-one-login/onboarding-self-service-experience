@@ -881,6 +881,74 @@ Resources:
           - Priority: 1
             Name: verified_email
 
+  UserPoolLogDelivery:
+    Type: AWS::Cognito::LogDeliveryConfiguration
+    Properties:
+      LogConfigurations:
+        - CloudWatchLogsConfiguration:
+            LogGroupArn: !Sub
+              - arn:aws:logs:${Region}:${Account}:log-group:${LogGroup}
+              - Region: !Ref AWS::Region
+                Account: !Ref AWS::AccountId
+                LogGroup: !Ref CognitoLogsGroup
+          EventSource: userNotification
+          LogLevel: ERROR
+      UserPoolId: !Ref UserPool
+
+  CognitoLogsGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join
+        - "/"
+        - - '/aws/cognito'
+          - 'onboarding-self-service'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'user-pool'
+      RetentionInDays: 14
+      DataProtectionPolicy:
+        Name: data-protection-policy-cognito-lambda
+        Description: Data Protection for Cloudwatch Logs
+        Version: '2021-06-01'
+        Statement:
+          - Sid: audit-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Audit:
+                FindingsDestination:
+                  CloudWatchLogs:
+                    LogGroup: !Ref LogAuditLogGroup
+          - Sid: redact-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Deidentify:
+                MaskConfig: { }
+
+  CognitoLogCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsLoggingEnabled
+    Properties:
+      LogGroupName: !Ref CognitoLogsGroup
+      FilterName: "Cognito error logs"
+      FilterPattern: ""
+      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
+
   # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
   SmsRole:
     Type: AWS::IAM::Role

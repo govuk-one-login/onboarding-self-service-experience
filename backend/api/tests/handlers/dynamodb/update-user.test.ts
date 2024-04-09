@@ -1,72 +1,46 @@
-import {updateUserHandler} from "../../../src/handlers/dynamodb/update-user";
+import {constructTestApiGatewayEvent} from "../utils";
+import {updateUserHandler} from "./../../../src/handlers/dynamodb/update-user";
 import DynamoDbClient from "../../../src/dynamodb-client";
-import ResolvedValue = jest.ResolvedValue;
+import {TEST_COGNITO_USER_ID, TEST_SERVICE_NAME, TEST_USER_ID} from "../constants";
+import {UpdateItemCommandOutput} from "@aws-sdk/client-dynamodb";
 
-const randomId = "1234Random";
-jest.mock("crypto", () => ({
-    randomUUID: jest.fn(() => randomId)
-}));
-
-const updateUserHandlerBody = {
+const TEST_USER_UPDATES = {
+    userId: TEST_USER_ID,
+    cognitoUserId: TEST_COGNITO_USER_ID,
     updates: {
-        serviceName: "New Test Service"
-    },
-    cognitoUserId: "123",
-    userId: "1ded3d65-d088-4319-9431-ea5a3323799d"
+        serviceName: TEST_SERVICE_NAME
+    }
 };
+const TEST_UPDATE_USER_EVENT = constructTestApiGatewayEvent({body: JSON.stringify(TEST_USER_UPDATES), pathParameters: {}});
 
-function createResolvedValue(): ResolvedValue<string> {
-    return <ResolvedValue<string>>{
-        userId: updateUserHandlerBody.userId,
-        cognitoUserId: updateUserHandlerBody.cognitoUserId
-    };
-}
-
-const resolvedBody = '{"userId":"1ded3d65-d088-4319-9431-ea5a3323799d","cognitoUserId":"123"}';
-
-describe("updateUserHandler tests", () => {
+describe("handlerName tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it("calls the dynamo client with a update command with the expected values and returns a 200 with the expected response body", async () => {
-        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "updateUser").mockResolvedValue(createResolvedValue());
+    it("returns a 200 and the stringified record in the response when the update is successful", async () => {
+        const updateUserResponse: UpdateItemCommandOutput = {$metadata: {httpStatusCode: 200}};
+        const updateUserSpy = jest.spyOn(DynamoDbClient.prototype, "updateUser").mockResolvedValue(updateUserResponse);
 
-        const updateServiceHandlerResponse = await updateUserHandler({
+        const response = await updateUserHandler(TEST_UPDATE_USER_EVENT);
+
+        expect(updateUserSpy).toHaveBeenCalledWith(TEST_USER_UPDATES.userId, TEST_USER_UPDATES.cognitoUserId, TEST_USER_UPDATES.updates);
+        expect(response).toStrictEqual({
             statusCode: 200,
-            body: JSON.stringify(updateUserHandlerBody)
-        });
-
-        expect(itemSpy).toHaveBeenCalledWith(
-            updateUserHandlerBody.userId,
-            updateUserHandlerBody.cognitoUserId,
-            updateUserHandlerBody.updates
-        );
-
-        expect(updateServiceHandlerResponse).toStrictEqual({
-            statusCode: 200,
-            body: resolvedBody
+            body: JSON.stringify(updateUserResponse)
         });
     });
 
-    it("calls the dynamo client with a update command with the expected values and returns a 500 when the dynamo client throws an error", async () => {
-        const error = "SomeAwsError";
-        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "updateUser").mockRejectedValue(error);
+    it("returns a 500 and a stringified error when the dynamo client throws", async () => {
+        const dynamoErr = "SomeDynamoErr";
+        const updateUserSpy = jest.spyOn(DynamoDbClient.prototype, "updateUser").mockRejectedValue(dynamoErr);
 
-        const updateServiceHandlerResponse = await updateUserHandler({
-            statusCode: 200,
-            body: JSON.stringify(updateUserHandlerBody)
-        });
+        const response = await updateUserHandler(TEST_UPDATE_USER_EVENT);
 
-        expect(itemSpy).toHaveBeenCalledWith(
-            updateUserHandlerBody.userId,
-            updateUserHandlerBody.cognitoUserId,
-            updateUserHandlerBody.updates
-        );
-
-        expect(updateServiceHandlerResponse).toStrictEqual({
+        expect(updateUserSpy).toHaveBeenCalledWith(TEST_USER_UPDATES.userId, TEST_USER_UPDATES.cognitoUserId, TEST_USER_UPDATES.updates);
+        expect(response).toStrictEqual({
             statusCode: 500,
-            body: JSON.stringify(error)
+            body: JSON.stringify(dynamoErr)
         });
     });
 });

@@ -1,63 +1,44 @@
-import {updateServiceHandler} from "../../../src/handlers/dynamodb/update-service";
+import {constructTestApiGatewayEvent} from "../utils";
+import {updateServiceHandler} from "./../../../src/handlers/dynamodb/update-service";
 import DynamoDbClient from "../../../src/dynamodb-client";
-import ResolvedValue = jest.ResolvedValue;
+import {TEST_SERVICE_ID, TEST_SERVICE_NAME} from "../constants";
 
-const randomId = "1234Random";
-jest.mock("crypto", () => ({
-    randomUUID: jest.fn(() => randomId)
-}));
-
-const updateServiceHandlerBody = {
+const TEST_SERVICE_UPDATES = {
+    serviceId: TEST_SERVICE_ID,
     updates: {
-        serviceName: "New Test Service"
-    },
-    serviceId: "1ded3d65-d088-4319-9431-ea5a3323799d"
+        serviceName: TEST_SERVICE_NAME
+    }
 };
+const TEST_UPDATE_SERVICE_EVENT = constructTestApiGatewayEvent({body: JSON.stringify(TEST_SERVICE_UPDATES), pathParameters: {}});
 
-function createResolvedValue(): ResolvedValue<string> {
-    return <ResolvedValue<string>>{
-        serviceId: updateServiceHandlerBody.serviceId,
-        selfServiceClientId: "570278c3-a5fd-4825-a8cf-bfdf578ee7a5"
-    };
-}
-
-const resolvedBody = '{"serviceId":"1ded3d65-d088-4319-9431-ea5a3323799d","selfServiceClientId":"570278c3-a5fd-4825-a8cf-bfdf578ee7a5"}';
-
-describe("updateServiceHandler tests", () => {
+describe("handlerName tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it("calls the dynamo client with a update command with the expected values and returns a 200 with the expected response body", async () => {
-        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "updateService").mockResolvedValue(createResolvedValue());
+    it("returns a 200 and the stringified record in the response when the update is successful", async () => {
+        const serviceUpdateResponse = {message: "All records updated successfully"};
+        const updateServiceSpy = jest.spyOn(DynamoDbClient.prototype, "updateService").mockResolvedValue(serviceUpdateResponse);
 
-        const updateServiceHandlerResponse = await updateServiceHandler({
+        const response = await updateServiceHandler(TEST_UPDATE_SERVICE_EVENT);
+
+        expect(updateServiceSpy).toHaveBeenCalledWith(TEST_SERVICE_UPDATES.serviceId, TEST_SERVICE_UPDATES.updates);
+        expect(response).toStrictEqual({
             statusCode: 200,
-            body: JSON.stringify(updateServiceHandlerBody)
-        });
-
-        expect(itemSpy).toHaveBeenCalledWith(updateServiceHandlerBody.serviceId, updateServiceHandlerBody.updates);
-
-        expect(updateServiceHandlerResponse).toStrictEqual({
-            statusCode: 200,
-            body: resolvedBody
+            body: JSON.stringify(serviceUpdateResponse)
         });
     });
 
-    it("calls the dynamo client with a update command with the expected values and returns a 500 when the dynamo client throws an error", async () => {
-        const error = "SomeAwsError";
-        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "updateService").mockRejectedValue(error);
+    it("returns a 500 and a stringified error when the dynamo client throws", async () => {
+        const dynamoErr = "SomeDynamoErr";
+        const updateServiceSpy = jest.spyOn(DynamoDbClient.prototype, "updateService").mockRejectedValue(dynamoErr);
 
-        const updateServiceHandlerResponse = await updateServiceHandler({
-            statusCode: 200,
-            body: JSON.stringify(updateServiceHandlerBody)
-        });
+        const response = await updateServiceHandler(TEST_UPDATE_SERVICE_EVENT);
 
-        expect(itemSpy).toHaveBeenCalledWith(updateServiceHandlerBody.serviceId, updateServiceHandlerBody.updates);
-
-        expect(updateServiceHandlerResponse).toStrictEqual({
+        expect(updateServiceSpy).toHaveBeenCalledWith(TEST_SERVICE_UPDATES.serviceId, TEST_SERVICE_UPDATES.updates);
+        expect(response).toStrictEqual({
             statusCode: 500,
-            body: JSON.stringify(error)
+            body: JSON.stringify(dynamoErr)
         });
     });
 });

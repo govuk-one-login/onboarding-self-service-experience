@@ -51,10 +51,12 @@ jobs:
           stack-name-prefix: preview-${{ inputs.name }}
           artifact-name: ${{ inputs.artifact }}
           template: ${{ inputs.template }}
+          cache-name: ${{ inputs.name }}
           s3-prefix: sse-preview
           tags: |-
             sse:component=${{ inputs.name }}
             sse:stack-type=preview
+            sse:stack-name=preview-${{ inputs.name }}
             sse:application=self-service
             sse:deployment-source=github-actions
           parameters: |-

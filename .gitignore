@@ -112,3 +112,9 @@ dist
 
 # Credentils
 googleCredentials.json
+
+#test output directory
+ui-automation-tests/output
+
+# PACT
+pacts/
