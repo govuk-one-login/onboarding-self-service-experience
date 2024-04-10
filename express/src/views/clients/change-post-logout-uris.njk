@@ -47,3 +47,15 @@
     href: addPostLogoutUriUrl
   }) }}
 {% endblock %}
+
+ {% block scripts %}
+   {{ga4OnPageLoad({
+     statusCode:"200",
+     englishPageTitle: pageTitle,
+     taxonomyLevel1: taxonomyLevel1,
+     taxonomyLevel2: taxonomyLevel2AdminTool,
+     contentId:"09d3686c-1279-49b8-bf47-e7f3e85baa2d",
+     loggedInStatus:true,
+     dynamic:false
+   })}}
+ {% endblock %}

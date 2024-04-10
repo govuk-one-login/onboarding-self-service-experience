@@ -100,3 +100,7 @@ e.g. `/services/123456/clients`
 `/parents/:parentId/children/:childId`
 
 e.g. `/services/123456/clients/456789`
+
+# To use Google Analytics locally env variable must be set:
+
+COOKIE_DOMAIN=localhost
