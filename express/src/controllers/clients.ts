@@ -208,7 +208,13 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
-    await s4.updateService(serviceId, {service_name: newServiceName}, nonNull(req.session.authenticationResult?.AccessToken));
+    await s4.updateService(
+        serviceId,
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {service_name: newServiceName},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
 
     req.session.updatedField = "service name";
     req.session.serviceName = newServiceName;
