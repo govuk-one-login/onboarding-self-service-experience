@@ -261,4 +261,13 @@
 
 {% block scripts %}
   <script src="/assets/javascripts/toggle-public-key-view.js"></script>
+  {{ga4OnPageLoad({
+    statusCode:"200",
+    englishPageTitle: pageTitle,
+    taxonomyLevel1: taxonomyLevel1,
+    taxonomyLevel2: taxonomyLevel2AdminTool,
+    contentId:"39c305b0-4e95-41c1-95cb-d46ea0307bf0",
+    loggedInStatus:true,
+    dynamic:false
+  })}}
 {% endblock %}
