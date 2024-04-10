@@ -48,6 +48,10 @@
   }) }}
 {% endblock %}
 
+{% block formInputs %}
+  {{ form.urlInput("Post logout redirect URIs") }}
+{% endblock %}
+
  {% block scripts %}
    {{ga4OnPageLoad({
      statusCode:"200",

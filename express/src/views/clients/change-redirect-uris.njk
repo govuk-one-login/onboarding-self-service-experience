@@ -50,6 +50,10 @@
   }) }}
 {% endblock %}
 
+{% block formInputs %}
+  {{ form.urlInput("Redirect URIs") }}
+{% endblock %}
+
  {% block scripts %}
    {{ga4OnPageLoad({
      statusCode:"200",
