@@ -654,6 +654,38 @@ Resources:
           TABLE:
             Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
 
+  UpdateServiceFunction:
+    # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+        External:
+          # AWS SDK v3 dependencies are already included in the lambda runtime
+          - "@aws-sdk/*"
+    Properties:
+      Handler: backend/api/src/handlers/dynamodb/update-service.updateServiceHandler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - DynamoDBWritePolicy:
+            TableName:
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - DynamoDBReadPolicy:
+            TableName:
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
+      Environment:
+        Variables:
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+
   UpdateServiceClientFunction:
     # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
     # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
@@ -902,20 +934,21 @@ Resources:
           # AWS SDK v3 dependencies are already included in the lambda runtime
           - "@aws-sdk/*"
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/update-service.updateServiceHandler
-      Description: Updates service data in DynamoDB
+      Handler: backend/api/src/handlers/step-functions/update-service.doUpdateServiceHandler
+      Description: Updates service data in DynamoDB and Client Registry
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
+        - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
-        - DynamoDBCrudPolicy:
-            TableName:
-              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
-        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: states:StartSyncExecution
+              Resource: !Ref UpdateServiceStepFunction
       Environment:
         Variables:
-          TABLE:
-            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
+          STATE_MACHINE_ARN: !Ref UpdateServiceStepFunction
       Events:
         Api:
           Type: Api
@@ -1037,6 +1070,7 @@ Resources:
                   - !GetAtt PutServiceFunction.Arn
                   - !GetAtt PutServiceUserFunction.Arn
                   - !GetAtt PutServiceClientFunction.Arn
+                  - !GetAtt UpdateServiceFunction.Arn
                   - !GetAtt UpdateServiceClientFunction.Arn
                   - !GetAtt RegisterAuthClientFunction.Arn
                   - !GetAtt UpdateAuthClientFunction.Arn
@@ -1099,6 +1133,24 @@ Resources:
       DefinitionSubstitutions:
         UpdateClientInRegistryFunctionArn: !GetAtt UpdateAuthClientFunction.Arn
         UpdateServiceClientFunctionArn: !GetAtt UpdateServiceClientFunction.Arn
+      Tracing:
+        Enabled: true
+
+  UpdateServiceStepFunction:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Role: !GetAtt StepFunctionExecutionRole.Arn
+      Logging:
+        Level: ALL
+        IncludeExecutionData: True
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StepFunctionsLogGroup.Arn
+      DefinitionUri: state-machines/update-service.json
+      DefinitionSubstitutions:
+        UpdateClientInRegistryFunctionArn: !GetAtt UpdateAuthClientFunction.Arn
+        UpdateServiceFunctionArn: !GetAtt UpdateServiceFunction.Arn
       Tracing:
         Enabled: true
 

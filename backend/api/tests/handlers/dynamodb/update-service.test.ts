@@ -1,15 +1,13 @@
-import {constructTestApiGatewayEvent} from "../utils";
-import {updateServiceHandler} from "./../../../src/handlers/dynamodb/update-service";
+import {updateServiceHandler} from "../../../src/handlers/dynamodb/update-service";
 import DynamoDbClient from "../../../src/dynamodb-client";
-import {TEST_SERVICE_ID, TEST_SERVICE_NAME} from "../constants";
 
-const TEST_SERVICE_UPDATES = {
-    serviceId: TEST_SERVICE_ID,
+const testRegistrationResponse = {
     updates: {
-        serviceName: TEST_SERVICE_NAME
-    }
+        service_name: "My test service 123456"
+    },
+    serviceId: "d0786cde-4e2b-4eec-a271-3a561b8cde1e",
+    clientId: "IiIznOD3UW01zmZInlOEgNYufuk"
 };
-const TEST_UPDATE_SERVICE_EVENT = constructTestApiGatewayEvent({body: JSON.stringify(TEST_SERVICE_UPDATES), pathParameters: {}});
 
 describe("handlerName tests", () => {
     beforeEach(() => {
@@ -20,9 +18,12 @@ describe("handlerName tests", () => {
         const serviceUpdateResponse = {message: "All records updated successfully"};
         const updateServiceSpy = jest.spyOn(DynamoDbClient.prototype, "updateService").mockResolvedValue(serviceUpdateResponse);
 
-        const response = await updateServiceHandler(TEST_UPDATE_SERVICE_EVENT);
+        const response = await updateServiceHandler({
+            statusCode: 200,
+            body: JSON.stringify(testRegistrationResponse)
+        });
 
-        expect(updateServiceSpy).toHaveBeenCalledWith(TEST_SERVICE_UPDATES.serviceId, TEST_SERVICE_UPDATES.updates);
+        expect(updateServiceSpy).toHaveBeenCalledWith(testRegistrationResponse.serviceId, testRegistrationResponse.updates);
         expect(response).toStrictEqual({
             statusCode: 200,
             body: JSON.stringify(serviceUpdateResponse)
@@ -33,9 +34,12 @@ describe("handlerName tests", () => {
         const dynamoErr = "SomeDynamoErr";
         const updateServiceSpy = jest.spyOn(DynamoDbClient.prototype, "updateService").mockRejectedValue(dynamoErr);
 
-        const response = await updateServiceHandler(TEST_UPDATE_SERVICE_EVENT);
+        const response = await updateServiceHandler({
+            statusCode: 200,
+            body: JSON.stringify(testRegistrationResponse)
+        });
 
-        expect(updateServiceSpy).toHaveBeenCalledWith(TEST_SERVICE_UPDATES.serviceId, TEST_SERVICE_UPDATES.updates);
+        expect(updateServiceSpy).toHaveBeenCalledWith(testRegistrationResponse.serviceId, testRegistrationResponse.updates);
         expect(response).toStrictEqual({
             statusCode: 500,
             body: JSON.stringify(dynamoErr)
