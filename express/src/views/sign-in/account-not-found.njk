@@ -11,15 +11,3 @@
     <a class="govuk-link" href="/register">create an account</a>.
   </p>
 {% endblock %}
-
- {% block scripts %}
-   {{ga4OnPageLoad({
-     statusCode:"200",
-     englishPageTitle: pageTitle,
-     taxonomyLevel1: taxonomyLevel1,
-     taxonomyLevel2: taxonomyLevel2Account,
-     contentId:"5d34ba1c-d893-4d36-bd21-6a280e396561",
-     loggedInStatus:false,
-     dynamic:false
-   })}}
- {% endblock %}
