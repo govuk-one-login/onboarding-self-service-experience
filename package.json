@@ -5,7 +5,8 @@
     "ui-automation-tests",
     "backend/api",
     "backend/cognito",
-    "express"
+    "express",
+    "exampleotp-tests"
   ],
   "scripts": {
     "build-express": "npm run build -w express",
@@ -26,7 +27,8 @@
     "lint": "eslint '*.ts' --quiet --fix",
     "acceptance": "npm run acceptance-tests -w ui-automation-tests --",
     "accessibility": "npm run accessibility-tests -w ui-automation-tests --",
-    "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt"
+    "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt",
+    "exampleotp": "npm run exampleotp-tests -w ui-automation-tests --"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.354.0",

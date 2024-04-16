@@ -1,7 +1,7 @@
 import {CodeMismatchException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
-import {isFixedCredential, respondToMFAChallengeForFixedOTPCredential} from "../lib/fixedOTPSupport";
+import {isFixedOTPCredential, respondToMFAChallengeForFixedOTPCredential} from "../lib/fixedOTP";
 import console from "console";
 
 export default async function processSecurityCode(req: Request, res: Response, next: NextFunction) {
@@ -18,7 +18,7 @@ export default async function processSecurityCode(req: Request, res: Response, n
         const userName = req.session.emailAddress as string;
         const securityCode = req.body.securityCode;
 
-        if (isFixedCredential(userName)) {
+        if (isFixedOTPCredential(userName)) {
             const userPassword: string = req.session.password as string;
 
             respondToMFAChallengeForFixedOTPCredential(userName, securityCode);
@@ -30,7 +30,7 @@ export default async function processSecurityCode(req: Request, res: Response, n
             req.session.cognitoSession = response.Session;
             req.session.authenticationResult = response.AuthenticationResult;
 
-            // Now reset MFA Preferences to ensure Account remains 'pure' in term sof normal accounts.
+            // Now reset MFA Preferences to ensure Account remains 'pure' in terms of normal accounts.
             await s4.setMfaPreference(userName);
         } else {
             req.session.authenticationResult = await s4.respondToMfaChallenge(req.session.mfaResponse, securityCode);

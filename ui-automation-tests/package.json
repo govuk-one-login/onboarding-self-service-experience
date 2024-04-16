@@ -6,7 +6,8 @@
     "acceptance-tests-fast": "npm run acceptance-tests -- --parallel 5",
     "acceptance-tests-report": "npm run acceptance-tests -- --format html:test-report.html",
     "accessibility-tests": "cucumber-js  accessibility-features",
-    "accessibility-report": "npm run accessibility-tests -- --format html:test-report.html"
+    "accessibility-report": "npm run accessibility-tests -- --format html:test-report.html",
+    "exampleotp-tests": "cucumber-js  exampleotp-features"
   },
   "devDependencies": {
     "@axe-core/puppeteer": "^4.8.5",

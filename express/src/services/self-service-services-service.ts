@@ -170,7 +170,7 @@ export default class SelfServiceServicesService {
     }
 
     async setSignUpStatus(userName: string, signUpStatusStage: SignupStatusStage): Promise<void> {
-        console.log("Setting Sign Up Status Stage =>" + signUpStatusStage);
+        console.info("In self-service-services-service:setSignUpStatus()");
 
         const signUpStatus: SignupStatus = await this.getSignUpStatus(userName);
         signUpStatus.setStage(signUpStatusStage, true);

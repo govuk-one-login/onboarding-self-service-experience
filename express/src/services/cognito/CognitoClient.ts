@@ -28,7 +28,14 @@ import {Command} from "@aws-sdk/types";
 import {cognito, region} from "../../config/environment";
 import CognitoInterface from "./CognitoInterface";
 import console from "console";
-import {fixedOTPInitialise, getFixedOTPTemporaryPassword, isFixedCredential, verifyMobileUsingOTPCode} from "../../lib/fixedOTPSupport";
+import {
+    fixedOTPInitialise,
+    getFixedOTPCredentialEmailAddress,
+    getFixedOTPCredentialTemporaryPassword,
+    isFixedOTPCredential,
+    isPseudonymisedFixedOTPCredential,
+    verifyMobileUsingOTPCode
+} from "../../lib/fixedOTP";
 import * as process from "process";
 
 type CognitoCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes> = Command<
@@ -49,7 +56,6 @@ export default class CognitoClient implements CognitoInterface {
     private readonly client;
 
     constructor() {
-        console.log("Creating Cognito client...");
         this.clientId = nonNull(cognito.clientId);
         this.userPoolId = nonNull(cognito.userPoolId);
         this.client = new CognitoIdentityProviderClient({region: region});
@@ -64,7 +70,7 @@ export default class CognitoClient implements CognitoInterface {
 
         this.client.send(updateUserPoolClientCommand);
 
-        // Initialise OTP Credentials
+        // Initialise Fixed OTP Credentials
         if (process.env.USE_STUB_OTP == "true") {
             fixedOTPInitialise();
         }
@@ -73,10 +79,11 @@ export default class CognitoClient implements CognitoInterface {
     async createUser(email: string): Promise<void> {
         console.log("In CognitoClient:createUser");
 
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
         let temporaryPassword: string;
 
-        if (isFixedCredential(email)) {
-            temporaryPassword = getFixedOTPTemporaryPassword(email);
+        if (isFixedOTPCredential(email)) {
+            temporaryPassword = getFixedOTPCredentialTemporaryPassword(email);
         } else {
             temporaryPassword = Math.floor(Math.random() * 100_000)
                 .toString()
@@ -85,30 +92,31 @@ export default class CognitoClient implements CognitoInterface {
 
         await this.sendCommand(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
-            Username: email,
+            Username: cognitoUserName,
             UserPoolId: this.userPoolId,
             TemporaryPassword: temporaryPassword,
             UserAttributes: [
-                {Name: "email", Value: email},
+                {Name: "email", Value: cognitoUserName},
                 {Name: "custom:signup_status", Value: ""}
             ]
         });
-        console.log("Exit createUser");
     }
 
     async recoverUser(email: string): Promise<void> {
         console.log("In CognitoClient:recoverUser");
 
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
+
         await this.sendCommand(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
             MessageAction: "SUPPRESS",
-            Username: email,
+            Username: cognitoUserName,
             UserPoolId: this.userPoolId,
             TemporaryPassword: Math.floor(Math.random() * 100_000)
                 .toString()
                 .padStart(6, "0"),
             UserAttributes: [
-                {Name: "email", Value: email},
+                {Name: "email", Value: cognitoUserName},
                 {Name: "custom:signup_status", Value: "HasEmail,HasPassword,HasPhoneNumber,HasTextCode"}
             ]
         });
@@ -117,10 +125,11 @@ export default class CognitoClient implements CognitoInterface {
     async resendEmailAuthCode(email: string): Promise<void> {
         console.info("In CognitoClient:resendEmailAuthCode()");
 
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
         let temporaryPassword: string;
 
-        if (isFixedCredential(email)) {
-            temporaryPassword = getFixedOTPTemporaryPassword(email);
+        if (isFixedOTPCredential(email)) {
+            temporaryPassword = getFixedOTPCredentialTemporaryPassword(email);
         } else {
             temporaryPassword = Math.floor(Math.random() * 100_000)
                 .toString()
@@ -129,23 +138,25 @@ export default class CognitoClient implements CognitoInterface {
 
         await this.sendCommand(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
-            Username: email,
+            Username: cognitoUserName,
             UserPoolId: this.userPoolId,
             MessageAction: "RESEND",
             TemporaryPassword: temporaryPassword,
-            UserAttributes: [{Name: "email", Value: email}]
+            UserAttributes: [{Name: "email", Value: cognitoUserName}]
         });
     }
 
     login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
         console.info("In CognitoClient:login()");
 
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
+
         return this.sendCommand(AdminInitiateAuthCommand, {
             UserPoolId: this.userPoolId,
             ClientId: this.clientId,
             AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
             AuthParameters: {
-                USERNAME: email,
+                USERNAME: cognitoUserName,
                 PASSWORD: password
             }
         });
@@ -166,11 +177,13 @@ export default class CognitoClient implements CognitoInterface {
     setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
         console.info("In CognitoClient:setNewPassword()");
 
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
+
         return this.sendCommand(RespondToAuthChallengeCommand, {
             ChallengeName: "NEW_PASSWORD_REQUIRED",
             ChallengeResponses: {
                 NEW_PASSWORD: password,
-                USERNAME: email
+                USERNAME: cognitoUserName
             },
             ClientId: this.clientId,
             Session: session
@@ -190,49 +203,57 @@ export default class CognitoClient implements CognitoInterface {
     async forgotPassword(email: string, protocol: string, host: string, useRecoveredAccountURL: boolean): Promise<void> {
         console.info("In CognitoClient:forgotPassword()");
 
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
+
         await this.sendCommand(ForgotPasswordCommand, {
             ClientId: this.clientId,
-            Username: email,
+            Username: cognitoUserName,
             ClientMetadata: {
                 protocol,
                 host: host.split("").join("/"),
-                username: email,
+                username: cognitoUserName,
                 use_recovered_account_url: useRecoveredAccountURL ? "true" : "false"
             }
         });
     }
 
-    async confirmForgotPassword(username: string, password: string, confirmationCode: string): Promise<void> {
+    async confirmForgotPassword(emailAddress: string, password: string, confirmationCode: string): Promise<void> {
         console.info("In CognitoClient:confirmForgotPassword()");
+
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
         await this.sendCommand(ConfirmForgotPasswordCommand, {
             ClientId: this.clientId,
-            Username: username,
+            Username: cognitoUserName,
             Password: password,
             ConfirmationCode: confirmationCode,
             ClientMetadata: {
-                email: username
+                email: cognitoUserName
             }
         });
     }
 
-    async setUserPassword(userName: string, password: string): Promise<void> {
+    async setUserPassword(emailAddress: string, password: string): Promise<void> {
         console.info("In CognitoClient:setUserPassword()");
+
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
         await this.sendCommand(AdminSetUserPasswordCommand, {
             Password: password,
             Permanent: true,
-            Username: userName,
+            Username: cognitoUserName,
             UserPoolId: this.userPoolId
         });
     }
 
-    async setEmailAsVerified(username: string): Promise<void> {
+    async setEmailAsVerified(email: string): Promise<void> {
         console.info("In CognitoClient:setEmailVerified()");
+
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
 
         await this.sendCommand(AdminUpdateUserAttributesCommand, {
             UserPoolId: this.userPoolId,
-            Username: username,
+            Username: cognitoUserName,
             UserAttributes: [
                 {
                     Name: "email_verified",
@@ -242,13 +263,14 @@ export default class CognitoClient implements CognitoInterface {
         });
     }
 
-    async setSignUpStatus(username: string, status: string): Promise<void> {
+    async setSignUpStatus(emailAddress: string, status: string): Promise<void> {
         console.info("In CognitoClient:setSignUpStatus()");
-        console.info("Setting Status => " + status);
+
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
         await this.sendCommand(AdminUpdateUserAttributesCommand, {
             UserPoolId: this.userPoolId,
-            Username: username,
+            Username: cognitoUserName,
             UserAttributes: [
                 {
                     Name: "custom:signup_status",
@@ -258,23 +280,27 @@ export default class CognitoClient implements CognitoInterface {
         });
     }
 
-    async adminGetUserCommandOutput(userName: string): Promise<AdminGetUserCommandOutput> {
+    async adminGetUserCommandOutput(emailAddress: string): Promise<AdminGetUserCommandOutput> {
         console.info("In CognitoClient:adminGetUserCommandOutput()");
+
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
         const command = new AdminGetUserCommand({
             UserPoolId: this.userPoolId,
-            Username: userName
+            Username: cognitoUserName
         });
 
         return this.client.send(command);
     }
 
-    async setMobilePhoneAsVerified(username: string): Promise<void> {
+    async setMobilePhoneAsVerified(emailAddress: string): Promise<void> {
         console.info("In CognitoClient:setMobilePhoneAsVerified()");
+
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
         await this.sendCommand(AdminUpdateUserAttributesCommand, {
             UserPoolId: this.userPoolId,
-            Username: username,
+            Username: cognitoUserName,
             UserAttributes: [
                 {
                     Name: "phone_number_verified",
@@ -284,12 +310,14 @@ export default class CognitoClient implements CognitoInterface {
         });
     }
 
-    async setPhoneNumber(username: string, phoneNumber: string): Promise<void> {
+    async setPhoneNumber(emailAddress: string, phoneNumber: string): Promise<void> {
         console.info("In CognitoClient:setPhoneNumber()");
+
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
         await this.sendCommand(AdminUpdateUserAttributesCommand, {
             UserPoolId: this.userPoolId,
-            Username: username,
+            Username: cognitoUserName,
             UserAttributes: [
                 {
                     Name: "phone_number",
@@ -314,7 +342,7 @@ export default class CognitoClient implements CognitoInterface {
     async verifyMobileUsingSmsCode(accessToken: string, code: string, emailAddress: string): Promise<void> {
         console.info("In CognitoClient:verifyMobileUsingSmsCode()");
 
-        if (isFixedCredential(emailAddress)) {
+        if (isFixedOTPCredential(emailAddress)) {
             verifyMobileUsingOTPCode(emailAddress, code);
         } else {
             await this.sendCommand(VerifyUserAttributeCommand, {
@@ -325,39 +353,45 @@ export default class CognitoClient implements CognitoInterface {
         }
     }
 
-    async setMfaPreference(cognitoUsername: string): Promise<void> {
+    async setMfaPreference(userName: string): Promise<void> {
         console.info("In CognitoClient:setMfaPreference()");
+
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(userName);
 
         await this.sendCommand(AdminSetUserMFAPreferenceCommand, {
             SMSMfaSettings: {
                 Enabled: true,
                 PreferredMfa: true
             },
-            Username: cognitoUsername,
+            Username: cognitoUserName,
             UserPoolId: this.userPoolId
         });
     }
 
-    async resetMfaPreference(cognitoUsername: string): Promise<void> {
+    async resetMfaPreference(username: string): Promise<void> {
         console.info("In CognitoClient:resetMfaPreference()");
+
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(username);
 
         await this.sendCommand(AdminSetUserMFAPreferenceCommand, {
             SMSMfaSettings: {
                 Enabled: false
             },
-            Username: cognitoUsername,
+            Username: cognitoUserName,
             UserPoolId: this.userPoolId
         });
     }
 
-    respondToMfaChallenge(username: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
+    respondToMfaChallenge(emailAddress: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
         console.info("In CognitoClient:respondToMfaChallenge()");
+
+        const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
         return this.sendCommand(AdminRespondToAuthChallengeCommand, {
             ChallengeName: "SMS_MFA",
             ChallengeResponses: {
                 SMS_MFA_CODE: mfaCode,
-                USERNAME: username
+                USERNAME: cognitoUserName
             },
             ClientId: this.clientId,
             UserPoolId: this.userPoolId,
@@ -383,5 +417,15 @@ export default class CognitoClient implements CognitoInterface {
         commandInput: Input
     ): Promise<ServiceOutputTypes> {
         return this.client.send(new commandConstructor(commandInput));
+    }
+
+    private translatePseudonymisedEmailAddress(target: string): string {
+        let translatedEmailAddress = target;
+
+        if (isPseudonymisedFixedOTPCredential(target)) {
+            translatedEmailAddress = getFixedOTPCredentialEmailAddress(target);
+        }
+
+        return translatedEmailAddress;
     }
 }
