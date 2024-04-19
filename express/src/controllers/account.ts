@@ -40,7 +40,7 @@ export const changePassword: RequestHandler = async (req, res) => {
         await s4.changePassword(accessToken, currentPassword, newPassword);
     } catch (error) {
         if (error instanceof CognitoIdentityProviderServiceException) {
-            const options: Record<string, Record<string, string>> = {values: {newPassword: newPassword}};
+            const options: Record<string, Record<string, string>> = {values: {newPassword: newPassword}, errorMessages: {}};
 
             if (error instanceof LimitExceededException) {
                 options.errorMessages.newPassword = "You have tried to change your password too many times. Try again in 15 minutes.";
