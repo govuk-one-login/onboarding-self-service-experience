@@ -8,7 +8,7 @@ jest.mock("../../src/lib/fixedOTP", () => ({
 }));
 
 import processSignInForm from "../../src/middleware/process-sign-in-form";
-import {mockCogntioInterface, mockLambdaFacade, request, response} from "../mocks";
+import {request, response} from "../mocks";
 import {NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import SelfServiceServicesService from "../../src/services/self-service-services-service";
 import {AxiosResponse} from "axios";
@@ -46,9 +46,6 @@ describe("processSignInForm tests", () => {
                 },
                 body: {
                     password: password
-                },
-                app: {
-                    get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
                 }
             });
             const mockResponse = response();
@@ -77,9 +74,6 @@ describe("processSignInForm tests", () => {
             },
             body: {
                 password: TEST_PASSWORD
-            },
-            app: {
-                get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
             },
             ip: TEST_IP_ADDRESS
         });
@@ -119,10 +113,7 @@ describe("processSignInForm tests", () => {
             body: {
                 password: TEST_PASSWORD
             },
-            ip: TEST_IP_ADDRESS,
-            app: {
-                get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
-            }
+            ip: TEST_IP_ADDRESS
         });
         const mockResponse = response();
         const processSignInFormMiddleware = processSignInForm(TEST_TEMPLATE_PATH);
@@ -143,10 +134,7 @@ describe("processSignInForm tests", () => {
             body: {
                 password: TEST_PASSWORD
             },
-            ip: TEST_IP_ADDRESS,
-            app: {
-                get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
-            }
+            ip: TEST_IP_ADDRESS
         });
         const mockResponse = response();
         const processSignInFormMiddleware = processSignInForm(TEST_TEMPLATE_PATH);
@@ -168,10 +156,7 @@ describe("processSignInForm tests", () => {
             body: {
                 password: TEST_PASSWORD
             },
-            ip: TEST_IP_ADDRESS,
-            app: {
-                get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
-            }
+            ip: TEST_IP_ADDRESS
         });
         const mockResponse = response();
         const processSignInFormMiddleware = processSignInForm(TEST_TEMPLATE_PATH);

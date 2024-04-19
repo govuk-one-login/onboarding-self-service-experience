@@ -121,9 +121,6 @@ describe("processSecurityCode tests", () => {
                 id: TEST_SESSION_ID,
                 mobileNumber: TEST_PHONE_NUMBER
             },
-            app: {
-                get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
-            },
             body: {
                 securityCode: TEST_SECURITY_CODE
             },
@@ -172,9 +169,6 @@ describe("processSecurityCode tests", () => {
                 id: TEST_SESSION_ID,
                 mobileNumber: TEST_PHONE_NUMBER
             },
-            app: {
-                get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
-            },
             body: {
                 securityCode: TEST_SECURITY_CODE
             },
@@ -207,9 +201,6 @@ describe("processSecurityCode tests", () => {
                 password: TEST_PASSWORD,
                 id: TEST_SESSION_ID,
                 mobileNumber: TEST_PHONE_NUMBER
-            },
-            app: {
-                get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
             },
             body: {
                 securityCode: TEST_SECURITY_CODE
