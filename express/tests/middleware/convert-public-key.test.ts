@@ -1,5 +1,4 @@
 import convertPublicKeyForAuth from "../../src/middleware/convert-public-key";
-import {TEST_CLIENT_ID, TEST_PUBLIC_KEY, TEST_SELF_SERVICE_CLIENT_ID, TEST_SERVICE_ID} from "../constants";
 import {publicKeyCompact, publicKeyWithHeaders} from "../lib/public-key.test";
 import {request, response} from "../mocks";
 import {
@@ -8,7 +7,9 @@ import {
     TEST_IP_ADDRESS,
     TEST_SELF_SERVICE_CLIENT_ID,
     TEST_SERVICE_ID,
-    TEST_SESSION_ID
+    TEST_SESSION_ID,
+    TEST_PUBLIC_KEY,
+    TEST_BAD_PUBLIC_KEY
 } from "../constants";
 
 describe("Validate and convert submitted public key", () => {
@@ -59,6 +60,7 @@ describe("Validate and convert submitted public key", () => {
     });
 
     it("Fail if public key unsuccessfully converted", () => {
+        const next = jest.fn();
         const mockReq = request({
             body: {
                 serviceUserPublicKey: "123"
@@ -74,9 +76,13 @@ describe("Validate and convert submitted public key", () => {
                 authenticationResult: TEST_AUTHENTICATION_RESULT,
                 id: TEST_SESSION_ID
             },
+            query: {
+                publicKey: TEST_BAD_PUBLIC_KEY
+            },
             path: ".",
             ip: TEST_IP_ADDRESS
         });
+        const res = response();
 
         convertPublicKeyForAuth(mockReq, res, next);
 
@@ -88,7 +94,7 @@ describe("Validate and convert submitted public key", () => {
             errorMessages: {
                 serviceUserPublicKey: "Enter a valid public key"
             },
-            serviceUserPublicKey: mockReq.body.authCompliantPublicKey
+            serviceUserPublicKey: TEST_BAD_PUBLIC_KEY
         });
         expect(next).not.toHaveBeenCalled();
     });
