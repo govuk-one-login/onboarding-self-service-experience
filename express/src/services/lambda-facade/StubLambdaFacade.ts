@@ -166,6 +166,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         },
                         data: {S: "SAM Service as a Service Service"},
                         redirect_uris: convertToAttr(this.redirectUris),
+                        token_endpoint_auth_method: {S: "private_key_jwt"},
                         sk: {S: "client#d61db4f3-7403-431d-9ead-14cc96476ce4"},
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
                         service_type: {S: "MANDATORY"},

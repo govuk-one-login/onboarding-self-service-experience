@@ -115,3 +115,4 @@ Feature: Users can change their public key, and toggle visibility
       Then they are able see their full public key
       When they click on the link that points to "/change-public-key"
       Then they should see the public key they just entered
+
