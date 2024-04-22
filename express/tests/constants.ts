@@ -9,6 +9,8 @@ export const TEST_NEW_PASSWORD = "superSecurePassword456";
 export const TEST_FIRST_NAME = "firstName";
 export const TEST_LAST_NAME = "lastName";
 export const TEST_FULL_NAME = `${TEST_FIRST_NAME} ${TEST_LAST_NAME}`;
+export const TEST_HOST_NAME = "someHost";
+export const TEST_PROTOCOL = "https";
 export const TEST_TIMESTAMP = 1713537678754;
 export const TEST_DYNAMO_USER = {
     pk: {S: "user#12345"},
