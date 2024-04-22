@@ -1,3 +1,5 @@
+import {Service} from "../@types/Service";
+
 export const TEST_TEMPLATE_PATH = "some/template/to/render";
 export const TEST_PASSWORD = "somePassword";
 export const TEST_EMAIL = "someEmail";
@@ -50,6 +52,9 @@ export const TEST_USER = {
     mobileNumber: TEST_PHONE_NUMBER,
     passwordLastUpdated: "2024-04-19T14:41:18.754Z"
 };
-
+export const TEST_SERVICE: Service = {
+    id: "service#123",
+    serviceName: "someService"
+};
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>
     "someHeader." + Buffer.from(JSON.stringify(jwtBody)).toString("base64") + ".someSignature";
