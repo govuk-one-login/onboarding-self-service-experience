@@ -1,0 +1,25 @@
+{% extends "layouts/form.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% set pageTitle = "Change scopes" %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/
+{% endset %}
+{% set formCancelUrl = backLinkPath %}
+{% set formButtonText = "Confirm" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Enter scopes</h1>
+
+  <p class="govuk-body">Choose the user attributes you want your service to receive.
+  </p>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.checkboxesInput("Select all that apply.", "scopes", [
+    {text: "Email address", value: "email", checked: email},
+    {text: "Phone number", value: "phone", checked: phone}
+  ], selectedScopes) }}
+{% endblock %}

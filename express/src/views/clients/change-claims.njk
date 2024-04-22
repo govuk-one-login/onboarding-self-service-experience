@@ -1,0 +1,20 @@
+{% extends "layouts/form.njk" %}
+
+{% set pageTitle = "Select claims" %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/
+{% endset %}
+{% set formCancelUrl = backLinkPath %}
+{% set formButtonText = "Confirm" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Select claims</h1>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.checkboxesInput("Select all that apply", "claims", [
+    {text: "Address", value: "address", checked: address},
+    {text: "coreIdentityJWT", value: "coreIdentityJWT", checked: coreIdentityJWT},
+    {text: "ReturnCode", value: "returnCode", checked: returnCode}
+  ], claims) }}
+{% endblock %}
