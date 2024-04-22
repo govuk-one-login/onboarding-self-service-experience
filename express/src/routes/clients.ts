@@ -8,6 +8,7 @@ import {
     processChangeScopesForm,
     processConfirmContactRemovalForm,
     processEnterContactEmailForm,
+    processEnterClientSecretHashForm,
     processPublicBetaForm,
     showChangeBackChannelLogoutUriForm,
     showChangePostLogoutUrisForm,
@@ -18,6 +19,7 @@ import {
     showChangeScopesForm,
     showClient,
     showConfirmContactRemovalForm,
+    showEnterClientSecretHashForm,
     showEnterContactEmailForm,
     showEnterContactForm,
     showPublicBetaForm,
@@ -105,3 +107,8 @@ router
     .route("/:clientId/:selfServiceClientId/change-sector-identifier-uri")
     .get(showChangeSectorIdentifierUriForm)
     .post(validateUri("clients/change-sector-identifier-uri.njk", "sectorIdentifierUri", true), processChangeSectorIdentifierUriForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/enter-client-secret-hash")
+    .get(showEnterClientSecretHashForm)
+    .post(processEnterClientSecretHashForm);

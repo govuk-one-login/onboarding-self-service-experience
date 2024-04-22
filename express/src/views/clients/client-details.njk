@@ -4,6 +4,17 @@
 
 {% set pageTitle = "Client details" %}
 
+{% set userAttributes %}
+  <div id="userAttributes">
+    {% for item in userAttributesRequired %}
+      {% if item == "openid" %}OpenID<br>{% endif %}
+      {% if item == "email" %}Email address<br>{% endif %}
+      {% if item == "phone" %}Phone number<br>{% endif %}
+      {% if item == "offline_access" %}Offline access{% endif %}
+    {% endfor %}
+  </div>
+{% endset %}
+
 {% block mainContent %}
   {% if updatedField %}
     {% call govukNotificationBanner({type: 'success'}) %}
@@ -24,27 +35,6 @@
 
   {% set clientIdContainer %}
     <code id="client-id-value">{{ clientId }}</code>
-  {% endset %}
-
-  {% set publicKeyLabel %}
-    <span id="public-key">Public key</span>
-  {% endset %}
-
-  {% set publicKeyContainer %}
-    <div id="publicKeyContainer" class="govuk-body">
-      {% if userPublicKey %}
-        <div id="publicKeyShort" aria-labelledby="public-key"><code>{{ userPublicKey.slice(0, 24) }} ...</code></div>
-        <div id="publicKeyLong" class="govuk-!-display-none"><code>{{ userPublicKey }}</code></div>
-        <button type="button" id="togglePublicKey" class="govuk-accordion__show-all" aria-expanded="false">
-            <span class="govuk-accordion__section-toggle-focus">
-              <span id="toggleTextChevron" class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down"></span>
-              <span id="buttonText" class="govuk-accordion__section-toggle-text">Show the full public key</span>
-            </span>
-        </button>
-      {% else %}
-        Not added yet
-      {% endif %}
-    </div>
   {% endset %}
 
   {% set redirectUrisContainer %}
@@ -126,17 +116,6 @@
 
   {{ govukSummaryList({
     rows: [
-      {
-        key: {html: publicKeyLabel},
-        value: {html: publicKeyContainer},
-        actions: {
-          items: [{
-            href: urls.changePublicKey,
-            text: "Change",
-            visuallyHiddenText: "public key"
-          }]
-        }
-      },
       {
         key: {text: "Redirect URIs"},
         value: {html: redirectUrisContainer},
@@ -230,7 +209,12 @@
             visuallyHiddenText: "scopes"
           }]
         }
-      },
+      }
+    ]
+  }) }}
+
+  {{ govukSummaryList({
+    rows: [
       {
         key: {text: "Identity verification enabled"},
         value: {html: idVerificationEnabledUriContainer}
@@ -256,6 +240,65 @@
   }) }}
   {% endif %}
 
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Client authentication</h2>
+
+  {% set authMethodContainer %}
+    <code id="auth-method-value">{{ authMethod }}</code>
+  {% endset %}
+
+  {% set publicKeyLabel %}
+    <span id="public-key">
+      {% if "client_secret_post" == authMethod  %}
+        Client Secret Hash
+      {% else %}
+        Public Key
+      {% endif %}
+    </span>
+  {% endset %}
+
+  {% set publicKeyContainer %}
+    <div id="publicKeyContainer" class="govuk-body">
+      {% if displayedKey %}
+        <div id="publicKeyShort" aria-labelledby="public-key"><code>{{ displayedKey.slice(0, 24) }} ...</code></div>
+        <div id="publicKeyLong" class="govuk-!-display-none"><code>{{ displayedKey }}</code></div>
+        <button type="button" id="togglePublicKey" class="govuk-accordion__show-all" aria-expanded="false">
+          <span class="govuk-accordion__section-toggle-focus">
+            <span id="toggleTextChevron" class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down"></span>
+            <span id="buttonText" class="govuk-accordion__section-toggle-text">
+              {% if "client_secret_post" == authMethod  %}
+                Show the full client secret hash
+              {% else %}
+                Show the full public key
+              {% endif %}
+            </span>
+          </span>
+        </button>
+      {% else %}
+        Not added yet
+      {% endif %}
+    </div>
+  {% endset %}
+
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: {text: "Authentication method"},
+        value: {html: authMethodContainer}
+      },
+      {
+        key: {html: publicKeyLabel},
+        value: {html: publicKeyContainer},
+        actions: {
+          items: [{
+            href: urls.changeKeyUri,
+            text: "Change",
+            visuallyHiddenText: "change key value"
+          }]
+        }
+      }
+    ]
+  }) }}
+
   <details class="govuk-details" data-module="govuk-details" id="client-details-summary">
     <summary class="govuk-details__summary" id="client-details-summary-toggle">
       <span class="govuk-details__summary-text">Help with API terms</span>
@@ -263,11 +306,6 @@
     <div class="govuk-details__text">
       <span class="govuk-body govuk-!-font-weight-bold">Back channel logouts</span>
       <p class="govuk-body">Read the <a class="govuk-link" href="https://openid.net/specs/openid-connect-backchannel-1_0.html#Backchannel">technical documents on back channel logouts</a>.</p>
-
-      <span class="govuk-body govuk-!-font-weight-bold">Claims</span>
-      <p class="govuk-body">Read the <a class="govuk-link" rel="noreferrer noopener" target="_blank"
-                                                href="https://docs.sign-in.service.gov.uk/before-integrating/choose-which-user-attributes-your-service-can-request/">technical documents on claims</a>.</p>
-
       <span class="govuk-body govuk-!-font-weight-bold">Client ID</span>
       <p class="govuk-body">Our API uses this to uniquely identify your client when it makes requests. You cannot change this.</p>
 
