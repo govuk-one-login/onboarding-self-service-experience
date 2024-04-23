@@ -114,7 +114,10 @@ Globals:
       SecurityGroupIds: [ !ImportValue VPC-VPCEndpointsSecurityGroup ]
       SubnetIds: !Split [ ",", !ImportValue VPC-PrivateSubnets ]
     LoggingConfig:
+      ApplicationLogLevel: INFO
+      LogFormat: JSON
       LogGroup: !Ref LambdaLogsGroup
+      SystemLogLevel: INFO
     CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
     Layers:
       - !If
@@ -289,8 +292,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: src/handlers/send-password-changed-email.handler
       Description: Send an email to confirm the user's password has been changed
@@ -331,8 +333,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: src/handlers/create-password-reset-message.handler
       Description: Create a customised email message to send when resetting the user's password
@@ -360,8 +361,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: src/handlers/send-security-code-text-message.lambdaHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
