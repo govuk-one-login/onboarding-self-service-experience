@@ -89,6 +89,14 @@ Mappings:
       cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+  WafArn:
+    Environment:
+      local: "/self-service/development/waf-web-acl"
+      dev: "/self-service/development/waf-web-acl"
+      build: "/self-service/build/waf-web-acl"
+      staging: "/self-service/staging/waf-web-acl"
+      integration: "/self-service/integration/waf-web-acl"
+      production: "/self-service/production/waf-web-acl"
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
@@ -995,7 +1003,9 @@ Resources:
   CognitoWebACLAssociation:
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
-      WebACLArn: !ImportValue self-service-waf-acl-arn
+      WebACLArn: !Sub
+        - "{{resolve:ssm:${WafArnParam}}}"
+        - WafArnParam: !FindInMap [ WafArn, Environment, !Ref Environment ]
       ResourceArn: !GetAtt UserPool.Arn
 
 Outputs:
