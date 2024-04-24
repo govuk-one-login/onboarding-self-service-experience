@@ -1,17 +1,18 @@
-import {constructTestApiGatewayEvent} from "../utils";
-import {putUserHandler} from "./../../../src/handlers/dynamodb/put-user";
+import {putUserHandler} from "../../../src/handlers/dynamodb/put-user";
 import DynamoDbClient from "../../../src/dynamodb-client";
 import {PutItemCommandOutput} from "@aws-sdk/client-dynamodb";
 import {TEST_USER_EMAIL, TEST_USER_PHONE_NUMBER} from "../constants";
+import {handlerInvokeEvent} from "../../../src/handlers/handler-utils";
 
 const TEST_USER = {
     userEmail: TEST_USER_EMAIL,
     phone: TEST_USER_PHONE_NUMBER
 };
-const TEST_PUT_USER_EVENT = constructTestApiGatewayEvent({
-    body: JSON.stringify(TEST_USER),
-    pathParameters: {}
-});
+
+const TEST_PUT_USER_EVENT: handlerInvokeEvent = {
+    statusCode: 200,
+    body: JSON.stringify(TEST_USER)
+};
 
 describe("putUserHandler tests", () => {
     beforeEach(() => {

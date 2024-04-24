@@ -1,8 +1,8 @@
-import {constructTestApiGatewayEvent} from "../utils";
-import {updateUserHandler} from "./../../../src/handlers/dynamodb/update-user";
+import {updateUserHandler} from "../../../src/handlers/dynamodb/update-user";
 import DynamoDbClient from "../../../src/dynamodb-client";
 import {TEST_COGNITO_USER_ID, TEST_SERVICE_NAME, TEST_USER_ID} from "../constants";
 import {UpdateItemCommandOutput} from "@aws-sdk/client-dynamodb";
+import {handlerInvokeEvent} from "../../../src/handlers/handler-utils";
 
 const TEST_USER_UPDATES = {
     userId: TEST_USER_ID,
@@ -11,7 +11,11 @@ const TEST_USER_UPDATES = {
         serviceName: TEST_SERVICE_NAME
     }
 };
-const TEST_UPDATE_USER_EVENT = constructTestApiGatewayEvent({body: JSON.stringify(TEST_USER_UPDATES), pathParameters: {}});
+
+const TEST_UPDATE_USER_EVENT: handlerInvokeEvent = {
+    statusCode: 200,
+    body: JSON.stringify(TEST_USER_UPDATES)
+};
 
 describe("handlerName tests", () => {
     beforeEach(() => {
