@@ -25,6 +25,7 @@
     "test": "jest --silent",
     "test:cov": "jest --silent --coverage",
     "lint": "prettier . --check ; eslint '*.ts' --quiet --fix",
+    "lint:fix": "prettier . --write ; eslint . --fix",
     "acceptance": "npm run acceptance-tests -w ui-automation-tests --",
     "accessibility": "npm run accessibility-tests -w ui-automation-tests --",
     "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt",
