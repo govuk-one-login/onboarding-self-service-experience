@@ -9,7 +9,7 @@ onboarding instructions.
 
 ## Developer tools
 
-Install SAM if it is not already installed
+Install SAM if it's not already installed
 
 ```shell
 brew tap aws/tap
