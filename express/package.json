@@ -14,14 +14,14 @@
     "build": "npm run buildts && npm run buildsass && npm run buildjs && npm run buildgovuk && npm run minifyjs",
     "coverage": "jest --coverage --coverageDirectory coverage --silent",
     "test": "jest --silent",
-    "cucumber": "npm run cucumber -w ../acceptance-tests --",
+    "acceptance": "npm run acceptance-tests -w ../ui-automation-tests --",
     "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile-dev .."
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.354.0",
     "@aws-sdk/client-sqs": "^3.398.0",
     "connect-dynamodb": "^3.0.0",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "express-session": "^1.17.3",
     "govuk-frontend": "^4.8.0",

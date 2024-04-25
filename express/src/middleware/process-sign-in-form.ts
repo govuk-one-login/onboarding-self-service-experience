@@ -4,14 +4,28 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 import console from "console";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import * as process from "process";
+import {
+    getFixedOTPCredentialEmailAddress,
+    getFixedOTPCredentialPassword,
+    isFixedOTPCredential,
+    isPseudonymisedFixedOTPCredential
+} from "../lib/fixedOTP";
 
 export default function processSignInForm(template: string): RequestHandler {
     console.info("In processSignInForm()");
 
     return async (req, res) => {
-        const email = req.session.emailAddress as string;
-        const password = req.body.password;
+        let email = req.session.emailAddress as string;
+        let password = req.body.password;
         const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+        if (isPseudonymisedFixedOTPCredential(email)) {
+            email = getFixedOTPCredentialEmailAddress(email);
+        }
+
+        if (isPseudonymisedFixedOTPCredential(password)) {
+            password = getFixedOTPCredentialPassword(password);
+        }
 
         if (password == null || password.length === 0) {
             return res.render(template, {
@@ -81,6 +95,10 @@ export default function processSignInForm(template: string): RequestHandler {
 
             console.log("Unknown Error");
             throw error;
+        }
+
+        if (isFixedOTPCredential(email)) {
+            req.session.password = password;
         }
 
         res.redirect("/sign-in/enter-text-code");

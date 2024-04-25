@@ -40,7 +40,7 @@ export const changePassword: RequestHandler = async (req, res) => {
         await s4.changePassword(accessToken, currentPassword, newPassword);
     } catch (error) {
         if (error instanceof CognitoIdentityProviderServiceException) {
-            const options: Record<string, Record<string, string>> = {values: {newPassword: newPassword}};
+            const options: Record<string, Record<string, string>> = {values: {newPassword: newPassword}, errorMessages: {}};
 
             if (error instanceof LimitExceededException) {
                 options.errorMessages.newPassword = "You have tried to change your password too many times. Try again in 15 minutes.";
@@ -123,7 +123,8 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
-        await s4.verifyMobileUsingSmsCode(accessToken, req.body.securityCode);
+        const emailAddress: string = AuthenticationResultParser.getEmail(nonNull(authenticationResult));
+        await s4.verifyMobileUsingSmsCode(accessToken, req.body.securityCode, emailAddress);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             s4.sendTxMALog(

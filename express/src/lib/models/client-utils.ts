@@ -15,6 +15,12 @@ export function dynamoClientToDomainClient(client: ClientFromDynamo): Client {
         serviceName: client.service_name,
         serviceType: client.service_type,
         subjectType: client.subject_type,
-        type: client.type
+        type: client.type,
+        sector_identifier_uri: client.sector_identifier_uri,
+        token_endpoint_auth_method: client.token_endpoint_auth_method,
+        client_secret: client.client_secret,
+        back_channel_logout_uri: client.back_channel_logout_uri,
+        identity_verification_enabled: client.identity_verification_enabled,
+        claims: client.claims
     };
 }

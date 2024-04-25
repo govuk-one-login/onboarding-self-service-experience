@@ -1,6 +1,8 @@
 import {CodeMismatchException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import {isFixedOTPCredential, respondToMFAChallengeForFixedOTPCredential} from "../lib/fixedOTP";
+import console from "console";
 
 export default async function processSecurityCode(req: Request, res: Response, next: NextFunction) {
     console.info("In processSecurityCode()");
@@ -13,7 +15,26 @@ export default async function processSecurityCode(req: Request, res: Response, n
     }
 
     try {
-        req.session.authenticationResult = await s4.respondToMfaChallenge(req.session.mfaResponse, req.body.securityCode);
+        const userName = req.session.emailAddress as string;
+        const securityCode = req.body.securityCode;
+
+        if (isFixedOTPCredential(userName)) {
+            const userPassword: string = req.session.password as string;
+
+            respondToMFAChallengeForFixedOTPCredential(userName, securityCode);
+
+            // As this is a Test User we want to ignore MFA Code so temporarily reset MFA to get Authentication Result.
+            await s4.resetMfaPreference(userName);
+
+            const response = await s4.submitUsernamePassword(userName, userPassword);
+            req.session.cognitoSession = response.Session;
+            req.session.authenticationResult = response.AuthenticationResult;
+
+            // Now reset MFA Preferences to ensure Account remains 'pure' in terms of normal accounts.
+            await s4.setMfaPreference(userName);
+        } else {
+            req.session.authenticationResult = await s4.respondToMfaChallenge(req.session.mfaResponse, securityCode);
+        }
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             s4.sendTxMALog(

@@ -3,8 +3,7 @@ import DynamoDbClient from "../../dynamodb-client";
 
 const client = new DynamoDbClient();
 
-// TODO remove explicit any
-export const updateUserHandler = async (event: APIGatewayProxyEvent): Promise<any> => {
+export const updateUserHandler = async (event: APIGatewayProxyEvent): Promise<{statusCode: number; body: string}> => {
     const body = JSON.parse(event.body as string);
     const response = {statusCode: 200, body: JSON.stringify("OK")};
 

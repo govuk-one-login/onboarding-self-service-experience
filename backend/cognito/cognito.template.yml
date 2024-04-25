@@ -89,6 +89,14 @@ Mappings:
       cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+  WafArn:
+    Environment:
+      local: "/self-service/development/waf-web-acl"
+      dev: "/self-service/development/waf-web-acl"
+      build: "/self-service/build/waf-web-acl"
+      staging: "/self-service/staging/waf-web-acl"
+      integration: "/self-service/integration/waf-web-acl"
+      production: "/self-service/production/waf-web-acl"
 
 Conditions:
   UseCodeSigning: !Not [ !Equals [ !Ref CodeSigningConfigArn, "" ] ]
@@ -106,7 +114,10 @@ Globals:
       SecurityGroupIds: [ !ImportValue VPC-VPCEndpointsSecurityGroup ]
       SubnetIds: !Split [ ",", !ImportValue VPC-PrivateSubnets ]
     LoggingConfig:
+      ApplicationLogLevel: INFO
+      LogFormat: JSON
       LogGroup: !Ref LambdaLogsGroup
+      SystemLogLevel: INFO
     CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
     Layers:
       - !If
@@ -281,8 +292,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: src/handlers/send-password-changed-email.handler
       Description: Send an email to confirm the user's password has been changed
@@ -323,8 +333,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: src/handlers/create-password-reset-message.handler
       Description: Create a customised email message to send when resetting the user's password
@@ -352,8 +361,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: src/handlers/send-security-code-text-message.lambdaHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -881,6 +889,74 @@ Resources:
           - Priority: 1
             Name: verified_email
 
+  UserPoolLogDelivery:
+    Type: AWS::Cognito::LogDeliveryConfiguration
+    Properties:
+      LogConfigurations:
+        - CloudWatchLogsConfiguration:
+            LogGroupArn: !Sub
+              - arn:aws:logs:${Region}:${Account}:log-group:${LogGroup}
+              - Region: !Ref AWS::Region
+                Account: !Ref AWS::AccountId
+                LogGroup: !Ref CognitoLogsGroup
+          EventSource: userNotification
+          LogLevel: ERROR
+      UserPoolId: !Ref UserPool
+
+  CognitoLogsGroup:
+    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join
+        - "/"
+        - - '/aws/cognito'
+          - 'onboarding-self-service'
+          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
+          - 'user-pool'
+      RetentionInDays: 14
+      DataProtectionPolicy:
+        Name: data-protection-policy-cognito-lambda
+        Description: Data Protection for Cloudwatch Logs
+        Version: '2021-06-01'
+        Statement:
+          - Sid: audit-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Audit:
+                FindingsDestination:
+                  CloudWatchLogs:
+                    LogGroup: !Ref LogAuditLogGroup
+          - Sid: redact-policy
+            DataIdentifier:
+              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
+              - arn:aws:dataprotection::aws:data-identifier/IpAddress
+              - arn:aws:dataprotection::aws:data-identifier/Address
+              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
+              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
+              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
+            Operation:
+              Deidentify:
+                MaskConfig: { }
+
+  CognitoLogCslsSubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CslsLoggingEnabled
+    Properties:
+      LogGroupName: !Ref CognitoLogsGroup
+      FilterName: "Cognito error logs"
+      FilterPattern: ""
+      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
+
   # https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-sms-settings.html
   SmsRole:
     Type: AWS::IAM::Role
@@ -924,145 +1000,13 @@ Resources:
       FunctionName: !Ref SendSecurityCodeTextMessageFunction
       Principal: cognito-idp.amazonaws.com
 
-  CognitoWebACL:
-    Type: AWS::WAFv2::WebACL
-    Properties:
-      Name: !Sub ${AWS::StackName}-${Environment}-CognitoWebACL
-      Scope: REGIONAL
-      Description: This is WebACL to protect Cognito
-      DefaultAction:
-        Allow: {}
-      VisibilityConfig:
-        SampledRequestsEnabled: true
-        CloudWatchMetricsEnabled: true
-        MetricName: !Sub ${AWS::StackName}-${Environment}-CognitoWebACLMetric
-      Rules:
-        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
-          Priority: 1
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesKnownBadInputsRuleSet
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesKnownBadInputsRuleSet
-        - Name: AWS-AWSManagedRulesAmazonIpReputationList
-          Priority: 2
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAmazonIpReputationList
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAmazonIpReputationList
-        - Name: AWS-AWSManagedRulesAnonymousIpList
-          Priority: 3
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAnonymousIpList
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAnonymousIpList
-        - Name: AWS-AWSManagedRulesCommonRuleSet
-          Priority: 4
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesCommonRuleSet
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesCommonRuleSet
-        - Name: AWS-AWSManagedRulesAdminProtectionRuleSet
-          Priority: 5
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAdminProtectionRuleSet
-          OverrideAction:
-            None: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAdminProtectionRuleSet
-
   CognitoWebACLAssociation:
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
-      WebACLArn: !GetAtt CognitoWebACL.Arn
+      WebACLArn: !Sub
+        - "{{resolve:ssm:${WafArnParam}}}"
+        - WafArnParam: !FindInMap [ WafArn, Environment, !Ref Environment ]
       ResourceArn: !GetAtt UserPool.Arn
-
-  WafLogGroup:
-    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Join
-        - "-"
-        - - 'aws-waf-logs'
-          - 'onboarding-self-service-cognito'
-          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
-      RetentionInDays: 14
-      DataProtectionPolicy:
-        Name: data-protection-policy-cognito-lambda
-        Description: Data Protection for Cloudwatch Logs
-        Version: '2021-06-01'
-        Statement:
-          - Sid: audit-policy
-            DataIdentifier:
-              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
-              - arn:aws:dataprotection::aws:data-identifier/IpAddress
-              - arn:aws:dataprotection::aws:data-identifier/Address
-              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
-              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
-            Operation:
-              Audit:
-                FindingsDestination:
-                  CloudWatchLogs:
-                    LogGroup: !Ref LogAuditLogGroup
-          - Sid: redact-policy
-            DataIdentifier:
-              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
-              - arn:aws:dataprotection::aws:data-identifier/IpAddress
-              - arn:aws:dataprotection::aws:data-identifier/Address
-              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
-              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
-            Operation:
-              Deidentify:
-                MaskConfig: { }
-
-  WafLoggingConfiguration:
-    Type: AWS::WAFv2::LoggingConfiguration
-    Properties:
-      ResourceArn: !GetAtt CognitoWebACL.Arn
-      LogDestinationConfigs:
-        - !GetAtt WafLogGroup.Arn
-
-  WafLogCslsSubscriptionFilter:
-    Type: AWS::Logs::SubscriptionFilter
-    Condition: CslsLoggingEnabled
-    Properties:
-      LogGroupName: !Ref WafLogGroup
-      FilterName: "Waf logs for Cognito"
-      FilterPattern: ""
-      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
 
 Outputs:
   UserPoolID:

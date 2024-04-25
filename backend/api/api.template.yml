@@ -20,10 +20,6 @@ Parameters:
     AllowedPattern: ^.*[^-]$
     Default: self-service
     Description: A unique prefix to identify the deployment; used to distinguish variation between ephemeral stacks
-  ClientRegistryEndpoint:
-    Type: String
-    Default: https://oidc.integration.account.gov.uk
-    Description: Auth client registration endpoint
   NotificationEmail:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/api/notifications-email
@@ -86,6 +82,14 @@ Mappings:
       cslsLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
+  WafArn:
+    Environment:
+      local: "/self-service/development/waf-web-acl"
+      dev: "/self-service/development/waf-web-acl"
+      build: "/self-service/build/waf-web-acl"
+      staging: "/self-service/staging/waf-web-acl"
+      integration: "/self-service/integration/waf-web-acl"
+      production: "/self-service/production/waf-web-acl"
 
 Conditions:
   PrivateAPI: !Equals [ !Ref PrivateAPI, Yes ]
@@ -104,7 +108,10 @@ Globals:
       SecurityGroupIds: [ !ImportValue VPC-VPCEndpointsSecurityGroup ]
       SubnetIds: !Split [ ",", !ImportValue VPC-PrivateSubnets ]
     LoggingConfig:
+      ApplicationLogLevel: INFO
+      LogFormat: JSON
       LogGroup: !Ref LambdaLogsGroup
+      SystemLogLevel: INFO
     Layers:
       - !If
         - DynatraceLoggingEnabled
@@ -354,8 +361,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-user.getUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -390,8 +396,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-user.putUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -426,8 +431,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/update-user.updateUserHandler
       Description: Updates user data in DynamoDB
@@ -465,8 +469,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-services.getServicesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -501,8 +504,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-session-count.getSessionCountHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -537,8 +539,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/global-sign-out.globalSignOutHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -573,8 +574,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service.putServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -604,8 +604,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/get-service-clients.getServiceClientsHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -640,8 +639,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service-client.putServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -669,8 +667,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/update-service-client.updateServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -700,8 +697,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/put-service-user.putServiceUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -731,8 +727,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Description: Assumes a cross-account role and invokes the Auth register Lambda
       Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
@@ -746,7 +741,7 @@ Resources:
         SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
       Environment:
         Variables:
-          AUTH_REGISTRATION_BASE_URL: !Ref ClientRegistryEndpoint
+          AUTH_REGISTRATION_BASE_URL: "{{resolve:ssm:/self-service/api/auth-base-url}}"
           AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/client-registry-api-key}}"
       KmsKeyArn: !GetAtt EnvironmentVariablesEncryptionKey.Arn
 
@@ -761,8 +756,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Description: Updates a client using an HTTP endpoint
       Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
@@ -776,7 +770,7 @@ Resources:
         SubnetIds: !Split [ ",", !ImportValue VPC-ProtectedSubnets ]
       Environment:
         Variables:
-          AUTH_REGISTRATION_BASE_URL: !Ref ClientRegistryEndpoint
+          AUTH_REGISTRATION_BASE_URL: "{{resolve:ssm:/self-service/api/auth-base-url}}"
           AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/client-registry-api-key}}"
       KmsKeyArn: !GetAtt EnvironmentVariablesEncryptionKey.Arn
 
@@ -793,8 +787,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/step-functions/new-service.newServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -830,8 +823,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/step-functions/new-client.newClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -867,8 +859,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/step-functions/update-client.doUpdateClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -903,8 +894,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/update-service.updateServiceHandler
       Description: Updates service data in DynamoDB
@@ -980,8 +970,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/logging/sqs-service.sendSQSMessageToTxMAHandler
       Description: Sends a message to the TxMA SQS
@@ -1184,8 +1173,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/dynamo-db-service.getDynamoDBEntriesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -1220,8 +1208,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBClientEntriesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -1256,8 +1243,7 @@ Resources:
       BuildProperties:
         Sourcemap: true
         External:
-          # AWS SDK v3 dependencies are already included in the lambda runtime
-          - "@aws-sdk/*"
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Handler: backend/api/src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBServiceEntriesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -1281,172 +1267,15 @@ Resources:
             Path: /delete-dynamodb-service-entries
             Method: POST
 
-  ApiGatewayWebACL:
-    # checkov:skip=CKV_AWS_192:Ensure WAF prevents message lookup in Log4j2
-    Type: AWS::WAFv2::WebACL
-    Properties:
-      Name: !Sub ${AWS::StackName}-${Environment}-ApiWebACL
-      Scope: REGIONAL
-      Description: This is WebACL to protect the API and Load Balancers
-      DefaultAction:
-        Allow: { }
-      VisibilityConfig:
-        SampledRequestsEnabled: true
-        CloudWatchMetricsEnabled: true
-        MetricName: !Sub ${AWS::StackName}-${Environment}-ApiGatewayWebACLMetric
-      Rules:
-        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
-          Priority: 1
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesKnownBadInputsRuleSet
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesKnownBadInputsRuleSet
-        - Name: AWS-AWSManagedRulesAmazonIpReputationList
-          Priority: 2
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAmazonIpReputationList
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAmazonIpReputationList
-        - Name: AWS-AWSManagedRulesAnonymousIpList
-          Priority: 3
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAnonymousIpList
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAnonymousIpList
-        - Name: AWS-AWSManagedRulesCommonRuleSet
-          Priority: 4
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesCommonRuleSet
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesCommonRuleSet
-        - Name: AWS-AWSManagedRulesAdminProtectionRuleSet
-          Priority: 5
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAdminProtectionRuleSet
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAdminProtectionRuleSet
-        - Name: SQLInject-RuleSet
-          Priority: 6
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesSQLiRuleSet
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub '${AWS::StackName}-${Environment}-SQLinjection-ruleset-metric'
-        - Name: RateBased-CountIpRule
-          Priority: 9
-          Statement:
-            RateBasedStatement:
-              Limit: 100
-              AggregateKeyType: IP
-          Action:
-            Count: { }
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub "${AWS::StackName}-${Environment}-RateBased-CountIp-ruleset-metric"
-            SampledRequestsEnabled: true
-
   ApiGatewayWebACLAssociation:
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
-      WebACLArn: !GetAtt ApiGatewayWebACL.Arn
+      WebACLArn: !Sub
+        - "{{resolve:ssm:${WafArnParam}}}"
+        - WafArnParam: !FindInMap [ WafArn, Environment, !Ref Environment ]
       ResourceArn: !Sub
         - 'arn:aws:apigateway:${AWS::Region}::/restapis/${ResourceArn}/stages/${API.Stage}'
         - ResourceArn: !Ref API
-
-  WafLoggingConfiguration:
-    Type: AWS::WAFv2::LoggingConfiguration
-    Properties:
-      ResourceArn: !GetAtt ApiGatewayWebACL.Arn
-      LogDestinationConfigs:
-        - !GetAtt WafLogGroup.Arn
-
-  WafLogGroup:
-    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Join
-        - "-"
-        - - 'aws-waf-logs'
-          - 'onboarding-self-service-backend-api'
-          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
-      RetentionInDays: 14
-      DataProtectionPolicy:
-        Name: data-protection-policy-backend-api
-        Description: Data Protection for Cloudwatch Logs
-        Version: '2021-06-01'
-        Statement:
-          - Sid: audit-policy
-            DataIdentifier:
-              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
-              - arn:aws:dataprotection::aws:data-identifier/IpAddress
-              - arn:aws:dataprotection::aws:data-identifier/Address
-              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
-              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
-            Operation:
-              Audit:
-                FindingsDestination:
-                  CloudWatchLogs:
-                    LogGroup: !Ref LogAuditLogGroup
-          - Sid: redact-policy
-            DataIdentifier:
-              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
-              - arn:aws:dataprotection::aws:data-identifier/IpAddress
-              - arn:aws:dataprotection::aws:data-identifier/Address
-              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
-              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
-            Operation:
-              Deidentify:
-                MaskConfig: { }
-
-  WafLogCslsSubscriptionFilter:
-    Type: AWS::Logs::SubscriptionFilter
-    Condition: CslsLoggingEnabled
-    Properties:
-      LogGroupName: !Ref WafLogGroup
-      FilterName: "Waf logs for Backend API"
-      FilterPattern: ""
-      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
 
 Outputs:
   # SAM Serverless Function implicit API resources | Invoking private APIs

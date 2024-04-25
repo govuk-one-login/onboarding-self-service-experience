@@ -33,6 +33,18 @@ Parameters:
   GoogleTagID:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/google-tag-id
+  GoogleAnalytics4GtmContainerId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/google-analytics-4-gtm-container-id
+  UniversalAnalyticsGtmContainerId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/universal-analytics-gtm-container-id
+  GoogleAnalytics4Disabled:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/google-analytics-4-disabled
+  UniversalAnalyticsDisabled:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/universal-analytics-disabled
   AllowedEmailDomainsSource:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/allowed-email-domains-source
@@ -48,6 +60,12 @@ Parameters:
   PublicBetaSheetHeaderRange:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/public-beta-sheet-header-range
+  UseCognitoDr:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/use-cognito-dr
+  UseStubOtp:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/use-stub-otp
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -101,6 +119,14 @@ Mappings:
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
       dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+  WafArn:
+    Environment:
+      local: "/self-service/development/waf-web-acl"
+      dev: "/self-service/development/waf-web-acl"
+      build: "/self-service/build/waf-web-acl"
+      staging: "/self-service/staging/waf-web-acl"
+      integration: "/self-service/integration/waf-web-acl"
+      production: "/self-service/production/waf-web-acl"
 
   # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
   ElasticLoadBalancer:
@@ -119,8 +145,9 @@ Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
   CslsLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, cslsLoggingEnabled ], true ]
-  IsLocal: !Equals [ !Ref Environment, "local" ]
   DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
+  IsLocal: !Equals [ !Ref Environment, "local" ]
+  IsProd: !Equals [ !Ref Environment, "production" ]
 
 Resources:
 
@@ -147,6 +174,14 @@ Resources:
               Value: !Ref ShowTestBanner
             - Name: GOOGLE_TAG_ID
               Value: !Ref GoogleTagID
+            - Name: GOOGLE_ANALYTICS_4_GTM_CONTAINER_ID
+              Value: !Ref GoogleAnalytics4GtmContainerId
+            - Name: UNIVERSAL_ANALYTICS_GTM_CONTAINER_ID
+              Value: !Ref UniversalAnalyticsGtmContainerId
+            - Name: GA4_DISABLED
+              Value: !Ref GoogleAnalytics4Disabled
+            - Name: UA_DISABLED
+              Value: !Ref UniversalAnalyticsDisabled
             - Name: SESSION_SECRET
               Value: "{{resolve:secretsmanager:/self-service/frontend/session-secret}}"
             - Name: ALLOWED_EMAIL_DOMAINS_SOURCE
@@ -178,7 +213,14 @@ Resources:
             - Name: PUBLIC_BETA_SHEET_HEADER_RANGE
               Value: !Ref PublicBetaSheetHeaderRange
             - Name: USE_COGNITO_DR
-              Value: "{{resolve:ssm:/self-service/frontend/use-cognito-dr}}"
+              Value: !Ref UseCognitoDr
+            - Name: USE_STUB_OTP
+              Value: !If [ IsProd, 'false', !Ref UseStubOtp ]
+            - Name: FIXED_OTP_CREDENTIALS
+              Value: !If
+                - IsProd
+                - !Ref AWS::NoValue
+                - "{{resolve:secretsmanager:/self-service/frontend/fixed-otp-credentials}}"
 
           PortMappings:
             - ContainerPort: !Ref ContainerPort
@@ -511,170 +553,14 @@ Resources:
             Principal:
               AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
 
-  LoadBalancerWebACL:
-    # checkov:skip=CKV_AWS_192:Ensure WAF prevents message lookup in Log4j2
-    Type: AWS::WAFv2::WebACL
-    Properties:
-      Name: !Sub ${AWS::StackName}-${Environment}-LoadBalancerWebACL
-      Scope: REGIONAL
-      Description: This is WebACL to protect the API and Load Balancers
-      DefaultAction:
-        Allow: { }
-      VisibilityConfig:
-        SampledRequestsEnabled: true
-        CloudWatchMetricsEnabled: true
-        MetricName: !Sub ${AWS::StackName}-${Environment}-FrontendWebACLMetric
-      Rules:
-        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
-          Priority: 1
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesKnownBadInputsRuleSet
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesKnownBadInputsRuleSet
-        - Name: AWS-AWSManagedRulesAmazonIpReputationList
-          Priority: 2
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAmazonIpReputationList
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAmazonIpReputationList
-        - Name: AWS-AWSManagedRulesAnonymousIpList
-          Priority: 3
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAnonymousIpList
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAnonymousIpList
-        - Name: AWS-AWSManagedRulesCommonRuleSet
-          Priority: 4
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesCommonRuleSet
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesCommonRuleSet
-        - Name: AWS-AWSManagedRulesAdminProtectionRuleSet
-          Priority: 5
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesAdminProtectionRuleSet
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub ${AWS::StackName}-${Environment}-AWSManagedRulesAdminProtectionRuleSet
-        - Name: SQLInject-RuleSet
-          Priority: 6
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesSQLiRuleSet
-          OverrideAction:
-            Count: { }
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub '${AWS::StackName}-${Environment}-SQLinjection-ruleset-metric'
-        - Name: RateBased-CountIpRule
-          Priority: 9
-          Statement:
-            RateBasedStatement:
-              Limit: 100
-              AggregateKeyType: IP
-          Action:
-            Count: { }
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: !Sub "${AWS::StackName}-${Environment}-RateBased-CountIp-ruleset-metric"
-            SampledRequestsEnabled: true
 
   LoadBalancerWebACLAssociation:
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
-      WebACLArn: !GetAtt LoadBalancerWebACL.Arn
+      WebACLArn: !Sub
+        - "{{resolve:ssm:${WafArnParam}}}"
+        - WafArnParam: !FindInMap [ WafArn, Environment, !Ref Environment ]
       ResourceArn: !Ref ApplicationLoadBalancer
-
-  WafLogGroup:
-    # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Join
-        - "-"
-        - - 'aws-waf-logs'
-          - 'onboarding-self-service-frontend'
-          - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
-      RetentionInDays: 14
-      DataProtectionPolicy:
-        Name: data-protection-policy-frontend-loadbalancer
-        Description: Data Protection for Cloudwatch Logs
-        Version: '2021-06-01'
-        Statement:
-          - Sid: audit-policy
-            DataIdentifier:
-              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
-              - arn:aws:dataprotection::aws:data-identifier/IpAddress
-              - arn:aws:dataprotection::aws:data-identifier/Address
-              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
-              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
-            Operation:
-              Audit:
-                FindingsDestination:
-                  CloudWatchLogs:
-                    LogGroup: !Ref LogAuditLogGroup
-          - Sid: redact-policy
-            DataIdentifier:
-              - arn:aws:dataprotection::aws:data-identifier/EmailAddress
-              - arn:aws:dataprotection::aws:data-identifier/IpAddress
-              - arn:aws:dataprotection::aws:data-identifier/Address
-              - arn:aws:dataprotection::aws:data-identifier/AwsSecretKey
-              - arn:aws:dataprotection::aws:data-identifier/OpenSshPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PgpPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PkcsPrivateKey
-              - arn:aws:dataprotection::aws:data-identifier/PuttyPrivateKey
-            Operation:
-              Deidentify:
-                MaskConfig: { }
-
-  WafLoggingConfiguration:
-    Type: AWS::WAFv2::LoggingConfiguration
-    Properties:
-      ResourceArn: !GetAtt LoadBalancerWebACL.Arn
-      LogDestinationConfigs:
-        - !GetAtt WafLogGroup.Arn
-
-  WafLogCslsSubscriptionFilter:
-    Type: AWS::Logs::SubscriptionFilter
-    Condition: CslsLoggingEnabled
-    Properties:
-      LogGroupName: !Ref WafLogGroup
-      FilterName: "Waf logs for Frontend"
-      FilterPattern: ""
-      DestinationArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, clslSubscriptionFilterArn ]
 
   TxMASQSProducerAuditEventQueue:
     Type: AWS::SQS::Queue

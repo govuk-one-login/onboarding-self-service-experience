@@ -272,7 +272,10 @@ const forgotPassword: RequestHandler = async (req, res) => {
         }
 
         if (error instanceof CognitoIdentityProviderServiceException) {
-            const options: Record<string, Record<string, string | undefined>> = {values: {emailAddress: req.session.emailAddress}};
+            const options: Record<string, Record<string, string | undefined>> = {
+                values: {emailAddress: req.session.emailAddress},
+                errorMessages: {}
+            };
 
             if (error instanceof UserNotFoundException) {
                 console.info("User does not exist.");

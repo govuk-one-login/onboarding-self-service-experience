@@ -9,6 +9,7 @@ import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import * as console from "console";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
+import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP";
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 
@@ -20,9 +21,7 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
     req.session.emailAddress = emailAddress;
 
     try {
-        console.info("Trying to Create User");
         await s4.createUser(emailAddress);
-        console.info("Created User");
     } catch (error) {
         if (error instanceof UsernameExistsException) {
             const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
@@ -161,13 +160,21 @@ export const showEnterMobileForm: RequestHandler = (req, res) => {
 };
 
 export const processEnterMobileForm: RequestHandler = async (req, res) => {
+    console.info("In Controller:Register - processEnterMobileForm()");
+
     const accessToken = req.session.authenticationResult?.AccessToken;
 
     if (!accessToken) {
         return res.redirect("/sign-in");
     }
 
-    const mobileNumber = convertToCountryPrefixFormat(req.body.mobileNumber);
+    let mobileNumber = req.body.mobileNumber;
+
+    if (isPseudonymisedFixedOTPCredential(req.body.mobileNumber)) {
+        mobileNumber = getFixedOTPCredentialMobileNumber(req.body.mobileNumber);
+    }
+
+    mobileNumber = convertToCountryPrefixFormat(mobileNumber);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     await s4.setPhoneNumber(nonNull(req.session.emailAddress), mobileNumber);
@@ -220,7 +227,8 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     const accessToken = nonNull(authenticationResult.AccessToken);
 
     try {
-        await s4.verifyMobileUsingSmsCode(accessToken, securityCode);
+        const emailAddress: string = AuthenticationResultParser.getEmail(nonNull(authenticationResult));
+        await s4.verifyMobileUsingSmsCode(accessToken, securityCode, emailAddress);
     } catch (error) {
         if (error instanceof CodeMismatchException) {
             s4.sendTxMALog(

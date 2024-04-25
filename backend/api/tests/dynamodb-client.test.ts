@@ -19,9 +19,10 @@ jest.mock("@aws-sdk/client-dynamodb", () => {
 });
 
 import DynamoDbClient from "../src/dynamodb-client";
+import {TEST_DYNAMO_TABLE_NAME} from "./setup";
 
 const queryCommandParams = {
-    TableName: "identities",
+    TableName: TEST_DYNAMO_TABLE_NAME,
     ExpressionAttributeNames: {
         "#serviceId": "pk"
     },
@@ -34,7 +35,7 @@ const queryCommandParams = {
 };
 
 const scanCommandParams = {
-    TableName: "identities",
+    TableName: TEST_DYNAMO_TABLE_NAME,
     ExpressionAttributeNames: {
         "#userEmail": "id"
     },
@@ -48,7 +49,7 @@ const scanCommandParams = {
 };
 
 const updateCommandParams01 = {
-    TableName: "identities",
+    TableName: TEST_DYNAMO_TABLE_NAME,
     Key: {
         pk: "pk-01",
         sk: "sk-01"
@@ -66,7 +67,7 @@ const updateCommandParams01 = {
 };
 
 const updateCommandParams02 = {
-    TableName: "identities",
+    TableName: TEST_DYNAMO_TABLE_NAME,
     Key: {
         pk: "pk-02",
         sk: "sk-02"
@@ -85,6 +86,7 @@ const updateCommandParams02 = {
 
 describe("DynamoDB client", () => {
     describe("table name not set", () => {
+        delete process.env.TABLE;
         it("should throw if table name not provided", () => {
             expect(() => new DynamoDbClient()).toThrow("Table name");
         });
@@ -102,7 +104,7 @@ describe("DynamoDB client", () => {
         };
 
         beforeAll(() => {
-            process.env.TABLE = "identities";
+            process.env.TABLE = TEST_DYNAMO_TABLE_NAME;
             client = new DynamoDbClient();
         });
 

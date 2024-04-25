@@ -12,7 +12,13 @@ export interface ClientFromDynamo {
     service_name: string;
     service_type: string;
     subject_type: string;
+    back_channel_logout_uri?: string | null;
+    sector_identifier_uri: string;
+    token_endpoint_auth_method: "private_key_jwt" | "client_secret_post";
+    client_secret?: string;
     type: string;
+    identity_verification_enabled: boolean;
+    claims: string[];
 }
 
 export interface Client {
@@ -26,8 +32,14 @@ export interface Client {
     publicKey: string;
     redirectUris: string[];
     scopes: string[];
+    back_channel_logout_uri?: string | null;
+    sector_identifier_uri: string;
     serviceName: string;
     serviceType: string;
     subjectType: string;
+    token_endpoint_auth_method: "private_key_jwt" | "client_secret_post";
+    client_secret?: string;
     type: string;
+    identity_verification_enabled: boolean;
+    claims: string[];
 }
