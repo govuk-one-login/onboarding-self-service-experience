@@ -1,3 +1,5 @@
+import {Service} from "../@types/Service";
+
 export const TEST_TEMPLATE_PATH = "some/template/to/render";
 export const TEST_PASSWORD = "somePassword";
 export const TEST_EMAIL = "someEmail";
@@ -31,6 +33,9 @@ export const TEST_AUTHENTICATION_RESULT = {
     RefreshToken: "someRefreshToken",
     IdToken: "someIdToken"
 };
+export const TEST_COGNITO_SESSION_STRING = "session9fee3263-ced5-4a0d-9b8a-d640646286c5";
+export const TEST_UUID = "eb93a770-fff9-4145-9773-343aee098d83";
+export const TEST_SERVICE_NAME = "someTestService";
 export const TEST_SPREAD_SHEET_ID = "someSpreadSheetId";
 export const TEST_HEADER_RANGE = "someHeaderRange";
 export const TEST_DATA_RANGE = "someDataRange";
@@ -50,6 +55,10 @@ export const TEST_USER = {
     mobileNumber: TEST_PHONE_NUMBER,
     passwordLastUpdated: "2024-04-19T14:41:18.754Z"
 };
-
+export const TEST_SERVICE_ID = "service#123";
+export const TEST_SERVICE: Service = {
+    id: TEST_SERVICE_ID,
+    serviceName: TEST_SERVICE_NAME
+};
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>
     "someHeader." + Buffer.from(JSON.stringify(jwtBody)).toString("base64") + ".someSignature";
