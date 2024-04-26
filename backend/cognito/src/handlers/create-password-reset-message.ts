@@ -31,7 +31,7 @@ async function forgotPassword(event: CustomMessageForgotPasswordTriggerEvent): P
     return event;
 }
 
-function generateEmailBody(emailBody: string) {
+export function generateEmailBody(emailBody: string) {
     return `
     <html>
         <body>
