@@ -60,5 +60,9 @@ export const TEST_SERVICE: Service = {
     id: TEST_SERVICE_ID,
     serviceName: TEST_SERVICE_NAME
 };
+export const TEST_COGNITO_CLIENT_ID = "c5cdaf0c-f92d-4ef7-922e";
+export const TEST_COGNITO_USER_POOL_ID = "1234-abcd-1234567890ab";
+export const TEST_AWS_REGION = "someRegion";
+
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>
     "someHeader." + Buffer.from(JSON.stringify(jwtBody)).toString("base64") + ".someSignature";
