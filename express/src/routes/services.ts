@@ -5,7 +5,6 @@ import setRequestContext from "../middleware/request-context";
 import clients from "./clients";
 import {processAddServiceForm, redirectToServicesList} from "../controllers/register";
 import validateServiceName from "../middleware/validators/service-name-validator";
-import {showTestBanner} from "../config/environment";
 
 const router = Router();
 export default router;
@@ -18,9 +17,7 @@ router.param("serviceId", setRequestContext);
 
 router.use("/:serviceId/clients", clients);
 
-if (showTestBanner) {
-    router
-        .route("/add-new-service")
-        .get(showAddNewServiceForm)
-        .post(validateServiceName("services/add-new-service.njk"), processAddServiceForm, redirectToServicesList);
-}
+router
+    .route("/add-new-service")
+    .get(showAddNewServiceForm)
+    .post(validateServiceName("services/add-new-service.njk"), processAddServiceForm, redirectToServicesList);
