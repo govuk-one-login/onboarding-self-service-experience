@@ -1,3 +1,4 @@
+import {OnboardingTableItem} from "../@types/OnboardingTableItem";
 import {Service} from "../@types/Service";
 
 export const TEST_TEMPLATE_PATH = "some/template/to/render";
@@ -64,10 +65,16 @@ export const TEST_SERVICE: Service = {
     serviceName: TEST_SERVICE_NAME
 };
 export const TEST_RANDOM_NUMBER = 123456;
+export const TEST_CLIENT_ID = "ajedebd2343";
 export const TEST_COGNITO_CLIENT_ID = "c5cdaf0c-f92d-4ef7-922e";
 export const TEST_COGNITO_USER_POOL_ID = "1234-abcd-1234567890ab";
 export const TEST_AWS_REGION = "someRegion";
 export const TEST_API_BASE_URL = "some.base.url";
+export const TEST_ONBOARDING_TABLE_ITEM: OnboardingTableItem = {
+    pk: TEST_SERVICE_ID,
+    sk: TEST_CLIENT_ID
+};
+export const TEST_SELF_SERVICE_CLIENT_ID = "someSelfServiceClientId";
 
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>
     "someHeader." + Buffer.from(JSON.stringify(jwtBody)).toString("base64") + ".someSignature";
