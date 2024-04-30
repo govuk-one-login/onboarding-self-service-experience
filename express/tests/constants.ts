@@ -26,13 +26,16 @@ export const TEST_MFA_RESPONSE = {
     codeSentTo: TEST_PHONE_NUMBER
 };
 export const TEST_SECURITY_CODE = "123456";
+export const TEST_ACCESS_TOKEN = "someAccessToken";
+export const TEST_REFRESH_TOKEN = "someRefreshToken";
 export const TEST_AUTHENTICATION_RESULT = {
-    AccessToken: "someAccessToken",
+    AccessToken: TEST_ACCESS_TOKEN,
     ExpiresIn: 12345,
     TokenType: "SomeTokenType",
     RefreshToken: "someRefreshToken",
     IdToken: "someIdToken"
 };
+export const TEST_SIGN_UP_STATUS = "someStatus";
 export const TEST_COGNITO_SESSION_STRING = "session9fee3263-ced5-4a0d-9b8a-d640646286c5";
 export const TEST_UUID = "eb93a770-fff9-4145-9773-343aee098d83";
 export const TEST_SERVICE_NAME = "someTestService";
@@ -60,9 +63,11 @@ export const TEST_SERVICE: Service = {
     id: TEST_SERVICE_ID,
     serviceName: TEST_SERVICE_NAME
 };
+export const TEST_RANDOM_NUMBER = 123456;
 export const TEST_COGNITO_CLIENT_ID = "c5cdaf0c-f92d-4ef7-922e";
 export const TEST_COGNITO_USER_POOL_ID = "1234-abcd-1234567890ab";
 export const TEST_AWS_REGION = "someRegion";
+export const TEST_API_BASE_URL = "some.base.url";
 
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>
     "someHeader." + Buffer.from(JSON.stringify(jwtBody)).toString("base64") + ".someSignature";
