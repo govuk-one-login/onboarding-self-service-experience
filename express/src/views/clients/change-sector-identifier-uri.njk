@@ -1,0 +1,22 @@
+{% extends "layouts/form.njk" %}
+
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set pageTitle = "Enter sector identifier URI" %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/
+{% endset %}
+{% set formCancelUrl = backLinkPath %}
+{% set formButtonText = "Confirm" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Enter sector identifier URI</h1>
+  {{ govukWarningText({
+  text: "If you change your sector identifier URI, your users’ subject identifiers will also change.",
+  iconFallbackText: "Warning"
+}) }}
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.uriInput("", "sectorIdentifierUri") }}
+{% endblock %}

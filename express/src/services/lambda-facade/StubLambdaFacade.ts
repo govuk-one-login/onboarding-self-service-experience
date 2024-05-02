@@ -14,8 +14,10 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private publicKey = defaultPublicKey;
     private serviceName = "Test Service";
     private redirectUris = ["http://localhost/"];
-    private postLogoutRedirectUris = ["http://localhost/", "http://localhost/logged_out"];
+    private postLogoutRedirectUris = [];
     private scopes = ["openid"];
+    private backChannelLogoutUri = [];
+    private sectorIdentifierUri = "http://gov.uk";
     private contacts = ["registered@test.gov.uk", "mockuser2@gov.uk", "mockuser3@gov.uk"];
 
     private user: DynamoUser = {
@@ -75,11 +77,19 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         }
 
         if (updates.post_logout_redirect_uris) {
-            this.postLogoutRedirectUris = updates.post_logout_redirect_uris as string[];
+            this.postLogoutRedirectUris = updates.post_logout_redirect_uris as [];
         }
 
         if (updates.scopes) {
             this.scopes = updates.scopes as string[];
+        }
+
+        if (updates.back_channel_logout_uri) {
+            this.backChannelLogoutUri = updates.back_channel_logout_uri as [];
+        }
+
+        if (updates.sector_identifier_uri) {
+            this.sectorIdentifierUri = updates.sector_identifier_uri as string;
         }
     }
 
@@ -124,6 +134,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                     {
                         service_name: {S: this.serviceName},
                         post_logout_redirect_uris: convertToAttr(this.postLogoutRedirectUris),
+                        sector_identifier_uri: {S: this.sectorIdentifierUri},
+                        back_channel_logout_uri: {S: this.backChannelLogoutUri},
                         subject_type: {S: "pairwise"},
                         contacts: convertToAttr(this.contacts),
                         public_key: {
@@ -139,6 +151,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                                 {S: "scopes"},
                                 {S: "contacts"},
                                 {S: "post_logout_redirect_uris"},
+                                {S: "sector_identifier_uri"},
+                                {S: "back_channel_logout_uri"},
                                 {S: "subject_type"},
                                 {S: "service_type"}
                             ]

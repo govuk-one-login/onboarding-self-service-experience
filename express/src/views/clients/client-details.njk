@@ -53,26 +53,31 @@
             </span>
         </button>
       {% else %}
-        Not yet added
+        Not added yet
       {% endif %}
     </div>
   {% endset %}
 
-  {% set redirectUrlsContainer %}
+  {% set redirectUrisContainer %}
       <ul class="govuk-list" id="redirectUris">
-        {% for item in redirectUrls %}
+        {% for item in redirectUris %}
           <li id="redirectUri{{ loop.index }}">{{ item }}</li>
         {% endfor %}
       </ul>
   {% endset %}
 
-  {% set postLogoutRedirectUrlsContainer %}
-    <div id="postLogoutRedirectUris">{{ postLogoutRedirectUrls }}</div>
+  {% set postLogoutRedirectUrisContainer %}
+    {% if postLogoutRedirectUris.length > 0 %}
+      <ul class="govuk-list" id="postLogoutRedirectUris">
+        {% for item in postLogoutRedirectUris %}
+          <li id="postLogoutRedirectUri{{ loop.index }}">{{ item }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <span id="postLogoutRedirectUris">Not added yet</span>
+    {% endif %}
   {% endset %}
 
-  {% set postLogoutRedirectUrlsContainer %}
-    <div id="postLogoutRedirectUris">{{ postLogoutRedirectUrls }}</div>
-  {% endset %}
 
   {% set changeServiceNameLink %}
     /services/{{ serviceId }}/clients/{{ clientId }}/{{ selfServiceClientId }}/change-service-name?serviceName={{ serviceName | urlencode }}
@@ -84,6 +89,18 @@
         <li>{{ item }}</li>
       {% endfor %}
     </ul>
+  {% endset %}
+
+  {% set backChannelLogoutUriContainer %}
+    {% if backChannelLogoutUri and backChannelLogoutUri.length > 0 and backChannelLogoutUri[0] !== "" %}
+      <div id="backChannelLogoutUri">{{ backChannelLogoutUri }}</div>
+    {% else %}
+      <div id="backChannelLogoutUri">Not added yet</div>
+    {% endif %}
+  {% endset %}
+
+  {% set sectorIdentifierUriContainer %}
+    <div id="sectorIdentifierUri">{{ sectorIdentifierUri }}</div>
   {% endset %}
 
   {{ govukSummaryList({
@@ -113,10 +130,17 @@
             visuallyHiddenText: "contacts"
           }]
         }
-      },
+      }
+    ]
+  }) }}
+
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Manage client</h2>
+
+  {{ govukSummaryList({
+    rows: [
       {
         key: {text: "Redirect URIs"},
-        value: {html: redirectUrlsContainer},
+        value: {html: redirectUrisContainer},
         actions: {
           items: [{
             href: urls.changeRedirectUris,
@@ -126,6 +150,44 @@
         }
       },
       {
+        key: {text: "Post logout redirect URIs (optional)"},
+        value: {html: postLogoutRedirectUrisContainer},
+        actions: {
+          items: [{
+            href: urls.changePostLogoutUris,
+            text: "Change",
+            visuallyHiddenText: "post logout redirect uris"
+          }]
+        }
+      },
+      {
+        key: {text: "Back channel logout URI (optional)"},
+        value: {html: backChannelLogoutUriContainer},
+        actions: {
+          items: [{
+            href: urls.changeBackChannelLogoutUri,
+            text: "Change",
+            visuallyHiddenText: "Back channel logout URI"
+          }]
+        }
+      }, 
+      {
+        key: {text: "Sector identifier URI"},
+        value: {html: sectorIdentifierUriContainer},
+        actions: {
+          items: [{
+            href: urls.changeSectorIdentifierUri,
+            text: "Change",
+            visuallyHiddenText: "Sector identifier URI"
+          }]
+        }
+      }
+    ]
+  }) }}
+
+  {{ govukSummaryList({
+    rows: [
+            {
         key: {text: "User attributes required"},
         value: {html: userAttributes},
         actions: {
@@ -146,31 +208,22 @@
             visuallyHiddenText: "public key"
           }]
         }
-      },
-      {
-        key: {text: "Post logout redirect URIs (optional)"},
-        value: {html: postLogoutRedirectUrlsContainer},
-        actions: {
-          items: [{
-            href: urls.changePostLogoutUris,
-            text: "Change",
-            visuallyHiddenText: "post logout redirect uris"
-          }]
-        }
       }
     ]
   }) }}
 
   <details class="govuk-details" data-module="govuk-details" id="client-details-summary">
     <summary class="govuk-details__summary" id="client-details-summary-toggle">
-      <span class="govuk-details__summary-text">What do these terms mean?</span>
+      <span class="govuk-details__summary-text">Help with API terms</span>
     </summary>
     <div class="govuk-details__text">
+      <span class="govuk-body govuk-!-font-weight-bold">Back channel logouts</span>
+      <p class="govuk-body">Read the <a class="govuk-link" href="https://openid.net/specs/openid-connect-backchannel-1_0.html#Backchannel">technical documents on back channel logouts</a>.</p>
       <span class="govuk-body govuk-!-font-weight-bold">Client ID</span>
       <p class="govuk-body">Our API uses this to uniquely identify your client when it makes requests. You cannot change this.</p>
 
       <span class="govuk-body govuk-!-font-weight-bold">Redirect URIs</span>
-      <p class="govuk-body">The page(s) you want your users to see after they sign in to your service.</p>
+      <p class="govuk-body">Identity details of the page you want your users to see after they sign in to your service.</p>
 
       <span class="govuk-body govuk-!-font-weight-bold">User attributes required</span>
       <p class="govuk-body">The information about your users that we send back to your service.</p>
@@ -183,8 +236,12 @@
         and add the public key.
       </p>
 
-      <span class="govuk-body govuk-!-font-weight-bold">Post logout redirect URIs (optional)</span>
-      <p class="govuk-body">The page(s) you want your users to see after they sign out of your service.</p>
+      <span class="govuk-body govuk-!-font-weight-bold">Post logout redirect URIs</span>
+      <p class="govuk-body">Identity details of the page you want your users to see after they sign out of your service.</p>
+
+      <span class="govuk-body govuk-!-font-weight-bold">Sector identifier URI</span>
+      <p class="govuk-body">Read the <a class="govuk-link" href="https://docs.sign-in.service.gov.uk/before-integrating/set-up-your-service-s-configuration/#set-up-your-service-s-configuration-with-gov-uk-one-login">technical documents on sector identifier URIs</a>.</p>
+
     </div>
   </details>
   <div id="client-details-integration-credentials">

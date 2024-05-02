@@ -169,3 +169,13 @@ Then(/^there should be no accessibility violations$/, async function (this: Test
 
 // eslint-disable-next-line
 Then("pause whilst waiting to complete", {timeout: 1 * 5000}, async function () {});
+
+Then("they they should not see a link that points to {string}", async function (href: string) {
+    const links = await this.page.$x(`//a[contains(@href, "${href}")]`);
+    assert.equal(links.length, 0, "The link exists");
+});
+
+Then("they should see a link that points to {string}", async function (href: string) {
+    const links = await this.page.$x(`//a[contains(@href, "${href}")]`);
+    assert.equal(links.length, 1, `The link pointing to "${href}" does not exist or is not unique`);
+});

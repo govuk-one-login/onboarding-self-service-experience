@@ -1,19 +1,49 @@
-{% extends "layouts/client-form.njk" %}
+{% extends "layouts/form.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
-{% set pageTitle = "Change post logout redirect URIs" %}
+{% set pageTitle = "Manage post logout redirect URIs" %}
+{% set addPostLogoutUriUrl %}
+  /services/{{ serviceId }}/clients/{{ authClientId }}/{{ selfServiceClientId }}/add-post-logout-uri
+{% endset %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients
+{% endset %}
 
-{% block beforeForm %}
-  <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your post logout redirect URIs</h1>
-  <p class="govuk-body">Add the URI for the page you want your users to see after they sign out of your service.</p>
-  <p class="govuk-body">
-    You can add multiple post logout redirect URIs if you want different groups of users to see different pages once
-    they sign out of your service. To do this, enter the URIs separated by a space.
-  </p>
-  <p class="govuk-body">If you do not specify one, your users will be redirected to the
-    <a class="govuk-link" href="https://signin.account.gov.uk/signed-out">default GOV.UK sign out page</a>.
-  </p>
-{% endblock %}
 
-{% block formInputs %}
-  {{ form.urlInput("Post logout redirect URIs") }}
+{% block mainContent %}
+  {% if updateResult %}
+    {% if updateResult === "Post logout redirect URIs updated" %}
+      {% call govukNotificationBanner({type: 'success'}) %}
+        <h3 class="govuk-notification-banner__heading">{{ updateResult }}</h3>
+      {% endcall %}
+    {% else %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: updateResult,
+            href: "#"
+          }
+        ]
+      }) }}
+    {% endif %}
+  {% endif %}
+  <h1 class="govuk-heading-l">Manage post logout redirect URIs</h1>
+  <dl class="govuk-summary-list">
+    {% for item in postLogoutRedirectUris %}
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          {{ item }}
+        </dt>
+        <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="/services/{{ serviceId }}/clients/{{ authClientId }}/{{ selfServiceClientId }}/confirm-post-logout-uri-removal?uriToRemove={{ item | urlencode }}">Remove</a>
+        </dd>
+      </div>
+    {% endfor %}
+  </dl>
+  {{ govukButton({
+    text: "Add another post logout redirect URI",
+    href: addPostLogoutUriUrl
+  }) }}
 {% endblock %}
