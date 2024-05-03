@@ -48,8 +48,10 @@ export const showClient: RequestHandler = async (req, res) => {
         idTokenSigningAlgorithm: client.hasOwnProperty("id_token_signing_algorithm") ? client.id_token_signing_algorithm : "",
         displayedKey: displayedKey,
         contacts: contacts,
-        identityVerificationEnabled: client.identity_verification_enabled,
+        token_endpoint_auth_method: client.token_endpoint_auth_method,
+        identity_verification_enabled: client.identity_verification_enabled,
         authMethod: client.token_endpoint_auth_method,
+        ...(client.identity_verification_enabled === true && {levelsOfConfidence: client.client_locs.join(" ")}),
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
