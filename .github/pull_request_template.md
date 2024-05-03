@@ -13,6 +13,11 @@ Before any work can be merged to main in must meet the definition of done and be
 
     `git fetch --all && git rebase origin/main`
 
+-   [ ] these changes are backwards compatible (no breaking changes)
+
+    -   all methods signatures and return values are the same
+    -   any replaced methods are marked as `@deprecated`
+
 -   [ ] tests have been written to cover any new or updated functionality
 
 -   [ ] new configuration parameters have been deployed to all environments, see [configuration management](https://govukverify.atlassian.net/l/cp/N7q3Vh3r).
