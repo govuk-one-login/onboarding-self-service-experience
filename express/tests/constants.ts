@@ -168,3 +168,38 @@ export const TEST_CLIENT: Client = {
 
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>
     "someHeader." + Buffer.from(JSON.stringify(jwtBody)).toString("base64") + ".someSignature";
+
+export const TEST_HELMET_CONFIG = {
+    referrerPolicy: {
+        policy: ["strict-origin"]
+    },
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                "https://www.googletagmanager.com",
+                "https://www.google-analytics.com",
+                "https://ssl.google-analytics.com"
+            ],
+            styleSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
+            objectSrc: ["'none'"],
+            connectSrc: ["'self'", "https://www.google-analytics.com"],
+            formAction: ["'self'"]
+        }
+    },
+    dnsPrefetchControl: {
+        allow: false
+    },
+    frameguard: {
+        action: "deny"
+    },
+    hsts: {
+        maxAge: 31536000, // 1 Year
+        preload: true,
+        includeSubDomains: true
+    },
+    permittedCrossDomainPolicies: false
+}
