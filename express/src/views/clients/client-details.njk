@@ -81,6 +81,16 @@
     <div id="sectorIdentifierUri">{{ sectorIdentifierUri }}</div>
   {% endset %}
 
+  {% set idTokenSigningAlgorithmContainer %}
+    <div id="idTokenSigningAlgorithm">{{ id_token_signing_algorithm }}</div>
+  {% endset %}
+
+{% if identity_verification_enabled %}
+  {% set levelsOfConfidenceContainer %}
+    <div id="levelsOfConfidence">{{ levelsOfConfidence }}</div>
+  {% endset %}
+{% endif %}
+
   {{ govukSummaryList({
     rows: [
       {
@@ -299,6 +309,51 @@
     ]
   }) }}
 
+
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Advanced options</h2>
+
+      {% if identity_verification_enabled and levelsOfConfidenceContainer%}
+    {{ govukSummaryList({
+    rows: [
+            {
+        key: {text: "ID token signing algorithm"},
+        value: {html: idTokenSigningAlgorithmContainer},
+        actions: {
+          items: [{
+            href: urls.changeIdTokenSigningAlgorithm,
+            text: "Change",
+            visuallyHiddenText: "Id Token signing algorithm"
+          }]
+        }
+      },
+      {
+
+        key: {html: "Level of confidence options"},
+        value: {html: levelsOfConfidenceContainer}
+
+      }
+    ]
+     }) }}
+      {% else %}
+      {{ govukSummaryList({
+    rows: [
+            {
+        key: {text: "ID token signing algorithm"},
+        value: {html: idTokenSigningAlgorithmContainer},
+        actions: {
+          items: [{
+            href: urls.changeIdTokenSigningAlgorithm,
+            text: "Change",
+            visuallyHiddenText: "Id Token signing algorithm"
+          }]
+        }
+      }
+    ]
+     }) }}
+  {% endif %}
+
+
+
   <details class="govuk-details" data-module="govuk-details" id="client-details-summary">
     <summary class="govuk-details__summary" id="client-details-summary-toggle">
       <span class="govuk-details__summary-text">Help with API terms</span>
@@ -315,6 +370,11 @@
           provide your own hash value.
         </p>
       {% endif %}
+      <span class="govuk-body govuk-!-font-weight-bold">ID token signing algorithm</span>
+      <p class="govuk-body">Read the <a class="govuk-link" href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/authenticate-your-user/#receive-response-for-make-a-token-request"> technical documents on tokens</a>.</p>
+
+      <span class="govuk-body govuk-!-font-weight-bold">Redirect URIs</span>
+      <p class="govuk-body">Identity details of the page you want your users to see after they sign in to your service.</p>
 
       <span class="govuk-body govuk-!-font-weight-bold">ID token signing algorithm</span>
       <p class="govuk-body">Read the <a class="govuk-link" href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/authenticate-your-user/#receive-response-for-make-a-token-request">technical documents on tokens</a>.</p>
@@ -325,7 +385,7 @@
       <span class="govuk-body govuk-!-font-weight-bold">Public key</span>
       <p class="govuk-body">This lets our services securely send messages to each other. You need to
         <a class="govuk-link" rel="noreferrer noopener" target="_blank"
-           href="https://docs.sign-in.service.gov.uk/before-integrating/generate-a-key/">
+          href="https://docs.sign-in.service.gov.uk/before-integrating/generate-a-key/">
           generate a key pair (opens in new tab)</a>
         and add the public key.
       </p>
