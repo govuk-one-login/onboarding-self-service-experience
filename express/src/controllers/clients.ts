@@ -875,3 +875,19 @@ export const showChangeIdTokenAlgorithmForm: RequestHandler = (req, res) => {
     });
 };
 
+export const processChangeIdTokenAlgorithmForm: RequestHandler = async (req, res) => {
+    const newIdTokenSigningAlgorithm = req.body.idTokenSigningAlgorithm;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {id_token_signing_algorithm: newIdTokenSigningAlgorithm},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "ID token signing algorithm";
+    res.redirect(`/services/${serviceId}/clients`);
+};
