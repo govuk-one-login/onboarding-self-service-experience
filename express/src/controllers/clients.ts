@@ -866,3 +866,12 @@ const sendTxMALog: (req: Request, userId: string, eventName: string) => void = (
         }
     );
 };
+
+export const showChangeIdTokenAlgorithmForm: RequestHandler = (req, res) => {
+    res.render("clients/change-id-token-algorithm.njk", {
+        serviceId: req.context.serviceId,
+        authClientId: req.params.clientId,
+        selfServiceClientId: req.params.selfServiceClientId
+    });
+};
+
