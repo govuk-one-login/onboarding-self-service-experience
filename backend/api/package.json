@@ -6,6 +6,7 @@
     "deploy": "../../infrastructure/dev/deploy.sh api",
     "testpact": "npm --prefix tests/contract-tests run build && npm --prefix tests/contract-tests run test",
     "test": "jest --silent",
+    "test:cov": "jest --silent --coverage",
     "compile": "tsc"
   },
   "dependencies": {
