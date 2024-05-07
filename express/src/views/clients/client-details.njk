@@ -82,7 +82,7 @@
   {% endset %}
 
   {% set idTokenSigningAlgorithmContainer %}
-    <div id="idTokenSigningAlgorithm">{{ id_token_signing_algorithm }}</div>
+    <div id="idTokenSigningAlgorithm">{{ idTokenSigningAlgorithm }}</div>
   {% endset %}
 
 {% if identity_verification_enabled %}
@@ -186,7 +186,7 @@
   {% endset %}
 
   {% set idVerificationEnabledUriContainer %}
-    {% if identityVerificationEnabled %}
+    {% if identity_verification_enabled %}
       <div id="idVerificationEnabledUri">
         Yes
       </div>
@@ -243,7 +243,7 @@
     ]
   }) }}
 
-  {% if identityVerificationEnabled %}
+  {% if identity_verification_enabled %}
   {{ govukSummaryList({
     rows: [
       {
