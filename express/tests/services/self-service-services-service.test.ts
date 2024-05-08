@@ -348,9 +348,15 @@ describe("SelfServiceServicesService tests", () => {
         mockCognitoInterface.getUser.mockResolvedValue({$metadata: {httpStatusCode: 200}});
         const mockUpdates = {service_name: "updated"};
 
-        await mockS4Instance.updateService(TEST_SERVICE_ID, mockUpdates, TEST_ACCESS_TOKEN);
+        await mockS4Instance.updateService(TEST_SERVICE_ID, TEST_SELF_SERVICE_CLIENT_ID, TEST_CLIENT_ID, mockUpdates, TEST_ACCESS_TOKEN);
         expect(mockCognitoInterface.getUser).toHaveBeenCalledWith(TEST_ACCESS_TOKEN);
-        expect(mockLambdaFacade.updateService).toHaveBeenCalledWith(TEST_SERVICE_ID, mockUpdates, TEST_ACCESS_TOKEN);
+        expect(mockLambdaFacade.updateService).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            mockUpdates,
+            TEST_ACCESS_TOKEN
+        );
         expect(console.info).toHaveBeenCalledWith("In self-service-services-service:updateService()");
     });
 
