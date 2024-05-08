@@ -7,7 +7,7 @@ jest.mock("../../src/lib/fixedOTP", () => ({
 }));
 
 import SelfServiceServicesService from "../../src/services/self-service-services-service";
-import {mockCogntioInterface, mockLambdaFacade, request, response} from "../mocks";
+import {mockCognitoInterface, mockLambdaFacade, request, response} from "../mocks";
 import processSecurityCode from "../../src/middleware/sign-in-middleware";
 import {
     TEST_AUTHENTICATION_RESULT,
@@ -38,7 +38,7 @@ describe("processSecurityCode tests", () => {
     it("calls redirect to '/sign-in if the session object lacks an mfaResponse", async () => {
         const mockReq = request({
             app: {
-                get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
+                get: () => new SelfServiceServicesService(mockCognitoInterface, mockLambdaFacade)
             }
         });
         const mockRes = response();
@@ -65,7 +65,7 @@ describe("processSecurityCode tests", () => {
                 password: TEST_PASSWORD
             },
             app: {
-                get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
+                get: () => new SelfServiceServicesService(mockCognitoInterface, mockLambdaFacade)
             },
             body: {
                 securityCode: TEST_SECURITY_CODE
@@ -91,7 +91,7 @@ describe("processSecurityCode tests", () => {
                 password: TEST_PASSWORD
             },
             app: {
-                get: () => new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade)
+                get: () => new SelfServiceServicesService(mockCognitoInterface, mockLambdaFacade)
             },
             body: {
                 securityCode: TEST_SECURITY_CODE

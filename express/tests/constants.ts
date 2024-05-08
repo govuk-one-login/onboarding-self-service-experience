@@ -1,4 +1,8 @@
-import {Service} from "../@types/Service";
+import {SignupStatusStage} from "../src/lib/utils/signup-status";
+import {OnboardingTableItem} from "../@types/OnboardingTableItem";
+import {Service, ServiceFromDynamo} from "../@types/Service";
+import {DynamoUser} from "../@types/user";
+import {Client} from "../@types/client";
 
 export const TEST_TEMPLATE_PATH = "some/template/to/render";
 export const TEST_PASSWORD = "somePassword";
@@ -14,6 +18,7 @@ export const TEST_FULL_NAME = `${TEST_FIRST_NAME} ${TEST_LAST_NAME}`;
 export const TEST_HOST_NAME = "someHost";
 export const TEST_PROTOCOL = "https";
 export const TEST_TIMESTAMP = 1713537678754;
+export const TEST_TIMESTAMP_STRING = "2024-04-19T15:41:18.754";
 export const TEST_DYNAMO_USER = {
     pk: {S: "user#12345"},
     phone: {S: TEST_PHONE_NUMBER}
@@ -26,13 +31,17 @@ export const TEST_MFA_RESPONSE = {
     codeSentTo: TEST_PHONE_NUMBER
 };
 export const TEST_SECURITY_CODE = "123456";
+export const TEST_ACCESS_TOKEN = "someAccessToken";
+export const TEST_REFRESH_TOKEN = "someRefreshToken";
 export const TEST_AUTHENTICATION_RESULT = {
-    AccessToken: "someAccessToken",
+    AccessToken: TEST_ACCESS_TOKEN,
     ExpiresIn: 12345,
     TokenType: "SomeTokenType",
     RefreshToken: "someRefreshToken",
     IdToken: "someIdToken"
 };
+export const TEST_SIGN_UP_STATUS = "HasEmail,HasPassword";
+export const TEST_SIGN_UP_STATUS_STAGE = SignupStatusStage.HasEmail;
 export const TEST_COGNITO_SESSION_STRING = "session9fee3263-ced5-4a0d-9b8a-d640646286c5";
 export const TEST_UUID = "eb93a770-fff9-4145-9773-343aee098d83";
 export const TEST_SERVICE_NAME = "someTestService";
@@ -45,9 +54,9 @@ export const TEST_JWT = JSON.stringify({
     email: TEST_EMAIL,
     scopes: TEST_SCOPES
 });
-
+export const TEST_USER_ID = "user#1234";
 export const TEST_USER = {
-    id: "12334",
+    id: TEST_USER_ID.substring("user#".length),
     fullName: TEST_FULL_NAME,
     firstName: TEST_FIRST_NAME,
     lastName: TEST_LAST_NAME,
@@ -55,10 +64,101 @@ export const TEST_USER = {
     mobileNumber: TEST_PHONE_NUMBER,
     passwordLastUpdated: "2024-04-19T14:41:18.754Z"
 };
+
+export const TEST_USER_FROM_DYNAMO: DynamoUser = {
+    pk: {S: TEST_USER_ID},
+    sk: {S: TEST_COGNITO_ID},
+    data: {S: TEST_FULL_NAME},
+    first_name: {S: TEST_FIRST_NAME},
+    last_name: {S: TEST_LAST_NAME},
+    email: {S: TEST_EMAIL},
+    phone: {S: TEST_PHONE_NUMBER},
+    password_last_updated: {S: "2024-04-19T14:41:18.754Z"}
+};
 export const TEST_SERVICE_ID = "service#123";
 export const TEST_SERVICE: Service = {
-    id: TEST_SERVICE_ID,
+    id: TEST_SERVICE_ID.substring("service#".length),
     serviceName: TEST_SERVICE_NAME
 };
+export const TEST_RANDOM_NUMBER = 123456;
+export const TEST_CLIENT_ID = "ajedebd2343";
+export const TEST_COGNITO_CLIENT_ID = "c5cdaf0c-f92d-4ef7-922e";
+export const TEST_COGNITO_USER_POOL_ID = "1234-abcd-1234567890ab";
+export const TEST_AWS_REGION = "someRegion";
+export const TEST_API_BASE_URL = "some.base.url";
+export const TEST_ONBOARDING_TABLE_ITEM: OnboardingTableItem = {
+    pk: TEST_SERVICE_ID,
+    sk: TEST_CLIENT_ID
+};
+export const TEST_SERVICE_FROM_DYNAMO: ServiceFromDynamo = {
+    pk: {S: TEST_SERVICE_ID},
+    sk: {S: TEST_USER_ID},
+    data: {S: ""},
+    service_name: {S: TEST_SERVICE_NAME}
+};
+export const TEST_SELF_SERVICE_CLIENT_ID = "someSelfServiceClientId";
+export const TEST_PUBLIC_KEY = "somePubKey";
+export const TEST_DYNAMO_ID = "client#456";
+export const TEST_CLIENT_NAME = "someClientName";
+export const TEST_REDIRECT_URI = "someRedirectURI";
+export const TEST_POST_LOGOUT_REDIRECT_URI = "somePostLogOutRedirectURI";
+export const TEST_CLIENT_SCOPES = "scope1";
+export const TEST_SERVICE_TYPE = "serviceType";
+export const TEST_SUBJECT_TYPE = "subject";
+export const TEST_BACK_CHANNEL_LOGOUT_URI = "someBackChannel";
+export const TEST_SECTOR_IDENTIFIER_URI = "someSectorIdentifier";
+export const TEST_TOKEN_AUTH_METHOD = "private_key_jwt";
+export const TEST_CLIENT_SECRET = "someSecret";
+export const TEST_TYPE = "someType";
+export const TEST_IDENTITY_VERIFICATION_ENABLED = true;
+export const TEST_CLAIM = "someClaims";
+export const TEST_DEFAULT_FIELD = "someFields";
+
+export const TEST_DYNAMO_CLIENT = {
+    pk: {S: TEST_SERVICE_ID},
+    sk: {S: TEST_DYNAMO_ID},
+    clientId: {S: TEST_CLIENT_ID},
+    contacts: {L: [{S: TEST_EMAIL}]},
+    default_fields: {L: [{S: TEST_DEFAULT_FIELD}]},
+    post_logout_redirect_uris: {L: [{S: TEST_POST_LOGOUT_REDIRECT_URI}]},
+    public_key: {S: TEST_PUBLIC_KEY},
+    redirect_uris: {L: [{S: TEST_REDIRECT_URI}]},
+    scopes: {L: [{S: TEST_CLIENT_SCOPES}]},
+    client_name: {S: TEST_CLIENT_NAME},
+    service_name: {S: TEST_SERVICE_NAME},
+    service_type: {S: TEST_SERVICE_TYPE},
+    subject_type: {S: TEST_SUBJECT_TYPE},
+    back_channel_logout_uri: {S: TEST_BACK_CHANNEL_LOGOUT_URI},
+    sector_identifier_uri: {S: TEST_SECTOR_IDENTIFIER_URI},
+    token_endpoint_auth_method: {S: TEST_TOKEN_AUTH_METHOD},
+    client_secret: {S: TEST_CLIENT_SECRET},
+    type: {S: TEST_TYPE},
+    identity_verification_enabled: {B: TEST_IDENTITY_VERIFICATION_ENABLED},
+    claims: {L: [{S: TEST_CLAIM}]}
+};
+
+export const TEST_CLIENT: Client = {
+    dynamoId: TEST_SERVICE_ID.substring("service#".length),
+    dynamoServiceId: TEST_DYNAMO_ID.substring("client#".length),
+    authClientId: TEST_CLIENT_ID,
+    contacts: [TEST_EMAIL],
+    defaultFields: [TEST_DEFAULT_FIELD],
+    postLogoutUris: [TEST_POST_LOGOUT_REDIRECT_URI],
+    publicKey: TEST_PUBLIC_KEY,
+    redirectUris: [TEST_REDIRECT_URI],
+    scopes: [TEST_CLIENT_SCOPES],
+    clientName: TEST_CLIENT_NAME,
+    serviceName: TEST_SERVICE_NAME,
+    serviceType: TEST_SERVICE_TYPE,
+    subjectType: TEST_SUBJECT_TYPE,
+    back_channel_logout_uri: TEST_BACK_CHANNEL_LOGOUT_URI,
+    sector_identifier_uri: TEST_SECTOR_IDENTIFIER_URI,
+    token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD,
+    client_secret: TEST_CLIENT_SECRET,
+    type: TEST_TYPE,
+    identity_verification_enabled: TEST_IDENTITY_VERIFICATION_ENABLED,
+    claims: [TEST_CLAIM]
+};
+
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>
     "someHeader." + Buffer.from(JSON.stringify(jwtBody)).toString("base64") + ".someSignature";
