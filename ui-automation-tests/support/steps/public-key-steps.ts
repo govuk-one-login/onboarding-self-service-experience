@@ -52,7 +52,7 @@ Then("they should see the public key they just entered", async function (this: T
 
 Given("the public key has not been added yet by the user", async function (this: TestContext) {
     const keyContainerContent = await this.page.$eval("#publicKeyContainer", element => element.textContent);
-    assert.equal(keyContainerContent?.trim(), "Not yet added");
+    assert.equal(keyContainerContent?.trim(), "Not added yet");
 });
 
 Then("they are able see their full public key", async function (this: TestContext) {

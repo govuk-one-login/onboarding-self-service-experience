@@ -1,8 +1,8 @@
 import DynamoDbClient from "../../../src/dynamodb-client";
 import {TEST_SERVICE_ID, TEST_SERVICE_NAME, TEST_USER_DYNAMO_ID, TEST_USER_EMAIL} from "../constants";
-import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils";
-import {putServiceUserHandler} from "./../../../src/handlers/dynamodb/put-service-user";
+import {putServiceUserHandler} from "../../../src/handlers/dynamodb/put-service-user";
 import {PutItemCommandOutput} from "@aws-sdk/client-dynamodb";
+import {handlerInvokeEvent} from "../../../src/handlers/handler-utils";
 
 const TEST_PUT_USER_PAYLOAD = {
     service: {
@@ -12,7 +12,11 @@ const TEST_PUT_USER_PAYLOAD = {
     userEmail: TEST_USER_EMAIL,
     userDynamoId: TEST_USER_DYNAMO_ID
 };
-const TEST_PUT_USER_INVOKE_EVENT = constructTestApiGatewayEvent({body: JSON.stringify(TEST_PUT_USER_PAYLOAD), pathParameters: {}});
+
+const TEST_PUT_USER_INVOKE_EVENT: handlerInvokeEvent = {
+    statusCode: 200,
+    body: JSON.stringify(TEST_PUT_USER_PAYLOAD)
+};
 
 const TEST_SERVICE_USER_RECORD = {
     pk: TEST_SERVICE_ID,
@@ -31,7 +35,7 @@ describe("putServiceUser tests", () => {
         const dynamoPutItemResponse: PutItemCommandOutput = {$metadata: {httpStatusCode: 200}, Attributes: {}};
         const dynamoPutSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockResolvedValue(dynamoPutItemResponse);
 
-        const response = await putServiceUserHandler(TEST_PUT_USER_INVOKE_EVENT, mockLambdaContext);
+        const response = await putServiceUserHandler(TEST_PUT_USER_INVOKE_EVENT);
         expect(dynamoPutSpy).toHaveBeenCalledWith(TEST_SERVICE_USER_RECORD);
         expect(response).toStrictEqual({
             statusCode: 200,
@@ -43,7 +47,7 @@ describe("putServiceUser tests", () => {
         const dynamoErr = "SomeDynamoError";
         const dynamoPutSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(dynamoErr);
 
-        const response = await putServiceUserHandler(TEST_PUT_USER_INVOKE_EVENT, mockLambdaContext);
+        const response = await putServiceUserHandler(TEST_PUT_USER_INVOKE_EVENT);
         expect(dynamoPutSpy).toHaveBeenCalledWith(TEST_SERVICE_USER_RECORD);
         expect(response).toStrictEqual({
             statusCode: 500,

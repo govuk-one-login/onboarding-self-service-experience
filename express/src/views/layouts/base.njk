@@ -10,6 +10,9 @@
 {% set phaseTagText  = "test" if showTestBanner else "beta" %}
 {% set phaseBannerClasses  = "test-banner" if showTestBanner %}
 {% set phaseBannerHtml = "This is a test environment." %}
+
+{% set govUkGridClass = gridClass or "govuk-grid-column-two-thirds" %}
+
 {% if not showTestBanner %}
   {% set phaseBannerHtml %}
     This is a new service – your
@@ -105,7 +108,7 @@
 
 {% block content %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
+    <div class="{{ govUkGridClass }}">
       {% block mainContent %}{% endblock %}
     </div>
   </div>

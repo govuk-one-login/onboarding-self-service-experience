@@ -1,22 +1,37 @@
 import {Router} from "express";
 import {
-    processChangePostLogoutUrisForm,
+    processChangeBackChannelLogOutUriForm,
+    showAddPostLogoutUriForm,
     processChangePublicKeyForm,
-    processChangeRedirectUrlsForm,
+    processChangeSectorIdentifierUriForm,
     processChangeServiceNameForm,
     processChangeUserAttributesForm,
+    processConfirmContactRemovalForm,
+    processEnterContactEmailForm,
     processPublicBetaForm,
+    showChangeBackChannelLogoutUriForm,
     showChangePostLogoutUrisForm,
     showChangePublicKeyForm,
     showChangeRedirectUrlsForm,
+    showChangeSectorIdentifierUriForm,
     showChangeServiceNameForm,
     showChangeUserAttributesForm,
     showClient,
+    showConfirmContactRemovalForm,
+    showEnterContactEmailForm,
+    showEnterContactForm,
     showPublicBetaForm,
-    showPublicBetaFormSubmitted
+    showPublicBetaFormSubmitted,
+    processAddPostLogoutUriForm,
+    showConfirmPostLogoutUriRemovalForm,
+    processRemovePostLogoutUriFrom,
+    showAddRedirectUriForm,
+    processAddRedirectUriForm,
+    showConfirmRedirectUriRemovalForm,
+    processRemoveRedirectUriFrom
 } from "../controllers/clients";
 import convertPublicKeyForAuth from "../middleware/convert-public-key";
-import validateUris from "../middleware/validators/uris-validator";
+import validateUri from "../middleware/validators/uri-validator";
 
 const router = Router();
 export default router;
@@ -37,17 +52,55 @@ router
     .get(showChangePublicKeyForm)
     .post(convertPublicKeyForAuth, processChangePublicKeyForm);
 
+router.route("/:clientId/:selfServiceClientId/change-redirect-uris").get(showChangeRedirectUrlsForm);
+
 router
-    .route("/:clientId/:selfServiceClientId/change-redirect-uris")
-    .get(showChangeRedirectUrlsForm)
-    .post(validateUris("clients/change-redirect-uris.njk"), processChangeRedirectUrlsForm);
+    .route("/:clientId/:selfServiceClientId/add-redirect-uri")
+    .get(showAddRedirectUriForm)
+    .post(validateUri("clients/add-redirect-uri.njk", "redirectUri"), processAddRedirectUriForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/confirm-redirect-uri-removal")
+    .get(showConfirmRedirectUriRemovalForm)
+    .post(processRemoveRedirectUriFrom);
 
 router
     .route("/:clientId/:selfServiceClientId/change-user-attributes")
     .get(showChangeUserAttributesForm)
     .post(processChangeUserAttributesForm);
 
+router.route("/:clientId/:selfServiceClientId/change-post-logout-uris").get(showChangePostLogoutUrisForm);
+
+router.route("/:clientId/:selfServiceClientId/change-post-logout-uris").get(showChangePostLogoutUrisForm);
+
+router.route("/:clientId/:selfServiceClientId/enter-contact").get(showEnterContactForm);
+
 router
-    .route("/:clientId/:selfServiceClientId/change-post-logout-uris")
-    .get(showChangePostLogoutUrisForm)
-    .post(validateUris("clients/change-post-logout-uris.njk"), processChangePostLogoutUrisForm);
+    .route("/:clientId/:selfServiceClientId/confirm-contact-removal")
+    .get(showConfirmContactRemovalForm)
+    .post(processConfirmContactRemovalForm);
+
+router.route("/:clientId/:selfServiceClientId/enter-contact-email").get(showEnterContactEmailForm).post(processEnterContactEmailForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/add-post-logout-uri")
+    .get(showAddPostLogoutUriForm)
+    .post(validateUri("clients/add-post-logout-uri.njk", "postLogoutRedirectUri"), processAddPostLogoutUriForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/confirm-post-logout-uri-removal")
+    .get(showConfirmPostLogoutUriRemovalForm)
+    .post(processRemovePostLogoutUriFrom);
+
+router
+    .route("/:clientId/:selfServiceClientId/change-back-channel-logout-uri")
+    .get(showChangeBackChannelLogoutUriForm)
+    .post(
+        validateUri("clients/change-back-channel-logout-uri.njk", "backChannelLogoutUri", false, true),
+        processChangeBackChannelLogOutUriForm
+    );
+
+router
+    .route("/:clientId/:selfServiceClientId/change-sector-identifier-uri")
+    .get(showChangeSectorIdentifierUriForm)
+    .post(validateUri("clients/change-sector-identifier-uri.njk", "sectorIdentifierUri", true), processChangeSectorIdentifierUriForm);

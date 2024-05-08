@@ -125,6 +125,11 @@ Then("they should see the text {string}", async function (this: TestContext, tex
     assert.equal(bodyText?.includes(text), true, `Body text does not contain '${text}'`);
 });
 
+Then("they should not see the text {string}", async function (this: TestContext, text) {
+    const bodyText = await this.page.$eval("body", element => element.textContent);
+    assert.equal(bodyText?.includes(text), false, `Body text does not contain '${text}'`);
+});
+
 Then("the {string} link will point to the following URL: {string}", async function (linkText, expectedUrl) {
     const link = await getLink(this.page, linkText);
     await checkUrl(this.page, link, expectedUrl);
@@ -164,3 +169,13 @@ Then(/^there should be no accessibility violations$/, async function (this: Test
 
 // eslint-disable-next-line
 Then("pause whilst waiting to complete", {timeout: 1 * 5000}, async function () {});
+
+Then("they they should not see a link that points to {string}", async function (href: string) {
+    const links = await this.page.$x(`//a[contains(@href, "${href}")]`);
+    assert.equal(links.length, 0, "The link exists");
+});
+
+Then("they should see a link that points to {string}", async function (href: string) {
+    const links = await this.page.$x(`//a[contains(@href, "${href}")]`);
+    assert.equal(links.length, 1, `The link pointing to "${href}" does not exist or is not unique`);
+});

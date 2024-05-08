@@ -1,5 +1,6 @@
 import {putServiceClientHandler} from "../../../src/handlers/dynamodb/put-service-client";
 import DynamoDbClient from "../../../src/dynamodb-client";
+import ResolvedValue = jest.ResolvedValue;
 
 const randomId = "1234Random";
 jest.mock("crypto", () => ({
@@ -28,7 +29,9 @@ const testRegistrationResponse = {
         id: "service#1234Random",
         serviceName: "Test Service"
     },
-    contactEmail: "test.test@test.gov.uk"
+    contact_email: "test.test@test.gov.uk",
+    id_token_signing_algorithm: "RSA256",
+    client_locs: ["P2"]
 };
 
 const expectedDynamoRecord = {
@@ -49,6 +52,8 @@ const expectedDynamoRecord = {
     back_channel_logout_uri: testRegistrationResponse.back_channel_logout_uri,
     sector_identifier_uri: testRegistrationResponse.sector_identifier_uri,
     token_endpoint_auth_method: testRegistrationResponse.token_endpoint_auth_method,
+    id_token_signing_algorithm: testRegistrationResponse.id_token_signing_algorithm,
+    client_locs: testRegistrationResponse.client_locs,
     default_fields: [
         "data",
         "public_key",
@@ -61,9 +66,14 @@ const expectedDynamoRecord = {
         "claims",
         "sector_identifier_uri",
         "back_channel_logout_uri",
-        "token_endpoint_auth_method"
+        "token_endpoint_auth_method",
+        "id_token_signing_algorithm"
     ]
 };
+
+function createResolvedValue(): ResolvedValue<string> {
+    return <ResolvedValue<string>>expectedDynamoRecord;
+}
 
 describe("putServiceClientHandler tests", () => {
     beforeEach(() => {
@@ -71,16 +81,14 @@ describe("putServiceClientHandler tests", () => {
     });
 
     it("calls the dynamo client with a put command with the expected values and returns a 200 with the expected response body", async () => {
-        const putItemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockResolvedValue({
-            $metadata: {}
-        });
+        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockResolvedValue(createResolvedValue());
 
         const putServiceHandlerResponse = await putServiceClientHandler({
             statusCode: 200,
             body: JSON.stringify(testRegistrationResponse)
         });
 
-        expect(putItemSpy).toHaveBeenCalledWith(expectedDynamoRecord);
+        expect(itemSpy).toHaveBeenCalledWith(expectedDynamoRecord);
         expect(putServiceHandlerResponse).toStrictEqual({
             statusCode: 200,
             body: JSON.stringify(expectedDynamoRecord)
@@ -89,14 +97,14 @@ describe("putServiceClientHandler tests", () => {
 
     it("calls the dynamo client with a put command with the expected values and returns a 500 when the dynamo client throws an error", async () => {
         const error = "SomeAwsError";
-        const putItemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(error);
+        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(error);
 
         const putServiceHandlerResponse = await putServiceClientHandler({
             statusCode: 200,
             body: JSON.stringify(testRegistrationResponse)
         });
 
-        expect(putItemSpy).toHaveBeenCalledWith(expectedDynamoRecord);
+        expect(itemSpy).toHaveBeenCalledWith(expectedDynamoRecord);
         expect(putServiceHandlerResponse).toStrictEqual({
             statusCode: 500,
             body: JSON.stringify(error)

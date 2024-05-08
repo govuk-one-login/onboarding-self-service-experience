@@ -1,20 +1,20 @@
 import {Request} from "express";
-import validateUris from "../../../src/middleware/validators/uris-validator";
+import validateUri from "../../../src/middleware/validators/uri-validator";
 import {request, response} from "../../mocks";
 
 let req: Request;
 
 const next = jest.fn();
 const res = response();
-const validator = validateUris("template.njk");
+const validator = validateUri("template.njk", "redirectUri");
 
 describe("Validate submitted URIs", () => {
     beforeEach(() => {
-        req = request({params: {serviceId: "foo", selfServiceClientId: "bar", clientId: "baz"}});
+        req = request({params: {selfServiceClientId: "bar", clientId: "baz"}, context: {serviceId: "foo"}});
     });
 
     it("Call next middleware if the URIs are valid", () => {
-        req.body.redirectUris = "https://valid.gov.uk/ https://also-valid.gov.uk";
+        req.body.redirectUri = "https://valid.gov.uk/";
         validator(req, res, next);
 
         expect(next).toHaveBeenCalled();
@@ -22,7 +22,7 @@ describe("Validate submitted URIs", () => {
     });
 
     it("Render errors if the URIs are not valid", () => {
-        req.body.redirectUris = "http://invalid.gov.uk/ http://also-invalid.gov.uk";
+        req.body.redirectUri = "http://invalid.gov.uk/";
         validator(req, res, next);
 
         expect(next).not.toHaveBeenCalled();

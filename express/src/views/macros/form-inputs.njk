@@ -49,8 +49,8 @@
   }) }}
 {% endmacro %}
 
-{% macro emailInput(label, hint, classes = "govuk-!-width-three-quarters", value, disabled) %}
-  {{ textInput(label | default("Email address"), "emailAddress", classes, hint, "email", "email", value = value, disabled = disabled) }}
+{% macro emailInput(label, hint, classes = "govuk-!-width-three-quarters", value, labelClasses, isPageHeading, disabled) %}
+  {{ textInput(label | default("Email address"), "emailAddress", classes, hint, "email", "email", value = value, labelClasses = labelClasses, isPageHeading = isPageHeading, disabled = disabled) }}
 {% endmacro %}
 
 {% macro passwordInput(label, id, hint, autocomplete = "current-password") %}
@@ -83,6 +83,10 @@
 
 {% macro urlInput(label) %}
   {{ textInput(label, "redirectUris", "govuk-!-width-full", "Enter a URL starting with https:// or a localhost URL starting with http://", "url", "url") }}
+{% endmacro %}
+
+{% macro uriInput(label, id) %}
+  {{ textInput(label, id, "govuk-!-width-full", "" , "url", "url") }}
 {% endmacro %}
 
 {% macro hiddenInput(id, value) %}
