@@ -113,6 +113,8 @@ export const TEST_TYPE = "someType";
 export const TEST_IDENTITY_VERIFICATION_ENABLED = true;
 export const TEST_CLAIM = "someClaims";
 export const TEST_DEFAULT_FIELD = "someFields";
+export const TEST_ID_SIGNING_TOKEN_ALGORITHM = "ES256";
+export const TEST_LEVELS_OF_CONFIDENCE = "P2";
 
 export const TEST_DYNAMO_CLIENT = {
     pk: {S: TEST_SERVICE_ID},
@@ -134,7 +136,9 @@ export const TEST_DYNAMO_CLIENT = {
     client_secret: {S: TEST_CLIENT_SECRET},
     type: {S: TEST_TYPE},
     identity_verification_enabled: {B: TEST_IDENTITY_VERIFICATION_ENABLED},
-    claims: {L: [{S: TEST_CLAIM}]}
+    claims: {L: [{S: TEST_CLAIM}]},
+    id_token_signing_algorithm: {S: TEST_ID_SIGNING_TOKEN_ALGORITHM},
+    client_locs: {L: [{S: TEST_LEVELS_OF_CONFIDENCE}]}
 };
 
 export const TEST_CLIENT: Client = {
@@ -157,7 +161,9 @@ export const TEST_CLIENT: Client = {
     client_secret: TEST_CLIENT_SECRET,
     type: TEST_TYPE,
     identity_verification_enabled: TEST_IDENTITY_VERIFICATION_ENABLED,
-    claims: [TEST_CLAIM]
+    claims: [TEST_CLAIM],
+    id_token_signing_algorithm: TEST_ID_SIGNING_TOKEN_ALGORITHM,
+    client_locs: [TEST_LEVELS_OF_CONFIDENCE]
 };
 
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>

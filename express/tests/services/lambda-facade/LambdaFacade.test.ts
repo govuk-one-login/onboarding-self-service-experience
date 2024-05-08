@@ -91,10 +91,12 @@ describe("Lambda Facade class tests", () => {
         };
         const expectedRequestBody = {
             serviceId: TEST_SERVICE_ID,
+            selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+            clientId: TEST_CLIENT_ID,
             updates: mockUpdates
         };
 
-        await mockLambdaFacade.updateService(TEST_SERVICE_ID, mockUpdates, TEST_ACCESS_TOKEN);
+        await mockLambdaFacade.updateService(TEST_SERVICE_ID, TEST_SELF_SERVICE_CLIENT_ID, TEST_CLIENT_ID, mockUpdates, TEST_ACCESS_TOKEN);
         expect(mockPost).toHaveBeenCalledWith("/update-service", JSON.stringify(expectedRequestBody), {
             headers: {
                 "authorised-by": TEST_ACCESS_TOKEN
