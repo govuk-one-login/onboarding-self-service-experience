@@ -1,5 +1,6 @@
 import DynamoDbClient from "../../dynamodb-client";
 import {Updates} from "../../dynamodb-client";
+import {handlerInvokeEvent} from "../handler-utils";
 
 const client = new DynamoDbClient();
 
@@ -10,12 +11,7 @@ export type clientRegistryUpdateResponse = {
     updates: Updates;
 };
 
-export type updateServiceHandlerInvokeEvent = {
-    statusCode: number;
-    body: string;
-};
-
-export const updateServiceClientHandler = async (event: updateServiceHandlerInvokeEvent): Promise<{statusCode: number; body: string}> => {
+export const updateServiceClientHandler = async (event: handlerInvokeEvent): Promise<{statusCode: number; body: string}> => {
     const payload: clientRegistryUpdateResponse = JSON.parse(event.body);
 
     const response = {statusCode: 200, body: JSON.stringify("OK")};

@@ -14,9 +14,11 @@ const fields = {
     "service name": "serviceName",
     "new password": "newPassword",
     "current password": "currentPassword",
-    "redirect uris": "redirectUris",
-    "post logout redirect uris": "redirectUris",
-    "change your public key": "serviceUserPublicKey"
+    "redirect uri": "redirectUri",
+    "post logout redirect uri": "postLogoutRedirectUri",
+    "change your public key": "serviceUserPublicKey",
+    "back channel logout uri": "backChannelLogoutUri",
+    "sector identifier uri": "sectorIdentifierUri"
 };
 
 When("they submit the {} {string}", async function (fieldName, value) {

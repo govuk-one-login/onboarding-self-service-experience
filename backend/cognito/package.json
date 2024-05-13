@@ -5,6 +5,7 @@
     "build": "../../infrastructure/dev/deploy.sh cognito --no-deploy",
     "deploy": "../../infrastructure/dev/deploy.sh cognito",
     "test": "jest --silent",
+    "test:cov": "jest --silent --coverage",
     "compile": "tsc"
   },
   "dependencies": {

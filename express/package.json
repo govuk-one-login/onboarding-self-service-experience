@@ -12,8 +12,8 @@
     "buildjs": "cp -r assets/javascripts dist/assets/",
     "buildgovuk": "govuk=$(npm ls -p govuk-frontend)/govuk; cp -r $govuk/assets/* dist/assets/ && cp $govuk/all.js dist/assets/javascripts/govuk-all.js",
     "build": "npm run buildts && npm run buildsass && npm run buildjs && npm run buildgovuk && npm run minifyjs",
-    "coverage": "jest --coverage --coverageDirectory coverage --silent",
     "test": "jest --silent",
+    "test:cov": "jest --silent --coverage",
     "acceptance": "npm run acceptance-tests -w ../ui-automation-tests --",
     "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile-dev .."
   },
@@ -37,6 +37,8 @@
     "nodemon": "^3.0.1",
     "sass": "^1.60.0",
     "typescript": "^5.2.2",
-    "uglify-js": "^3.17.4"
+    "uglify-js": "^3.17.4",
+    "aws-sdk-client-mock": "^4.0.0",
+    "aws-sdk-client-mock-jest": "^4.0.0"
   }
 }

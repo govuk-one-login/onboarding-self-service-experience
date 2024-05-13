@@ -15,10 +15,6 @@
             <li class="govuk-breadcrumbs__list-item govuk-!-font-size-19 govuk-!-font-weight-bold">{{ serviceName }}</li>
           {% endif %}
         </ol>
-        <a href="/services/{{ serviceId }}/clients/{{ clientId }}/{{ selfServiceClientId }}/change-service-name?serviceName={{ serviceName }}"
-           class="govuk-link govuk-link--no-visited-state navigation-service-change govuk-!-font-size-19">
-          Change service name
-        </a>
       </div>
     </div>
   </nav>
@@ -32,7 +28,7 @@
         <nav class="side-navigation govuk-!-margin-top-3">
           <ul class="govuk-list side-navigation__list">
             <li class="side-navigation__item{% if sidebarActiveItem == 'client-details' %} side-navigation__item--active{% endif %}">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}/clients">Client details</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}/clients">Manage {{ serviceName }}</a>
             </li>
             <li class="side-navigation__item{% if sidebarActiveItem == 'public-beta' %} side-navigation__item--active{% endif %}">
               <a class="govuk-link govuk-link--no-visited-state" href="/services/{{ serviceId }}/clients/{{ clientId }}/{{ selfServiceClientId }}/public-beta">

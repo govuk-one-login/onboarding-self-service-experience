@@ -232,10 +232,16 @@ export default class SelfServiceServicesService {
         return this.lambda.updateClient(serviceId, selfServiceClientId, clientId, updates, accessToken);
     }
 
-    async updateService(serviceId: string, updates: ServiceNameUpdates, accessToken: string): Promise<void> {
+    async updateService(
+        serviceId: string,
+        selfServiceClientId: string,
+        clientId: string,
+        updates: ServiceNameUpdates,
+        accessToken: string
+    ): Promise<void> {
         console.info("In self-service-services-service:updateService()");
         await this.validateToken(accessToken, "updateService");
-        return this.lambda.updateService(serviceId, updates, accessToken);
+        return this.lambda.updateService(serviceId, selfServiceClientId, clientId, updates, accessToken);
     }
 
     private async validateToken(accessToken: string, message: string) {

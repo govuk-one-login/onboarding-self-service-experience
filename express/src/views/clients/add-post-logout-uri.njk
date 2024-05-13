@@ -1,0 +1,24 @@
+{% extends "layouts/form.njk" %}
+
+{% set pageTitle = "Enter post logout redirect URI" %}
+{% set formButtonText = "Confirm" %}
+
+{% if postLogoutRedirectUris | length == 0 %}
+  {% set backLinkPath %}
+      /services/{{ serviceId }}/clients/
+  {% endset %}
+{% else %}
+  {% set backLinkPath %}
+      /services/{{ serviceId }}/clients/{{ authClientId }}/{{ selfServiceClientId }}/change-post-logout-uris
+  {% endset %}
+{% endif %}
+
+{% set formCancelUrl = backLinkPath %}
+
+{% block beforeForm %}
+    <h1 class="govuk-heading-l govuk-!-margin-top-3">Enter post logout redirect URI</h1>
+{% endblock %}
+
+{% block formInputs %}
+    {{ form.uriInput("", "postLogoutRedirectUri", "") }}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layouts/form.njk" %}
+
+{% set pageTitle = "Are you sure you want to remove this post logout redirect URI?" %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/{{ authClientId }}/{{ selfServiceClientId }}/change-post-logout-uris
+{% endset %}
+{% set uriToRemove = uriToRemove %}
+{% set formButtonText = "Confirm" %}
+{% set gridClass = "govuk-grid-column-full" %}
+
+{% block formInputs %}
+  {{ form.radiosInput(
+    "Are you sure you want to remove this post logout redirect URI?",
+    "govuk-fieldset__legend--l",
+    name = "removeUri",
+    items = [
+      {text: "Yes", value: "yes"},
+      {text: "No", value: "no"}
+    ],
+    isPageHeading = true
+  ) }}
+  {{ form.hiddenInput("uriToRemove", uriToRemove) }}
+{% endblock %}

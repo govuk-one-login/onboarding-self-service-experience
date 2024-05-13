@@ -14,8 +14,11 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private publicKey = defaultPublicKey;
     private serviceName = "Test Service";
     private redirectUris = ["http://localhost/"];
-    private postLogoutRedirectUris = ["http://localhost/", "http://localhost/logged_out"];
+    private postLogoutRedirectUris = [];
     private scopes = ["openid"];
+    private backChannelLogoutUri = [];
+    private sectorIdentifierUri = "http://gov.uk";
+    private contacts = ["registered@test.gov.uk", "mockuser2@gov.uk", "mockuser3@gov.uk"];
 
     private user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
@@ -69,16 +72,28 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
             this.redirectUris = updates.redirect_uris as string[];
         }
 
+        if (updates.contacts) {
+            this.contacts = updates.contacts as string[];
+        }
+
         if (updates.post_logout_redirect_uris) {
-            this.postLogoutRedirectUris = updates.post_logout_redirect_uris as string[];
+            this.postLogoutRedirectUris = updates.post_logout_redirect_uris as [];
         }
 
         if (updates.scopes) {
             this.scopes = updates.scopes as string[];
         }
+
+        if (updates.back_channel_logout_uri) {
+            this.backChannelLogoutUri = updates.back_channel_logout_uri as [];
+        }
+
+        if (updates.sector_identifier_uri) {
+            this.sectorIdentifierUri = updates.sector_identifier_uri as string;
+        }
     }
 
-    async updateService(serviceId: string, updates: ServiceNameUpdates): Promise<void> {
+    async updateService(serviceId: string, selfServiceClientId: string, clientId: string, updates: ServiceNameUpdates): Promise<void> {
         if (updates.service_name) {
             this.serviceName = updates.service_name as string;
         }
@@ -119,8 +134,10 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                     {
                         service_name: {S: this.serviceName},
                         post_logout_redirect_uris: convertToAttr(this.postLogoutRedirectUris),
+                        sector_identifier_uri: {S: this.sectorIdentifierUri},
+                        back_channel_logout_uri: {S: this.backChannelLogoutUri},
                         subject_type: {S: "pairwise"},
-                        contacts: {L: [{S: "john.watts@test.gov.uk"}, {S: "onboarding@test.gov.uk"}]},
+                        contacts: convertToAttr(this.contacts),
                         public_key: {
                             S: this.publicKey
                         },
@@ -132,7 +149,10 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                                 {S: "public_key"},
                                 {S: "redirect_uris"},
                                 {S: "scopes"},
+                                {S: "contacts"},
                                 {S: "post_logout_redirect_uris"},
+                                {S: "sector_identifier_uri"},
+                                {S: "back_channel_logout_uri"},
                                 {S: "subject_type"},
                                 {S: "service_type"}
                             ]

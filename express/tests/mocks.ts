@@ -1,9 +1,7 @@
 import {Request, Response} from "express";
-import CognitoInterface from "../src/services/cognito/CognitoInterface";
-import LambdaFacadeInterface from "../src/services/lambda-facade/LambdaFacadeInterface";
 import SelfServiceServicesService from "../src/services/self-service-services-service";
 
-export const mockLambdaFacade: LambdaFacadeInterface = {
+export const mockLambdaFacade = {
     sendTxMALog: jest.fn(),
     getDynamoDBEntries: jest.fn(),
     deleteClientEntries: jest.fn(),
@@ -21,7 +19,7 @@ export const mockLambdaFacade: LambdaFacadeInterface = {
     sessionCount: jest.fn()
 };
 
-export const mockCogntioInterface: CognitoInterface = {
+export const mockCognitoInterface = {
     login: jest.fn(),
     adminGetUserCommandOutput: jest.fn(),
     changePassword: jest.fn(),
@@ -52,7 +50,7 @@ export const request = (properties?: Partial<Request> | object) =>
         session: {},
         app: {
             get: (keyName: string) => {
-                if (keyName === "backing-service") return new SelfServiceServicesService(mockCogntioInterface, mockLambdaFacade);
+                if (keyName === "backing-service") return new SelfServiceServicesService(mockCognitoInterface, mockLambdaFacade);
             }
         },
         params: {},

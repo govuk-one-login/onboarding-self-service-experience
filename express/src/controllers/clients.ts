@@ -6,6 +6,8 @@ import {v4 as uuid_4} from "uuid";
 import SheetsService from "../lib/sheets/SheetsService";
 import console from "console";
 import getTimestamp from "../lib/timestamp";
+import {removeContact, addContact} from "../lib/updateContacts";
+import validate from "../lib/validators/email-validator";
 
 const defaultPublicKey =
     "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
@@ -19,8 +21,10 @@ export const showClient: RequestHandler = async (req, res) => {
     const selfServiceClientId = client.dynamoServiceId;
     const authClientId = client.authClientId;
     const serviceName = client.serviceName;
-    const redirectUrls = client.redirectUris;
+    const redirectUris = client.redirectUris;
     const userPublicKey = client.publicKey == defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);
+    const userSectorIdentifierUri = client.sector_identifier_uri;
+    const contacts = client.contacts;
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
@@ -28,33 +32,41 @@ export const showClient: RequestHandler = async (req, res) => {
         serviceId: serviceId,
         serviceName: serviceName,
         updatedField: req.session.updatedField,
-        redirectUrls: redirectUrls,
+        redirectUris: redirectUris,
         userAttributesRequired: client.scopes,
         ...(client.token_endpoint_auth_method === "client_secret_post"
             ? {client_secret: client.client_secret ?? ""}
             : {userPublicKey: userPublicKey}),
-        back_channel_logout_uri: client.back_channel_logout_uri,
-        sector_identifier_uri: client.sector_identifier_uri,
-        postLogoutRedirectUrls: client.postLogoutUris.join(" "),
+        backChannelLogoutUri: client.back_channel_logout_uri,
+        sectorIdentifierUri: userSectorIdentifierUri,
+        postLogoutRedirectUris: client.postLogoutUris,
         claims: client.identity_verification_enabled && client.hasOwnProperty("claims") ? client.claims : [],
+        id_token_signing_algorithm: client.hasOwnProperty("id_token_signing_algorithm") ? client.id_token_signing_algorithm : "",
+        contacts: contacts,
         token_endpoint_auth_method: client.token_endpoint_auth_method,
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
                 client.clientName
             )}`,
-            changeRedirectUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-redirect-uris?redirectUris=${encodeURIComponent(
-                client.redirectUris.join(" ")
-            )}`,
+            changeRedirectUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-redirect-uris`,
             changeUserAttributes: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-user-attributes?userAttributes=${encodeURIComponent(
                 client.scopes.join(" ")
             )}`,
             changePublicKey: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-public-key?publicKey=${encodeURIComponent(
                 userPublicKey
             )}`,
-            changePostLogoutUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-post-logout-uris?redirectUris=${encodeURIComponent(
-                client.postLogoutUris.join(" ")
-            )}`
+            changePostLogoutUris:
+                client.postLogoutUris.length === 0
+                    ? `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/add-post-logout-uri`
+                    : `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-post-logout-uris`,
+            changeBackChannelLogoutUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-back-channel-logout-uri?backChannelLogoutUri=${encodeURIComponent(
+                client.back_channel_logout_uri ?? ""
+            )}`,
+            changeSectorIdentifierUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(
+                userSectorIdentifierUri
+            )}`,
+            changeContacts: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-contact`
         }
     });
 
@@ -201,7 +213,13 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
-    await s4.updateService(serviceId, {service_name: newServiceName}, nonNull(req.session.authenticationResult?.AccessToken));
+    await s4.updateService(
+        serviceId,
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {service_name: newServiceName},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
 
     req.session.updatedField = "service name";
     req.session.serviceName = newServiceName;
@@ -274,31 +292,65 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
 
-export const showChangeRedirectUrlsForm: RequestHandler = (req, res) => {
+export const showChangeRedirectUrlsForm: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const redirectUris = client.redirectUris;
+    const authClientId = client.authClientId;
     res.render("clients/change-redirect-uris.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
-        values: {
-            redirectUris: req.query.redirectUris
-        }
+        redirectUris,
+        authClientId,
+        updateResult: req.query.updateResult
     });
 };
 
-export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) => {
-    const redirectUris = req.body.redirectUris.split(" ").filter((url: string) => url.trim().length > 0);
+export const showAddRedirectUriForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const authClientId = client.authClientId;
+    const redirectUris = client.redirectUris;
+    res.render("clients/add-redirect-uri.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        authClientId,
+        redirectUris
+    });
+};
+
+export const processAddRedirectUriForm: RequestHandler = async (req, res) => {
+    const redirectUriToAdd = req.body.redirectUri.trim();
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const currentRedirectUris = client.redirectUris;
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+
+    if (currentRedirectUris.includes(redirectUriToAdd)) {
+        return res.redirect(
+            `/services/${serviceId}/clients/${req.params.clientId}/${
+                req.params.selfServiceClientId
+            }/change-redirect-uris?updateResult=${encodeURIComponent("This URI has already been added")}`
+        );
+    }
+
+    const newRedirectUris = [...currentRedirectUris, redirectUriToAdd];
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
         req.params.selfServiceClientId,
         req.params.clientId,
-        {redirect_uris: redirectUris},
+        {redirect_uris: newRedirectUris},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
-
-    req.session.updatedField = "redirect URIs";
 
     s4.sendTxMALog(
         "SSE_UPDATE_REDIRECT_URL",
@@ -312,7 +364,91 @@ export const processChangeRedirectUrlsForm: RequestHandler = async (req, res) =>
         }
     );
 
-    res.redirect(`/services/${req.context.serviceId}/clients`);
+    return res.redirect(
+        `/services/${serviceId}/clients/${req.params.clientId}/${
+            req.params.selfServiceClientId
+        }/change-redirect-uris?updateResult=${encodeURIComponent("Redirect URIs updated")}`
+    );
+};
+
+export const showConfirmRedirectUriRemovalForm: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const authClientId = client.authClientId;
+    res.render("clients/confirm-redirect-uri-removal.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        authClientId,
+        uriToRemove: req.query.uriToRemove
+    });
+};
+
+export const processRemoveRedirectUriFrom: RequestHandler = async (req, res) => {
+    const redirectUriToRemove = req.body.uriToRemove;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const currentRedirectUris = client.redirectUris;
+    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+
+    if (req.body.removeUri === "yes") {
+        if (!currentRedirectUris.includes(redirectUriToRemove)) {
+            return res.redirect(
+                `/services/${serviceId}/clients/${req.params.clientId}/${
+                    req.params.selfServiceClientId
+                }/change-redirect-uris?updateResult=${encodeURIComponent("Not updated. URI not found")}`
+            );
+        }
+
+        if (currentRedirectUris.length === 1) {
+            return res.redirect(
+                `/services/${serviceId}/clients/${req.params.clientId}/${
+                    req.params.selfServiceClientId
+                }/change-redirect-uris?updateResult=${encodeURIComponent("Not updated. At least one redirect URI is required")}`
+            );
+        }
+
+        const newPostLogoutRedirectUris = currentRedirectUris.filter(uri => uri !== redirectUriToRemove);
+        await s4.updateClient(
+            nonNull(req.context.serviceId),
+            req.params.selfServiceClientId,
+            req.params.clientId,
+            {redirect_uris: newPostLogoutRedirectUris},
+            nonNull(req.session.authenticationResult?.AccessToken)
+        );
+        s4.sendTxMALog(
+            "SSE_UPDATE_REDIRECT_URL",
+            {
+                session_id: req.session.id,
+                ip_address: req.ip,
+                user_id: userId
+            },
+            {
+                service_id: nonNull(req.context.serviceId)
+            }
+        );
+        res.redirect(
+            `/services/${serviceId}/clients/${req.params.clientId}/${
+                req.params.selfServiceClientId
+            }/change-redirect-uris?updateResult=${encodeURIComponent("Redirect URIs updated")}`
+        );
+    } else if (req.body.removeUri === "no") {
+        res.redirect(`/services/${serviceId}/clients/${req.params.clientId}/${req.params.selfServiceClientId}/change-redirect-uris`);
+    } else {
+        res.render("clients/confirm-redirect-uri-removal.njk", {
+            serviceId: req.context.serviceId,
+            authClientId: req.params.clientId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            uriToRemove: req.query.uriToRemove,
+            errorMessages: {
+                "removeUri-options": "Select yes if you want to remove this redirect URI"
+            }
+        });
+    }
 };
 
 export const showChangeUserAttributesForm: RequestHandler = (req, res) => {
@@ -346,31 +482,65 @@ export const processChangeUserAttributesForm: RequestHandler = async (req, res) 
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
 
-export const showChangePostLogoutUrisForm: RequestHandler = (req, res) => {
+export const showChangePostLogoutUrisForm: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const postLogoutRedirectUris = client.postLogoutUris;
+    const authClientId = client.authClientId;
     res.render("clients/change-post-logout-uris.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
-        values: {
-            redirectUris: req.query.redirectUris
-        }
+        authClientId,
+        postLogoutRedirectUris,
+        updateResult: req.query.updateResult
     });
 };
 
-export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) => {
-    const postLogoutUris = req.body.redirectUris.split(" ").filter((url: string) => url.trim().length > 0);
+export const showAddPostLogoutUriForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const authClientId = client.authClientId;
+    const postLogoutRedirectUris = client.postLogoutUris;
+    res.render("clients/add-post-logout-uri.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        authClientId,
+        postLogoutRedirectUris
+    });
+};
+
+export const processAddPostLogoutUriForm: RequestHandler = async (req, res) => {
+    const postLogoutRedirectUriToAdd = req.body.postLogoutRedirectUri.trim();
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const currentPostLogoutRedirectUris = client.postLogoutUris;
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+
+    if (currentPostLogoutRedirectUris.includes(postLogoutRedirectUriToAdd)) {
+        return res.redirect(
+            `/services/${serviceId}/clients/${req.params.clientId}/${
+                req.params.selfServiceClientId
+            }/change-post-logout-uris?updateResult=${encodeURIComponent("Not updated. URI already exists")}`
+        );
+    }
+
+    const newPostLogoutRedirectUris = [...currentPostLogoutRedirectUris, postLogoutRedirectUriToAdd];
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
         req.params.selfServiceClientId,
         req.params.clientId,
-        {post_logout_redirect_uris: postLogoutUris},
+        {post_logout_redirect_uris: newPostLogoutRedirectUris},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
-
-    req.session.updatedField = "post-logout redirect URIs";
 
     s4.sendTxMALog(
         "SSE_UPDATE_LOGOUT_REDIRECT_URL",
@@ -384,5 +554,277 @@ export const processChangePostLogoutUrisForm: RequestHandler = async (req, res) 
         }
     );
 
+    return res.redirect(
+        `/services/${serviceId}/clients/${req.params.clientId}/${
+            req.params.selfServiceClientId
+        }/change-post-logout-uris?updateResult=${encodeURIComponent("Post logout redirect URIs updated")}`
+    );
+};
+
+export const showConfirmPostLogoutUriRemovalForm: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const authClientId = client.authClientId;
+    res.render("clients/confirm-post-logout-uri-removal.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        authClientId,
+        uriToRemove: req.query.uriToRemove
+    });
+};
+
+export const processRemovePostLogoutUriFrom: RequestHandler = async (req, res) => {
+    const postLogoutRedirectUriToRemove = req.body.uriToRemove;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const currentPostLogoutRedirectUris = client.postLogoutUris;
+    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
+
+    if (req.body.removeUri === "yes") {
+        if (!currentPostLogoutRedirectUris.includes(postLogoutRedirectUriToRemove)) {
+            return res.redirect(
+                `/services/${serviceId}/clients/${req.params.clientId}/${
+                    req.params.selfServiceClientId
+                }/change-post-logout-uris?updateResult=${encodeURIComponent("Not updated. URI not found")}`
+            );
+        }
+        const newPostLogoutRedirectUris = currentPostLogoutRedirectUris.filter(uri => uri !== postLogoutRedirectUriToRemove);
+        await s4.updateClient(
+            nonNull(req.context.serviceId),
+            req.params.selfServiceClientId,
+            req.params.clientId,
+            {post_logout_redirect_uris: newPostLogoutRedirectUris},
+            nonNull(req.session.authenticationResult?.AccessToken)
+        );
+        s4.sendTxMALog(
+            "SSE_UPDATE_LOGOUT_REDIRECT_URL",
+            {
+                session_id: req.session.id,
+                ip_address: req.ip,
+                user_id: userId
+            },
+            {
+                service_id: nonNull(req.context.serviceId)
+            }
+        );
+        if (newPostLogoutRedirectUris.length) {
+            res.redirect(
+                `/services/${serviceId}/clients/${req.params.clientId}/${
+                    req.params.selfServiceClientId
+                }/change-post-logout-uris?updateResult=${encodeURIComponent("Post logout redirect URIs updated")}`
+            );
+        } else {
+            req.session.updatedField = "Post logout redirect URIs";
+            res.redirect(`/services/${req.context.serviceId}/clients`);
+        }
+    } else if (req.body.removeUri === "no") {
+        res.redirect(`/services/${serviceId}/clients/${req.params.clientId}/${req.params.selfServiceClientId}/change-post-logout-uris`);
+    } else {
+        res.render("clients/confirm-post-logout-uri-removal.njk", {
+            serviceId: req.context.serviceId,
+            authClientId: req.params.clientId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            uriToRemove: req.query.uriToRemove,
+            errorMessages: {
+                "removeUri-options": "Select yes if you want to remove this post logout redirect URI"
+            }
+        });
+    }
+};
+
+export const showChangeBackChannelLogoutUriForm: RequestHandler = (req, res) => {
+    res.render("clients/change-back-channel-logout-uri.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        values: {
+            backChannelLogoutUri: req.query.backChannelLogoutUri
+        }
+    });
+};
+
+export const processChangeBackChannelLogOutUriForm: RequestHandler = async (req, res) => {
+    const backChannelLogoutUri = req.body.backChannelLogoutUri;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const newbackChannelLogoutUri = [backChannelLogoutUri];
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {back_channel_logout_uri: newbackChannelLogoutUri},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    if (typeof backChannelLogoutUri === "string" && backChannelLogoutUri.trim().length > 0) {
+        req.session.updatedField = "Back channel logout URI";
+    }
+
     res.redirect(`/services/${req.context.serviceId}/clients`);
+};
+
+export const showChangeSectorIdentifierUriForm: RequestHandler = (req, res) => {
+    res.render("clients/change-sector-identifier-uri.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        values: {
+            sectorIdentifierUri: req.query.sectorIdentifierUri
+        }
+    });
+};
+
+export const processChangeSectorIdentifierUriForm: RequestHandler = async (req, res) => {
+    const sectorIdentifierUri = req.body.sectorIdentifierUri;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {sector_identifier_uri: sectorIdentifierUri},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "Sector Identifier URI";
+
+    res.redirect(`/services/${req.context.serviceId}/clients`);
+};
+
+export const showEnterContactForm: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const contacts = client.contacts;
+    const authClientId = client.authClientId;
+    const selfServiceClientId = client.dynamoServiceId;
+    res.render("clients/enter-contact.njk", {
+        contacts: contacts,
+        serviceId: serviceId,
+        authClientId: authClientId,
+        selfServiceClientId: selfServiceClientId,
+        updateResult: req.query.updateResult
+    });
+};
+
+export const showConfirmContactRemovalForm: RequestHandler = (req, res) => {
+    res.render("clients/confirm-contact-removal.njk", {
+        serviceId: req.context.serviceId,
+        authClientId: req.params.clientId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        contactToRemove: req.query.contactToRemove
+    });
+};
+
+export const processConfirmContactRemovalForm: RequestHandler = async (req, res) => {
+    const contactToRemove = req.body.contactToRemove;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const contacts = client.contacts;
+
+    if (req.body.removeContact === "yes") {
+        const updateContactsResult = removeContact(contacts, contactToRemove);
+        let updateMessage: string;
+        if (typeof updateContactsResult === "string") {
+            updateMessage = updateContactsResult;
+        } else {
+            await s4.updateClient(
+                nonNull(req.context.serviceId),
+                req.params.selfServiceClientId,
+                req.params.clientId,
+                {contacts: updateContactsResult},
+                nonNull(req.session.authenticationResult?.AccessToken)
+            );
+            updateMessage = "Contacts updated";
+        }
+        res.redirect(
+            `/services/${serviceId}/clients/${req.params.clientId}/${
+                req.params.selfServiceClientId
+            }/enter-contact?updateResult=${encodeURIComponent(updateMessage)}`
+        );
+    } else if (req.body.removeContact === "no") {
+        res.redirect(`/services/${serviceId}/clients/${req.params.clientId}/${req.params.selfServiceClientId}/enter-contact`);
+    } else {
+        res.render("clients/confirm-contact-removal.njk", {
+            serviceId: req.context.serviceId,
+            authClientId: req.params.clientId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            contactToRemove: req.query.contactToRemove,
+            errorMessages: {
+                "removeContact-options": "Select yes if you want to remove this contact"
+            }
+        });
+    }
+};
+
+export const showEnterContactEmailForm: RequestHandler = (req, res) => {
+    res.render("clients/enter-contact-email.njk", {
+        serviceId: req.context.serviceId,
+        authClientId: req.params.clientId,
+        selfServiceClientId: req.params.selfServiceClientId
+    });
+};
+
+export const processEnterContactEmailForm: RequestHandler = async (req, res) => {
+    const contactToAdd = req.body.emailAddress;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+    const clients = await s4.listClients(serviceId, nonNull(req.session.authenticationResult?.AccessToken));
+    const client = clients[0];
+    const contacts = client.contacts;
+
+    const emailAddress = req.body.emailAddress.trim();
+    const result = await validate(emailAddress);
+
+    if (result.isValid) {
+        const updateContactsResult = addContact(contactToAdd, contacts);
+
+        if (typeof updateContactsResult === "string" && updateContactsResult === "This contact has already been added") {
+            res.render("clients/enter-contact-email.njk", {
+                values: {
+                    emailAddress: emailAddress
+                },
+                errorMessages: {
+                    emailAddress: updateContactsResult
+                },
+                serviceId: req.context.serviceId,
+                authClientId: req.params.clientId,
+                selfServiceClientId: req.params.selfServiceClientId
+            });
+        } else {
+            await s4.updateClient(
+                nonNull(req.context.serviceId),
+                req.params.selfServiceClientId,
+                req.params.clientId,
+                {contacts: updateContactsResult},
+                nonNull(req.session.authenticationResult?.AccessToken)
+            );
+
+            res.redirect(
+                `/services/${serviceId}/clients/${req.params.clientId}/${
+                    req.params.selfServiceClientId
+                }/enter-contact?updateResult=${encodeURIComponent("Contacts updated")}`
+            );
+        }
+    } else {
+        res.render("clients/enter-contact-email.njk", {
+            values: {
+                emailAddress: emailAddress
+            },
+            errorMessages: {
+                emailAddress: result.errorMessage
+            },
+            serviceId: req.context.serviceId,
+            authClientId: req.params.clientId,
+            selfServiceClientId: req.params.selfServiceClientId
+        });
+    }
 };

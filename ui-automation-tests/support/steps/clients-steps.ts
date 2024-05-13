@@ -4,9 +4,16 @@ import {strict as assert} from "assert";
 
 const fields = {
     "redirect uris": "redirectUris",
+    "redirect uri1": "redirectUri1",
+    "redirect uri2": "redirectUri2",
+    "redirect uri": "redirectUri",
     "post logout redirect uris": "postLogoutRedirectUris",
+    "post logout redirect uri 1": "postLogoutRedirectUri1",
+    "post logout redirect uri 2": "postLogoutRedirectUri2",
     "user attributes": "userAttributes",
-    "first redirect uri": "redirectUri1"
+    "first redirect uri": "redirectUri1",
+    "back channel logout uri": "backChannelLogoutUri",
+    "sector identifier uri": "sectorIdentifierUri"
 };
 
 Then("they should see the value for the Client ID {string}", async function (this: TestContext, text) {

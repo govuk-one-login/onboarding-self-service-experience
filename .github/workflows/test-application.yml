@@ -1,0 +1,28 @@
+name: Test the application
+
+on:
+  # Eventually run on PR and replace existing tests.
+  merge_group:
+    types:
+      - checks_requested
+
+permissions:
+  id-token: write
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  code-quality:
+    name: Code quality
+    uses: ./.github/workflows/check-code-quality.yml
+
+  build-frontend:
+    name: Frontend
+    uses: ./.github/workflows/build-frontend.yml
+
+  run-unit-tests:
+    name: Run tests
+    uses: ./.github/workflows/run-unit-tests.yml
