@@ -12,6 +12,21 @@ export default function getAuthApiCompliantPublicKey(publicKey: string): string 
     }
 }
 
+export function isPublicKeyValid(enteredPublicKey: string): string {
+    try {
+        const createdPublicKey = createPublicKey({key: prepareKey(enteredPublicKey), format: "pem"});
+
+        if ((createdPublicKey.asymmetricKeyType as string).toUpperCase() != "RSA") {
+            throw new Error("Not RSA Type");
+        }
+    } catch (err) {
+        console.error(err);
+        throw new Error(`Failed to convert public key\n${enteredPublicKey}`);
+    }
+
+    return enteredPublicKey;
+}
+
 function makeAuthCompliant(publicKey: string) {
     return createPublicKey({key: prepareKey(publicKey), format: "pem"})
         .export({format: "pem", type: "spki"})
