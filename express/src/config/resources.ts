@@ -14,5 +14,5 @@ export const resources = {
 export const distribution = {
     assets: path.join(baseDir, "dist/assets"),
     images: path.join(baseDir, "assets/images"),
-    ga4Assets: path.join(baseDir, "../node_modules/@govuk-one-login/one-login-analytics/lib")
+    ga4Assets: path.join(baseDir, "../node_modules/@govuk-one-login/frontend-analytics/lib")
 };
