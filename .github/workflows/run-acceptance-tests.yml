@@ -4,6 +4,9 @@ on:
   workflow_call:
     inputs:
       environment: { required: true, type: string }
+  merge_group:
+    types:
+      - checks_requested
 
 permissions: { }
 concurrency: acceptance-test-${{ inputs.environment }}-${{ github.head_ref || github.ref_name }}
