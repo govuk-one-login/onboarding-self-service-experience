@@ -1,6 +1,7 @@
 name: Test the application
 
 on:
+  push:
   # Eventually run on PR and replace existing tests.
   merge_group:
     types:
