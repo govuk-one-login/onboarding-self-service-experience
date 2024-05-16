@@ -11,6 +11,9 @@ interface fixedOTPCredential {
 }
 
 const pseudonymisedIndicator = "~";
+const expiredSecurityCode = "666666";
+const expiredSMSCode = "999999";
+
 let fixedOTPCredentials: fixedOTPCredential[] = [];
 let useFixedOTP = false;
 
@@ -67,16 +70,18 @@ function getFixedOTPCredential(emailAddress: string): number {
     return -1;
 }
 
-function verifyMFACode(emailAddress: string, securityCode: string) {
+function verifyMFACode(emailAddress: string, securityCode: string, expiredCode: string) {
     const index = getFixedOTPCredential(emailAddress);
 
     if (index > -1) {
-        if (isPseudonymisedFixedOTPCredential(securityCode)) {
-            securityCode = getFixedOTPCredentialSMSCode(securityCode);
-        }
+        if (securityCode != expiredCode) {
+            if (isPseudonymisedFixedOTPCredential(securityCode)) {
+                securityCode = getFixedOTPCredentialSMSCode(securityCode);
+            }
 
-        if (fixedOTPCredentials[index].SMSCode === securityCode) {
-            return;
+            if (fixedOTPCredentials[index].SMSCode === securityCode) {
+                return;
+            }
         }
     }
 
@@ -98,11 +103,11 @@ export function fixedOTPInitialise(): void {
 
 export function verifyMobileUsingOTPCode(emailAddress: string, smsCode: string): void {
     console.log("in fixedOTP - verifyMobileUsingOTPCode");
-    verifyMFACode(emailAddress, smsCode);
+    verifyMFACode(emailAddress, smsCode, expiredSMSCode);
 }
 
 export function respondToMFAChallengeForFixedOTPCredential(email: string, securityCode: string): void {
-    verifyMFACode(email, securityCode);
+    verifyMFACode(email, securityCode, expiredSecurityCode);
 }
 
 export function isFixedOTPCredential(credential: string): boolean {

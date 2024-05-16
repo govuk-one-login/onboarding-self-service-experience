@@ -97,7 +97,8 @@ export const TEST_SERVICE_FROM_DYNAMO: ServiceFromDynamo = {
     service_name: {S: TEST_SERVICE_NAME}
 };
 export const TEST_SELF_SERVICE_CLIENT_ID = "someSelfServiceClientId";
-export const TEST_PUBLIC_KEY = "somePubKey";
+export const TEST_PUBLIC_KEY =
+    "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeQ90Vm6wnW9AYqRTj4bHiFLHWHe1w1u6CaQnkWYeL1q5LCyWofFb0hNZt7h70ZKDvmyDy3Rfw0qwGY9P49neZQJEkSj/VLGrqWhHJEq9Bi4xKxtTo2as8c+uNP8uede6fRTGIO5miaaiR4dhHdViWE2v8LDx0vWkBAi30Ry3kowIDAQAB";
 export const TEST_DYNAMO_ID = "client#456";
 export const TEST_CLIENT_NAME = "someClientName";
 export const TEST_REDIRECT_URI = "someRedirectURI";
@@ -168,3 +169,55 @@ export const TEST_CLIENT: Client = {
 
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>
     "someHeader." + Buffer.from(JSON.stringify(jwtBody)).toString("base64") + ".someSignature";
+
+export const TEST_HELMET_CONFIG = {
+    referrerPolicy: {
+        policy: ["strict-origin"]
+    },
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                "https://www.googletagmanager.com",
+                "https://www.google-analytics.com",
+                "https://ssl.google-analytics.com"
+            ],
+            styleSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
+            objectSrc: ["'none'"],
+            connectSrc: ["'self'", "https://www.google-analytics.com"],
+            formAction: ["'self'"]
+        }
+    },
+    dnsPrefetchControl: {
+        allow: false
+    },
+    frameguard: {
+        action: "deny"
+    },
+    hsts: {
+        maxAge: 31536000, // 1 Year
+        preload: true,
+        includeSubDomains: true
+    },
+    permittedCrossDomainPolicies: false
+};
+
+export const TEST_PUBLIC_BETA_FORM_SUBMISSION = {
+    userName: TEST_FULL_NAME,
+    role: "Testing",
+    organisationName: "Test",
+    serviceUrl: "test.gov.uk",
+    serviceDescription: "Some users for stuff",
+    serviceUse: "signUsersInAndCheckIdentity",
+    migrateExistingAccounts: "yes",
+    numberOfUsersEachYear: "rangeOver1Million",
+    "targetDate-day": "12",
+    "targetDate-month": "12",
+    "targetDate-year": "1212",
+    serviceName: TEST_SERVICE_NAME
+};
+
+export const TEST_USER_ATTRIBUTES = ["phone", "email"];
