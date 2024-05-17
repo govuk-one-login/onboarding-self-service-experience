@@ -10,7 +10,7 @@ export default function convertPublicKeyForAuth(req: Request, res: Response, nex
         console.error(err);
 
         return res.render("clients/change-public-key.njk", {
-            serviceId: req.params.serviceId,
+            serviceId: req.context.serviceId,
             selfServiceClientId: req.params.selfServiceClientId,
             clientId: req.params.clientId,
             errorMessages: {
