@@ -76,8 +76,6 @@ const sheetsInitSpy = jest.spyOn(SheetsService.prototype, "init");
 jest.spyOn(AuthenticationResultParser, "getCognitoId").mockReturnValue(TEST_COGNITO_ID);
 timestampMock.mockReturnValue(TEST_TIMESTAMP_STRING);
 
-const mockNext = jest.fn();
-
 describe("showClient Controller tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -96,7 +94,7 @@ describe("showClient Controller tests", () => {
         });
         const mockResponse = response();
 
-        await showClient(mockRequest, mockResponse, mockNext);
+        await showClient(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockResponse.render).toHaveBeenCalledWith("clients/client-details.njk", {
@@ -153,7 +151,7 @@ describe("showClient Controller tests", () => {
         });
         const mockResponse = response();
 
-        await showClient(mockRequest, mockResponse, mockNext);
+        await showClient(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockResponse.render).toHaveBeenCalledWith("clients/client-details.njk", {
@@ -219,7 +217,7 @@ describe("showPublicBetaForm controller tests", () => {
         });
         const mockResponse = response();
 
-        showPublicBetaForm(mockRequest, mockResponse, mockNext);
+        showPublicBetaForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/public-beta.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -286,7 +284,7 @@ describe("processPublicBetaForm controller tests", () => {
                 ip: TEST_IP_ADDRESS
             });
             const mockResponse = response();
-            await processPublicBetaForm(mockRequest, mockResponse, mockNext);
+            await processPublicBetaForm(mockRequest, mockResponse);
             expect(mockResponse.render).toHaveBeenCalledWith("clients/public-beta.njk", {
                 serviceId: TEST_SERVICE_ID,
                 selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
@@ -342,7 +340,7 @@ describe("processPublicBetaForm controller tests", () => {
             })
         );
 
-        await processPublicBetaForm(mockRequest, mockResponse, mockNext);
+        await processPublicBetaForm(mockRequest, mockResponse);
 
         expect(sheetsInitSpy).toHaveBeenCalled();
         expect(sheetsAppendValueSpy).toHaveBeenCalledWith(expectedValuesToAppend, TEST_DATA_RANGE, TEST_HEADER_RANGE);
@@ -376,7 +374,7 @@ describe("showPublicBetaFormSubmitted controller tests", () => {
         });
         const mockRes = response();
 
-        showPublicBetaFormSubmitted(mockReq, mockRes, mockNext);
+        showPublicBetaFormSubmitted(mockReq, mockRes);
 
         expect(mockRes.render).toHaveBeenCalledWith("clients/public-beta-form-submitted.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -402,7 +400,7 @@ describe("showChangeServiceNameForm controller tests", () => {
         });
         const mockRes = response();
 
-        showChangeServiceNameForm(mockReq, mockRes, mockNext);
+        showChangeServiceNameForm(mockReq, mockRes);
 
         expect(mockRes.render).toHaveBeenCalledWith("clients/change-service-name.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -428,7 +426,7 @@ describe("processChangeServiceNameForm controller tests", () => {
             }
         });
         const mockResponse = response();
-        await processChangeServiceNameForm(mockRequest, mockResponse, mockNext);
+        await processChangeServiceNameForm(mockRequest, mockResponse);
         expect(mockResponse.render).toHaveBeenCalledWith("clients/change-service-name.njk", {
             serviceId: TEST_SERVICE_ID,
             errorMessages: {
@@ -460,7 +458,7 @@ describe("processChangeServiceNameForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processChangeServiceNameForm(mockRequest, mockResponse, mockNext);
+        await processChangeServiceNameForm(mockRequest, mockResponse);
 
         expect(s4UpdateServiceSpy).toHaveBeenCalledWith(
             TEST_SERVICE_ID,
@@ -506,7 +504,7 @@ describe("showChangePublicKeyForm controller tests", () => {
         });
         const mockResponse = response();
 
-        showChangePublicKeyForm(mockRequest, mockResponse, mockNext);
+        showChangePublicKeyForm(mockRequest, mockResponse);
         expect(mockResponse.render).toHaveBeenCalledWith("clients/change-public-key.njk", {
             serviceId: TEST_SERVICE_ID,
             selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
@@ -543,7 +541,7 @@ describe("processChangePublicKeyForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockResponse = response();
-        await processChangePublicKeyForm(mockRequest, mockResponse, mockNext);
+        await processChangePublicKeyForm(mockRequest, mockResponse);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
             TEST_SERVICE_ID,
@@ -589,7 +587,7 @@ describe("processChangePublicKeyForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockResponse = response();
-        await processChangePublicKeyForm(mockRequest, mockResponse, mockNext);
+        await processChangePublicKeyForm(mockRequest, mockResponse);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
             TEST_SERVICE_ID,
@@ -640,7 +638,7 @@ describe("showChangeRedirectUrlsForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await showChangeRedirectUrlsForm(mockRequest, mockResponse, mockNext);
+        await showChangeRedirectUrlsForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/change-redirect-uris.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -675,7 +673,7 @@ describe("showAddRedirectUriForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await showAddRedirectUriForm(mockRequest, mockResponse, mockNext);
+        await showAddRedirectUriForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/add-redirect-uri.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -714,7 +712,7 @@ describe("processAddRedirectUriForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processAddRedirectUriForm(mockRequest, mockResponse, mockNext);
+        await processAddRedirectUriForm(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockResponse.redirect).toHaveBeenCalledWith(
@@ -749,7 +747,7 @@ describe("processAddRedirectUriForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processAddRedirectUriForm(mockRequest, mockResponse, mockNext);
+        await processAddRedirectUriForm(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -805,7 +803,7 @@ describe("showConfirmRedirectUriRemovalForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await showConfirmRedirectUriRemovalForm(mockRequest, mockResponse, mockNext);
+        await showConfirmRedirectUriRemovalForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/confirm-redirect-uri-removal.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -845,7 +843,7 @@ describe("processRemoveRedirectUriFrom controller tests", () => {
         });
         const mockResponse = response();
 
-        await processRemoveRedirectUriFrom(mockRequest, mockResponse, mockNext);
+        await processRemoveRedirectUriFrom(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockResponse.redirect).toHaveBeenCalledWith(
@@ -880,7 +878,7 @@ describe("processRemoveRedirectUriFrom controller tests", () => {
             });
             const mockResponse = response();
 
-            await processRemoveRedirectUriFrom(mockRequest, mockResponse, mockNext);
+            await processRemoveRedirectUriFrom(mockRequest, mockResponse);
 
             expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
             expect(mockResponse.redirect).toHaveBeenCalledWith(
@@ -919,7 +917,7 @@ describe("processRemoveRedirectUriFrom controller tests", () => {
         });
         const mockResponse = response();
 
-        await processRemoveRedirectUriFrom(mockRequest, mockResponse, mockNext);
+        await processRemoveRedirectUriFrom(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -972,7 +970,7 @@ describe("processRemoveRedirectUriFrom controller tests", () => {
         });
         const mockResponse = response();
 
-        await processRemoveRedirectUriFrom(mockRequest, mockResponse, mockNext);
+        await processRemoveRedirectUriFrom(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockResponse.redirect).toHaveBeenCalledWith(
@@ -1007,7 +1005,7 @@ describe("processRemoveRedirectUriFrom controller tests", () => {
         });
         const mockResponse = response();
 
-        await processRemoveRedirectUriFrom(mockRequest, mockResponse, mockNext);
+        await processRemoveRedirectUriFrom(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(s4UpdateClientSpy).not.toHaveBeenCalled();
@@ -1043,7 +1041,7 @@ describe("showChangeUserAttributesForm controller tests", () => {
         });
         const mockResponse = response();
 
-        showChangeUserAttributesForm(mockRequest, mockResponse, mockNext);
+        showChangeUserAttributesForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/change-user-attributes.njk", {
             selectedUserAttributes: TEST_USER_ATTRIBUTES.toString().split(" "),
@@ -1079,7 +1077,7 @@ describe("processChangeUserAttributesForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processChangeUserAttributesForm(mockRequest, mockResponse, mockNext);
+        await processChangeUserAttributesForm(mockRequest, mockResponse);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
             TEST_SERVICE_ID,
@@ -1114,7 +1112,7 @@ describe("processChangeUserAttributesForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processChangeUserAttributesForm(mockRequest, mockResponse, mockNext);
+        await processChangeUserAttributesForm(mockRequest, mockResponse);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
             TEST_SERVICE_ID,
@@ -1155,7 +1153,7 @@ describe("showChangePostLogoutUrisForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await showChangePostLogoutUrisForm(mockRequest, mockResponse, mockNext);
+        await showChangePostLogoutUrisForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/change-post-logout-uris.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -1190,7 +1188,7 @@ describe("showAddPostLogoutUriForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await showAddPostLogoutUriForm(mockRequest, mockResponse, mockNext);
+        await showAddPostLogoutUriForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/add-post-logout-uri.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -1229,7 +1227,7 @@ describe("processAddPostLogoutUriForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processAddPostLogoutUriForm(mockRequest, mockResponse, mockNext);
+        await processAddPostLogoutUriForm(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockResponse.redirect).toHaveBeenCalledWith(
@@ -1265,7 +1263,7 @@ describe("processAddPostLogoutUriForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processAddPostLogoutUriForm(mockRequest, mockResponse, mockNext);
+        await processAddPostLogoutUriForm(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -1321,7 +1319,7 @@ describe("showConfirmPostLogoutUriRemovalForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await showConfirmPostLogoutUriRemovalForm(mockRequest, mockResponse, mockNext);
+        await showConfirmPostLogoutUriRemovalForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/confirm-post-logout-uri-removal.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -1361,7 +1359,7 @@ describe("processRemovePostLogoutUriFrom controller tests", () => {
         });
         const mockResponse = response();
 
-        await processRemovePostLogoutUriFrom(mockRequest, mockResponse, mockNext);
+        await processRemovePostLogoutUriFrom(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockResponse.redirect).toHaveBeenCalledWith(
@@ -1397,7 +1395,7 @@ describe("processRemovePostLogoutUriFrom controller tests", () => {
         });
         const mockResponse = response();
 
-        await processRemovePostLogoutUriFrom(mockRequest, mockResponse, mockNext);
+        await processRemovePostLogoutUriFrom(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -1447,7 +1445,7 @@ describe("processRemovePostLogoutUriFrom controller tests", () => {
         });
         const mockResponse = response();
 
-        await processRemovePostLogoutUriFrom(mockRequest, mockResponse, mockNext);
+        await processRemovePostLogoutUriFrom(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -1498,7 +1496,7 @@ describe("processRemovePostLogoutUriFrom controller tests", () => {
         });
         const mockResponse = response();
 
-        await processRemovePostLogoutUriFrom(mockRequest, mockResponse, mockNext);
+        await processRemovePostLogoutUriFrom(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockResponse.redirect).toHaveBeenCalledWith(
@@ -1532,7 +1530,7 @@ describe("processRemovePostLogoutUriFrom controller tests", () => {
         });
         const mockResponse = response();
 
-        await processRemovePostLogoutUriFrom(mockRequest, mockResponse, mockNext);
+        await processRemovePostLogoutUriFrom(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockResponse.render).toHaveBeenCalledWith("clients/confirm-post-logout-uri-removal.njk", {
@@ -1568,7 +1566,7 @@ describe("showChangeBackChannelLogoutUriForm controller tests", () => {
         });
         const mockResponse = response();
 
-        showChangeBackChannelLogoutUriForm(mockRequest, mockResponse, mockNext);
+        showChangeBackChannelLogoutUriForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/change-back-channel-logout-uri.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -1606,7 +1604,7 @@ describe("processChangeBackChannelLogOutUriForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processChangeBackChannelLogOutUriForm(mockRequest, mockResponse, mockNext);
+        await processChangeBackChannelLogOutUriForm(mockRequest, mockResponse);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
             TEST_SERVICE_ID,
@@ -1640,7 +1638,7 @@ describe("showChangeSectorIdentifierUriForm controller tests", () => {
         });
         const mockResponse = response();
 
-        showChangeSectorIdentifierUriForm(mockRequest, mockResponse, mockNext);
+        showChangeSectorIdentifierUriForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/change-sector-identifier-uri.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -1678,7 +1676,7 @@ describe("processChangeSectorIdentifierUriForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processChangeSectorIdentifierUriForm(mockRequest, mockResponse, mockNext);
+        await processChangeSectorIdentifierUriForm(mockRequest, mockResponse);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
             TEST_SERVICE_ID,
@@ -1716,7 +1714,7 @@ describe("showEnterContactForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await showEnterContactForm(mockRequest, mockResponse, mockNext);
+        await showEnterContactForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/enter-contact.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -1748,7 +1746,7 @@ describe("showConfirmContactRemovalForm controller tests", () => {
         });
         const mockResponse = response();
 
-        showConfirmContactRemovalForm(mockRequest, mockResponse, mockNext);
+        showConfirmContactRemovalForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/confirm-contact-removal.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -1788,7 +1786,7 @@ describe("processConfirmContactRemovalForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processConfirmContactRemovalForm(mockRequest, mockResponse, mockNext);
+        await processConfirmContactRemovalForm(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -1828,7 +1826,7 @@ describe("processConfirmContactRemovalForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processConfirmContactRemovalForm(mockRequest, mockResponse, mockNext);
+        await processConfirmContactRemovalForm(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(s4UpdateClientSpy).not.toHaveBeenCalled();
@@ -1861,7 +1859,7 @@ describe("processConfirmContactRemovalForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processConfirmContactRemovalForm(mockRequest, mockResponse, mockNext);
+        await processConfirmContactRemovalForm(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(s4UpdateClientSpy).not.toHaveBeenCalled();
@@ -1894,7 +1892,7 @@ describe("processConfirmContactRemovalForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processConfirmContactRemovalForm(mockRequest, mockResponse, mockNext);
+        await processConfirmContactRemovalForm(mockRequest, mockResponse);
 
         expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(s4UpdateClientSpy).not.toHaveBeenCalled();
@@ -1927,7 +1925,7 @@ describe("showEnterContactEmailForm controller tests", () => {
         });
         const mockResponse = response();
 
-        showEnterContactEmailForm(mockRequest, mockResponse, mockNext);
+        showEnterContactEmailForm(mockRequest, mockResponse);
 
         expect(mockResponse.render).toHaveBeenCalledWith("clients/enter-contact-email.njk", {
             serviceId: TEST_SERVICE_ID,
@@ -1963,7 +1961,7 @@ describe("processEnterContactEmailForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processEnterContactEmailForm(mockRequest, mockResponse, mockNext);
+        await processEnterContactEmailForm(mockRequest, mockResponse);
 
         expect(s4UpdateClientSpy).not.toHaveBeenCalled();
         expect(mockResponse.render).toHaveBeenCalledWith("clients/enter-contact-email.njk", {
@@ -2001,7 +1999,7 @@ describe("processEnterContactEmailForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processEnterContactEmailForm(mockRequest, mockResponse, mockNext);
+        await processEnterContactEmailForm(mockRequest, mockResponse);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
             TEST_SERVICE_ID,
@@ -2038,7 +2036,7 @@ describe("processEnterContactEmailForm controller tests", () => {
         });
         const mockResponse = response();
 
-        await processEnterContactEmailForm(mockRequest, mockResponse, mockNext);
+        await processEnterContactEmailForm(mockRequest, mockResponse);
 
         expect(s4UpdateClientSpy).not.toHaveBeenCalled();
         expect(mockResponse.render).toHaveBeenCalledWith("clients/enter-contact-email.njk", {
