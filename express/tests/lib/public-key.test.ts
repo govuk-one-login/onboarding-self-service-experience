@@ -1,4 +1,4 @@
-import getAuthApiCompliantPublicKey from "../../src/lib/public-key";
+import getAuthApiCompliantPublicKey, {isPublicKeyValid} from "../../src/lib/public-key";
 
 const header = "-----BEGIN PUBLIC KEY-----";
 const footer = "-----END PUBLIC KEY-----";
@@ -138,6 +138,143 @@ describe("Public keys are validated and prepared for the Auth API", () => {
         it("Throws an exception when the key has invalid content", () => {
             const invalidKey = `${header}\ninvalid-public-key-content\n${footer}`;
             expect(() => getAuthApiCompliantPublicKey(invalidKey)).toThrow(invalidKey);
+        });
+    });
+});
+
+describe("Public keys are validated", () => {
+    describe("Valid public keys are accepted", () => {
+        it("Accepts a valid public key with headers and line breaks", () => {
+            expect(isPublicKeyValid(publicKeyWithHeaders)).toEqual(publicKeyWithHeaders);
+        });
+
+        it("Accepts a valid public key with headers and no line breaks", () => {
+            expect(isPublicKeyValid(publicKeyCompactWithHeaders)).toEqual(publicKeyCompactWithHeaders);
+        });
+
+        it("Accepts a valid public key with line breaks and no headers", () => {
+            expect(isPublicKeyValid(publicKey)).toEqual(publicKey);
+        });
+
+        it("Accepts a valid public key with headers and line breaks", () => {
+            expect(isPublicKeyValid(publicKeyWithHeaders)).toEqual(publicKeyWithHeaders);
+        });
+    });
+
+    describe("Incorrectly formatted keys with valid content are corrected and accepted", () => {
+        describe.each([{key: publicKey, type: "multiline"}])("Keys with missing begin or end lines are accepted", ({key, type}) => {
+            it(`Accepts and corrects a ${type} key without the header`, () => {
+                const enteredPublicKey = `${key}\n${footer}`;
+                expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+            });
+
+            it(`Accepts and corrects a ${type} key without the footer`, () => {
+                const enteredPublicKey = `${header}\n${key}`;
+                expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+            });
+        });
+
+        describe.each([
+            {whitespace: "\n\n\n", whitespaceName: "newlines"},
+            {whitespace: "   ", whitespaceName: "spaces"},
+            {whitespace: "     \n      \n\n\n   ", whitespaceName: "space"}
+        ])("Keys with extra whitespace are correced and accepted", ({whitespace, whitespaceName}) => {
+            describe("Keys with extra whitespace outside the key content are accepted", () => {
+                describe.each([
+                    {key: publicKey, type: "multiline"},
+                    {key: publicKeyWithHeaders, type: "wrapped multiline"}
+                ])(`Keys with extra ${whitespaceName} outside the key content are accepted`, ({key, type}) => {
+                    it(`Accepts a ${type} key with extra ${whitespaceName} before the key content`, () => {
+                        const enteredPublicKey = `${whitespace}${key}`;
+                        expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+                    });
+
+                    it(`Accepts a ${type} key with extra ${whitespaceName} after the key content`, () => {
+                        const enteredPublicKey = `${key}${whitespace}`;
+                        expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+                    });
+
+                    it(`Accepts a ${type} key with extra ${whitespaceName} before and after the key content`, () => {
+                        const enteredPublicKey = `${whitespace}${key}${whitespace}`;
+                        expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+                    });
+                });
+            });
+
+            describe("Keys with extra whitespace inside the key content are accepted", () => {
+                describe.each([
+                    {key: publicKey, type: "multiline"},
+                    {key: publicKeyCompact, type: "compact"}
+                ])(`Keys with extra ${whitespaceName} inside the key content are accepted`, ({key, type}) => {
+                    it(`Accepts a ${type} key with extra ${whitespaceName} after the header`, () => {
+                        const enteredPublicKey = `${header}${whitespace}${key}${footer}`;
+                        expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+                    });
+
+                    it(`Accepts a ${type} key with extra ${whitespaceName} before the footer`, () => {
+                        const enteredPublicKey = `${header}${key}${whitespace}${footer}`;
+                        expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+                    });
+
+                    it(`Accepts a ${type} key with extra ${whitespaceName} inside the main part`, () => {
+                        const enteredPublicKey = `${header}${key.substring(0, 20)}${whitespace}${key.substring(20)}${footer}`;
+                        expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+                    });
+
+                    it(`Accepts a ${type} key with extra ${whitespaceName}`, () => {
+                        const enteredPublicKey = `${header}${whitespace}${key.substring(0, 20)}${whitespace}${key.substring(
+                            20
+                        )}${whitespace}${footer}`;
+                        expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+                    });
+                });
+            });
+        });
+
+        describe("Keys with extra text outside the key content are accepted", () => {
+            it("Accepts a key with extra text before the header", () => {
+                let enteredPublicKey = `not-part-of-the-key\n${publicKeyWithHeaders}`;
+                expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+
+                enteredPublicKey = `not-part-of-the-key${publicKeyWithHeaders}`;
+                expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+            });
+
+            it("Accepts a key with extra text after the footer", () => {
+                let enteredPublicKey = `${publicKeyWithHeaders}\nnot-part-of-the-key`;
+                expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+
+                enteredPublicKey = `${publicKeyWithHeaders}not-part-of-the-key`;
+                expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+            });
+
+            it("Accepts a key with extra text before and after the key content", () => {
+                let enteredPublicKey = `text-before\n${publicKeyWithHeaders}\ntext-after`;
+                expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+
+                enteredPublicKey = `text-before${publicKeyWithHeaders}text-after`;
+                expect(isPublicKeyValid(enteredPublicKey)).toEqual(enteredPublicKey);
+            });
+        });
+    });
+
+    describe("Invalid public keys are rejected", () => {
+        it("Throws an exception when no key has been passed", () => {
+            expect(() => isPublicKeyValid("")).toThrow();
+        });
+
+        it("Throws an exception when the key has no content", () => {
+            expect(() => isPublicKeyValid(`${header}\n${footer}`)).toThrow();
+        });
+
+        it("Throws an exception when the key has invalid content", () => {
+            const invalidKey = `${header}\ninvalid-public-key-content\n${footer}`;
+            expect(() => isPublicKeyValid(invalidKey)).toThrow(invalidKey);
+        });
+
+        it("Throws an exception when the key is not RSA", () => {
+            const invalidKey = `${header}\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE0M8qKD+sKh7OuITZ7tUhHbGsECcxghd4zr7sp2xt9cGxqj41Z0IOjui4A32UHq/2pkTnM9/LtzFM+QzHLJyQxw==\n${footer}`;
+            expect(() => isPublicKeyValid(invalidKey)).toThrow(invalidKey);
         });
     });
 });
