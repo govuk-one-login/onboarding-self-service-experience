@@ -1,7 +1,9 @@
 name: Check code quality
 
 on: workflow_call
-permissions: read-all
+permissions:
+  id-token: write
+  contents: read
 
 concurrency:
   group: code-quality-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
