@@ -750,3 +750,8 @@ Outputs:
     Value: !Sub '${TxMASQSProducerAuditEventQueue.QueueUrl}'
     Export:
       Name: !Sub '${AWS::StackName}-QueueURL'
+  AppLoadBalancerName:
+    Description: 'The full name of the application load balancer.'
+    Value: !Sub '${ApplicationLoadBalancer.LoadBalancerFullName}'
+    Export:
+      Name: !Sub '${AWS::StackName}-AppLBName'
