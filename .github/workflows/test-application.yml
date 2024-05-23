@@ -18,7 +18,6 @@ jobs:
   code-quality:
     name: Code quality
     uses: ./.github/workflows/check-code-quality.yml
-    permissions: read-all
 
   build-frontend:
     name: Frontend
