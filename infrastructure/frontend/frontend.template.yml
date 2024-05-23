@@ -271,7 +271,7 @@ Resources:
         - - '/onboarding-self-service/frontend'
           - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
           - 'audit'
-      RetentionInDays: 14
+      RetentionInDays: 30
 
   FrontendLogsGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
@@ -282,7 +282,7 @@ Resources:
         - - '/aws/ecs'
           - 'onboarding-self-service/frontend'
           - !If [ IsLocal, !Ref DeploymentName, !Ref AWS::NoValue ]
-      RetentionInDays: 14
+      RetentionInDays: 30
       DataProtectionPolicy:
         Name: data-protection-policy-frontend
         Description: Data Protection for Cloudwatch Logs
