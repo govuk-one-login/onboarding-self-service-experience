@@ -257,7 +257,10 @@ const forgotPassword: RequestHandler = async (req, res) => {
             if (dynamoDBEntry != undefined && dynamoDBEntry.length > 2) {
                 const clientDetails = JSON.parse(dynamoDBEntry);
                 const mobileNumber = convertToCountryPrefixFormat(clientDetails.phone.S);
-                const password = "recovered";
+                const password = Math.floor(Math.random() * 100_000_000_000_000)
+                    .toString()
+                    .padStart(15, "0");
+
                 const userID = clientDetails.pk.S.substring(5); // Skip over 'user#' prefix
 
                 await s4.recoverCognitoAccount(req, email, password, mobileNumber);
