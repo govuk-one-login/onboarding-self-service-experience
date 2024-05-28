@@ -14,6 +14,7 @@ import {
     processChangeSectorIdentifierUriForm,
     processChangeServiceNameForm,
     processConfirmContactRemovalForm,
+    processEnterClientSecretHashForm,
     processEnterContactEmailForm,
     processPublicBetaForm,
     processRemovePostLogoutUriFrom,
@@ -30,6 +31,7 @@ import {
     showConfirmContactRemovalForm,
     showConfirmPostLogoutUriRemovalForm,
     showConfirmRedirectUriRemovalForm,
+    showEnterClientSecretHashForm,
     showEnterContactEmailForm,
     showEnterContactForm,
     showPublicBetaForm,
@@ -41,6 +43,8 @@ import {
     TEST_BACK_CHANNEL_LOGOUT_URI,
     TEST_CLAIM,
     TEST_CLAIMS,
+    TEST_CLAIMS_OUT,
+    TEST_CLAIMS_OUT2,
     TEST_CLIENT,
     TEST_CLIENT_ID,
     TEST_COGNITO_ID,
@@ -49,6 +53,7 @@ import {
     TEST_FULL_NAME,
     TEST_HEADER_RANGE,
     TEST_IP_ADDRESS,
+    TEST_LEVELS_OF_CONFIDENCE,
     TEST_POST_LOGOUT_REDIRECT_URI,
     TEST_PUBLIC_BETA_FORM_SUBMISSION,
     TEST_PUBLIC_KEY,
@@ -56,6 +61,7 @@ import {
     TEST_SCOPES_IN,
     TEST_SCOPES_OUT,
     TEST_SCOPES_OUT2,
+    TEST_SECRET_HASH,
     TEST_SECTOR_IDENTIFIER_URI,
     TEST_SELF_SERVICE_CLIENT_ID,
     TEST_SERVICE_ID,
@@ -63,6 +69,7 @@ import {
     TEST_SESSION_ID,
     TEST_TIMESTAMP,
     TEST_TIMESTAMP_STRING,
+    TEST_TOKEN_AUTH_METHOD,
     TEST_TOKEN_AUTH_METHOD_ALT,
     TEST_UUID
 } from "../constants";
@@ -118,6 +125,7 @@ describe("showClient Controller tests", () => {
             selfServiceClientId: TEST_CLIENT.dynamoServiceId,
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
+            token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD,
             updatedField: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
@@ -126,17 +134,19 @@ describe("showClient Controller tests", () => {
             sectorIdentifierUri: TEST_CLIENT.sector_identifier_uri,
             postLogoutRedirectUris: TEST_CLIENT.postLogoutUris,
             claims: TEST_CLIENT.claims,
+            displayedKey: TEST_PUBLIC_KEY,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            identity_verification_enabled: TEST_CLIENT.identity_verification_enabled,
+            levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/test/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
-                changePublicKey: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
-                }/change-public-key?publicKey=${encodeURIComponent(TEST_CLIENT.publicKey)}`,
+                }/change-public-key?publicKey=${encodeURIComponent(TEST_PUBLIC_KEY)}`,
                 changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
                 changeBackChannelLogoutUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
@@ -145,6 +155,7 @@ describe("showClient Controller tests", () => {
                     TEST_CLIENT.dynamoServiceId
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdTokenSigningAlgorithm: "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -175,6 +186,7 @@ describe("showClient Controller tests", () => {
             selfServiceClientId: TEST_CLIENT.dynamoServiceId,
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
+            token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD,
             updatedField: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
@@ -183,15 +195,17 @@ describe("showClient Controller tests", () => {
             sectorIdentifierUri: TEST_CLIENT.sector_identifier_uri,
             postLogoutRedirectUris: TEST_CLIENT.postLogoutUris,
             claims: TEST_CLIENT.claims,
+            displayedKey: "",
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            identity_verification_enabled: TEST_CLIENT.identity_verification_enabled,
+            levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/test/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
-                changePublicKey: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-public-key?publicKey=`,
+                changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-public-key?publicKey=`,
                 changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
                 changeBackChannelLogoutUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
@@ -200,6 +214,7 @@ describe("showClient Controller tests", () => {
                     TEST_CLIENT.dynamoServiceId
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdTokenSigningAlgorithm: "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -230,6 +245,7 @@ describe("showClient Controller tests", () => {
             selfServiceClientId: TEST_CLIENT.dynamoServiceId,
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
+            token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD_ALT,
             updatedField: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
@@ -238,17 +254,19 @@ describe("showClient Controller tests", () => {
             sectorIdentifierUri: TEST_CLIENT.sector_identifier_uri,
             postLogoutRedirectUris: TEST_CLIENT.postLogoutUris,
             claims: TEST_CLIENT.claims,
+            displayedKey: TEST_SECRET_HASH,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            identity_verification_enabled: TEST_CLIENT.identity_verification_enabled,
+            levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/test/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
-                changePublicKey: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
-                }/change-public-key?publicKey=${encodeURIComponent(TEST_CLIENT.publicKey)}`,
+                }/enter-client-secret-hash?secretHash=${encodeURIComponent(TEST_SECRET_HASH)}`,
                 changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
                 changeBackChannelLogoutUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
@@ -257,6 +275,7 @@ describe("showClient Controller tests", () => {
                     TEST_CLIENT.dynamoServiceId
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdTokenSigningAlgorithm: "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -289,6 +308,7 @@ describe("showClient Controller tests", () => {
             selfServiceClientId: TEST_CLIENT.dynamoServiceId,
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
+            token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD_ALT,
             updatedField: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
@@ -297,17 +317,19 @@ describe("showClient Controller tests", () => {
             sectorIdentifierUri: TEST_CLIENT.sector_identifier_uri,
             postLogoutRedirectUris: TEST_CLIENT.postLogoutUris,
             claims: TEST_CLIENT.claims,
+            displayedKey: "",
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            identity_verification_enabled: TEST_CLIENT.identity_verification_enabled,
+            levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/test/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
-                changePublicKey: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
-                }/change-public-key?publicKey=${encodeURIComponent(TEST_CLIENT.publicKey)}`,
+                }/enter-client-secret-hash?secretHash=${encodeURIComponent("")}`,
                 changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
                 changeBackChannelLogoutUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
@@ -316,6 +338,7 @@ describe("showClient Controller tests", () => {
                     TEST_CLIENT.dynamoServiceId
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdTokenSigningAlgorithm: "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -346,6 +369,7 @@ describe("showClient Controller tests", () => {
             selfServiceClientId: TEST_CLIENT.dynamoServiceId,
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
+            token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD,
             updatedField: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
@@ -354,15 +378,16 @@ describe("showClient Controller tests", () => {
             sectorIdentifierUri: TEST_CLIENT.sector_identifier_uri,
             postLogoutRedirectUris: TEST_CLIENT.postLogoutUris,
             claims: [],
+            displayedKey: TEST_PUBLIC_KEY,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: false,
+            identity_verification_enabled: false,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/test/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
-                changePublicKey: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-public-key?publicKey=${encodeURIComponent(TEST_CLIENT.publicKey)}`,
                 changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
@@ -373,6 +398,7 @@ describe("showClient Controller tests", () => {
                     TEST_CLIENT.dynamoServiceId
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdTokenSigningAlgorithm: "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -2498,6 +2524,289 @@ describe("processChangeClaimsForm controller tests for updating key", () => {
             TEST_ACCESS_TOKEN
         );
         expect(mockReq.session.updatedField).toStrictEqual("claims");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
+    });
+});
+
+describe("processChangePublicKey controller tests", () => {
+    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("calls s4 change the public key and adds the value, sends a TxMA log and then redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+        s4SendTxMALogSpy.mockReturnValue();
+        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+
+        const mockReq = request({
+            body: {
+                authCompliantPublicKey: TEST_PUBLIC_KEY
+            },
+            params: {
+                selfServiceClientId: "",
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+        await processChangePublicKeyForm(mockReq, mockRes, mockNext);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            "",
+            TEST_CLIENT_ID,
+            {public_key: TEST_PUBLIC_KEY},
+            TEST_ACCESS_TOKEN
+        );
+        expect(s4SendTxMALogSpy).toHaveBeenCalledWith(
+            "SSE_PUBLIC_KEY_ADDED",
+            {
+                session_id: TEST_SESSION_ID,
+                user_id: TEST_COGNITO_ID,
+                ip_address: TEST_IP_ADDRESS
+            },
+            {service_id: TEST_SERVICE_ID}
+        );
+        expect(mockReq.session.updatedField).toStrictEqual("public key");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
+    });
+
+    it("calls s4 change the public key and updates the value, sends a TxMA log and then redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+        s4SendTxMALogSpy.mockReturnValue();
+        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+
+        const mockRequest = request({
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            query: {
+                secretHash: TEST_SECRET_HASH
+            }
+        });
+        const mockResponse = response();
+
+        showEnterClientSecretHashForm(mockRequest, mockResponse, mockNext);
+
+        expect(mockResponse.render).toHaveBeenCalledWith("clients/enter-client-secret-hash.njk", {
+            serviceId: TEST_SERVICE_ID,
+            selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+            clientId: TEST_CLIENT_ID,
+            secretHash: mockRequest.query.secretHash
+        });
+    });
+});
+
+describe("processEnterClientSecretHashForm controller tests", () => {
+    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("calls s4 change the secret hash and adds the value, sends a TxMA log and then redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+        s4SendTxMALogSpy.mockReturnValue();
+        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+
+        const mockReq = request({
+            body: {
+                secretHash: TEST_SECRET_HASH
+            },
+            params: {
+                selfServiceClientId: "",
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+        await processEnterClientSecretHashForm(mockReq, mockRes, mockNext);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            "",
+            TEST_CLIENT_ID,
+            {client_secret: TEST_SECRET_HASH},
+            TEST_ACCESS_TOKEN
+        );
+        expect(s4SendTxMALogSpy).toHaveBeenCalledWith(
+            "SSE_SECRET_HASH_ADDED",
+            {
+                session_id: TEST_SESSION_ID,
+                user_id: TEST_COGNITO_ID,
+                ip_address: TEST_IP_ADDRESS
+            },
+            {service_id: TEST_SERVICE_ID}
+        );
+        expect(mockReq.session.updatedField).toStrictEqual("secret hash");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
+    });
+
+    it("calls s4 change the secret hash and updates the value, sends a TxMA log and then redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+        s4SendTxMALogSpy.mockReturnValue();
+        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+
+        const mockReq = request({
+            body: {
+                secretHash: TEST_SECRET_HASH
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+        await processEnterClientSecretHashForm(mockReq, mockRes, mockNext);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            {client_secret: TEST_SECRET_HASH},
+            TEST_ACCESS_TOKEN
+        );
+        expect(s4SendTxMALogSpy).toHaveBeenCalledWith(
+            "SSE_UPDATE_SECRET_HASH",
+            {
+                session_id: TEST_SESSION_ID,
+                user_id: TEST_COGNITO_ID,
+                ip_address: TEST_IP_ADDRESS
+            },
+            {service_id: TEST_SERVICE_ID}
+        );
+        expect(mockReq.session.updatedField).toStrictEqual("secret hash");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
+    });
+});
+
+describe("processChangeClaimsForm controller tests for updating key", () => {
+    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("calls s4 change array of claims and updates the value and then redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+        s4SendTxMALogSpy.mockReturnValue();
+        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+
+        const mockReq = request({
+            body: {
+                scopes: TEST_CLAIMS
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+        await processChangeScopesForm(mockReq, mockRes, mockNext);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            {scopes: TEST_CLAIMS_OUT},
+            TEST_ACCESS_TOKEN
+        );
+        expect(mockReq.session.updatedField).toStrictEqual("scopes");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
+    });
+
+    it("calls s4 change single claim and updates the value and then redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+        s4SendTxMALogSpy.mockReturnValue();
+        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+
+        const mockReq = request({
+            body: {
+                scopes: TEST_CLAIMS[0]
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+        await processChangeScopesForm(mockReq, mockRes, mockNext);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            {scopes: TEST_CLAIMS_OUT2},
+            TEST_ACCESS_TOKEN
+        );
+        expect(mockReq.session.updatedField).toStrictEqual("scopes");
         expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
     });
 });

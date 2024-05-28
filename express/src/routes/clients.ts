@@ -8,6 +8,7 @@ import {
     processChangeScopesForm,
     processConfirmContactRemovalForm,
     processEnterContactEmailForm,
+    processEnterClientSecretHashForm,
     processPublicBetaForm,
     showChangeBackChannelLogoutUriForm,
     showChangePostLogoutUrisForm,
@@ -18,6 +19,7 @@ import {
     showChangeScopesForm,
     showClient,
     showConfirmContactRemovalForm,
+    showEnterClientSecretHashForm,
     showEnterContactEmailForm,
     showEnterContactForm,
     showPublicBetaForm,
@@ -30,7 +32,9 @@ import {
     showAddRedirectUriForm,
     processAddRedirectUriForm,
     showConfirmRedirectUriRemovalForm,
-    processRemoveRedirectUriFrom
+    processRemoveRedirectUriFrom,
+    showChangeIdTokenAlgorithmForm,
+    processChangeIdTokenAlgorithmForm
 } from "../controllers/clients";
 import convertPublicKeyForAuth from "../middleware/convert-public-key";
 import validateUri from "../middleware/validators/uri-validator";
@@ -105,3 +109,13 @@ router
     .route("/:clientId/:selfServiceClientId/change-sector-identifier-uri")
     .get(showChangeSectorIdentifierUriForm)
     .post(validateUri("clients/change-sector-identifier-uri.njk", "sectorIdentifierUri", true), processChangeSectorIdentifierUriForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/enter-client-secret-hash")
+    .get(showEnterClientSecretHashForm)
+    .post(processEnterClientSecretHashForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/change-id-token-signing-algorithm")
+    .get(showChangeIdTokenAlgorithmForm)
+    .post(processChangeIdTokenAlgorithmForm);

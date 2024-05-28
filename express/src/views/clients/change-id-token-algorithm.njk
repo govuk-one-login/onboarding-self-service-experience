@@ -1,0 +1,23 @@
+{% extends "layouts/form.njk" %}
+
+{% set pageTitle = "Select an ID token signing algorithm" %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/
+{% endset %}
+{% set gridClass = "govuk-grid-column-full" %}
+{% set formCancelUrl %}
+    /services/{{ serviceId }}/clients/ 
+{% endset %}
+
+{% block formInputs %}
+  {{ form.radiosInput(
+    "Select an ID token signing algorithm",
+    "govuk-fieldset__legend--l",
+    name = "idTokenSigningAlgorithm",
+    items = [
+      {text: "RS256", value: "RS256"},
+      {text: "ES256", value: "ES256"}
+    ],
+    isPageHeading = true
+  ) }}
+{% endblock %}

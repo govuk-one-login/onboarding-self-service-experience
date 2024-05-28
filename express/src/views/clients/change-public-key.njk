@@ -1,27 +1,31 @@
-{% extends "layouts/client-form.njk" %}
+{% extends "layouts/form.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
 
-{% set pageTitle = "Change public key" %}
-
-{% set publicKeyBlock %}
-  <p class="govuk-body govuk-!-static-margin-bottom-0 govuk-!-font-weight-bold">Current public key</p>
-  <p class="govuk-body govuk-!-static-margin-bottom-0" id="current-public-key">{{ serviceUserPublicKey }}</p>
+{% set pageTitle = "Enter public key" %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/
 {% endset %}
-
-{% block beforeForm %}
-  <h1 class="govuk-heading-l govuk-!-margin-top-3">Change your public key</h1>
-
-  <p class="govuk-body">You need to
-    <a href="https://docs.sign-in.service.gov.uk/before-integrating/generate-a-key/" class="govuk-link" rel="noreferrer noopener" target="_blank">
-      generate a key pair (opens in new tab)</a> and add the public key. This is so our services can securely send messages to each other.
-  </p>
-  {{ govukInsetText({
-    html: publicKeyBlock
-  }) if serviceUserPublicKey }}
-{% endblock %}
+{% set formCancelUrl = backLinkPath %}
+{% set formButtonText = "Confirm" %}
 
 {% block formInputs %}
-  {{ form.textAreaInput("Public key", "serviceUserPublicKey",
-    "Paste in the entire public key in PEM format, including the headers"
-  ) }}
+  <main class="govuk-main-wrapper govuk-!-padding-top-7" id="main-content" role="main">
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-form-group">
+          <h1 class="govuk-label-wrapper">
+            <label class="govuk-label govuk-label--l" for="more-detail">
+              Enter public key
+            </label>
+          </h1>
+          {{ form.textAreaInput("", "serviceUserPublicKey", "") }}
+        </div>
+      </div>
+
+  </div></div></main>
+
 {% endblock %}

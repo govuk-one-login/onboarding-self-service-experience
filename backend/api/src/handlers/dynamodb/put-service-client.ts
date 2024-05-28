@@ -28,7 +28,7 @@ export type clientRegistryRegistrationResponse = {
         serviceName: string;
     };
     contact_email: string;
-    id_token_signing_algorithm: string;
+    id_token_signing_algorithm: "ES256" | "RS256";
     client_locs: string[];
 };
 
