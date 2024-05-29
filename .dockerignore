@@ -1,0 +1,33 @@
+# Hidden files & directories
+.github
+.idea
+./.*
+
+# Dependencies build as required
+node_modules/
+jspm_packages/
+
+# Infrastructure
+infrastructure/
+backend/
+
+# Test files
+express/tests/
+ci/
+test/
+ui-automation-tests/
+coverage/
+features/
+pacts/
+
+# Environment configuration files
+.env.example
+.env
+
+# Utility configuration files
+sonar-project.properties
+jest.config.*
+.prettierignore
+.prettierrc.js
+.eslintrc.js
+tsconfig.eslint.json

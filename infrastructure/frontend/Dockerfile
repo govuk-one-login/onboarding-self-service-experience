@@ -1,21 +1,21 @@
-FROM node:current-alpine
+# Use a slim lts-supported version.
+FROM node:lts-alpine as production
 
+# Expose any necessary ports (if your application requires it)
 ARG PORT=3000
 ENV PORT=$PORT
 EXPOSE $PORT
 
-WORKDIR /self-service
-COPY package*.json ./
+# Set the working directory in the container
+WORKDIR /app
 
-WORKDIR /self-service/express
-COPY express/package*.json ./
-RUN npm install --include-workspace-root --omit=dev
+# Copy the application code, see .dockerignore for exclusions
+COPY . .
 
-COPY express/dist dist
-COPY express/stubs stubs
-COPY express/resources resources
-COPY express/src/views src/views
-COPY express/assets/images assets/images
+# Install project dependencies
+RUN npm install --include-workspace-root --omit=dev && npm run build
+
+# Add the Dynatrace OneAgent
 COPY --from=khw46367.live.dynatrace.com/linux/oneagent-codemodules-musl:nodejs / /
 ENV LD_PRELOAD /opt/dynatrace/oneagent/agent/lib64/liboneagentproc.so
 
