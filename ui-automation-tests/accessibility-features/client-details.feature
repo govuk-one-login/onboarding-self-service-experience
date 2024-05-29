@@ -17,14 +17,14 @@ Feature: A page where users can view the details associated with a client
       When they click on the link that points to "/change-redirect-uris"
       Then there should be no accessibility violations
 
-    Scenario: User verifying the accessibility of /clients page
-      When they click on the link that points to "/change-user-attributes"
-      Then there should be no accessibility violations
-
     Scenario: User verifying the accessibility of /change-public-key page
       When they click on the link that points to "/change-public-key"
       Then there should be no accessibility violations
 
     Scenario: User verifying the accessibility of /change-post-logout-uris page
       When they click on the link that points to "/change-post-logout-uris"
+      Then there should be no accessibility violations
+
+    Scenario: User verifying the accessibility of /clients page
+      When they click on the link that points to "/change-scopes"
       Then there should be no accessibility violations

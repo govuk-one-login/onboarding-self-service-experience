@@ -19,6 +19,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private backChannelLogoutUri = [];
     private sectorIdentifierUri = "http://gov.uk";
     private contacts = ["registered@test.gov.uk", "mockuser2@gov.uk", "mockuser3@gov.uk"];
+    private claims = [""];
 
     private user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
@@ -91,6 +92,10 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         if (updates.sector_identifier_uri) {
             this.sectorIdentifierUri = updates.sector_identifier_uri as string;
         }
+
+        if (updates.claims) {
+            this.claims = updates.claims as string[];
+        }
     }
 
     async updateService(serviceId: string, selfServiceClientId: string, clientId: string, updates: ServiceNameUpdates): Promise<void> {
@@ -142,6 +147,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                             S: this.publicKey
                         },
                         scopes: convertToAttr(this.scopes),
+                        claims: convertToAttr(this.claims),
                         clientId: {S: "P0_ZdXojEGDlaZEU8Q9Zlv-fo1s"},
                         default_fields: {
                             L: [
@@ -154,11 +160,13 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                                 {S: "sector_identifier_uri"},
                                 {S: "back_channel_logout_uri"},
                                 {S: "subject_type"},
-                                {S: "service_type"}
+                                {S: "service_type"},
+                                {S: "claims"}
                             ]
                         },
                         data: {S: "SAM Service as a Service Service"},
                         redirect_uris: convertToAttr(this.redirectUris),
+                        token_endpoint_auth_method: {S: "private_key_jwt"},
                         sk: {S: "client#d61db4f3-7403-431d-9ead-14cc96476ce4"},
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
                         service_type: {S: "MANDATORY"},

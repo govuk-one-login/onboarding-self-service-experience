@@ -5,9 +5,10 @@ import {
     processChangePublicKeyForm,
     processChangeSectorIdentifierUriForm,
     processChangeServiceNameForm,
-    processChangeUserAttributesForm,
+    processChangeScopesForm,
     processConfirmContactRemovalForm,
     processEnterContactEmailForm,
+    processEnterClientSecretHashForm,
     processPublicBetaForm,
     showChangeBackChannelLogoutUriForm,
     showChangePostLogoutUrisForm,
@@ -15,12 +16,15 @@ import {
     showChangeRedirectUrlsForm,
     showChangeSectorIdentifierUriForm,
     showChangeServiceNameForm,
-    showChangeUserAttributesForm,
+    showChangeScopesForm,
     showClient,
     showConfirmContactRemovalForm,
+    showEnterClientSecretHashForm,
     showEnterContactEmailForm,
     showEnterContactForm,
     showPublicBetaForm,
+    showChangeClaimsForm,
+    processChangeClaimsForm,
     showPublicBetaFormSubmitted,
     processAddPostLogoutUriForm,
     showConfirmPostLogoutUriRemovalForm,
@@ -64,11 +68,6 @@ router
     .get(showConfirmRedirectUriRemovalForm)
     .post(processRemoveRedirectUriFrom);
 
-router
-    .route("/:clientId/:selfServiceClientId/change-user-attributes")
-    .get(showChangeUserAttributesForm)
-    .post(processChangeUserAttributesForm);
-
 router.route("/:clientId/:selfServiceClientId/change-post-logout-uris").get(showChangePostLogoutUrisForm);
 
 router.route("/:clientId/:selfServiceClientId/change-post-logout-uris").get(showChangePostLogoutUrisForm);
@@ -81,6 +80,10 @@ router
     .post(processConfirmContactRemovalForm);
 
 router.route("/:clientId/:selfServiceClientId/enter-contact-email").get(showEnterContactEmailForm).post(processEnterContactEmailForm);
+
+router.route("/:clientId/:selfServiceClientId/change-scopes").get(showChangeScopesForm).post(processChangeScopesForm);
+
+router.route("/:clientId/:selfServiceClientId/change-claims").get(showChangeClaimsForm).post(processChangeClaimsForm);
 
 router
     .route("/:clientId/:selfServiceClientId/add-post-logout-uri")
@@ -104,3 +107,8 @@ router
     .route("/:clientId/:selfServiceClientId/change-sector-identifier-uri")
     .get(showChangeSectorIdentifierUriForm)
     .post(validateUri("clients/change-sector-identifier-uri.njk", "sectorIdentifierUri", true), processChangeSectorIdentifierUriForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/enter-client-secret-hash")
+    .get(showEnterClientSecretHashForm)
+    .post(processEnterClientSecretHashForm);

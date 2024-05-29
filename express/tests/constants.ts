@@ -33,12 +33,13 @@ export const TEST_MFA_RESPONSE = {
 export const TEST_SECURITY_CODE = "123456";
 export const TEST_ACCESS_TOKEN = "someAccessToken";
 export const TEST_REFRESH_TOKEN = "someRefreshToken";
+export const TEST_ID_TOKEN = "1.2.3";
 export const TEST_AUTHENTICATION_RESULT = {
     AccessToken: TEST_ACCESS_TOKEN,
     ExpiresIn: 12345,
     TokenType: "SomeTokenType",
     RefreshToken: "someRefreshToken",
-    IdToken: "someIdToken"
+    IdToken: TEST_ID_TOKEN
 };
 export const TEST_SIGN_UP_STATUS = "HasEmail,HasPassword";
 export const TEST_SIGN_UP_STATUS_STAGE = SignupStatusStage.HasEmail;
@@ -97,22 +98,29 @@ export const TEST_SERVICE_FROM_DYNAMO: ServiceFromDynamo = {
     service_name: {S: TEST_SERVICE_NAME}
 };
 export const TEST_SELF_SERVICE_CLIENT_ID = "someSelfServiceClientId";
+export const TEST_SCOPES_IN = ["email", "phone"];
+export const TEST_SCOPES_OUT = ["openid", "email", "phone"];
+export const TEST_SCOPES_OUT2 = ["openid", "email"];
 export const TEST_PUBLIC_KEY =
     "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeQ90Vm6wnW9AYqRTj4bHiFLHWHe1w1u6CaQnkWYeL1q5LCyWofFb0hNZt7h70ZKDvmyDy3Rfw0qwGY9P49neZQJEkSj/VLGrqWhHJEq9Bi4xKxtTo2as8c+uNP8uede6fRTGIO5miaaiR4dhHdViWE2v8LDx0vWkBAi30Ry3kowIDAQAB";
+export const TEST_BAD_PUBLIC_KEY = "BAD KEY";
+export const TEST_SECRET_HASH = "A secret";
 export const TEST_DYNAMO_ID = "client#456";
 export const TEST_CLIENT_NAME = "someClientName";
 export const TEST_REDIRECT_URI = "someRedirectURI";
 export const TEST_POST_LOGOUT_REDIRECT_URI = "somePostLogOutRedirectURI";
-export const TEST_CLIENT_SCOPES = "scope1";
 export const TEST_SERVICE_TYPE = "serviceType";
 export const TEST_SUBJECT_TYPE = "subject";
 export const TEST_BACK_CHANNEL_LOGOUT_URI = "someBackChannel";
 export const TEST_SECTOR_IDENTIFIER_URI = "someSectorIdentifier";
 export const TEST_TOKEN_AUTH_METHOD = "private_key_jwt";
-export const TEST_CLIENT_SECRET = "someSecret";
+export const TEST_TOKEN_AUTH_METHOD_ALT = "client_secret_post";
 export const TEST_TYPE = "someType";
 export const TEST_IDENTITY_VERIFICATION_ENABLED = true;
 export const TEST_CLAIM = "someClaims";
+export const TEST_CLAIMS = ["cl1", "cl2"];
+export const TEST_CLAIMS_OUT = ["openid", "cl1", "cl2"];
+export const TEST_CLAIMS_OUT2 = ["openid", "cl1"];
 export const TEST_DEFAULT_FIELD = "someFields";
 export const TEST_ID_SIGNING_TOKEN_ALGORITHM = "ES256";
 export const TEST_LEVELS_OF_CONFIDENCE = "P2";
@@ -126,7 +134,7 @@ export const TEST_DYNAMO_CLIENT = {
     post_logout_redirect_uris: {L: [{S: TEST_POST_LOGOUT_REDIRECT_URI}]},
     public_key: {S: TEST_PUBLIC_KEY},
     redirect_uris: {L: [{S: TEST_REDIRECT_URI}]},
-    scopes: {L: [{S: TEST_CLIENT_SCOPES}]},
+    scopes: {L: [{S: TEST_SCOPES_IN[0]}]},
     client_name: {S: TEST_CLIENT_NAME},
     service_name: {S: TEST_SERVICE_NAME},
     service_type: {S: TEST_SERVICE_TYPE},
@@ -134,7 +142,7 @@ export const TEST_DYNAMO_CLIENT = {
     back_channel_logout_uri: {S: TEST_BACK_CHANNEL_LOGOUT_URI},
     sector_identifier_uri: {S: TEST_SECTOR_IDENTIFIER_URI},
     token_endpoint_auth_method: {S: TEST_TOKEN_AUTH_METHOD},
-    client_secret: {S: TEST_CLIENT_SECRET},
+    client_secret: {S: TEST_SECRET_HASH},
     type: {S: TEST_TYPE},
     identity_verification_enabled: {B: TEST_IDENTITY_VERIFICATION_ENABLED},
     claims: {L: [{S: TEST_CLAIM}]},
@@ -151,7 +159,7 @@ export const TEST_CLIENT: Client = {
     postLogoutUris: [TEST_POST_LOGOUT_REDIRECT_URI],
     publicKey: TEST_PUBLIC_KEY,
     redirectUris: [TEST_REDIRECT_URI],
-    scopes: [TEST_CLIENT_SCOPES],
+    scopes: [TEST_SCOPES_IN[0]],
     clientName: TEST_CLIENT_NAME,
     serviceName: TEST_SERVICE_NAME,
     serviceType: TEST_SERVICE_TYPE,
@@ -159,7 +167,7 @@ export const TEST_CLIENT: Client = {
     back_channel_logout_uri: TEST_BACK_CHANNEL_LOGOUT_URI,
     sector_identifier_uri: TEST_SECTOR_IDENTIFIER_URI,
     token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD,
-    client_secret: TEST_CLIENT_SECRET,
+    client_secret: TEST_SECRET_HASH,
     type: TEST_TYPE,
     identity_verification_enabled: TEST_IDENTITY_VERIFICATION_ENABLED,
     claims: [TEST_CLAIM],
