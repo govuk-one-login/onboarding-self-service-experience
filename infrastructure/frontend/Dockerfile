@@ -13,7 +13,8 @@ WORKDIR /app
 COPY . .
 
 # Install project dependencies
-RUN cd ./express && npm install --include-workspace-root --omit=dev
+WORKDIR /app/express
+RUN npm install --include-workspace-root --omit=dev
 
 # Add the Dynatrace OneAgent
 COPY --from=khw46367.live.dynatrace.com/linux/oneagent-codemodules-musl:nodejs / /
