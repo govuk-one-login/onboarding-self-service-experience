@@ -44,7 +44,7 @@ jobs:
           image-version: ${{ github.sha }}
           aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
           repository: ${{ vars.FRONTEND_CONTAINER_IMAGE_REPOSITORY }}
-          image-tags: ${{ github.head_ref || github.ref_name }}
+          image-tags: "test-${{ github.head_ref || github.ref_name }}"
           dockerfile: infrastructure/frontend/Dockerfile
           artifact-name: ${{ inputs.artifact-name }}
           artifact-path: express/dist
