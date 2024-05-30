@@ -32,14 +32,25 @@ i4xPt3HFvs5aMmCSAa22rDpoo2R2bSLkpWXRa91VfrIC1Q2GzepW4VfHS+SV5wQK
 RtlswrYQW59AfWQcdQIDAQAB
 `.trim();
 
+const badPublicKey = `Ib3DQEBAQUAA4GNAD`.trim();
+
+const blankPublicKey = ``.trim();
+
 const keys = {
     "without headers": publicKey,
     "with headers": publicKeyWithHeaders,
     "with extra text": publicKeyWithExtraText,
-    "with different value": publicKey2
+    "with different value": publicKey2,
+    "with bad value": badPublicKey,
+    "with blank value": blankPublicKey
 };
 
 Given("they submit a valid public key {}", async function (keyValue) {
+    await enterTextIntoTextInput(this.page, keys[keyValue as keyof typeof keys], "serviceUserPublicKey");
+    await clickSubmitButton(this.page);
+});
+
+Given("they submit an invalid public key {}", async function (keyValue) {
     await enterTextIntoTextInput(this.page, keys[keyValue as keyof typeof keys], "serviceUserPublicKey");
     await clickSubmitButton(this.page);
 });

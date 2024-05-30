@@ -8,12 +8,15 @@ const fields = {
     "redirect uri2": "redirectUri2",
     "redirect uri": "redirectUri",
     "post logout redirect uris": "postLogoutRedirectUris",
+    scopes: "scopesUri",
     "post logout redirect uri 1": "postLogoutRedirectUri1",
     "post logout redirect uri 2": "postLogoutRedirectUri2",
     "user attributes": "userAttributes",
     "first redirect uri": "redirectUri1",
     "back channel logout uri": "backChannelLogoutUri",
-    "sector identifier uri": "sectorIdentifierUri"
+    "sector identifier uri": "sectorIdentifierUri",
+    "identity verification enabled": "idVerificationEnabledUri",
+    claims: "claimsUri"
 };
 
 Then("they should see the value for the Client ID {string}", async function (this: TestContext, text) {
@@ -54,19 +57,29 @@ Then("they should see the exact value {string} in the {} field", async function 
 });
 
 Then("they click 'email' checkbox", async function () {
-    const emailCheckboxInput = await this.page.$("#userAttributes");
+    const emailCheckboxInput = await this.page.$("#scopes");
     if (!emailCheckboxInput) {
-        throw new Error(`Could not find element with id userAttributes`);
+        throw new Error(`Could not find element with id #scopes`);
     }
     await emailCheckboxInput.click();
 });
 
 Then("they should see that Email option is checked", async function (this: TestContext) {
-    const emailIsChecked = await this.page.$eval("#userAttributes", element => element.hasAttribute("checked"));
+    const emailIsChecked = await this.page.$eval("#scopes", element => element.hasAttribute("checked"));
     assert.equal(emailIsChecked, true);
 });
 
 Then("they should see that Email option is not checked", async function (this: TestContext) {
-    const emailIsChecked = await this.page.$eval("#userAttributes", element => element.hasAttribute("checked"));
+    const emailIsChecked = await this.page.$eval("#scopes", element => element.hasAttribute("checked"));
     assert.equal(emailIsChecked, false);
+});
+
+Then("they should see that claims field is not present", async function (this: TestContext) {
+    const exists = await this.page.$("#claimsUri");
+
+    if (exists) {
+        assert.fail("Claims field is present, which is unexpected.");
+    } else {
+        assert.ok("Claims field is not present, as expected.");
+    }
 });
