@@ -16,6 +16,7 @@ jobs:
 
   run-unit-tests:
     name: Run tests
+    permissions: { }
     uses: ./.github/workflows/run-unit-tests.yml
 
   run-acceptance-tests:

@@ -55,13 +55,11 @@ jobs:
     name: Frontend
     needs: [ build-frontend, deploy-cognito, deploy-dynamodb, deploy-api ]
     uses: ./.github/workflows/upload-frontend-package.yml
-    
     permissions:
       id-token: write
       contents: read
     with:
       environment: build-secure-pipelines
-      
       artifact-name: ${{ needs.build-frontend.outputs.artifact-name || inputs.frontend-artifact }}
     secrets:
       dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
