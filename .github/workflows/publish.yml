@@ -5,9 +5,7 @@ on:
   push:
     branches: [ main ]
 
-permissions:
-  id-token: write
-  contents: read
+permissions: { }
 
 jobs:
   build-frontend:
