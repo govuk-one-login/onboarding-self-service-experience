@@ -53,12 +53,7 @@ jobs:
           template: ${{ inputs.template }}
           cache-name: ${{ inputs.name }}
           s3-prefix: sse-preview
-          tags: |-
-            sse:component=${{ inputs.name }}
-            sse:stack-type=preview
-            sse:stack-name=preview-${{ inputs.name }}
-            sse:application=self-service
-            sse:deployment-source=github-actions
+          tags: sse:component=${{ inputs.name }}|sse:stack-type=preview|sse:stack-name=preview-${{ inputs.name }}|sse:application=self-service|sse:deployment-source=github-actions|Product="GOV.UK Sign In"|System="Self-Service"|Owner="Self-Service Team"|Service="${{ inputs.name }}"|Environment="${{ steps.get-deployment-name.outputs.pretty-branch-name }}"
           parameters: |-
             DeploymentName=${{ steps.get-deployment-name.outputs.pretty-branch-name }}
             Environment=local
