@@ -1,0 +1,74 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - common
+      - dependabot
+    commit-message:
+      prefix: "BAU"
+  - package-ecosystem: npm
+    directory: /backend/api
+    schedule:
+      interval: daily
+    labels:
+      - api
+      - dependabot
+    commit-message:
+      prefix: "BAU"
+  - package-ecosystem: npm
+    directory: /backend/api/tests/contract-tests
+    schedule:
+      interval: daily
+    labels:
+      - contact-tests
+      - dependabot
+    commit-message:
+      prefix: "BAU"
+  - package-ecosystem: npm
+    directory: /backend/cognito
+    schedule:
+      interval: daily
+    labels:
+      - cognito
+      - dependabot
+    commit-message:
+      prefix: "BAU"
+  - package-ecosystem: npm
+    directory: /express
+    schedule:
+      interval: daily
+    labels:
+      - express
+      - dependabot
+    commit-message:
+      prefix: "BAU"
+  - package-ecosystem: npm
+    directory: /ui-automation-tests
+    schedule:
+      interval: daily
+    labels:
+      - ui-tests
+      - dependabot
+    commit-message:
+      prefix: "BAU"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - actions
+      - dependabot
+    commit-message:
+      prefix: "BAU"
+  - package-ecosystem: docker
+    directory: /infrastructure/frontend
+    schedule:
+      interval: daily
+    labels:
+      - docker
+      - dependabot
+    commit-message:
+      prefix: "BAU"
