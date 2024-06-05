@@ -38,6 +38,7 @@ jobs:
           password: ${{ secrets.dynatrace-pass-token }}
 
       - name: Push Docker image
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: govuk-one-login/github-actions/aws/ecr/build-docker-image@94bfee8a40ab914626a7fb5bc459dd2c6a4ed435 # 5/03/2024
         id: push-image
         with:
