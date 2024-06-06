@@ -216,8 +216,15 @@
   {{ govukSummaryList({
     rows: [
       {
-        key: {text: "Identity verification enabled"},
-        value: {html: idVerificationEnabledUriContainer}
+        key: {text: "Prove users' identities"},
+        value: {html: idVerificationEnabledUriContainer},
+        actions: {
+          items: [{
+            href: urls.changeIdVerificationEnabledUri,
+            text: "Change",
+            visuallyHiddenText: "change idVerificationEnabled value"
+          }]
+        }
       }
     ]
   }) }}
@@ -323,6 +330,10 @@
 
       <span class="govuk-body govuk-!-font-weight-bold">Post logout redirect URIs (optional)</span>
       <p class="govuk-body">The page(s) you want your users to see after they sign out of your service.</p>
+
+      <span class="govuk-body govuk-!-font-weight-bold">Prove users' identities</span>
+      <p class="govuk-body">To prove users' identities with GOV.UK One Login you need to complete an identity memorandum of understanding before you go live. Read the <a class="govuk-link" rel="noreferrer noopener" target="_blank"
+                                                href="https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/prove-users-identity/#prove-your-user-39-s-identity/">technical documents on proving your users' identities</a>.</p>
 
       <span class="govuk-body govuk-!-font-weight-bold">Public key</span>
       <p class="govuk-body">This lets our services securely send messages to each other. You need to generate a key pair and add the public key. Read the
