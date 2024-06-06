@@ -874,3 +874,33 @@ export const showEnterIdentityVerificationForm: RequestHandler = (req: Request, 
         clientId: req.params.clientId
     });
 };
+
+export const processEnterIdentityVerificationForm = async (req: Request, res: Response): Promise<void> => {
+    const {context, params, app, body, session} = req;
+    const s4: SelfServiceServicesService = app.get("backing-service");
+
+    const {serviceId} = context;
+
+    const identityVerificationEnabled = body.identityVerificationEnabled;
+
+    if (!identityVerificationEnabled || (identityVerificationEnabled !== "yes" && identityVerificationEnabled !== "no")) {
+        return res.render("clients/enter-identity-verification.njk", {
+            serviceId: req.context.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId,
+            errorMessages: {
+                "identityVerificationEnabled-options": "Select yes if you want to enable identity verification"
+            }
+        });
+    }
+    await s4.updateClient(
+        nonNull(context.serviceId),
+        params.selfServiceClientId,
+        params.clientId,
+        {identity_verification_enabled: identityVerificationEnabled === "yes"},
+        nonNull(session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "identity verification";
+    res.redirect(`/services/${serviceId}/clients`);
+};
