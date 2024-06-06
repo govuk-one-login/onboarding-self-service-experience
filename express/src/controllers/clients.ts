@@ -866,3 +866,11 @@ const sendTxMALog: (req: Request, userId: string, eventName: string) => void = (
         }
     );
 };
+
+export const showEnterIdentityVerificationForm: RequestHandler = (req: Request, res: Response): void => {
+    res.render("clients/enter-identity-verification.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId
+    });
+};
