@@ -32,7 +32,9 @@ import {
     showAddRedirectUriForm,
     processAddRedirectUriForm,
     showConfirmRedirectUriRemovalForm,
-    processRemoveRedirectUriFrom
+    processRemoveRedirectUriFrom,
+    showEnterIdentityVerificationForm,
+    processEnterIdentityVerificationForm
 } from "../controllers/clients";
 import convertPublicKeyForAuth from "../middleware/convert-public-key";
 import validateUri from "../middleware/validators/uri-validator";
@@ -112,3 +114,8 @@ router
     .route("/:clientId/:selfServiceClientId/enter-client-secret-hash")
     .get(showEnterClientSecretHashForm)
     .post(processEnterClientSecretHashForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/enter-identity-verification")
+    .get(showEnterIdentityVerificationForm)
+    .post(processEnterIdentityVerificationForm);
