@@ -9,7 +9,7 @@ describe("Lambda Facade class tests", () => {
                 Items: [
                     {
                         back_channel_logout_uri: {S: []},
-                        claims: {L: [{S: ""}]},
+                        claims: {L: []},
                         clientId: {S: "P0_ZdXojEGDlaZEU8Q9Zlv-fo1s"},
                         contacts: {L: [{S: "registered@test.gov.uk"}, {S: "mockuser2@gov.uk"}, {S: "mockuser3@gov.uk"}]},
                         data: {S: "SAM Service as a Service Service"},

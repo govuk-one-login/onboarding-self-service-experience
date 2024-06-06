@@ -19,7 +19,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private backChannelLogoutUri = [];
     private sectorIdentifierUri = "http://gov.uk";
     private contacts = ["registered@test.gov.uk", "mockuser2@gov.uk", "mockuser3@gov.uk"];
-    private claims = [""];
+    private claims: string[] = [];
     private identityVerificationEnabled = false;
 
     private user: DynamoUser = {
