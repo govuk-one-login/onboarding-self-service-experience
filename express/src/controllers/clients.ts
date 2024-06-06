@@ -28,7 +28,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const secretHash = client.client_secret ? client.client_secret : "";
     const displayedKey: string = client.token_endpoint_auth_method === "client_secret_post" ? secretHash : userPublicKey;
     const contacts = client.contacts;
-    const claims = client.identity_verification_enabled && client.hasOwnProperty("claims") ? client.claims : [];
+    const identityVerificationEnabled = client.identity_verification_enabled;
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
@@ -48,7 +48,7 @@ export const showClient: RequestHandler = async (req, res) => {
         idTokenSigningAlgorithm: client.hasOwnProperty("id_token_signing_algorithm") ? client.id_token_signing_algorithm : "",
         displayedKey: displayedKey,
         contacts: contacts,
-        identityVerificationEnabled: client.identity_verification_enabled,
+        identityVerificationEnabled: identityVerificationEnabled,
         authMethod: client.token_endpoint_auth_method,
         urls: {
             // TODO changeClientName is currently not used
