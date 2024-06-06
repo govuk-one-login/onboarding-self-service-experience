@@ -151,6 +151,7 @@ describe("showClient Controller tests", () => {
                     TEST_CLIENT.dynamoServiceId
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -207,6 +208,7 @@ describe("showClient Controller tests", () => {
                     TEST_CLIENT.dynamoServiceId
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -264,7 +266,9 @@ describe("showClient Controller tests", () => {
                 changeSectorIdentifierUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
+
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -324,7 +328,9 @@ describe("showClient Controller tests", () => {
                 changeSectorIdentifierUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
+
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -382,7 +388,9 @@ describe("showClient Controller tests", () => {
                 changeSectorIdentifierUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
+
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
