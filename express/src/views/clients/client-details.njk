@@ -189,11 +189,15 @@
 
   {% set claimsUriContainer %}
     <div id="claimsUri">
+      {% if not claims or claims | length == 0 %}
+      Not added yet
+    {% else %}
       {% for item in claims %}
         {% if item == "address" %}Address<br>{% endif %}
         {% if item == "coreIdentityJWT" %}coreIdentityJWT<br>{% endif %}
         {% if item == "returnCode" %}ReturnCode<br>{% endif %}
       {% endfor %}
+    {% endif %}
     </div>
   {% endset %}
 
