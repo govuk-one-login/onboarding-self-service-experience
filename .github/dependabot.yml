@@ -9,6 +9,13 @@ updates:
       - dependabot
     commit-message:
       prefix: "BAU"
+    groups:
+      prod-dependencies:
+        applies-to: version-updates
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: npm
     directory: /backend/api
     schedule:
@@ -18,6 +25,14 @@ updates:
       - dependabot
     commit-message:
       prefix: "BAU"
+    groups:
+      api-dependencies:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: npm
     directory: /backend/api/tests/contract-tests
     schedule:
@@ -27,6 +42,11 @@ updates:
       - dependabot
     commit-message:
       prefix: "BAU"
+    groups:
+      api-test-dependencies:
+        applies-to: version-updates
+        patterns:
+          - "*"
   - package-ecosystem: npm
     directory: /backend/cognito
     schedule:
@@ -36,6 +56,13 @@ updates:
       - dependabot
     commit-message:
       prefix: "BAU"
+    groups:
+      cognito-dependencies:
+        applies-to: version-updates
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: npm
     directory: /express
     schedule:
@@ -45,6 +72,13 @@ updates:
       - dependabot
     commit-message:
       prefix: "BAU"
+    groups:
+      frontend-dependencies:
+        applies-to: version-updates
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: npm
     directory: /ui-automation-tests
     schedule:
@@ -54,6 +88,11 @@ updates:
       - dependabot
     commit-message:
       prefix: "BAU"
+    groups:
+      test-dependencies:
+        applies-to: version-updates
+        patterns:
+          - "*"
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -63,6 +102,11 @@ updates:
       - dependabot
     commit-message:
       prefix: "BAU"
+    groups:
+      gha-dependencies:
+        applies-to: version-updates
+        patterns:
+          - "*"
   - package-ecosystem: docker
     directory: /infrastructure/frontend
     schedule:
@@ -72,3 +116,8 @@ updates:
       - dependabot
     commit-message:
       prefix: "BAU"
+    groups:
+      docker-dependencies:
+        applies-to: version-updates
+        patterns:
+          - "*"

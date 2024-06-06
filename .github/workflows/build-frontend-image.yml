@@ -31,6 +31,7 @@ jobs:
 
     steps:
       - name: Login to GDS Dev Dynatrace Container Registry
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: docker/login-action@v3
         with:
           registry: khw46367.live.dynatrace.com
