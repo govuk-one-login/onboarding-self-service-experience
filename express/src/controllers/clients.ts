@@ -81,7 +81,8 @@ export const showClient: RequestHandler = async (req, res) => {
                     : `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-public-key?publicKey=${encodeURIComponent(
                           displayedKey
                       )}`,
-            changeContacts: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-contact`
+            changeContacts: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-contact`,
+            changeIdVerificationEnabledUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-identity-verification`
         }
     });
 
