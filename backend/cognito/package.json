@@ -9,9 +9,9 @@
     "compile": "tsc"
   },
   "dependencies": {
-    "@aws-sdk/client-ses": "^3.354.0",
+    "@aws-sdk/client-ses": "^3.590.0",
     "notifications-node-client": "^7.0.0",
-    "esbuild": "^0.18.4",
+    "esbuild": "^0.21.4",
     "@aws-crypto/client-node": "^3.2.0"
   }
 }

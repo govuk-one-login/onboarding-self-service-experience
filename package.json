@@ -32,13 +32,13 @@
     "exampleotp": "npm run exampleotp-tests -w ui-automation-tests --"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.354.0",
-    "@aws-sdk/client-sqs": "^3.398.0",
-    "@aws-sdk/util-dynamodb": "^3.354.0",
-    "@pact-foundation/pact": "^12.1.1",
-    "axios": "^1.6.2",
+    "@aws-sdk/client-dynamodb": "^3.590.0",
+    "@aws-sdk/client-sqs": "^3.590.0",
+    "@aws-sdk/util-dynamodb": "^3.590.0",
+    "@pact-foundation/pact": "^12.5.2",
+    "axios": "^1.7.2",
     "googleapis": "^128.0.0",
-    "googleapis-common": "^7.0.1",
+    "googleapis-common": "^7.2.0",
     "helmet": "^7.0.0"
   },
   "devDependencies": {
@@ -47,7 +47,7 @@
     "@types/jest": "^29.5.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
-    "esbuild": "^0.18.4",
+    "esbuild": "^0.21.4",
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
