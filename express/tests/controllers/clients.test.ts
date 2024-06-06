@@ -16,6 +16,7 @@ import {
     processConfirmContactRemovalForm,
     processEnterClientSecretHashForm,
     processEnterContactEmailForm,
+    processEnterIdentityVerificationForm,
     processPublicBetaForm,
     processRemovePostLogoutUriFrom,
     processRemoveRedirectUriFrom,
@@ -34,6 +35,7 @@ import {
     showEnterClientSecretHashForm,
     showEnterContactEmailForm,
     showEnterContactForm,
+    showEnterIdentityVerificationForm,
     showPublicBetaForm,
     showPublicBetaFormSubmitted
 } from "../../src/controllers/clients";
@@ -52,6 +54,10 @@ import {
     TEST_EMAIL,
     TEST_FULL_NAME,
     TEST_HEADER_RANGE,
+    TEST_IDENTITY_VERIFICATION_ENABLED,
+    TEST_IDENTITY_VERIFICATION_ENABLED_ALT,
+    TEST_IDENTITY_VERIFICATION_ENABLED_ALT_TX,
+    TEST_IDENTITY_VERIFICATION_ENABLED_TX,
     TEST_IP_ADDRESS,
     TEST_POST_LOGOUT_REDIRECT_URI,
     TEST_PUBLIC_BETA_FORM_SUBMISSION,
@@ -2874,6 +2880,120 @@ describe("showEnterIdentityVerificationForm controller tests", () => {
             serviceId: TEST_SERVICE_ID,
             selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
             clientId: TEST_CLIENT_ID
+        });
+    });
+});
+
+describe("processEnterIdentityVerificationForm controller tests for updating flag", () => {
+    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("calls s4 change this flag to true and updates the value and then redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+
+        const mockReq = request({
+            body: {
+                identityVerificationEnabled: TEST_IDENTITY_VERIFICATION_ENABLED_TX
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        await processEnterIdentityVerificationForm(mockReq, mockRes);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            {identity_verification_enabled: TEST_IDENTITY_VERIFICATION_ENABLED},
+            TEST_ACCESS_TOKEN
+        );
+
+        expect(mockReq.session.updatedField).toStrictEqual("identity verification");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
+    });
+
+    it("calls s4 change this flag to false and updates the value and then redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+
+        const mockReq = request({
+            body: {
+                identityVerificationEnabled: TEST_IDENTITY_VERIFICATION_ENABLED_ALT_TX
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        await processEnterIdentityVerificationForm(mockReq, mockRes);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            {identity_verification_enabled: TEST_IDENTITY_VERIFICATION_ENABLED_ALT},
+            TEST_ACCESS_TOKEN
+        );
+
+        expect(mockReq.session.updatedField).toStrictEqual("identity verification");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
+    });
+
+    it("does not call s4 and re-renders the same template if the user submits without selecting an option", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+
+        const mockReq = request({
+            body: {},
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        await processEnterIdentityVerificationForm(mockReq, mockRes);
+
+        expect(s4UpdateClientSpy).not.toHaveBeenCalled();
+        expect(mockRes.render).toHaveBeenCalledWith("clients/enter-identity-verification.njk", {
+            serviceId: TEST_SERVICE_ID,
+            selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+            clientId: TEST_CLIENT_ID,
+            errorMessages: {
+                "identityVerificationEnabled-options": "Select yes if you want to enable identity verification"
+            }
         });
     });
 });
