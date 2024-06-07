@@ -6,7 +6,7 @@ import {Service} from "../../../@types/Service";
 import {TxMAEvent} from "../../types/txma-event";
 
 export type UserUpdates = Record<string, string | Date>;
-export type ClientUpdates = Record<string, string | string[]>;
+export type ClientUpdates = Record<string, string | string[] | boolean>;
 export type ServiceNameUpdates = {service_name: string};
 
 export default interface LambdaFacadeInterface {
