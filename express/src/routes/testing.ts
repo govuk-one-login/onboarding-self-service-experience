@@ -2,57 +2,9 @@ import {Router} from "express";
 import validateEmail from "../middleware/validators/email-validator";
 import validateMobileNumber from "../middleware/validators/mobile-number-validator";
 import validatePassword from "../middleware/validators/password-validator";
-import SelfServiceServicesService from "../services/self-service-services-service";
 
 const router = Router();
 export default router;
-
-// Testing routes for Change your client name page
-router.get("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-client-name", (req, res) => {
-    res.render("test/change-client-name.njk", {
-        serviceId: req.params.serviceId,
-        selfServiceClientId: req.params.selfServiceClientId,
-        clientId: req.params.clientId,
-        values: {
-            clientName: req.query.clientName
-        }
-    });
-});
-
-router.post("/services/:serviceId/clients/:clientId/:selfServiceClientId/change-client-name", async (req, res) => {
-    const newClientName = req.body.clientName;
-
-    if (newClientName === "") {
-        res.render("test/change-client-name.njk", {
-            serviceId: req.params.serviceId,
-            selfServiceClientId: req.params.selfServiceClientId,
-            clientId: req.params.clientId,
-            errorMessages: {
-                clientName: "Enter your client name"
-            }
-        });
-
-        return;
-    }
-
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
-    try {
-        await s4.updateClient(
-            req.params.serviceId,
-            req.params.selfServiceClientId,
-            req.params.clientId,
-            {client_name: newClientName},
-            req.session.authenticationResult?.AccessToken as string
-        );
-    } catch (error) {
-        console.error(error);
-        res.redirect("/there-is-a-problem");
-        return;
-    }
-
-    req.session.updatedField = "client name";
-    res.redirect(`/services/${req.params.serviceId}/clients}`);
-});
 
 // Testing route for "Finish connecting the sign in journey to your service" page
 router.get("/redirect-placeholder", (req, res) => {

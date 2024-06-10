@@ -37,7 +37,9 @@ import {
     showEnterContactForm,
     showEnterIdentityVerificationForm,
     showPublicBetaForm,
-    showPublicBetaFormSubmitted
+    showPublicBetaFormSubmitted,
+    showChangeClientName,
+    processChangeClientName
 } from "../../src/controllers/clients";
 import {
     TEST_ACCESS_TOKEN,
@@ -49,6 +51,7 @@ import {
     TEST_CLAIMS_OUT2,
     TEST_CLIENT,
     TEST_CLIENT_ID,
+    TEST_CLIENT_NAME,
     TEST_COGNITO_ID,
     TEST_DATA_RANGE,
     TEST_EMAIL,
@@ -87,6 +90,7 @@ import {
     processChangeClaimsForm
 } from "../../src/controllers/clients";
 import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
+import console from "console";
 
 const s4ListClientsSpy = jest.spyOn(SelfServiceServicesService.prototype, "listClients");
 const s4SendTxmaLogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
@@ -2995,5 +2999,154 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
                 "identityVerificationEnabled-options": "Select yes if you want to enable identity verification"
             }
         });
+    });
+});
+
+describe("showChangeClientName controller tests", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it("renders the expected template with the expected values", () => {
+        const mockRequest = request({
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            query: {
+                clientName: TEST_CLIENT_NAME
+            }
+        });
+        const mockResponse = response();
+
+        showChangeClientName(mockRequest, mockResponse, mockNext);
+
+        expect(mockResponse.render).toHaveBeenCalledWith("clients/change-client-name.njk", {
+            serviceId: TEST_SERVICE_ID,
+            selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+            clientId: TEST_CLIENT_ID,
+            values: {
+                clientName: TEST_CLIENT_NAME
+            }
+        });
+    });
+});
+
+describe("processChangeClientName controller tests", () => {
+    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        jest.spyOn(console, "error");
+    });
+
+    it("calls s4 updateClient with the new client name and redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+
+        const mockRequest = request({
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            body: {
+                clientName: TEST_CLIENT_NAME
+            }
+        });
+        const mockResponse = response();
+
+        await processChangeClientName(mockRequest, mockResponse);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            {client_name: TEST_CLIENT_NAME},
+            TEST_ACCESS_TOKEN
+        );
+
+        expect(mockRequest.session.updatedField).toStrictEqual("client name");
+        expect(mockResponse.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
+    });
+
+    it("re-renders the template with error messages if the client name is empty", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+
+        const mockRequest = request({
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            body: {
+                clientName: ""
+            }
+        });
+        const mockResponse = response();
+
+        await processChangeClientName(mockRequest, mockResponse);
+
+        expect(s4UpdateClientSpy).not.toHaveBeenCalled();
+
+        expect(mockRequest.session.updatedField).toBeUndefined();
+        expect(mockResponse.render).toHaveBeenCalledWith("clients/change-client-name.njk", {
+            serviceId: TEST_SERVICE_ID,
+            selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+            clientId: TEST_CLIENT_ID,
+            errorMessages: {
+                clientName: "Enter your client name"
+            }
+        });
+    });
+
+    it("redirects to /there-is-a-problem if s4UpdateClient throws an error", async () => {
+        const err = "someError";
+        s4UpdateClientSpy.mockRejectedValue(err);
+
+        const mockRequest = request({
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            body: {
+                clientName: TEST_CLIENT_NAME
+            }
+        });
+        const mockResponse = response();
+
+        await processChangeClientName(mockRequest, mockResponse);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            {client_name: TEST_CLIENT_NAME},
+            TEST_ACCESS_TOKEN
+        );
+        expect(mockRequest.session.updatedField).toBeUndefined();
+        expect(console.error).toHaveBeenCalledWith(err);
+        expect(mockResponse.redirect).toHaveBeenCalledWith("/there-is-a-problem");
     });
 });
