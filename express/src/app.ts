@@ -11,7 +11,6 @@ import baseRoutes from "./routes/base";
 import register from "./routes/register";
 import services from "./routes/services";
 import signIn from "./routes/sign-in";
-import testingRoutes from "./routes/testing";
 
 const app = Express();
 
@@ -36,7 +35,6 @@ app.use("/register", register);
 app.use("/sign-in", signIn);
 app.use("/account", account);
 app.use("/services", services);
-app.use("/test", testingRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
