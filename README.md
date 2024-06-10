@@ -17,7 +17,7 @@ brew install aws-sam-cli
 ```
 
 Install and use the latest version of bash.
-
+**_The deployment scripts need at least bash >= 5.2.26_**
 ```shell
 brew install bash
 ```
