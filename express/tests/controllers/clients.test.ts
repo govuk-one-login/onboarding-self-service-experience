@@ -146,7 +146,7 @@ describe("showClient Controller tests", () => {
             identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
             contacts: TEST_CLIENT.contacts,
             urls: {
-                changeClientName: `/test/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
@@ -205,7 +205,7 @@ describe("showClient Controller tests", () => {
             identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
             contacts: TEST_CLIENT.contacts,
             urls: {
-                changeClientName: `/test/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
@@ -262,7 +262,7 @@ describe("showClient Controller tests", () => {
             identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
             contacts: TEST_CLIENT.contacts,
             urls: {
-                changeClientName: `/test/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
@@ -324,7 +324,7 @@ describe("showClient Controller tests", () => {
             identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
             contacts: TEST_CLIENT.contacts,
             urls: {
-                changeClientName: `/test/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
@@ -384,7 +384,7 @@ describe("showClient Controller tests", () => {
             identityVerificationEnabled: false,
             contacts: TEST_CLIENT.contacts,
             urls: {
-                changeClientName: `/test/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,

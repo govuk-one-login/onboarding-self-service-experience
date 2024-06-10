@@ -53,7 +53,7 @@ export const showClient: RequestHandler = async (req, res) => {
         authMethod: client.token_endpoint_auth_method,
         urls: {
             // TODO changeClientName is currently not used
-            changeClientName: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
+            changeClientName: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
                 client.clientName
             )}`,
             changeRedirectUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-redirect-uris`,
