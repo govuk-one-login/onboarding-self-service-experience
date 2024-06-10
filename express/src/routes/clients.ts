@@ -37,6 +37,7 @@ import {
     processEnterIdentityVerificationForm,
     showChangeClientName,
     processChangeClientName,
+    processEnterIdentityVerificationForm,
     showChangeIdTokenAlgorithmForm,
     processChangeIdTokenAlgorithmForm
 } from "../controllers/clients";

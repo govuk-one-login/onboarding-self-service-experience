@@ -49,7 +49,6 @@ export const TEST_SERVICE_NAME = "someTestService";
 export const TEST_SPREAD_SHEET_ID = "someSpreadSheetId";
 export const TEST_HEADER_RANGE = "someHeaderRange";
 export const TEST_DATA_RANGE = "someDataRange";
-export const TEST_SELF_SERVICE_CLIENT_ID = "someSelfServiceClientId";
 export const TEST_DATA_TO_APPEND = new Map<string, string>([["hello", "World"]]);
 export const TEST_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 export const TEST_JWT = JSON.stringify({
@@ -98,6 +97,7 @@ export const TEST_SERVICE_FROM_DYNAMO: ServiceFromDynamo = {
     data: {S: ""},
     service_name: {S: TEST_SERVICE_NAME}
 };
+export const TEST_SELF_SERVICE_CLIENT_ID = "someSelfServiceClientId";
 export const TEST_SCOPES_IN = ["email", "phone"];
 export const TEST_SCOPES_OUT = ["openid", "email", "phone"];
 export const TEST_SCOPES_OUT2 = ["openid", "email"];

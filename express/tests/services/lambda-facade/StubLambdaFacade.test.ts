@@ -28,7 +28,6 @@ describe("Lambda Facade class tests", () => {
                                 {S: "service_type"},
                                 {S: "claims"},
                                 {S: "identity_verification_enabled"},
-                                {S: "service_type"},
                                 {S: "client_locs"},
                                 {S: "id_token_signing_algorithm"}
                             ]

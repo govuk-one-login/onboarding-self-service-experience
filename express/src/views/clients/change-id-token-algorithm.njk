@@ -6,7 +6,7 @@
 {% endset %}
 {% set gridClass = "govuk-grid-column-full" %}
 {% set formCancelUrl %}
-    /services/{{ serviceId }}/clients/ 
+    /services/{{ serviceId }}/clients/
 {% endset %}
 
 {% block formInputs %}
@@ -15,8 +15,8 @@
     "govuk-fieldset__legend--l",
     name = "idTokenSigningAlgorithm",
     items = [
-      {text: "RS256", value: "RS256"},
-      {text: "ES256", value: "ES256"}
+      {text: "RS256", value: "RS256", checked: algorithm == "RS256"},
+      {text: "ES256", value: "ES256", checked: algorithm == "ES256"}
     ],
     isPageHeading = true
   ) }}
