@@ -33,7 +33,7 @@ jobs:
 
       - name: Deploy
         id: deploy
-        uses: govuk-one-login/github-actions/secure-pipelines/deploy-fargate@94bfee8a40ab914626a7fb5bc459dd2c6a4ed435 # 5/03/2024
+        uses: govuk-one-login/github-actions/secure-pipelines/deploy-fargate@5e4b2d8a5d5e2af09620f1f5cb2c5fd89ec8a257 # 5/03/2024
         timeout-minutes: 20
         with:
           aws-role-arn: ${{ vars.FRONTEND_DEPLOYMENT_ROLE_ARN }}

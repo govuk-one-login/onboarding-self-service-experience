@@ -28,7 +28,8 @@ export const showClient: RequestHandler = async (req, res) => {
     const secretHash = client.client_secret ? client.client_secret : "";
     const displayedKey: string = client.token_endpoint_auth_method === "client_secret_post" ? secretHash : userPublicKey;
     const contacts = client.contacts;
-    const claims = client.identity_verification_enabled && client.hasOwnProperty("claims") ? client.claims : [];
+    const identityVerificationEnabled = client.identity_verification_enabled;
+    const claims = identityVerificationEnabled && client.hasOwnProperty("claims") ? client.claims : [];
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
@@ -48,7 +49,7 @@ export const showClient: RequestHandler = async (req, res) => {
         idTokenSigningAlgorithm: client.hasOwnProperty("id_token_signing_algorithm") ? client.id_token_signing_algorithm : "",
         displayedKey: displayedKey,
         contacts: contacts,
-        identityVerificationEnabled: client.identity_verification_enabled,
+        identityVerificationEnabled: identityVerificationEnabled,
         authMethod: client.token_endpoint_auth_method,
         urls: {
             // TODO changeClientName is currently not used
@@ -80,7 +81,8 @@ export const showClient: RequestHandler = async (req, res) => {
                     : `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-public-key?publicKey=${encodeURIComponent(
                           displayedKey
                       )}`,
-            changeContacts: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-contact`
+            changeContacts: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-contact`,
+            changeIdVerificationEnabledUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-identity-verification`
         }
     });
 
@@ -863,4 +865,42 @@ const sendTxMALog: (req: Request, userId: string, eventName: string) => void = (
             service_id: nonNull(req.context.serviceId)
         }
     );
+};
+
+export const showEnterIdentityVerificationForm: RequestHandler = (req: Request, res: Response): void => {
+    res.render("clients/enter-identity-verification.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId
+    });
+};
+
+export const processEnterIdentityVerificationForm = async (req: Request, res: Response): Promise<void> => {
+    const {context, params, app, body, session} = req;
+    const s4: SelfServiceServicesService = app.get("backing-service");
+
+    const {serviceId} = context;
+
+    const identityVerificationEnabled = body.identityVerificationEnabled;
+
+    if (!identityVerificationEnabled || (identityVerificationEnabled !== "yes" && identityVerificationEnabled !== "no")) {
+        return res.render("clients/enter-identity-verification.njk", {
+            serviceId: req.context.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId,
+            errorMessages: {
+                "identityVerificationEnabled-options": "Select yes if you want to enable identity verification"
+            }
+        });
+    }
+    await s4.updateClient(
+        nonNull(context.serviceId),
+        params.selfServiceClientId,
+        params.clientId,
+        {identity_verification_enabled: identityVerificationEnabled === "yes"},
+        nonNull(session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "identity verification";
+    res.redirect(`/services/${serviceId}/clients`);
 };

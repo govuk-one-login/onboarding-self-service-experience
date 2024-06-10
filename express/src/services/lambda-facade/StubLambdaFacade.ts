@@ -19,7 +19,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private backChannelLogoutUri = [];
     private sectorIdentifierUri = "http://gov.uk";
     private contacts = ["registered@test.gov.uk", "mockuser2@gov.uk", "mockuser3@gov.uk"];
-    private claims = [""];
+    private claims: string[] = [];
+    private identityVerificationEnabled = false;
 
     private user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
@@ -96,6 +97,10 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         if (updates.claims) {
             this.claims = updates.claims as string[];
         }
+
+        if (typeof updates.identity_verification_enabled !== "undefined") {
+            this.identityVerificationEnabled = updates.identity_verification_enabled as boolean;
+        }
     }
 
     async updateService(serviceId: string, selfServiceClientId: string, clientId: string, updates: ServiceNameUpdates): Promise<void> {
@@ -161,7 +166,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                                 {S: "back_channel_logout_uri"},
                                 {S: "subject_type"},
                                 {S: "service_type"},
-                                {S: "claims"}
+                                {S: "claims"},
+                                {S: "identity_verification_enabled"}
                             ]
                         },
                         data: {S: "SAM Service as a Service Service"},
@@ -170,7 +176,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         sk: {S: "client#d61db4f3-7403-431d-9ead-14cc96476ce4"},
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
                         service_type: {S: "MANDATORY"},
-                        type: {S: "integration"}
+                        type: {S: "integration"},
+                        identity_verification_enabled: {S: this.identityVerificationEnabled}
                     }
                 ]
             }

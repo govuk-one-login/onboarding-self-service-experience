@@ -33,6 +33,7 @@ jobs:
 
     steps:
       - name: Get deployment name
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: govuk-one-login/github-actions/beautify-branch-name@62863904d9aef239c1214f8e2d58577f38c9bb76 # 21/08/2023
         id: get-deployment-name
         with:
@@ -41,6 +42,7 @@ jobs:
           verbose: false
 
       - name: Deploy stack
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: govuk-one-login/github-actions/sam/deploy-stack@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
         id: deploy
         with:
@@ -66,7 +68,7 @@ jobs:
 
       - name: Get deployment URL
         id: get-deployment-url
-        if: ${{ inputs.deployment-url-output != null }}
+        if: ${{ inputs.deployment-url-output != null && github.actor != 'dependabot[bot]' }}
         env:
           NAME: ${{ inputs.deployment-url-output }}
           OUTPUTS: ${{ steps.deploy.outputs.stack-outputs }}
