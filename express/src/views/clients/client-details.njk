@@ -186,7 +186,7 @@
   {% endset %}
 
   {% set idVerificationEnabledUriContainer %}
-    {% if identity_verification_enabled %}
+    {% if identityVerificationEnabled %}
       <div id="idVerificationEnabledUri">
         Yes
       </div>
@@ -243,7 +243,7 @@
     ]
   }) }}
 
-  {% if identity_verification_enabled %}
+  {% if identityVerificationEnabled %}
   {{ govukSummaryList({
     rows: [
       {
@@ -322,7 +322,7 @@
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Advanced options</h2>
 
-      {% if identity_verification_enabled and levelsOfConfidenceContainer%}
+      {% if identityVerificationEnabled and levelsOfConfidenceContainer%}
     {{ govukSummaryList({
     rows: [
             {
