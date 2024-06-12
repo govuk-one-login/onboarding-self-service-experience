@@ -42,7 +42,7 @@
     "helmet": "^7.0.0"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.114",
+    "@types/aws-lambda": "^8.10.138",
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
