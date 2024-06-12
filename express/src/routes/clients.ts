@@ -34,7 +34,9 @@ import {
     showConfirmRedirectUriRemovalForm,
     processRemoveRedirectUriFrom,
     showEnterIdentityVerificationForm,
-    processEnterIdentityVerificationForm
+    processEnterIdentityVerificationForm,
+    showChangeClientName,
+    processChangeClientName
 } from "../controllers/clients";
 import convertPublicKeyForAuth from "../middleware/convert-public-key";
 import validateUri from "../middleware/validators/uri-validator";
@@ -119,3 +121,5 @@ router
     .route("/:clientId/:selfServiceClientId/enter-identity-verification")
     .get(showEnterIdentityVerificationForm)
     .post(processEnterIdentityVerificationForm);
+
+router.route("/:clientId/:selfServiceClientId/change-client-name").get(showChangeClientName).post(processChangeClientName);

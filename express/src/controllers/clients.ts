@@ -53,7 +53,7 @@ export const showClient: RequestHandler = async (req, res) => {
         authMethod: client.token_endpoint_auth_method,
         urls: {
             // TODO changeClientName is currently not used
-            changeClientName: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
+            changeClientName: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
                 client.clientName
             )}`,
             changeRedirectUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-redirect-uris`,
@@ -903,4 +903,50 @@ export const processEnterIdentityVerificationForm = async (req: Request, res: Re
 
     req.session.updatedField = "identity verification";
     res.redirect(`/services/${serviceId}/clients`);
+};
+
+export const showChangeClientName: RequestHandler = (req, res) => {
+    res.render("clients/change-client-name.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        values: {
+            clientName: req.query.clientName
+        }
+    });
+};
+
+export const processChangeClientName = async (req: Request, res: Response): Promise<void> => {
+    const newClientName = req.body.clientName;
+
+    if (newClientName === "") {
+        res.render("clients/change-client-name.njk", {
+            serviceId: req.context.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId,
+            errorMessages: {
+                clientName: "Enter your client name"
+            }
+        });
+
+        return;
+    }
+
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    try {
+        await s4.updateClient(
+            nonNull(req.context.serviceId),
+            req.params.selfServiceClientId,
+            req.params.clientId,
+            {client_name: newClientName},
+            req.session.authenticationResult?.AccessToken as string
+        );
+    } catch (error) {
+        console.error(error);
+        res.redirect("/there-is-a-problem");
+        return;
+    }
+
+    req.session.updatedField = "client name";
+    res.redirect(`/services/${req.context.serviceId}/clients`);
 };
