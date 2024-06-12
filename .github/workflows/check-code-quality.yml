@@ -58,7 +58,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Pull repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run AWS Template Scan
         id: pii-scan
         uses: ./.github/actions/check-pii-audit
