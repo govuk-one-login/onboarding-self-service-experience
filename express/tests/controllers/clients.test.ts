@@ -146,7 +146,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: TEST_PUBLIC_KEY,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identity_verification_enabled: TEST_CLIENT.identity_verification_enabled,
+            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -166,7 +166,8 @@ describe("showClient Controller tests", () => {
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
-                changeIdTokenSigningAlgorithm: "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm",
+                changeIdTokenSigningAlgorithm:
+                    "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -267,7 +268,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: "",
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identity_verification_enabled: TEST_CLIENT.identity_verification_enabled,
+            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -285,7 +286,8 @@ describe("showClient Controller tests", () => {
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
-                changeIdTokenSigningAlgorithm: "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm",
+                changeIdTokenSigningAlgorithm:
+                    "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -327,7 +329,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: TEST_SECRET_HASH,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identity_verification_enabled: TEST_CLIENT.identity_verification_enabled,
+            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -348,7 +350,8 @@ describe("showClient Controller tests", () => {
 
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
-                changeIdTokenSigningAlgorithm: "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm",
+                changeIdTokenSigningAlgorithm:
+                    "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -392,7 +395,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: "",
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identity_verification_enabled: TEST_CLIENT.identity_verification_enabled,
+            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -413,7 +416,8 @@ describe("showClient Controller tests", () => {
 
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
-                changeIdTokenSigningAlgorithm: "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm",
+                changeIdTokenSigningAlgorithm:
+                    "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
@@ -422,7 +426,7 @@ describe("showClient Controller tests", () => {
         expect(mockRequest.session.updatedField).toBeUndefined();
     });
 
-    it("includes claims is empty if identity_verification_enabled is disabled", async () => {
+    it("includes claims is empty if identityVerificationEnabled is disabled", async () => {
         s4ListClientsSpy.mockResolvedValue([{...TEST_CLIENT, identity_verification_enabled: false}]);
 
         const mockRequest = request({
@@ -455,7 +459,7 @@ describe("showClient Controller tests", () => {
             claims: [],
             displayedKey: TEST_PUBLIC_KEY,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identity_verification_enabled: false,
+            identityVerificationEnabled: false,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
@@ -475,7 +479,8 @@ describe("showClient Controller tests", () => {
 
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
-                changeIdTokenSigningAlgorithm: "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm",
+                changeIdTokenSigningAlgorithm:
+                    "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             }
