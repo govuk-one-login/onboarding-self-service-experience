@@ -29,7 +29,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const displayedKey: string = client.token_endpoint_auth_method === "client_secret_post" ? secretHash : userPublicKey;
     const contacts = client.contacts;
     const identityVerificationEnabled = client.identity_verification_enabled;
-    const claims = identityVerificationEnabled && client.hasOwnProperty("claims") ? client.claims : [];
+    const claims = identityVerificationEnabled && client.claims ? client.claims : [];
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
