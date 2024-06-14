@@ -57,6 +57,7 @@ import {
     TEST_EMAIL,
     TEST_FULL_NAME,
     TEST_HEADER_RANGE,
+    TEST_ID_SIGNING_TOKEN_ALGORITHM,
     TEST_IDENTITY_VERIFICATION_ENABLED,
     TEST_IDENTITY_VERIFICATION_ENABLED_ALT,
     TEST_IDENTITY_VERIFICATION_ENABLED_ALT_TX,
@@ -210,7 +211,10 @@ describe("showClient Controller tests", () => {
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
             identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
             contacts: TEST_CLIENT.contacts,
+            levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
+            token_endpoint_auth_method: TEST_CLIENT.token_endpoint_auth_method,
             urls: {
+                changeIdTokenSigningAlgorithm: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-id-token-signing-algorithm?algorithm=${TEST_ID_SIGNING_TOKEN_ALGORITHM}`,
                 changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
