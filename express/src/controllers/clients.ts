@@ -30,7 +30,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const contacts = client.contacts;
     const identityVerificationEnabled = client.identity_verification_enabled;
     const claims = identityVerificationEnabled && client.claims ? client.claims : [];
-    const idTokenSigningAlgorithm = client.hasOwnProperty("id_token_signing_algorithm") ? client.id_token_signing_algorithm : "";
+    const idTokenSigningAlgorithm = client.id_token_signing_algorithm ?? "";
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
