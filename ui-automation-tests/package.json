@@ -10,7 +10,7 @@
     "exampleotp-tests": "cucumber-js  exampleotp-features"
   },
   "devDependencies": {
-    "@axe-core/puppeteer": "^4.8.5",
+    "@axe-core/puppeteer": "^4.9.1",
     "@cucumber/cucumber": "^9.1.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.2.0",
