@@ -273,7 +273,7 @@ describe("showClient Controller tests", () => {
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
             identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
             contacts: TEST_CLIENT.contacts,
-            levelsOfConfidence: [],
+            levelsOfConfidence: "",
             token_endpoint_auth_method: TEST_CLIENT.token_endpoint_auth_method,
             urls: {
                 changeIdTokenSigningAlgorithm: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-id-token-signing-algorithm?algorithm=${TEST_ID_SIGNING_TOKEN_ALGORITHM}`,
