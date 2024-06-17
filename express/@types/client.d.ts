@@ -20,7 +20,7 @@ export interface ClientFromDynamo {
     identity_verification_enabled: boolean;
     claims?: string[];
     id_token_signing_algorithm?: "ES256" | "RS256";
-    client_locs: string[];
+    client_locs?: string[];
 }
 
 export interface Client {
@@ -45,5 +45,5 @@ export interface Client {
     identity_verification_enabled: boolean;
     claims?: string[];
     id_token_signing_algorithm?: "ES256" | "RS256";
-    client_locs: string[];
+    client_locs?: string[];
 }
