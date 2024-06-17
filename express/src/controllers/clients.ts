@@ -30,6 +30,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const contacts = client.contacts;
     const identityVerificationEnabled = client.identity_verification_enabled;
     const claims = identityVerificationEnabled && client.claims ? client.claims : [];
+    const idTokenSigningAlgorithm = client.id_token_signing_algorithm ?? "";
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
@@ -46,11 +47,13 @@ export const showClient: RequestHandler = async (req, res) => {
         sectorIdentifierUri: userSectorIdentifierUri,
         postLogoutRedirectUris: client.postLogoutUris,
         claims: claims,
-        idTokenSigningAlgorithm: client.hasOwnProperty("id_token_signing_algorithm") ? client.id_token_signing_algorithm : "",
+        idTokenSigningAlgorithm,
         displayedKey: displayedKey,
         contacts: contacts,
+        token_endpoint_auth_method: client.token_endpoint_auth_method,
         identityVerificationEnabled: identityVerificationEnabled,
         authMethod: client.token_endpoint_auth_method,
+        ...(client.identity_verification_enabled === true && {levelsOfConfidence: client.client_locs.join(" ")}),
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
@@ -82,7 +85,10 @@ export const showClient: RequestHandler = async (req, res) => {
                           displayedKey
                       )}`,
             changeContacts: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-contact`,
-            changeIdVerificationEnabledUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-identity-verification`
+            changeIdVerificationEnabledUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-identity-verification`,
+            changeIdTokenSigningAlgorithm: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-id-token-signing-algorithm?algorithm=${encodeURIComponent(
+                idTokenSigningAlgorithm
+            )}`
         }
     });
 
@@ -949,4 +955,30 @@ export const processChangeClientName = async (req: Request, res: Response): Prom
 
     req.session.updatedField = "client name";
     res.redirect(`/services/${req.context.serviceId}/clients`);
+};
+
+export const showChangeIdTokenAlgorithmForm: RequestHandler = (req, res) => {
+    res.render("clients/change-id-token-algorithm.njk", {
+        serviceId: req.context.serviceId,
+        authClientId: req.params.clientId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        algorithm: req.query.algorithm?.toString()
+    });
+};
+
+export const processChangeIdTokenAlgorithmForm: RequestHandler = async (req, res) => {
+    const newIdTokenSigningAlgorithm = req.body.idTokenSigningAlgorithm;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {id_token_signing_algorithm: newIdTokenSigningAlgorithm},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "ID token signing algorithm";
+    res.redirect(`/services/${serviceId}/clients`);
 };

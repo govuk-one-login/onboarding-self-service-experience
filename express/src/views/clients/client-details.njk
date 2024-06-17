@@ -81,6 +81,16 @@
     <div id="sectorIdentifierUri">{{ sectorIdentifierUri }}</div>
   {% endset %}
 
+  {% set idTokenSigningAlgorithmContainer %}
+    <div id="idTokenSigningAlgorithm">{{ idTokenSigningAlgorithm }}</div>
+  {% endset %}
+
+{% if identity_verification_enabled %}
+  {% set levelsOfConfidenceContainer %}
+    <div id="levelsOfConfidence">{{ levelsOfConfidence }}</div>
+  {% endset %}
+{% endif %}
+
   {{ govukSummaryList({
     rows: [
       {
@@ -310,6 +320,50 @@
     ]
   }) }}
 
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Advanced options</h2>
+
+      {% if identityVerificationEnabled and levelsOfConfidenceContainer%}
+    {{ govukSummaryList({
+    rows: [
+            {
+        key: {text: "ID token signing algorithm"},
+        value: {html: idTokenSigningAlgorithmContainer},
+        actions: {
+          items: [{
+            href: urls.changeIdTokenSigningAlgorithm,
+            text: "Change",
+            visuallyHiddenText: "Id Token signing algorithm"
+          }]
+        }
+      },
+      {
+
+        key: {html: "Level of confidence options"},
+        value: {html: levelsOfConfidenceContainer}
+
+      }
+    ]
+     }) }}
+      {% else %}
+      {{ govukSummaryList({
+    rows: [
+            {
+        key: {text: "ID token signing algorithm"},
+        value: {html: idTokenSigningAlgorithmContainer},
+        actions: {
+          items: [{
+            href: urls.changeIdTokenSigningAlgorithm,
+            text: "Change",
+            visuallyHiddenText: "Id Token signing algorithm"
+          }]
+        }
+      }
+    ]
+     }) }}
+  {% endif %}
+
+
+
   <details class="govuk-details" data-module="govuk-details" id="client-details-summary">
     <summary class="govuk-details__summary" id="client-details-summary-toggle">
       <span class="govuk-details__summary-text">Help with API terms</span>
@@ -342,7 +396,7 @@
       <span class="govuk-body govuk-!-font-weight-bold">Public key</span>
       <p class="govuk-body">This lets our services securely send messages to each other. You need to generate a key pair and add the public key. Read the
         <a class="govuk-link" rel="noreferrer noopener" target="_blank"
-           href="https://docs.sign-in.service.gov.uk/before-integrating/generate-a-key/">
+          href="https://docs.sign-in.service.gov.uk/before-integrating/generate-a-key/">
           technical documents on key pairs.</a>
       </p>
 

@@ -36,7 +36,9 @@ import {
     showEnterIdentityVerificationForm,
     processEnterIdentityVerificationForm,
     showChangeClientName,
-    processChangeClientName
+    processChangeClientName,
+    showChangeIdTokenAlgorithmForm,
+    processChangeIdTokenAlgorithmForm
 } from "../controllers/clients";
 import convertPublicKeyForAuth from "../middleware/convert-public-key";
 import validateUri from "../middleware/validators/uri-validator";
@@ -123,3 +125,8 @@ router
     .post(processEnterIdentityVerificationForm);
 
 router.route("/:clientId/:selfServiceClientId/change-client-name").get(showChangeClientName).post(processChangeClientName);
+
+router
+    .route("/:clientId/:selfServiceClientId/change-id-token-signing-algorithm")
+    .get(showChangeIdTokenAlgorithmForm)
+    .post(processChangeIdTokenAlgorithmForm);

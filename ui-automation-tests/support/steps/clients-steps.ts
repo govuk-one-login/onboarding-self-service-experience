@@ -16,7 +16,8 @@ const fields = {
     "back channel logout uri": "backChannelLogoutUri",
     "sector identifier uri": "sectorIdentifierUri",
     "identity verification enabled": "idVerificationEnabledUri",
-    claims: "claimsUri"
+    claims: "claimsUri",
+    "id token signing algorithm": "idTokenSigningAlgorithm"
 };
 
 Then("they should see the value for the Client ID {string}", async function (this: TestContext, text) {

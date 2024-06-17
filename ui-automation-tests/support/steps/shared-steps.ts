@@ -179,3 +179,8 @@ Then("they should see a link that points to {string}", async function (href: str
     const links = await this.page.$x(`//a[contains(@href, "${href}")]`);
     assert.equal(links.length, 1, `The link pointing to "${href}" does not exist or is not unique`);
 });
+
+Then("{string} radio button is selected", async function (buttonValue) {
+    const el = await this.page.$x(`//input[@value="${buttonValue}" and @checked]`);
+    assert.equal(await el.length, 1, `The ${buttonValue} radio button is not selected`);
+});
