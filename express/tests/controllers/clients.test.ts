@@ -239,6 +239,68 @@ describe("showClient Controller tests", () => {
         expect(mockRequest.session.updatedField).toBeUndefined();
     });
 
+    it("calls render with an empty array when client_locs is undefined", async () => {
+        s4ListClientsSpy.mockResolvedValue([{...TEST_CLIENT, client_locs: undefined}]);
+
+        const mockRequest = request({
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT
+            }
+        });
+        const mockResponse = response();
+
+        await showClient(mockRequest, mockResponse, mockNext);
+
+        expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
+        expect(mockResponse.render).toHaveBeenCalledWith("clients/client-details.njk", {
+            authMethod: TEST_CLIENT.token_endpoint_auth_method,
+            clientId: TEST_CLIENT.authClientId,
+            selfServiceClientId: TEST_CLIENT.dynamoServiceId,
+            serviceId: TEST_SERVICE_ID,
+            serviceName: TEST_CLIENT.serviceName,
+            updatedField: undefined,
+            redirectUris: TEST_CLIENT.redirectUris,
+            scopesRequired: TEST_CLIENT.scopes,
+            userPublicKey: TEST_CLIENT.publicKey,
+            backChannelLogoutUri: TEST_CLIENT.back_channel_logout_uri,
+            sectorIdentifierUri: TEST_CLIENT.sector_identifier_uri,
+            postLogoutRedirectUris: TEST_CLIENT.postLogoutUris,
+            claims: TEST_CLIENT.claims,
+            displayedKey: TEST_PUBLIC_KEY,
+            idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
+            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            contacts: TEST_CLIENT.contacts,
+            levelsOfConfidence: "",
+            token_endpoint_auth_method: TEST_CLIENT.token_endpoint_auth_method,
+            urls: {
+                changeIdTokenSigningAlgorithm: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-id-token-signing-algorithm?algorithm=${TEST_ID_SIGNING_TOKEN_ALGORITHM}`,
+                changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
+                changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
+                changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-public-key?publicKey=${encodeURIComponent(TEST_PUBLIC_KEY)}`,
+                changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
+                changeBackChannelLogoutUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-back-channel-logout-uri?backChannelLogoutUri=${encodeURIComponent(TEST_CLIENT.back_channel_logout_uri as string)}`,
+                changeSectorIdentifierUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
+                changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
+                changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
+                changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLIENT.claims}`,
+                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+            }
+        });
+        expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
+        expect(mockRequest.session.updatedField).toBeUndefined();
+    });
+
     it("includes public key is blank if not set on the client", async () => {
         s4ListClientsSpy.mockResolvedValue([{...TEST_CLIENT, publicKey: defaultPublicKey}]);
 
