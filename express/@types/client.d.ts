@@ -17,7 +17,7 @@ export interface ClientFromDynamo {
     token_endpoint_auth_method: "private_key_jwt" | "client_secret_post";
     client_secret?: string;
     type: string;
-    identity_verification_enabled: boolean;
+    identity_verification_supported: boolean;
     claims?: string[];
     id_token_signing_algorithm?: "ES256" | "RS256";
     client_locs?: string[];
@@ -42,7 +42,7 @@ export interface Client {
     token_endpoint_auth_method: "private_key_jwt" | "client_secret_post";
     client_secret?: string;
     type: string;
-    identity_verification_enabled: boolean;
+    identity_verification_supported: boolean;
     claims?: string[];
     id_token_signing_algorithm?: "ES256" | "RS256";
     client_locs?: string[];

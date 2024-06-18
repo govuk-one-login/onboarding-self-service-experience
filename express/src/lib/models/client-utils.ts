@@ -20,7 +20,7 @@ export function dynamoClientToDomainClient(client: ClientFromDynamo): Client {
         token_endpoint_auth_method: client.token_endpoint_auth_method,
         client_secret: client.client_secret,
         back_channel_logout_uri: client.back_channel_logout_uri,
-        identity_verification_enabled: client.identity_verification_enabled,
+        identity_verification_supported: client.identity_verification_supported,
         claims: client.claims,
         id_token_signing_algorithm: client.id_token_signing_algorithm,
         client_locs: client.client_locs
