@@ -32,10 +32,9 @@ fi
 printf "Endpoint ok\n"
 
 printf "Running e2e tests...\n"
-declare error_code=0
 
 if [[ $ENVIRONMENT =~ dev ]] || [[ $ENVIRONMENT =~ build ]]; then
   npm run acceptance-tests
 fi
 
-exit $error_code
+exit 0
