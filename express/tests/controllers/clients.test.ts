@@ -58,10 +58,10 @@ import {
     TEST_FULL_NAME,
     TEST_HEADER_RANGE,
     TEST_ID_SIGNING_TOKEN_ALGORITHM,
-    TEST_IDENTITY_VERIFICATION_ENABLED,
-    TEST_IDENTITY_VERIFICATION_ENABLED_ALT,
-    TEST_IDENTITY_VERIFICATION_ENABLED_ALT_TX,
-    TEST_IDENTITY_VERIFICATION_ENABLED_TX,
+    TEST_IDENTITY_VERIFICATION_SUPPORTED,
+    TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT,
+    TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT_TX,
+    TEST_IDENTITY_VERIFICATION_SUPPORTED_TX,
     TEST_IP_ADDRESS,
     TEST_LEVELS_OF_CONFIDENCE,
     TEST_POST_LOGOUT_REDIRECT_URI,
@@ -147,7 +147,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: TEST_PUBLIC_KEY,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -209,7 +209,7 @@ describe("showClient Controller tests", () => {
             claims: [],
             displayedKey: TEST_PUBLIC_KEY,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             contacts: TEST_CLIENT.contacts,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             token_endpoint_auth_method: TEST_CLIENT.token_endpoint_auth_method,
@@ -271,7 +271,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: TEST_PUBLIC_KEY,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             contacts: TEST_CLIENT.contacts,
             levelsOfConfidence: "",
             token_endpoint_auth_method: TEST_CLIENT.token_endpoint_auth_method,
@@ -334,7 +334,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: "",
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -395,7 +395,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: TEST_SECRET_HASH,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -461,7 +461,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: "",
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: TEST_CLIENT.identity_verification_enabled,
+            identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -492,8 +492,8 @@ describe("showClient Controller tests", () => {
         expect(mockRequest.session.updatedField).toBeUndefined();
     });
 
-    it("includes claims is empty if identityVerificationEnabled is disabled", async () => {
-        s4ListClientsSpy.mockResolvedValue([{...TEST_CLIENT, identity_verification_enabled: false}]);
+    it("includes claims is empty if identityVerificationSupported is disabled", async () => {
+        s4ListClientsSpy.mockResolvedValue([{...TEST_CLIENT, identity_verification_supported: false}]);
 
         const mockRequest = request({
             context: {
@@ -525,7 +525,7 @@ describe("showClient Controller tests", () => {
             claims: [],
             displayedKey: TEST_PUBLIC_KEY,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
-            identityVerificationEnabled: false,
+            identityVerificationSupported: false,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
@@ -3002,7 +3002,7 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
 
         const mockReq = request({
             body: {
-                identityVerificationEnabled: TEST_IDENTITY_VERIFICATION_ENABLED_TX
+                identityVerificationSupported: TEST_IDENTITY_VERIFICATION_SUPPORTED_TX
             },
             params: {
                 selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
@@ -3024,7 +3024,7 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             TEST_SERVICE_ID,
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
-            {identity_verification_enabled: TEST_IDENTITY_VERIFICATION_ENABLED},
+            {identity_verification_supported: TEST_IDENTITY_VERIFICATION_SUPPORTED},
             TEST_ACCESS_TOKEN
         );
 
@@ -3037,7 +3037,7 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
 
         const mockReq = request({
             body: {
-                identityVerificationEnabled: TEST_IDENTITY_VERIFICATION_ENABLED_ALT_TX
+                identityVerificationSupported: TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT_TX
             },
             params: {
                 selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
@@ -3059,7 +3059,7 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             TEST_SERVICE_ID,
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
-            {identity_verification_enabled: TEST_IDENTITY_VERIFICATION_ENABLED_ALT},
+            {identity_verification_supported: TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT},
             TEST_ACCESS_TOKEN
         );
 
@@ -3094,7 +3094,7 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
             clientId: TEST_CLIENT_ID,
             errorMessages: {
-                "identityVerificationEnabled-options": "Select yes if you want to enable identity verification"
+                "identityVerificationSupported-options": "Select yes if you want to enable identity verification"
             }
         });
     });

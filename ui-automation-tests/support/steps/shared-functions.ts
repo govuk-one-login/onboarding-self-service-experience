@@ -4,29 +4,29 @@ import {ElementHandle, Page} from "puppeteer";
 const defaultTimeout = 5000;
 
 export async function getLink(page: Page, linkText: string): Promise<ElementHandle> {
-    const links = await page.$x(`//a[contains(text(), "${linkText}")]`);
+    const links = await page.$$(`::-p-xpath(//a[contains(text(), "${linkText}")])`);
     return getSingleElement(links, "a", linkText);
 }
 
 export async function getLinkWithHref(page: Page, href: string): Promise<ElementHandle> {
-    const links = await page.$x(`//a[contains(@href, "${href}")]`);
+    const links = await page.$$(`::-p-xpath(//a[contains(@href, "${href}")])`);
     return getSingleElement(links, "a", href);
 }
 
 export async function getLinkWithHrefStarting(page: Page, hrefStarting: string): Promise<ElementHandle> {
-    const links = await page.$x(`//a[starts-with(@href, "${hrefStarting}")]`);
+    const links = await page.$$(`::-p-xpath(//a[starts-with(@href, "${hrefStarting}")])`);
     return getSingleElement(links, "a", hrefStarting);
 }
 
 export async function getButton(page: Page, buttonText: string, buttonClass?: string, linkedFieldName?: string): Promise<ElementHandle> {
     const classSelector = buttonClass ? `[@class="${buttonClass}"]` : "";
     const ariaSelector = linkedFieldName ? `[@aria-controls="${linkedFieldName}"]` : "";
-    const buttons = await page.$x(`//button[contains(text(), "${buttonText}")]${classSelector}${ariaSelector}`);
+    const buttons = await page.$$(`::-p-xpath(//button[contains(text(), "${buttonText}")]${classSelector}${ariaSelector})`);
     return getSingleElement(buttons, "button", buttonText);
 }
 
 export async function getButtonLink(page: Page, buttonText: string): Promise<ElementHandle | undefined> {
-    const buttons = await page.$x(`//a[contains(text(), "${buttonText}")][@role="button"][@class="govuk-button"]`);
+    const buttons = await page.$$(`::-p-xpath(//a[contains(text(), "${buttonText}")][@role="button"][@class="govuk-button"])`);
 
     if (buttons.length == 1) {
         return buttons[0].toElement("a");
@@ -80,7 +80,7 @@ export async function checkErrorMessageDisplayedForField(page: Page, errorLink: 
     const messageInSummary = await page.evaluate(element => element.textContent, errorLink[0]);
     assert.equal(messageInSummary, errorMessage, `Expected text of the link to be ${errorMessage}`);
 
-    const messagesAboveElement = await page.$x(`//p[@class="govuk-error-message"][@id="${field}-error"]`);
+    const messagesAboveElement = await page.$$(`::-p-xpath(//p[@class="govuk-error-message"][@id="${field}-error"])`);
     assert.notEqual(messagesAboveElement.length, 0, `Expected to find the message ${errorMessage} above the ${field} field.`);
 
     const messageAboveElement = await page.evaluate(element => element.textContent, messagesAboveElement[0]);

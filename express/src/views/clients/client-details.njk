@@ -85,7 +85,7 @@
     <div id="idTokenSigningAlgorithm">{{ idTokenSigningAlgorithm }}</div>
   {% endset %}
 
-{% if identity_verification_enabled %}
+{% if identity_verification_supported %}
   {% set levelsOfConfidenceContainer %}
     <div id="levelsOfConfidence">{{ levelsOfConfidence }}</div>
   {% endset %}
@@ -186,7 +186,7 @@
   {% endset %}
 
   {% set idVerificationEnabledUriContainer %}
-    {% if identityVerificationEnabled %}
+    {% if identityVerificationSupported %}
       <div id="idVerificationEnabledUri">
         Yes
       </div>
@@ -243,7 +243,7 @@
     ]
   }) }}
 
-  {% if identityVerificationEnabled %}
+  {% if identityVerificationSupported %}
   {{ govukSummaryList({
     rows: [
       {
@@ -322,7 +322,7 @@
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Advanced options</h2>
 
-      {% if identityVerificationEnabled and levelsOfConfidenceContainer%}
+      {% if identityVerificationSupported and levelsOfConfidenceContainer%}
     {{ govukSummaryList({
     rows: [
             {

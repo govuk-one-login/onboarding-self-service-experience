@@ -116,7 +116,7 @@ Then("their data is saved in the spreadsheet", async function () {
 });
 
 Then("the error message {string} must be displayed for the {string} radios", async function (errorMessage, field) {
-    const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${field}-options"]`);
+    const errorLink = await this.page.$$(`::-p-xpath(//div[@class="govuk-error-summary"]//a[@href="#${field}-options"])`);
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, field);
 });
 
@@ -158,7 +158,7 @@ When("they try to submit the form without selecting any value from the radio but
 });
 
 When("they select the {string} radio button", async function (labelText) {
-    const el = await this.page.$x(`//label[contains(text(), "${labelText}")]`);
+    const el = await this.page.$$(`::-p-xpath(//label[contains(text(), "${labelText}")])`);
     await el[0].click();
 });
 
@@ -171,16 +171,16 @@ Then(/^there should be no accessibility violations$/, async function (this: Test
 Then("pause whilst waiting to complete", {timeout: 1 * 5000}, async function () {});
 
 Then("they they should not see a link that points to {string}", async function (href: string) {
-    const links = await this.page.$x(`//a[contains(@href, "${href}")]`);
+    const links = await this.page.$$(`::-p-xpath(//a[contains(@href, "${href}")])`);
     assert.equal(links.length, 0, "The link exists");
 });
 
 Then("they should see a link that points to {string}", async function (href: string) {
-    const links = await this.page.$x(`//a[contains(@href, "${href}")]`);
+    const links = await this.page.$$(`::-p-xpath(//a[contains(@href, "${href}")])`);
     assert.equal(links.length, 1, `The link pointing to "${href}" does not exist or is not unique`);
 });
 
 Then("{string} radio button is selected", async function (buttonValue) {
-    const el = await this.page.$x(`//input[@value="${buttonValue}" and @checked]`);
+    const el = await this.page.$$(`::-p-xpath(//input[@value="${buttonValue}" and @checked])`);
     assert.equal(await el.length, 1, `The ${buttonValue} radio button is not selected`);
 });

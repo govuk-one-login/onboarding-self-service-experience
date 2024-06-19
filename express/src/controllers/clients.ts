@@ -28,8 +28,8 @@ export const showClient: RequestHandler = async (req, res) => {
     const secretHash = client.client_secret ? client.client_secret : "";
     const displayedKey: string = client.token_endpoint_auth_method === "client_secret_post" ? secretHash : userPublicKey;
     const contacts = client.contacts;
-    const identityVerificationEnabled = client.identity_verification_enabled;
-    const claims = identityVerificationEnabled && client.claims ? client.claims : [];
+    const identityVerificationSupported = client.identity_verification_supported;
+    const claims = identityVerificationSupported && client.claims ? client.claims : [];
     const idTokenSigningAlgorithm = client.id_token_signing_algorithm ?? "";
 
     res.render("clients/client-details.njk", {
@@ -51,9 +51,11 @@ export const showClient: RequestHandler = async (req, res) => {
         displayedKey: displayedKey,
         contacts: contacts,
         token_endpoint_auth_method: client.token_endpoint_auth_method,
-        identityVerificationEnabled: identityVerificationEnabled,
+        identityVerificationSupported: identityVerificationSupported,
         authMethod: client.token_endpoint_auth_method,
-        ...(client.identity_verification_enabled === true && {levelsOfConfidence: client.client_locs ? client.client_locs.join(" ") : ""}),
+        ...(client.identity_verification_supported === true && {
+            levelsOfConfidence: client.client_locs ? client.client_locs.join(" ") : ""
+        }),
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
@@ -887,23 +889,24 @@ export const processEnterIdentityVerificationForm = async (req: Request, res: Re
 
     const {serviceId} = context;
 
-    const identityVerificationEnabled = body.identityVerificationEnabled;
+    const identityVerificationSupported = body.identityVerificationSupported;
 
-    if (!identityVerificationEnabled || (identityVerificationEnabled !== "yes" && identityVerificationEnabled !== "no")) {
+    if (!identityVerificationSupported || (identityVerificationSupported !== "yes" && identityVerificationSupported !== "no")) {
         return res.render("clients/enter-identity-verification.njk", {
             serviceId: req.context.serviceId,
             selfServiceClientId: req.params.selfServiceClientId,
             clientId: req.params.clientId,
             errorMessages: {
-                "identityVerificationEnabled-options": "Select yes if you want to enable identity verification"
+                "identityVerificationSupported-options": "Select yes if you want to enable identity verification"
             }
         });
     }
+    // sending flag to Client Register API
     await s4.updateClient(
         nonNull(context.serviceId),
         params.selfServiceClientId,
         params.clientId,
-        {identity_verification_enabled: identityVerificationEnabled === "yes"},
+        {identity_verification_supported: identityVerificationSupported === "yes"},
         nonNull(session.authenticationResult?.AccessToken)
     );
 
