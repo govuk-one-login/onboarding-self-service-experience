@@ -15,6 +15,8 @@
   {{ form.checkboxesInput("Select all that apply", "claims", [
     {text: "Address", value: "address", checked: address},
     {text: "coreIdentityJWT", value: "coreIdentityJWT", checked: coreIdentityJWT},
-    {text: "ReturnCode", value: "returnCode", checked: returnCode}
+    {text: "ReturnCode", value: "returnCode", checked: returnCode},
+    {text: "Passport", value: "passport", checked: passport},
+    {text: "Driving Permit", value: "drivingPermit", checked: drivingPermit}
   ], claims) }}
 {% endblock %}
