@@ -3,7 +3,7 @@
   "description": "DI self-service acceptance tests",
   "scripts": {
     "acceptance-tests": "cucumber-js acceptance-features",
-    "accessibility-tests": "cucumber-js  accessibility-features",
+    "accessibility-tests": "cucumber-js accessibility-features",
     "exampleotp-tests": "cucumber-js  exampleotp-features"
   },
   "devDependencies": {

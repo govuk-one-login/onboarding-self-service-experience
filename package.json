@@ -2,7 +2,6 @@
   "name": "gds-di-self-service-common",
   "description": "DI Self-Service monorepo",
   "workspaces": [
-    "ui-automation-tests",
     "backend/api",
     "backend/cognito",
     "express",
@@ -26,10 +25,7 @@
     "test:cov": "jest --silent --coverage",
     "lint": "prettier . --check ; eslint '*.ts' --quiet --fix",
     "lint:fix": "prettier . --write ; eslint . --fix",
-    "acceptance": "npm run acceptance-tests -w ui-automation-tests --",
-    "accessibility": "npm run accessibility-tests -w ui-automation-tests --",
-    "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt",
-    "exampleotp": "npm run exampleotp-tests -w ui-automation-tests --"
+    "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.598.0",
