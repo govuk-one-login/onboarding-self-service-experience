@@ -10,12 +10,9 @@
       "support/steps/**/*.ts"
     ],
     "format":  [
-      "progress",
+      "summary",
       "html:reports/cucumber-report.html",
       "json:reports/cucumber-report.json"
-    ],
-    "worldParameters": {
-      "reportsDir": "./reports"
-    }
+    ]
   }
 }

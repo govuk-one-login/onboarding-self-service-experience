@@ -29,7 +29,9 @@ jobs:
           cache: npm
 
       - name: Install Node dependencies
-        run: npm ci --include-workspace-root
+        run: |
+          npm ci --include-workspace-root
+          cd ../express && npm install && cd .. && npm run build-express
 
       - name: Run cucumber tests
         id: run-tests
@@ -42,15 +44,10 @@ jobs:
           TEST_BANNER: true
           NODE_OPTIONS: --max-old-space-size=2048
         run: |
-           cd ../express && npm install && cd .. && npm run build-express
-           
-           cd ui-automation-tests && npm install
-          
-           cd .. && npm run --silent local &
-          
-           while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
-          
-           npm run acceptance-tests -- --format summary:results || cat heading results >> "$REPORT"
+          cd .. && npm run --silent local &
+          while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
+          npm run acceptance-tests
+          cat reports/cucumber-report.json >> "$REPORT"
 
       - name: Report test results
         if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
