@@ -43,11 +43,11 @@ BeforeAll(async function () {
         fse.ensureDirSync(screenshotsDir);
     }
     console.log(`Running tests against ${process.env.HOST ?? "local"}`);
-    browser = await puppeteer.launch({headless: !process.env.SHOW_BROWSER});
     browser = await puppeteer.launch({
         timeout: 5000,
         headless: !process.env.SHOW_BROWSER,
-        args: ["--no-sandbox"]
+        args: ["--no-sandbox"],
+        dumpio: true
     });
 });
 
