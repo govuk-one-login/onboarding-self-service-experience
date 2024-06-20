@@ -1,0 +1,10 @@
+# Dependencies build as required
+node_modules/
+
+# Test files
+accessibility-features
+exampleotp-features
+
+# Environment configuration files
+.env.example
+.env

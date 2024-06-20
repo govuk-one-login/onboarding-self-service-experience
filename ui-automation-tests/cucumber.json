@@ -1,12 +1,21 @@
 {
   "default": {
     "tags": "not @wip",
+    "failFast": true,
     "requireModule": [
       "ts-node/register"
     ],
     "require": [
       "support/test-setup.ts",
       "support/steps/**/*.ts"
-    ]
+    ],
+    "format":  [
+      "progress",
+      "html:reports/cucumber-report.html",
+      "json:reports/cucumber-report.json"
+    ],
+    "worldParameters": {
+      "reportsDir": "./reports"
+    }
   }
 }
