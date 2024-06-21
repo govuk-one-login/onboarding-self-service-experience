@@ -32,9 +32,13 @@ fi
 printf "Endpoint ok\n"
 
 printf "Running e2e tests...\n"
+declare error_code=0
 
 if [[ $ENVIRONMENT =~ dev ]] || [[ $ENVIRONMENT =~ build ]]; then
-  npm run acceptance-tests
+  error_code=$(npm run acceptance-tests 2>&1 1> reports/cucumber-report.summary)
+  cat cucumber-report.summary
+
+  [[ -d "$TEST_REPORT_ABSOLUTE_DIR" ]] && cp -rn ./reports "$TEST_REPORT_ABSOLUTE_DIR"
 fi
 
-exit 0
+exit "$error_code"

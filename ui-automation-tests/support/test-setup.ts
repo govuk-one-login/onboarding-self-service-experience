@@ -33,7 +33,7 @@ export class TestContext extends World {
 
 BeforeAll(async function () {
     counter = 0;
-    const screenshotsDir = `${process.env.TEST_REPORT_ABSOLUTE_DIR ?? "reports"}/screenshots`;
+    const screenshotsDir = "reports/screenshots";
     if (fse.pathExistsSync(screenshotsDir)) {
         console.log("Clear screenshots directory ...");
         fse.removeSync(screenshotsDir);
@@ -63,7 +63,7 @@ After(async function (this: TestContext, scenario) {
     const name = scenario.pickle.name.replace(/ /g, "-");
     if (result === "FAILED") {
         counter++;
-        const screenshotsDir = `${process.env.TEST_REPORT_ABSOLUTE_DIR ?? "reports"}/screenshots`;
+        const screenshotsDir = "reports/screenshots";
         const stream = await this.page.screenshot({
             path: `${screenshotsDir}/${counter}-${result}-[${name}].jpeg`,
             fullPage: true
