@@ -1,9 +1,24 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
     "lib": ["DOM"],
+    "target": "ES2022",
+    "module": "CommonJS",
+    "strict": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowUnreachableCode": false,
+    "moduleResolution": "Node",
+    "removeComments": true,
+    "noUnusedLocals": true,
+    "baseUrl": "./",
+    "outDir": "./dist",
     "rootDir": "./support",
     "noEmit": true
   },
-  "include": ["support/**/*"]
+  "files": [],
+  "include": ["support/**/*"],
+  "exclude": ["node_modules"]
 }

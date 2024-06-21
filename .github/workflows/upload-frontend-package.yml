@@ -24,6 +24,19 @@ jobs:
       url: ${{ steps.deploy.outputs.pipeline-url }}
 
     steps:
+      - name: Push tests Docker image
+        id: tests-image-build
+        uses: govuk-one-login/github-actions/aws/ecr/build-docker-image@7d56b09b4d2a9a9c6005843d28f31a2333ad1373
+        timeout-minutes: 20
+        with:
+          aws-role-arn: ${{ vars.FRONTEND_DEPLOYMENT_ROLE_ARN }}
+          repository: ${{ vars.FRONTEND_TEST_ECR_REPOSITORY_NAME }}
+          dockerfile: ui-automation-tests/tests.Dockerfile
+          build-path: ui-automation-tests
+          image-tags: "latest"
+          immutable-tags: "false"
+          image-version: ${{ github.sha }}
+
       - name: Login to GDS Dev Dynatrace Container Registry
         uses: docker/login-action@v3
         with:
