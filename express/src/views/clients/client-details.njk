@@ -203,9 +203,11 @@
       Not added yet
     {% else %}
       {% for item in claims %}
-        {% if item == "address" %}Address<br>{% endif %}
-        {% if item == "coreIdentityJWT" %}coreIdentityJWT<br>{% endif %}
-        {% if item == "returnCode" %}ReturnCode<br>{% endif %}
+        {% if item == "https://vocab.account.gov.uk/v1/address" %}Address<br>{% endif %}
+        {% if item == "https://vocab.account.gov.uk/v1/coreIdentityJWT" %}coreIdentityJWT<br>{% endif %}
+        {% if item == "https://vocab.account.gov.uk/v1/returnCode" %}Return Code<br>{% endif %}
+        {% if item == "https://vocab.account.gov.uk/v1/passport" %}Passport<br>{% endif %}
+        {% if item == "https://vocab.account.gov.uk/v1/drivingPermit" %}Driving Permit<br>{% endif %}
       {% endfor %}
     {% endif %}
     </div>
