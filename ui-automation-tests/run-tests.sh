@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -u
 set -o pipefail
 
 cat << EOF
@@ -32,13 +32,11 @@ fi
 printf "Endpoint ok\n"
 
 printf "Running e2e tests...\n"
-declare error_code=0
 
 if [[ $ENVIRONMENT =~ dev ]] || [[ $ENVIRONMENT =~ build ]]; then
-  error_code=$(npm run acceptance-tests 2>&1 1> reports/cucumber-report.summary)
-  cat cucumber-report.summary
+  npm run acceptance-tests
 
   [[ -d "$TEST_REPORT_ABSOLUTE_DIR" ]] && cp -rn ./reports "$TEST_REPORT_ABSOLUTE_DIR"
 fi
 
-exit "$error_code"
+exit $?
