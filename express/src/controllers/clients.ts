@@ -646,13 +646,12 @@ export const showChangeBackChannelLogoutUriForm: RequestHandler = (req, res) => 
 export const processChangeBackChannelLogOutUriForm: RequestHandler = async (req, res) => {
     const backChannelLogoutUri = req.body.backChannelLogoutUri;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const newbackChannelLogoutUri = [backChannelLogoutUri];
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
         req.params.selfServiceClientId,
         req.params.clientId,
-        {back_channel_logout_uri: newbackChannelLogoutUri},
+        {back_channel_logout_uri: backChannelLogoutUri},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
 
