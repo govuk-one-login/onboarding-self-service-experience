@@ -28,9 +28,9 @@
     "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.598.0",
+    "@aws-sdk/client-dynamodb": "^3.602.0",
     "@aws-sdk/client-sqs": "^3.598.0",
-    "@aws-sdk/util-dynamodb": "^3.598.0",
+    "@aws-sdk/util-dynamodb": "^3.602.0",
     "@pact-foundation/pact": "^12.5.2",
     "axios": "^1.7.2",
     "googleapis": "^128.0.0",
