@@ -1863,7 +1863,7 @@ describe("processChangeBackChannelLogOutUriForm controller tests", () => {
             TEST_SERVICE_ID,
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
-            {back_channel_logout_uri: [TEST_BACK_CHANNEL_LOGOUT_URI]},
+            {back_channel_logout_uri: TEST_BACK_CHANNEL_LOGOUT_URI},
             TEST_AUTHENTICATION_RESULT.AccessToken
         );
         expect(mockRequest.session.updatedField).toBe("Back channel logout URI");
