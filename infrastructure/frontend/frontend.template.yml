@@ -23,7 +23,7 @@ Parameters:
   ImageURI:
     Type: String
     Default: ""
-    Description: The URI of the ECR image to use for the container
+    Description: [DEPRECATED] The URI of the ECR image to use for the container
   ContainerPort:
     Type: Number
     Default: 3000
@@ -165,7 +165,7 @@ Resources:
       NetworkMode: awsvpc
       ContainerDefinitions:
         - Name: self-service-frontend
-          Image: !Ref ImageURI
+          Image: CONTAINER-IMAGE-PLACEHOLDER
           ReadonlyRootFilesystem: true
           Environment:
             - Name: PORT
