@@ -19,7 +19,7 @@ EOF
 export HOST=${CFN_AdminToolURL:-} # Set the variable for the endpoint
 export ENVIRONMENT=${TEST_ENVIRONMENT:-}
 
-cd /app
+cd /app || exit
 
 printf "Running heartbeat check...\n"
 declare status_code
