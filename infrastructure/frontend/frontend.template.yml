@@ -20,10 +20,6 @@ Parameters:
     AllowedPattern: ^.*[^-]$
     Default: self-service
     Description: A unique prefix to identify the deployment; used to distinguish variation between ephemeral stacks
-  ImageURI:
-    Type: String
-    Default: ""
-    Description: "[DEPRECATED] The URI of the ECR image to use for the container."
   ContainerPort:
     Type: Number
     Default: 3000
