@@ -41,7 +41,7 @@ jobs:
           
           if grep -q "CONTAINER-IMAGE-PLACEHOLDER" .aws-sam/build/template.yaml; then
             echo "Replacing \"CONTAINER-IMAGE-PLACEHOLDER\" with new ECR image ref"
-            sed -i "s|CONTAINER-IMAGE-PLACEHOLDER|$ECR_REGISTRY/$ECR_REPO_NAME:$GITHUB_SHA|" .aws-sam/build/template.yaml
+            sed -i "s|CONTAINER-IMAGE-PLACEHOLDER|$IMAGE_URI|" .aws-sam/build/template.yaml
           else
             echo "WARNING!!! Image placeholder text \"CONTAINER-IMAGE-PLACEHOLDER\" not found - uploading template anyway"
           fi

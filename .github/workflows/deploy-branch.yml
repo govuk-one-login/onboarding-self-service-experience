@@ -32,7 +32,7 @@ jobs:
     uses: ./.github/workflows/build-fargate.yml
     with:
       template: infrastructure/frontend/frontend.template.yml
-      image_uri: needs.push-frontend-image.outputs.image-uri
+      image_uri: ${{ needs.push-frontend-image.outputs.image-uri }}
 
   deploy-frontend:
     name: Frontend
