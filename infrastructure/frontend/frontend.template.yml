@@ -23,7 +23,7 @@ Parameters:
   ImageURI:
     Type: String
     Default: ""
-    Description: [DEPRECATED] The URI of the ECR image to use for the container
+    Description: "[DEPRECATED] The URI of the ECR image to use for the container."
   ContainerPort:
     Type: Number
     Default: 3000
