@@ -31,7 +31,6 @@ jobs:
     needs: [ push-frontend-image, deploy-api, deploy-cognito, deploy-dynamodb ]
     uses: ./.github/workflows/build-fargate.yml
     with:
-      artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
       template: infrastructure/frontend/frontend.template.yml
       image_uri: needs.push-frontend-image.outputs.image-uri
 

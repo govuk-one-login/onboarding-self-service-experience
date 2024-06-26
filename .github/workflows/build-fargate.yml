@@ -5,7 +5,7 @@ on:
     inputs:
       image_uri: { required: true, type: string }
       template: { required: false, type: string }
-      artifact-name: { required: false, type: string, default: Frontend-Node }
+      artifact-name: { required: false, type: string, default: Frontend-SAM }
     outputs:
       template:
         value: ${{ jobs.build.outputs.template }}
@@ -20,7 +20,7 @@ permissions: { }
 
 jobs:
   build:
-    name: Build
+    name: Build stack
     runs-on: ubuntu-latest
     outputs:
       template: ${{ steps.replace-placeholders.outputs.template }}
