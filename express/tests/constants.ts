@@ -127,6 +127,7 @@ export const TEST_CLAIMS_OUT2 = ["openid", "cl1"];
 export const TEST_DEFAULT_FIELD = "someFields";
 export const TEST_ID_SIGNING_TOKEN_ALGORITHM = "ES256";
 export const TEST_LEVELS_OF_CONFIDENCE = "P2";
+export const TEST_LEVELS_OF_CONFIDENCE_ALT = "P0";
 
 export const TEST_DYNAMO_CLIENT = {
     pk: {S: TEST_SERVICE_ID},
