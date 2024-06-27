@@ -1,7 +1,7 @@
 Feature: Users can change their Back channel logout URI
 
     Background:
-    Given the user is on the "/sign-in" page
+        Given the user is on the "/sign-in" page
         And they submit the email "registered@test.gov.uk"
         And they submit a valid password
         And they submit a correct security code

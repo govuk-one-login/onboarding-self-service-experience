@@ -1,6 +1,6 @@
 import {Given, Then, When} from "@cucumber/cucumber";
 import {strict as assert} from "assert";
-import {TestContext} from "../test-setup";
+import {TestContext, username, password, email_otp_code} from "../test-setup";
 import {
     checkErrorMessageDisplayedForField,
     checkUrl,
@@ -17,6 +17,19 @@ import {
 } from "./shared-functions";
 
 import AxePuppeteer from "@axe-core/puppeteer";
+
+Given("the user is signed in", async function () {
+    await this.goToPath("/sign-in");
+    await enterTextIntoTextInput(this.page, username, "emailAddress");
+    await clickSubmitButton(this.page);
+    await enterTextIntoTextInput(this.page, password, "password");
+    await clickSubmitButton(this.page);
+    await enterTextIntoTextInput(this.page, email_otp_code, "securityCode");
+    await clickSubmitButton(this.page);
+
+    const actualTitle = await this.page.title();
+    assert.equal(actualTitle, "Your services - GOV.UK One Login", `Page title was ${actualTitle}`);
+});
 
 Given("the user is on the home page", async function () {
     await this.goToPath("/");
