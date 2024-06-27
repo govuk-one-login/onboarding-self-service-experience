@@ -112,7 +112,7 @@ router
 router
     .route("/:clientId/:selfServiceClientId/change-sector-identifier-uri")
     .get(showChangeSectorIdentifierUriForm)
-    .post(validateUri("clients/change-sector-identifier-uri.njk", "sectorIdentifierUri", true), processChangeSectorIdentifierUriForm);
+    .post(validateUri("clients/change-sector-identifier-uri.njk", "sectorIdentifierUri", false), processChangeSectorIdentifierUriForm);
 
 router
     .route("/:clientId/:selfServiceClientId/enter-client-secret-hash")

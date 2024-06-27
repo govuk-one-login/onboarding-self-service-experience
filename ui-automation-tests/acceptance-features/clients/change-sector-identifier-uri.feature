@@ -21,7 +21,6 @@ Feature: Users can change their Sector identifier URI
         |                   | Enter a URI                                      |
         | someVerywrongURI  | Enter your URIs in the format https://example.com |
         | http://test.com   | URIs must be https or http://localhost            |
-        | https://test.com  | URIs must end in .gov.uk                          |
 
     Scenario: The user clicks "Cancel" on the Enter sector identifier URI
       When they click on the "Cancel" link
@@ -38,7 +37,7 @@ Feature: Users can change their Sector identifier URI
       Given they should see the exact value "http://gov.uk" in the sector identifier uri field
       When they click on the link that points to "/change-sector-identifier-uri"
       Then they should be redirected to a page with the title "Enter sector identifier URI - GOV.UK One Login"
-      When they submit the sector identifier uri "https://testsectoridentifieruri2.gov.uk"
+      When they submit the sector identifier uri "https://testsectoridentifieruri2.co.uk"
       Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
-      And they should see the exact value "https://testsectoridentifieruri2.gov.uk" in the sector identifier uri field
+      And they should see the exact value "https://testsectoridentifieruri2.co.uk" in the sector identifier uri field
       And they should see the text "You have changed your Sector Identifier URI"
