@@ -20,10 +20,6 @@ Parameters:
     AllowedPattern: ^.*[^-]$
     Default: self-service
     Description: A unique prefix to identify the deployment; used to distinguish variation between ephemeral stacks
-  ImageURI:
-    Type: String
-    Default: ""
-    Description: The URI of the ECR image to use for the container
   ContainerPort:
     Type: Number
     Default: 3000
@@ -89,7 +85,7 @@ Rules:
 Mappings:
   EnvironmentConfiguration:
     local:
-      cslsLoggingEnabled: true
+      cslsLoggingEnabled: false
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
       # Local builds do not support dynatrace
       dynatraceLoggingEnabled: false
@@ -119,6 +115,9 @@ Mappings:
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
       dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+    default:
+      cslsLoggingEnabled: false
+      dynatraceLoggingEnabled: false
   WafArn:
     Environment:
       local: "/self-service/development/waf-web-acl"
@@ -144,8 +143,8 @@ Mappings:
 Conditions:
   Subdomain: !Not [ !Equals [ !Ref DeploymentName, self-service ] ]
   UsePermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundary, "" ] ]
-  CslsLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, cslsLoggingEnabled ], true ]
-  DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
+  CslsLoggingEnabled: !Equals [ true, !FindInMap [ EnvironmentConfiguration, !Ref Environment, cslsLoggingEnabled ] ]
+  DynatraceLoggingEnabled: !Equals [ true, !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ] ]
   IsLocal: !Equals [ !Ref Environment, "local" ]
   IsProd: !Equals [ !Ref Environment, "production" ]
 
@@ -165,7 +164,7 @@ Resources:
       NetworkMode: awsvpc
       ContainerDefinitions:
         - Name: self-service-frontend
-          Image: !Ref ImageURI
+          Image: CONTAINER-IMAGE-PLACEHOLDER
           ReadonlyRootFilesystem: true
           Environment:
             - Name: PORT

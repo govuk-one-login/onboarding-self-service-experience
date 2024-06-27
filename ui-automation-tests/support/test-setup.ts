@@ -46,8 +46,7 @@ BeforeAll(async function () {
     browser = await puppeteer.launch({
         timeout: 5000,
         headless: !process.env.SHOW_BROWSER,
-        args: ["--no-sandbox"],
-        dumpio: true
+        args: ["--no-sandbox"]
     });
 });
 
