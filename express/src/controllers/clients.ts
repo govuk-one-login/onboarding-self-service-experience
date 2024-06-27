@@ -900,12 +900,14 @@ export const processEnterIdentityVerificationForm = async (req: Request, res: Re
             }
         });
     }
+
+    const identity_verification_supported = identityVerificationSupported === "yes";
     // sending flag to Client Register API
     await s4.updateClient(
         nonNull(context.serviceId),
         params.selfServiceClientId,
         params.clientId,
-        {identity_verification_supported: identityVerificationSupported === "yes"},
+        {identity_verification_supported, accepted_levels_of_confidence: identity_verification_supported ? ["P2"] : ["P0"]},
         nonNull(session.authenticationResult?.AccessToken)
     );
 

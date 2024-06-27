@@ -291,9 +291,10 @@ export default class DynamoDbClient {
 
     // TODO: Make methods below private whilst making testing work
     generateUpdateExpression(attributes: string[]): string {
-        return attributes
-            .map(attribute => `set ${this.getAttributeNameAlias(attribute)} = ${this.getAttributeValueLabel(attribute)}`)
-            .join(", ");
+        return (
+            "set " +
+            attributes.map(attribute => `${this.getAttributeNameAlias(attribute)} = ${this.getAttributeValueLabel(attribute)}`).join(", ")
+        );
     }
 
     generateExpressionAttributeNames(attributes: string[]): AttributeNames {

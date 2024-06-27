@@ -64,6 +64,7 @@ import {
     TEST_IDENTITY_VERIFICATION_SUPPORTED_TX,
     TEST_IP_ADDRESS,
     TEST_LEVELS_OF_CONFIDENCE,
+    TEST_LEVELS_OF_CONFIDENCE_ALT,
     TEST_POST_LOGOUT_REDIRECT_URI,
     TEST_PUBLIC_BETA_FORM_SUBMISSION,
     TEST_PUBLIC_KEY,
@@ -3024,7 +3025,10 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             TEST_SERVICE_ID,
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
-            {identity_verification_supported: TEST_IDENTITY_VERIFICATION_SUPPORTED},
+            {
+                accepted_levels_of_confidence: [TEST_LEVELS_OF_CONFIDENCE],
+                identity_verification_supported: TEST_IDENTITY_VERIFICATION_SUPPORTED
+            },
             TEST_ACCESS_TOKEN
         );
 
@@ -3059,7 +3063,10 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             TEST_SERVICE_ID,
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
-            {identity_verification_supported: TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT},
+            {
+                accepted_levels_of_confidence: [TEST_LEVELS_OF_CONFIDENCE_ALT],
+                identity_verification_supported: TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT
+            },
             TEST_ACCESS_TOKEN
         );
 

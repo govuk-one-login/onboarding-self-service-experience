@@ -124,7 +124,7 @@ describe("DynamoDB client", () => {
         it("should generate correct update expression", () => {
             const updateExpression = client.generateUpdateExpression(Object.keys(updates));
             const expectedUpdateExpression =
-                "set #services = :services, set #email = :email, set #attempts = :attempts, set #verified = :verified, set #D = :data";
+                "set #services = :services, #email = :email, #attempts = :attempts, #verified = :verified, #D = :data";
 
             expect(updateExpression).toEqual(expectedUpdateExpression);
         });
