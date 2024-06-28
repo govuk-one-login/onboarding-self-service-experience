@@ -40,7 +40,7 @@ jobs:
         env:
           REPORT: ${{ runner.temp }}/acceptance-tests.report
           HOST: http://localhost:3000
-          STUB_API: true
+          STUB_API: false
           TEST_BANNER: true
           NODE_OPTIONS: --max-old-space-size=2048
         run: |
