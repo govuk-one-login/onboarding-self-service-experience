@@ -39,7 +39,7 @@ jobs:
         timeout-minutes: 10
         env:
           REPORT: ${{ runner.temp }}/acceptance-tests.report
-          HOST: https://admin.development.sign-in.service.gov.uk/
+          HOST: https://admin.development.sign-in.service.gov.uk
           STUB_API: false
           TEST_BANNER: true
           NODE_OPTIONS: --max-old-space-size=2048

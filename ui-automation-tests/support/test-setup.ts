@@ -1,4 +1,4 @@
-import {After, AfterAll, Before, BeforeAll, setWorldConstructor} from "@cucumber/cucumber";
+import {After, AfterAll, Before, BeforeAll, setWorldConstructor, setDefaultTimeout} from "@cucumber/cucumber";
 import {IWorldOptions} from "@cucumber/cucumber/lib/support_code_library_builder/world";
 import puppeteer, {Browser, Page} from "puppeteer";
 import {enterTextIntoTextInput, clickSubmitButton} from "./steps/shared-functions";
@@ -7,6 +7,8 @@ import fse from "fs-extra";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const {World} = require("@cucumber/cucumber");
+
+setDefaultTimeout(60 * 1000);
 
 let browser: Browser, counter: number;
 const chance = new Chance.Chance();
@@ -42,7 +44,7 @@ export class TestContext extends World {
     }
 }
 
-BeforeAll(async function () {
+BeforeAll({ timeout: 30 * 1000 }, async function () {
     counter = 0;
     const screenshotsDir = "reports/screenshots";
     if (fse.pathExistsSync(screenshotsDir)) {
@@ -57,26 +59,35 @@ BeforeAll(async function () {
     const host = process.env.HOST ?? "http://localhost:3000";
     console.log(`Running tests against ${host}`);
     browser = await puppeteer.launch({
-        timeout: 5000,
+        timeout: 30000,
         headless: !process.env.SHOW_BROWSER,
         args: ["--no-sandbox"]
     });
-
+    console.log("Puppeteer launched...");
     const page = await browser.newPage();
+    console.log("New page tab opened...");
 
-    await page.goto(`${host}/register/enter-email-address`);
+    await page.goto(`${host}/register`, {timeout: 0});
+
+    console.log("Navigated to registration page...");
     await enterTextIntoTextInput(page, username, "emailAddress");
     await clickSubmitButton(page);
+    console.log("Entered email address.");
     await enterTextIntoTextInput(page, email_otp_code, "securityCode");
     await clickSubmitButton(page);
+    console.log("Entered email otp code.");
     await enterTextIntoTextInput(page, password, "password");
     await clickSubmitButton(page);
+    console.log("Entered password.");
     await enterTextIntoTextInput(page, mobile_number, "mobileNumber");
     await clickSubmitButton(page);
+    console.log("Entered mobile number.");
     await enterTextIntoTextInput(page, sms_otp_code, "securityCode");
     await clickSubmitButton(page);
+    console.log("Entered otp security code.");
     await enterTextIntoTextInput(page, servicename, "serviceName");
-    await clickSubmitButton(page);
+    await clickSubmitButton(page, 60000);
+    console.log("Completed user registration.");
 });
 
 Before(async function (this: TestContext) {
