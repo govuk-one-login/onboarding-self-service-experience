@@ -26,17 +26,22 @@ jobs:
     secrets:
       dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
 
-  deploy-frontend:
+  build-frontend-stack:
     name: Frontend
     needs: [ push-frontend-image, deploy-api, deploy-cognito, deploy-dynamodb ]
+    uses: ./.github/workflows/build-fargate.yml
+    with:
+      template: infrastructure/frontend/frontend.template.yml
+      image_uri: ${{ needs.push-frontend-image.outputs.image-uri }}
+
+  deploy-frontend:
+    name: Frontend
+    needs: [ build-frontend-stack ]
     uses: ./.github/workflows/deploy-component.yml
     with:
       name: frontend
-      artifact: ${{ needs.build-frontend.outputs.artifact-name }}
+      artifact: ${{ needs.build-frontend-stack.outputs.artifact-name }}
       deployment-url-output: AdminToolURL
-      template: infrastructure/frontend/frontend.template.yml
-      parameters: |
-        ImageURI=${{ needs.push-frontend-image.outputs.image-uri }}
 
   build-cognito:
     name: Cognito

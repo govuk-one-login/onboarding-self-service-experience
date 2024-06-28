@@ -28,7 +28,7 @@ export type clientRegistryRegistrationResponse = {
         serviceName: string;
     };
     contact_email: string;
-    id_token_signing_algorithm: string;
+    id_token_signing_algorithm: "ES256" | "RS256";
     client_locs: string[];
 };
 
@@ -48,7 +48,7 @@ export const putServiceClientHandler = async (event: handlerInvokeEvent): Promis
         service_type: payload.service_type,
         client_name: "integration",
         service_name: payload.service.serviceName,
-        identity_verification_enabled: false,
+        identity_verification_supported: false,
         claims: [],
         back_channel_logout_uri: payload.back_channel_logout_uri,
         sector_identifier_uri: payload.sector_identifier_uri,
@@ -63,7 +63,7 @@ export const putServiceClientHandler = async (event: handlerInvokeEvent): Promis
             "post_logout_redirect_uris",
             "subject_type",
             "service_type",
-            "identity_verification_enabled",
+            "identity_verification_supported",
             "claims",
             "sector_identifier_uri",
             "back_channel_logout_uri",

@@ -20,7 +20,9 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private sectorIdentifierUri = "http://gov.uk";
     private contacts = ["registered@test.gov.uk", "mockuser2@gov.uk", "mockuser3@gov.uk"];
     private claims: string[] = [];
-    private identityVerificationEnabled = false;
+    private identityVerificationSupported = false;
+    private client_locs = ["P2"];
+    private id_token_signing_algorithm = "ES256";
 
     private user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
@@ -98,8 +100,12 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
             this.claims = updates.claims as string[];
         }
 
-        if (typeof updates.identity_verification_enabled !== "undefined") {
-            this.identityVerificationEnabled = updates.identity_verification_enabled as boolean;
+        if (typeof updates.identity_verification_supported !== "undefined") {
+            this.identityVerificationSupported = updates.identity_verification_supported as boolean;
+        }
+
+        if (updates.id_token_signing_algorithm) {
+            this.id_token_signing_algorithm = updates.id_token_signing_algorithm as string;
         }
     }
 
@@ -148,6 +154,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         back_channel_logout_uri: {S: this.backChannelLogoutUri},
                         subject_type: {S: "pairwise"},
                         contacts: convertToAttr(this.contacts),
+                        client_locs: {L: [{S: this.client_locs[0]}]},
+                        id_token_signing_algorithm: {S: this.id_token_signing_algorithm},
                         public_key: {
                             S: this.publicKey
                         },
@@ -167,7 +175,9 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                                 {S: "subject_type"},
                                 {S: "service_type"},
                                 {S: "claims"},
-                                {S: "identity_verification_enabled"}
+                                {S: "identity_verification_supported"},
+                                {S: "client_locs"},
+                                {S: "id_token_signing_algorithm"}
                             ]
                         },
                         data: {S: "SAM Service as a Service Service"},
@@ -177,7 +187,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
                         service_type: {S: "MANDATORY"},
                         type: {S: "integration"},
-                        identity_verification_enabled: {S: this.identityVerificationEnabled}
+                        identity_verification_supported: {S: this.identityVerificationSupported}
                     }
                 ]
             }

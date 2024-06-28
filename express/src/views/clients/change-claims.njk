@@ -13,8 +13,10 @@
 
 {% block formInputs %}
   {{ form.checkboxesInput("Select all that apply", "claims", [
-    {text: "Address", value: "address", checked: address},
-    {text: "coreIdentityJWT", value: "coreIdentityJWT", checked: coreIdentityJWT},
-    {text: "ReturnCode", value: "returnCode", checked: returnCode}
+    {text: "Address", value: "https://vocab.account.gov.uk/v1/address", checked: address},
+    {text: "coreIdentityJWT", value: "https://vocab.account.gov.uk/v1/coreIdentityJWT", checked: coreIdentityJWT},
+    {text: "Return Code", value: "https://vocab.account.gov.uk/v1/returnCode", checked: returnCode},
+    {text: "Passport", value: "https://vocab.account.gov.uk/v1/passport", checked: passport},
+    {text: "Driving Permit", value: "https://vocab.account.gov.uk/v1/drivingPermit", checked: drivingPermit}
   ], claims) }}
 {% endblock %}

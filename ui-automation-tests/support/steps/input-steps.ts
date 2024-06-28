@@ -46,7 +46,9 @@ When("they submit a valid password", async function () {
 });
 
 Then("the error message {string} must be displayed for the {} field", async function (errorMessage, fieldName) {
-    const errorLink = await this.page.$x(`//div[@class="govuk-error-summary"]//a[@href="#${fields[fieldName as keyof typeof fields]}"]`);
+    const errorLink = await this.page.$$(
+        `::-p-xpath(//div[@class="govuk-error-summary"]//a[@href="#${fields[fieldName as keyof typeof fields]}"])`
+    );
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, fields[fieldName as keyof typeof fields]);
 });
 

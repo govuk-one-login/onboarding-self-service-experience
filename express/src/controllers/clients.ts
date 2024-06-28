@@ -28,8 +28,9 @@ export const showClient: RequestHandler = async (req, res) => {
     const secretHash = client.client_secret ? client.client_secret : "";
     const displayedKey: string = client.token_endpoint_auth_method === "client_secret_post" ? secretHash : userPublicKey;
     const contacts = client.contacts;
-    const identityVerificationEnabled = client.identity_verification_enabled;
-    const claims = identityVerificationEnabled && client.hasOwnProperty("claims") ? client.claims : [];
+    const identityVerificationSupported = client.identity_verification_supported;
+    const claims = identityVerificationSupported && client.claims ? client.claims : [];
+    const idTokenSigningAlgorithm = client.id_token_signing_algorithm ?? "";
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
@@ -46,14 +47,18 @@ export const showClient: RequestHandler = async (req, res) => {
         sectorIdentifierUri: userSectorIdentifierUri,
         postLogoutRedirectUris: client.postLogoutUris,
         claims: claims,
-        idTokenSigningAlgorithm: client.hasOwnProperty("id_token_signing_algorithm") ? client.id_token_signing_algorithm : "",
+        idTokenSigningAlgorithm,
         displayedKey: displayedKey,
         contacts: contacts,
-        identityVerificationEnabled: identityVerificationEnabled,
+        token_endpoint_auth_method: client.token_endpoint_auth_method,
+        identityVerificationSupported: identityVerificationSupported,
         authMethod: client.token_endpoint_auth_method,
+        ...(client.identity_verification_supported === true && {
+            levelsOfConfidence: client.client_locs ? client.client_locs.join(" ") : ""
+        }),
         urls: {
             // TODO changeClientName is currently not used
-            changeClientName: `/test/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
+            changeClientName: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
                 client.clientName
             )}`,
             changeRedirectUris: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-redirect-uris`,
@@ -82,7 +87,10 @@ export const showClient: RequestHandler = async (req, res) => {
                           displayedKey
                       )}`,
             changeContacts: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-contact`,
-            changeIdVerificationEnabledUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-identity-verification`
+            changeIdVerificationEnabledUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-identity-verification`,
+            changeIdTokenSigningAlgorithm: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-id-token-signing-algorithm?algorithm=${encodeURIComponent(
+                idTokenSigningAlgorithm
+            )}`
         }
     });
 
@@ -638,13 +646,12 @@ export const showChangeBackChannelLogoutUriForm: RequestHandler = (req, res) => 
 export const processChangeBackChannelLogOutUriForm: RequestHandler = async (req, res) => {
     const backChannelLogoutUri = req.body.backChannelLogoutUri;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    const newbackChannelLogoutUri = [backChannelLogoutUri];
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
         req.params.selfServiceClientId,
         req.params.clientId,
-        {back_channel_logout_uri: newbackChannelLogoutUri},
+        {back_channel_logout_uri: backChannelLogoutUri},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
 
@@ -881,26 +888,101 @@ export const processEnterIdentityVerificationForm = async (req: Request, res: Re
 
     const {serviceId} = context;
 
-    const identityVerificationEnabled = body.identityVerificationEnabled;
+    const identityVerificationSupported = body.identityVerificationSupported;
 
-    if (!identityVerificationEnabled || (identityVerificationEnabled !== "yes" && identityVerificationEnabled !== "no")) {
+    if (!identityVerificationSupported || (identityVerificationSupported !== "yes" && identityVerificationSupported !== "no")) {
         return res.render("clients/enter-identity-verification.njk", {
             serviceId: req.context.serviceId,
             selfServiceClientId: req.params.selfServiceClientId,
             clientId: req.params.clientId,
             errorMessages: {
-                "identityVerificationEnabled-options": "Select yes if you want to enable identity verification"
+                "identityVerificationSupported-options": "Select yes if you want to enable identity verification"
             }
         });
     }
+
+    const identity_verification_supported = identityVerificationSupported === "yes";
+    // sending flag to Client Register API
     await s4.updateClient(
         nonNull(context.serviceId),
         params.selfServiceClientId,
         params.clientId,
-        {identity_verification_enabled: identityVerificationEnabled === "yes"},
+        {identity_verification_supported, accepted_levels_of_confidence: identity_verification_supported ? ["P2"] : ["P0"]},
         nonNull(session.authenticationResult?.AccessToken)
     );
 
     req.session.updatedField = "identity verification";
+    res.redirect(`/services/${serviceId}/clients`);
+};
+
+export const showChangeClientName: RequestHandler = (req, res) => {
+    res.render("clients/change-client-name.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        values: {
+            clientName: req.query.clientName
+        }
+    });
+};
+
+export const processChangeClientName = async (req: Request, res: Response): Promise<void> => {
+    const newClientName = req.body.clientName;
+
+    if (newClientName === "") {
+        res.render("clients/change-client-name.njk", {
+            serviceId: req.context.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId,
+            errorMessages: {
+                clientName: "Enter your client name"
+            }
+        });
+
+        return;
+    }
+
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    try {
+        await s4.updateClient(
+            nonNull(req.context.serviceId),
+            req.params.selfServiceClientId,
+            req.params.clientId,
+            {client_name: newClientName},
+            req.session.authenticationResult?.AccessToken as string
+        );
+    } catch (error) {
+        console.error(error);
+        res.redirect("/there-is-a-problem");
+        return;
+    }
+
+    req.session.updatedField = "client name";
+    res.redirect(`/services/${req.context.serviceId}/clients`);
+};
+
+export const showChangeIdTokenAlgorithmForm: RequestHandler = (req, res) => {
+    res.render("clients/change-id-token-algorithm.njk", {
+        serviceId: req.context.serviceId,
+        authClientId: req.params.clientId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        algorithm: req.query.algorithm?.toString()
+    });
+};
+
+export const processChangeIdTokenAlgorithmForm: RequestHandler = async (req, res) => {
+    const newIdTokenSigningAlgorithm = req.body.idTokenSigningAlgorithm;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    const serviceId = nonNull(req.context.serviceId);
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {id_token_signing_algorithm: newIdTokenSigningAlgorithm},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "ID token signing algorithm";
     res.redirect(`/services/${serviceId}/clients`);
 };

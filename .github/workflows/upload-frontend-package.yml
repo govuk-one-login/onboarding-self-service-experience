@@ -24,6 +24,19 @@ jobs:
       url: ${{ steps.deploy.outputs.pipeline-url }}
 
     steps:
+      - name: Push tests Docker image
+        id: tests-image-build
+        uses: govuk-one-login/github-actions/aws/ecr/build-docker-image@7d56b09b4d2a9a9c6005843d28f31a2333ad1373
+        timeout-minutes: 20
+        with:
+          aws-role-arn: ${{ vars.FRONTEND_DEPLOYMENT_ROLE_ARN }}
+          repository: ${{ vars.FRONTEND_TEST_ECR_REPOSITORY_NAME }}
+          dockerfile: ui-automation-tests/tests.Dockerfile
+          build-path: ui-automation-tests
+          image-tags: "latest"
+          immutable-tags: "false"
+          image-version: ${{ github.sha }}
+
       - name: Login to GDS Dev Dynatrace Container Registry
         uses: docker/login-action@v3
         with:
@@ -33,7 +46,7 @@ jobs:
 
       - name: Deploy
         id: deploy
-        uses: govuk-one-login/github-actions/secure-pipelines/deploy-fargate@5e4b2d8a5d5e2af09620f1f5cb2c5fd89ec8a257 # 5/03/2024
+        uses: govuk-one-login/github-actions/secure-pipelines/deploy-fargate@f9d28e080ca94169b420181dd0199569687f85a1 # 27/06/2024
         timeout-minutes: 20
         with:
           aws-role-arn: ${{ vars.FRONTEND_DEPLOYMENT_ROLE_ARN }}

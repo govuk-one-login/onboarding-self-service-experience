@@ -16,7 +16,8 @@ const fields = {
     "back channel logout uri": "backChannelLogoutUri",
     "sector identifier uri": "sectorIdentifierUri",
     "identity verification enabled": "idVerificationEnabledUri",
-    claims: "claimsUri"
+    claims: "claimsUri",
+    "id token signing algorithm": "idTokenSigningAlgorithm"
 };
 
 Then("they should see the value for the Client ID {string}", async function (this: TestContext, text) {
@@ -64,8 +65,21 @@ Then("they click 'email' checkbox", async function () {
     await emailCheckboxInput.click();
 });
 
+Then("they click 'Address' claim checkbox", async function () {
+    const emailCheckboxInput = await this.page.$("#claims");
+    if (!emailCheckboxInput) {
+        throw new Error(`Could not find element with id #claims`);
+    }
+    await emailCheckboxInput.click();
+});
+
 Then("they should see that Email option is checked", async function (this: TestContext) {
     const emailIsChecked = await this.page.$eval("#scopes", element => element.hasAttribute("checked"));
+    assert.equal(emailIsChecked, true);
+});
+
+Then("they should see that 'Address' claim is checked", async function (this: TestContext) {
+    const emailIsChecked = await this.page.$eval("#claims", element => element.hasAttribute("checked"));
     assert.equal(emailIsChecked, true);
 });
 

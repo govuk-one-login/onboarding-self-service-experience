@@ -202,6 +202,7 @@ describe("cognito client tests", () => {
         expect(mockCognitoClient).toHaveReceivedCommandWith(ConfirmForgotPasswordCommand, {
             ClientId: TEST_COGNITO_CLIENT_ID,
             Username: TEST_EMAIL,
+            Password: TEST_PASSWORD,
             ConfirmationCode: TEST_SECURITY_CODE,
             ClientMetadata: {
                 email: TEST_EMAIL

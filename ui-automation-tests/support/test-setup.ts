@@ -33,16 +33,21 @@ export class TestContext extends World {
 
 BeforeAll(async function () {
     counter = 0;
-    if (fse.pathExistsSync("output/screenshots")) {
+    const screenshotsDir = "reports/screenshots";
+    if (fse.pathExistsSync(screenshotsDir)) {
         console.log("Clear screenshots directory ...");
-        fse.removeSync("output/screenshots/");
+        fse.removeSync(screenshotsDir);
         // recreate directory
-        fse.ensureDirSync("output/screenshots");
+        fse.ensureDirSync(screenshotsDir);
     } else {
-        fse.ensureDirSync("output/screenshots");
+        fse.ensureDirSync(screenshotsDir);
     }
     console.log(`Running tests against ${process.env.HOST ?? "local"}`);
-    browser = await puppeteer.launch({headless: !process.env.SHOW_BROWSER});
+    browser = await puppeteer.launch({
+        timeout: 5000,
+        headless: !process.env.SHOW_BROWSER,
+        args: ["--no-sandbox"]
+    });
 });
 
 Before(async function (this: TestContext) {
@@ -57,8 +62,9 @@ After(async function (this: TestContext, scenario) {
     const name = scenario.pickle.name.replace(/ /g, "-");
     if (result === "FAILED") {
         counter++;
+        const screenshotsDir = "reports/screenshots";
         const stream = await this.page.screenshot({
-            path: `./output/screenshots/${counter}-${result}-[${name}].jpeg`,
+            path: `${screenshotsDir}/${counter}-${result}-[${name}].jpeg`,
             fullPage: true
         });
         return this.attach(stream, "image/jpeg");

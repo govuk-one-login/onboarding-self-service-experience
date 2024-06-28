@@ -81,6 +81,16 @@
     <div id="sectorIdentifierUri">{{ sectorIdentifierUri }}</div>
   {% endset %}
 
+  {% set idTokenSigningAlgorithmContainer %}
+    <div id="idTokenSigningAlgorithm">{{ idTokenSigningAlgorithm }}</div>
+  {% endset %}
+
+{% if identity_verification_supported %}
+  {% set levelsOfConfidenceContainer %}
+    <div id="levelsOfConfidence">{{ levelsOfConfidence }}</div>
+  {% endset %}
+{% endif %}
+
   {{ govukSummaryList({
     rows: [
       {
@@ -176,7 +186,7 @@
   {% endset %}
 
   {% set idVerificationEnabledUriContainer %}
-    {% if identityVerificationEnabled %}
+    {% if identityVerificationSupported %}
       <div id="idVerificationEnabledUri">
         Yes
       </div>
@@ -193,9 +203,11 @@
       Not added yet
     {% else %}
       {% for item in claims %}
-        {% if item == "address" %}Address<br>{% endif %}
-        {% if item == "coreIdentityJWT" %}coreIdentityJWT<br>{% endif %}
-        {% if item == "returnCode" %}ReturnCode<br>{% endif %}
+        {% if item == "https://vocab.account.gov.uk/v1/address" %}Address<br>{% endif %}
+        {% if item == "https://vocab.account.gov.uk/v1/coreIdentityJWT" %}coreIdentityJWT<br>{% endif %}
+        {% if item == "https://vocab.account.gov.uk/v1/returnCode" %}Return Code<br>{% endif %}
+        {% if item == "https://vocab.account.gov.uk/v1/passport" %}Passport<br>{% endif %}
+        {% if item == "https://vocab.account.gov.uk/v1/drivingPermit" %}Driving Permit<br>{% endif %}
       {% endfor %}
     {% endif %}
     </div>
@@ -233,7 +245,7 @@
     ]
   }) }}
 
-  {% if identityVerificationEnabled %}
+  {% if identityVerificationSupported %}
   {{ govukSummaryList({
     rows: [
       {
@@ -310,6 +322,50 @@
     ]
   }) }}
 
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Advanced options</h2>
+
+      {% if identityVerificationSupported and levelsOfConfidenceContainer%}
+    {{ govukSummaryList({
+    rows: [
+            {
+        key: {text: "ID token signing algorithm"},
+        value: {html: idTokenSigningAlgorithmContainer},
+        actions: {
+          items: [{
+            href: urls.changeIdTokenSigningAlgorithm,
+            text: "Change",
+            visuallyHiddenText: "Id Token signing algorithm"
+          }]
+        }
+      },
+      {
+
+        key: {html: "Level of confidence options"},
+        value: {html: levelsOfConfidenceContainer}
+
+      }
+    ]
+     }) }}
+      {% else %}
+      {{ govukSummaryList({
+    rows: [
+            {
+        key: {text: "ID token signing algorithm"},
+        value: {html: idTokenSigningAlgorithmContainer},
+        actions: {
+          items: [{
+            href: urls.changeIdTokenSigningAlgorithm,
+            text: "Change",
+            visuallyHiddenText: "Id Token signing algorithm"
+          }]
+        }
+      }
+    ]
+     }) }}
+  {% endif %}
+
+
+
   <details class="govuk-details" data-module="govuk-details" id="client-details-summary">
     <summary class="govuk-details__summary" id="client-details-summary-toggle">
       <span class="govuk-details__summary-text">Help with API terms</span>
@@ -342,7 +398,7 @@
       <span class="govuk-body govuk-!-font-weight-bold">Public key</span>
       <p class="govuk-body">This lets our services securely send messages to each other. You need to generate a key pair and add the public key. Read the
         <a class="govuk-link" rel="noreferrer noopener" target="_blank"
-           href="https://docs.sign-in.service.gov.uk/before-integrating/generate-a-key/">
+          href="https://docs.sign-in.service.gov.uk/before-integrating/generate-a-key/">
           technical documents on key pairs.</a>
       </p>
 

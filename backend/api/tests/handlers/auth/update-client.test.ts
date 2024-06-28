@@ -1,5 +1,4 @@
-import sinon from "sinon";
-import axios from "axios";
+import axios, {AxiosError, AxiosResponse} from "axios";
 import {UpdateClientPayload, updateClientInRegistryHandler} from "../../../src/handlers/auth/update-client";
 
 const postRequest = async (data: UpdateClientPayload): Promise<string> => {
@@ -10,12 +9,9 @@ const postRequest = async (data: UpdateClientPayload): Promise<string> => {
 const EXPECTED_RESPONSE =
     '{"statusCode":200,"body":"{\\"clientId\\":\\"123\\",\\"updates\\":{\\"serviceName\\":\\"My test service\\"},\\"serviceId\\":\\"456\\",\\"selfServiceClientId\\":\\"789\\"}"}';
 
-const EXPECTED_BAD_RESPONSE =
-    '{"statusCode":200,"body":"{\\"updates\\":{\\"serviceName\\":\\"My test service\\"},\\"serviceId\\":\\"456\\",\\"selfServiceClientId\\":\\"789\\"}"}';
-
 describe("exercise update-client api", () => {
-    let axiosPutStub: sinon.SinonStub;
-    let consoleErrorStub: sinon.SinonStub;
+    let axiosPutStub: jest.SpyInstance;
+    let consoleErrorStub: jest.SpyInstance;
 
     const updateClientRequest = {
         clientId: "123",
@@ -27,36 +23,46 @@ describe("exercise update-client api", () => {
     };
 
     beforeEach(() => {
-        axiosPutStub = sinon.stub(axios, "put");
-        consoleErrorStub = sinon.stub(console, "error");
+        axiosPutStub = jest.spyOn(axios, "put");
+        consoleErrorStub = jest.spyOn(console, "error");
     });
 
     afterEach(() => {
-        axiosPutStub.restore();
-        consoleErrorStub.restore();
+        axiosPutStub.mockRestore();
+        consoleErrorStub.mockRestore();
     });
 
     it("should return the data for a successful update", async () => {
         const mockResponse = {
+            status: 200,
             data: {
                 clientId: "123"
             }
         };
 
-        axiosPutStub.resolves(mockResponse);
+        axiosPutStub.mockResolvedValue(mockResponse);
 
         const result = await postRequest(updateClientRequest);
         expect(result).toEqual(EXPECTED_RESPONSE);
     });
 
-    it("should handle errors gracefully", async () => {
-        const mockResponse = {
-            status: 400
-        };
+    it("should log the status and throw an axios error", async () => {
+        const axiosError = new AxiosError();
+        axiosError.response = {
+            status: 400,
+            data: "Invalid Request"
+        } as AxiosResponse;
 
-        axiosPutStub.resolves(mockResponse);
+        axiosPutStub.mockRejectedValue(axiosError);
 
-        const result = await postRequest(updateClientRequest);
-        expect(result).toEqual(EXPECTED_BAD_RESPONSE);
+        await expect(postRequest(updateClientRequest)).rejects.toThrow(AxiosError);
+        expect(consoleErrorStub).toHaveBeenCalledWith('Client registry request failed with response: "400" and message "Invalid Request"');
+    });
+
+    it("should throw an non axios error", async () => {
+        const error = new Error("somethingNotAnAxiosOne");
+        axiosPutStub.mockRejectedValue(error);
+
+        await expect(postRequest(updateClientRequest)).rejects.toThrow(error);
     });
 });
