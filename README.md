@@ -4,8 +4,7 @@ The Admin Tool is a self-service product that allows government service teams to
 with the GOV.UK One Login service.
 
 See the [product page](https://sign-in.service.gov.uk/) for details and features, and
-the [technical documentation](https://docs.sign-in.service.gov.uk/) for
-onboarding instructions.
+the [technical documentation](https://docs.sign-in.service.gov.uk/) for onboarding instructions.
 
 ## Developer tools
 
@@ -100,3 +99,7 @@ e.g. `/services/123456/clients`
 `/parents/:parentId/children/:childId`
 
 e.g. `/services/123456/clients/456789`
+
+# To use Google Analytics locally env variable must be set:
+
+COOKIE_DOMAIN=localhost

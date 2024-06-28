@@ -12,3 +12,15 @@
 {% block formInputs %}
   {{ form.textInput("Service name", "serviceName") }}
 {% endblock %}
+
+ {% block scripts %}
+   {{ga4OnPageLoad({
+     statusCode:"200",
+     englishPageTitle: pageTitle,
+     taxonomyLevel1: taxonomyLevel1,
+     taxonomyLevel2: taxonomyLevel2Account,
+     contentId:"7ce3f236-d50f-4d77-843c-07160fe78106",
+     loggedInStatus:false,
+     dynamic:false
+   })}}
+ {% endblock %}

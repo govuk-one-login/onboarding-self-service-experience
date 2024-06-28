@@ -49,3 +49,15 @@
   }) }}
 
 {% endblock %}
+
+ {% block scripts %}
+   {{ga4OnPageLoad({
+     statusCode:"200",
+     englishPageTitle: pageTitle,
+     taxonomyLevel1: taxonomyLevel1,
+     taxonomyLevel2: taxonomyLevel2AdminTool,
+     contentId:"b6e6b07a-c633-4b0a-adf2-e33e2615e344",
+     loggedInStatus:true,
+     dynamic:false
+   })}}
+ {% endblock %}
