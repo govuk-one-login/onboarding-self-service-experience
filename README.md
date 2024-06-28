@@ -4,8 +4,7 @@ The Admin Tool is a self-service product that allows government service teams to
 with the GOV.UK One Login service.
 
 See the [product page](https://sign-in.service.gov.uk/) for details and features, and
-the [technical documentation](https://docs.sign-in.service.gov.uk/) for
-onboarding instructions.
+the [technical documentation](https://docs.sign-in.service.gov.uk/) for onboarding instructions.
 
 ## Developer tools
 
