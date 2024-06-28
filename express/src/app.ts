@@ -43,8 +43,8 @@ app.use(errorHandler);
 app.locals.showTestBanner = showTestBanner;
 app.locals.ga4ContainerId = process.env.GOOGLE_ANALYTICS_4_GTM_CONTAINER_ID;
 app.locals.uaContainerId = process.env.UNIVERSAL_ANALYTICS_GTM_CONTAINER_ID;
-app.locals.ga4Disabled = process.env.GA4_DISABLED;
-app.locals.uaDisabled = process.env.UA_DISABLED;
+app.locals.ga4Disabled = process.env.GA4_DISABLED || true;
+app.locals.uaDisabled = process.env.UA_DISABLED || true;
 app.locals.cookieDomain = process.env.COOKIE_DOMAIN || "sign-in.service.gov.uk";
 
 app.set("trust proxy", true);
