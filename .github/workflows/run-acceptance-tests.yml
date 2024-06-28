@@ -39,12 +39,11 @@ jobs:
         timeout-minutes: 10
         env:
           REPORT: ${{ runner.temp }}/acceptance-tests.report
-          HOST: http://localhost:3000
+          HOST: https://admin.development.sign-in.service.gov.uk/
           STUB_API: false
           TEST_BANNER: true
           NODE_OPTIONS: --max-old-space-size=2048
         run: |
-          cd .. && npm run --silent local &
           while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
           npm run acceptance-tests
           cat reports/cucumber-report.json >> "$REPORT"
