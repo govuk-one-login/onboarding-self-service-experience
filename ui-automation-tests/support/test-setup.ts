@@ -2,19 +2,18 @@ import {After, AfterAll, Before, BeforeAll, setWorldConstructor} from "@cucumber
 import {IWorldOptions} from "@cucumber/cucumber/lib/support_code_library_builder/world";
 import puppeteer, {Browser, Page} from "puppeteer";
 import {enterTextIntoTextInput, clickSubmitButton} from "./steps/shared-functions";
-import Chance from 'chance';
+import Chance from "chance";
 import fse from "fs-extra";
-import { v4 as uuidv4 } from 'uuid';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const {World} = require("@cucumber/cucumber");
 
 let browser: Browser, counter: number;
 const chance = new Chance.Chance();
-const uuid = uuidv4();
+const uuid = chance.guid();
 export const username = `testuser.${uuid}@digital.cabinet-office.gov.uk`;
 export const servicename = `testservice_${uuid}`;
-export const password = chance.string({ length: 8 });
+export const password = `valid_${chance.string({length: 20})}`;
 export const email_otp_code = "123456";
 export const mobile_number = "07700900000";
 export const sms_otp_code = "789012";
@@ -55,7 +54,7 @@ BeforeAll(async function () {
         fse.ensureDirSync(screenshotsDir);
     }
 
-    const host = process.env.HOST ?? "http://localhost:3000"
+    const host = process.env.HOST ?? "http://localhost:3000";
     console.log(`Running tests against ${host}`);
     browser = await puppeteer.launch({
         timeout: 5000,
@@ -63,7 +62,7 @@ BeforeAll(async function () {
         args: ["--no-sandbox"]
     });
 
-    let page = await browser.newPage();
+    const page = await browser.newPage();
 
     await page.goto(`${host}/register/enter-email-address`);
     await enterTextIntoTextInput(page, username, "emailAddress");
