@@ -43,6 +43,7 @@ jobs:
           STUB_API: false
           TEST_BANNER: true
           NODE_OPTIONS: --max-old-space-size=2048
+          DEBUG: cucumber
         run: |
           while ! curl --output /dev/null --silent --head --fail $HOST; do sleep 1 && echo -n .; done;
           npm run acceptance-tests

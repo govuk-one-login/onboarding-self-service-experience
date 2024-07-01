@@ -142,6 +142,9 @@ BeforeAll({timeout: 60 * 1000}, async function () {
 Before(async function (this: TestContext) {
     this.host = process.env.HOST ?? "http://localhost:3000";
     this.page = await browser.newPage();
+
+    // Record the state for the test run.
+    console.log(`Starting test with context: username='${this.username}' servicename='${this.servicename}' mobile='${this.mobile}' password='${this.password}'`);
 });
 
 After(async function (this: TestContext, scenario) {
