@@ -1,6 +1,6 @@
 import {Given, Then, When} from "@cucumber/cucumber";
 import {strict as assert} from "assert";
-import {TestContext, username, password, sms_otp_code, servicename} from "../test-setup";
+import {TestContext} from "../test-setup";
 import {
     checkErrorMessageDisplayedForField,
     checkUrl,
@@ -18,13 +18,13 @@ import {
 
 import AxePuppeteer from "@axe-core/puppeteer";
 
-Given("the user is signed in", async function () {
+Given("the user is signed in", async function (this: TestContext) {
     await this.goToPath("/sign-in");
-    await enterTextIntoTextInput(this.page, username, "emailAddress");
+    await enterTextIntoTextInput(this.page, this.username, "emailAddress");
     await clickSubmitButton(this.page);
-    await enterTextIntoTextInput(this.page, password, "password");
+    await enterTextIntoTextInput(this.page, this.password, "password");
     await clickSubmitButton(this.page);
-    await enterTextIntoTextInput(this.page, sms_otp_code, "securityCode");
+    await enterTextIntoTextInput(this.page, this.otp_code, "securityCode");
     await clickSubmitButton(this.page);
 
     const actualTitle = await this.page.title();
@@ -39,8 +39,8 @@ Given("the user is on the {string} page", async function (path: string) {
     await this.goToPath(path);
 });
 
-Given("they goto on the test service page", async function () {
-    const link = await getLink(this.page, servicename);
+Given("they goto on the test service page", async function (this: TestContext) {
+    const link = await getLink(this.page, this.servicename);
     await clickElement(this.page, link);
 
     const actualTitle = await this.page.title();

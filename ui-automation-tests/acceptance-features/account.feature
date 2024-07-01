@@ -28,16 +28,16 @@ Feature: A page where users can view and change the details associated with thei
     Background:
       When they click on the link that points to "/account/change-phone-number"
       Then they should see the text "Change your mobile phone number"
-      And they submit a valid mobile phone number
+      And they submit a valid mobile phone number "07700 900123"
 
     Scenario: The user enters an incorrect SMS code
-      When they submit the security code "666666"
+      When they submit an incorrect security code
       Then they should be redirected to the "/account/change-phone-number/enter-text-code" page
       And they should see the text "The code you entered is not correct or has expired - enter it again or request a new code"
 
     # TODO this test doesn't check the resending of the phone code
     Scenario: The user needs a new SMS code
-      When they submit the security code "666666"
+      When they submit an incorrect security code
       Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
       And they should see the text "We sent a code to: 07700 900123"
       When they click on the "Problems receiving a text message?" link

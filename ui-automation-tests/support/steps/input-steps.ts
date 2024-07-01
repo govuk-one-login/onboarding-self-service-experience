@@ -1,8 +1,10 @@
 import {When, Then} from "@cucumber/cucumber";
 import {enterTextIntoTextInput, checkErrorMessageDisplayedForField, clickSubmitButton} from "./shared-functions";
-import {TestContext, mobile_number, password, sms_otp_code} from "../test-setup";
+import {TestContext} from "../test-setup";
 import {strict as assert} from "assert";
+import Chance from "chance";
 
+const chance = new Chance.Chance();
 const fields = {
     name: "userName",
     email: "emailAddress",
@@ -30,19 +32,28 @@ When("they enter the {} {string}", async function (fieldName, value) {
     await enterTextIntoTextInput(this.page, value, fields[fieldName as keyof typeof fields]);
 });
 
-When("they submit a correct security code", async function () {
-    await enterTextIntoTextInput(this.page, sms_otp_code, fields["security code"]);
+When("they submit a correct security code", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.otp_code, fields["security code"]);
     await clickSubmitButton(this.page);
 });
 
-When("they submit a valid mobile phone number", async function () {
+When("they submit an incorrect security code", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, "666666", fields["security code"]);
+    await clickSubmitButton(this.page);
+});
+
+When("they submit a valid mobile phone number {string}", async function (this: TestContext, mobile_number) {
     await enterTextIntoTextInput(this.page, mobile_number, fields["mobile phone number"]);
     await clickSubmitButton(this.page);
+    this.mobile = mobile_number
 });
 
-When("they submit a valid password", async function () {
-    await enterTextIntoTextInput(this.page, password, fields["password"]);
+When("they submit a valid password", async function (this: TestContext) {
+    const new_password = `new_valid_${chance.string({length: 20})}`;
+
+    await enterTextIntoTextInput(this.page, new_password, fields["password"]);
     await clickSubmitButton(this.page);
+    this.password = new_password
 });
 
 Then("the error message {string} must be displayed for the {} field", async function (errorMessage, fieldName) {
