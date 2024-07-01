@@ -1,14 +1,16 @@
-import {After, AfterAll, Before, BeforeAll, setWorldConstructor, setDefaultTimeout, IRuntimeOptions} from "@cucumber/cucumber";
+import {After, AfterAll, Before, BeforeAll, setWorldConstructor, setDefaultTimeout} from "@cucumber/cucumber";
 import {IWorldOptions} from "@cucumber/cucumber/lib/support_code_library_builder/world";
 import puppeteer, {Browser, Page} from "puppeteer";
 import {enterTextIntoTextInput, clickSubmitButton} from "./steps/shared-functions";
 import Chance from "chance";
 import fse from "fs-extra";
 
-import {World} from "@cucumber/cucumber";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {World} = require("@cucumber/cucumber");
+
 const chance = new Chance.Chance();
 
-export let timeout=5000;
+export const timeout = 5000;
 setDefaultTimeout(timeout);
 
 let browser: Browser, counter: number;
@@ -45,7 +47,7 @@ export class TestContext extends World {
     }
 }
 
-BeforeAll({ timeout: 60 * 1000 }, async function () {
+BeforeAll({timeout: 60 * 1000}, async function () {
     counter = 0;
     const screenshotsDir = "reports/screenshots";
     if (fse.pathExistsSync(screenshotsDir)) {
