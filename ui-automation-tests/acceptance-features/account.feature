@@ -11,6 +11,7 @@ Feature: A page where users can view and change the details associated with thei
       When they click on the link that points to "/account/change-phone-number"
       Then they should see the text "Change your mobile phone number"
 
+    @ci @smoke
     Scenario Outline: The user enters an invalid phone number
       When they submit the mobile phone number "<mobileNo>"
       Then the error message "<errorMsg>" must be displayed for the mobile phone number field
@@ -20,6 +21,7 @@ Feature: A page where users can view and change the details associated with thei
         | +919465245634 | Enter a UK mobile phone number, like 07700 900000 |
         | 075ABC54$78   | Enter a UK mobile phone number using numbers only |
 
+    @ci
     Scenario: User cancels the phone number update
       When they click on the 'Cancel' link
       Then they should be redirected to the '/account' page
@@ -30,12 +32,14 @@ Feature: A page where users can view and change the details associated with thei
       Then they should see the text "Change your mobile phone number"
       And they submit a valid mobile phone number "07700 900123"
 
+    @ci @smoke
     Scenario: The user enters an incorrect SMS code
       When they submit an incorrect security code
       Then they should be redirected to the "/account/change-phone-number/enter-text-code" page
       And they should see the text "The code you entered is not correct or has expired - enter it again or request a new code"
 
     # TODO this test doesn't check the resending of the phone code
+    @ci @smoke
     Scenario: The user needs a new SMS code
       When they submit an incorrect security code
       Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
@@ -44,6 +48,7 @@ Feature: A page where users can view and change the details associated with thei
       Then they should be redirected to the "/account/change-phone-number/resend-text-code" page
       And they should see the text "Resend security code"
 
+    @ci @smoke
     Scenario: The user successfully changes their phone number
       When they submit a correct security code
       Then they should be redirected to the "/account" page
@@ -56,15 +61,18 @@ Feature: A page where users can view and change the details associated with thei
       Then they should be redirected to the "/account/change-password" page
       And they should see the text "Add your new password"
 
+    @ci @smoke
     Scenario: User enters less than 8 characters for their new password
       When they enter their current password correctly
       And they submit the new password "NewTest"
       Then the error message "Your password must be 8 characters or more" must be displayed for the new password field
 
+    @ci
     Scenario: User cancels the password change
       When they click on the 'Cancel' link
       Then they should be redirected to the '/account' page
 
+    @ci
     Scenario Outline: The user wants to see or hide their <password_type> as they type it
       When they toggle the "Show" link on the field "<password_field>"
       Then they see the toggle link "Hide" on the field "<password_field>"
@@ -77,16 +85,19 @@ Feature: A page where users can view and change the details associated with thei
         | current password | currentPassword |
         | new password     | newPassword     |
 
+    @ci @smoke
     Scenario: The user tries to change their current password and does not enter any value into any of the two fields
       When they click the Confirm button
       Then the error message "Enter your current password" must be displayed for the current password field
       And the error message "Enter your new password" must be displayed for the new password field
 
+    @ci @smoke
     Scenario: The user tries to change their current password and does not enter any value for the new password
       When they enter their current password correctly
       And they click the Confirm button
       Then the error message "Enter your new password" must be displayed for the new password field
 
+    @ci @smoke
     Scenario: The user tries to change their current password and does not enter any value for the current password
       When they submit the new password "NewTestPa$$word"
       Then the error message "Enter your current password" must be displayed for the current password field

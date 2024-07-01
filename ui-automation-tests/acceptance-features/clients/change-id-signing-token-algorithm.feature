@@ -7,6 +7,7 @@ Feature: Users can update id token signing algorithm
         Then they should be redirected to a page with the title "Select an ID token signing algorithm - GOV.UK One Login"
 
     Rule: User updates the ID token signing algorithm
+        @ci @smoke
         Scenario: The chooses RS256 as the ID token signing algorithm
             When they select the "RS256" radio button
             And they click the Confirm button
@@ -16,6 +17,7 @@ Feature: Users can update id token signing algorithm
             And they click on the link that points to "/change-id-token-signing-algorithm"
             And "RS256" radio button is selected
 
+        @ci @smoke
         Scenario: The chooses ES256 as the ID token signing algorithm
             When they select the "ES256" radio button
             And they click the Confirm button

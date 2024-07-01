@@ -1,6 +1,6 @@
 {
   "default": {
-    "tags": "not @wip",
+    "tags": "@ci and @smoke",
     "failFast": true,
     "requireModule": [
       "ts-node/register"
