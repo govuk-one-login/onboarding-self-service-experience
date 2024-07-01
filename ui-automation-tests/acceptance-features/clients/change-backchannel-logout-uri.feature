@@ -4,7 +4,6 @@ Feature: Users can change their Back channel logout URI
         Given the user is signed in
         And they goto on the test service page
 
-
     Rule: The user tries to change their Back channel logout URI
         Background:
             When they click on the link that points to "/change-back-channel-logout-uri"
