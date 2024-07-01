@@ -1,18 +1,19 @@
-import {After, AfterAll, Before, BeforeAll, setWorldConstructor, setDefaultTimeout} from "@cucumber/cucumber";
+import {After, AfterAll, Before, BeforeAll, setWorldConstructor, setDefaultTimeout, IRuntimeOptions} from "@cucumber/cucumber";
 import {IWorldOptions} from "@cucumber/cucumber/lib/support_code_library_builder/world";
 import puppeteer, {Browser, Page} from "puppeteer";
 import {enterTextIntoTextInput, clickSubmitButton} from "./steps/shared-functions";
 import Chance from "chance";
 import fse from "fs-extra";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const {World} = require("@cucumber/cucumber");
+import {World} from "@cucumber/cucumber";
+const chance = new Chance.Chance();
 
-setDefaultTimeout(60 * 1000);
+export let timeout=5000;
+setDefaultTimeout(timeout);
 
 let browser: Browser, counter: number;
-const chance = new Chance.Chance();
 const uuid = chance.guid();
+
 export const username = `testuser.${uuid}@digital.cabinet-office.gov.uk`;
 export const servicename = `testservice_${uuid}`;
 export const password = `valid_${chance.string({length: 20})}`;
@@ -44,7 +45,7 @@ export class TestContext extends World {
     }
 }
 
-BeforeAll({ timeout: 30 * 1000 }, async function () {
+BeforeAll({ timeout: 60 * 1000 }, async function () {
     counter = 0;
     const screenshotsDir = "reports/screenshots";
     if (fse.pathExistsSync(screenshotsDir)) {
@@ -59,7 +60,6 @@ BeforeAll({ timeout: 30 * 1000 }, async function () {
     const host = process.env.HOST ?? "http://localhost:3000";
     console.log(`Running tests against ${host}`);
     browser = await puppeteer.launch({
-        timeout: 30000,
         headless: !process.env.SHOW_BROWSER,
         args: ["--no-sandbox"]
     });
@@ -67,7 +67,7 @@ BeforeAll({ timeout: 30 * 1000 }, async function () {
     const page = await browser.newPage();
     console.log("New page tab opened...");
 
-    await page.goto(`${host}/register`, {timeout: 0});
+    await page.goto(`${host}/register`);
 
     console.log("Navigated to registration page...");
     await enterTextIntoTextInput(page, username, "emailAddress");

@@ -1,13 +1,8 @@
 Feature: A page where users can view the details associated with a client
 
   Background:
-    Given the user is on the "/sign-in" page
-    And they submit the email "registered@test.gov.uk"
-    And they submit a valid password
-    And they submit a correct security code
-    Then they should be redirected to a page with the title "Your services - GOV.UK One Login"
-    When they click on the "Test Service" link
-    Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
+    Given the user is signed in
+    And they goto on the test service page
 
   Rule: The the automatically generated details are available for the user to view
     Scenario: The user is able to see the value for the field Client ID

@@ -1,13 +1,8 @@
 Feature: Users can change their scopes
 
   Background:
-    Given the user is on the "/sign-in" page
-    And they submit the email "registered@test.gov.uk"
-    And they submit a valid password
-    And they submit a correct security code
-    Then they should be redirected to a page with the title "Your services - GOV.UK One Login"
-    When they click on the "Test Service" link
-    Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
+    Given the user is signed in
+    And they goto on the test service page
 
   Rule: The user doesn't want to save changes on Change scopes page
     Scenario: The user doesn't want to change any details on Change scopes page
