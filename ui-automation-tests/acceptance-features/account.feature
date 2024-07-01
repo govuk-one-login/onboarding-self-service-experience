@@ -57,7 +57,7 @@ Feature: A page where users can view and change the details associated with thei
       And they should see the text "Add your new password"
 
     Scenario: User enters less than 8 characters for their new password
-      When they enter the current password "TestPa$$word"
+      When they enter their current password correctly
       And they submit the new password "NewTest"
       Then the error message "Your password must be 8 characters or more" must be displayed for the new password field
 
@@ -83,7 +83,7 @@ Feature: A page where users can view and change the details associated with thei
       And the error message "Enter your new password" must be displayed for the new password field
 
     Scenario: The user tries to change their current password and does not enter any value for the new password
-      When they enter the current password "OldTestPa$$word"
+      When they enter their current password correctly
       And they click the Confirm button
       Then the error message "Enter your new password" must be displayed for the new password field
 
@@ -92,7 +92,6 @@ Feature: A page where users can view and change the details associated with thei
       Then the error message "Enter your current password" must be displayed for the current password field
 
     Scenario: User successfully changes their password
-      When they enter the current password "OldTestPa$$word"
-      When they submit the new password "NewTestPa$$word"
+      When they change their password
       Then they should be redirected to the "/account" page
       And they should see the text "You have changed your password"

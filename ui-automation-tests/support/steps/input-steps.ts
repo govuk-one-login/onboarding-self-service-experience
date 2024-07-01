@@ -56,6 +56,19 @@ When("they submit a valid password", async function (this: TestContext) {
     this.password = new_password
 });
 
+When("they enter their current password correctly", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.password, fields["current password"]);
+});
+
+When("they change their password", async function (this: TestContext) {
+    const new_password = `new_valid_${chance.string({length: 20})}`;
+
+    await enterTextIntoTextInput(this.page, this.password, fields["current password"]);
+    await enterTextIntoTextInput(this.page, new_password, fields["new password"]);
+    await clickSubmitButton(this.page);
+    this.password = new_password
+});
+
 Then("the error message {string} must be displayed for the {} field", async function (errorMessage, fieldName) {
     const errorLink = await this.page.$$(
         `::-p-xpath(//div[@class="govuk-error-summary"]//a[@href="#${fields[fieldName as keyof typeof fields]}"])`
