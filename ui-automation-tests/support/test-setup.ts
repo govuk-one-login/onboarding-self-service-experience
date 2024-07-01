@@ -16,15 +16,22 @@ setDefaultTimeout(timeout);
 let browser: Browser, counter: number;
 const uuid = chance.guid();
 
-export const username = `testuser.${uuid}@digital.cabinet-office.gov.uk`;
-export const servicename = `testservice_${uuid}`;
-export const password = `valid_${chance.string({length: 20})}`;
-export const email_otp_code = "123456";
-export const mobile_number = "07700900000";
-export const sms_otp_code = "789012";
+const username = `testuser.${uuid}@digital.cabinet-office.gov.uk`;
+const servicename = `testservice_${uuid}`;
+const password = `valid_${chance.string({length: 20})}`;
+const email_otp_code = "123456";
+const mobile_number = "07700900000";
+const sms_otp_code = "789012";
 
 export class TestContext extends World {
     private browserPage: Page | undefined;
+
+    // Track the current state of the user credentials.
+    private _username: string = username
+    private _password: string = password
+    private _mobile: string = mobile_number
+    private _otp_code: string = sms_otp_code
+    private _servicename: string = servicename
 
     constructor(options: IWorldOptions) {
         super(options);
@@ -44,6 +51,46 @@ export class TestContext extends World {
 
     set page(page: Page) {
         this.browserPage = page;
+    }
+
+    get username(): string {
+        return this._username;
+    }
+
+    set username(username: string) {
+        this._username = username;
+    }
+
+    get password(): string {
+        return this._password;
+    }
+
+    set password(password: string) {
+        this._password = password;
+    }
+
+    get mobile(): string {
+        return this._mobile;
+    }
+
+    set mobile(mobile: string) {
+        this._mobile = mobile;
+    }
+
+    get otp_code(): string {
+        return this._otp_code;
+    }
+
+    set otp_code(otp_code: string) {
+        this._otp_code = otp_code;
+    }
+
+    get servicename(): string {
+        return this._servicename;
+    }
+
+    set servicename(servicename: string) {
+        this._servicename = servicename;
     }
 }
 
