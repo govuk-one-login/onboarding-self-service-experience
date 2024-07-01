@@ -1,6 +1,6 @@
 import {When, Then} from "@cucumber/cucumber";
 import {enterTextIntoTextInput, checkErrorMessageDisplayedForField, clickSubmitButton} from "./shared-functions";
-import {TestContext} from "../test-setup";
+import {TestContext, mobile_number, password, sms_otp_code} from "../test-setup";
 import {strict as assert} from "assert";
 
 const fields = {
@@ -31,17 +31,17 @@ When("they enter the {} {string}", async function (fieldName, value) {
 });
 
 When("they submit a correct security code", async function () {
-    await enterTextIntoTextInput(this.page, "123456", fields["security code"]);
+    await enterTextIntoTextInput(this.page, sms_otp_code, fields["security code"]);
     await clickSubmitButton(this.page);
 });
 
 When("they submit a valid mobile phone number", async function () {
-    await enterTextIntoTextInput(this.page, "07700 900123", fields["mobile phone number"]);
+    await enterTextIntoTextInput(this.page, mobile_number, fields["mobile phone number"]);
     await clickSubmitButton(this.page);
 });
 
 When("they submit a valid password", async function () {
-    await enterTextIntoTextInput(this.page, "this-is-not-a-common-password", fields["password"]);
+    await enterTextIntoTextInput(this.page, password, fields["password"]);
     await clickSubmitButton(this.page);
 });
 
