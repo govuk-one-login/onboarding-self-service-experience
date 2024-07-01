@@ -45,7 +45,7 @@ When("they submit an incorrect security code", async function (this: TestContext
 When("they submit a valid mobile phone number {string}", async function (this: TestContext, mobile_number) {
     await enterTextIntoTextInput(this.page, mobile_number, fields["mobile phone number"]);
     await clickSubmitButton(this.page);
-    this.mobile = mobile_number
+    this.mobile = mobile_number;
 });
 
 When("they submit a valid password", async function (this: TestContext) {
@@ -53,7 +53,7 @@ When("they submit a valid password", async function (this: TestContext) {
 
     await enterTextIntoTextInput(this.page, new_password, fields["password"]);
     await clickSubmitButton(this.page);
-    this.password = new_password
+    this.password = new_password;
 });
 
 When("they enter their current password correctly", async function (this: TestContext) {
@@ -66,7 +66,7 @@ When("they change their password", async function (this: TestContext) {
     await enterTextIntoTextInput(this.page, this.password, fields["current password"]);
     await enterTextIntoTextInput(this.page, new_password, fields["new password"]);
     await clickSubmitButton(this.page);
-    this.password = new_password
+    this.password = new_password;
 });
 
 Then("the error message {string} must be displayed for the {} field", async function (errorMessage, fieldName) {

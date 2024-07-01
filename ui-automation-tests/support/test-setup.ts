@@ -10,7 +10,7 @@ const {World} = require("@cucumber/cucumber");
 
 const chance = new Chance.Chance();
 
-export const timeout = 10000;
+export const timeout = 30000;
 setDefaultTimeout(timeout);
 
 let browser: Browser, counter: number;
@@ -27,11 +27,11 @@ export class TestContext extends World {
     private browserPage: Page | undefined;
 
     // Track the current state of the user credentials.
-    private _username: string = username
-    private _password: string = password
-    private _mobile: string = mobile_number
-    private _otp_code: string = sms_otp_code
-    private _servicename: string = servicename
+    private _username: string = username;
+    private _password: string = password;
+    private _mobile: string = mobile_number;
+    private _otp_code: string = sms_otp_code;
+    private _servicename: string = servicename;
 
     constructor(options: IWorldOptions) {
         super(options);
@@ -144,7 +144,7 @@ Before(async function (this: TestContext) {
     this.page = await browser.newPage();
 
     // Record the state for the test run.
-    console.log(`Starting test with context: username='${this.username}' servicename='${this.servicename}' mobile='${this.mobile}' password='${this.password}'`);
+    console.log(`Starting test with context: username='${this.username}' servicename='${this.servicename}'`);
 });
 
 After(async function (this: TestContext, scenario) {

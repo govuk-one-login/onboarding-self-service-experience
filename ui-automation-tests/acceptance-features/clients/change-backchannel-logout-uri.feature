@@ -18,13 +18,13 @@ Feature: Users can change their Back channel logout URI
                 | someVerywrongURI | Enter your URIs in the format https://example.com |
                 | http://test.com  | URIs must be https or http://localhost            |
 
-        @ci @smoke
+        @ci
         Scenario: The user clicks "Cancel" on the Enter back channel logout URI page
             When they click on the "Cancel" link
             Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
             And they should see the exact value "Not added yet" in the back channel logout uri field
 
-        @ci @smoke
+        @ci
         Scenario: The user clicks "Back" on the Enter back channel logout URI page
             When they click on the "Back" link
             Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
