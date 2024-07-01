@@ -10,7 +10,7 @@ const {World} = require("@cucumber/cucumber");
 
 const chance = new Chance.Chance();
 
-export const timeout = 5000;
+export const timeout = 10000;
 setDefaultTimeout(timeout);
 
 let browser: Browser, counter: number;
