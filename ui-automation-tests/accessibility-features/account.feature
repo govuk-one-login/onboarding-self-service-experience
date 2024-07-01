@@ -1,11 +1,7 @@
 Feature: A page where users can view and change the details associated with their account
 
   Background:
-    Given the user is on the "/sign-in" page
-    And they submit the email "registered@test.gov.uk"
-    And they submit a valid password
-    And they submit a correct security code
-    And they should be redirected to a page with the title "Your services - GOV.UK One Login"
+    Given the user is signed in
     When they click Your account link in the left side navigation
     Then they should be redirected to the "/account" page
     And they should see the text "Your account"

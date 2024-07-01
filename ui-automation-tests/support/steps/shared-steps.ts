@@ -1,6 +1,6 @@
 import {Given, Then, When} from "@cucumber/cucumber";
 import {strict as assert} from "assert";
-import {TestContext, username, password, email_otp_code} from "../test-setup";
+import {TestContext, username, password, sms_otp_code, servicename} from "../test-setup";
 import {
     checkErrorMessageDisplayedForField,
     checkUrl,
@@ -24,7 +24,7 @@ Given("the user is signed in", async function () {
     await clickSubmitButton(this.page);
     await enterTextIntoTextInput(this.page, password, "password");
     await clickSubmitButton(this.page);
-    await enterTextIntoTextInput(this.page, email_otp_code, "securityCode");
+    await enterTextIntoTextInput(this.page, sms_otp_code, "securityCode");
     await clickSubmitButton(this.page);
 
     const actualTitle = await this.page.title();
@@ -37,6 +37,14 @@ Given("the user is on the home page", async function () {
 
 Given("the user is on the {string} page", async function (path: string) {
     await this.goToPath(path);
+});
+
+Given("they goto on the test service page", async function () {
+    const link = await getLink(this.page, servicename);
+    await clickElement(this.page, link);
+
+    const actualTitle = await this.page.title();
+    assert.equal(actualTitle, "Client details - GOV.UK One Login", `Page title was ${actualTitle}`);
 });
 
 When("they click on the {string} link", async function (text: string) {
