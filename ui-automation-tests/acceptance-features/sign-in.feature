@@ -4,10 +4,12 @@ Feature: Users can sign in to the self-service experience
     Given the user is on the "/sign-in" page
 
   Rule: The user tries to submit an email address
+    @ci @smoke
     Scenario: The user does not enter any characters into the Email address text field
       When they submit the email ""
       Then the error message "Enter your email address" must be displayed for the email field
 
+    @ci @smoke
     Scenario: User does not enter a valid email address
       When they submit the email "invalid-email.com"
       Then the error message "Enter an email address in the correct format, like name@example.com" must be displayed for the email field
@@ -15,15 +17,19 @@ Feature: Users can sign in to the self-service experience
   Rule: The user is navigating back to previous page using back link
     Background:
       When they submit the email "registered@test.gov.uk"
+
+    @ci @smoke
     Scenario: User navigates back to /enter-email-address page
       When they click on the "Back" link
       Then they should be redirected to the "/sign-in/enter-email-address" page
 
+    @ci @smoke
     Scenario: User navigates back to /enter-password page
       When they click on the "Forgot your password?" link
       And they click on the "Back" link
       Then they should be redirected to the "/sign-in/enter-password" page
 
+    @ci @smoke
     Scenario: User navigates back to /forgot-password page
       When they click on the "Forgot your password?" link
       And they click the Continue button
@@ -31,6 +37,7 @@ Feature: Users can sign in to the self-service experience
       Then they should be redirected to the "/sign-in/forgot-password" page
 
   Rule: The user tries to submit a password
+    @ci @smoke
     Scenario Outline: User submits invalid passwords
       When they submit the email "<email>"
       When they submit the password "<password>"
@@ -42,6 +49,7 @@ Feature: Users can sign in to the self-service experience
         | password-will-be-wrong@test.gov.uk | WrongPa$$word    | Incorrect password  |
 
   Rule: The user toggle the show/hide to view the password in signIn process
+    @ci @smoke
     Scenario: The user wants to see or hide their password as they type it
       When they submit the email "registered@test.gov.uk"
       Then they should see the text "Enter your password"
@@ -59,6 +67,7 @@ Feature: Users can sign in to the self-service experience
       And they submit a valid password
       Then they should be redirected to the "/sign-in/enter-text-code" page
 
+    @ci @smoke
     Scenario Outline: User submits a security code with invalid format
       When they submit the value of security code "<code>" that <condition>
       Then they should be redirected to the "/sign-in/enter-text-code" page
@@ -75,6 +84,7 @@ Feature: Users can sign in to the self-service experience
         | is incorrect or expired     | 000000  | The code you entered is not correct or has expired - enter it again or request a new code |
 
   Rule: The user tries to sign in with account which is not registered
+    @ci @smoke
     Scenario: The user submits email and password but account is not registered
       When they submit the email "not-registered@test.gov.uk"
       And they submit a valid password
@@ -88,11 +98,13 @@ Feature: Users can sign in to the self-service experience
       When they click the Continue button
       Then they should be redirected to the "/sign-in/forgot-password/enter-email-code" page
 
+    @ci @smoke
     Scenario: The user tries to use a password on the list of common passwords during password reset
       When they click on the forgot password link in their email
       And they submit the password "Password123"
       Then they should see the text "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers."
 
+    @ci
     Scenario: The user wants to see or hide their password as they type it
       When they click on the forgot password link in their email
       Then they should see the text "Create a new password"
@@ -104,10 +116,12 @@ Feature: Users can sign in to the self-service experience
       And they see the toggle link "Show" on the field "password"
       Then they can not see the content in the password field
 
+    @ci @smoke
     Scenario: The user resends the email security code when resetting their password
       When they click the "Resend the email" button
       Then they should be redirected to the "/sign-in/forgot-password/enter-email-code" page
 
+    @ci @smoke
     Scenario: The user resets their password
       When they click on the forgot password link in their email
       And they submit a valid password

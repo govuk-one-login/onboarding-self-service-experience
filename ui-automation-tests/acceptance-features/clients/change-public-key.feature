@@ -8,10 +8,12 @@ Feature: Users can change their public key, and toggle visibility
     Background: Go to change your public key page
       Given they click on the link that points to "/change-public-key"
 
+    @ci
     Scenario: User cancels the public key change
       When they click on the 'Cancel' link
       Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
 
+    @ci @smoke
     Scenario Outline: User submits invalid public key
       When they submit the change your public key '<keyValue>'
       Then the error message "Enter a valid public key" must be displayed for the change your public key field
@@ -21,6 +23,7 @@ Feature: Users can change their public key, and toggle visibility
         | test     |
 
   Rule: The user adds their public key for the first time
+    @ci @smoke
     Scenario: The user submits a valid public key with headers
       Given the public key has not been added yet by the user
       When they click on the link that points to "/change-public-key"
@@ -34,10 +37,12 @@ Feature: Users can change their public key, and toggle visibility
       Then they should see the public key they just entered
 
   Rule: Public key show/hide functionality is available for the user
+    @ci @smoke
     Scenario: The user wants to see their full public key
       When they click the toggle public key visibility button
       Then they are able see their full public key
 
+    @ci @smoke
     Scenario: The user want to hide their public key data
       When they click the toggle public key visibility button
       Then they are able see their full public key
@@ -45,6 +50,7 @@ Feature: Users can change their public key, and toggle visibility
       Then they should only see the first 24 characters of the public key for their service
 
   Rule: The user changes their public key by entering it in different formats
+    @ci @smoke
     Scenario Outline: The user submits a valid public key <keyVersion>
       When they click the toggle public key visibility button
       And they are able see their full public key
@@ -63,6 +69,7 @@ Feature: Users can change their public key, and toggle visibility
         | without headers |
 
   Rule: The user changes their public key with different one
+    @ci @smoke
     Scenario: They user submits a different valid public key with headers
       When they click the toggle public key visibility button
       And they are able see their full public key
@@ -73,6 +80,7 @@ Feature: Users can change their public key, and toggle visibility
       And they are able see the updated value for public key
 
   Rule: The user changes their public key to an invalid one and cancels
+    @ci @smoke
     Scenario: They user submits a different valid public key with headers
       When they click the toggle public key visibility button
       And they are able see the updated value for public key
@@ -84,6 +92,7 @@ Feature: Users can change their public key, and toggle visibility
       Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
 
   Rule: The user changes their public key to a blank one and cancels
+    @ci @smoke
     Scenario: They user submits a different valid public key with headers
       When they click the toggle public key visibility button
       And they are able see the updated value for public key
@@ -95,6 +104,7 @@ Feature: Users can change their public key, and toggle visibility
       Then they should be redirected to a page with the title "Client details - GOV.UK One Login"
 
   Rule: The user changes their public key to an invalid one and corrects it
+    @ci @smoke
     Scenario: They user submits a different valid public key with headers
       When they click the toggle public key visibility button
       And they are able see the updated value for public key

@@ -11,6 +11,7 @@ Feature: Users can change their claims
     And they should see the exact value "Yes" in the identity verification enabled field
 
   Rule: The user doesn't want to save changes on Change scopes page
+    @ci @smoke
     Scenario: The user doesn't want to change any details on Change scopes page
       When they click on the link that points to "/change-claims"
       Then they should be redirected to a page with the title "Select claims - GOV.UK One Login"
@@ -19,6 +20,7 @@ Feature: Users can change their claims
       And they should see the exact value "Yes" in the identity verification enabled field
 
   Rule: The user tries to change their claims and then sets it back to original value
+    @ci @smoke
     Scenario: The user wants to add email attribute
       When they click on the link that points to "/change-claims"
       Then they should be redirected to a page with the title "Select claims - GOV.UK One Login"

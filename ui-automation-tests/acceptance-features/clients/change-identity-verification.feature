@@ -11,6 +11,7 @@ Background:
     And they should see the exact value "No" in the identity verification enabled field
 
 Rule: The user can navigate back to the client page by clicking cancel
+    @ci @smoke
     Scenario: The user clicks cancel
         Given they should see the exact value "No" in the identity verification enabled field
         Then they click on the link that points to "/enter-identity-verification"
@@ -21,6 +22,7 @@ Rule: The user can navigate back to the client page by clicking cancel
         And they should not see the text "You have changed your identity verification"
 
 Rule: The user can navigate back to the client page by clicking the back link
+    @ci @smoke
     Scenario: The user clicks cancel
         Given they should see the exact value "No" in the identity verification enabled field
         Then they click on the link that points to "/enter-identity-verification"
@@ -31,6 +33,7 @@ Rule: The user can navigate back to the client page by clicking the back link
         And they should not see the text "You have changed your identity verification"
 
 Rule: The user can enable and then disable identity verification
+    @ci @smoke
     Scenario: The user clicks yes and then confirm
         Given they should see the exact value "No" in the identity verification enabled field
         Then they click on the link that points to "/enter-identity-verification"
