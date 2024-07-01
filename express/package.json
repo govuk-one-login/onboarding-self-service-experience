@@ -42,7 +42,7 @@
     "dotenv": "^16.0.3",
     "nodemon": "^3.0.1",
     "sass": "^1.60.0",
-    "typescript": "^5.2.2",
+    "typescript": "^5.5.2",
     "uglify-js": "^3.17.4",
     "aws-sdk-client-mock": "^4.0.0",
     "aws-sdk-client-mock-jest": "^4.0.0"
