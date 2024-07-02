@@ -113,6 +113,10 @@ BeforeAll({timeout: 60 * 1000}, async function () {
         args: ["--no-sandbox"]
     });
     console.log("Puppeteer launched...");
+
+    // Record the state for the test run.
+    console.log(`Starting test with context: username='${username}' password='${password}'`);
+
     const page = await browser.newPage();
     console.log("New page tab opened...");
 
@@ -142,9 +146,6 @@ BeforeAll({timeout: 60 * 1000}, async function () {
 Before(async function (this: TestContext) {
     this.host = process.env.HOST ?? "http://localhost:3000";
     this.page = await browser.newPage();
-
-    // Record the state for the test run.
-    console.log(`Starting test with context: username='${this.username}' servicename='${this.servicename}'`);
 });
 
 After(async function (this: TestContext, scenario) {

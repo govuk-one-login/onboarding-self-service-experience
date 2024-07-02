@@ -140,7 +140,7 @@ Feature: Users can sign up to the self-service experience
     Background:
       Given they submit the email "testuser.valid-email@digital.cabinet-office.gov.uk"
       And they submit a correct security code
-      And they submit a new password
+      And they submit a new valid password
       Then they should be redirected to the "/register/enter-phone-number" page
 
     @ci @smoke
@@ -157,7 +157,7 @@ Feature: Users can sign up to the self-service experience
     Background:
       Given they submit the email "testuser.valid-email@digital.cabinet-office.gov.uk"
       And they submit a correct security code
-      And they submit a new password
+      And they submit a new valid password
       And they submit a valid mobile phone number "07700 900100"
       Then they should be redirected to the "/register/enter-text-code" page
       And they should see the text "We sent a code to: 07700 900100"
@@ -207,7 +207,7 @@ Feature: Users can sign up to the self-service experience
     Background:
       Given they submit the email "registering-successfully@test.gov.uk"
       And they submit a correct security code
-      And they submit a new password
+      And they submit a new valid password
       And they submit a valid mobile phone number "07700 900900"
       And they submit a correct security code
       Then they should be redirected to the "/register/create-service" page

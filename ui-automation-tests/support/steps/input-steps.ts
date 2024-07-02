@@ -65,10 +65,9 @@ When("they submit the current password correctly", async function (this: TestCon
 
 When("they enter the current password correctly", async function (this: TestContext) {
     await enterTextIntoTextInput(this.page, this.password, fields["current password"]);
-    await clickSubmitButton(this.page);
 });
 
-When("they submit a new password", async function (this: TestContext) {
+When("they submit a new valid password", async function (this: TestContext) {
     const new_password = `new_valid_${chance.string({length: 20})}`;
 
     await enterTextIntoTextInput(this.page, new_password, fields["password"]);
@@ -89,7 +88,6 @@ Then("the error message {string} must be displayed for the {} field", async func
     const errorLink = await this.page.$$(
         `::-p-xpath(//div[@class="govuk-error-summary"]//a[@href="#${fields[fieldName as keyof typeof fields]}"])`
     );
-    console.log(`Checking the error message for the '${fields[fieldName as keyof typeof fields]}' field: ${errorLink.length}`);
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, fields[fieldName as keyof typeof fields]);
 });
 
