@@ -146,9 +146,24 @@ Then("they should see the text {string}", async function (this: TestContext, tex
     assert.equal(bodyText?.includes(text), true, `Body text does not contain '${text}'`);
 });
 
+Then("they should see their email address", async function (this: TestContext) {
+    const bodyText = await this.page.$eval("body", element => element.textContent);
+    assert.equal(bodyText?.includes(this.username), true, `Body text does not contain the current user's email address`);
+});
+
+Then("they should see their mobile number", async function (this: TestContext) {
+    const bodyText = await this.page.$eval("body", element => element.textContent);
+    assert.equal(bodyText?.includes(this.mobile), true, `Body text does not contain the current user's mobile number`);
+});
+
 Then("they should not see the text {string}", async function (this: TestContext, text) {
     const bodyText = await this.page.$eval("body", element => element.textContent);
     assert.equal(bodyText?.includes(text), false, `Body text does not contain '${text}'`);
+});
+
+Then("they should see the success message {string}", async function (this: TestContext, message) {
+    const messageText = await this.page.$eval(".govuk-notification-banner", element => element.textContent);
+    assert.equal(messageText?.includes(message), true, `Success message does not contain '${message}'`);
 });
 
 Then("the {string} link will point to the following URL: {string}", async function (linkText, expectedUrl) {

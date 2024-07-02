@@ -16,20 +16,20 @@ Feature: Users can sign in to the self-service experience
 
   Rule: The user is navigating back to previous page using back link
     Background:
-      When they submit the email "registered@test.gov.uk"
+      When they enter the current username correctly
 
-    @ci @smoke
+    @ci
     Scenario: User navigates back to /enter-email-address page
       When they click on the "Back" link
       Then they should be redirected to the "/sign-in/enter-email-address" page
 
-    @ci @smoke
+    @ci
     Scenario: User navigates back to /enter-password page
       When they click on the "Forgot your password?" link
       And they click on the "Back" link
       Then they should be redirected to the "/sign-in/enter-password" page
 
-    @ci @smoke
+    @ci
     Scenario: User navigates back to /forgot-password page
       When they click on the "Forgot your password?" link
       And they click the Continue button
@@ -39,19 +39,19 @@ Feature: Users can sign in to the self-service experience
   Rule: The user tries to submit a password
     @ci @smoke
     Scenario Outline: User submits invalid passwords
-      When they submit the email "<email>"
+      When they enter the current username correctly
       When they submit the password "<password>"
       Then the error message "<errorMessage>" must be displayed for the password field
       Examples:
-        | email                              | password         | errorMessage        |
-        | registered@test.gov.uk             |                  | Enter your password |
-        | password-will-be-wrong@test.gov.uk | Invalid-Password | Incorrect password  |
-        | password-will-be-wrong@test.gov.uk | WrongPa$$word    | Incorrect password  |
+        | password         | errorMessage        |
+        |                  | Enter your password |
+        | Invalid-Password | Incorrect password  |
+        | WrongPa$$word    | Incorrect password  |
 
   Rule: The user toggle the show/hide to view the password in signIn process
     @ci @smoke
     Scenario: The user wants to see or hide their password as they type it
-      When they submit the email "registered@test.gov.uk"
+      When they enter the current username correctly
       Then they should see the text "Enter your password"
       When they toggle the "Show" link on the field "password"
       And they enter the password "PasswordIsShown"
@@ -63,8 +63,8 @@ Feature: Users can sign in to the self-service experience
 
   Rule: The user tries to submit SMS security code
     Background:
-      When they submit the email "registered@test.gov.uk"
-      And they submit a valid password
+      When they enter the current username correctly
+      And they enter the current password correctly
       Then they should be redirected to the "/sign-in/enter-text-code" page
 
     @ci @smoke
@@ -92,7 +92,7 @@ Feature: Users can sign in to the self-service experience
 
   Rule: The user tries to reset their password
     Background:
-      When they submit the email "registered@test.gov.uk"
+      When they enter the current username correctly
       Then they click on the "Forgot your password?" link
       And they should be redirected to the "/sign-in/forgot-password" page
       When they click the Continue button

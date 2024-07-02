@@ -8,37 +8,32 @@ Feature: Users can update contacts
 
   Rule: User updates the contacts
     @ci @smoke
-    Scenario: The user removes a contact from the contact list
-      And they should see the text "registered@test.gov.uk"
-      And they should see the text "mockuser2@gov.uk"
-      And they should see the text "mockuser3@gov.uk"
-      When they click on the link that points to "confirm-contact-removal?contactToRemove=mockuser3%40gov.uk"
+    Scenario: The user adds a contact to the contact list and then removes it
+      And they should see their email address
+      And they should not see the text "testuser.mock.2@digital.cabinet-office.gov.uk"
+      And they click on the link that points to "/enter-contact-email"
+      Then they should be redirected to a page with the title "Enter contact email address - GOV.UK One Login"
+      When they submit the email "testuser.mock.2@digital.cabinet-office.gov.uk"
+      Then they should be redirected to a page with the title "Enter contacts - GOV.UK One Login"
+      And they should see the text "testuser.mock.2@digital.cabinet-office.gov.uk"
+      And they should not see the text "testuser.mock.3@digital.cabinet-office.gov.uk"
+      And they should see the success message "Contacts updated"
+      When they click on the link that points to "confirm-contact-removal?contactToRemove=testuser.mock.2%40digital.cabinet-office.gov.uk"
       Then they should be redirected to a page with the title "Are you sure you want to remove this contact? - GOV.UK One Login"
       When they select the "Yes" radio button
       And they click the Confirm button
       Then they should be redirected to a page with the title "Enter contacts - GOV.UK One Login"
-      And they should not see the text "mockuser3@gov.uk"
+      And they should see the success message "Contacts updated"
+      And they should not see the text "testuser.mock.2@digital.cabinet-office.gov.uk"
 
-    @ci @smoke
-    Scenario: The user adds a contact to the contact list
-      And they should see the text "registered@test.gov.uk"
-      And they should see the text "mockuser2@gov.uk"
-      And they should not see the text "mockuser4@gov.uk"
-      And they click on the link that points to "/enter-contact-email"
-      Then they should be redirected to a page with the title "Enter contact email address - GOV.UK One Login"
-      When they submit the email "mockuser4@test.gov.uk"
-      Then they should be redirected to a page with the title "Enter contacts - GOV.UK One Login"
-      And they should see the text "mockuser4@test.gov.uk"
-      And they should see the text "Contacts updated"
-
-    @ci @smoke
+    @ci
     Scenario: The user wants to add a contact but changes his mind and clicks Cancel link on "Enter contact email address" page
       When they click on the link that points to "/enter-contact-email"
       Then they should be redirected to a page with the title "Enter contact email address - GOV.UK One Login"
       When they click on the "Cancel" link
       Then they should be redirected to a page with the title "Enter contacts - GOV.UK One Login"
 
-    @ci @smoke
+    @ci
     Scenario: The user wants to remove a contact but changes his mind and submits No on "Enter contact email address" page
       When they click on the link that points to "confirm-contact-removal?contactToRemove=mockuser2%40gov.uk"
       Then they should be redirected to a page with the title "Are you sure you want to remove this contact? - GOV.UK One Login"
