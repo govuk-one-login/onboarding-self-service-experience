@@ -89,6 +89,7 @@ Then("the error message {string} must be displayed for the {} field", async func
     const errorLink = await this.page.$$(
         `::-p-xpath(//div[@class="govuk-error-summary"]//a[@href="#${fields[fieldName as keyof typeof fields]}"])`
     );
+    console.log(`Checking the error message for the '${fields[fieldName as keyof typeof fields]}' field: ${errorLink.length}`);
     await checkErrorMessageDisplayedForField(this.page, errorLink, errorMessage, fields[fieldName as keyof typeof fields]);
 });
 
