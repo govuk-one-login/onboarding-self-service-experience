@@ -52,6 +52,11 @@ Then("they should see the value {string} in the {} field", async function (this:
     assert.equal(elementText?.includes(text), true, `Element does not contain '${text}'`);
 });
 
+Then("they should not see the value {string} in the {} field", async function (this: TestContext, text, fieldName) {
+    const elementText = await this.page.$eval(`#${fields[fieldName as keyof typeof fields]}`, element => element.textContent);
+    assert.equal(elementText?.includes(text), false, `Element contains '${text}'`);
+});
+
 Then("they should see the exact value {string} in the {} field", async function (this: TestContext, text, fieldName) {
     const elementText = await this.page.$eval(`#${fields[fieldName as keyof typeof fields]}`, element => element.textContent);
     assert.equal(elementText?.trim(), text, `Element does not contain '${text}'`);
