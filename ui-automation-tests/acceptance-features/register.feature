@@ -39,17 +39,17 @@ Feature: Users can sign up to the self-service experience
   Rule: The user tries to submit an email address that is already registered
     @ci @smoke
     Scenario: The user is offered to sign in and signs in instead
-      When they enter the current username correctly
+      When they submit the current username correctly
       Then they should be redirected to the "/register/account-exists" page
       And they should see the text "An account already exists with the email address"
-      When they enter the current password correctly
+      When they submit the current password correctly
       And they submit a correct security code
       Then they should be redirected to a page with the path starting with "/services"
       And they should see the text "Your services"
 
     @ci @smoke
     Scenario Outline: The user signIn with incorrect password
-      When they enter the current username correctly
+      When they submit the current username correctly
       Then they should be redirected to the "/register/account-exists" page
       And they should see the text "An account already exists with the email address <email>"
       When they submit the password "<password>"
@@ -68,7 +68,7 @@ Feature: Users can sign up to the self-service experience
 
     @ci
     Scenario: User navigates back to /enter-email-address from account exists page
-      When they enter the current username correctly
+      When they submit the current username correctly
       When they click on the "Back" link
       Then they should be redirected to the "/register/enter-email-address" page
 
@@ -140,7 +140,7 @@ Feature: Users can sign up to the self-service experience
     Background:
       Given they submit the email "testuser.valid-email@digital.cabinet-office.gov.uk"
       And they submit a correct security code
-      And they submit a valid password
+      And they submit a new password
       Then they should be redirected to the "/register/enter-phone-number" page
 
     @ci @smoke
@@ -157,7 +157,7 @@ Feature: Users can sign up to the self-service experience
     Background:
       Given they submit the email "testuser.valid-email@digital.cabinet-office.gov.uk"
       And they submit a correct security code
-      And they submit a valid password
+      And they submit a new password
       And they submit a valid mobile phone number "07700 900100"
       Then they should be redirected to the "/register/enter-text-code" page
       And they should see the text "We sent a code to: 07700 900100"
@@ -207,7 +207,7 @@ Feature: Users can sign up to the self-service experience
     Background:
       Given they submit the email "registering-successfully@test.gov.uk"
       And they submit a correct security code
-      And they submit a valid password
+      And they submit a new password
       And they submit a valid mobile phone number "07700 900900"
       And they submit a correct security code
       Then they should be redirected to the "/register/create-service" page

@@ -32,9 +32,13 @@ When("they enter the {} {string}", async function (fieldName, value) {
     await enterTextIntoTextInput(this.page, value, fields[fieldName as keyof typeof fields]);
 });
 
-When("they enter the current username correctly", async function (this: TestContext) {
+When("they submit the current username correctly", async function (this: TestContext) {
     await enterTextIntoTextInput(this.page, this.username, fields["email"]);
     await clickSubmitButton(this.page);
+});
+
+When("they enter the current username correctly", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.username, fields["email"]);
 });
 
 When("they submit a correct security code", async function (this: TestContext) {
@@ -54,12 +58,17 @@ When("they submit a valid mobile phone number {string}", async function (this: T
     this.mobile = mobile_number;
 });
 
+When("they submit the current password correctly", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.password, fields["current password"]);
+    await clickSubmitButton(this.page);
+});
+
 When("they enter the current password correctly", async function (this: TestContext) {
     await enterTextIntoTextInput(this.page, this.password, fields["current password"]);
     await clickSubmitButton(this.page);
 });
 
-When("they submit a valid password", async function (this: TestContext) {
+When("they submit a new password", async function (this: TestContext) {
     const new_password = `new_valid_${chance.string({length: 20})}`;
 
     await enterTextIntoTextInput(this.page, new_password, fields["password"]);
