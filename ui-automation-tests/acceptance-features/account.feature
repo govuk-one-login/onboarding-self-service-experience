@@ -34,14 +34,14 @@ Feature: A page where users can view and change the details associated with thei
 
     @ci @smoke
     Scenario: The user enters an incorrect SMS code
-      When they submit an incorrect security code
+      When they submit an incorrect security code "666666"
       Then they should be redirected to the "/account/change-phone-number/enter-text-code" page
       And they should see the text "The code you entered is not correct or has expired - enter it again or request a new code"
 
     # TODO this test doesn't check the resending of the phone code
     @ci @smoke
     Scenario: The user needs a new SMS code
-      When they submit an incorrect security code
+      When they submit an incorrect security code "666666"
       Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
       And they should see the text "We sent a code to: 07700 900123"
       When they click on the "Problems receiving a text message?" link
@@ -63,7 +63,7 @@ Feature: A page where users can view and change the details associated with thei
 
     @ci @smoke
     Scenario: User enters less than 8 characters for their new password
-      When they enter their current password correctly
+      When they enter the current password correctly
       And they submit the new password "NewTest"
       Then the error message "Your password must be 8 characters or more" must be displayed for the new password field
 
@@ -93,7 +93,7 @@ Feature: A page where users can view and change the details associated with thei
 
     @ci @smoke
     Scenario: The user tries to change their current password and does not enter any value for the new password
-      When they enter their current password correctly
+      When they enter the current password correctly
       And they click the Confirm button
       Then the error message "Enter your new password" must be displayed for the new password field
 
