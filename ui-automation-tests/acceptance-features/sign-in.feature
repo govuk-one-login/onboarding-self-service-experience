@@ -87,7 +87,7 @@ Feature: Users can sign in to the self-service experience
     @ci @smoke
     Scenario: The user submits email and password but account is not registered
       When they submit the email "not-registered@test.gov.uk"
-      And they submit a new password
+      And they submit a new valid password
       Then they should be redirected to the "/sign-in/account-not-found" page
 
   Rule: The user tries to reset their password
@@ -124,7 +124,7 @@ Feature: Users can sign in to the self-service experience
     @ci @smoke
     Scenario: The user resets their password
       When they click on the forgot password link in their email
-      And they submit a new password
+      And they submit a new valid password
       And they submit a correct security code
       Then they should be redirected to a page with the path starting with "/services"
       And they should see the text "Your services"

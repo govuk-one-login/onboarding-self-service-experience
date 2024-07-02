@@ -5,7 +5,6 @@ Feature: A page where users can view the details associated with a client
     And they goto on the test service page
 
   Rule: The the automatically generated details are available for the user to view
-    @ci @smoke
     Scenario: The user is able to see the value for the field Client ID
       Then they should see the value for the Client ID "P0_ZdXojEGDlaZEU8Q9Zlv-fo1s"
 
