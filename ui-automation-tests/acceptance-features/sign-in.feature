@@ -16,7 +16,7 @@ Feature: Users can sign in to the self-service experience
 
   Rule: The user is navigating back to previous page using back link
     Background:
-      When they enter the current username correctly
+      When they submit the current username correctly
 
     @ci
     Scenario: User navigates back to /enter-email-address page
@@ -39,7 +39,7 @@ Feature: Users can sign in to the self-service experience
   Rule: The user tries to submit a password
     @ci @smoke
     Scenario Outline: User submits invalid passwords
-      When they enter the current username correctly
+      When they submit the current username correctly
       When they submit the password "<password>"
       Then the error message "<errorMessage>" must be displayed for the password field
       Examples:
@@ -51,7 +51,7 @@ Feature: Users can sign in to the self-service experience
   Rule: The user toggle the show/hide to view the password in signIn process
     @ci @smoke
     Scenario: The user wants to see or hide their password as they type it
-      When they enter the current username correctly
+      When they submit the current username correctly
       Then they should see the text "Enter your password"
       When they toggle the "Show" link on the field "password"
       And they enter the password "PasswordIsShown"
@@ -63,8 +63,8 @@ Feature: Users can sign in to the self-service experience
 
   Rule: The user tries to submit SMS security code
     Background:
-      When they enter the current username correctly
-      And they enter the current password correctly
+      When they submit the current username correctly
+      And they submit the current password correctly
       Then they should be redirected to the "/sign-in/enter-text-code" page
 
     @ci @smoke
@@ -87,12 +87,12 @@ Feature: Users can sign in to the self-service experience
     @ci @smoke
     Scenario: The user submits email and password but account is not registered
       When they submit the email "not-registered@test.gov.uk"
-      And they submit a valid password
+      And they submit a new password
       Then they should be redirected to the "/sign-in/account-not-found" page
 
   Rule: The user tries to reset their password
     Background:
-      When they enter the current username correctly
+      When they submit the current username correctly
       Then they click on the "Forgot your password?" link
       And they should be redirected to the "/sign-in/forgot-password" page
       When they click the Continue button
@@ -124,7 +124,7 @@ Feature: Users can sign in to the self-service experience
     @ci @smoke
     Scenario: The user resets their password
       When they click on the forgot password link in their email
-      And they submit a valid password
+      And they submit a new password
       And they submit a correct security code
       Then they should be redirected to a page with the path starting with "/services"
       And they should see the text "Your services"

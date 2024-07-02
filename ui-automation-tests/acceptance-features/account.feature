@@ -65,6 +65,7 @@ Feature: A page where users can view and change the details associated with thei
     Scenario: User enters less than 8 characters for their new password
       When they enter the current password correctly
       And they submit the new password "NewTest"
+      And they should see the text "Add your new password"
       Then the error message "Your password must be 8 characters or more" must be displayed for the new password field
 
     @ci
