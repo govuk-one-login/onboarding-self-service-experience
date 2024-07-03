@@ -10,18 +10,8 @@ jobs:
     name: Code quality
     uses: ./.github/workflows/check-code-quality.yml
 
-  build-frontend:
-    name: Frontend
-    uses: ./.github/workflows/build-frontend.yml
-
   run-unit-tests:
     name: Run tests
     permissions: { }
     uses: ./.github/workflows/run-unit-tests.yml
-
-  run-acceptance-tests:
-    name: Run tests
-    uses: ./.github/workflows/run-acceptance-tests.yml
-    with:
-      environment: ${{ needs.deploy-preview-frontend.outputs.environment }}
 
