@@ -37,16 +37,21 @@ Feature: Users can sign in to the self-service experience
       Then they should be redirected to the "/sign-in/forgot-password" page
 
   Rule: The user tries to submit a password
-    @ci @smoke
+    @ci
     Scenario Outline: User submits invalid passwords
       When they submit the current username correctly
       When they submit the password "<password>"
       Then the error message "<errorMessage>" must be displayed for the password field
+
+      @smoke
+      Examples:
+        | password         | errorMessage        |
+        | WrongPa$$word    | Incorrect password  |
+
       Examples:
         | password         | errorMessage        |
         |                  | Enter your password |
         | Invalid-Password | Incorrect password  |
-        | WrongPa$$word    | Incorrect password  |
 
   Rule: The user toggle the show/hide to view the password in signIn process
     @ci @smoke
@@ -67,19 +72,23 @@ Feature: Users can sign in to the self-service experience
       And they submit their password
       Then they should be redirected to the "/sign-in/enter-text-code" page
 
-    @ci @smoke
+    @ci
     Scenario Outline: User submits a security code with invalid format
       When they submit the value of security code "<code>" that <condition>
       Then they should be redirected to the "/sign-in/enter-text-code" page
       And the error message "<error_message>" must be displayed for the security code field
       And they should see the text "We sent a code to:"
 
+      @smoke
+      Examples:
+        | condition                   | code    | error_message                                                                             |
+        | contains letters            | 12345A  | Your security code should only include numbers                                            |
+
       Examples:
         | condition                   | code    | error_message                                                                             |
         | is empty                    |         | Enter the 6 digit security code                                                           |
         | has more than 6 digits      | 1234567 | Enter the security code using only 6 digits                                               |
         | has fewer than 6 digits     | 12345   | Enter the security code using only 6 digits                                               |
-        | contains letters            | 12345A  | Your security code should only include numbers                                            |
         | contains special characters | 12345$  | Your security code should only include numbers                                            |
         | is incorrect or expired     | 000000  | The code you entered is not correct or has expired - enter it again or request a new code |
 

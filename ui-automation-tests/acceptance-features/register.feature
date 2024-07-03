@@ -4,10 +4,16 @@ Feature: Users can sign up to the self-service experience
     Given the user is on the "/register" page
 
   Rule: The user tries to submit an email address when creating an account
-    @ci @smoke
+    @ci
     Scenario Outline: user submits an invalid email address
       When they submit the email "<email>"
       Then the error message "<errorMsg>" must be displayed for the email field
+
+      @smoke
+      Examples:
+        | email                               | errorMsg                                                            |
+        | testuser.invalid.a941d@sneakygov.uk | Enter a government email address                                    |
+
       Examples:
         | email                               | errorMsg                                                            |
         |                                     | Enter your email address                                            |
@@ -22,7 +28,7 @@ Feature: Users can sign up to the self-service experience
       Then they should be redirected to the "/register/enter-email-code" page
 
   Rule: User validating the links in registration page
-    @ci @smoke
+    @ci
     Scenario Outline:User validating links in enter-email address page
       Given the user is on the '/register' page
       When they click on the '<linkName>' link
@@ -43,17 +49,22 @@ Feature: Users can sign up to the self-service experience
       Then they should be redirected to a page with the path starting with "/services"
       And they should see the text "Your services"
 
-    @ci @smoke
+    @ci
     Scenario Outline: The user signIn with incorrect password
       When they submit the current username correctly
       Then they should be redirected to the "/register/account-exists" page
       And they should see the text "An account already exists with the email address"
       When they submit the password "<password>"
       Then the error message "<errorMsg>" must be displayed for the password field
+
+      @smoke
+      Examples:
+        | password      | errorMsg            |
+        | WrongPa$$word | Incorrect password  |
+
       Examples:
         | password      | errorMsg            |
         |               | Enter your password |
-        | WrongPa$$word | Incorrect password  |
 
   Rule: The user is navigating back to previous page using back link
     @ci
@@ -73,15 +84,20 @@ Feature: Users can sign up to the self-service experience
       Given they submit a random valid email address
       Then they should be redirected to the "/register/enter-email-code" page
 
-    @ci @smoke
+    @ci
     Scenario Outline: the user enters an invalid email code
       When they submit an incorrect security code "<code>"
       Then the error message "<errorMsg>" must be displayed for the security code field
       And they should see the text "We have sent an email to:"
+
+      @smoke
+      Examples:
+        | code   | errorMsg                                                                                  |
+        | 12345A | Your security code should only include numbers                                            |
+
       Examples:
         | code   | errorMsg                                                                                  |
         |        | Enter the 6 digit security code                                                           |
-        | 12345A | Your security code should only include numbers                                            |
         | 000000 | The code you entered is not correct or has expired - enter it again or request a new code |
 
   Rule: The user does not receive their email security code and clicks 'Not received an email?' link
@@ -111,16 +127,21 @@ Feature: Users can sign up to the self-service experience
       And they submit a correct email code
       Then they should be redirected to the "/register/create-password" page
 
-    @ci @smoke
+    @ci
     Scenario Outline: The user tries to set an invalid password
       When they submit the password "<password>"
       Then they should be redirected to the "/register/create-password" page
       And they should see the text "<errorMsg>"
+
+      @smoke
+      Examples:
+        | password    | errorMsg                                                                                              |
+        | Pa$1GOv     | Your password must be 8 characters or more                                                            |
+
       Examples:
         | password    | errorMsg                                                                                              |
         |             | Enter a password                                                                                      |
         | Password123 | Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers. |
-        | Pa$1GOv     | Your password must be 8 characters or more                                                            |
 
     @ci
     Scenario: The user wants to see or hide their password as they type it
@@ -139,15 +160,20 @@ Feature: Users can sign up to the self-service experience
       And they submit a new valid password
       Then they should be redirected to the "/register/enter-phone-number" page
 
-    @ci @smoke
+    @ci
     Scenario Outline: user enters an invalid phone number
       When they submit the mobile phone number "<mobileNo>"
       Then the error message "<errorMsg>" must be displayed for the mobile phone number field
+
+      @smoke
+      Examples:
+        | mobileNo      | errorMsg                                          |
+        | +919465245634 | Enter a UK mobile phone number, like 07700 900000 |
+
       Examples:
         | mobileNo      | errorMsg                                          |
         |               | Enter a mobile phone number                       |
         | 075ABC54$78   | Enter a UK mobile phone number using numbers only |
-        | +919465245634 | Enter a UK mobile phone number, like 07700 900000 |
 
   Rule: The user tries to verify the SMS security code when creating an account
     Background:
@@ -158,16 +184,21 @@ Feature: Users can sign up to the self-service experience
       Then they should be redirected to the "/register/enter-text-code" page
       And they should see the text "We sent a code to: 07700 900100"
 
-    @ci @smoke
+    @ci
     Scenario Outline: The user submits an invalid otp code
       When they submit an incorrect security code "<code>"
       Then the error message "<errorMsg>" must be displayed for the security code field
       And they should see the text "We sent a code to: 07700 900100"
+
+      @smoke
+      Examples:
+        | code    | errorMsg                                                                                  |
+        | 12345   | Enter the security code using only 6 digits                                               |
+
       Examples:
         | code    | errorMsg                                                                                  |
         |         | Enter the 6 digit security code                                                           |
         | 1234567 | Enter the security code using only 6 digits                                               |
-        | 12345   | Enter the security code using only 6 digits                                               |
         | 12345A  | Your security code should only include numbers                                            |
         | 12345$  | Your security code should only include numbers                                            |
         | 666666  | The code you entered is not correct or has expired - enter it again or request a new code |

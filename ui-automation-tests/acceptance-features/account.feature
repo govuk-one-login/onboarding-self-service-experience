@@ -11,14 +11,19 @@ Feature: A page where users can view and change the details associated with thei
       When they click on the link that points to "/account/change-phone-number"
       Then they should see the text "Change your mobile phone number"
 
-    @ci @smoke
+    @ci
     Scenario Outline: The user enters an invalid phone number
       When they submit the mobile phone number "<mobileNo>"
       Then the error message "<errorMsg>" must be displayed for the mobile phone number field
+
+      @smoke
+      Examples:
+        | mobileNo      | errorMsg                                          |
+        | +919465245634 | Enter a UK mobile phone number, like 07700 900000 |
+
       Examples:
         | mobileNo      | errorMsg                                          |
         |               | Enter a mobile phone number                       |
-        | +919465245634 | Enter a UK mobile phone number, like 07700 900000 |
         | 075ABC54$78   | Enter a UK mobile phone number using numbers only |
 
     @ci

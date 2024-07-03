@@ -12,6 +12,7 @@
     "format":  [
       "progress",
       "html:reports/cucumber-report.html",
+      "usage:reports/cucumber-usage.txt",
       "json:reports/cucumber-report.json"
     ]
   }
