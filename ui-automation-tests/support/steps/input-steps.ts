@@ -41,14 +41,25 @@ When("they enter the current username correctly", async function (this: TestCont
     await enterTextIntoTextInput(this.page, this.username, fields["email"]);
 });
 
+When("they submit a random valid email address", async function (this: TestContext) {
+    const new_email = `testuser.does-not-exist.${chance.guid()}@digital.cabinet-office.gov.uk`;
+    await enterTextIntoTextInput(this.page, new_email, fields["email"]);
+    await clickSubmitButton(this.page);
+});
+
 When("they submit a correct security code", async function (this: TestContext) {
     await enterTextIntoTextInput(this.page, this.otp_code, fields["security code"]);
     await clickSubmitButton(this.page);
 });
 
 When("they submit an incorrect security code {string}", async function (this: TestContext, code) {
-    const otp_code = code ?? "666666"
+    const otp_code = code ?? "666666";
     await enterTextIntoTextInput(this.page, otp_code, fields["security code"]);
+    await clickSubmitButton(this.page);
+});
+
+When("they submit a correct email code", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.email_code, fields["security code"]);
     await clickSubmitButton(this.page);
 });
 
@@ -60,6 +71,11 @@ When("they submit a valid mobile phone number {string}", async function (this: T
 
 When("they submit the current password correctly", async function (this: TestContext) {
     await enterTextIntoTextInput(this.page, this.password, fields["current password"]);
+    await clickSubmitButton(this.page);
+});
+
+When("they submit their password", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.password, fields["password"]);
     await clickSubmitButton(this.page);
 });
 

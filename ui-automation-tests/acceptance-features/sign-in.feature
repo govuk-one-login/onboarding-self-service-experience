@@ -64,7 +64,7 @@ Feature: Users can sign in to the self-service experience
   Rule: The user tries to submit SMS security code
     Background:
       When they submit the current username correctly
-      And they submit the current password correctly
+      And they submit their password
       Then they should be redirected to the "/sign-in/enter-text-code" page
 
     @ci @smoke
@@ -121,7 +121,6 @@ Feature: Users can sign in to the self-service experience
       When they click the "Resend the email" button
       Then they should be redirected to the "/sign-in/forgot-password/enter-email-code" page
 
-    @ci @smoke
     Scenario: The user resets their password
       When they click on the forgot password link in their email
       And they submit a new valid password

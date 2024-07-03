@@ -31,6 +31,7 @@ export class TestContext extends World {
     private _password: string = password;
     private _mobile: string = mobile_number;
     private _otp_code: string = sms_otp_code;
+    private _email_code: string = email_otp_code;
     private _servicename: string = servicename;
 
     constructor(options: IWorldOptions) {
@@ -85,6 +86,14 @@ export class TestContext extends World {
         this._otp_code = otp_code;
     }
 
+    get email_code(): string {
+        return this._email_code;
+    }
+
+    set email_code(code: string) {
+        this._email_code = code;
+    }
+
     get servicename(): string {
         return this._servicename;
     }
@@ -114,33 +123,29 @@ BeforeAll({timeout: 60 * 1000}, async function () {
     });
     console.log("Puppeteer launched...");
 
-    // Record the state for the test run.
-    console.log(`Starting test with context: username='${username}' password='${password}'`);
-
     const page = await browser.newPage();
-    console.log("New page tab opened...");
 
     await page.goto(`${host}/register`);
 
-    console.log("Navigated to registration page...");
     await enterTextIntoTextInput(page, username, "emailAddress");
     await clickSubmitButton(page);
-    console.log("Entered email address.");
+
     await enterTextIntoTextInput(page, email_otp_code, "securityCode");
     await clickSubmitButton(page);
-    console.log("Entered email otp code.");
+
     await enterTextIntoTextInput(page, password, "password");
     await clickSubmitButton(page);
-    console.log("Entered password.");
+
     await enterTextIntoTextInput(page, mobile_number, "mobileNumber");
     await clickSubmitButton(page);
-    console.log("Entered mobile number.");
+
     await enterTextIntoTextInput(page, sms_otp_code, "securityCode");
     await clickSubmitButton(page);
-    console.log("Entered otp security code.");
+
     await enterTextIntoTextInput(page, servicename, "serviceName");
     await clickSubmitButton(page, 60000);
-    console.log("Completed user registration.");
+
+    console.log("Test setup completed, running tests...");
 });
 
 Before(async function (this: TestContext) {

@@ -10,7 +10,7 @@
       "support/steps/**/*.ts"
     ],
     "format":  [
-      "summary",
+      "progress",
       "html:reports/cucumber-report.html",
       "json:reports/cucumber-report.json"
     ]
