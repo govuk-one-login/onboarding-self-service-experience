@@ -18,10 +18,10 @@
     "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile-dev .."
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.598.0",
-    "@aws-sdk/client-dynamodb": "^3.598.0",
-    "@aws-sdk/util-dynamodb": "^3.598.0",
-    "@aws-sdk/client-sqs": "^3.598.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.609.0",
+    "@aws-sdk/client-dynamodb": "^3.609.0",
+    "@aws-sdk/util-dynamodb": "^3.609.0",
+    "@aws-sdk/client-sqs": "^3.609.0",
     "axios": "^1.7.2",
     "connect-dynamodb": "^3.0.0",
     "express": "^4.19.2",
@@ -42,7 +42,7 @@
     "dotenv": "^16.0.3",
     "nodemon": "^3.0.1",
     "sass": "^1.60.0",
-    "typescript": "^5.2.2",
+    "typescript": "^5.5.2",
     "uglify-js": "^3.17.4",
     "aws-sdk-client-mock": "^4.0.0",
     "aws-sdk-client-mock-jest": "^4.0.0"
