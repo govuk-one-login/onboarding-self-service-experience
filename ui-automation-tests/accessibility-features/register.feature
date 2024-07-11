@@ -31,7 +31,7 @@ Feature: Users can sign up to the self-service experience
       Given they submit the email "registering-successfully@test.gov.uk"
       When they submit a correct security code
       And they submit a valid password
-      And they submit a valid mobile phone number
+      And they submit a valid mobile phone number "07700 900100"
       And they click on the "Problems receiving a text message?" link
       Then there should be no accessibility violations
 
@@ -39,13 +39,13 @@ Feature: Users can sign up to the self-service experience
       Given they submit the email "registering-successfully@test.gov.uk"
       When they submit a correct security code
       And they submit a valid password
-      And they submit a valid mobile phone number
+      And they submit a valid mobile phone number "07700 900100"
       Then there should be no accessibility violations
 
     Scenario: User verifying the accessibility of /create-service page
       Given they submit the email "registering-successfully@test.gov.uk"
       When they submit a correct security code
       And they submit a valid password
-      And they submit a valid mobile phone number
+      And they submit a valid mobile phone number "07700 900100"
       And they submit a correct security code
       Then there should be no accessibility violations

@@ -1,6 +1,6 @@
 {
   "default": {
-    "tags": "not @wip",
+    "tags": "@ci and @smoke",
     "failFast": true,
     "requireModule": [
       "ts-node/register"
@@ -10,8 +10,9 @@
       "support/steps/**/*.ts"
     ],
     "format":  [
-      "summary",
+      "progress",
       "html:reports/cucumber-report.html",
+      "usage:reports/cucumber-usage.txt",
       "json:reports/cucumber-report.json"
     ]
   }

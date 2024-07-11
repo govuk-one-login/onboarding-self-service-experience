@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -u
-set -o pipefail
+set -uo pipefail
 
 cat << EOF
 This script runs internal integration tests for the Product Pages application.
@@ -22,7 +21,6 @@ export ENVIRONMENT=${TEST_ENVIRONMENT:-}
 cd /app || exit
 
 printf "Running heartbeat check...\n"
-declare status_code
 
 # shellcheck disable=SC2154
 status_code="$(curl --silent --location --output /dev/null --write-out '%{http_code}' "$HOST")"
@@ -32,11 +30,13 @@ fi
 printf "Endpoint ok\n"
 
 printf "Running e2e tests...\n"
+exit_code=0
 
 if [[ $ENVIRONMENT =~ dev ]] || [[ $ENVIRONMENT =~ build ]]; then
   npm run acceptance-tests
+  exit_code=$?
 
   [[ -d "$TEST_REPORT_ABSOLUTE_DIR" ]] && cp -rn ./reports "$TEST_REPORT_ABSOLUTE_DIR"
 fi
 
-exit $?
+exit $exit_code
