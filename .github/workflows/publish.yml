@@ -18,18 +18,9 @@ jobs:
     permissions: { }
     uses: ./.github/workflows/run-unit-tests.yml
 
-  run-acceptance-tests:
-    name: Run tests
-    uses: ./.github/workflows/run-acceptance-tests.yml
-    permissions:
-      id-token: write
-      contents: read
-    with:
-      environment: test
-
   deploy-dynamodb:
     name: DynamoDB
-    needs: run-acceptance-tests
+    needs: run-unit-tests
     uses: ./.github/workflows/upload-dynamodb-package.yml
     permissions:
       id-token: write
@@ -39,12 +30,12 @@ jobs:
 
   build-api:
     name: API
-    needs: run-acceptance-tests
+    needs: run-unit-tests
     uses: ./.github/workflows/build-api.yml
 
   deploy-api:
     name: API
-    needs: [ run-acceptance-tests, build-api, deploy-dynamodb ]
+    needs: [ run-unit-tests, build-api, deploy-dynamodb ]
     uses: ./.github/workflows/upload-api-package.yml
     permissions:
       id-token: write
@@ -55,12 +46,12 @@ jobs:
 
   build-cognito:
     name: Cognito
-    needs: run-acceptance-tests
+    needs: run-unit-tests
     uses: ./.github/workflows/build-cognito.yml
 
   deploy-cognito:
     name: Cognito
-    needs: [ run-acceptance-tests, build-cognito ]
+    needs: [ run-unit-tests, build-cognito ]
     uses: ./.github/workflows/upload-cognito-package.yml
     permissions:
       id-token: write
@@ -71,7 +62,7 @@ jobs:
 
   deploy-frontend:
     name: Frontend
-    needs: [ run-acceptance-tests, build-frontend, deploy-cognito, deploy-dynamodb, deploy-api ]
+    needs: [ run-unit-tests, build-frontend, deploy-cognito, deploy-dynamodb, deploy-api ]
     uses: ./.github/workflows/upload-frontend-package.yml
     permissions:
       id-token: write

@@ -2,7 +2,9 @@ import {When, Then} from "@cucumber/cucumber";
 import {enterTextIntoTextInput, checkErrorMessageDisplayedForField, clickSubmitButton} from "./shared-functions";
 import {TestContext} from "../test-setup";
 import {strict as assert} from "assert";
+import Chance from "chance";
 
+const chance = new Chance.Chance();
 const fields = {
     name: "userName",
     email: "emailAddress",
@@ -30,19 +32,72 @@ When("they enter the {} {string}", async function (fieldName, value) {
     await enterTextIntoTextInput(this.page, value, fields[fieldName as keyof typeof fields]);
 });
 
-When("they submit a correct security code", async function () {
-    await enterTextIntoTextInput(this.page, "123456", fields["security code"]);
+When("they submit the current username correctly", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.username, fields["email"]);
     await clickSubmitButton(this.page);
 });
 
-When("they submit a valid mobile phone number", async function () {
-    await enterTextIntoTextInput(this.page, "07700 900123", fields["mobile phone number"]);
+When("they enter the current username correctly", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.username, fields["email"]);
+});
+
+When("they submit a random valid email address", async function (this: TestContext) {
+    const new_email = `testuser.does-not-exist.${chance.guid()}@digital.cabinet-office.gov.uk`;
+    await enterTextIntoTextInput(this.page, new_email, fields["email"]);
     await clickSubmitButton(this.page);
 });
 
-When("they submit a valid password", async function () {
-    await enterTextIntoTextInput(this.page, "this-is-not-a-common-password", fields["password"]);
+When("they submit a correct security code", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.otp_code, fields["security code"]);
     await clickSubmitButton(this.page);
+});
+
+When("they submit an incorrect security code {string}", async function (this: TestContext, code) {
+    const otp_code = code ?? "666666";
+    await enterTextIntoTextInput(this.page, otp_code, fields["security code"]);
+    await clickSubmitButton(this.page);
+});
+
+When("they submit a correct email code", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.email_code, fields["security code"]);
+    await clickSubmitButton(this.page);
+});
+
+When("they submit a valid mobile phone number {string}", async function (this: TestContext, mobile_number) {
+    await enterTextIntoTextInput(this.page, mobile_number, fields["mobile phone number"]);
+    await clickSubmitButton(this.page);
+    this.mobile = mobile_number;
+});
+
+When("they submit the current password correctly", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.password, fields["current password"]);
+    await clickSubmitButton(this.page);
+});
+
+When("they submit their password", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.password, fields["password"]);
+    await clickSubmitButton(this.page);
+});
+
+When("they enter the current password correctly", async function (this: TestContext) {
+    await enterTextIntoTextInput(this.page, this.password, fields["current password"]);
+});
+
+When("they submit a new valid password", async function (this: TestContext) {
+    const new_password = `new_valid_${chance.string({length: 20})}`;
+
+    await enterTextIntoTextInput(this.page, new_password, fields["password"]);
+    await clickSubmitButton(this.page);
+    this.password = new_password;
+});
+
+When("they change their password", async function (this: TestContext) {
+    const new_password = `new_valid_${chance.string({length: 20})}`;
+
+    await enterTextIntoTextInput(this.page, this.password, fields["current password"]);
+    await enterTextIntoTextInput(this.page, new_password, fields["new password"]);
+    await clickSubmitButton(this.page);
+    this.password = new_password;
 });
 
 Then("the error message {string} must be displayed for the {} field", async function (errorMessage, fieldName) {

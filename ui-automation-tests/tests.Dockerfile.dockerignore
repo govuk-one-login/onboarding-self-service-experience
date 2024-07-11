@@ -5,6 +5,10 @@ node_modules/
 accessibility-features
 exampleotp-features
 
+# Generated files
+reports/*
+@rerun.txt
+
 # Environment configuration files
 .env.example
 .env
