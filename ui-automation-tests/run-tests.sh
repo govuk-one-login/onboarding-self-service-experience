@@ -23,7 +23,7 @@ cd /app || exit
 printf "Running heartbeat check...\n"
 
 # shellcheck disable=SC2154
-status_code="$(curl --silent --location --output /dev/null --write-out '%{http_code}' "$HOST")"
+status_code="$(curl --location --output /dev/null --write-out '%{http_code}\n' "$HOST")"
 if [[ $status_code != "200" ]]; then
   exit 1
 fi
