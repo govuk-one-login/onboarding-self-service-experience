@@ -24,13 +24,19 @@ export const showClient: RequestHandler = async (req, res) => {
     const serviceName = client.serviceName;
     const redirectUris = client.redirectUris;
     const userSectorIdentifierUri = client.sector_identifier_uri;
+    const publicKeySource = client.publicKeySource;
     const userPublicKey = client.publicKey == defaultPublicKey ? "" : getAuthApiCompliantPublicKey(client.publicKey);
+    const jwksUrl = client.jwksUri;
     const secretHash = client.client_secret ? client.client_secret : "";
-    const displayedKey: string = client.token_endpoint_auth_method === "client_secret_post" ? secretHash : userPublicKey;
+    var displayedKey: string = client.token_endpoint_auth_method === "client_secret_post" ? secretHash : userPublicKey;
     const contacts = client.contacts;
     const identityVerificationSupported = client.identity_verification_supported;
     const claims = identityVerificationSupported && client.claims ? client.claims : [];
     const idTokenSigningAlgorithm = client.id_token_signing_algorithm ?? "";
+
+    if (client.publicKeySource == "JWKS" && client.token_endpoint_auth_method != "client_secret_post") {
+        displayedKey = client.jwksUri;
+    }
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
@@ -83,9 +89,9 @@ export const showClient: RequestHandler = async (req, res) => {
                     ? `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-client-secret-hash?secretHash=${encodeURIComponent(
                           displayedKey
                       )}`
-                    : `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-public-key?publicKey=${encodeURIComponent(
-                          displayedKey
-                      )}`,
+                    : `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-public-key?publicKeySource=${encodeURIComponent(
+                          publicKeySource
+                      )}&publicKey=${encodeURIComponent(userPublicKey)}&jwksUrl=${encodeURIComponent(jwksUrl)}`,
             changeContacts: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-contact`,
             changeIdVerificationEnabledUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-identity-verification`,
             changeIdTokenSigningAlgorithm: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-id-token-signing-algorithm?algorithm=${encodeURIComponent(
@@ -259,7 +265,9 @@ export const showChangePublicKeyForm: RequestHandler = (req, res) => {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
-        serviceUserPublicKey: req.query.publicKey
+        publicKeySource: req.query.publicKeySource,
+        serviceUserPublicKey: req.query.publicKey,
+        jwksUrl: req.query.jwksUrl
     });
 };
 
@@ -272,7 +280,7 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
         nonNull(req.context.serviceId),
         req.params.selfServiceClientId,
         req.params.clientId,
-        {public_key: req.body.authCompliantPublicKey},
+        req.body.update,
         nonNull(req.session.authenticationResult?.AccessToken)
     );
 

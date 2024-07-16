@@ -5,7 +5,9 @@ export interface ClientFromDynamo {
     contacts: string[];
     default_fields: string[];
     post_logout_redirect_uris: string[];
+    public_key_source: string;
     public_key: string;
+    jwks_uri: string;
     redirect_uris: string[];
     scopes: string[];
     client_name: string;
@@ -31,7 +33,9 @@ export interface Client {
     contacts: string[];
     defaultFields: string[];
     postLogoutUris: string[];
+    publicKeySource: string;
     publicKey: string;
+    jwksUri: string;
     redirectUris: string[];
     scopes: string[];
     back_channel_logout_uri?: string | null;
