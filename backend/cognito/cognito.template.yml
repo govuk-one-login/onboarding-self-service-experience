@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Cognito UserPool and Client for the Admin Tool
+Description: Cognito UserPool and Client for the Admin Tool | v1.0.0
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
