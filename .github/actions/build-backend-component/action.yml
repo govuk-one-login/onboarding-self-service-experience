@@ -40,3 +40,4 @@ runs:
         cache-name: ${{ inputs.name }}
         artifact-name: ${{ inputs.name }}-SAM
         additional-artifact-paths: ${{ inputs.additional-artifact-paths }}
+        pull-repository: true
