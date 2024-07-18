@@ -3,9 +3,14 @@
 import {MatchersV3, PactV3} from "@pact-foundation/pact";
 import * as path from "path";
 import axios from "axios";
+import {Agent} from "node:http";
 
 beforeAll((): void => {
     jest.setTimeout(200000);
+});
+
+const client = axios.create({
+    httpAgent: new Agent()
 });
 
 const EXPECTED_BODY =
@@ -26,7 +31,7 @@ const postRequest = async (url, data): string => {
     const postUrl = `${url}/connect/register`;
     const headers = {headers: {responseType: "json", "Content-Type": "application/json; charset=utf-8"}};
     console.log("********** postRequest sending to :" + postUrl);
-    return await axios
+    return await client
         .post(postUrl, data, headers)
         .then(res => {
             console.log("********** postRequest returning : " + res.data.toString());
@@ -44,7 +49,7 @@ const putRequest = async (url, data): string => {
     const postUrl = `${url}/connect/register`;
     const headers = {headers: {responseType: "json", "Content-Type": "application/json; charset=utf-8"}};
     console.log("********** putRequest sending to :" + postUrl);
-    return await axios
+    return await client
         .put(postUrl, data, headers)
         .then(res => {
             console.log("********** putRequest returning : " + res.data.toString());
