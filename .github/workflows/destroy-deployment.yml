@@ -1,0 +1,102 @@
+name: Delete deployment
+run-name: ${{ github.event.pull_request.title || format('Delete deployment [{0}]', github.head_ref || github.ref_name) }}
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [ closed ]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  delete-frontend-image:
+    name: Delete frontend image
+    needs: delete-frontend
+    runs-on: ubuntu-latest
+    environment: development
+    concurrency: push-frontend-image-development-${{ github.head_ref || github.ref_name }}
+    steps:
+      - name: Delete docker image
+        uses: govuk-one-login/github-actions/aws/ecr/delete-docker-images@94bfee8a40ab914626a7fb5bc459dd2c6a4ed435 # 5/03/2024
+        with:
+          aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          repository: ${{ vars.FRONTEND_CONTAINER_IMAGE_REPOSITORY }}
+          image-tags: ${{ github.head_ref || github.ref_name }}
+
+  delete-frontend:
+    name: frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get stack name
+        uses: govuk-one-login/github-actions/beautify-branch-name@299bdda5b093a5d13c76e4d0f97f59bc727b4e03 # 28/06/2023
+        id: get-stack-name
+        with:
+          usage: Stack name
+          prefix: preview-frontend
+          length-limit: 128
+
+      - name: Delete stack
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        uses: govuk-one-login/github-actions/sam/delete-stacks@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
+        with:
+          aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          stack-names: ${{ steps.get-stack-name.outputs.pretty-branch-name }}
+
+  delete-dynamodb:
+    name: dynamodb
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get stack name
+        uses: govuk-one-login/github-actions/beautify-branch-name@299bdda5b093a5d13c76e4d0f97f59bc727b4e03 # 28/06/2023
+        id: get-stack-name
+        with:
+          usage: Stack name
+          prefix: preview-dynamodb
+          length-limit: 128
+
+      - name: Delete stack
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        uses: govuk-one-login/github-actions/sam/delete-stacks@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
+        with:
+          aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          stack-names: ${{ steps.get-stack-name.outputs.pretty-branch-name }}
+
+  delete-cognito:
+    name: cognito
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get stack name
+        uses: govuk-one-login/github-actions/beautify-branch-name@299bdda5b093a5d13c76e4d0f97f59bc727b4e03 # 28/06/2023
+        id: get-stack-name
+        with:
+          usage: Stack name
+          prefix: preview-cognito
+          length-limit: 128
+
+      - name: Delete stack
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        uses: govuk-one-login/github-actions/sam/delete-stacks@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
+        with:
+          aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          stack-names: ${{ steps.get-stack-name.outputs.pretty-branch-name }}
+
+  delete-api:
+    name: api
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get stack name
+        uses: govuk-one-login/github-actions/beautify-branch-name@299bdda5b093a5d13c76e4d0f97f59bc727b4e03 # 28/06/2023
+        id: get-stack-name
+        with:
+          usage: Stack name
+          prefix: preview-api
+          length-limit: 128
+
+      - name: Delete stack
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        uses: govuk-one-login/github-actions/sam/delete-stacks@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
+        with:
+          aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          stack-names: ${{ steps.get-stack-name.outputs.pretty-branch-name }}
