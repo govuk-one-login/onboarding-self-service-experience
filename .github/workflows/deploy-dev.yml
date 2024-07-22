@@ -1,5 +1,5 @@
-name: Deploy branch
-run-name: Deploy demo [${{ github.head_ref || github.ref_name }}]
+name: Deploy to development
+run-name: Deploy to development [${{ github.head_ref || github.ref_name }}]
 
 on:
   merge_group:
