@@ -1,0 +1,49 @@
+name: "Build application"
+description: "Build and compile all the assets required to run the application in the container"
+inputs:
+  artifact-name:
+    description: "The artifact name to store the build cache under"
+    required: true
+    default: frontend-build
+outputs:
+  artifact-id:
+    description: "The artifact id for the artifact that was just uploaded or empty if the artifact upload failed."
+    value: ${{ steps.upload.outputs.artifact-id }}
+runs:
+  using: composite
+  steps:
+    - name: Pull repository
+      id: checkout
+      uses: actions/checkout@v4
+
+    - name: Install Node
+      id: node
+      uses: actions/setup-node@v4
+      with:
+        cache: npm
+
+    - name: Install Node dependencies
+      id: install
+      shell: bash
+      working-directory: express
+      run: npm install --include-workspace-root
+
+    - name: Build app
+      id: build
+      shell: bash
+      working-directory: express
+      run: npm run build
+
+    - name: Archive distribution artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        retention-days: 7
+        path: |
+          express/dist
+          express/resources
+          express/src/views
+          express/assets/images
+          express/package*.json
+          express/manifest.yml

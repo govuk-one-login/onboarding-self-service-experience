@@ -26,6 +26,9 @@ outputs:
   artifact-name:
     description: "The name of the uploaded artifact"
     value: ${{ steps.build.outputs.artifact-name }}
+  cache-key:
+    description: "The name of the uploaded artifact"
+    value: ${{ steps.build.outputs.cache-key }}
 runs:
   using: composite
   steps:
@@ -37,7 +40,7 @@ runs:
         template: ${{ inputs.template }}
         manifest: ${{ inputs.manifest }}
         base-dir: ${{ inputs.base-dir }}
-        cache-name: ${{ inputs.name }}
-        artifact-name: ${{ inputs.name }}-SAM
+        cache-name: ${{ inputs.name }}-infra
+        artifact-name: ${{ inputs.name }}-infrastructure
         additional-artifact-paths: ${{ inputs.additional-artifact-paths }}
         pull-repository: true
