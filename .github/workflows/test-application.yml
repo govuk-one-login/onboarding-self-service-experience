@@ -15,15 +15,88 @@ defaults:
     shell: bash
 
 jobs:
-  code-quality:
-    name: Code quality
-    uses: ./.github/workflows/check-code-quality.yml
+  run-checkov:
+    name: Checkov
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run checkov
+        uses: govuk-one-login/github-actions/code-quality/run-checkov@9c5db98832a3d5f8d27e08eb0b3d89d186c8e163
+        with:
+          skip-checks:
+            CKV_SECRET_6
+            CKV_SECRET_9
 
-  build-frontend:
-    name: Frontend
-    uses: ./.github/workflows/build-frontend.yml
+  check-shell-scripts:
+    name: Shell scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run shell checks
+        uses: govuk-one-login/github-actions/code-quality/check-shell-scripts@5dacba941def444d69f02843feaebed79b5fca51 # 11/04/2023
+
+  check-linting:
+    name: Linting
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check linting and formatting
+        uses: govuk-one-login/github-actions/code-quality/check-linting@5dacba941def444d69f02843feaebed79b5fca51 # 11/04/2023
+
+  check-vulnerabilities:
+    name: Vulnerabilities
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run security audit
+        uses: govuk-one-login/github-actions/code-quality/run-security-audit@5dacba941def444d69f02843feaebed79b5fca51 # 11/04/2023
+        with:
+          workspaces: true
+
+  sonarcloud:
+    if: startsWith(github.head_ref, 'dependabot') != true
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull repository
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        id: build
+        uses: ./.github/actions/build-frontend
+        with:
+          artifact-name: frontend-build-sonar
+
+      - name: Generate coverage report
+        run: npm run test:cov
+
+      - name: Fix Code Coverage Paths
+        working-directory: ./coverage
+        run: sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' lcov.info
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   run-unit-tests:
-    name: Run tests
-    permissions: { }
-    uses: ./.github/workflows/run-unit-tests.yml
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull repository
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        id: build
+        uses: ./.github/actions/build-frontend
+        with:
+          artifact-name: frontend-build-tests
+
+      - name: Run unit tests
+        id: run-tests
+        env:
+          REPORT: ${{ runner.temp }}/unit-tests.report
+        run: npm run test -- --config infrastructure/ci/jest.config.ts

@@ -1,0 +1,182 @@
+name: Deploy branch
+run-name: Deploy demo [${{ github.head_ref || github.ref_name }}]
+
+on:
+  merge_group:
+    types:
+      - checks_requested
+  pull_request:
+    branches:
+      - main
+
+concurrency: deploy-demo-${{ github.head_ref || github.ref_name }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-frontend:
+    if: github.event_name == 'merge_group'
+    name: Build frontend
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.build.outputs.artifact-id }}
+    steps:
+      - name: Pull repository
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        id: build
+        uses: ./.github/actions/build-frontend
+        with:
+          artifact-name: frontend-build-development
+
+  push-frontend:
+    if: github.event_name == 'merge_group'
+    name: Push image
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: development
+      url: ${{ steps.push.outputs.pipeline-url }}
+    outputs:
+      pipeline-url: ${{ steps.push.outputs.pipeline-url }}
+    steps:
+      - name: Pull repository
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Push
+        id: push
+        uses: ./.github/actions/push
+        with:
+          artifact-name: frontend-build-development
+          artifact-bucket-name: ${{ vars.DEPLOYMENT_ARTIFACTS_BUCKET }}
+          container-repository-name: ${{ vars.FRONTEND_CONTAINER_REPOSITORY_NAME }}
+          deployment-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
+          pipeline-name: ${{ vars.FRONTEND_PIPELINE_NAME }}
+          test-container-repository-name: ${{ vars.TEST_ECR_REPOSITORY_NAME }}
+
+  build-dynamo:
+    if: github.event_name == 'merge_group'
+    name: Build dynamodb
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.build.outputs.artifact-name }}
+      cache-key: ${{ steps.build.outputs.cache-key }}
+    steps:
+      - name: Build
+        id: build
+        uses: govuk-one-login/github-actions/sam/build-application@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
+        with:
+          template: backend/dynamodb/cognito.template.yml
+          base-dir: backend/dynamodb
+          source-dir: backend/dynamodb
+          cache-name: dynamodb-infra
+          artifact-name: dynamodb-infrastructure
+          pull-repository: true
+
+  deploy-dynamodb:
+    if: github.event_name == 'merge_group'
+    name: Deploy dynamodb
+    runs-on: ubuntu-latest
+    outputs:
+      stack-name: ${{ steps.build.outputs.stack-name }}
+      stack-url: ${{ steps.build.outputs.stack-url }}
+    steps:
+      - name: Deploy
+        id: deploy
+        uses: govuk-one-login/github-actions/secure-pipelines/deploy-application@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
+        timeout-minutes: 15
+        with:
+          aws-role-arn: ${{ vars.API_DEPLOYMENT_ROLE_ARN }}
+          artifact-bucket-name: ${{ vars.API_ARTIFACT_SOURCE_BUCKET_NAME }}
+          signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
+          pipeline-name: ${{ vars.API_PIPELINE_NAME }}
+          artifact-name: ${{ needs.build-dynamodb.outputs.artifact-name }}
+          template: .aws-sam/build/template.yaml
+
+  build-cognito:
+    if: github.event_name == 'merge_group'
+    name: Build cognito
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.build.outputs.artifact-name }}
+      cache-key: ${{ steps.build.outputs.cache-key }}
+    steps:
+      - name: Build
+        id: build
+        uses: govuk-one-login/github-actions/sam/build-application@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
+        with:
+          template: backend/cognito/cognito.template.yml
+          manifest: backend/cognito/package.json
+          base-dir: backend/cognito
+          source-dir: backend/cognito
+          cache-name: cognito-infra
+          artifact-name: cognito-infrastructure
+          pull-repository: true
+
+  deploy-cognito:
+    if: github.event_name == 'merge_group'
+    name: Deploy cognito
+    runs-on: ubuntu-latest
+    outputs:
+      stack-name: ${{ steps.build.outputs.stack-name }}
+      stack-url: ${{ steps.build.outputs.stack-url }}
+    steps:
+      - name: Deploy
+        id: deploy
+        uses: govuk-one-login/github-actions/secure-pipelines/deploy-application@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
+        timeout-minutes: 15
+        with:
+          aws-role-arn: ${{ vars.API_DEPLOYMENT_ROLE_ARN }}
+          artifact-bucket-name: ${{ vars.API_ARTIFACT_SOURCE_BUCKET_NAME }}
+          signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
+          pipeline-name: ${{ vars.API_PIPELINE_NAME }}
+          artifact-name: ${{ needs.build-cognito.outputs.artifact-name }}
+          template: .aws-sam/build/template.yaml
+
+  build-api:
+    if: github.event_name == 'merge_group'
+    name: Build api
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.build.outputs.artifact-name }}
+      cache-key: ${{ steps.build.outputs.cache-key }}
+    steps:
+      - name: Build
+        id: build
+        uses: govuk-one-login/github-actions/sam/build-application@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
+        with:
+          template: backend/api/api.template.yml
+          manifest: backend/api/package.json
+          base-dir: backend/api
+          source-dir: backend/api
+          additional-artifact-paths: backend/api/state-machines
+          cache-name: api-infra
+          artifact-name: api-infrastructure
+          pull-repository: true
+
+  deploy-api:
+    if: github.event_name == 'merge_group'
+    name: Deploy api
+    runs-on: ubuntu-latest
+    outputs:
+      stack-name: ${{ steps.build.outputs.stack-name }}
+      stack-url: ${{ steps.build.outputs.stack-url }}
+    steps:
+      - name: Deploy
+        id: deploy
+        uses: govuk-one-login/github-actions/secure-pipelines/deploy-application@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
+        timeout-minutes: 15
+        with:
+          aws-role-arn: ${{ vars.API_DEPLOYMENT_ROLE_ARN }}
+          artifact-bucket-name: ${{ vars.API_ARTIFACT_SOURCE_BUCKET_NAME }}
+          signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
+          pipeline-name: ${{ vars.API_PIPELINE_NAME }}
+          artifact-name: ${{ needs.build-api.outputs.artifact-name }}
+          template: .aws-sam/build/template.yaml
