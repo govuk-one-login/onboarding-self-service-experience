@@ -22,6 +22,8 @@ jobs:
     if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build frontend
     runs-on: ubuntu-latest
+    environment:
+      name: demo
     outputs:
       artifact-name: ${{ steps.build.outputs.artifact-id }}
     steps:
@@ -40,11 +42,11 @@ jobs:
     name: Push frontend image
     needs: build-frontend-dependencies
     runs-on: ubuntu-latest
-    outputs:
-      image-uri: ${{ steps.push-image.outputs.image-uri }}
     environment:
       name: demo
       url: ${{ steps.push-image.outputs.image-url }}
+    outputs:
+      image-uri: ${{ steps.push-image.outputs.image-uri }}
     steps:
       - name: Login to GDS Dev Dynatrace Container Registry
         uses: docker/login-action@v3
@@ -61,7 +63,7 @@ jobs:
           aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
           repository: ${{ vars.FRONTEND_CONTAINER_REPOSITORY_NAME }}
           image-tags: "${{ github.head_ref || github.ref_name }}"
-          dockerfile: Dockerfile
+          dockerfile: infrastructure/frontend/Dockerfile
           artifact-name: frontend-build-demo
           artifact-path: dist
 
@@ -70,10 +72,10 @@ jobs:
     name: Build frontend infrastructure
     needs: push-frontend-image
     runs-on: ubuntu-latest
+    environment:
+      name: demo
     outputs:
       template: ${{ steps.replace-placeholders.outputs.template }}
-    environment:
-      name: development
     steps:
       - name: Pull repository
         id: checkout
@@ -143,7 +145,6 @@ jobs:
             sse:deployment-source=github-actions
             sse:lifecycle=temporary
           parameters: |-
-            Environment=demo
             DeploymentName=${{ steps.get-deployment-name.outputs.pretty-branch-name }}
 
       - name: Get deployment URL
@@ -156,10 +157,12 @@ jobs:
           printf "🌐 Deployment URL\n%s" "$url" >> "$GITHUB_STEP_SUMMARY"
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
-  build-dynamo:
+  build-dynamodb:
     if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build dynamodb
     runs-on: ubuntu-latest
+    environment:
+      name: demo
     outputs:
       artifact-name: ${{ steps.build.outputs.artifact-name }}
       cache-key: ${{ steps.build.outputs.cache-key }}
@@ -168,18 +171,21 @@ jobs:
         id: build
         uses: govuk-one-login/github-actions/sam/build-application@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
         with:
-          template: backend/dynamodb/cognito.template.yml
+          template: backend/dynamodb/dynamodb.template.yml
           base-dir: backend/dynamodb
           source-dir: backend/dynamodb
-          cache-name: dynamodb-infra
-          artifact-name: dynamodb-infrastructure
+          cache-name: backend-dynamodb-infra
+          artifact-name: backend-dynamodb-infrastructure
           pull-repository: true
 
   deploy-dynamodb:
     if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Deploy dynamodb
-    needs: build-dynamo
+    needs: build-dynamodb
     runs-on: ubuntu-latest
+    environment:
+      name: demo
+      url: ${{ steps.deploy.outputs.stack-url }}
     outputs:
       stack-name: ${{ steps.build.outputs.stack-name }}
       stack-url: ${{ steps.build.outputs.stack-url }}
@@ -202,6 +208,8 @@ jobs:
           disable-rollback: false
           stack-name-prefix: preview-dynamodb
           artifact-name: ${{ needs.build-dynamodb.outputs.artifact-name }}
+          artifact-path: .aws-sam/build
+          template: .aws-sam/build/template.yaml
           cache-name: ${{ needs.build-dynamodb.outputs.cache-key }}
           s3-prefix: sse-preview
           tags: |-
@@ -217,6 +225,8 @@ jobs:
     if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build cognito
     runs-on: ubuntu-latest
+    environment:
+      name: demo
     outputs:
       artifact-name: ${{ steps.build.outputs.artifact-name }}
       cache-key: ${{ steps.build.outputs.cache-key }}
@@ -229,8 +239,8 @@ jobs:
           manifest: backend/cognito/package.json
           base-dir: backend/cognito
           source-dir: backend/cognito
-          cache-name: cognito-infra
-          artifact-name: cognito-infrastructure
+          cache-name: backend-cognito-infra
+          artifact-name: backend-cognito-infrastructure
           pull-repository: true
 
   deploy-cognito:
@@ -238,6 +248,9 @@ jobs:
     name: Deploy cognito
     needs: build-cognito
     runs-on: ubuntu-latest
+    environment:
+      name: demo
+      url: ${{ steps.deploy.outputs.stack-url }}
     outputs:
       stack-name: ${{ steps.build.outputs.stack-name }}
       stack-url: ${{ steps.build.outputs.stack-url }}
@@ -259,7 +272,9 @@ jobs:
           delete-failed-stack: true
           disable-rollback: false
           stack-name-prefix: preview-cognito
-          artifact-name: backend-cognito-infrastructure
+          artifact-name: ${{ needs.build-cognito.outputs.artifact-name }}
+          artifact-path: .aws-sam/build
+          template: .aws-sam/build/template.yaml
           cache-name: ${{ needs.build-cognito.outputs.cache-key }}
           s3-prefix: sse-preview
           tags: |-
@@ -275,6 +290,8 @@ jobs:
     if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build api
     runs-on: ubuntu-latest
+    environment:
+      name: demo
     outputs:
       artifact-name: ${{ steps.build.outputs.artifact-name }}
       cache-key: ${{ steps.build.outputs.cache-key }}
@@ -288,8 +305,8 @@ jobs:
           base-dir: backend/api
           source-dir: backend/api
           additional-artifact-paths: backend/api/state-machines
-          cache-name: api-infra
-          artifact-name: api-infrastructure
+          cache-name: backend-api-infra
+          artifact-name: backend-api-infrastructure
           pull-repository: true
 
   deploy-api:
@@ -297,6 +314,9 @@ jobs:
     name: Deploy api
     needs: build-api
     runs-on: ubuntu-latest
+    environment:
+      name: demo
+      url: ${{ steps.deploy.outputs.stack-url }}
     outputs:
       stack-name: ${{ steps.build.outputs.stack-name }}
       stack-url: ${{ steps.build.outputs.stack-url }}
@@ -318,7 +338,8 @@ jobs:
           delete-failed-stack: true
           disable-rollback: false
           stack-name-prefix: preview-api
-          artifact-name: backend-api-infrastructure
+          artifact-name: ${{ needs.build-api.outputs.artifact-name }}
+          template: .aws-sam/build/template.yaml
           cache-name: ${{ needs.build-api.outputs.cache-key }}
           s3-prefix: sse-preview
           tags: |-

@@ -70,11 +70,8 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      - name: Build
-        id: build
-        uses: ./.github/actions/build-frontend
-        with:
-          artifact-name: frontend-build-sonar
+      - name: Install Node dependencies
+        run: npm install
 
       - name: Generate coverage report
         run: npm run test:cov
@@ -97,11 +94,8 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      - name: Build
-        id: build
-        uses: ./.github/actions/build-frontend
-        with:
-          artifact-name: frontend-build-tests
+      - name: Install Node dependencies
+        run: npm install
 
       - name: Run unit tests
         id: run-tests

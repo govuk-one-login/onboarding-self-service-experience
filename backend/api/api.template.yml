@@ -366,7 +366,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/get-user.getUserHandler
+      Handler: src/handlers/dynamodb/get-user.getUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -401,7 +401,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/put-user.putUserHandler
+      Handler: src/handlers/dynamodb/put-user.putUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -436,7 +436,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/update-user.updateUserHandler
+      Handler: src/handlers/dynamodb/update-user.updateUserHandler
       Description: Updates user data in DynamoDB
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
@@ -474,7 +474,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/get-services.getServicesHandler
+      Handler: src/handlers/dynamodb/get-services.getServicesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -509,7 +509,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/get-session-count.getSessionCountHandler
+      Handler: src/handlers/dynamodb/get-session-count.getSessionCountHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -544,7 +544,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/global-sign-out.globalSignOutHandler
+      Handler: src/handlers/dynamodb/global-sign-out.globalSignOutHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -579,7 +579,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/put-service.putServiceHandler
+      Handler: src/handlers/dynamodb/put-service.putServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -609,7 +609,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/get-service-clients.getServiceClientsHandler
+      Handler: src/handlers/dynamodb/get-service-clients.getServiceClientsHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -644,7 +644,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/put-service-client.putServiceClientHandler
+      Handler: src/handlers/dynamodb/put-service-client.putServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -673,7 +673,7 @@ Resources:
           # AWS SDK v3 dependencies are already included in the lambda runtime
           - "@aws-sdk/*"
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/update-service.updateServiceHandler
+      Handler: src/handlers/dynamodb/update-service.updateServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -704,7 +704,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/update-service-client.updateServiceClientHandler
+      Handler: src/handlers/dynamodb/update-service-client.updateServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -734,7 +734,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/put-service-user.putServiceUserHandler
+      Handler: src/handlers/dynamodb/put-service-user.putServiceUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -765,7 +765,7 @@ Resources:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Description: Assumes a cross-account role and invokes the Auth register Lambda
-      Handler: backend/api/src/handlers/auth/register-client.registerClientHandler
+      Handler: src/handlers/auth/register-client.registerClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -794,7 +794,7 @@ Resources:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
       Description: Updates a client using an HTTP endpoint
-      Handler: backend/api/src/handlers/auth/update-client.updateClientInRegistryHandler
+      Handler: src/handlers/auth/update-client.updateClientInRegistryHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -824,7 +824,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/step-functions/new-service.newServiceHandler
+      Handler: src/handlers/step-functions/new-service.newServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -860,7 +860,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/step-functions/new-client.newClientHandler
+      Handler: src/handlers/step-functions/new-client.newClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -896,7 +896,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/step-functions/update-client.doUpdateClientHandler
+      Handler: src/handlers/step-functions/update-client.doUpdateClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -931,7 +931,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/step-functions/update-service.doUpdateServiceHandler
+      Handler: src/handlers/step-functions/update-service.doUpdateServiceHandler
       Description: Updates service data in DynamoDB and Client Registry
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
@@ -1008,7 +1008,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/logging/sqs-service.sendSQSMessageToTxMAHandler
+      Handler: src/handlers/logging/sqs-service.sendSQSMessageToTxMAHandler
       Description: Sends a message to the TxMA SQS
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Policies:
@@ -1230,7 +1230,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/dynamo-db-service.getDynamoDBEntriesHandler
+      Handler: src/handlers/dynamodb/dynamo-db-service.getDynamoDBEntriesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -1265,7 +1265,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBClientEntriesHandler
+      Handler: src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBClientEntriesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
@@ -1300,7 +1300,7 @@ Resources:
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
     Properties:
-      Handler: backend/api/src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBServiceEntriesHandler
+      Handler: src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBServiceEntriesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
       Tracing: Active
       Policies:
