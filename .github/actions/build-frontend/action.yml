@@ -6,6 +6,9 @@ inputs:
     required: true
     default: frontend-build
 outputs:
+  artifact-name:
+    description: "Pass through the artifact name"
+    value: ${{ inputs.artifact-name }}
   artifact-id:
     description: "The artifact id for the artifact that was just uploaded or empty if the artifact upload failed."
     value: ${{ steps.upload.outputs.artifact-id }}

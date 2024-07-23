@@ -68,11 +68,11 @@ jobs:
         id: build
         uses: govuk-one-login/github-actions/sam/build-application@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
         with:
-          template: backend/dynamodb/cognito.template.yml
+          template: backend/dynamodb/dynamodb.template.yml
           base-dir: backend/dynamodb
           source-dir: backend/dynamodb
-          cache-name: dynamodb-infra
-          artifact-name: dynamodb-infrastructure
+          cache-name: backend-dynamodb-infra
+          artifact-name: backend-dynamodb-infrastructure
           pull-repository: true
 
   deploy-dynamodb:
@@ -95,7 +95,6 @@ jobs:
           signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
           pipeline-name: ${{ vars.DYNAMODB_PIPELINE_NAME }}
           artifact-name: ${{ needs.build-dynamodb.outputs.artifact-name }}
-          template: .aws-sam/build/template.yaml
 
   build-cognito:
     if: github.event_name == 'merge_group'
@@ -113,8 +112,8 @@ jobs:
           manifest: backend/cognito/package.json
           base-dir: backend/cognito
           source-dir: backend/cognito
-          cache-name: cognito-infra
-          artifact-name: cognito-infrastructure
+          cache-name: backend-cognito-infra
+          artifact-name: backend-cognito-infrastructure
           pull-repository: true
 
   deploy-cognito:
@@ -137,7 +136,6 @@ jobs:
           signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
           pipeline-name: ${{ vars.COGNITO_PIPELINE_NAME }}
           artifact-name: ${{ needs.build-cognito.outputs.artifact-name }}
-          template: .aws-sam/build/template.yaml
 
   build-api:
     if: github.event_name == 'merge_group'
@@ -156,8 +154,8 @@ jobs:
           base-dir: backend/api
           source-dir: backend/api
           additional-artifact-paths: backend/api/state-machines
-          cache-name: api-infra
-          artifact-name: api-infrastructure
+          cache-name: backend-api-infra
+          artifact-name: backend-api-infrastructure
           pull-repository: true
 
   deploy-api:
@@ -180,4 +178,3 @@ jobs:
           signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
           pipeline-name: ${{ vars.API_PIPELINE_NAME }}
           artifact-name: ${{ needs.build-api.outputs.artifact-name }}
-          template: .aws-sam/build/template.yaml
