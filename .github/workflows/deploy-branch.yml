@@ -18,6 +18,30 @@ permissions:
   contents: read
 
 jobs:
+  get-branch-details:
+    name: Branch details
+    runs-on: ubuntu-latest
+    environment:
+      name: demo
+    outputs:
+      deployment-name: ${{ steps.get-deployment-name.outputs.pretty-branch-name }}
+      commit-message: ${{ steps.github-event-details.outputs.commit-message }}
+      first-commit-message: ${{ steps.github-event-details.outputs.first-commit-message }}
+    steps:
+      - name: Get deployment name
+        uses: govuk-one-login/github-actions/beautify-branch-name@7d56b09b4d2a9a9c6005843d28f31a2333ad1373 # 13/03/2024
+        id: get-deployment-name
+        with:
+          length-limit: 22
+          prefix: preview
+          verbose: false
+
+      - name: Github details
+        id: github-event-details
+        run: |
+          echo "commit-message=${{ github.event.head_commit.message }}" >> "$GITHUB_OUTPUT"
+          echo "first-commit-message=${{ github.event.commits[0].message }}" >> "$GITHUB_OUTPUT"
+
   build-frontend-dependencies:
     if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build frontend
