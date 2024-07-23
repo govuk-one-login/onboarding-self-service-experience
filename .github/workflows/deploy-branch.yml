@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   build-frontend-dependencies:
-#    if: contains(github.event.head_commit.message, '[deploy]') == true
+    if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build frontend
     runs-on: ubuntu-latest
     environment:
@@ -38,7 +38,7 @@ jobs:
           artifact-name: frontend-build-demo
 
   push-frontend-image:
-#    if: contains(github.event.head_commit.message, '[deploy]') == true
+    if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Push frontend image
     needs: build-frontend-dependencies
     runs-on: ubuntu-latest
@@ -68,7 +68,7 @@ jobs:
           artifact-path: dist
 
   build-frontend-infrastructure:
-#    if: contains(github.event.head_commit.message, '[deploy]') == true
+    if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build frontend infrastructure
     needs: push-frontend-image
     runs-on: ubuntu-latest
@@ -106,7 +106,7 @@ jobs:
           path: .aws-sam/build
 
   deploy-frontend:
-#    if: contains(github.event.head_commit.message, '[deploy]') == true
+    if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Deploy frontend
     needs: [ build-frontend-infrastructure, deploy-api, deploy-cognito, deploy-dynamodb ]
     runs-on: ubuntu-latest
@@ -145,7 +145,6 @@ jobs:
             sse:deployment-source=github-actions
             sse:lifecycle=temporary
           parameters: |-
-            Environment=demo
             DeploymentName=${{ steps.get-deployment-name.outputs.pretty-branch-name }}
 
       - name: Get deployment URL
@@ -159,7 +158,7 @@ jobs:
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
   build-dynamodb:
-#    if: contains(github.event.head_commit.message, '[deploy]') == true
+    if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build dynamodb
     runs-on: ubuntu-latest
     environment:
@@ -180,7 +179,7 @@ jobs:
           pull-repository: true
 
   deploy-dynamodb:
-#    if: contains(github.event.head_commit.message, '[deploy]') == true
+    if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Deploy dynamodb
     needs: build-dynamodb
     runs-on: ubuntu-latest
@@ -223,7 +222,7 @@ jobs:
             DeploymentName=${{ steps.get-deployment-name.outputs.pretty-branch-name }}
 
   build-cognito:
-#    if: contains(github.event.head_commit.message, '[deploy]') == true
+    if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build cognito
     runs-on: ubuntu-latest
     environment:
@@ -245,7 +244,7 @@ jobs:
           pull-repository: true
 
   deploy-cognito:
-#    if: contains(github.event.head_commit.message, '[deploy]') == true
+    if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Deploy cognito
     needs: build-cognito
     runs-on: ubuntu-latest
@@ -288,7 +287,7 @@ jobs:
             DeploymentName=${{ steps.get-deployment-name.outputs.pretty-branch-name }}
 
   build-api:
-#    if: contains(github.event.head_commit.message, '[deploy]') == true
+    if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build api
     runs-on: ubuntu-latest
     environment:
@@ -311,7 +310,7 @@ jobs:
           pull-repository: true
 
   deploy-api:
-#    if: contains(github.event.head_commit.message, '[deploy]') == true
+    if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Deploy api
     needs: build-api
     runs-on: ubuntu-latest
