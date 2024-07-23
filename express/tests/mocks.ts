@@ -44,10 +44,13 @@ export const mockCognitoInterface = {
     globalSignOut: jest.fn()
 };
 
-export const request = (properties?: Partial<Request> | object) =>
+export const request = (properties?: Partial<Request> | Record<string, unknown>) =>
     ({
         body: {},
-        session: {},
+        session: {
+            save: jest.fn(),
+            ...(properties?.session as Partial<Request["session"]>)
+        },
         app: {
             get: (keyName: string) => {
                 if (keyName === "backing-service") return new SelfServiceServicesService(mockCognitoInterface, mockLambdaFacade);
