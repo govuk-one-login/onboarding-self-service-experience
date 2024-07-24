@@ -18,22 +18,6 @@ permissions:
   contents: read
 
 jobs:
-  get-branch-details:
-    name: Branch details
-    runs-on: ubuntu-latest
-    environment:
-      name: demo
-    outputs:
-      deployment-name: ${{ steps.get-deployment-name.outputs.pretty-branch-name }}
-      commit-message: ${{ steps.github-event-details.outputs.commit-message }}
-      first-commit-message: ${{ steps.github-event-details.outputs.first-commit-message }}
-    steps:
-      - name: Github details
-        id: github-event-details
-        run: |
-          echo "${{ github.event.head_commit.message }}"
-          echo "${{ github.event.commits[0].message }}"
-
   build-frontend-dependencies:
     if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Build frontend
@@ -104,7 +88,8 @@ jobs:
           TEMPLATE_FILE: infrastructure/frontend/frontend.template.yml
           IMAGE_URI: ${{ needs.push-frontend-image.outputs.image-uri }}
         run: |
-          sam build ${TEMPLATE_FILE:+--template $TEMPLATE_FILE}
+          sam build --cached \
+            ${TEMPLATE_FILE:+--template $TEMPLATE_FILE}
           echo "template=.aws-sam/build/template.yaml" >> "$GITHUB_OUTPUT"
 
           if grep -q "CONTAINER-IMAGE-PLACEHOLDER" .aws-sam/build/template.yaml; then
@@ -344,6 +329,16 @@ jobs:
           length-limit: 22
           prefix: preview
           verbose: false
+
+      - name: List build assets
+        id: get-deployment-url
+        env:
+          NAME: AdminToolURL
+          OUTPUTS: ${{ steps.deploy.outputs.stack-outputs }}
+        run: |
+          url=$(jq --raw-output ".$NAME" <<< "$OUTPUTS")
+          printf "🌐 Deployment URL\n%s" "$url" >> "$GITHUB_STEP_SUMMARY"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
 
       - name: Deploy stack
         uses: govuk-one-login/github-actions/sam/deploy-stack@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024

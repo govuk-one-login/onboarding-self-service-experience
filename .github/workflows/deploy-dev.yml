@@ -16,11 +16,15 @@ permissions:
 jobs:
   build-frontend:
     # if: github.event_name == 'merge_group'
-    name: Build frontend
+    name: Deploy frontend
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: development
+      url: ${{ steps.push.outputs.pipeline-url }}
     outputs:
       artifact-name: ${{ steps.build.outputs.artifact-name }}
-      artifact-id: ${{ steps.build.outputs.artifact-id }}
+      pipeline-url: ${{ steps.push.outputs.pipeline-url }}
     steps:
       - name: Pull repository
         id: checkout
@@ -31,22 +35,6 @@ jobs:
         uses: ./.github/actions/build-frontend
         with:
           artifact-name: frontend-build-development
-
-  push-frontend:
-    # if: github.event_name == 'merge_group'
-    name: Push frontend
-    needs: build-frontend
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    environment:
-      name: development
-      url: ${{ steps.push.outputs.pipeline-url }}
-    outputs:
-      pipeline-url: ${{ steps.push.outputs.pipeline-url }}
-    steps:
-      - name: Pull repository
-        id: checkout
-        uses: actions/checkout@v4
 
       - name: Push
         id: push
@@ -64,9 +52,13 @@ jobs:
     # if: github.event_name == 'merge_group'
     name: Build dynamodb
     runs-on: ubuntu-latest
+    environment:
+      name: development
+      url: ${{ steps.deploy.outputs.pipeline-url }}
     outputs:
       artifact-name: ${{ steps.build.outputs.artifact-name }}
       cache-key: ${{ steps.build.outputs.cache-key }}
+      pipeline-url: ${{ steps.deploy.outputs.pipeline-url }}
     steps:
       - name: Build
         id: build
@@ -79,17 +71,6 @@ jobs:
           artifact-name: backend-dynamodb-infrastructure
           pull-repository: true
 
-  deploy-dynamodb:
-    # if: github.event_name == 'merge_group'
-    name: Deploy dynamodb
-    needs: build-dynamo
-    runs-on: ubuntu-latest
-    environment:
-      name: development
-      url: ${{ steps.deploy.outputs.pipeline-url }}
-    outputs:
-      pipeline-url: ${{ steps.deploy.outputs.pipeline-url }}
-    steps:
       - name: Deploy
         id: deploy
         uses: govuk-one-login/github-actions/secure-pipelines/deploy-application@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
@@ -99,15 +80,19 @@ jobs:
           artifact-bucket-name: ${{ vars.DYNAMODB_DEPLOYMENT_ARTIFACTS_BUCKET }}
           signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
           pipeline-name: ${{ vars.DYNAMODB_PIPELINE_NAME }}
-          artifact-name: ${{ needs.build-dynamo.outputs.artifact-name }}
+          artifact-name: ${{ steps.build.outputs.artifact-name }}
 
   build-cognito:
     # if: github.event_name == 'merge_group'
     name: Build cognito
     runs-on: ubuntu-latest
+    environment:
+      name: development
+      url: ${{ steps.deploy.outputs.pipeline-url }}
     outputs:
       artifact-name: ${{ steps.build.outputs.artifact-name }}
       cache-key: ${{ steps.build.outputs.cache-key }}
+      pipeline-url: ${{ steps.deploy.outputs.pipeline-url }}
     steps:
       - name: Build
         id: build
@@ -121,17 +106,6 @@ jobs:
           artifact-name: backend-cognito-infrastructure
           pull-repository: true
 
-  deploy-cognito:
-    # if: github.event_name == 'merge_group'
-    name: Deploy cognito
-    needs: build-cognito
-    runs-on: ubuntu-latest
-    environment:
-      name: development
-      url: ${{ steps.deploy.outputs.pipeline-url }}
-    outputs:
-      pipeline-url: ${{ steps.deploy.outputs.pipeline-url }}
-    steps:
       - name: Deploy
         id: deploy
         uses: govuk-one-login/github-actions/secure-pipelines/deploy-application@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
@@ -141,15 +115,19 @@ jobs:
           artifact-bucket-name: ${{ vars.COGNITO_DEPLOYMENT_ARTIFACTS_BUCKET }}
           signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
           pipeline-name: ${{ vars.COGNITO_PIPELINE_NAME }}
-          artifact-name: ${{ needs.build-cognito.outputs.artifact-name }}
+          artifact-name: ${{ steps.build.outputs.artifact-name }}
 
   build-api:
     # if: github.event_name == 'merge_group'
-    name: Build api
+    name: Deploy API
     runs-on: ubuntu-latest
+    environment:
+      name: development
+      url: ${{ steps.deploy.outputs.pipeline-url }}
     outputs:
       artifact-name: ${{ steps.build.outputs.artifact-name }}
       cache-key: ${{ steps.build.outputs.cache-key }}
+      pipeline-url: ${{ steps.deploy.outputs.pipeline-url }}
     steps:
       - name: Build
         id: build
@@ -163,17 +141,6 @@ jobs:
           artifact-name: backend-api-infrastructure
           pull-repository: true
 
-  deploy-api:
-    # if: github.event_name == 'merge_group'
-    name: Deploy api
-    needs: build-api
-    runs-on: ubuntu-latest
-    environment:
-      name: development
-      url: ${{ steps.deploy.outputs.pipeline-url }}
-    outputs:
-      pipeline-url: ${{ steps.deploy.outputs.pipeline-url }}
-    steps:
       - name: Deploy
         id: deploy
         uses: govuk-one-login/github-actions/secure-pipelines/deploy-application@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
@@ -183,5 +150,5 @@ jobs:
           artifact-bucket-name: ${{ vars.API_DEPLOYMENT_ARTIFACTS_BUCKET }}
           signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
           pipeline-name: ${{ vars.API_PIPELINE_NAME }}
-          artifact-name: ${{ needs.build-api.outputs.artifact-name }}
+          artifact-name: ${{ steps.build.outputs.artifact-name }}
           template: .aws-sam/build/template.yml

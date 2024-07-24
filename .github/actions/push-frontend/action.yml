@@ -60,4 +60,3 @@ runs:
         dockerfile: infrastructure/frontend/Dockerfile
         template: infrastructure/frontend/frontend.template.yml
         artifact-name: ${{ inputs.artifact-name }}
-        artifact-path: express/dist
