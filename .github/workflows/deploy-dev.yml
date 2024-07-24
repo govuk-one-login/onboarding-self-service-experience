@@ -21,9 +21,6 @@ jobs:
     name: Deploy frontend
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    defaults:
-      run:
-        working-directory: express
     environment:
       name: development
       url: ${{ steps.push.outputs.pipeline-url }}
@@ -41,10 +38,6 @@ jobs:
         with:
           artifact-name: frontend-build-development
 
-      - name: List build assets
-        id: list
-        run: ls -lah express/
-
       - name: Push
         id: push
         uses: ./.github/actions/push-frontend
@@ -52,7 +45,7 @@ jobs:
           deployment-role-arn: ${{ vars.FRONTEND_DEPLOYMENT_ROLE_ARN }}
           artifact-bucket-name: ${{ vars.FRONTEND_DEPLOYMENT_ARTIFACTS_BUCKET }}
           pipeline-name: ${{ vars.FRONTEND_PIPELINE_NAME }}
-          artifact-name: ${{ needs.build-frontend.outputs.artifact-name }}
+          artifact-name: ${{ steps.build.outputs.artifact-name }}
           dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
           container-repository-name: ${{ vars.FRONTEND_CONTAINER_REPOSITORY_NAME }}
           test-container-repository-name: ${{ vars.FRONTEND_TEST_CONTAINER_REPOSITORY_NAME }}

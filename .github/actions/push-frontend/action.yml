@@ -58,6 +58,7 @@ runs:
         ecr-repository: ${{ inputs.container-repository-name }}
         pipeline-name: ${{ inputs.pipeline-name }}
         dockerfile: infrastructure/frontend/Dockerfile
+        docker-build-path: .
         template: infrastructure/frontend/frontend.template.yml
         artifact-name: ${{ inputs.artifact-name }}
         artifact-path: express/dist
