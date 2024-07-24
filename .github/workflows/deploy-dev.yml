@@ -9,6 +9,8 @@ on:
     branches:
       - main
 
+concurrency: deploy-development
+
 permissions:
   id-token: write
   contents: read
@@ -19,6 +21,9 @@ jobs:
     name: Deploy frontend
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: express
     environment:
       name: development
       url: ${{ steps.push.outputs.pipeline-url }}
@@ -35,6 +40,10 @@ jobs:
         uses: ./.github/actions/build-frontend
         with:
           artifact-name: frontend-build-development
+
+      - name: List build assets
+        id: list
+        run: ls -lah express/
 
       - name: Push
         id: push
@@ -151,4 +160,4 @@ jobs:
           signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
           pipeline-name: ${{ vars.API_PIPELINE_NAME }}
           artifact-name: ${{ steps.build.outputs.artifact-name }}
-          template: .aws-sam/build/template.yml
+          template: .aws-sam/build/template.yaml

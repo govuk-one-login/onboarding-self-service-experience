@@ -43,10 +43,4 @@ runs:
       with:
         name: ${{ inputs.artifact-name }}
         retention-days: 7
-        path: |
-          express/dist
-          express/resources
-          express/src/views
-          express/assets/images
-          express/package*.json
-          express/manifest.yml
+        path: express/dist
