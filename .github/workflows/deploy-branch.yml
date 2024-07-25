@@ -18,29 +18,9 @@ permissions:
   contents: read
 
 jobs:
-  build-frontend-dependencies:
-    if: contains(github.event.head_commit.message, '[deploy]') == true
-    name: Build frontend
-    runs-on: ubuntu-latest
-    environment:
-      name: demo
-    outputs:
-      artifact-name: ${{ steps.build.outputs.artifact-id }}
-    steps:
-      - name: Pull repository
-        id: checkout
-        uses: actions/checkout@v4
-
-      - name: Build
-        id: build
-        uses: ./.github/actions/build-frontend
-        with:
-          artifact-name: frontend-build-demo
-
   push-frontend-image:
     if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Push frontend image
-    needs: build-frontend-dependencies
     runs-on: ubuntu-latest
     environment:
       name: demo
@@ -64,31 +44,40 @@ jobs:
           repository: ${{ vars.FRONTEND_CONTAINER_REPOSITORY_NAME }}
           image-tags: "${{ github.head_ref || github.ref_name }}"
           dockerfile: infrastructure/frontend/Dockerfile
-          artifact-name: frontend-build-demo
-          artifact-path: dist
 
-  build-frontend-infrastructure:
+  deploy-frontend:
     if: contains(github.event.head_commit.message, '[deploy]') == true
-    name: Build frontend infrastructure
-    needs: push-frontend-image
+    name: Deploy frontend (demo)
+    needs: [ push-frontend-image ]
     runs-on: ubuntu-latest
+    outputs:
+      stack-name: ${{ steps.deploy.outputs.stack-name }}
+      stack-url: ${{ steps.deploy.outputs.stack-url }}
+      deployment-url: ${{ steps.get-deployment-url.outputs.url }}
     environment:
       name: demo
-    outputs:
-      template: ${{ steps.replace-placeholders.outputs.template }}
+      url: ${{ steps.get-deployment-url.outputs.url || steps.deploy.outputs.stack-url }}
     steps:
       - name: Pull repository
         id: checkout
         uses: actions/checkout@v4
 
-      - name: Replace placeholders
-        if: ${{ github.actor != 'dependabot[bot]' }}
-        id: replace-placeholders
+      - name: Get deployment name
+        id: get-deployment-name
+        uses: govuk-one-login/github-actions/beautify-branch-name@7d56b09b4d2a9a9c6005843d28f31a2333ad1373 # 13/03/2024
+        with:
+          length-limit: 22
+          prefix: preview
+          verbose: false
+
+      - name: Build
+        id: build
         env:
           TEMPLATE_FILE: infrastructure/frontend/frontend.template.yml
           IMAGE_URI: ${{ needs.push-frontend-image.outputs.image-uri }}
         run: |
-          sam build ${TEMPLATE_FILE:+--template $TEMPLATE_FILE}
+          sam build --cached \
+            ${TEMPLATE_FILE:+--template $TEMPLATE_FILE}
           echo "template=.aws-sam/build/template.yaml" >> "$GITHUB_OUTPUT"
 
           if grep -q "CONTAINER-IMAGE-PLACEHOLDER" .aws-sam/build/template.yaml; then
@@ -98,35 +87,8 @@ jobs:
             echo "WARNING!!! Image placeholder text \"CONTAINER-IMAGE-PLACEHOLDER\" not found - uploading template anyway"
           fi
 
-      - name: Archive distribution artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-infrastructure
-          retention-days: 7
-          path: .aws-sam/build
-
-  deploy-frontend:
-    if: contains(github.event.head_commit.message, '[deploy]') == true
-    name: Deploy frontend
-    needs: [ build-frontend-infrastructure, deploy-api, deploy-cognito, deploy-dynamodb ]
-    runs-on: ubuntu-latest
-    outputs:
-      stack-name: ${{ steps.deploy.outputs.stack-name }}
-      deployment-url: ${{ steps.get-deployment-url.outputs.url }}
-    environment:
-      name: demo
-      url: ${{ steps.get-deployment-url.outputs.url || steps.deploy.outputs.stack-url }}
-    steps:
-      - name: Get deployment name
-        uses: govuk-one-login/github-actions/beautify-branch-name@7d56b09b4d2a9a9c6005843d28f31a2333ad1373 # 13/03/2024
-        id: get-deployment-name
-        with:
-          length-limit: 22
-          prefix: preview
-          verbose: false
-
-      - name: Deploy stack
-        uses: govuk-one-login/github-actions/sam/deploy-stack@7d56b09b4d2a9a9c6005843d28f31a2333ad1373 # 13/03/2024
+      - name: Deploy
+        uses: govuk-one-login/github-actions/sam/deploy-stack@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
         id: deploy
         with:
           aws-role-arn: ${{ vars.DEPLOYMENT_ROLE_ARN }}
@@ -134,9 +96,7 @@ jobs:
           delete-failed-stack: true
           disable-rollback: false
           stack-name-prefix: preview-frontend
-          artifact-name: frontend-infrastructure
-          artifact-path: .aws-sam/build
-          template: ${{ needs.build-frontend-infrastructure.outputs.template }}
+          template: ${{ steps.build.outputs.template }}
           s3-prefix: sse-preview
           tags: |-
             sse:component=frontend
@@ -157,16 +117,26 @@ jobs:
           printf "🌐 Deployment URL\n%s" "$url" >> "$GITHUB_STEP_SUMMARY"
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
-  build-dynamodb:
+  deploy-dynamodb:
     if: contains(github.event.head_commit.message, '[deploy]') == true
-    name: Build dynamodb
+    name: Deploy dynamodb (demo)
     runs-on: ubuntu-latest
     environment:
       name: demo
+      url: ${{ steps.deploy.outputs.stack-url }}
     outputs:
-      artifact-name: ${{ steps.build.outputs.artifact-name }}
+      stack-name: ${{ steps.deploy.outputs.stack-name }}
+      stack-url: ${{ steps.deploy.outputs.stack-url }}
       cache-key: ${{ steps.build.outputs.cache-key }}
     steps:
+      - name: Get deployment name
+        uses: govuk-one-login/github-actions/beautify-branch-name@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
+        id: get-deployment-name
+        with:
+          length-limit: 22
+          prefix: preview
+          verbose: false
+
       - name: Build
         id: build
         uses: govuk-one-login/github-actions/sam/build-application@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
@@ -178,27 +148,7 @@ jobs:
           artifact-name: backend-dynamodb-infrastructure
           pull-repository: true
 
-  deploy-dynamodb:
-    if: contains(github.event.head_commit.message, '[deploy]') == true
-    name: Deploy dynamodb
-    needs: build-dynamodb
-    runs-on: ubuntu-latest
-    environment:
-      name: demo
-      url: ${{ steps.deploy.outputs.stack-url }}
-    outputs:
-      stack-name: ${{ steps.build.outputs.stack-name }}
-      stack-url: ${{ steps.build.outputs.stack-url }}
-    steps:
-      - name: Get deployment name
-        uses: govuk-one-login/github-actions/beautify-branch-name@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
-        id: get-deployment-name
-        with:
-          length-limit: 22
-          prefix: preview
-          verbose: false
-
-      - name: Deploy stack
+      - name: Deploy
         uses: govuk-one-login/github-actions/sam/deploy-stack@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
         id: deploy
         with:
@@ -207,10 +157,8 @@ jobs:
           delete-failed-stack: true
           disable-rollback: false
           stack-name-prefix: preview-dynamodb
-          artifact-name: ${{ needs.build-dynamodb.outputs.artifact-name }}
-          artifact-path: .aws-sam/build
           template: .aws-sam/build/template.yaml
-          cache-name: ${{ needs.build-dynamodb.outputs.cache-key }}
+          cache-name: ${{ steps.build.outputs.cache-key }}
           s3-prefix: sse-preview
           tags: |-
             sse:component=dynamodb
@@ -221,16 +169,26 @@ jobs:
           parameters: |-
             DeploymentName=${{ steps.get-deployment-name.outputs.pretty-branch-name }}
 
-  build-cognito:
+  deploy-cognito:
     if: contains(github.event.head_commit.message, '[deploy]') == true
-    name: Build cognito
+    name: Deploy cognito (demo)
     runs-on: ubuntu-latest
     environment:
       name: demo
+      url: ${{ steps.deploy.outputs.stack-url }}
     outputs:
-      artifact-name: ${{ steps.build.outputs.artifact-name }}
+      stack-name: ${{ steps.deploy.outputs.stack-name }}
+      stack-url: ${{ steps.deploy.outputs.stack-url }}
       cache-key: ${{ steps.build.outputs.cache-key }}
     steps:
+      - name: Get deployment name
+        uses: govuk-one-login/github-actions/beautify-branch-name@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
+        id: get-deployment-name
+        with:
+          length-limit: 22
+          prefix: preview
+          verbose: false
+
       - name: Build
         id: build
         uses: govuk-one-login/github-actions/sam/build-application@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
@@ -243,26 +201,6 @@ jobs:
           artifact-name: backend-cognito-infrastructure
           pull-repository: true
 
-  deploy-cognito:
-    if: contains(github.event.head_commit.message, '[deploy]') == true
-    name: Deploy cognito
-    needs: build-cognito
-    runs-on: ubuntu-latest
-    environment:
-      name: demo
-      url: ${{ steps.deploy.outputs.stack-url }}
-    outputs:
-      stack-name: ${{ steps.build.outputs.stack-name }}
-      stack-url: ${{ steps.build.outputs.stack-url }}
-    steps:
-      - name: Get deployment name
-        uses: govuk-one-login/github-actions/beautify-branch-name@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
-        id: get-deployment-name
-        with:
-          length-limit: 22
-          prefix: preview
-          verbose: false
-
       - name: Deploy stack
         uses: govuk-one-login/github-actions/sam/deploy-stack@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
         id: deploy
@@ -272,10 +210,8 @@ jobs:
           delete-failed-stack: true
           disable-rollback: false
           stack-name-prefix: preview-cognito
-          artifact-name: ${{ needs.build-cognito.outputs.artifact-name }}
-          artifact-path: .aws-sam/build
           template: .aws-sam/build/template.yaml
-          cache-name: ${{ needs.build-cognito.outputs.cache-key }}
+          cache-name: ${{ steps.build.outputs.cache-key }}
           s3-prefix: sse-preview
           tags: |-
             sse:component=cognito
@@ -286,16 +222,26 @@ jobs:
           parameters: |-
             DeploymentName=${{ steps.get-deployment-name.outputs.pretty-branch-name }}
 
-  build-api:
+  deploy-api:
     if: contains(github.event.head_commit.message, '[deploy]') == true
-    name: Build api
+    name: Deploy API (demo)
     runs-on: ubuntu-latest
     environment:
       name: demo
+      url: ${{ steps.deploy.outputs.stack-url }}
     outputs:
-      artifact-name: ${{ steps.build.outputs.artifact-name }}
+      stack-name: ${{ steps.deploy.outputs.stack-name }}
+      stack-url: ${{ steps.deploy.outputs.stack-url }}
       cache-key: ${{ steps.build.outputs.cache-key }}
     steps:
+      - name: Get deployment name
+        uses: govuk-one-login/github-actions/beautify-branch-name@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
+        id: get-deployment-name
+        with:
+          length-limit: 22
+          prefix: preview
+          verbose: false
+
       - name: Build
         id: build
         uses: govuk-one-login/github-actions/sam/build-application@6144f39407b01c9b25b39537b3956deca9e32620 # 22/02/2024
@@ -309,26 +255,6 @@ jobs:
           artifact-name: backend-api-infrastructure
           pull-repository: true
 
-  deploy-api:
-    if: contains(github.event.head_commit.message, '[deploy]') == true
-    name: Deploy api
-    needs: build-api
-    runs-on: ubuntu-latest
-    environment:
-      name: demo
-      url: ${{ steps.deploy.outputs.stack-url }}
-    outputs:
-      stack-name: ${{ steps.build.outputs.stack-name }}
-      stack-url: ${{ steps.build.outputs.stack-url }}
-    steps:
-      - name: Get deployment name
-        uses: govuk-one-login/github-actions/beautify-branch-name@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
-        id: get-deployment-name
-        with:
-          length-limit: 22
-          prefix: preview
-          verbose: false
-
       - name: Deploy stack
         uses: govuk-one-login/github-actions/sam/deploy-stack@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
         id: deploy
@@ -338,9 +264,8 @@ jobs:
           delete-failed-stack: true
           disable-rollback: false
           stack-name-prefix: preview-api
-          artifact-name: ${{ needs.build-api.outputs.artifact-name }}
           template: .aws-sam/build/template.yaml
-          cache-name: ${{ needs.build-api.outputs.cache-key }}
+          cache-name: ${{ steps.build.outputs.cache-key }}
           s3-prefix: sse-preview
           tags: |-
             sse:component=api
