@@ -16,9 +16,10 @@ permissions:
   contents: read
 
 jobs:
-  build-frontend:
-    # if: github.event_name == 'merge_group'
-    name: Deploy frontend
+  deploy-frontend:
+    if: github.event_name == 'merge_group'
+    name: Deploy Frontend (dev)
+    needs: [ deploy-api, deploy-cognito, deploy-dynamodb ]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment:
@@ -50,9 +51,9 @@ jobs:
           container-repository-name: ${{ vars.FRONTEND_CONTAINER_REPOSITORY_NAME }}
           test-container-repository-name: ${{ vars.FRONTEND_TEST_CONTAINER_REPOSITORY_NAME }}
 
-  build-dynamo:
-    # if: github.event_name == 'merge_group'
-    name: Build dynamodb
+  deploy-dynamodb:
+    if: github.event_name == 'merge_group'
+    name: Deploy Dynamodb (dev)
     runs-on: ubuntu-latest
     environment:
       name: development
@@ -84,9 +85,9 @@ jobs:
           pipeline-name: ${{ vars.DYNAMODB_PIPELINE_NAME }}
           artifact-name: ${{ steps.build.outputs.artifact-name }}
 
-  build-cognito:
-    # if: github.event_name == 'merge_group'
-    name: Build cognito
+  deploy-cognito:
+    if: github.event_name == 'merge_group'
+    name: Deploy Cognito (dev)
     runs-on: ubuntu-latest
     environment:
       name: development
@@ -119,9 +120,9 @@ jobs:
           pipeline-name: ${{ vars.COGNITO_PIPELINE_NAME }}
           artifact-name: ${{ steps.build.outputs.artifact-name }}
 
-  build-api:
-    # if: github.event_name == 'merge_group'
-    name: Deploy API
+  deploy-api:
+    if: github.event_name == 'merge_group'
+    name: Deploy API (dev)
     runs-on: ubuntu-latest
     environment:
       name: development

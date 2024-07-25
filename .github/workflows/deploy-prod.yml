@@ -14,14 +14,15 @@ permissions:
 
 jobs:
   deploy-frontend:
-    name: Deploy frontend
+    name: Deploy Frontend (prod)
+    needs: [ deploy-api, deploy-cognito, deploy-dynamodb ]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment:
       name: production
       url: ${{ steps.push.outputs.pipeline-url }}
     outputs:
-      artifact-name: ${{ steps.build.outputs.artifact-id }}
+      artifact-name: ${{ steps.build.outputs.artifact-name }}
       pipeline-url: ${{ steps.push.outputs.pipeline-url }}
     steps:
       - name: Pull repository
@@ -32,7 +33,7 @@ jobs:
         id: build
         uses: ./.github/actions/build-frontend
         with:
-          artifact-name: frontend-build-production
+          artifact-name: frontend-build-development
 
       - name: Push
         id: push
@@ -41,12 +42,13 @@ jobs:
           deployment-role-arn: ${{ vars.FRONTEND_DEPLOYMENT_ROLE_ARN }}
           artifact-bucket-name: ${{ vars.FRONTEND_DEPLOYMENT_ARTIFACTS_BUCKET }}
           pipeline-name: ${{ vars.FRONTEND_PIPELINE_NAME }}
+          artifact-name: ${{ steps.build.outputs.artifact-name }}
           dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
           container-repository-name: ${{ vars.FRONTEND_CONTAINER_REPOSITORY_NAME }}
           test-container-repository-name: ${{ vars.FRONTEND_TEST_CONTAINER_REPOSITORY_NAME }}
 
-  deploy-dynamo:
-    name: Build dynamodb
+  deploy-dynamodb:
+    name: Deploy Dynamodb (prod)
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -76,9 +78,10 @@ jobs:
           artifact-bucket-name: ${{ vars.DYNAMODB_DEPLOYMENT_ARTIFACTS_BUCKET }}
           signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
           pipeline-name: ${{ vars.DYNAMODB_PIPELINE_NAME }}
+          artifact-name: ${{ steps.build.outputs.artifact-name }}
 
   deploy-cognito:
-    name: Build cognito
+    name: Deploy Cognito (prod)
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -109,9 +112,10 @@ jobs:
           artifact-bucket-name: ${{ vars.COGNITO_DEPLOYMENT_ARTIFACTS_BUCKET }}
           signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
           pipeline-name: ${{ vars.COGNITO_PIPELINE_NAME }}
+          artifact-name: ${{ steps.build.outputs.artifact-name }}
 
   deploy-api:
-    name: Build api
+    name: Deploy API (prod)
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -128,7 +132,6 @@ jobs:
           template: backend/api/api.template.yml
           manifest: backend/api/package.json
           base-dir: backend/api
-          source-dir: backend/api
           additional-artifact-paths: backend/api/state-machines
           cache-name: backend-api-infra
           artifact-name: backend-api-infrastructure
@@ -143,4 +146,5 @@ jobs:
           artifact-bucket-name: ${{ vars.API_DEPLOYMENT_ARTIFACTS_BUCKET }}
           signing-profile-name: ${{ vars.SIGNING_PROFILE_NAME }}
           pipeline-name: ${{ vars.API_PIPELINE_NAME }}
-          template: ./aws-sam/build/template.yml
+          artifact-name: ${{ steps.build.outputs.artifact-name }}
+          template: .aws-sam/build/template.yaml
