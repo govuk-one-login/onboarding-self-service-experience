@@ -1,10 +1,6 @@
 name: "Build and push application"
 description: "Build the container and push the application through secure pipelines"
 inputs:
-  artifact-name:
-    description: "The artifact name where the build cache is stored"
-    required: true
-    default: frontend-build
   artifact-bucket-name:
     description: "The source bucket to push the deployment artifacts to"
     required: true
@@ -58,7 +54,4 @@ runs:
         ecr-repository: ${{ inputs.container-repository-name }}
         pipeline-name: ${{ inputs.pipeline-name }}
         dockerfile: infrastructure/frontend/Dockerfile
-        docker-build-path: .
         template: infrastructure/frontend/frontend.template.yml
-        artifact-name: ${{ inputs.artifact-name }}
-        artifact-path: express/dist

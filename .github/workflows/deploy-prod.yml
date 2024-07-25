@@ -4,7 +4,7 @@ run-name: Deploy to production [${{ github.head_ref || github.ref_name }}]
 on:
   push:
     branches:
-      - main-fake
+      - main
 
 concurrency: deploy-production
 
@@ -15,25 +15,17 @@ permissions:
 jobs:
   deploy-frontend:
     name: Deploy Frontend (prod)
-    needs: [ deploy-api, deploy-cognito, deploy-dynamodb ]
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     environment:
       name: production
       url: ${{ steps.push.outputs.pipeline-url }}
     outputs:
-      artifact-name: ${{ steps.build.outputs.artifact-name }}
       pipeline-url: ${{ steps.push.outputs.pipeline-url }}
     steps:
       - name: Pull repository
         id: checkout
         uses: actions/checkout@v4
-
-      - name: Build
-        id: build
-        uses: ./.github/actions/build-frontend
-        with:
-          artifact-name: frontend-build-development
 
       - name: Push
         id: push
@@ -42,7 +34,6 @@ jobs:
           deployment-role-arn: ${{ vars.FRONTEND_DEPLOYMENT_ROLE_ARN }}
           artifact-bucket-name: ${{ vars.FRONTEND_DEPLOYMENT_ARTIFACTS_BUCKET }}
           pipeline-name: ${{ vars.FRONTEND_PIPELINE_NAME }}
-          artifact-name: ${{ steps.build.outputs.artifact-name }}
           dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
           container-repository-name: ${{ vars.FRONTEND_CONTAINER_REPOSITORY_NAME }}
           test-container-repository-name: ${{ vars.FRONTEND_TEST_CONTAINER_REPOSITORY_NAME }}
@@ -50,6 +41,7 @@ jobs:
   deploy-dynamodb:
     name: Deploy Dynamodb (prod)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: production
       url: ${{ steps.deploy.outputs.pipeline-url }}
@@ -83,6 +75,7 @@ jobs:
   deploy-cognito:
     name: Deploy Cognito (prod)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: production
       url: ${{ steps.deploy.outputs.pipeline-url }}
@@ -117,6 +110,7 @@ jobs:
   deploy-api:
     name: Deploy API (prod)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment:
       name: production
       url: ${{ steps.deploy.outputs.pipeline-url }}

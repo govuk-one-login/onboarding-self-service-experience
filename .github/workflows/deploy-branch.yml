@@ -48,7 +48,7 @@ jobs:
   deploy-frontend:
     if: contains(github.event.head_commit.message, '[deploy]') == true
     name: Deploy frontend (demo)
-    needs: [ push-frontend-image, deploy-api, deploy-cognito, deploy-dynamodb ]
+    needs: [ push-frontend-image ]
     runs-on: ubuntu-latest
     outputs:
       stack-name: ${{ steps.deploy.outputs.stack-name }}
