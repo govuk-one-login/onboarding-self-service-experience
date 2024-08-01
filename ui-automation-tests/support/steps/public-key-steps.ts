@@ -35,6 +35,9 @@ RtlswrYQW59AfWQcdQIDAQAB
 const badPublicKey = `Ib3DQEBAQUAA4GNAD`.trim();
 
 const blankPublicKey = ``.trim();
+const badUrl = "invalidurl";
+const jwksUrl = "https://www.example.com/";
+const jwksUrl2 = "https://www.example2.com/";
 
 const keys = {
     "without headers": publicKey,
@@ -42,23 +45,20 @@ const keys = {
     "with extra text": publicKeyWithExtraText,
     "with different value": publicKey2,
     "with bad value": badPublicKey,
-    "with blank value": blankPublicKey
+    "with blank value": blankPublicKey,
+    "with valid url": jwksUrl,
+    "with different url": jwksUrl2,
+    "with bad url": badUrl
 };
 
-Given("they submit a valid public key {}", async function (keyValue) {
-    await enterTextIntoTextInput(this.page, keys[keyValue as keyof typeof keys], "serviceUserPublicKey");
+Given("they submit a jwks url {string}", async function (keyValue) {
+    await enterTextIntoTextInput(this.page, keys[keyValue as keyof typeof keys], "jwksUrl");
     await clickSubmitButton(this.page);
 });
 
-Given("they submit an invalid public key {}", async function (keyValue) {
+Given("they submit a public key {}", async function (keyValue) {
     await enterTextIntoTextInput(this.page, keys[keyValue as keyof typeof keys], "serviceUserPublicKey");
     await clickSubmitButton(this.page);
-});
-
-Then("they should see the public key they just entered", async function (this: TestContext) {
-    const publicKeySpan = await this.page.$("p#current-public-key");
-    const publicKey = await this.page.evaluate(element => element?.textContent, publicKeySpan);
-    assert.equal(publicKey?.replace(/\n/g, "").trim(), publicKey?.replace(/\n/g, ""));
 });
 
 Given("the public key has not been added yet by the user", async function (this: TestContext) {
@@ -66,14 +66,30 @@ Given("the public key has not been added yet by the user", async function (this:
     assert.equal(keyContainerContent?.trim(), "Not added yet");
 });
 
-Then("they are able see their full public key", async function (this: TestContext) {
+Then("they are able see their public key {string}", async function (this: TestContext, keyValue) {
     const keyContainerContent = await this.page.$eval("#publicKeyLong", element => element.textContent);
     const elementVisibility = await this.page.$eval("#publicKeyLong", element => element.checkVisibility());
     assert.equal(elementVisibility, true);
-    assert.equal(keyContainerContent, publicKey.replace(/\n/g, ""));
+    assert.equal(keyContainerContent, keys[keyValue as keyof typeof keys].replace(/\n/g, ""));
 });
 
-Then("they are able see the updated value for public key", async function (this: TestContext) {
+Then("their public key is prefilled {string}", async function (this: TestContext, keyValue) {
+    const keyContainerContent = await this.page.$eval("#serviceUserPublicKey", element => element.textContent);
+    const elementVisibility = await this.page.$eval("#serviceUserPublicKey", element => element.checkVisibility());
+    assert.equal(elementVisibility, true);
+    assert.equal(keyContainerContent, keys[keyValue as keyof typeof keys].replace(/\n/g, ""));
+});
+
+Then("they are able see their jwks url {string}", async function (this: TestContext, keyValue) {
     const keyContainerContent = await this.page.$eval("#publicKeyLong", element => element.textContent);
-    assert.equal(keyContainerContent, publicKey2.replace(/\n/g, ""));
+    const elementVisibility = await this.page.$eval("#publicKeyLong", element => element.checkVisibility());
+    assert.equal(elementVisibility, true);
+    assert.equal(keyContainerContent, keys[keyValue as keyof typeof keys].replace(/\n/g, ""));
+});
+
+Then("their jwks url is prefilled {string}", async function (this: TestContext, keyValue) {
+    const keyContainerContent = await this.page.$eval("#jwksUrl", element => element.getAttribute("value"));
+    const elementVisibility = await this.page.$eval("#jwksUrl", element => element.checkVisibility());
+    assert.equal(elementVisibility, true);
+    assert.equal(keyContainerContent, keys[keyValue as keyof typeof keys].replace(/\n/g, ""));
 });

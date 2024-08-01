@@ -1,8 +1,8 @@
 {% extends "layouts/form.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set pageTitle = "Enter public key" %}
 {% set backLinkPath %}
@@ -10,22 +10,48 @@
 {% endset %}
 {% set formCancelUrl = backLinkPath %}
 {% set formButtonText = "Confirm" %}
+{% set jwksUrlText = (jwksUrl if publicKeySource === 'JWKS' else '') %}
+{% set serviceUserPublicKeyText = (serviceUserPublicKey if publicKeySource === 'STATIC' else '') %}
 
 {% block formInputs %}
-  <main class="govuk-main-wrapper govuk-!-padding-top-7" id="main-content" role="main">
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-form-group">
-          <h1 class="govuk-label-wrapper">
-            <label class="govuk-label govuk-label--l" for="more-detail">
-              Enter public key
-            </label>
-          </h1>
-          {{ form.textAreaInput("", "serviceUserPublicKey", "") }}
-        </div>
-      </div>
+{% set jwksHtml %}
+{{ form.textInput("", "jwksUrl", "govuk-!-width-full", "", "url", "url",value=jwksUrlText) }}
+{% endset -%}
 
-  </div></div></main>
+{% set publicKeyHtml %}
+{{ form.textAreaInput("", "serviceUserPublicKey", "", serviceUserPublicKeyText) }}
+{% endset -%}
+
+{{ govukRadios({
+  name: "publicKeySource",
+  fieldset: {
+    legend: {
+      text: "Select a Key source",
+      isPageHeading: true,
+      classes: "govuk-fieldset__legend--l"
+    }
+  },
+  hint: {
+    text: "Select one option."
+  },
+  items: [
+    {
+      value: "JWKS",
+      text: "JWKs URL",
+      checked: (publicKeySource === 'JWKS'),
+      conditional: {
+        html: jwksHtml
+      }
+    },
+    {
+      value: "STATIC",
+      text: "Static Key",
+      checked: (publicKeySource === 'STATIC'),
+      conditional: {
+        html: publicKeyHtml
+      }
+    }
+  ]
+}) }}
 
 {% endblock %}
