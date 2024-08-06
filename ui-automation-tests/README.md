@@ -1,41 +1,52 @@
 # Acceptance tests
 
-We are using tools Gherkin and Cucumber, which allow non-technical stakeholders to understand and contribute to the testing process.
+These end-to-end tests are separated into acceptance and accessibility feature sets.
 
-## Use business language:
+### Test Container
 
-The acceptance test should be written in the language of the business domain. This makes the test easy to understand for non-technical stakeholders and allows for better collaboration between technical and non-technical team members.
+The acceptance tests are run from a test image see `tests.Dockerfile`. This image requires the following parameters to be passed to it can be run (these are passed automatically in CI pipelines):
 
-## Use the Gherkin Syntax:
+| Variable         | Description                                                                                           |
+| ---------------- | ----------------------------------------------------------------------------------------------------- |
+| CFN_AdminToolURL | The fully qualified URL endpoint for tests to run against.                                            |
+| TEST_ENVIRONMENT | Should be one of 'local' for developer and preview builds, or 'development' or 'build' for CI builds. |
 
-Use `Given`, `When`, `Then`, `And`
+See the guide on [build environments](https://govukverify.atlassian.net/wiki/spaces/DFA/pages/3962929695/Build+and+Deployment+processes) for more information.
 
-`Given` steps are used to describe the initial context of the system - the scene of the scenario.
+### Stubbing
 
-`When` steps are used to describe an event, or an action.
+The tests are designed to run across the full Self-Service application including all of the backing services.
 
-`Then` steps are used to describe an expected outcome, or result.
+Variables exist to allow some of these backing services to be stubbed out:
 
-Use `And` if you have successive Given’s, When’s, or Then’s.
+| Variable     | Default | Description                                                                                               |
+| ------------ | ------- | --------------------------------------------------------------------------------------------------------- |
+| STUB_API     | False   | Runs the frontend service along, stubbing out all backend services including the private API and cognito. |
+| USE_STUB_OTP | True    | Stubs the OTP validation for cognito, allowing bypassing mulit-factor requirements for test users.        |
 
-Use the `Background` and `Rule` in features to group set up steps together.
+## Running tests in CI
 
-## Avoid Technical Details:
+The acceptance end-to-end tests are run as part of the [secure pipelines test phase](https://govukverify.atlassian.net/wiki/x/IoAItg) in development and build environments.
 
-As these tests should be understandable by non-technical team members, avoid using technical language or details about how the system works. Focus on what the system should do, not how it does it.
+The accessibility tests are run manually as required.
 
-## Use Scenarios:
+**Note:** The test endpoints have restricted access and tests can only be run from the same AWS VPC that the endpoint is deployed into.
 
-Each scenario should represent a single piece of functionality or behavior. Keep scenarios as simple and independent as possible to make them easier to maintain and understand.
+## Running tests locally
 
-## Make it Measurable:
+Tests can be run against endpoints other than development and build by running locally whilst connected to the GDS VPN.
 
-The outcome in a `Then` statement should be measurable and should not require interpretation. Avoid vague words and describe the expected outcome clearly.
+### Prerequisites
 
-## Other:
+-   docker `v24.0.0`
 
-Use a directory structure if needed.
+### Run
 
-Use scenario outlines to reduce duplication in features.
+To run the tests locally, the endpoint variables must be set, the test image must be built, and then the container can be run...
 
-If possible test success scenarios in the error scenarios for the steps that come after.
+```
+docker run -t \
+  -e TEST_ENVIRONMENT='development' \
+  -e CFN_AdminToolURL='https://admin.development.sign-in.service.gov.uk' \
+  $(docker build --rm -f tests.Dockerfile --platform linux/amd64 -q .) /run-tests.sh
+```

@@ -33,11 +33,11 @@ process.env.SECURITY_CODE_TEXT_MESSAGE_TEMPLATE = templateId;
 
 import {toByteArray} from "base64-js";
 import {lambdaHandler} from "../../src/handlers/send-security-code-text-message";
-import {smsSenderTrigger} from "../mocks";
+import {mockLambdaContext, smsSenderTrigger} from "../mocks";
 
 describe("Custom SMS sender", () => {
     it("Send SMS with a security code", async () => {
-        await lambdaHandler(smsSenderTrigger(phoneNumber, encryptedCode));
+        await lambdaHandler(smsSenderTrigger(phoneNumber, encryptedCode), mockLambdaContext);
 
         expect(sendSms).toBeCalledTimes(1);
         expect(sendSms.mock.calls[0][0]).toBe(templateId);
@@ -52,6 +52,6 @@ describe("Custom SMS sender", () => {
     });
 
     it("Throw an error for missing code", async () => {
-        await expect(lambdaHandler(smsSenderTrigger(phoneNumber))).rejects.toThrow(/missing.*code/i);
+        await expect(lambdaHandler(smsSenderTrigger(phoneNumber), mockLambdaContext)).rejects.toThrow(/missing.*code/i);
     });
 });

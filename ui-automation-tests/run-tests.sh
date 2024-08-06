@@ -20,7 +20,7 @@ export ENVIRONMENT=${TEST_ENVIRONMENT:-}
 
 cd /app || exit
 
-printf "Running heartbeat check...\n"
+printf "Running heartbeat check against %s...\n" "$HOST"
 
 # shellcheck disable=SC2154
 status_code="$(curl --location --output /dev/null --write-out '%{http_code}\n' "$HOST")"
@@ -29,10 +29,10 @@ if [[ $status_code != "200" ]]; then
 fi
 printf "Endpoint ok\n"
 
-printf "Running e2e tests...\n"
+printf "Running e2e tests against %s...\n" "$HOST"
 exit_code=0
 
-if [[ $ENVIRONMENT =~ dev ]] || [[ $ENVIRONMENT =~ build ]]; then
+if [[ $ENVIRONMENT =~ local ]] || [[ $ENVIRONMENT =~ dev ]] || [[ $ENVIRONMENT =~ build ]]; then
   npm run acceptance-tests
   exit_code=$?
 

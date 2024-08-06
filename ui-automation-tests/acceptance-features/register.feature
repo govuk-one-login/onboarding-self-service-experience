@@ -116,10 +116,10 @@ Feature: Users can sign up to the self-service experience
       When they click on the "Slack channel" external link
       Then they should be directed to the URL "https://ukgovernmentdigital.slack.com/?redir=%2Farchives%2FC02AQUJ6WTC"
 
-    @ci @smoke
+    @ci
     Scenario: The user does not receive their email security and wants to contact the service via support form
       When they click on the "support form" link
-      Then they should be redirected to the "/contact-us?adminTool"
+      Then they should be redirected to the "/contact-us"
 
   Rule: The user tries to set a password when creating an account
     Background:
