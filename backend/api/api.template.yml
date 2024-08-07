@@ -104,7 +104,7 @@ Conditions:
 
 Globals:
   Function:
-    Timeout: 10
+    Timeout: 15
     Runtime: nodejs18.x
     PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
     VpcConfig:
