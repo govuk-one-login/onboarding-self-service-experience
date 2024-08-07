@@ -1,8 +1,9 @@
 import axios, {AxiosError, AxiosResponse} from "axios";
-import {UpdateClientPayload, updateClientInRegistryHandler} from "../../../src/handlers/auth/update-client";
+import {UpdateClientPayload, updateClientInRegistryHandler, logger} from "../../../src/handlers/auth/update-client";
+import {mockLambdaContext} from "../utils";
 
 const postRequest = async (data: UpdateClientPayload): Promise<string> => {
-    const result = await updateClientInRegistryHandler(data);
+    const result = await updateClientInRegistryHandler(data, mockLambdaContext);
     return JSON.stringify(result);
 };
 
@@ -24,7 +25,7 @@ describe("exercise update-client api", () => {
 
     beforeEach(() => {
         axiosPutStub = jest.spyOn(axios, "put");
-        consoleErrorStub = jest.spyOn(console, "error");
+        consoleErrorStub = jest.spyOn(logger, "error");
     });
 
     afterEach(() => {
@@ -56,7 +57,7 @@ describe("exercise update-client api", () => {
         axiosPutStub.mockRejectedValue(axiosError);
 
         await expect(postRequest(updateClientRequest)).rejects.toThrow(AxiosError);
-        expect(consoleErrorStub).toHaveBeenCalledWith('Client registry request failed with response: "400" and message "Invalid Request"');
+        expect(consoleErrorStub).toHaveBeenCalledWith("Client registry request failed with response.", axiosError);
     });
 
     it("should throw an non axios error", async () => {

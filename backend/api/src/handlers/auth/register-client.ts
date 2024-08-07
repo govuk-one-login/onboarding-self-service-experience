@@ -1,5 +1,10 @@
-import {APIGatewayProxyResult} from "aws-lambda";
+import {Context, APIGatewayProxyResult} from "aws-lambda";
 import axios from "axios";
+import {Logger} from "@aws-lambda-powertools/logger";
+
+export const logger = new Logger({
+    serviceName: "self-service-experience"
+});
 
 export type RegisterClientPayload = {
     service: {
@@ -14,7 +19,9 @@ const public_key =
 
 // Handler is invoked by step function not API Gateway
 //The event type is not APIGatewayProxyEvent but the custom JSON payload from the step function invoke
-export const registerClientHandler = async (event: RegisterClientPayload): Promise<APIGatewayProxyResult> => {
+export const registerClientHandler = async (event: RegisterClientPayload, context: Context): Promise<APIGatewayProxyResult> => {
+    logger.addContext(context);
+
     const redirect_uris = ["http://localhost/"];
     const scopes = ["openid", "email", "phone"];
     const subject_type = "pairwise";
@@ -35,12 +42,18 @@ export const registerClientHandler = async (event: RegisterClientPayload): Promi
     };
 
     const url = process.env.AUTH_REGISTRATION_BASE_URL + "/connect/register";
-    const result = await axios.post(url, JSON.stringify(clientConfig), {
-        headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": process.env.AUTH_API_KEY as string
-        }
-    });
+    const result = await axios
+        .post(url, JSON.stringify(clientConfig), {
+            headers: {
+                "Content-Type": "application/json",
+                "X-API-Key": process.env.AUTH_API_KEY as string
+            }
+        })
+        .catch(error => {
+            logger.error("Client registry request failed with response.", error as Error);
+            throw error;
+        });
+
     const body = {...clientConfig, ...result.data, ...event};
 
     return {

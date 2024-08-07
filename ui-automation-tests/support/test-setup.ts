@@ -118,7 +118,7 @@ BeforeAll({timeout: 60 * 1000}, async function () {
     const host = process.env.HOST ?? "http://localhost:3000";
     console.log(`Running tests against ${host}`);
     browser = await puppeteer.launch({
-        headless: !process.env.SHOW_BROWSER,
+        headless: true,
         args: ["--no-sandbox"]
     });
     console.log("Puppeteer launched...");
@@ -145,7 +145,11 @@ BeforeAll({timeout: 60 * 1000}, async function () {
     await enterTextIntoTextInput(page, servicename, "serviceName");
     await clickSubmitButton(page, 60000);
 
-    console.log("Test setup completed, running tests...");
+    if ((await page.title()) === "Client details - GOV.UK One Login") {
+        console.log("Test setup completed, running tests...");
+    } else {
+        throw new Error("Test setup incomplete.");
+    }
 });
 
 Before(async function (this: TestContext) {

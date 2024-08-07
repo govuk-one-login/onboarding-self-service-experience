@@ -1,5 +1,10 @@
-import {APIGatewayProxyResult} from "aws-lambda";
-import axios, {AxiosResponse, isAxiosError} from "axios";
+import {Context, APIGatewayProxyResult} from "aws-lambda";
+import axios, {AxiosResponse} from "axios";
+import {Logger} from "@aws-lambda-powertools/logger";
+
+export const logger = new Logger({
+    serviceName: "self-service-experience"
+});
 
 export type UpdateClientPayload = {
     clientId: string;
@@ -10,8 +15,9 @@ export type UpdateClientPayload = {
 
 // Handler is invoked by step function not API Gateway
 //The event type is not APIGatewayProxyEvent but the custom JSON payload from the step function invokes
-export const updateClientInRegistryHandler = async (event: UpdateClientPayload): Promise<APIGatewayProxyResult> => {
-    console.log("Update client request received");
+export const updateClientInRegistryHandler = async (event: UpdateClientPayload, context: Context): Promise<APIGatewayProxyResult> => {
+    logger.addContext(context);
+
     const url = process.env.AUTH_REGISTRATION_BASE_URL + "/connect/register/" + event.clientId;
 
     if (event.updates.hasOwnProperty("service_name")) {
@@ -28,11 +34,7 @@ export const updateClientInRegistryHandler = async (event: UpdateClientPayload):
         })
         .then(handleResponse(event))
         .catch(error => {
-            if (isAxiosError(error)) {
-                console.error(
-                    `Client registry request failed with response: "${error.response?.status}" and message "${error.response?.data}"`
-                );
-            }
+            logger.error("Client registry request failed with response.", error as Error);
             throw error;
         });
 
