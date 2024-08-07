@@ -90,16 +90,21 @@ export default class CognitoClient implements CognitoInterface {
                 .padStart(6, "0");
         }
 
-        await this.sendCommand(AdminCreateUserCommand, {
-            DesiredDeliveryMediums: ["EMAIL"],
-            Username: cognitoUserName,
-            UserPoolId: this.userPoolId,
-            TemporaryPassword: temporaryPassword,
-            UserAttributes: [
-                {Name: "email", Value: cognitoUserName},
-                {Name: "custom:signup_status", Value: ""}
-            ]
-        });
+        try {
+            await this.sendCommand(AdminCreateUserCommand, {
+                DesiredDeliveryMediums: ["EMAIL"],
+                Username: cognitoUserName,
+                UserPoolId: this.userPoolId,
+                TemporaryPassword: temporaryPassword,
+                UserAttributes: [
+                    {Name: "email", Value: cognitoUserName},
+                    {Name: "custom:signup_status", Value: ""}
+                ]
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async recoverUser(email: string): Promise<void> {
@@ -107,19 +112,24 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
 
-        await this.sendCommand(AdminCreateUserCommand, {
-            DesiredDeliveryMediums: ["EMAIL"],
-            MessageAction: "SUPPRESS",
-            Username: cognitoUserName,
-            UserPoolId: this.userPoolId,
-            TemporaryPassword: Math.floor(Math.random() * 100_000)
-                .toString()
-                .padStart(6, "0"),
-            UserAttributes: [
-                {Name: "email", Value: cognitoUserName},
-                {Name: "custom:signup_status", Value: "HasEmail,HasPassword,HasPhoneNumber,HasTextCode"}
-            ]
-        });
+        try {
+            await this.sendCommand(AdminCreateUserCommand, {
+                DesiredDeliveryMediums: ["EMAIL"],
+                MessageAction: "SUPPRESS",
+                Username: cognitoUserName,
+                UserPoolId: this.userPoolId,
+                TemporaryPassword: Math.floor(Math.random() * 100_000)
+                    .toString()
+                    .padStart(6, "0"),
+                UserAttributes: [
+                    {Name: "email", Value: cognitoUserName},
+                    {Name: "custom:signup_status", Value: "HasEmail,HasPassword,HasPhoneNumber,HasTextCode"}
+                ]
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async resendEmailAuthCode(email: string): Promise<void> {
@@ -136,14 +146,19 @@ export default class CognitoClient implements CognitoInterface {
                 .padStart(6, "0");
         }
 
-        await this.sendCommand(AdminCreateUserCommand, {
-            DesiredDeliveryMediums: ["EMAIL"],
-            Username: cognitoUserName,
-            UserPoolId: this.userPoolId,
-            MessageAction: "RESEND",
-            TemporaryPassword: temporaryPassword,
-            UserAttributes: [{Name: "email", Value: cognitoUserName}]
-        });
+        try {
+            await this.sendCommand(AdminCreateUserCommand, {
+                DesiredDeliveryMediums: ["EMAIL"],
+                Username: cognitoUserName,
+                UserPoolId: this.userPoolId,
+                MessageAction: "RESEND",
+                TemporaryPassword: temporaryPassword,
+                UserAttributes: [{Name: "email", Value: cognitoUserName}]
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
@@ -163,15 +178,25 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async globalSignOut(accessToken: string): Promise<AdminInitiateAuthCommandOutput> {
-        return await this.sendCommand(GlobalSignOutCommand, {
-            AccessToken: accessToken
-        });
+        try {
+            return await this.sendCommand(GlobalSignOutCommand, {
+                AccessToken: accessToken
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async getUser(accessToken: string): Promise<AdminInitiateAuthCommandOutput> {
-        return await this.sendCommand(GetUserCommand, {
-            AccessToken: accessToken
-        });
+        try {
+            return await this.sendCommand(GetUserCommand, {
+                AccessToken: accessToken
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
@@ -193,11 +218,16 @@ export default class CognitoClient implements CognitoInterface {
     async changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<void> {
         console.info("In CognitoClient:changePassword()");
 
-        await this.sendCommand(ChangePasswordCommand, {
-            AccessToken: accessToken,
-            PreviousPassword: previousPassword,
-            ProposedPassword: proposedPassword
-        });
+        try {
+            await this.sendCommand(ChangePasswordCommand, {
+                AccessToken: accessToken,
+                PreviousPassword: previousPassword,
+                ProposedPassword: proposedPassword
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async forgotPassword(email: string, protocol: string, host: string, useRecoveredAccountURL: boolean): Promise<void> {
@@ -205,16 +235,21 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
 
-        await this.sendCommand(ForgotPasswordCommand, {
-            ClientId: this.clientId,
-            Username: cognitoUserName,
-            ClientMetadata: {
-                protocol,
-                host: host.split("").join("/"),
-                username: cognitoUserName,
-                use_recovered_account_url: useRecoveredAccountURL ? "true" : "false"
-            }
-        });
+        try {
+            await this.sendCommand(ForgotPasswordCommand, {
+                ClientId: this.clientId,
+                Username: cognitoUserName,
+                ClientMetadata: {
+                    protocol,
+                    host: host.split("").join("/"),
+                    username: cognitoUserName,
+                    use_recovered_account_url: useRecoveredAccountURL ? "true" : "false"
+                }
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async confirmForgotPassword(emailAddress: string, password: string, confirmationCode: string): Promise<void> {
@@ -222,15 +257,20 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
-        await this.sendCommand(ConfirmForgotPasswordCommand, {
-            ClientId: this.clientId,
-            Username: cognitoUserName,
-            Password: password,
-            ConfirmationCode: confirmationCode,
-            ClientMetadata: {
-                email: cognitoUserName
-            }
-        });
+        try {
+            await this.sendCommand(ConfirmForgotPasswordCommand, {
+                ClientId: this.clientId,
+                Username: cognitoUserName,
+                Password: password,
+                ConfirmationCode: confirmationCode,
+                ClientMetadata: {
+                    email: cognitoUserName
+                }
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async setUserPassword(emailAddress: string, password: string): Promise<void> {
@@ -238,12 +278,17 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
-        await this.sendCommand(AdminSetUserPasswordCommand, {
-            Password: password,
-            Permanent: true,
-            Username: cognitoUserName,
-            UserPoolId: this.userPoolId
-        });
+        try {
+            await this.sendCommand(AdminSetUserPasswordCommand, {
+                Password: password,
+                Permanent: true,
+                Username: cognitoUserName,
+                UserPoolId: this.userPoolId
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async setEmailAsVerified(email: string): Promise<void> {
@@ -251,16 +296,21 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
 
-        await this.sendCommand(AdminUpdateUserAttributesCommand, {
-            UserPoolId: this.userPoolId,
-            Username: cognitoUserName,
-            UserAttributes: [
-                {
-                    Name: "email_verified",
-                    Value: "true"
-                }
-            ]
-        });
+        try {
+            await this.sendCommand(AdminUpdateUserAttributesCommand, {
+                UserPoolId: this.userPoolId,
+                Username: cognitoUserName,
+                UserAttributes: [
+                    {
+                        Name: "email_verified",
+                        Value: "true"
+                    }
+                ]
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async setSignUpStatus(emailAddress: string, status: string): Promise<void> {
@@ -268,16 +318,21 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
-        await this.sendCommand(AdminUpdateUserAttributesCommand, {
-            UserPoolId: this.userPoolId,
-            Username: cognitoUserName,
-            UserAttributes: [
-                {
-                    Name: "custom:signup_status",
-                    Value: status
-                }
-            ]
-        });
+        try {
+            await this.sendCommand(AdminUpdateUserAttributesCommand, {
+                UserPoolId: this.userPoolId,
+                Username: cognitoUserName,
+                UserAttributes: [
+                    {
+                        Name: "custom:signup_status",
+                        Value: status
+                    }
+                ]
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async adminGetUserCommandOutput(emailAddress: string): Promise<AdminGetUserCommandOutput> {
@@ -298,16 +353,21 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
-        await this.sendCommand(AdminUpdateUserAttributesCommand, {
-            UserPoolId: this.userPoolId,
-            Username: cognitoUserName,
-            UserAttributes: [
-                {
-                    Name: "phone_number_verified",
-                    Value: "true"
-                }
-            ]
-        });
+        try {
+            await this.sendCommand(AdminUpdateUserAttributesCommand, {
+                UserPoolId: this.userPoolId,
+                Username: cognitoUserName,
+                UserAttributes: [
+                    {
+                        Name: "phone_number_verified",
+                        Value: "true"
+                    }
+                ]
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async setPhoneNumber(emailAddress: string, phoneNumber: string): Promise<void> {
@@ -315,25 +375,35 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
-        await this.sendCommand(AdminUpdateUserAttributesCommand, {
-            UserPoolId: this.userPoolId,
-            Username: cognitoUserName,
-            UserAttributes: [
-                {
-                    Name: "phone_number",
-                    Value: phoneNumber
-                }
-            ]
-        });
+        try {
+            await this.sendCommand(AdminUpdateUserAttributesCommand, {
+                UserPoolId: this.userPoolId,
+                Username: cognitoUserName,
+                UserAttributes: [
+                    {
+                        Name: "phone_number",
+                        Value: phoneNumber
+                    }
+                ]
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async sendMobileNumberVerificationCode(accessToken: string): Promise<void> {
         console.info("In CognitoClient:sendMobileNumberVerification()");
 
-        await this.sendCommand(GetUserAttributeVerificationCodeCommand, {
-            AccessToken: accessToken,
-            AttributeName: "phone_number"
-        });
+        try {
+            await this.sendCommand(GetUserAttributeVerificationCodeCommand, {
+                AccessToken: accessToken,
+                AttributeName: "phone_number"
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     /**
@@ -345,11 +415,16 @@ export default class CognitoClient implements CognitoInterface {
         if (isFixedOTPCredential(emailAddress)) {
             verifyMobileUsingOTPCode(emailAddress, code);
         } else {
-            await this.sendCommand(VerifyUserAttributeCommand, {
-                AccessToken: accessToken,
-                AttributeName: "phone_number",
-                Code: code
-            });
+            try {
+                await this.sendCommand(VerifyUserAttributeCommand, {
+                    AccessToken: accessToken,
+                    AttributeName: "phone_number",
+                    Code: code
+                });
+            } catch (error) {
+                console.error(error as Error);
+                throw error;
+            }
         }
     }
 
@@ -358,14 +433,19 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(userName);
 
-        await this.sendCommand(AdminSetUserMFAPreferenceCommand, {
-            SMSMfaSettings: {
-                Enabled: true,
-                PreferredMfa: true
-            },
-            Username: cognitoUserName,
-            UserPoolId: this.userPoolId
-        });
+        try {
+            await this.sendCommand(AdminSetUserMFAPreferenceCommand, {
+                SMSMfaSettings: {
+                    Enabled: true,
+                    PreferredMfa: true
+                },
+                Username: cognitoUserName,
+                UserPoolId: this.userPoolId
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async resetMfaPreference(username: string): Promise<void> {
@@ -373,13 +453,18 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(username);
 
-        await this.sendCommand(AdminSetUserMFAPreferenceCommand, {
-            SMSMfaSettings: {
-                Enabled: false
-            },
-            Username: cognitoUserName,
-            UserPoolId: this.userPoolId
-        });
+        try {
+            await this.sendCommand(AdminSetUserMFAPreferenceCommand, {
+                SMSMfaSettings: {
+                    Enabled: false
+                },
+                Username: cognitoUserName,
+                UserPoolId: this.userPoolId
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     respondToMfaChallenge(emailAddress: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
