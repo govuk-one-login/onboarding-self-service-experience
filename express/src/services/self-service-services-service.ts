@@ -82,18 +82,25 @@ export default class SelfServiceServicesService {
     async login(email: string, password: string): Promise<MfaResponse> {
         console.info("In self-service-services-service:login()");
 
-        const response = await this.cognito.login(email, password);
+        try {
+            const response = await this.cognito.login(email, password);
 
-        return {
-            cognitoSession: nonNull(response.Session),
-            cognitoId: nonNull(response.ChallengeParameters?.USER_ID_FOR_SRP),
-            codeSentTo: nonNull(response.ChallengeParameters?.CODE_DELIVERY_DESTINATION)
-        };
+            return {
+                cognitoSession: nonNull(response.Session),
+                cognitoId: nonNull(response.ChallengeParameters?.USER_ID_FOR_SRP),
+                codeSentTo: nonNull(response.ChallengeParameters?.CODE_DELIVERY_DESTINATION)
+            };
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async putUser(user: OnboardingTableItem, accessToken: string): Promise<void> {
         console.info("In self-service-services-service:putUser()");
+
         await this.validateToken(accessToken, "putUser");
+
         return this.lambda.putUser(user, accessToken);
     }
 

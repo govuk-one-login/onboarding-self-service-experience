@@ -25,7 +25,12 @@ export default class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async putUser(user: OnboardingTableItem, accessToken: string): Promise<void> {
-        await this.post("/put-user", user, accessToken);
+        try {
+            await this.post("/put-user", user, accessToken);
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     getUserByCognitoId(cognitoId: string, accessToken: string): Promise<AxiosResponse> {
@@ -39,7 +44,12 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             userEmail: email
         };
 
-        await this.post("/new-service", JSON.stringify(body), accessToken);
+        try {
+            await this.post("/new-service", JSON.stringify(body), accessToken);
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     generateClient(service: Service, authenticationResult: AuthenticationResultType): Promise<AxiosResponse> {
@@ -66,7 +76,12 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             updates: updates
         };
 
-        await this.post(`/update-client`, JSON.stringify(body), accessToken);
+        try {
+            await this.post(`/update-client`, JSON.stringify(body), accessToken);
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async updateService(
@@ -84,7 +99,12 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             updates: updates
         };
 
-        await this.post(`/update-service`, JSON.stringify(body), accessToken);
+        try {
+            await this.post(`/update-service`, JSON.stringify(body), accessToken);
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     listServices(userId: string): Promise<AxiosResponse> {
@@ -103,11 +123,21 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             updates: updates
         };
 
-        await this.post("/update-user", JSON.stringify(body), accessToken);
+        try {
+            await this.post("/update-user", JSON.stringify(body), accessToken);
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async sendTxMALog(message: TxMAEvent) {
-        await this.post("/txma-logging", message);
+        try {
+            await this.post("/txma-logging", message);
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async getDynamoDBEntries(userEmail: string): Promise<AxiosResponse> {
@@ -116,7 +146,12 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         const endPoint: string = "/get-dynamodb-entries/" + userEmail;
         console.log("EndPoint => " + endPoint);
 
-        return await this.get(endPoint);
+        try {
+            return await this.get(endPoint);
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async deleteClientEntries(userID: string, serviceID: string): Promise<void> {
@@ -127,7 +162,12 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             serviceId: serviceID
         };
 
-        await this.post("/delete-dynamodb-client-entries/", JSON.stringify(body));
+        try {
+            await this.post("/delete-dynamodb-client-entries/", JSON.stringify(body));
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     async deleteServiceEntries(serviceID: string): Promise<void> {
@@ -137,7 +177,12 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             serviceId: serviceID
         };
 
-        await this.post("/delete-dynamodb-service-entries/", JSON.stringify(body));
+        try {
+            await this.post("/delete-dynamodb-service-entries/", JSON.stringify(body));
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
     }
 
     globalSignOut(userEmail: string): Promise<AxiosResponse> {
