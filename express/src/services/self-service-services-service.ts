@@ -82,7 +82,12 @@ export default class SelfServiceServicesService {
     async login(email: string, password: string): Promise<MfaResponse> {
         console.info("In self-service-services-service:login()");
 
-        const response = await this.cognito.login(email, password);
+        try {
+            const response = await this.cognito.login(email, password);
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
 
         return {
             cognitoSession: nonNull(response.Session),
@@ -93,7 +98,9 @@ export default class SelfServiceServicesService {
 
     async putUser(user: OnboardingTableItem, accessToken: string): Promise<void> {
         console.info("In self-service-services-service:putUser()");
+
         await this.validateToken(accessToken, "putUser");
+
         return this.lambda.putUser(user, accessToken);
     }
 
