@@ -82,6 +82,7 @@ describe("processGetEmailForm controller tests", () => {
 
         await processGetEmailForm(mockReq, mockRes, mockNext);
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
+        expect(mockReq.session.save).toHaveBeenCalled();
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/enter-email-code");
     });
 
@@ -106,6 +107,7 @@ describe("processGetEmailForm controller tests", () => {
         await processGetEmailForm(mockReq, mockRes, mockNext);
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(s4SignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
+        expect(mockReq.session.save).toHaveBeenCalled();
         expect(console.info).toHaveBeenCalledWith("Processing No HasEMail");
         expect(mockRes.redirect).toHaveBeenCalledWith("resume-before-password");
     });
@@ -134,6 +136,7 @@ describe("processGetEmailForm controller tests", () => {
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(s4SignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(console.info).toHaveBeenCalledWith("Processing No HasPassword");
+        expect(mockReq.session.save).toHaveBeenCalled();
         expect(mockRes.redirect).toHaveBeenCalledWith("resume-before-password");
     });
 
@@ -162,6 +165,7 @@ describe("processGetEmailForm controller tests", () => {
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(s4SignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(console.info).toHaveBeenCalledWith("Processing No HasPhoneNumber");
+        expect(mockReq.session.save).toHaveBeenCalled();
         expect(mockRes.redirect).toHaveBeenCalledWith("resume-after-password");
     });
 
@@ -190,6 +194,7 @@ describe("processGetEmailForm controller tests", () => {
         await processGetEmailForm(mockReq, mockRes, mockNext);
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(s4SignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
+        expect(mockReq.session.save).toHaveBeenCalled();
         expect(console.info).toHaveBeenCalledWith("Processing No HasTextCode");
         expect(mockRes.redirect).toHaveBeenCalledWith("resume-after-password");
     });
@@ -207,6 +212,7 @@ describe("processGetEmailForm controller tests", () => {
 
         await expect(processGetEmailForm(mockReq, mockRes, mockNext)).rejects.toThrow();
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
+        expect(mockReq.session.save).toHaveBeenCalled();
         expect(s4SignUpStatusSpy).not.toHaveBeenCalled();
     });
 });

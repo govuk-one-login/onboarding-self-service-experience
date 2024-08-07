@@ -19,6 +19,7 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
     console.info("In ProcessGetEmailForm");
 
     req.session.emailAddress = emailAddress;
+    req.session.save();
 
     try {
         await s4.createUser(emailAddress);
