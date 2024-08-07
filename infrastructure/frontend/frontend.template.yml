@@ -146,6 +146,7 @@ Conditions:
   CslsLoggingEnabled: !Equals [ true, !FindInMap [ EnvironmentConfiguration, !Ref Environment, cslsLoggingEnabled ] ]
   DynatraceLoggingEnabled: !Equals [ true, !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ] ]
   IsLocal: !Equals [ !Ref Environment, "local" ]
+  IsNotLocal: !Not [ !Equals [ !Ref Environment, "local" ] ]
   IsProd: !Equals [ !Ref Environment, "production" ]
 
 Resources:
@@ -431,7 +432,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
       PropagateTags: SERVICE
       LaunchType: FARGATE
-      DesiredCount: 1
+      DesiredCount: !If [ IsNotLocal, "2", "1" ]
       LoadBalancers:
         - ContainerName: self-service-frontend
           ContainerPort: !Ref ContainerPort
