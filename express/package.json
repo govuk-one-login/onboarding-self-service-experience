@@ -29,7 +29,7 @@
     "express-session": "^1.17.3",
     "googleapis": "^128.0.0",
     "googleapis-common": "^7.2.0",
-    "govuk-frontend": "^4.8.0",
+    "govuk-frontend": "^5.4.1",
     "helmet": "^7.0.0",
     "nunjucks": "^3.2.3"
   },
