@@ -24,7 +24,6 @@ export const sendSQSMessageToTxMAHandler = async (event: APIGatewayProxyEvent): 
         try {
             const data = await client.send(new SendMessageCommand(messageParams));
             if (data) {
-                console.log(JSON.stringify(payload));
                 const bodyMessage = "Message Send to SQS - Here is MessageId: " + data.MessageId;
                 response = {
                     statusCode: 200,
