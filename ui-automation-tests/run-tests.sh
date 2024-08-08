@@ -32,7 +32,7 @@ printf "Endpoint ok\n"
 printf "Running e2e tests against %s...\n" "$HOST"
 exit_code=0
 
-if [[ $ENVIRONMENT =~ local ]] || [[ $ENVIRONMENT =~ dev ]] || [[ $ENVIRONMENT =~ build ]]; then
+if [[ $ENVIRONMENT =~ local ]] || [[ $ENVIRONMENT =~ dev ]] || [[ $ENVIRONMENT =~ demo ]]; then
   npm run acceptance-tests
   exit_code=$?
 
