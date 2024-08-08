@@ -14,9 +14,9 @@
     "@aws-sdk/client-sns": "^3.609.0",
     "@aws-sdk/client-sqs": "^3.609.0",
     "@aws-sdk/client-dynamodb": "^3.609.0",
-    "@aws-sdk/util-dynamodb": "^3.609.0",
+    "@aws-sdk/util-dynamodb": "^3.624.0",
     "@aws-lambda-powertools/logger": "2.6.0",
-    "axios": "^1.7.2",
+    "axios": "^1.7.3",
     "esbuild": "^0.23.0",
     "sinon": "^17.0.1"
   },
