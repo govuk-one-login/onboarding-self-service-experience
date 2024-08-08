@@ -44,12 +44,14 @@ export const mockCognitoInterface = {
     globalSignOut: jest.fn()
 };
 
-export const request = (properties?: Partial<Request> | Record<string, unknown>) =>
-    ({
+export const request = (properties?: Partial<Request> | Record<string, unknown>) => {
+    const session = properties?.session;
+    delete properties?.session;
+    return {
         body: {},
         session: {
             save: jest.fn(),
-            ...(properties?.session as Partial<Request["session"]>)
+            ...(session as Partial<Request["session"]>)
         },
         app: {
             get: (keyName: string) => {
@@ -58,7 +60,8 @@ export const request = (properties?: Partial<Request> | Record<string, unknown>)
         },
         params: {},
         ...properties
-    } as Request);
+    } as Request;
+};
 
 export const response = (properties?: Partial<Response>) =>
     ({render: jest.fn(), redirect: jest.fn(), locals: {}, ...properties} as Partial<Response> as Response);
