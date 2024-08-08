@@ -44,7 +44,7 @@ Feature: A page where users can view and change the details associated with thei
       And they should see the text "The code you entered is not correct or has expired - enter it again or request a new code"
 
     # TODO this test doesn't check the resending of the phone code
-    @ci @smoke
+    @ci
     Scenario: The user needs a new SMS code
       When they submit an incorrect security code "666666"
       Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
@@ -97,13 +97,13 @@ Feature: A page where users can view and change the details associated with thei
       Then the error message "Enter your current password" must be displayed for the current password field
       And the error message "Enter your new password" must be displayed for the new password field
 
-    @ci @smoke
+    @ci
     Scenario: The user tries to change their current password and does not enter any value for the new password
       When they enter the current password correctly
       And they click the Confirm button
       Then the error message "Enter your new password" must be displayed for the new password field
 
-    @ci @smoke
+    @ci
     Scenario: The user tries to change their current password and does not enter any value for the current password
       When they submit the new password "NewTestPa$$word"
       Then the error message "Enter your current password" must be displayed for the current password field
