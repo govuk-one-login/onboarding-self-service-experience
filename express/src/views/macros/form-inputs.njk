@@ -93,7 +93,7 @@
   {{ textInput(id = id, type = "hidden", value = value) }}
 {% endmacro %}
 
-{% macro textAreaInput(label, id, hint, rows = 5) %}
+{% macro textAreaInput(label, id, hint, value, rows = 5) %}
   {{ govukTextarea({
     label: {
       text: label
@@ -104,7 +104,7 @@
     id: id,
     name: id,
     rows: rows,
-    value: values[id] if values and values.hasOwnProperty(id),
+    value: value | default(values[id] if values and values.hasOwnProperty(id)),
     errorMessage: {
       text: errorMessages[id]
     } if errorMessages and errorMessages.hasOwnProperty(id)

@@ -67,7 +67,6 @@ import {
     TEST_LEVELS_OF_CONFIDENCE_ALT,
     TEST_POST_LOGOUT_REDIRECT_URI,
     TEST_PUBLIC_BETA_FORM_SUBMISSION,
-    TEST_PUBLIC_KEY,
     TEST_REDIRECT_URI,
     TEST_SCOPES_IN,
     TEST_SCOPES_OUT,
@@ -78,6 +77,7 @@ import {
     TEST_SERVICE_ID,
     TEST_SERVICE_NAME,
     TEST_SESSION_ID,
+    TEST_STATIC_KEY_UPDATE,
     TEST_TIMESTAMP,
     TEST_TIMESTAMP_STRING,
     TEST_TOKEN_AUTH_METHOD,
@@ -146,7 +146,7 @@ describe("showClient Controller tests", () => {
             sectorIdentifierUri: TEST_CLIENT.sector_identifier_uri,
             postLogoutRedirectUris: TEST_CLIENT.postLogoutUris,
             claims: TEST_CLIENT.claims,
-            displayedKey: TEST_PUBLIC_KEY,
+            displayedKey: TEST_STATIC_KEY_UPDATE.public_key,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
@@ -158,7 +158,9 @@ describe("showClient Controller tests", () => {
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
                 changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
-                }/change-public-key?publicKey=${encodeURIComponent(TEST_PUBLIC_KEY)}`,
+                }/change-public-key?publicKeySource=${TEST_CLIENT.publicKeySource}&publicKey=${encodeURIComponent(
+                    TEST_CLIENT.publicKey
+                )}&jwksUrl=${encodeURIComponent(TEST_CLIENT.jwksUri)}`,
                 changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
                 changeBackChannelLogoutUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
@@ -208,7 +210,7 @@ describe("showClient Controller tests", () => {
             sectorIdentifierUri: TEST_CLIENT.sector_identifier_uri,
             postLogoutRedirectUris: TEST_CLIENT.postLogoutUris,
             claims: [],
-            displayedKey: TEST_PUBLIC_KEY,
+            displayedKey: TEST_STATIC_KEY_UPDATE.public_key,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             contacts: TEST_CLIENT.contacts,
@@ -222,7 +224,9 @@ describe("showClient Controller tests", () => {
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
                 changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
-                }/change-public-key?publicKey=${encodeURIComponent(TEST_PUBLIC_KEY)}`,
+                }/change-public-key?publicKeySource=${TEST_CLIENT.publicKeySource}&publicKey=${encodeURIComponent(
+                    TEST_CLIENT.publicKey
+                )}&jwksUrl=${encodeURIComponent(TEST_CLIENT.jwksUri)}`,
                 changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
                 changeBackChannelLogoutUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
@@ -270,7 +274,7 @@ describe("showClient Controller tests", () => {
             sectorIdentifierUri: TEST_CLIENT.sector_identifier_uri,
             postLogoutRedirectUris: TEST_CLIENT.postLogoutUris,
             claims: TEST_CLIENT.claims,
-            displayedKey: TEST_PUBLIC_KEY,
+            displayedKey: TEST_STATIC_KEY_UPDATE.public_key,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             contacts: TEST_CLIENT.contacts,
@@ -284,7 +288,9 @@ describe("showClient Controller tests", () => {
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
                 changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
-                }/change-public-key?publicKey=${encodeURIComponent(TEST_PUBLIC_KEY)}`,
+                }/change-public-key?publicKeySource=${TEST_CLIENT.publicKeySource}&publicKey=${encodeURIComponent(
+                    TEST_CLIENT.publicKey
+                )}&jwksUrl=${encodeURIComponent(TEST_CLIENT.jwksUri)}`,
                 changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
                 changeBackChannelLogoutUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
@@ -343,7 +349,11 @@ describe("showClient Controller tests", () => {
                     TEST_CLIENT.dynamoServiceId
                 }/change-client-name?clientName=${encodeURIComponent(TEST_CLIENT.clientName)}`,
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
-                changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-public-key?publicKey=`,
+                changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-public-key?publicKeySource=${TEST_CLIENT.publicKeySource}&publicKey=&jwksUrl=${encodeURIComponent(
+                    TEST_CLIENT.jwksUri
+                )}`,
                 changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
                 changeBackChannelLogoutUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
@@ -524,7 +534,7 @@ describe("showClient Controller tests", () => {
             sectorIdentifierUri: TEST_CLIENT.sector_identifier_uri,
             postLogoutRedirectUris: TEST_CLIENT.postLogoutUris,
             claims: [],
-            displayedKey: TEST_PUBLIC_KEY,
+            displayedKey: TEST_STATIC_KEY_UPDATE.public_key,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
             identityVerificationSupported: false,
             contacts: TEST_CLIENT.contacts,
@@ -535,7 +545,9 @@ describe("showClient Controller tests", () => {
                 changeRedirectUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-redirect-uris`,
                 changeKeyUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
-                }/change-public-key?publicKey=${encodeURIComponent(TEST_CLIENT.publicKey)}`,
+                }/change-public-key?publicKeySource=${TEST_CLIENT.publicKeySource}&publicKey=${encodeURIComponent(
+                    TEST_CLIENT.publicKey
+                )}&jwksUrl=${encodeURIComponent(TEST_CLIENT.jwksUri)}`,
                 changePostLogoutUris: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-post-logout-uris`,
                 changeBackChannelLogoutUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
@@ -860,7 +872,9 @@ describe("showChangePublicKeyForm controller tests", () => {
                 clientId: TEST_CLIENT_ID
             },
             query: {
-                publicKey: TEST_PUBLIC_KEY
+                publicKeySource: TEST_STATIC_KEY_UPDATE.public_key_source,
+                publicKey: TEST_STATIC_KEY_UPDATE.public_key,
+                jwksUrl: ""
             }
         });
         const mockResponse = response();
@@ -870,7 +884,9 @@ describe("showChangePublicKeyForm controller tests", () => {
             serviceId: TEST_SERVICE_ID,
             selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
             clientId: TEST_CLIENT_ID,
-            serviceUserPublicKey: TEST_PUBLIC_KEY
+            publicKeySource: TEST_STATIC_KEY_UPDATE.public_key_source,
+            serviceUserPublicKey: TEST_STATIC_KEY_UPDATE.public_key,
+            jwksUrl: ""
         });
     });
 });
@@ -894,7 +910,7 @@ describe("processChangePublicKeyForm controller tests", () => {
                 clientId: TEST_CLIENT_ID
             },
             body: {
-                authCompliantPublicKey: TEST_PUBLIC_KEY
+                update: TEST_STATIC_KEY_UPDATE
             },
             context: {
                 serviceId: TEST_SERVICE_ID
@@ -908,7 +924,7 @@ describe("processChangePublicKeyForm controller tests", () => {
             TEST_SERVICE_ID,
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
-            {public_key: TEST_PUBLIC_KEY},
+            TEST_STATIC_KEY_UPDATE,
             TEST_AUTHENTICATION_RESULT.AccessToken
         );
         expect(mockRequest.session.updatedField).toEqual("public key");
@@ -940,7 +956,7 @@ describe("processChangePublicKeyForm controller tests", () => {
                 clientId: TEST_CLIENT_ID
             },
             body: {
-                authCompliantPublicKey: TEST_PUBLIC_KEY
+                update: TEST_STATIC_KEY_UPDATE
             },
             context: {
                 serviceId: TEST_SERVICE_ID
@@ -954,7 +970,7 @@ describe("processChangePublicKeyForm controller tests", () => {
             TEST_SERVICE_ID,
             "",
             TEST_CLIENT_ID,
-            {public_key: TEST_PUBLIC_KEY},
+            TEST_STATIC_KEY_UPDATE,
             TEST_AUTHENTICATION_RESULT.AccessToken
         );
         expect(mockRequest.session.updatedField).toEqual("public key");
@@ -2327,7 +2343,7 @@ describe("processChangePublicKey controller tests", () => {
 
         const mockReq = request({
             body: {
-                authCompliantPublicKey: TEST_PUBLIC_KEY
+                update: TEST_STATIC_KEY_UPDATE
             },
             params: {
                 selfServiceClientId: "",
@@ -2346,13 +2362,7 @@ describe("processChangePublicKey controller tests", () => {
         const mockNext = jest.fn();
         await processChangePublicKeyForm(mockReq, mockRes, mockNext);
 
-        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
-            TEST_SERVICE_ID,
-            "",
-            TEST_CLIENT_ID,
-            {public_key: TEST_PUBLIC_KEY},
-            TEST_ACCESS_TOKEN
-        );
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, "", TEST_CLIENT_ID, TEST_STATIC_KEY_UPDATE, TEST_ACCESS_TOKEN);
         expect(s4SendTxMALogSpy).toHaveBeenCalledWith(
             "SSE_PUBLIC_KEY_ADDED",
             {
@@ -2366,14 +2376,14 @@ describe("processChangePublicKey controller tests", () => {
         expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
     });
 
-    it("calls s4 change the public key and updates the value, sends a TxMA log and then redirects to /clients", async () => {
+    it("calls s4 change the static public key and updates the value, sends a TxMA log and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
         AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
-                authCompliantPublicKey: TEST_PUBLIC_KEY
+                update: TEST_STATIC_KEY_UPDATE
             },
             params: {
                 selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
@@ -2396,7 +2406,7 @@ describe("processChangePublicKey controller tests", () => {
             TEST_SERVICE_ID,
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
-            {public_key: TEST_PUBLIC_KEY},
+            TEST_STATIC_KEY_UPDATE,
             TEST_ACCESS_TOKEN
         );
         expect(s4SendTxMALogSpy).toHaveBeenCalledWith(
@@ -2697,7 +2707,7 @@ describe("processChangePublicKey controller tests", () => {
 
         const mockReq = request({
             body: {
-                authCompliantPublicKey: TEST_PUBLIC_KEY
+                update: TEST_STATIC_KEY_UPDATE
             },
             params: {
                 selfServiceClientId: "",
@@ -2716,13 +2726,7 @@ describe("processChangePublicKey controller tests", () => {
         const mockNext = jest.fn();
         await processChangePublicKeyForm(mockReq, mockRes, mockNext);
 
-        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
-            TEST_SERVICE_ID,
-            "",
-            TEST_CLIENT_ID,
-            {public_key: TEST_PUBLIC_KEY},
-            TEST_ACCESS_TOKEN
-        );
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, "", TEST_CLIENT_ID, TEST_STATIC_KEY_UPDATE, TEST_ACCESS_TOKEN);
         expect(s4SendTxMALogSpy).toHaveBeenCalledWith(
             "SSE_PUBLIC_KEY_ADDED",
             {

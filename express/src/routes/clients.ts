@@ -40,7 +40,7 @@ import {
     showChangeIdTokenAlgorithmForm,
     processChangeIdTokenAlgorithmForm
 } from "../controllers/clients";
-import convertPublicKeyForAuth from "../middleware/convert-public-key";
+import validateKeySource from "../middleware/validate-public-key";
 import validateUri from "../middleware/validators/uri-validator";
 
 const router = Router();
@@ -60,7 +60,7 @@ router.route("/:clientId/:selfServiceClientId/change-service-name").get(showChan
 router
     .route("/:clientId/:selfServiceClientId/change-public-key")
     .get(showChangePublicKeyForm)
-    .post(convertPublicKeyForAuth, processChangePublicKeyForm);
+    .post(validateKeySource, processChangePublicKeyForm);
 
 router.route("/:clientId/:selfServiceClientId/change-redirect-uris").get(showChangeRedirectUrlsForm);
 

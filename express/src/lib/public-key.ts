@@ -1,4 +1,5 @@
 import {createPublicKey} from "crypto";
+import validate from "../lib/validators/uri-validator";
 
 const BEGIN = "-----BEGIN PUBLIC KEY-----";
 const END = "-----END PUBLIC KEY-----";
@@ -25,6 +26,15 @@ export function isPublicKeyValid(enteredPublicKey: string): string {
     }
 
     return enteredPublicKey;
+}
+
+export function validateJwksURL(enteredUrl: string): string {
+    const validationResult = validate(enteredUrl, false, false);
+    if (validationResult.isValid) {
+        return enteredUrl;
+    } else {
+        throw new Error(`Invalid JWKs URL Supplied\n${enteredUrl}`);
+    }
 }
 
 function makeAuthCompliant(publicKey: string) {

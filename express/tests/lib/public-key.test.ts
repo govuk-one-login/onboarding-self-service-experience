@@ -1,4 +1,5 @@
-import getAuthApiCompliantPublicKey, {isPublicKeyValid} from "../../src/lib/public-key";
+import getAuthApiCompliantPublicKey, {isPublicKeyValid, validateJwksURL} from "../../src/lib/public-key";
+import {TEST_JWKS_KEY_UPDATE} from "../constants";
 
 const header = "-----BEGIN PUBLIC KEY-----";
 const footer = "-----END PUBLIC KEY-----";
@@ -19,7 +20,7 @@ export const publicKeyWithHeaders = `${header}\n${publicKey}\n${footer}`;
 export const publicKeyCompact = publicKey.replaceAll("\n", "");
 export const publicKeyCompactWithHeaders = `${header}\n${publicKeyCompact}\n${footer}`;
 
-describe("Public keys are validated and prepared for the Auth API", () => {
+describe("Static public keys are validated and prepared for the Auth API", () => {
     describe("Valid public keys are correctly transformed", () => {
         it("Accepts a valid public key with no headers and no line breaks", () => {
             expect(getAuthApiCompliantPublicKey(publicKeyCompact)).toEqual(publicKeyCompact);
@@ -142,7 +143,7 @@ describe("Public keys are validated and prepared for the Auth API", () => {
     });
 });
 
-describe("Public keys are validated", () => {
+describe("Static public keys are validated", () => {
     describe("Valid public keys are accepted", () => {
         it("Accepts a valid public key with headers and line breaks", () => {
             expect(isPublicKeyValid(publicKeyWithHeaders)).toEqual(publicKeyWithHeaders);
@@ -276,5 +277,14 @@ describe("Public keys are validated", () => {
             const invalidKey = `${header}\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE0M8qKD+sKh7OuITZ7tUhHbGsECcxghd4zr7sp2xt9cGxqj41Z0IOjui4A32UHq/2pkTnM9/LtzFM+QzHLJyQxw==\n${footer}`;
             expect(() => isPublicKeyValid(invalidKey)).toThrow(invalidKey);
         });
+    });
+});
+
+describe("JWKs Urls are validated", () => {
+    it("Accepts a valid url", () => {
+        expect(validateJwksURL(TEST_JWKS_KEY_UPDATE.jwks_uri)).toEqual(TEST_JWKS_KEY_UPDATE.jwks_uri);
+    });
+    it("Invalid urls are rejected", () => {
+        expect(() => validateJwksURL("someInvalidURL")).toThrow();
     });
 });

@@ -101,9 +101,19 @@ export const TEST_SELF_SERVICE_CLIENT_ID = "someSelfServiceClientId";
 export const TEST_SCOPES_IN = ["email", "phone"];
 export const TEST_SCOPES_OUT = ["openid", "email", "phone"];
 export const TEST_SCOPES_OUT2 = ["openid", "email"];
-export const TEST_PUBLIC_KEY =
-    "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeQ90Vm6wnW9AYqRTj4bHiFLHWHe1w1u6CaQnkWYeL1q5LCyWofFb0hNZt7h70ZKDvmyDy3Rfw0qwGY9P49neZQJEkSj/VLGrqWhHJEq9Bi4xKxtTo2as8c+uNP8uede6fRTGIO5miaaiR4dhHdViWE2v8LDx0vWkBAi30Ry3kowIDAQAB";
 export const TEST_BAD_PUBLIC_KEY = "BAD KEY";
+
+export const TEST_STATIC_KEY_UPDATE = {
+    public_key_source: "STATIC",
+    public_key:
+        "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeQ90Vm6wnW9AYqRTj4bHiFLHWHe1w1u6CaQnkWYeL1q5LCyWofFb0hNZt7h70ZKDvmyDy3Rfw0qwGY9P49neZQJEkSj/VLGrqWhHJEq9Bi4xKxtTo2as8c+uNP8uede6fRTGIO5miaaiR4dhHdViWE2v8LDx0vWkBAi30Ry3kowIDAQAB"
+};
+
+export const TEST_JWKS_KEY_UPDATE = {
+    public_key_source: "JWKS",
+    jwks_uri: "https://www.example.com/"
+};
+
 export const TEST_SECRET_HASH = "A secret";
 export const TEST_DYNAMO_ID = "client#456";
 export const TEST_CLIENT_NAME = "someClientName";
@@ -136,7 +146,9 @@ export const TEST_DYNAMO_CLIENT = {
     contacts: {L: [{S: TEST_EMAIL}]},
     default_fields: {L: [{S: TEST_DEFAULT_FIELD}]},
     post_logout_redirect_uris: {L: [{S: TEST_POST_LOGOUT_REDIRECT_URI}]},
-    public_key: {S: TEST_PUBLIC_KEY},
+    public_key_source: {S: TEST_STATIC_KEY_UPDATE.public_key_source},
+    public_key: {S: TEST_STATIC_KEY_UPDATE.public_key},
+    jwks_uri: {S: TEST_JWKS_KEY_UPDATE.jwks_uri},
     redirect_uris: {L: [{S: TEST_REDIRECT_URI}]},
     scopes: {L: [{S: TEST_SCOPES_IN[0]}]},
     client_name: {S: TEST_CLIENT_NAME},
@@ -161,7 +173,9 @@ export const TEST_CLIENT: Client = {
     contacts: [TEST_EMAIL],
     defaultFields: [TEST_DEFAULT_FIELD],
     postLogoutUris: [TEST_POST_LOGOUT_REDIRECT_URI],
-    publicKey: TEST_PUBLIC_KEY,
+    publicKeySource: TEST_STATIC_KEY_UPDATE.public_key_source,
+    publicKey: TEST_STATIC_KEY_UPDATE.public_key,
+    jwksUri: TEST_JWKS_KEY_UPDATE.jwks_uri,
     redirectUris: [TEST_REDIRECT_URI],
     scopes: [TEST_SCOPES_IN[0]],
     clientName: TEST_CLIENT_NAME,

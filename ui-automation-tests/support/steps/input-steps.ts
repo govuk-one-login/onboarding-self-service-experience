@@ -18,7 +18,8 @@ const fields = {
     "current password": "currentPassword",
     "redirect uri": "redirectUri",
     "post logout redirect uri": "postLogoutRedirectUri",
-    "change your public key": "serviceUserPublicKey",
+    "change your static key": "serviceUserPublicKey",
+    "change your jwks url": "jwksUrl",
     "back channel logout uri": "backChannelLogoutUri",
     "sector identifier uri": "sectorIdentifierUri"
 };
