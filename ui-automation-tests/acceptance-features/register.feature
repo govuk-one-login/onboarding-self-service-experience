@@ -107,7 +107,7 @@ Feature: Users can sign up to the self-service experience
       And they click on the "Not received an email?" link
       Then they should be redirected to the "/register/resend-email-code" page
 
-    @ci @smoke
+    @ci
     Scenario: The user tries to resend their code using the application
       And they click the Resend security code button
       Then they should be redirected to the "/register/enter-email-code" page
@@ -203,7 +203,7 @@ Feature: Users can sign up to the self-service experience
         | 12345$  | Your security code should only include numbers                                            |
         | 666666  | The code you entered is not correct or has expired - enter it again or request a new code |
 
-    @ci @smoke
+    @ci
     Scenario: User does not receive their code
       When they click on the "Problems receiving a text message?" link
       Then they should be redirected to the "/register/resend-text-code" page
@@ -221,7 +221,7 @@ Feature: Users can sign up to the self-service experience
       And they click on the "support form" link
       Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us?adminTool"
 
-    @ci @smoke
+    @ci
     Scenario: The user wants the app to resend their code
       When they click on the "Problems receiving a text message?" link
       Then they should be redirected to the "/register/resend-text-code" page
@@ -239,13 +239,13 @@ Feature: Users can sign up to the self-service experience
       And they submit a correct security code
       Then they should be redirected to the "/register/create-service" page
 
-    @ci @smoke
+    @ci
     Scenario: The user submits an empty service name
       When they submit the service name ""
       Then they should be redirected to the "/register/create-service" page
       And the error message "Enter your service name" must be displayed for the service name field
 
-    @ci @smoke
+    @ci
     Scenario: The user types everything correctly, creates an account and adds a service
       When they submit the service name "Test Service"
       Then they should see the text "Manage Test Service"

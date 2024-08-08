@@ -4,13 +4,13 @@ Feature: Users can sign in to the self-service experience
     Given the user is on the "/sign-in" page
 
   Rule: The user tries to submit an email address
-    @ci @smoke
+    @ci
     Scenario: The user does not enter any characters into the Email address text field
       When they submit the email ""
       Then the error message "Enter your email address" must be displayed for the email field
 
     @ci @smoke
-    Scenario: User does not enter a valid email address
+    Scenario: User does not enter an invalid email address
       When they submit the email "invalid-email.com"
       Then the error message "Enter an email address in the correct format, like name@example.com" must be displayed for the email field
 
@@ -54,7 +54,7 @@ Feature: Users can sign in to the self-service experience
         | Invalid-Password | Incorrect password  |
 
   Rule: The user toggle the show/hide to view the password in signIn process
-    @ci @smoke
+    @ci
     Scenario: The user wants to see or hide their password as they type it
       When they submit the current username correctly
       Then they should see the text "Enter your password"
