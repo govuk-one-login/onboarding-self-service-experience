@@ -1,0 +1,12 @@
+{% extends "layouts/client-form.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set sidebarActiveItem = "Go live with GOV.UK One Login" %}
+{% set pageTitle = "Go live with GOV.UK One Login" %}
+
+{% block mainContent%}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Go live with GOV.UK One Login</h1>
+  <p class="govuk-body">To go live, get in touch with your Engagement Manager and they will guide you through the process. If you do not have an Engagement Manager, complete the form to <a class="govuk-link" href="https://www.sign-in.service.gov.uk/register">register your interest</a> and we'll support you with integrating to the production environment.</p>
+{% endblock %}
+
