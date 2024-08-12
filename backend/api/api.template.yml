@@ -85,6 +85,8 @@ Mappings:
     default:
       cslsLoggingEnabled: false
       dynatraceLoggingEnabled: false
+      dynatraceSecretArn: placeholder
+      clslSubscriptionFilterArn: placeholder
   WafArn:
     Environment:
       local: "/self-service/development/waf-web-acl"
@@ -157,6 +159,12 @@ Globals:
             - SecretArn: !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
           - !Ref "AWS::NoValue"
         DT_OPEN_TELEMETRY_ENABLE_INTEGRATION: !If [DynatraceLoggingEnabled, "true", !Ref "AWS::NoValue"]
+
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W6001
 
 Resources:
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html
