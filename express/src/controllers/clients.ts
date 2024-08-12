@@ -102,8 +102,8 @@ export const showClient: RequestHandler = async (req, res) => {
     req.session.updatedField = undefined;
 };
 
-export const showPublicBetaForm: RequestHandler = (req, res) => {
-    res.render("clients/public-beta.njk", {
+export const showGoLivePage: RequestHandler = (req, res) => {
+    res.render("clients/go-live.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
