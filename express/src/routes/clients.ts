@@ -9,7 +9,6 @@ import {
     processConfirmContactRemovalForm,
     processEnterContactEmailForm,
     processEnterClientSecretHashForm,
-    processPublicBetaForm,
     showChangeBackChannelLogoutUriForm,
     showChangePostLogoutUrisForm,
     showChangePublicKeyForm,
@@ -22,10 +21,9 @@ import {
     showEnterClientSecretHashForm,
     showEnterContactEmailForm,
     showEnterContactForm,
-    showPublicBetaForm,
+    showGoLivePage,
     showChangeClaimsForm,
     processChangeClaimsForm,
-    showPublicBetaFormSubmitted,
     processAddPostLogoutUriForm,
     showConfirmPostLogoutUriRemovalForm,
     processRemovePostLogoutUriFrom,
@@ -50,9 +48,7 @@ export default router;
 router.get("/", showClient);
 
 // TODO This shouldn't use the clientId - public beta is per service
-router.route("/:clientId/:selfServiceClientId/public-beta").get(showPublicBetaForm).post(processPublicBetaForm);
-
-router.route("/:clientId/:selfServiceClientId/public-beta/submitted").get(showPublicBetaFormSubmitted);
+router.route("/:clientId/:selfServiceClientId/go-live").get(showGoLivePage);
 
 // TODO This shouldn't use the clientId - we're changing the service name
 router.route("/:clientId/:selfServiceClientId/change-service-name").get(showChangeServiceNameForm).post(processChangeServiceNameForm);
