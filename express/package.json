@@ -22,7 +22,7 @@
     "@aws-sdk/client-dynamodb": "^3.609.0",
     "@aws-sdk/util-dynamodb": "^3.624.0",
     "@aws-sdk/client-sqs": "^3.609.0",
-    "axios": "^1.7.3",
+    "axios": "^1.7.4",
     "connect-dynamodb": "^3.0.0",
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
