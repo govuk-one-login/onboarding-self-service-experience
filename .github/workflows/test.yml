@@ -24,6 +24,7 @@ defaults:
 
 jobs:
   run-checkov:
+    if: contains(needs.get-head-commit.outputs.commit-message, '[skip-checks]') != true
     name: Checkov
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -36,6 +37,7 @@ jobs:
             CKV_SECRET_9
 
   check-shell-scripts:
+    if: contains(needs.get-head-commit.outputs.commit-message, '[skip-checks]') != true
     name: Shell scripts
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -44,6 +46,7 @@ jobs:
         uses: govuk-one-login/github-actions/code-quality/check-shell-scripts@5dacba941def444d69f02843feaebed79b5fca51 # 11/04/2023
 
   check-linting:
+    if: contains(needs.get-head-commit.outputs.commit-message, '[skip-checks]') != true
     name: Linting
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -52,6 +55,7 @@ jobs:
         uses: govuk-one-login/github-actions/code-quality/check-linting@5dacba941def444d69f02843feaebed79b5fca51 # 11/04/2023
 
   check-vulnerabilities:
+    if: contains(needs.get-head-commit.outputs.commit-message, '[skip-checks]') != true
     name: Vulnerabilities
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -62,7 +66,7 @@ jobs:
           workspaces: true
 
   sonarcloud:
-    if: startsWith(github.head_ref, 'dependabot') != true
+    if: startsWith(github.head_ref, 'dependabot') != true && contains(needs.get-head-commit.outputs.commit-message, '[skip-checks]') != true
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
@@ -87,6 +91,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   run-unit-tests:
+    if: contains(needs.get-head-commit.outputs.commit-message, '[skip-checks]') != true
     name: Run unit tests
     runs-on: ubuntu-latest
     steps:
