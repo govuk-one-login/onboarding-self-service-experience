@@ -1,8 +1,3 @@
-const uuidMock = jest.fn();
-jest.mock("uuid", () => ({
-    v4: uuidMock
-}));
-
 const timestampMock = jest.fn();
 jest.mock("../../src/lib/timestamp", () => timestampMock);
 
@@ -17,7 +12,6 @@ import {
     processEnterClientSecretHashForm,
     processEnterContactEmailForm,
     processEnterIdentityVerificationForm,
-    processPublicBetaForm,
     processRemovePostLogoutUriFrom,
     processRemoveRedirectUriFrom,
     showAddPostLogoutUriForm,
@@ -36,8 +30,7 @@ import {
     showEnterContactEmailForm,
     showEnterContactForm,
     showEnterIdentityVerificationForm,
-    showPublicBetaForm,
-    showPublicBetaFormSubmitted,
+    showGoLivePage,
     showChangeClientName,
     processChangeClientName
 } from "../../src/controllers/clients";
@@ -53,10 +46,7 @@ import {
     TEST_CLIENT_ID,
     TEST_CLIENT_NAME,
     TEST_COGNITO_ID,
-    TEST_DATA_RANGE,
     TEST_EMAIL,
-    TEST_FULL_NAME,
-    TEST_HEADER_RANGE,
     TEST_ID_SIGNING_TOKEN_ALGORITHM,
     TEST_IDENTITY_VERIFICATION_SUPPORTED,
     TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT,
@@ -66,7 +56,6 @@ import {
     TEST_LEVELS_OF_CONFIDENCE,
     TEST_LEVELS_OF_CONFIDENCE_ALT,
     TEST_POST_LOGOUT_REDIRECT_URI,
-    TEST_PUBLIC_BETA_FORM_SUBMISSION,
     TEST_REDIRECT_URI,
     TEST_SCOPES_IN,
     TEST_SCOPES_OUT,
@@ -81,11 +70,9 @@ import {
     TEST_TIMESTAMP,
     TEST_TIMESTAMP_STRING,
     TEST_TOKEN_AUTH_METHOD,
-    TEST_TOKEN_AUTH_METHOD_ALT,
-    TEST_UUID
+    TEST_TOKEN_AUTH_METHOD_ALT
 } from "../constants";
 import {request, response} from "../mocks";
-import SheetsService from "../../src/lib/sheets/SheetsService";
 import {
     processChangeScopesForm,
     processChangePublicKeyForm,
@@ -100,8 +87,6 @@ const s4ListClientsSpy = jest.spyOn(SelfServiceServicesService.prototype, "listC
 const s4SendTxmaLogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
 const s4UpdateServiceSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateService");
 const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
-const sheetsAppendValueSpy = jest.spyOn(SheetsService.prototype, "appendValues");
-const sheetsInitSpy = jest.spyOn(SheetsService.prototype, "init");
 jest.spyOn(AuthenticationResultParser, "getCognitoId").mockReturnValue(TEST_COGNITO_ID);
 timestampMock.mockReturnValue(TEST_TIMESTAMP_STRING);
 
@@ -569,7 +554,7 @@ describe("showClient Controller tests", () => {
     });
 });
 
-describe("showPublicBetaForm controller tests", () => {
+describe("showGoLivePage controller tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -590,169 +575,14 @@ describe("showPublicBetaForm controller tests", () => {
         });
         const mockResponse = response();
 
-        showPublicBetaForm(mockRequest, mockResponse, mockNext);
+        showGoLivePage(mockRequest, mockResponse, mockNext);
 
-        expect(mockResponse.render).toHaveBeenCalledWith("clients/public-beta.njk", {
+        expect(mockResponse.render).toHaveBeenCalledWith("clients/go-live.njk", {
             serviceId: TEST_SERVICE_ID,
             selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
             clientId: TEST_CLIENT_ID,
             serviceName: TEST_SERVICE_NAME,
             emailAddress: TEST_EMAIL
-        });
-    });
-});
-
-describe("processPublicBetaForm controller tests", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-        uuidMock.mockReturnValue(TEST_UUID);
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
-        process.env.PUBLIC_BETA_SHEET_DATA_RANGE = TEST_DATA_RANGE;
-        process.env.PUBLIC_BETA_SHEET_HEADER_RANGE = TEST_HEADER_RANGE;
-    });
-
-    afterEach(() => {
-        delete process.env.PUBLIC_BETA_SHEET_DATA_RANGE;
-        delete process.env.PUBLIC_BETA_SHEET_DATA_RANGE;
-        jest.useRealTimers();
-    });
-
-    it.each([
-        {
-            missingFieldKey: "userName",
-            formSubmission: {...TEST_PUBLIC_BETA_FORM_SUBMISSION, userName: ""},
-            errorMessages: new Map<string, string>().set("userName", "Enter your name")
-        },
-        {
-            missingFieldKey: "organisationName",
-            formSubmission: {...TEST_PUBLIC_BETA_FORM_SUBMISSION, organisationName: ""},
-            errorMessages: new Map<string, string>().set("organisationName", "Enter your organisation name")
-        },
-        {
-            missingFieldKey: "serviceUse",
-            formSubmission: {...TEST_PUBLIC_BETA_FORM_SUBMISSION, serviceUse: ""},
-            errorMessages: new Map<string, string>().set("serviceUse-options", "Service use is required")
-        },
-        {
-            missingFieldKey: "migrateExistingAccounts",
-            formSubmission: {...TEST_PUBLIC_BETA_FORM_SUBMISSION, migrateExistingAccounts: ""},
-            errorMessages: new Map<string, string>().set("migrateExistingAccounts-options", "Migration of existing accounts is required")
-        }
-    ])(
-        "renders the public beta form template with error messages when $missingFieldKey is missing ",
-        async ({formSubmission, errorMessages}) => {
-            const mockRequest = request({
-                body: formSubmission,
-                session: {
-                    emailAddress: TEST_EMAIL,
-                    id: TEST_SESSION_ID
-                },
-                context: {
-                    serviceId: TEST_SERVICE_ID
-                },
-                params: {
-                    selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
-                    clientId: TEST_CLIENT_ID
-                },
-                ip: TEST_IP_ADDRESS
-            });
-            const mockResponse = response();
-            await processPublicBetaForm(mockRequest, mockResponse, mockNext);
-            expect(mockResponse.render).toHaveBeenCalledWith("clients/public-beta.njk", {
-                serviceId: TEST_SERVICE_ID,
-                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
-                clientId: TEST_CLIENT_ID,
-                serviceName: TEST_SERVICE_NAME,
-                emailAddress: TEST_EMAIL,
-                errorMessages: Object.fromEntries(errorMessages),
-                values: formSubmission
-            });
-        }
-    );
-
-    it("calls the sheets service with the expected values and then redirects to the successfully submitted page", async () => {
-        sheetsInitSpy.mockResolvedValue();
-        sheetsAppendValueSpy.mockResolvedValue();
-        s4SendTxmaLogSpy.mockReturnValue();
-
-        const mockRequest = request({
-            body: TEST_PUBLIC_BETA_FORM_SUBMISSION,
-            session: {
-                emailAddress: TEST_EMAIL,
-                authenticationResult: TEST_AUTHENTICATION_RESULT,
-                id: TEST_SESSION_ID
-            },
-            context: {
-                serviceId: TEST_SERVICE_ID
-            },
-            params: {
-                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
-                clientId: TEST_CLIENT_ID
-            },
-            ip: TEST_IP_ADDRESS
-        });
-        const mockResponse = response();
-        const expectedValuesToAppend = new Map(
-            Object.entries({
-                userName: TEST_FULL_NAME,
-                role: "Testing",
-                organisationName: "Test",
-                serviceUrl: "test.gov.uk",
-                serviceDescription: "Some users for stuff",
-                serviceUse: "To sign users in and check their identity",
-                migrateExistingAccounts: "Yes",
-                numberOfUsersEachYear: "Over 1 million users",
-                "targetDate-day": "12",
-                "targetDate-month": "12",
-                "targetDate-year": "1212",
-                serviceName: "someTestService",
-                id: TEST_UUID,
-                "submission-date": TEST_TIMESTAMP_STRING,
-                email: TEST_EMAIL,
-                estimatedServiceGoLiveDate: "12/12/1212"
-            })
-        );
-
-        await processPublicBetaForm(mockRequest, mockResponse, mockNext);
-
-        expect(sheetsInitSpy).toHaveBeenCalled();
-        expect(sheetsAppendValueSpy).toHaveBeenCalledWith(expectedValuesToAppend, TEST_DATA_RANGE, TEST_HEADER_RANGE);
-        expect(s4SendTxmaLogSpy).toHaveBeenCalledWith(
-            "SSE_PUBLIC_BETA_FORM_SUBMITTED",
-            {
-                session_id: TEST_SESSION_ID,
-                ip_address: TEST_IP_ADDRESS,
-                user_id: TEST_COGNITO_ID
-            },
-            {
-                service_id: TEST_SERVICE_ID
-            }
-        );
-        expect(mockResponse.redirect).toHaveBeenCalledWith(
-            `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT_ID}/${TEST_SELF_SERVICE_CLIENT_ID}/public-beta/submitted`
-        );
-    });
-});
-
-describe("showPublicBetaFormSubmitted controller tests", () => {
-    it("calls render with the expected values", () => {
-        const mockReq = request({
-            context: {
-                serviceId: TEST_SERVICE_ID
-            },
-            params: {
-                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
-                clientId: TEST_CLIENT_ID
-            }
-        });
-        const mockRes = response();
-
-        showPublicBetaFormSubmitted(mockReq, mockRes, mockNext);
-
-        expect(mockRes.render).toHaveBeenCalledWith("clients/public-beta-form-submitted.njk", {
-            serviceId: TEST_SERVICE_ID,
-            selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
-            clientId: TEST_CLIENT_ID
         });
     });
 });

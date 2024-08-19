@@ -2,10 +2,7 @@ import {RequestHandler} from "express";
 import getAuthApiCompliantPublicKey from "../lib/public-key";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
-import {v4 as uuid_4} from "uuid";
-import SheetsService from "../lib/sheets/SheetsService";
 import console from "console";
-import getTimestamp from "../lib/timestamp";
 import {removeContact, addContact} from "../lib/updateContacts";
 import validate from "../lib/validators/email-validator";
 import {Request, Response} from "express-serve-static-core";
@@ -105,107 +102,13 @@ export const showClient: RequestHandler = async (req, res) => {
     req.session.updatedField = undefined;
 };
 
-export const showPublicBetaForm: RequestHandler = (req, res) => {
-    res.render("clients/public-beta.njk", {
+export const showGoLivePage: RequestHandler = (req, res) => {
+    res.render("clients/go-live.njk", {
         serviceId: req.context.serviceId,
         selfServiceClientId: req.params.selfServiceClientId,
         clientId: req.params.clientId,
         serviceName: req.session.serviceName,
         emailAddress: req.session.emailAddress
-    });
-};
-
-export const processPublicBetaForm: RequestHandler = async (req, res) => {
-    const {body, session, context, params} = req;
-
-    const values = new Map<string, string>(Object.entries(body).map(([key, value]) => [key, String(value).trim()]));
-
-    const {serviceName, serviceUse, migrateExistingAccounts} = body;
-
-    const {emailAddress} = session;
-    const {serviceId} = context;
-    const {selfServiceClientId, clientId} = params;
-
-    const errorMessages = new Map<string, string>();
-    const requiredFields = [
-        {key: "userName", message: "Enter your name"},
-        {key: "organisationName", message: "Enter your organisation name"}
-    ];
-
-    requiredFields.forEach(({key, message}) => {
-        if (body[key] === "") {
-            errorMessages.set(key, message);
-        }
-    });
-
-    if (!serviceUse) errorMessages.set("serviceUse-options", "Service use is required");
-    if (!migrateExistingAccounts) errorMessages.set("migrateExistingAccounts-options", "Migration of existing accounts is required");
-
-    if (errorMessages.size > 0) {
-        return res.render("clients/public-beta.njk", {
-            serviceId,
-            selfServiceClientId,
-            clientId,
-            serviceName,
-            emailAddress,
-            errorMessages: Object.fromEntries(errorMessages),
-            values: Object.fromEntries(values)
-        });
-    }
-
-    const totalAnnualNumberMappings = {
-        range1To1000: "1 to 1,000",
-        range1001To50000: "1,001 to 50,000",
-        range50001To250000: "50,001 to 250,000",
-        range250001To1Million: "250,001 to 1 million",
-        rangeOver1Million: "Over 1 million users",
-        notSure: "Not sure"
-    };
-    for (const [key, value] of Object.entries(totalAnnualNumberMappings)) {
-        if (req.body.numberOfUsersEachYear === key) {
-            values.set("numberOfUsersEachYear", value);
-            break;
-        }
-    }
-
-    values.set("serviceUse", serviceUse === "signUsersIn" ? "To sign users in" : "To sign users in and check their identity");
-    values.set("migrateExistingAccounts", migrateExistingAccounts === "yes" ? "Yes" : migrateExistingAccounts === "no" ? "No" : "Not sure");
-
-    values.set("id", uuid_4());
-    values.set("submission-date", getTimestamp());
-
-    if (emailAddress) {
-        values.set("email", emailAddress);
-    }
-
-    const keysToCheck = ["targetDate-day", "targetDate-month", "targetDate-year"];
-    const output = keysToCheck
-        .map(key => values.get(key))
-        .filter(Boolean)
-        .join("/");
-    if (output) {
-        values.set("estimatedServiceGoLiveDate", output);
-    }
-    const sheetsService: SheetsService = new SheetsService(process.env.USER_SIGNUP_SHEET_ID as string);
-    await sheetsService.init().catch(error => console.error("updateUserSpreadsheet: " + error));
-    await sheetsService
-        .appendValues(values, process.env.PUBLIC_BETA_SHEET_DATA_RANGE as string, process.env.PUBLIC_BETA_SHEET_HEADER_RANGE as string)
-        .then(() => console.log("Saved to Public Beta Spreadsheet"))
-        .catch(reason => {
-            console.error("updatePublicBetaSpreadsheet: " + reason);
-        });
-    const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
-
-    sendTxMALog(req, userId, "SSE_PUBLIC_BETA_FORM_SUBMITTED");
-
-    res.redirect(`/services/${serviceId}/clients/${clientId}/${selfServiceClientId}/public-beta/submitted`);
-};
-
-export const showPublicBetaFormSubmitted: RequestHandler = (req, res) => {
-    res.render("clients/public-beta-form-submitted.njk", {
-        serviceId: req.context.serviceId,
-        selfServiceClientId: req.params.selfServiceClientId,
-        clientId: req.params.clientId
     });
 };
 
