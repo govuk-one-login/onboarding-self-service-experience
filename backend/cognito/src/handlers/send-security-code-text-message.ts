@@ -32,7 +32,7 @@ export const lambdaHandler = async (event: CustomSMSSenderTriggerEvent, context:
             reference: null
         });
     } catch (error) {
-        logger.error("Failed to send security code sms", error as Error);
+        logger.error("Failed to send security code sms.", error as Error);
         throw error;
     }
 };
