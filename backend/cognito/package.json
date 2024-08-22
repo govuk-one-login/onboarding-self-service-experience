@@ -9,10 +9,11 @@
     "compile": "tsc"
   },
   "dependencies": {
-    "@aws-sdk/client-ses": "^3.609.0",
+    "@aws-crypto/client-node": "^4.0.1",
     "@aws-lambda-powertools/logger": "2.6.0",
-    "notifications-node-client": "^8.2.1",
+    "@aws-sdk/client-ses": "^3.609.0",
+    "base64-js": "^1.5.1",
     "esbuild": "^0.23.0",
-    "@aws-crypto/client-node": "^4.0.1"
+    "notifications-node-client": "^8.2.1"
   }
 }
