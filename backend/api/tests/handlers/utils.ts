@@ -1,15 +1,15 @@
 import {APIGatewayProxyEvent} from "aws-lambda";
 import {Context} from "aws-lambda";
 
-export const constructTestApiGatewayEvent = (params = {body: "", pathParameters: {}}): APIGatewayProxyEvent => ({
+export const constructTestApiGatewayEvent = (
+    params: Partial<APIGatewayProxyEvent> & Pick<APIGatewayProxyEvent, "body" | "pathParameters"> = {body: "", pathParameters: {}}
+): APIGatewayProxyEvent => ({
     httpMethod: "get",
-    body: params.body,
     headers: {},
     isBase64Encoded: false,
     multiValueHeaders: {},
     multiValueQueryStringParameters: {},
     path: "/",
-    pathParameters: params.pathParameters,
     queryStringParameters: {},
     requestContext: {
         accountId: "123456789012",
@@ -52,7 +52,8 @@ export const constructTestApiGatewayEvent = (params = {body: "", pathParameters:
         stage: "dev"
     },
     resource: "",
-    stageVariables: {}
+    stageVariables: {},
+    ...params
 });
 
 export const mockLambdaContext: Context = {

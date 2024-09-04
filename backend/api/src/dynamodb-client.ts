@@ -160,6 +160,17 @@ export default class DynamoDbClient {
         return this.dynamodb.send(command);
     }
 
+    async checkServiceUserExists(serviceId: string, userId: string): Promise<boolean> {
+        const params = {
+            TableName: this.tableName,
+            Key: marshall({pk: `service#${serviceId}`, sk: `user#${userId}`})
+        };
+
+        const command = new GetItemCommand(params);
+        const result = await this.dynamodb.send(command);
+        return result.Item !== undefined;
+    }
+
     async updateClient(serviceId: string, clientId: string, updates: Updates): Promise<UpdateItemCommandOutput> {
         return this.update("service", serviceId, "client", clientId, updates);
     }

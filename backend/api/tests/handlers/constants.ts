@@ -117,3 +117,4 @@ export const TEST_DATA_TABLE_ITEM = {
 };
 
 export const TEST_MESSAGE_ID = "1234";
+export const TEST_ACCESS_TOKEN = `.${Buffer.from(JSON.stringify({sub: TEST_USER_ID})).toString("base64url")}.`;
