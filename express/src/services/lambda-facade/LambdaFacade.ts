@@ -111,10 +111,9 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         return this.get(`/get-services/${userId}`);
     }
 
-    // TODO Don't we need to use the token to authorise when making the call to the database? Seems odd it's not used
-    listClients(serviceId: string): Promise<AxiosResponse<QueryCommandOutput>> {
+    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse<QueryCommandOutput>> {
         const bareServiceId = serviceId.startsWith("service#") ? serviceId.substring(8) : serviceId;
-        return this.get(`/get-service-clients/${bareServiceId}`);
+        return this.get(`/get-service-clients/${bareServiceId}`, accessToken);
     }
 
     async updateUser(selfServiceUserId: string, updates: UserUpdates, accessToken: string): Promise<void> {
@@ -189,14 +188,26 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         return this.get(`/global-sign-out/${userEmail}`);
     }
 
-    private get(endpoint: string): Promise<AxiosResponse> {
-        return this.client.get(endpoint);
+    private get(endpoint: string, accessToken = ""): Promise<AxiosResponse> {
+        if (accessToken === "") {
+            return this.client.get(endpoint);
+        }
+
+        return this.client.get(endpoint, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
     }
 
     private post(endpoint: string, data: object | string, accessToken = ""): Promise<AxiosResponse> {
+        if (accessToken === "") {
+            return this.client.post(endpoint, data);
+        }
+
         return this.client.post(endpoint, data, {
             headers: {
-                "authorised-by": accessToken
+                Authorization: `Bearer ${accessToken}`
             }
         });
     }

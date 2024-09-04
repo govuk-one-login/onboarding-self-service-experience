@@ -280,7 +280,7 @@ export default class SelfServiceServicesService {
     async listClients(serviceId: string, accessToken: string): Promise<Client[]> {
         console.info("In self-service-services-service:listClients()");
         await this.validateToken(accessToken, "listClients");
-        const clients = await this.lambda.listClients(serviceId);
+        const clients = await this.lambda.listClients(serviceId, accessToken);
         return clients.data.Items?.map(client => dynamoClientToDomainClient(unmarshall(client) as ClientFromDynamo)) ?? [];
     }
 

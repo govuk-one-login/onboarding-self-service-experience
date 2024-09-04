@@ -23,7 +23,7 @@ export default interface LambdaFacadeInterface {
     listServices(userId: string): Promise<AxiosResponse>;
 
     // TODO The QueryCommandOutput type should be replaced by a class shared between the frontend and the API (contract)
-    listClients(serviceId: string): Promise<AxiosResponse<QueryCommandOutput>>;
+    listClients(serviceId: string, accessToken: string): Promise<AxiosResponse<QueryCommandOutput>>;
 
     updateClient(
         serviceId: string,

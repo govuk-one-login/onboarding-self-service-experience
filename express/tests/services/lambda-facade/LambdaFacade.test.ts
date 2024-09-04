@@ -47,7 +47,7 @@ describe("Lambda Facade class tests", () => {
 
         expect(mockPost).toHaveBeenCalledWith("/put-user", TEST_ONBOARDING_TABLE_ITEM, {
             headers: {
-                "authorised-by": TEST_ACCESS_TOKEN
+                Authorization: `Bearer ${TEST_ACCESS_TOKEN}`
             }
         });
     });
@@ -59,7 +59,7 @@ describe("Lambda Facade class tests", () => {
 
         expect(mockPost).toHaveBeenCalledWith("/new-client", JSON.stringify({service: TEST_SERVICE, contactEmail: TEST_EMAIL}), {
             headers: {
-                "authorised-by": TEST_ACCESS_TOKEN
+                Authorization: `Bearer ${TEST_ACCESS_TOKEN}`
             }
         });
     });
@@ -79,7 +79,7 @@ describe("Lambda Facade class tests", () => {
         await mockLambdaFacade.updateClient(TEST_SERVICE_ID, TEST_SELF_SERVICE_CLIENT_ID, TEST_CLIENT_ID, mockUpdates, TEST_ACCESS_TOKEN);
         expect(mockPost).toHaveBeenCalledWith("/update-client", JSON.stringify(mockRequestBody), {
             headers: {
-                "authorised-by": TEST_ACCESS_TOKEN
+                Authorization: `Bearer ${TEST_ACCESS_TOKEN}`
             }
         });
     });
@@ -99,7 +99,7 @@ describe("Lambda Facade class tests", () => {
         await mockLambdaFacade.updateService(TEST_SERVICE_ID, TEST_SELF_SERVICE_CLIENT_ID, TEST_CLIENT_ID, mockUpdates, TEST_ACCESS_TOKEN);
         expect(mockPost).toHaveBeenCalledWith("/update-service", JSON.stringify(expectedRequestBody), {
             headers: {
-                "authorised-by": TEST_ACCESS_TOKEN
+                Authorization: `Bearer ${TEST_ACCESS_TOKEN}`
             }
         });
     });
@@ -107,8 +107,8 @@ describe("Lambda Facade class tests", () => {
     it("GETs the /get-service-clients endpoint with the userId as a path parameter when listClients method is called", async () => {
         const mockLambdaFacade = new LambdaFacade();
 
-        await mockLambdaFacade.listClients(TEST_SERVICE_ID);
-        expect(mockGet).toHaveBeenCalledWith("/get-service-clients/123");
+        await mockLambdaFacade.listClients(TEST_SERVICE_ID, TEST_ACCESS_TOKEN);
+        expect(mockGet).toHaveBeenCalledWith("/get-service-clients/123", {headers: {Authorization: `Bearer ${TEST_ACCESS_TOKEN}`}});
     });
 
     it("POSTs the /update-user endpoint with the provided updates and access token", async () => {
@@ -127,7 +127,7 @@ describe("Lambda Facade class tests", () => {
             }),
             {
                 headers: {
-                    "authorised-by": TEST_ACCESS_TOKEN
+                    Authorization: `Bearer ${TEST_ACCESS_TOKEN}`
                 }
             }
         );
@@ -140,11 +140,7 @@ describe("Lambda Facade class tests", () => {
         } as TxMAEvent;
         mockLambdaFacade.sendTxMALog(mockEvent);
 
-        expect(mockPost).toHaveBeenCalledWith("/txma-logging", mockEvent, {
-            headers: {
-                "authorised-by": ""
-            }
-        });
+        expect(mockPost).toHaveBeenCalledWith("/txma-logging", mockEvent);
     });
 
     it("GETs the /get-dynamodb-entries endpoint with the user Email when the getDynamoDBEntries method is called", async () => {
@@ -163,12 +159,7 @@ describe("Lambda Facade class tests", () => {
             JSON.stringify({
                 userId: TEST_COGNITO_ID,
                 serviceId: TEST_SERVICE_ID
-            }),
-            {
-                headers: {
-                    "authorised-by": ""
-                }
-            }
+            })
         );
     });
 
@@ -180,12 +171,7 @@ describe("Lambda Facade class tests", () => {
             "/delete-dynamodb-service-entries/",
             JSON.stringify({
                 serviceId: TEST_SERVICE_ID
-            }),
-            {
-                headers: {
-                    "authorised-by": ""
-                }
-            }
+            })
         );
     });
 
