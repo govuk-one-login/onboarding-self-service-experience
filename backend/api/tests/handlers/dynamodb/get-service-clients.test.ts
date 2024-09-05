@@ -1,6 +1,6 @@
 import DynamoDbClient from "../../../src/dynamodb-client";
 import {getServiceClientsHandler} from "../../../src/handlers/dynamodb/get-service-clients";
-import {TEST_SERVICE_ID} from "../constants";
+import {TEST_ACCESS_TOKEN, TEST_SERVICE_ID, TEST_USER_ID} from "../constants";
 import {constructTestApiGatewayEvent} from "../utils";
 
 describe("getServiceClientsHandler tests", () => {
@@ -30,39 +30,74 @@ describe("getServiceClientsHandler tests", () => {
         });
     });
 
-    // it("returns the clients when they are returned from dynamo", async () => {
-    //     const testDynamoResponse = {
-    //         $metadata: {},
-    //         Items: []
-    //     };
-    //     const getClientsSpy = jest.spyOn(DynamoDbClient.prototype, "getClients").mockResolvedValue(testDynamoResponse);
+    it("returns a 400 when the authorization header is invalid", async () => {
+        const testApiEvent = constructTestApiGatewayEvent({
+            body: "",
+            pathParameters: {serviceId: TEST_SERVICE_ID},
+            headers: {Authorization: "Bearer invalid"}
+        });
+        const getServiceClientsResponse = await getServiceClientsHandler(testApiEvent);
 
-    //     const testApiEvent = constructTestApiGatewayEvent({
-    //         body: "",
-    //         pathParameters: {serviceId: TEST_SERVICE_ID},
-    //         headers: {Authorization: ""}
-    //     });
-    //     const getServiceClientsResponse = await getServiceClientsHandler(testApiEvent);
+        expect(getServiceClientsResponse).toStrictEqual({
+            statusCode: 400,
+            body: "Invalid access token"
+        });
+    });
 
-    //     expect(getServiceClientsResponse).toStrictEqual({
-    //         statusCode: 200,
-    //         body: JSON.stringify(testDynamoResponse)
-    //     });
+    it("returns 403 when the user is not authorised", async () => {
+        const checkServiceUserExistsSpy = jest.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(false);
+        const testApiEvent = constructTestApiGatewayEvent({
+            body: "",
+            pathParameters: {serviceId: TEST_SERVICE_ID},
+            headers: {Authorization: "Bearer " + TEST_ACCESS_TOKEN}
+        });
+        const getServiceClientsResponse = await getServiceClientsHandler(testApiEvent);
+        expect(checkServiceUserExistsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_USER_ID);
+        expect(getServiceClientsResponse).toStrictEqual({
+            statusCode: 403,
+            body: "Forbidden"
+        });
+    });
 
-    //     expect(getClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID);
-    // });
+    it("returns the clients when they are returned from dynamo", async () => {
+        jest.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(true);
+        const testDynamoResponse = {
+            $metadata: {},
+            Items: []
+        };
+        const getClientsSpy = jest.spyOn(DynamoDbClient.prototype, "getClients").mockResolvedValue(testDynamoResponse);
 
-    // it("returns an error response when the dynamo query throws an error", async () => {
-    //     const dynamoErr = "someDynamoError";
-    //     const getClientsSpy = jest.spyOn(DynamoDbClient.prototype, "getClients").mockRejectedValue(dynamoErr);
-    //     const testApiEvent = constructTestApiGatewayEvent({body: "", pathParameters: {serviceId: TEST_SERVICE_ID}});
+        const testApiEvent = constructTestApiGatewayEvent({
+            body: "",
+            pathParameters: {serviceId: TEST_SERVICE_ID},
+            headers: {Authorization: "Bearer " + TEST_ACCESS_TOKEN}
+        });
+        const getServiceClientsResponse = await getServiceClientsHandler(testApiEvent);
 
-    //     const getServiceClientsResponse = await getServiceClientsHandler(testApiEvent);
+        expect(getServiceClientsResponse).toStrictEqual({
+            statusCode: 200,
+            body: JSON.stringify(testDynamoResponse)
+        });
 
-    //     expect(getServiceClientsResponse).toStrictEqual({
-    //         statusCode: 500,
-    //         body: JSON.stringify(dynamoErr)
-    //     });
-    //     expect(getClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID);
-    // });
+        expect(getClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID);
+    });
+
+    it("returns an error response when the dynamo query throws an error", async () => {
+        jest.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(true);
+        const dynamoErr = "someDynamoError";
+        const getClientsSpy = jest.spyOn(DynamoDbClient.prototype, "getClients").mockRejectedValue(dynamoErr);
+        const testApiEvent = constructTestApiGatewayEvent({
+            body: "",
+            pathParameters: {serviceId: TEST_SERVICE_ID},
+            headers: {Authorization: "Bearer " + TEST_ACCESS_TOKEN}
+        });
+
+        const getServiceClientsResponse = await getServiceClientsHandler(testApiEvent);
+
+        expect(getServiceClientsResponse).toStrictEqual({
+            statusCode: 500,
+            body: JSON.stringify(dynamoErr)
+        });
+        expect(getClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID);
+    });
 });
