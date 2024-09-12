@@ -946,6 +946,9 @@ Resources:
       Policies:
         - AWSLambdaVPCAccessExecutionRole
         - AWSXrayWriteOnlyAccess
+        - DynamoDBReadPolicy:
+            TableName:
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
         - Version: 2012-10-17
           Statement:
             - Effect: Allow
@@ -954,6 +957,8 @@ Resources:
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref UpdateServiceStepFunction
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
           Type: Api
