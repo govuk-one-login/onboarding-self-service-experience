@@ -107,8 +107,8 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         }
     }
 
-    listServices(userId: string): Promise<AxiosResponse> {
-        return this.get(`/get-services/${userId}`);
+    listServices(userId: string, accessToken: string): Promise<AxiosResponse> {
+        return this.get(`/get-services/${userId}`, accessToken);
     }
 
     listClients(serviceId: string, accessToken: string): Promise<AxiosResponse<QueryCommandOutput>> {

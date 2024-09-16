@@ -268,7 +268,7 @@ export default class SelfServiceServicesService {
     async listServices(userId: string, accessToken: string): Promise<Service[]> {
         console.info("In self-service-services-service:listServices()");
         await this.validateToken(accessToken, "listServices");
-        return dynamoServicesToDomainServices((await this.lambda.listServices(userId)).data.Items);
+        return dynamoServicesToDomainServices((await this.lambda.listServices(userId, accessToken)).data.Items);
     }
 
     async updateUser(userId: string, updates: UserUpdates, accessToken: string): Promise<void> {
@@ -285,6 +285,7 @@ export default class SelfServiceServicesService {
     }
 
     async globalSignOut(userEmail: string, accessToken: string): Promise<AxiosResponse> {
+        await this.validateToken(accessToken, "Global sign out");
         await this.cognito.globalSignOut(accessToken);
         return this.lambda.globalSignOut(userEmail);
     }
@@ -362,7 +363,9 @@ export default class SelfServiceServicesService {
     async recreateDynamoDBAccountLinks(authenticationResult: AuthenticationResultType, oldUserID: string) {
         console.info("In self-service-services-service:createNewDynamoDBAccountLinks()");
 
-        const serviceListToReplicate = dynamoServicesToDomainServices((await this.lambda.listServices(oldUserID)).data.Items);
+        const serviceListToReplicate = dynamoServicesToDomainServices(
+            (await this.lambda.listServices(oldUserID, nonNull(authenticationResult.AccessToken))).data.Items
+        );
 
         for (const serviceItem of serviceListToReplicate) {
             const serviceID: string = serviceItem.id;

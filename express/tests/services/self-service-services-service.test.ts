@@ -370,7 +370,7 @@ describe("SelfServiceServicesService tests", () => {
 
         const receivedServices = await mockS4Instance.listServices(TEST_USER_ID, TEST_ACCESS_TOKEN);
         expect(mockCognitoInterface.getUser).toHaveBeenCalledWith(TEST_ACCESS_TOKEN);
-        expect(mockLambdaFacade.listServices).toHaveBeenCalledWith(TEST_USER_ID);
+        expect(mockLambdaFacade.listServices).toHaveBeenCalledWith(TEST_USER_ID, TEST_ACCESS_TOKEN);
         expect(receivedServices).toStrictEqual([TEST_SERVICE, TEST_SERVICE]);
         expect(console.info).toHaveBeenCalledWith("In self-service-services-service:listServices()");
     });
