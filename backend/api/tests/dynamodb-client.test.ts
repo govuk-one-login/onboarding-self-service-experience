@@ -174,7 +174,7 @@ describe("DynamoDB client", () => {
         });
 
         it("should invoke updateUser successfully", async () => {
-            await client.updateUser("423423ada-32123892", "c-id-0001", {Name: "Robert"});
+            await client.updateUser("423423ada-32123892", {Name: "Robert"});
             expect(updateItemCommand).toBeCalledTimes(1);
         });
 

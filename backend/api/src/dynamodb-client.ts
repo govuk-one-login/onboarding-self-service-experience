@@ -175,7 +175,7 @@ export default class DynamoDbClient {
         return this.update("service", serviceId, "client", clientId, updates);
     }
 
-    async updateUser(userId: string, cognitoUserId: string, updates: Updates): Promise<UpdateItemCommandOutput> {
+    async updateUser(userId: string, updates: Updates): Promise<UpdateItemCommandOutput> {
         return this.update("user", userId, "user", userId, updates);
     }
 
