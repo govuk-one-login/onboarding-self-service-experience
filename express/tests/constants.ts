@@ -6,6 +6,7 @@ import {Client} from "../@types/client";
 
 export const TEST_TEMPLATE_PATH = "some/template/to/render";
 export const TEST_PASSWORD = "somePassword";
+export const TEST_USER_ID = "1ded3d65-d088-4319-9431-ea5a3323799d";
 export const TEST_EMAIL = "someEmail";
 export const TEST_SESSION_ID = "someSessionId";
 export const TEST_IP_ADDRESS = "1.1.1.1";
@@ -31,7 +32,7 @@ export const TEST_MFA_RESPONSE = {
     codeSentTo: TEST_PHONE_NUMBER
 };
 export const TEST_SECURITY_CODE = "123456";
-export const TEST_ACCESS_TOKEN = "someAccessToken";
+export const TEST_ACCESS_TOKEN = `.${Buffer.from(JSON.stringify({sub: TEST_USER_ID})).toString("base64url")}.`;
 export const TEST_REFRESH_TOKEN = "someRefreshToken";
 export const TEST_ID_TOKEN = "1.2.3";
 export const TEST_AUTHENTICATION_RESULT = {
@@ -55,7 +56,6 @@ export const TEST_JWT = JSON.stringify({
     email: TEST_EMAIL,
     scopes: TEST_SCOPES
 });
-export const TEST_USER_ID = "user#1234";
 export const TEST_USER = {
     id: TEST_USER_ID.substring("user#".length),
     fullName: TEST_FULL_NAME,
