@@ -153,7 +153,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         }
     }
 
-    async deleteClientEntries(userID: string, serviceID: string): Promise<void> {
+    async deleteClientEntries(userID: string, serviceID: string, accessToken: string): Promise<void> {
         console.log("In LambdaFacade-deleteClientEntries");
 
         const body = {
@@ -162,14 +162,14 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         };
 
         try {
-            await this.post("/delete-dynamodb-client-entries/", JSON.stringify(body));
+            await this.post("/delete-dynamodb-client-entries/", JSON.stringify(body), accessToken);
         } catch (error) {
             console.error(error as Error);
             throw error;
         }
     }
 
-    async deleteServiceEntries(serviceID: string): Promise<void> {
+    async deleteServiceEntries(serviceID: string, accessToken: string): Promise<void> {
         console.log("In LambdaFacade-deleteServiceEntries");
 
         const body = {
@@ -177,7 +177,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         };
 
         try {
-            await this.post("/delete-dynamodb-service-entries/", JSON.stringify(body));
+            await this.post("/delete-dynamodb-service-entries/", JSON.stringify(body), accessToken);
         } catch (error) {
             console.error(error as Error);
             throw error;
