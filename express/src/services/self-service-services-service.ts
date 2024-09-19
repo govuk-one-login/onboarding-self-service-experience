@@ -268,7 +268,7 @@ export default class SelfServiceServicesService {
     async listServices(userId: string, accessToken: string): Promise<Service[]> {
         console.info("In self-service-services-service:listServices()");
         await this.validateToken(accessToken, "listServices");
-        return dynamoServicesToDomainServices((await this.lambda.listServices(userId)).data.Items);
+        return dynamoServicesToDomainServices((await this.lambda.listServices(userId, accessToken)).data.Items);
     }
 
     async updateUser(userId: string, updates: UserUpdates, accessToken: string): Promise<void> {
@@ -285,6 +285,7 @@ export default class SelfServiceServicesService {
     }
 
     async globalSignOut(userEmail: string, accessToken: string): Promise<AxiosResponse> {
+        await this.validateToken(accessToken, "Global sign out");
         await this.cognito.globalSignOut(accessToken);
         return this.lambda.globalSignOut(userEmail);
     }
@@ -361,14 +362,15 @@ export default class SelfServiceServicesService {
 
     async recreateDynamoDBAccountLinks(authenticationResult: AuthenticationResultType, oldUserID: string) {
         console.info("In self-service-services-service:createNewDynamoDBAccountLinks()");
+        const accessToken = nonNull(authenticationResult.AccessToken);
+        await this.validateToken(accessToken, "recreateDynamoDBAccountLinks");
 
-        const serviceListToReplicate = dynamoServicesToDomainServices((await this.lambda.listServices(oldUserID)).data.Items);
+        const serviceListToReplicate = dynamoServicesToDomainServices((await this.lambda.listServices(oldUserID, accessToken)).data.Items);
 
         for (const serviceItem of serviceListToReplicate) {
             const serviceID: string = serviceItem.id;
             const serviceName: string = serviceItem.serviceName;
             const currentUserID = AuthenticationResultParser.getCognitoId(authenticationResult);
-            const accessToken: string = authenticationResult.AccessToken as string;
             const emailAddress = AuthenticationResultParser.getEmail(authenticationResult);
             const mobileNumber = AuthenticationResultParser.getPhoneNumber(authenticationResult);
 
@@ -389,13 +391,14 @@ export default class SelfServiceServicesService {
 
             await this.putUser(dynamoUser, accessToken);
             await this.newService(service, currentUserID, authenticationResult);
-            await this.lambda.deleteClientEntries(oldUserID, serviceID);
+            await this.lambda.deleteClientEntries(oldUserID, serviceID, accessToken);
         }
     }
 
-    async deleteServiceEntries(serviceID: string) {
+    async deleteServiceEntries(serviceID: string, accessToken: string) {
         console.info("In self-service-services-service:deleteServiceEntries()");
         console.log("Service ID => " + serviceID);
-        await this.lambda.deleteServiceEntries(serviceID);
+        await this.validateToken(accessToken, "deleteServiceEntries");
+        await this.lambda.deleteServiceEntries(serviceID, accessToken);
     }
 }

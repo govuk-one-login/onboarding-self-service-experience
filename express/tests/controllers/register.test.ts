@@ -18,6 +18,7 @@ import {
 } from "../../src/controllers/register";
 import {request, response} from "../mocks";
 import {
+    TEST_ACCESS_TOKEN,
     TEST_AUTHENTICATION_RESULT,
     TEST_COGNITO_ID,
     TEST_COGNITO_SESSION_STRING,
@@ -792,7 +793,7 @@ describe("processAddServiceForm controller tests", () => {
             {id: `service#${TEST_UUID}`, serviceName: TEST_SERVICE_NAME},
             TEST_AUTHENTICATION_RESULT
         );
-        expect(s4DeleteServiceEntriesSpy).toHaveBeenCalledWith(TEST_UUID);
+        expect(s4DeleteServiceEntriesSpy).toHaveBeenCalledWith(TEST_UUID, TEST_ACCESS_TOKEN);
         expect(mockRes.render).toHaveBeenCalledWith("there-is-a-problem.njk");
     });
 

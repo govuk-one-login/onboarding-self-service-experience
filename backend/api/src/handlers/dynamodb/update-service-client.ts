@@ -10,7 +10,9 @@ export type clientRegistryUpdateResponse = {
     clientId: string;
     updates: Updates;
 };
-
+//This lambda is called by the step function after updating the Client registry
+//Given we authorise the user before we call the step function, there is no need
+//to implement additional authorisation here
 export const updateServiceClientHandler = async (event: handlerInvokeEvent): Promise<{statusCode: number; body: string}> => {
     const payload: clientRegistryUpdateResponse = JSON.parse(event.body);
 

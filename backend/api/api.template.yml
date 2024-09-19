@@ -915,9 +915,14 @@ Resources:
             - Effect: Allow
               Action: states:StartSyncExecution
               Resource: !Ref UpdateClientStepFunction
+        - DynamoDBReadPolicy:
+            TableName:
+              Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref UpdateClientStepFunction
+          TABLE:
+            Fn::ImportValue: !Sub ${DeploymentName}-DynamoDB-DataTableName
       Events:
         Api:
           Type: Api

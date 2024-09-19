@@ -152,26 +152,36 @@ describe("Lambda Facade class tests", () => {
 
     it("POSTs the /delete-dynamodb-client-entries when the deleteClientEntries method is called", async () => {
         const mockLambdaFacade = new LambdaFacade();
-        await mockLambdaFacade.deleteClientEntries(TEST_COGNITO_ID, TEST_SERVICE_ID);
+        await mockLambdaFacade.deleteClientEntries(TEST_COGNITO_ID, TEST_SERVICE_ID, TEST_ACCESS_TOKEN);
 
         expect(mockPost).toHaveBeenCalledWith(
             "/delete-dynamodb-client-entries/",
             JSON.stringify({
                 userId: TEST_COGNITO_ID,
                 serviceId: TEST_SERVICE_ID
-            })
+            }),
+            {
+                headers: {
+                    Authorization: `Bearer ${TEST_ACCESS_TOKEN}`
+                }
+            }
         );
     });
 
     it("POSTs the /delete-dynamodb-service-entries when the deleteServiceEntries method is called", async () => {
         const mockLambdaFacade = new LambdaFacade();
-        await mockLambdaFacade.deleteServiceEntries(TEST_SERVICE_ID);
+        await mockLambdaFacade.deleteServiceEntries(TEST_SERVICE_ID, TEST_ACCESS_TOKEN);
 
         expect(mockPost).toHaveBeenCalledWith(
             "/delete-dynamodb-service-entries/",
             JSON.stringify({
                 serviceId: TEST_SERVICE_ID
-            })
+            }),
+            {
+                headers: {
+                    Authorization: `Bearer ${TEST_ACCESS_TOKEN}`
+                }
+            }
         );
     });
 
