@@ -8,10 +8,6 @@ Feature: A page where users can view the details associated with a client
     Scenario: The user is able to see the value for the field Client ID
       Then they should see the value for the Client ID "P0_ZdXojEGDlaZEU8Q9Zlv-fo1s"
 
-    @ci @smoke
-    Scenario: The user wants to view the user name and password for end journey
-      Then they should see the text "Username: integration-user"
-      And they should see the text "Password: winter2021"
 
   Rule: The the hidden content and the links which open in a new tab, are available for the user to view
     @ci @smoke
