@@ -38,6 +38,8 @@ import {
     TEST_ACCESS_TOKEN,
     TEST_AUTHENTICATION_RESULT,
     TEST_BACK_CHANNEL_LOGOUT_URI,
+    TEST_BASIC_AUTH_PASSWORD,
+    TEST_BASIC_AUTH_USERNAME,
     TEST_CLAIM,
     TEST_CLAIMS,
     TEST_CLAIMS_OUT,
@@ -98,6 +100,8 @@ describe("showClient Controller tests", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        process.env.BASIC_AUTH_USERNAME = TEST_BASIC_AUTH_USERNAME;
+        process.env.BASIC_AUTH_PASSWORD = TEST_BASIC_AUTH_PASSWORD;
     });
 
     it("calls render with the expected template and options from the first client returned from s4 listClients", async () => {
@@ -159,6 +163,10 @@ describe("showClient Controller tests", () => {
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+            },
+            basicAuthCreds: {
+                username: TEST_BASIC_AUTH_USERNAME,
+                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -223,6 +231,10 @@ describe("showClient Controller tests", () => {
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+            },
+            basicAuthCreds: {
+                username: TEST_BASIC_AUTH_USERNAME,
+                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -287,6 +299,10 @@ describe("showClient Controller tests", () => {
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLIENT.claims}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+            },
+            basicAuthCreds: {
+                username: TEST_BASIC_AUTH_USERNAME,
+                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -352,6 +368,10 @@ describe("showClient Controller tests", () => {
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+            },
+            basicAuthCreds: {
+                username: TEST_BASIC_AUTH_USERNAME,
+                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -416,6 +436,10 @@ describe("showClient Controller tests", () => {
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+            },
+            basicAuthCreds: {
+                username: TEST_BASIC_AUTH_USERNAME,
+                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -482,6 +506,10 @@ describe("showClient Controller tests", () => {
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+            },
+            basicAuthCreds: {
+                username: TEST_BASIC_AUTH_USERNAME,
+                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -547,6 +575,10 @@ describe("showClient Controller tests", () => {
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+            },
+            basicAuthCreds: {
+                username: TEST_BASIC_AUTH_USERNAME,
+                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);

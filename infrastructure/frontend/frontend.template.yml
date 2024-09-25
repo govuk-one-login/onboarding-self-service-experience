@@ -221,6 +221,10 @@ Resources:
                 - IsProd
                 - !Ref AWS::NoValue
                 - "{{resolve:secretsmanager:/self-service/frontend/fixed-otp-credentials}}"
+            - Name: BASIC_AUTH_USERNAME
+              Value: "{{resolve:secretsmanager:/self-service/frontend/basic-auth-username}}"
+            - Name: BASIC_AUTH_PASSWORD
+              Value: "{{resolve:secretsmanager:/self-service/frontend/basic-auth-password}}"
 
           PortMappings:
             - ContainerPort: !Ref ContainerPort

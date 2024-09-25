@@ -94,6 +94,10 @@ export const showClient: RequestHandler = async (req, res) => {
             changeIdTokenSigningAlgorithm: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-id-token-signing-algorithm?algorithm=${encodeURIComponent(
                 idTokenSigningAlgorithm
             )}`
+        },
+        basicAuthCreds: {
+            username: process.env.BASIC_AUTH_USERNAME ?? "",
+            password: process.env.BASIC_AUTH_PASSWORD ?? ""
         }
     });
 
