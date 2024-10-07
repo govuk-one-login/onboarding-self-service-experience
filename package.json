@@ -33,7 +33,7 @@
     "@aws-sdk/util-dynamodb": "^3.624.0",
     "@pact-foundation/pact": "^12.5.2",
     "axios": "^1.7.4",
-    "googleapis": "^128.0.0",
+    "googleapis": "^142.0.0",
     "googleapis-common": "^7.2.0",
     "helmet": "^7.0.0"
   },
