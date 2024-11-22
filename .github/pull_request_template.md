@@ -39,3 +39,8 @@ Before any work can be merged to main in must meet the definition of done and be
 ### `Fixed` for any bug fixes
 
 ### `Security` in case of vulnerabilities
+
+## Commit message controls
+
+-   `[deploy]` in the commit message of the pushed commit will trigger a preview deploy
+-   `[skip-checks]` in the commit message of the merge commit will skip merge queue checks. This is to be used as an escape hatch only.
