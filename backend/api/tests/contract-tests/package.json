@@ -8,7 +8,6 @@
     "buildjs": "cp -r assets/javascripts dist/assets/",
     "build": "npm run buildts && npm run buildjs",
     "publish": "node dist/provider/publish.js",
-    "verify": "node dist/provider/verifier.js",
     "test": "npm run publish && jest --detectOpenHandles"
   },
   "author": "",
