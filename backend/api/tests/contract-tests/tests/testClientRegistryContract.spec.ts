@@ -2,64 +2,14 @@
 
 import {MatchersV3, PactV3} from "@pact-foundation/pact";
 import * as path from "path";
-import axios from "axios";
-import {Agent} from "node:http";
+import {  public_key, registerClientHandler, RegisterClientPayload } from "../../../src/handlers/auth/register-client";
+import {clientRegistryResponse } from "../../../src/handlers/types/client-registry-response";
+import { mockLambdaContext } from "../../handlers/utils";
+import { updateClientInRegistryHandler, UpdateClientPayload } from "../../../src/handlers/auth/update-client";
 
 beforeAll((): void => {
     jest.setTimeout(200000);
 });
-
-const client = axios.create({
-    httpAgent: new Agent()
-});
-
-const EXPECTED_BODY =
-    "{\n" +
-    '"client_name": "My test service",\n' +
-    '"public_key": "1234567890",\n' +
-    '"redirect_uris": ["http://localhost/"],\n' +
-    '"contacts": ["pacttest.account@digital.cabinet-office.gov.uk"],\n' +
-    '"scopes": ["openid", "email", "phone"],\n' +
-    '"subject_type": "pairwise",\n' +
-    '"service_type": "MANDATORY",\n' +
-    '"sector_identifier_uri": "http://gov.uk"\n' +
-    "}";
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const postRequest = async (url, data): string => {
-    const postUrl = `${url}/connect/register`;
-    const headers = {headers: {responseType: "json", "Content-Type": "application/json; charset=utf-8"}};
-    console.log("********** postRequest sending to :" + postUrl);
-    return await client
-        .post(postUrl, data, headers)
-        .then(res => {
-            console.log("********** postRequest returning : " + res.data.toString());
-            return res.data.toString();
-        })
-        .catch(err => {
-            console.log("********** postRequest error : " + err.toString());
-            return "ERROR: " + err.toString();
-        });
-};
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const putRequest = async (url, data): string => {
-    const postUrl = `${url}/connect/register`;
-    const headers = {headers: {responseType: "json", "Content-Type": "application/json; charset=utf-8"}};
-    console.log("********** putRequest sending to :" + postUrl);
-    return await client
-        .put(postUrl, data, headers)
-        .then(res => {
-            console.log("********** putRequest returning : " + res.data.toString());
-            return res.data.toString();
-        })
-        .catch(err => {
-            console.log("********** putRequest error : " + err.toString());
-            return "ERROR: " + err.toString();
-        });
-};
 
 describe("ClientRegistryProvider", () => {
     const {eachLike} = MatchersV3;
@@ -73,21 +23,43 @@ describe("ClientRegistryProvider", () => {
     });
 
     describe("When a POST request is made to create a client", () => {
-        test("it should return a message", async () => {
+        const postEvent: RegisterClientPayload = {
+            contactEmail: "pacttest.account@digital.cabinet-office.gov.uk",
+            service: {
+                serviceName: "My test service",
+                id: "service#testRandomId"
+            }
+        };
+
+        const client_config = {
+            client_name: postEvent.service.serviceName,
+            public_key: public_key,
+            redirect_uris: ["http://localhost/"],
+            contacts: [postEvent.contactEmail],
+            scopes: ["openid", "email", "phone"],
+            subject_type: "pairwise",
+            service_type: "MANDATORY",
+            sector_identifier_uri: "http://gov.uk",
+            client_locs: ["P2"]
+        };
+    
+        const { client_locs, ...expected_returned_values } = client_config;
+
+        test("it should return an a client registry object when adding a client", async () => {
             provider
-                .uponReceiving("add a Client")
+                .uponReceiving("configuration to add a client")
                 .withRequest({
                     method: "POST",
                     path: "/connect/register",
                     contentType: "application/json",
                     headers: {
-                        "Content-Type": "application/json; charset=utf-8"
+                        "Content-Type": "application/json"
                     },
-                    body: EXPECTED_BODY
+                    body: JSON.stringify(client_config)
                 })
                 .willRespondWith({
                     status: 200,
-                    body: eachLike(EXPECTED_BODY),
+                    body: eachLike(expected_returned_values),
                     contentType: "application/json",
                     headers: {
                         "Content-Type": "application/json; charset=utf-8"
@@ -95,29 +67,67 @@ describe("ClientRegistryProvider", () => {
                 });
 
             await provider.executeTest(async mockProvider => {
-                const [results] = await Promise.all([postRequest(mockProvider.url, EXPECTED_BODY)]);
-                console.log("RESULTS: " + JSON.stringify(results));
-                expect(results).toContain(EXPECTED_BODY);
+                process.env.AUTH_REGISTRATION_BASE_URL = mockProvider.url;
+                const results = await registerClientHandler(postEvent, mockLambdaContext);
+                expect(JSON.parse(results.body)).toMatchObject(expected_returned_values);
             });
         });
     });
 
     describe("When a PUT request is made to update a client", () => {
-        test("it should return a message", async () => {
+        const updatesForClient = {
+            contacts: ["new.eamil@digital.cabinet-office.gov.uk"],
+            subject_type: "pairwise"
+        }
+
+        const putEvent: UpdateClientPayload = {
+            clientId: "testClientId",
+            serviceId: "testServiceId",
+            selfServiceClientId: "testSelfServiceClientId",
+            updates: {
+                ...updatesForClient
+            }
+        }
+
+        const expected_response: clientRegistryResponse  = {
+            client_name: "testClientUpdateResponseName",
+            public_key: "testClientPublicKey",
+            public_key_source: "STATIC",
+            redirect_uris: ["http://testClientUrl"],
+            contacts: updatesForClient.contacts,
+            scopes: ["openid", "email"],
+            subject_type: updatesForClient.subject_type,
+            service_type: "MANDATORY",
+            sector_identifier_uri: "http://gov.uk",
+            client_id: "testClientId",
+            post_logout_redirect_uris: [],
+            back_channel_logout_uri: null,
+            token_endpoint_auth_method: "private_key_jwt",
+            response_type: "code",
+            jar_validation_required: false,
+            claims: [],
+            client_type: "web", 
+            id_token_signing_algorithm: "ES256",
+            jwks_uri: null,
+            channel: "WEB",
+            max_age_enabled: false
+        }
+
+        test("it should return an a client registry object when updating a client", async () => {
             provider
-                .uponReceiving("update a Client")
+                .uponReceiving("configuration to update a client")
                 .withRequest({
                     method: "PUT",
-                    path: "/connect/register",
+                    path: `/connect/register/${putEvent.clientId}`,
                     contentType: "application/json",
                     headers: {
-                        "Content-Type": "application/json; charset=utf-8"
+                        "Content-Type": "application/json;"
                     },
-                    body: EXPECTED_BODY
+                    body: updatesForClient
                 })
                 .willRespondWith({
                     status: 200,
-                    body: eachLike(EXPECTED_BODY),
+                    body: eachLike(expected_response),
                     contentType: "application/json",
                     headers: {
                         "Content-Type": "application/json; charset=utf-8"
@@ -125,9 +135,9 @@ describe("ClientRegistryProvider", () => {
                 });
 
             await provider.executeTest(async mockProvider => {
-                const [results] = await Promise.all([putRequest(mockProvider.url, EXPECTED_BODY)]);
-                console.log("RESULTS: " + JSON.stringify(JSON.stringify(results)));
-                expect(results).toContain(EXPECTED_BODY);
+                process.env.AUTH_REGISTRATION_BASE_URL = mockProvider.url;
+                const results = await updateClientInRegistryHandler(putEvent, mockLambdaContext);
+                expect(JSON.parse(results.body)[0]).toMatchObject(expected_response);
             });
         });
     });
