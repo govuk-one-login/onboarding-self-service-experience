@@ -8,7 +8,8 @@
     "buildjs": "cp -r assets/javascripts dist/assets/",
     "build": "npm run buildts && npm run buildjs",
     "publish": "node dist/provider/publish.js",
-    "test": "npm run publish && jest --detectOpenHandles"
+    "test": "jest && npm run publish",
+    "test:pact": "jest"
   },
   "author": "",
   "license": "ISC",
