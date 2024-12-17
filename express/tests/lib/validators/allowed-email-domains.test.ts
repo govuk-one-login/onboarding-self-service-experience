@@ -18,10 +18,6 @@ describe("Verify email domains", () => {
         it("Allow an email address ending with a domain on the allowed list", async () => {
             expect(await hasAllowedDomain(`email@top.level.${allowedDomain}`)).toBe(true);
         });
-
-        it("Allow an email address ending with a subdomain on the allowed list", async () => {
-            expect(await hasAllowedDomain(`email@top.level${allowedSubDomain}`)).toBe(true);
-        });
     });
 
     describe("Reject invalid domains", () => {
@@ -35,6 +31,10 @@ describe("Verify email domains", () => {
 
         it("Reject an email address not ending with a subdomain on the allowed list", async () => {
             expect(await hasAllowedDomain(`email@top.level.${allowedSubDomain}.subdomain`)).toBe(false);
+        });
+
+        it("Rejects an email address where the allowed domain is a substring but not a subdomain", async () => {
+            expect(await hasAllowedDomain(`email@evil.not${allowedSubDomain}`)).toBe(false);
         });
     });
 });
