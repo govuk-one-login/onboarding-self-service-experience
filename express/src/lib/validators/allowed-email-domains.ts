@@ -6,7 +6,7 @@ const allowedEmailDomains = loadAllowedEmailDomains();
 export default async function hasAllowedDomain(emailAddress: string): Promise<boolean> {
     const domains = await allowedEmailDomains;
     const emailDomain = getEmailDomain(emailAddress);
-    return domains.some(domain => emailDomain.endsWith(domain));
+    return domains.some(domain => emailDomain === domain || emailDomain.endsWith("." + domain));
 }
 
 function getEmailDomain(email: string) {

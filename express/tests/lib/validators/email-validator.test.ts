@@ -2,7 +2,7 @@ import validateEmail from "../../../src/lib/validators/email-validator";
 
 jest.mock("fs/promises", () => {
     return {
-        readFile: jest.fn(() => `allowed.domain\n.gov.uk`)
+        readFile: jest.fn(() => `allowed.domain\ngov.uk`)
     };
 });
 
