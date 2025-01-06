@@ -59,6 +59,7 @@ describe("ClientRegistryProvider", () => {
 
         test("it should return an a client registry object when adding a client", async () => {
             provider
+                .given("valid configuration to add a client")
                 .uponReceiving("configuration to add a client")
                 .withRequest({
                     method: "POST",
@@ -108,6 +109,7 @@ describe("ClientRegistryProvider", () => {
 
         test("it should return an a client registry object when updating a client", async () => {
             provider
+                .given("testClientIdExampleText1234 is a valid clientId")
                 .uponReceiving("configuration to update a client")
                 .withRequest({
                     method: "PUT",
