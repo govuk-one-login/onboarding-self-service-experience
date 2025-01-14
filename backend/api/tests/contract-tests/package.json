@@ -9,7 +9,7 @@
     "build": "npm run buildts && npm run buildjs",
     "publish": "node dist/provider/publish.js",
     "test": "jest && npm run publish",
-    "test:pact": "jest"
+    "test:pact": "jest --detectOpenHandles -runInBand"
   },
   "author": "",
   "license": "ISC",

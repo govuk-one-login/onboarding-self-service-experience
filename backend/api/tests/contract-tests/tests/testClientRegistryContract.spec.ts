@@ -8,22 +8,19 @@ import {clientRegistryResponse} from "../../../src/handlers/types/client-registr
 import {mockLambdaContext} from "../../handlers/utils";
 import {updateClientInRegistryHandler, UpdateClientPayload} from "../../../src/handlers/auth/update-client";
 
-beforeAll((): void => {
-    jest.setTimeout(200000);
-});
-
 describe("ClientRegistryProvider", () => {
     const {like} = MatchersV3;
 
-    const provider = new PactV3({
-        dir: path.resolve(process.cwd(), "pacts"),
-        logLevel: "debug",
-        port: 8080,
-        consumer: "SSEAdminAPIClient",
-        provider: "ClientRegistryProvider"
-    });
-
     describe("When a POST request is made to create a client", () => {
+        const provider = new PactV3({
+            dir: path.resolve(process.cwd(), "pacts"),
+            logLevel: "debug",
+            port: 8080,
+            host: "127.0.0.1",
+            consumer: "SSEAdminAPIClient",
+            provider: "ClientRegistryProvider"
+        });
+
         const postEvent: RegisterClientPayload = {
             contactEmail: "pacttest.account@digital.cabinet-office.gov.uk",
             service: {
@@ -88,6 +85,15 @@ describe("ClientRegistryProvider", () => {
     });
 
     describe("When a PUT request is made to update a client", () => {
+        const provider = new PactV3({
+            dir: path.resolve(process.cwd(), "pacts"),
+            logLevel: "debug",
+            port: 8081,
+            host: "127.0.0.1",
+            consumer: "SSEAdminAPIClient",
+            provider: "ClientRegistryProvider"
+        });
+
         const updatesForClient = {
             contacts: ["new.email@digital.cabinet-office.gov.uk"],
             subject_type: "pairwise"
