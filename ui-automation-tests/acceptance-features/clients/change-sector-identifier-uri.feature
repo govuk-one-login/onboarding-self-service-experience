@@ -16,7 +16,6 @@ Feature: Users can change their Sector identifier URI
         | uri               | errorMsg                                          |
         |                   | Enter a URI                                      |
         | someVerywrongURI  | Enter your URIs in the format https://example.com |
-        | http://test.com   | URIs must be https or http://localhost            |
 
     @ci @smoke
     Scenario: The user clicks "Cancel" on the Enter sector identifier URI

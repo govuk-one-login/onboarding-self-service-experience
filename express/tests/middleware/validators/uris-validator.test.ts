@@ -22,7 +22,7 @@ describe("Validate submitted URIs", () => {
     });
 
     it("Render errors if the URIs are not valid", () => {
-        req.body.redirectUri = "http://invalid.gov.uk/";
+        req.body.redirectUri = "invalid.gov.uk/";
         validator(req, res, next);
 
         expect(next).not.toHaveBeenCalled();

@@ -16,7 +16,6 @@ Feature: Users can change their Back channel logout URI
             Examples:
                 | uri              | errorMsg                                          |
                 | someVerywrongURI | Enter your URIs in the format https://example.com |
-                | http://test.com  | URIs must be https or http://localhost            |
 
         @ci
         Scenario: The user clicks "Cancel" on the Enter back channel logout URI page

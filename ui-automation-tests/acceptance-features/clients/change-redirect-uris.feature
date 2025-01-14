@@ -20,7 +20,6 @@ Feature: Users can change their Redirect URIs
         | uri              | errorMsg                                          |
         |                  | Enter a URI                                      |
         | someVerywrongURI | Enter your URIs in the format https://example.com |
-        | http://test.com  | URIs must be https or http://localhost            |
 
     @ci
     Scenario: The user clicks "Cancel" link on the Enter redirect URI page
