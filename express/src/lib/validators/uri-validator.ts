@@ -19,7 +19,7 @@ export default function validateUri(uri: string, isGovUrl?: boolean, allowEmptyV
         return {isValid: false, errorMessage: "Enter your URIs in the format https://example.com"};
     }
 
-    if (validUri.protocol !== "https:" && validUri.hostname !== "localhost") {
+    if (validUri.protocol !== "https:" && validUri.protocol !== "http:") {
         return {isValid: false, errorMessage: "URIs must be https or http://localhost"};
     }
     if (isGovUrl && !/.+\.gov\.uk$/.test(validUri.hostname)) {
