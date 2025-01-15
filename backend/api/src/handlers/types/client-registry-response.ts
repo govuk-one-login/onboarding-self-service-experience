@@ -1,0 +1,23 @@
+export type clientRegistryResponse = {
+    client_name: string;
+    public_key: string;
+    public_key_source: null | string;
+    redirect_uris: string[];
+    contacts: string[];
+    scopes: string[];
+    subject_type: string;
+    service_type: string;
+    sector_identifier_uri: string;
+    client_id: string;
+    post_logout_redirect_uris: string[];
+    back_channel_logout_uri: null | string;
+    token_endpoint_auth_method: string;
+    response_type: string;
+    jar_validation_required: boolean;
+    claims: string[];
+    client_type: string;
+    id_token_signing_algorithm: "ES256" | "RS256";
+    jwks_uri: null | string;
+    channel: null | string;
+    max_age_enabled: boolean;
+};

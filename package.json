@@ -21,8 +21,8 @@
     "list": "infrastructure/dev/deploy.sh list",
     "open": "infrastructure/dev/deploy.sh open",
     "creds": "infrastructure/aws.sh",
-    "test": "jest --silent",
-    "test:cov": "jest --silent --coverage",
+    "test": "jest --runInBand",
+    "test:cov": "jest --coverage",
     "lint": "prettier . --check ; eslint '*.ts' --quiet --fix",
     "lint:fix": "prettier . --write ; eslint . --fix",
     "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt"
