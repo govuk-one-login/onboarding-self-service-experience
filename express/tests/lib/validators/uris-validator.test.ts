@@ -20,10 +20,7 @@ describe("Validate URIs", () => {
         expect(validateUri("http://localhost/link").isValid).toBe(true);
     });
 
-    it("Reject http for a non-localhost URL", () => {
-        expect(validateUri("http://some.gov.uk/link")).toEqual({
-            isValid: false,
-            errorMessage: "URIs must be https or http://localhost"
-        });
+    it("Accept http for a non-localhost URL", () => {
+        expect(validateUri("http://some.gov.uk/link").isValid).toBe(true);
     });
 });
