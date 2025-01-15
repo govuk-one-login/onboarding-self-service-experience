@@ -19,7 +19,7 @@
     "supertest": "^6.3.3"
   },
   "dependencies": {
-    "@pact-foundation/pact-core": "^14.0.5",
+    "@pact-foundation/pact-core": "^15.2.1",
     "@pact-foundation/pact-node": "^10.17.7",
     "mocha": "^10.2.0"
   }
