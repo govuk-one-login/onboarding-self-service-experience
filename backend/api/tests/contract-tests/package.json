@@ -7,7 +7,7 @@
     "buildts": "tsc $(${CI:-false} && echo --sourceMap false)",
     "buildjs": "cp -r assets/javascripts dist/assets/",
     "build": "npm run buildts && npm run buildjs",
-    "publish": "node dist/publish.js",
+    "publish": "tsc src/publish.ts",
     "test": "jest && npm run publish",
     "test:pact": "jest --detectOpenHandles -runInBand"
   },
