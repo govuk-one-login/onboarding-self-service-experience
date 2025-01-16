@@ -1,2 +1,4 @@
 # Global
 *   @govuk-one-login/orchestration-team
+express/resources/allowed-email-domains.txt @govuk-one-login/adoption-architects @govuk-one-login/orchestration-team
+express/src/views/register/enter-email-address.njk @govuk-one-login/adoption-architects @govuk-one-login/orchestration-team
