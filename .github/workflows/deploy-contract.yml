@@ -1,0 +1,60 @@
+#Contract test workflow for Typescript
+name: Run Consumer Contract Test
+
+env:
+  PACT_USER: ${{ secrets.PACT_USER }}
+  PACT_PASSWORD: ${{ secrets.PACT_PASSWORD }}
+  PACT_URL: ${{ secrets.PACT_URL }}
+  PACT_BROKER_SOURCE_SECRET_DEV: ${{ secrets.PACT_BROKER_SOURCE_SECRET }}
+  GIT_BRANCH: ${{ github.head_ref || github.ref_name }}
+  CONSUMER_APP_VERSION: ${{ github.sha }}
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+      - synchronize
+
+permissions:
+  id-token: write
+  contents: read
+
+
+jobs:
+  contract-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Install Tyepscript
+        run: npm install -D typescript
+
+      - name: Install Node
+        run: sudo apt install nodejs
+
+      - name: Install Pact Node
+        run: npm install @pact-foundation/pact-node --save
+
+      - name: Install dependencies
+        working-directory: ./backend/api/tests/contract-tests
+        run: npm install
+
+      - name: Build
+        working-directory: ./backend/api/tests/contract-tests
+        run: npm run buildts
+
+      - name: Run Pact Test
+        working-directory: ./backend/api/tests/contract-tests
+        run: npm run test:pact
+
+      - name: Publish Pact Contract
+        working-directory: ./backend/api/tests/contract-tests
+        if: github.actor != 'dependabot[bot]' && github.event_name == 'push'
+        run: |
+          npm run connect
+          npm run publish
