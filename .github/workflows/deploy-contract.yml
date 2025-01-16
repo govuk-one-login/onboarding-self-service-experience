@@ -10,18 +10,11 @@ env:
   GIT_BRANCH: ${{ github.head_ref || github.ref_name }}
   CONSUMER_APP_VERSION: ${{ github.sha }}
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - backend/api/tests/contract-tests
+on: [pull_request]
 
 permissions:
   id-token: write
   contents: read
-
 
 jobs:
   contract-testing:
