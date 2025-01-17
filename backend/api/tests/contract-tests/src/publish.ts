@@ -36,8 +36,4 @@ const publishPact = async () => {
     }
 };
 
-if (process.arch.toString() != "x64") {
-    console.log("Unsupported architecture " + process.arch.toString() + " - bailing out.");
-} else {
-    void publishPact();
-}
+void publishPact();
