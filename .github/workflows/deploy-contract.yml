@@ -36,10 +36,19 @@ jobs:
         working-directory: ./backend/api/tests/contract-tests
         run: npm install
 
+      - name: Build
+        working-directory: ./backend/api/tests/contract-tests
+        run: npm run buildts
+
       - name: Run Pact Test
         working-directory: ./backend/api/tests/contract-tests
         run: npm run test:pact
 
       - name: Publish Pact Contract
         working-directory: ./backend/api/tests/contract-tests
+        env:
+          PACT_USER: ${{ secrets.PACT_USER }}
+          PACT_PASSWORD: ${{ secrets.PACT_PASSWORD }}
+          PACT_URL: ${{ secrets.PACT_URL }}
+          PACT_BROKER_SOURCE_SECRET_DEV: ${{ secrets.PACT_BROKER_SOURCE_SECRET_DEV }}
         run: npm run publish
