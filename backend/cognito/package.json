@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@aws-crypto/client-node": "^4.0.1",
-    "@aws-lambda-powertools/logger": "2.6.0",
+    "@aws-lambda-powertools/logger": "2.13.0",
     "@aws-sdk/client-ses": "^3.609.0",
     "base64-js": "^1.5.1",
-    "esbuild": "^0.23.0",
+    "esbuild": "^0.24.2",
     "notifications-node-client": "^8.2.1"
   }
 }
