@@ -7,25 +7,22 @@ const {publishPacts} = pkg;
 
 import {resolve} from "path";
 
-const brokerUrl = process.env.PACT_BROKER_BASE_URL || "";
-const brokerUsername = process.env.PACT_BROKER_USERNAME || "";
-const brokerPassword = process.env.PACT_BROKER_PASSWORD || "";
+const brokerUrl = process.env.PACT_URL || "";
+const brokerUsername = process.env.PACT_USER || "";
+const brokerPassword = process.env.PACT_PASSWORD || "";
 
-const consumerVersion = "1.0.0";
-const providerVersion = "1.0.0";
+const consumerVersion = process.env.CONSUMER_APP_VERSION || "";
 
 const publishPact = async () => {
     try {
         const publishOptions = {
-            pactFilesOrDirs: ["src/pacts"],
+            pactFilesOrDirs: [resolve(process.cwd(), "pacts")],
             pactBroker: brokerUrl,
             pactBrokerUsername: brokerUsername,
             pactBrokerPassword: brokerPassword,
-            pactUrls: [resolve(process.cwd(), "src/pacts")],
-            logLevel: "debug",
+            logLevel: "info",
             consumerVersion: consumerVersion,
-            providerVersion: providerVersion,
-            providersVersionTags: ""
+            branch: process.env.GIT_BRANCH
         };
 
         const result = await publishPacts(publishOptions);
@@ -36,8 +33,4 @@ const publishPact = async () => {
     }
 };
 
-if (process.arch.toString() != "x64") {
-    console.log("Unsupported architecture " + process.arch.toString() + " - bailing out.");
-} else {
-    void publishPact();
-}
+void publishPact();
