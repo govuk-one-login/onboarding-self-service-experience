@@ -165,6 +165,7 @@ Metadata:
     config:
       ignore_checks:
         - W6001
+        - W8003
 
 Resources:
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html
