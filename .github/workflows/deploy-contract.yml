@@ -18,6 +18,9 @@ on:
       - reopened
       - ready_for_review
       - synchronize
+  push:
+    branches:
+      - main
 
 permissions:
   id-token: write
