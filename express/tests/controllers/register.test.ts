@@ -260,6 +260,22 @@ describe("showCheckEmailForm controller tests", () => {
         expect(s4SendTxmaLogSpy).not.toHaveBeenCalled();
         expect(mockRes.redirect).toHaveBeenCalledWith("/register");
     });
+
+    it("it renders an error page if the code request count in the session is higher than 6", async () => {
+        const mockReq = request({
+            session: {
+                id: TEST_SESSION_ID,
+                emailAddress: TEST_EMAIL,
+                emailCodeSubmitCount: 10
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+
+        await showCheckEmailForm(mockReq, mockRes, mockNext);
+        expect(mockRes.render).toHaveBeenCalledWith("register/too-many-codes.njk");
+    });
 });
 
 describe("submitEmailSecurityCode controller tests", () => {
@@ -375,6 +391,52 @@ describe("submitEmailSecurityCode controller tests", () => {
         const mockNext = jest.fn();
         await expect(submitEmailSecurityCode(mockReq, mockRes, mockNext)).rejects.toThrow();
         expect(s4SubmitUsernamePasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_SECURITY_CODE);
+    });
+
+    it("increments the emailSubmitCount when the code is incorrect", async () => {
+        s4SubmitUsernamePasswordSpy.mockRejectedValue(
+            new NotAuthorizedException({
+                $metadata: {httpStatusCode: 400},
+                message: "Wrong code"
+            })
+        );
+
+        s4SendTxmaLogSpy.mockReturnValue();
+
+        const mockReq = request({
+            session: {
+                id: TEST_SESSION_ID,
+                emailAddress: TEST_EMAIL
+            },
+            body: {
+                securityCode: TEST_SECURITY_CODE
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+        await submitEmailSecurityCode(mockReq, mockRes, mockNext);
+        expect(s4SubmitUsernamePasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_SECURITY_CODE);
+        expect(s4SetSignupStatusSpy).not.toHaveBeenCalled();
+        expect(s4SendTxmaLogSpy).toHaveBeenCalledWith(
+            "SSE_EMAIL_VERIFICATION_COMPLETE",
+            {
+                session_id: TEST_SESSION_ID,
+                ip_address: TEST_IP_ADDRESS,
+                email: TEST_EMAIL
+            },
+            {
+                outcome: "failed"
+            }
+        );
+
+        expect(mockReq.session.emailCodeSubmitCount).toStrictEqual(1);
+        expect(mockRes.render).toHaveBeenCalledWith("register/enter-email-code.njk", {
+            values: {emailAddress: TEST_EMAIL},
+            errorMessages: {
+                securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
+            }
+        });
     });
 });
 

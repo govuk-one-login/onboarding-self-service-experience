@@ -66,6 +66,10 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
         return res.redirect("/register");
     }
 
+    if (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) {
+        return res.render("register/too-many-codes.njk");
+    }
+
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     s4.sendTxMALog("SSE_EMAIL_VERIFICATION_REQUEST", {
@@ -84,12 +88,23 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         return res.redirect("/register");
     }
 
+    if (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) {
+        return res.render("register/too-many-codes.njk");
+    }
+
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
         const response = await s4.submitUsernamePassword(req.session.emailAddress, req.body.securityCode);
         req.session.cognitoSession = response.Session;
     } catch (error) {
+        if (!req.session.emailCodeSubmitCount) {
+            req.session.emailCodeSubmitCount = 1;
+        } else {
+            req.session.emailCodeSubmitCount += 1;
+        }
+        req.session.save();
+
         if (error instanceof NotAuthorizedException) {
             s4.sendTxMALog(
                 "SSE_EMAIL_VERIFICATION_COMPLETE",
