@@ -16,7 +16,10 @@ export const mockLambdaFacade = {
     listClients: jest.fn(),
     updateClient: jest.fn(),
     updateService: jest.fn(),
-    sessionCount: jest.fn()
+    sessionCount: jest.fn(),
+    getEmailCodeBlock: jest.fn(),
+    putEmailCodeBlock: jest.fn(),
+    removeEmailCodeBlock: jest.fn()
 };
 
 export const mockCognitoInterface = {

@@ -51,4 +51,7 @@ export default interface LambdaFacadeInterface {
 
     deleteClientEntries(oldUserID: string, serviceID: string, accessToken: string): Promise<void>;
     deleteServiceEntries(serviceID: string, accessToken: string): Promise<void>;
+    getEmailCodeBlock(email: string): Promise<boolean>;
+    putEmailCodeBlock(email: string): Promise<void>;
+    removeEmailCodeBlock(email: string): Promise<void>;
 }
