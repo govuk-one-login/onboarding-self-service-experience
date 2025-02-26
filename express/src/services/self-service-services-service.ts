@@ -401,4 +401,16 @@ export default class SelfServiceServicesService {
         await this.validateToken(accessToken, "deleteServiceEntries");
         await this.lambda.deleteServiceEntries(serviceID, accessToken);
     }
+
+    async getEmailCodeBlock(email: string): Promise<boolean> {
+        return this.lambda.getEmailCodeBlock(email);
+    }
+
+    async putEmailCodeBlock(email: string): Promise<void> {
+        await this.lambda.putEmailCodeBlock(email);
+    }
+
+    async removeEmailCodeBlock(email: string): Promise<void> {
+        await this.lambda.removeEmailCodeBlock(email);
+    }
 }
