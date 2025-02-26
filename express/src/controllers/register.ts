@@ -62,15 +62,19 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
 export const showCheckEmailForm: RequestHandler = async (req, res) => {
     console.log("In register-showCheckEmailForm");
 
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
 
-    if (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) {
+    if (
+        (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
+        (await s4.getEmailCodeBlock(req.session.emailAddress.toLowerCase().trim()))
+    ) {
+        console.log("Email is code blocked");
         return res.render("register/too-many-codes.njk");
     }
-
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     s4.sendTxMALog("SSE_EMAIL_VERIFICATION_REQUEST", {
         session_id: req.session.id,
@@ -84,28 +88,39 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     console.log("In register-submitEmailSecurityCode");
 
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
 
-    if (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) {
+    if (
+        (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
+        (await s4.getEmailCodeBlock(req.session.emailAddress.toLowerCase().trim()))
+    ) {
+        console.warn("Email blocked for OTP code");
         return res.render("register/too-many-codes.njk");
     }
-
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
         const response = await s4.submitUsernamePassword(req.session.emailAddress, req.body.securityCode);
         req.session.cognitoSession = response.Session;
+        await s4.removeEmailCodeBlock(req.session.emailAddress.toLowerCase().trim());
     } catch (error) {
-        if (!req.session.emailCodeSubmitCount) {
-            req.session.emailCodeSubmitCount = 1;
-        } else {
-            req.session.emailCodeSubmitCount += 1;
-        }
-        req.session.save();
-
         if (error instanceof NotAuthorizedException) {
+            if (!req.session.emailCodeSubmitCount) {
+                req.session.emailCodeSubmitCount = 1;
+            } else {
+                req.session.emailCodeSubmitCount += 1;
+            }
+            req.session.save();
+
+            if (req.session.emailCodeSubmitCount >= 6) {
+                console.warn("Email code block added");
+                await s4.putEmailCodeBlock(req.session.emailAddress.toLowerCase().trim());
+                return res.render("register/too-many-codes.njk");
+            }
+
             s4.sendTxMALog(
                 "SSE_EMAIL_VERIFICATION_COMPLETE",
                 {

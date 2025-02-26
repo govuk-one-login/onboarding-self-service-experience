@@ -64,6 +64,10 @@ const s4updateUserSpreadsheetSpy = jest.spyOn(SelfServiceServicesService.prototy
 const getEmailSpy = jest.spyOn(AuthenticationResultParser, "getEmail");
 const getCognitoIdSpy = jest.spyOn(AuthenticationResultParser, "getCognitoId");
 
+const getEmailCodeBlockSpy = jest.spyOn(SelfServiceServicesService.prototype, "getEmailCodeBlock");
+const putEmailCodeBlockSpy = jest.spyOn(SelfServiceServicesService.prototype, "putEmailCodeBlock");
+const removeEmailCodeBlockSpy = jest.spyOn(SelfServiceServicesService.prototype, "removeEmailCodeBlock");
+
 describe("processGetEmailForm controller tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -276,11 +280,29 @@ describe("showCheckEmailForm controller tests", () => {
         await showCheckEmailForm(mockReq, mockRes, mockNext);
         expect(mockRes.render).toHaveBeenCalledWith("register/too-many-codes.njk");
     });
+
+    it("it renders an error page if the user is code blocked for that email", async () => {
+        const mockReq = request({
+            session: {
+                id: TEST_SESSION_ID,
+                emailAddress: TEST_EMAIL
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+
+        getEmailCodeBlockSpy.mockResolvedValue(true);
+
+        await showCheckEmailForm(mockReq, mockRes, mockNext);
+        expect(mockRes.render).toHaveBeenCalledWith("register/too-many-codes.njk");
+    });
 });
 
 describe("submitEmailSecurityCode controller tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.resetAllMocks();
     });
 
     it("redirects to /register if there is no emailAddress in the session", async () => {
@@ -328,6 +350,7 @@ describe("submitEmailSecurityCode controller tests", () => {
             }
         );
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/create-password");
+        expect(removeEmailCodeBlockSpy).toHaveBeenCalledWith(TEST_EMAIL.toLowerCase().trim());
     });
 
     it("calls submitUserNamePassword with the session email and security code and renders the register/enter-email-code.njk template with an error message when a NotAuthorizedException is thrown", async () => {
@@ -337,6 +360,7 @@ describe("submitEmailSecurityCode controller tests", () => {
                 message: "Wrong code"
             })
         );
+        getEmailCodeBlockSpy.mockResolvedValue(false);
 
         s4SendTxmaLogSpy.mockReturnValue();
 
@@ -372,6 +396,34 @@ describe("submitEmailSecurityCode controller tests", () => {
                 securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
             }
         });
+    });
+
+    it("puts an email code block when a not authorized exception is thrown and the session submit count is incremented to 6 or more", async () => {
+        s4SubmitUsernamePasswordSpy.mockRejectedValue(
+            new NotAuthorizedException({
+                $metadata: {httpStatusCode: 400},
+                message: "Wrong code"
+            })
+        );
+
+        s4SendTxmaLogSpy.mockReturnValue();
+
+        const mockReq = request({
+            session: {
+                id: TEST_SESSION_ID,
+                emailAddress: TEST_EMAIL,
+                emailCodeSubmitCount: 5
+            },
+            body: {
+                securityCode: TEST_SECURITY_CODE
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+        await submitEmailSecurityCode(mockReq, mockRes, mockNext);
+        expect(putEmailCodeBlockSpy).toHaveBeenCalledWith(TEST_EMAIL.toLowerCase().trim());
+        expect(mockRes.render).toHaveBeenCalledWith("register/too-many-codes.njk");
     });
 
     it("throws any other type of error thrown by s4 submitUserNamePassword", async () => {
