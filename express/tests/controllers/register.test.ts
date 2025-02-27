@@ -11,6 +11,7 @@ import {
     showCheckEmailForm,
     showEnterMobileForm,
     showNewPasswordForm,
+    showResendEmailCodeForm,
     showSubmitMobileVerificationCode,
     submitEmailSecurityCode,
     submitMobileVerificationCode,
@@ -813,6 +814,7 @@ describe("resendEmailVerificationCode controller tests", () => {
 
     it("calls s4 resendEmailAuthCode with the session email and then redirects to /register/enter-email-code", async () => {
         s4ResendEmailCodeSpy.mockResolvedValue();
+        getEmailCodeBlockSpy.mockResolvedValue(false);
 
         const mockReq = request({
             session: {
@@ -825,6 +827,99 @@ describe("resendEmailVerificationCode controller tests", () => {
         await resendEmailVerificationCode(mockReq, mockRes, mockNext);
         expect(s4ResendEmailCodeSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/enter-email-code");
+    });
+
+    it("renders too many codes if the email is code blocked", async () => {
+        s4ResendEmailCodeSpy.mockResolvedValue();
+        getEmailCodeBlockSpy.mockResolvedValue(true);
+
+        const mockReq = request({
+            session: {
+                emailAddress: TEST_EMAIL
+            }
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+
+        await resendEmailVerificationCode(mockReq, mockRes, mockNext);
+        expect(s4ResendEmailCodeSpy).not.toHaveBeenCalled();
+        expect(mockRes.render).toHaveBeenCalledWith("/register/too-many-codes.njk");
+    });
+
+    it("renders too many codes if the session has 6 or more email code submits", async () => {
+        s4ResendEmailCodeSpy.mockResolvedValue();
+        getEmailCodeBlockSpy.mockResolvedValue(true);
+
+        const mockReq = request({
+            session: {
+                emailAddress: TEST_EMAIL,
+                emailCodeSubmitCount: 6
+            }
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+
+        await resendEmailVerificationCode(mockReq, mockRes, mockNext);
+        expect(s4ResendEmailCodeSpy).not.toHaveBeenCalled();
+        expect(mockRes.render).toHaveBeenCalledWith("/register/too-many-codes.njk");
+    });
+});
+
+describe("showResendEmailCodeForm controller tests", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        jest.resetAllMocks();
+    });
+
+    it("renders the resend email code form if email is not code blocked", async () => {
+        s4ResendEmailCodeSpy.mockResolvedValue();
+        getEmailCodeBlockSpy.mockResolvedValue(false);
+
+        const mockReq = request({
+            session: {
+                emailAddress: TEST_EMAIL
+            }
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+
+        await showResendEmailCodeForm(mockReq, mockRes, mockNext);
+        expect(getEmailCodeBlockSpy).toHaveBeenCalledWith(TEST_EMAIL.toLowerCase().trim());
+        expect(mockRes.render).toHaveBeenCalledWith("register/resend-email-code.njk");
+    });
+
+    it("renders too many codes if the email is code blocked", async () => {
+        s4ResendEmailCodeSpy.mockResolvedValue();
+        getEmailCodeBlockSpy.mockResolvedValue(true);
+
+        const mockReq = request({
+            session: {
+                emailAddress: TEST_EMAIL
+            }
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+
+        await showResendEmailCodeForm(mockReq, mockRes, mockNext);
+        expect(getEmailCodeBlockSpy).toHaveBeenCalledWith(TEST_EMAIL.toLowerCase().trim());
+        expect(mockRes.render).toHaveBeenCalledWith("/register/too-many-codes.njk");
+    });
+
+    it("renders too many codes if the session has 6 or more email code submits", async () => {
+        s4ResendEmailCodeSpy.mockResolvedValue();
+        getEmailCodeBlockSpy.mockResolvedValue(true);
+
+        const mockReq = request({
+            session: {
+                emailAddress: TEST_EMAIL,
+                emailCodeSubmitCount: 6
+            }
+        });
+        const mockRes = response();
+        const mockNext = jest.fn();
+
+        await showResendEmailCodeForm(mockReq, mockRes, mockNext);
+        expect(mockRes.render).toHaveBeenCalledWith("/register/too-many-codes.njk");
     });
 });
 

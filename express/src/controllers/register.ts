@@ -333,15 +333,35 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
 };
 
 export const showResendPhoneCodeForm = render("register/resend-text-code.njk");
-export const showResendEmailCodeForm = render("register/resend-email-code.njk");
+export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
+
+    if (
+        (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
+        (await s4.getEmailCodeBlock((req.session.emailAddress as string).toLowerCase().trim()))
+    ) {
+        res.render("/register/too-many-codes.njk");
+        return;
+    }
+
+    res.render("register/resend-email-code.njk");
+};
 export const resumeAfterPassword = render("register/resume-after-password.njk");
 
 export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
     console.info("Resending E-Mail Verification Code");
+    if (
+        (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
+        (await s4.getEmailCodeBlock((req.session.emailAddress as string).toLowerCase().trim()))
+    ) {
+        res.render("/register/too-many-codes.njk");
+        return;
+    }
+
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
-    res.redirect("/register/enter-email-code");
+    return res.redirect("/register/enter-email-code");
 };
 
 export const showAddServiceForm = render("register/add-service-name.njk");
