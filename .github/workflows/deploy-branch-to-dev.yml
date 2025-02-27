@@ -1,15 +1,7 @@
-name: Deploy to development
-run-name: Deploy to development [${{ github.head_ref || github.ref_name }}]
+name: Deploy branch to development
+run-name: Deploy branch to development [${{ github.head_ref || github.ref_name }}]
 
-on:
-  merge_group:
-    types:
-      - checks_requested
-  pull_request:
-    branches:
-      - main
-
-concurrency: deploy-development
+on: workflow_dispatch
 
 permissions:
   id-token: write
@@ -17,7 +9,6 @@ permissions:
 
 jobs:
   deploy-frontend:
-    if: github.event_name == 'merge_group'
     name: Deploy Frontend (dev)
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -43,7 +34,6 @@ jobs:
           test-container-repository-name: ${{ vars.FRONTEND_TEST_CONTAINER_REPOSITORY_NAME }}
 
   deploy-dynamodb:
-    if: github.event_name == 'merge_group'
     name: Deploy Dynamodb (dev)
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -78,7 +68,6 @@ jobs:
           artifact-name: ${{ steps.build.outputs.artifact-name }}
 
   deploy-cognito:
-    if: github.event_name == 'merge_group'
     name: Deploy Cognito (dev)
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -114,7 +103,6 @@ jobs:
           artifact-name: ${{ steps.build.outputs.artifact-name }}
 
   deploy-api:
-    if: github.event_name == 'merge_group'
     name: Deploy API (dev)
     runs-on: ubuntu-latest
     timeout-minutes: 15
