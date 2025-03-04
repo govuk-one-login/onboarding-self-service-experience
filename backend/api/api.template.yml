@@ -1351,6 +1351,101 @@ Resources:
         - 'arn:aws:apigateway:${AWS::Region}::/restapis/${ResourceArn}/stages/${API.Stage}'
         - ResourceArn: !Ref API
 
+
+  ## Start Code Block Function ##
+
+  CodeBlockHandler:
+   # checkov:skip=CKV_AWS_115:Ensure that AWS Lambda function is configured for function-level concurrent execution limit
+    # checkov:skip=CKV_AWS_117:Ensure that AWS Lambda function is configured inside a VPC
+    # checkov:skip=CKV_AWS_116:Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)
+    # checkov:skip=CKV_AWS_173:Check encryption settings for Lambda environmental variable
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Sourcemap: true
+        External:
+          - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+    Properties:
+      Handler: src/handlers/code-block/code-block-handler.handler
+      CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
+      Tracing: Active
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - !Ref CodeRequestBlockTableCrudAccessPolicy
+        - !If [DynatraceLoggingEnabled, !Ref DynatraceSecretsAccessPolicy, !Ref "AWS::NoValue"]
+      Environment:
+        Variables:
+          CODE_BLOCK_TABLE_NAME:
+             Fn::ImportValue: 
+                !Sub ${DeploymentName}-CodeRequestBlockTableName
+      Events:
+        getCodeBlock:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /code-block/get/
+            Method: POST
+        putCodeBlock:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /code-block/put/
+            Method: POST
+        deleteCodeBlock:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /code-block/delete/
+            Method: POST
+
+  CodeRequestBlockTableCrudAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowCodeRequestBlockTableReadAccess
+            Effect: Allow
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:Get*
+            Resource: 
+              Fn::ImportValue: 
+                !Sub ${DeploymentName}-CodeRequestBlockTableArn
+          - Sid: AllowCodeRequestBlockTableDecryption
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource:
+              Fn::ImportValue: 
+                  !Sub ${DeploymentName}-CodeRequestBlockEncryptionKeyArn
+          - Sid: AllowCodeRequestBlockTableWriteAccess
+            Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+            Resource: 
+              Fn::ImportValue: 
+                !Sub ${DeploymentName}-CodeRequestBlockTableArn
+          - Sid: AllowCodeRequestBlockTableEncryption
+            Effect: Allow
+            Action:
+              - kms:Encrypt
+            Resource: 
+              Fn::ImportValue: 
+                  !Sub ${DeploymentName}-CodeRequestBlockEncryptionKeyArn
+          - Sid: CodeRequestBlockTableDeleteAccess
+            Effect: Allow
+            Action:
+              - dynamodb:DeleteItem
+            Resource:  
+              Fn::ImportValue: 
+                !Sub ${DeploymentName}-CodeRequestBlockTableArn
+
+  ## End Code Block Function ##
+
 Outputs:
   # SAM Serverless Function implicit API resources | Invoking private APIs
   # https://github.com/aws/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api

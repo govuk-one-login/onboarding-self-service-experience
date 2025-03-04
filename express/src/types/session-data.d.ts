@@ -11,4 +11,5 @@ export default interface SelfServiceSessionData extends Record<string, unknown> 
     mfaResponse: MfaResponse;
     updatedField: string;
     serviceName: string;
+    emailCodeSubmitCount: number;
 }

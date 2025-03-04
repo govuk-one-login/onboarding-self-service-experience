@@ -30,7 +30,6 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.609.0",
     "@aws-sdk/client-sqs": "^3.609.0",
-    "@aws-sdk/util-dynamodb": "^3.624.0",
     "@pact-foundation/pact": "^13.1.5",
     "axios": "^1.7.4",
     "googleapis": "^128.0.0",

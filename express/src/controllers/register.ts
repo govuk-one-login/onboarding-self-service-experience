@@ -62,11 +62,19 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
 export const showCheckEmailForm: RequestHandler = async (req, res) => {
     console.log("In register-showCheckEmailForm");
 
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
 
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    if (
+        (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
+        (await s4.getEmailCodeBlock(req.session.emailAddress.toLowerCase().trim()))
+    ) {
+        console.log("Email is code blocked");
+        return res.render("register/too-many-codes.njk");
+    }
 
     s4.sendTxMALog("SSE_EMAIL_VERIFICATION_REQUEST", {
         session_id: req.session.id,
@@ -80,17 +88,39 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     console.log("In register-submitEmailSecurityCode");
 
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
     if (!req.session.emailAddress) {
         return res.redirect("/register");
     }
 
-    const s4: SelfServiceServicesService = req.app.get("backing-service");
+    if (
+        (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
+        (await s4.getEmailCodeBlock(req.session.emailAddress.toLowerCase().trim()))
+    ) {
+        console.warn("Email blocked for OTP code");
+        return res.render("register/too-many-codes.njk");
+    }
 
     try {
         const response = await s4.submitUsernamePassword(req.session.emailAddress, req.body.securityCode);
         req.session.cognitoSession = response.Session;
+        await s4.removeEmailCodeBlock(req.session.emailAddress.toLowerCase().trim());
     } catch (error) {
         if (error instanceof NotAuthorizedException) {
+            if (!req.session.emailCodeSubmitCount) {
+                req.session.emailCodeSubmitCount = 1;
+            } else {
+                req.session.emailCodeSubmitCount += 1;
+            }
+            req.session.save();
+
+            if (req.session.emailCodeSubmitCount >= 6) {
+                console.warn("Email code block added");
+                await s4.putEmailCodeBlock(req.session.emailAddress.toLowerCase().trim());
+                return res.render("register/too-many-codes.njk");
+            }
+
             s4.sendTxMALog(
                 "SSE_EMAIL_VERIFICATION_COMPLETE",
                 {
@@ -303,15 +333,35 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
 };
 
 export const showResendPhoneCodeForm = render("register/resend-text-code.njk");
-export const showResendEmailCodeForm = render("register/resend-email-code.njk");
+export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
+    const s4: SelfServiceServicesService = await req.app.get("backing-service");
+
+    if (
+        (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
+        (await s4.getEmailCodeBlock((req.session.emailAddress as string).toLowerCase().trim()))
+    ) {
+        res.render("/register/too-many-codes.njk");
+        return;
+    }
+
+    res.render("register/resend-email-code.njk");
+};
 export const resumeAfterPassword = render("register/resume-after-password.njk");
 
 export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
     console.info("Resending E-Mail Verification Code");
+    if (
+        (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
+        (await s4.getEmailCodeBlock((req.session.emailAddress as string).toLowerCase().trim()))
+    ) {
+        res.render("/register/too-many-codes.njk");
+        return;
+    }
+
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
-    res.redirect("/register/enter-email-code");
+    return res.redirect("/register/enter-email-code");
 };
 
 export const showAddServiceForm = render("register/add-service-name.njk");

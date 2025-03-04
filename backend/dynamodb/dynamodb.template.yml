@@ -71,6 +71,59 @@ Resources:
       SSESpecification:
         SSEEnabled: true
 
+
+    ## CodeRequestBlockTable ##
+
+  CodeRequestBlockEncryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: KMS encryption key for CodeRequestBlock DynamoDB table
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowIamManagement
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: kms:*
+            Resource: "*"
+          - Sid: AllowDynamodbAccessToEncryptionKey
+            Effect: Allow
+            Principal:
+              Service: dynamodb.amazonaws.com
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: "*"
+            Condition:
+              ArnLike:
+                kms:EncryptionContext:aws:dynamodb:table/arn: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/*
+
+  CodeRequestBlockTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${DeploymentName}-Code-Request-Block
+      AttributeDefinitions:
+        - AttributeName: CodeBlockIdentifier
+          AttributeType: S
+      KeySchema:
+        - AttributeName: CodeBlockIdentifier
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+        KMSMasterKeyId: !GetAtt CodeRequestBlockEncryptionKey.Arn
+        SSEType: KMS
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
 Outputs:
   DataTableName:
     Value: !Ref DataTable
@@ -84,3 +137,16 @@ Outputs:
     Value: !GetAtt SessionsTable.Arn
     Export:
       Name: !Sub ${DeploymentName}-DynamoDB-SessionsTableARN
+  CodeRequestBlockTableName:
+    Value: !Ref CodeRequestBlockTable
+    Export:
+      Name: !Sub ${DeploymentName}-CodeRequestBlockTableName
+  CodeRequestBlockTableArn:
+    Value: !GetAtt CodeRequestBlockTable.Arn
+    Export:
+      Name: !Sub ${DeploymentName}-CodeRequestBlockTableArn
+  CodeRequestBlockTableKmsKeyArn:
+    Value: !GetAtt CodeRequestBlockEncryptionKey.Arn
+    Export:
+      Name: !Sub ${DeploymentName}-CodeRequestBlockEncryptionKeyArn
+

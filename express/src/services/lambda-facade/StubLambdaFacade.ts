@@ -218,4 +218,19 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         console.log(JSON.stringify(message));
         return;
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async getEmailCodeBlock(_email: string): Promise<boolean> {
+        return false;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async putEmailCodeBlock(_e: string): Promise<void> {
+        return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async removeEmailCodeBlock(_e: string): Promise<void> {
+        return;
+    }
 }

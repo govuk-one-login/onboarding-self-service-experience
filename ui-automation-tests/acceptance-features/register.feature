@@ -100,6 +100,24 @@ Feature: Users can sign up to the self-service experience
         |        | Enter the 6 digit security code                                                           |
         | 000000 | The code you entered is not correct or has expired - enter it again or request a new code |
 
+  Rule: The user is locked out when submitting 6 incorrect code attempts
+    Background:
+      When they submit an incorrect security code "000000"
+      Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
+      When they submit an incorrect security code "000000"
+      Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
+      When they submit an incorrect security code "000000"
+      Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
+      When they submit an incorrect security code "000000"
+      Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
+      When they submit an incorrect security code "000000"
+      Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
+      When they submit an incorrect security code "000000"
+      Then the error message "The code you entered is not correct or has expired - enter it again or request a new code" must be displayed for the security code field
+      When they submit an incorrect security code "000000"
+       Then they should be redirected to a page with the title "You've entered too many security codes"
+
+
   Rule: The user does not receive their email security code and clicks 'Not received an email?' link
     Background:
       Given they submit a random valid email address

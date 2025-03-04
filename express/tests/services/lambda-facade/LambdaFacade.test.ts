@@ -14,6 +14,7 @@ import {
 } from "../../constants";
 import AuthenticationResultParser from "../../../src/lib/authentication-result-parser";
 import {TxMAEvent} from "../../../src/types/txma-event";
+import {createHash} from "crypto";
 
 const axiosCreateSpy = jest.spyOn(axios, "create");
 const mockPost = jest.fn();
@@ -183,6 +184,40 @@ describe("Lambda Facade class tests", () => {
                 }
             }
         );
+    });
+
+    it("POSTs the get code block endpoint with an email hash", async () => {
+        const mockLambdaFacade = new LambdaFacade();
+        const expectedEmailHash = createHash("sha256").update(TEST_EMAIL).digest("base64url");
+        mockPost.mockResolvedValue({data: {blocked: true}});
+        const isBlocked = await mockLambdaFacade.getEmailCodeBlock(TEST_EMAIL);
+
+        expect(mockPost).toHaveBeenCalledWith("/code-block/get", {
+            id: mockLambdaFacade.EMAIL_BLOCK_PREFIX + expectedEmailHash
+        });
+        expect(isBlocked).toBe(true);
+    });
+
+    it("POSTs the put code block endpoint with an email hash", async () => {
+        const mockLambdaFacade = new LambdaFacade();
+        const expectedEmailHash = createHash("sha256").update(TEST_EMAIL).digest("base64url");
+        mockPost.mockResolvedValue({status: 204});
+        await mockLambdaFacade.putEmailCodeBlock(TEST_EMAIL);
+
+        expect(mockPost).toHaveBeenCalledWith("/code-block/put", {
+            id: mockLambdaFacade.EMAIL_BLOCK_PREFIX + expectedEmailHash
+        });
+    });
+
+    it("POSTs the delete code block endpoint with an email hash", async () => {
+        const mockLambdaFacade = new LambdaFacade();
+        const expectedEmailHash = createHash("sha256").update(TEST_EMAIL).digest("base64url");
+        mockPost.mockResolvedValue({status: 204});
+        await mockLambdaFacade.removeEmailCodeBlock(TEST_EMAIL);
+
+        expect(mockPost).toHaveBeenCalledWith("/code-block/delete", {
+            id: mockLambdaFacade.EMAIL_BLOCK_PREFIX + expectedEmailHash
+        });
     });
 
     it("GETs the /global-sign-out endpoint when the globalSignOut method is called", async () => {
