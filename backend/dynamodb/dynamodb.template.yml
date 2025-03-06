@@ -48,6 +48,9 @@ Resources:
             ProjectionType: ALL
       SSESpecification:
         SSEEnabled: true
+      Tags:
+        - Key: BackupFrequency
+          Value: Daily
 
   SessionsTable:
     # https://github.com/ca98am79/connect-dynamodb#options
