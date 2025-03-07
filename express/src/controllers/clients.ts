@@ -957,3 +957,36 @@ export const showChangePKCEEnforcedForm: RequestHandler = (req: Request, res: Re
         clientId: req.params.clientId
     });
 };
+
+export const processChangePKCEEnforcedForm = async (req: Request, res: Response): Promise<void> => {
+    const {context, params, app, body, session} = req;
+    const s4: SelfServiceServicesService = app.get("backing-service");
+
+    const {serviceId} = context;
+
+    const pkceEnforced = body.pkceEnforced;
+
+    if (!pkceEnforced || (pkceEnforced !== "yes" && pkceEnforced !== "no")) {
+        return res.render("clients/change-pkce-enforced.njk", {
+            serviceId: req.context.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId,
+            errorMessages: {
+                "pkceEnforced-options": "Select yes if you want to enforce PKCE"
+            }
+        });
+    }
+
+    const pkce_enforced = pkceEnforced === "yes";
+    // sending flag to Client Register API
+    await s4.updateClient(
+        nonNull(context.serviceId),
+        params.selfServiceClientId,
+        params.clientId,
+        {pkce_enforced},
+        nonNull(session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "PKCE enforced";
+    res.redirect(`/services/${serviceId}/clients`);
+};
