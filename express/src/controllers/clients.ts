@@ -95,7 +95,8 @@ export const showClient: RequestHandler = async (req, res) => {
             changeIdVerificationEnabledUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-identity-verification`,
             changeIdTokenSigningAlgorithm: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-id-token-signing-algorithm?algorithm=${encodeURIComponent(
                 idTokenSigningAlgorithm
-            )}`
+            )}`,
+            changePKCEEnforcedUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-pkce-enforced`
         },
         basicAuthCreds: {
             username: process.env.BASIC_AUTH_USERNAME ?? "",
