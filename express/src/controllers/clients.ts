@@ -905,3 +905,11 @@ export const processChangeIdTokenAlgorithmForm: RequestHandler = async (req, res
     req.session.updatedField = "ID token signing algorithm";
     res.redirect(`/services/${serviceId}/clients`);
 };
+
+export const showChangePKCEEnforcedForm: RequestHandler = (req: Request, res: Response): void => {
+    res.render("clients/change-pkce-enforced.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId
+    });
+};
