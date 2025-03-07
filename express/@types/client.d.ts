@@ -23,6 +23,7 @@ export interface ClientFromDynamo {
     claims?: string[];
     id_token_signing_algorithm?: "ES256" | "RS256";
     client_locs?: string[];
+    pkce_enforced: boolean;
 }
 
 export interface Client {
@@ -50,4 +51,5 @@ export interface Client {
     claims?: string[];
     id_token_signing_algorithm?: "ES256" | "RS256";
     client_locs?: string[];
+    pkce_enforced: boolean;
 }
