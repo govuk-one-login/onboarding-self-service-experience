@@ -1,0 +1,27 @@
+{% extends "layouts/form.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% set pageTitle = "Change PKCE Verification Enforcement" %}
+
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/
+{% endset %}
+
+{% set formCancelUrl = backLinkPath %}
+
+{% set formButtonText = "Confirm" %}
+
+{% block formInputs %}
+  {{ form.radiosInput(
+      "Do you want to enforce PKCE verification?",
+      "govuk-fieldset__legend--l",
+      name = "pkceEnforced",
+      items = [
+        {text: "Yes", value: "yes"},
+        {text: "No", value: "no"}
+      ],
+      isPageHeading = true
+    ) }}
+{% endblock %}
