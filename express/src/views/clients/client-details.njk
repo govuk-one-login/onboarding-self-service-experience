@@ -236,6 +236,18 @@
     </div>
   {% endset %}
 
+  {% set pkceEnforcedContainer %}
+    {% if pkceEnforced %}
+      <div id="changePKCEEnforcedUri">
+        Yes
+      </div>
+    {% else %}
+      <div id="changePKCEEnforcedUri">
+        No
+      </div>
+    {% endif %}
+  {% endset %}
+
   {{ govukSummaryList({
     rows: [
       {
@@ -285,6 +297,22 @@
     ]
   }) }}
   {% endif %}
+
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: {text: "Enforce PKCE"},
+        value: {html: pkceEnforcedContainer},
+        actions: {
+          items: [{
+            href: urls.changePKCEEnforcedUri,
+            text: "Change",
+            visuallyHiddenText: "change pkceEnforced value"
+          }]
+        }
+      }
+    ]
+  }) }}
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Client authentication</h2>
 
