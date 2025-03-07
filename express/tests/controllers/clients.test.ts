@@ -162,7 +162,8 @@ describe("showClient Controller tests", () => {
                 changeIdTokenSigningAlgorithm:
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
-                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -230,7 +231,8 @@ describe("showClient Controller tests", () => {
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
-                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -298,7 +300,8 @@ describe("showClient Controller tests", () => {
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLIENT.claims}`,
-                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -367,7 +370,8 @@ describe("showClient Controller tests", () => {
                 changeIdTokenSigningAlgorithm:
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
-                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -435,7 +439,8 @@ describe("showClient Controller tests", () => {
                 changeIdTokenSigningAlgorithm:
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
-                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -505,7 +510,8 @@ describe("showClient Controller tests", () => {
                 changeIdTokenSigningAlgorithm:
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
-                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -574,7 +580,8 @@ describe("showClient Controller tests", () => {
                 changeIdTokenSigningAlgorithm:
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
-                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
