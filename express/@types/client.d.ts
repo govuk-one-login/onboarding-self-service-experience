@@ -24,6 +24,7 @@ export interface ClientFromDynamo {
     id_token_signing_algorithm?: "ES256" | "RS256";
     client_locs?: string[];
     max_age_enabled?: boolean;
+    pkce_enforced: boolean;
 }
 
 export interface Client {
@@ -52,4 +53,5 @@ export interface Client {
     id_token_signing_algorithm?: "ES256" | "RS256";
     client_locs?: string[];
     max_age_enabled?: boolean;
+    pkce_enforced: boolean;
 }

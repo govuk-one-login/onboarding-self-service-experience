@@ -31,6 +31,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const claims = identityVerificationSupported && client.claims ? client.claims : [];
     const idTokenSigningAlgorithm = client.id_token_signing_algorithm ?? "";
     const maxAgeEnabled = client.max_age_enabled;
+    const pkceEnforced = client.pkce_enforced;
 
     if (client.publicKeySource == "JWKS" && client.token_endpoint_auth_method != "client_secret_post") {
         displayedKey = client.jwksUri;
@@ -56,6 +57,7 @@ export const showClient: RequestHandler = async (req, res) => {
         contacts: contacts,
         token_endpoint_auth_method: client.token_endpoint_auth_method,
         identityVerificationSupported: identityVerificationSupported,
+        pkceEnforced: pkceEnforced,
         authMethod: client.token_endpoint_auth_method,
         ...(client.identity_verification_supported === true && {
             levelsOfConfidence: client.client_locs ? client.client_locs.join(" ") : ""
