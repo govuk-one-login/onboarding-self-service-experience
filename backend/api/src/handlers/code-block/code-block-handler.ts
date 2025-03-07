@@ -2,9 +2,9 @@ import {APIGatewayEvent, APIGatewayProxyResult, Context} from "aws-lambda";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {deleteCodeBlock, getCodeBlock, putCodeBlock} from "../dynamodb/code-block-service";
 
-export const logger = new Logger();
-
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
+    const logger = new Logger();
+
     logger.addContext(context);
 
     logger.info("Code block request received");
