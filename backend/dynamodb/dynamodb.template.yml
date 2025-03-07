@@ -50,7 +50,7 @@ Resources:
         SSEEnabled: true
       Tags:
         - Key: BackupFrequency
-          Value: Daily
+          Value: Bihourly # TODO ATO-1232: Revert to 'Daily' after debug of the monitoring stack.
 
   SessionsTable:
     # https://github.com/ca98am79/connect-dynamodb#options
