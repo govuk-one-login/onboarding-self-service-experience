@@ -23,6 +23,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private identityVerificationSupported = false;
     private client_locs = ["P2"];
     private id_token_signing_algorithm = "ES256";
+    private pkceEnforced = false;
 
     private user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
@@ -107,6 +108,10 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         if (updates.id_token_signing_algorithm) {
             this.id_token_signing_algorithm = updates.id_token_signing_algorithm as string;
         }
+
+        if (typeof updates.pkce_enforced !== "undefined") {
+            this.pkceEnforced = updates.pkce_enforced as boolean;
+        }
     }
 
     async updateService(serviceId: string, selfServiceClientId: string, clientId: string, updates: ServiceNameUpdates): Promise<void> {
@@ -177,7 +182,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                                 {S: "claims"},
                                 {S: "identity_verification_supported"},
                                 {S: "client_locs"},
-                                {S: "id_token_signing_algorithm"}
+                                {S: "id_token_signing_algorithm"},
+                                {S: "pkce_enforced"}
                             ]
                         },
                         data: {S: "SAM Service as a Service Service"},
@@ -187,7 +193,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
                         service_type: {S: "MANDATORY"},
                         type: {S: "integration"},
-                        identity_verification_supported: {S: this.identityVerificationSupported}
+                        identity_verification_supported: {S: this.identityVerificationSupported},
+                        pkce_enforced: {S: this.pkceEnforced}
                     }
                 ]
             }
