@@ -1,10 +1,6 @@
 import {APIGatewayEvent, APIGatewayProxyResult, Context} from "aws-lambda";
-import {Logger} from "@aws-lambda-powertools/logger";
 import {deleteCodeBlock, getCodeBlock, putCodeBlock} from "../dynamodb/code-block-service";
-
-export const logger = new Logger({
-    serviceName: "self-service-experience"
-});
+import {logger} from "../helper/logger";
 
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
     logger.addContext(context);
