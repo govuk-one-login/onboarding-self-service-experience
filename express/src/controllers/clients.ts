@@ -923,7 +923,7 @@ export const processChangePKCEEnforcedForm = async (req: Request, res: Response)
     const pkceEnforced = body.pkceEnforced;
 
     if (!pkceEnforced || (pkceEnforced !== "yes" && pkceEnforced !== "no")) {
-        return res.render("clients/enter-identity-verification.njk", {
+        return res.render("clients/change-pkce-enforced.njk", {
             serviceId: req.context.serviceId,
             selfServiceClientId: req.params.selfServiceClientId,
             clientId: req.params.clientId,
@@ -943,6 +943,6 @@ export const processChangePKCEEnforcedForm = async (req: Request, res: Response)
         nonNull(session.authenticationResult?.AccessToken)
     );
 
-    req.session.updatedField = "identity verification";
+    req.session.updatedField = "pkce enforced";
     res.redirect(`/services/${serviceId}/clients`);
 };

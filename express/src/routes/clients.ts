@@ -129,7 +129,4 @@ router
     .get(showChangeIdTokenAlgorithmForm)
     .post(processChangeIdTokenAlgorithmForm);
 
-router
-    .route("/:clientId/:selfServiceClientId/change-pkce-enforced")
-    .get(showChangePKCEEnforcedForm)
-    .post(processChangePKCEEnforcedForm);
+router.route("/:clientId/:selfServiceClientId/change-pkce-enforced").get(showChangePKCEEnforcedForm).post(processChangePKCEEnforcedForm);
