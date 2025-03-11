@@ -107,7 +107,7 @@ Conditions:
 Globals:
   Function:
     Timeout: 15
-    Runtime: nodejs18.x
+    Runtime: nodejs22.x
     PermissionsBoundary: !If [ UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue ]
     VpcConfig:
       SecurityGroupIds: [ !ImportValue VPC-VPCEndpointsSecurityGroup ]
