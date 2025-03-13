@@ -213,6 +213,9 @@ Resources:
             httpMethod: $context.httpMethod
             responseLength: $context.responseLength
             extendedRequestId: $context.extendedRequestId
+      Tags:
+        FMSRegionalPolicy: false
+        CustomPolicy: true
 
   LogAuditLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
