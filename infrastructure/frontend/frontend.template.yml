@@ -148,6 +148,7 @@ Conditions:
   IsLocal: !Equals [ !Ref Environment, "local" ]
   IsNotLocal: !Not [ !Equals [ !Ref Environment, "local" ] ]
   IsProd: !Equals [ !Ref Environment, "production" ]
+  WebAclAssociated: !Not [ !Equals [ !Ref Environment, "dev" ] ]
 
 Resources:
 
@@ -564,6 +565,7 @@ Resources:
 
 
   LoadBalancerWebACLAssociation:
+    Condition: WebAclAssociated
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
       WebACLArn: !Sub
@@ -653,7 +655,7 @@ Resources:
             Action:
               - kms:Encrypt
               - kms:Decrypt
-              - kms:ReEncrypt
+              - kms:ReEncrypt*
               - kms:GenerateDataKey
             Resource: '*'
           - Sid: 'Allow decryption of events by TxMA'

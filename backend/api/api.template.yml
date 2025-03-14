@@ -103,6 +103,7 @@ Conditions:
   DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
   CslsLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, cslsLoggingEnabled ], true ]
   IsLocal: !Equals [ !Ref Environment, "local" ]
+  WebAclAssociated: !Not [ !Equals [ !Ref Environment, "dev" ] ]
 
 Globals:
   Function:
@@ -1345,6 +1346,7 @@ Resources:
             Method: POST
 
   ApiGatewayWebACLAssociation:
+    Condition: WebAclAssociated
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
       WebACLArn: !Sub
