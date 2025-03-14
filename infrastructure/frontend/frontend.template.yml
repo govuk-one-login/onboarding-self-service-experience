@@ -655,7 +655,7 @@ Resources:
             Action:
               - kms:Encrypt
               - kms:Decrypt
-              - kms:ReEncrypt
+              - kms:ReEncrypt*
               - kms:GenerateDataKey
             Resource: '*'
           - Sid: 'Allow decryption of events by TxMA'
