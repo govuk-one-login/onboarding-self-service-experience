@@ -49,6 +49,7 @@ export const putServiceClientHandler = async (event: handlerInvokeEvent): Promis
         client_name: "integration",
         service_name: payload.service.serviceName,
         identity_verification_supported: false,
+        pkce_enforced: false,
         claims: [],
         back_channel_logout_uri: payload.back_channel_logout_uri,
         sector_identifier_uri: payload.sector_identifier_uri,
@@ -68,7 +69,8 @@ export const putServiceClientHandler = async (event: handlerInvokeEvent): Promis
             "sector_identifier_uri",
             "back_channel_logout_uri",
             "token_endpoint_auth_method",
-            "id_token_signing_algorithm"
+            "id_token_signing_algorithm",
+            "pkce_enforced"
         ]
     };
 

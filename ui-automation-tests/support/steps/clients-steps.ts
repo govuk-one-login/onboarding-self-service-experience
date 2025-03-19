@@ -17,7 +17,8 @@ const fields = {
     "sector identifier uri": "sectorIdentifierUri",
     "identity verification enabled": "idVerificationEnabledUri",
     claims: "claimsUri",
-    "id token signing algorithm": "idTokenSigningAlgorithm"
+    "id token signing algorithm": "idTokenSigningAlgorithm",
+    "PKCE enforced": "changePKCEEnforcedUri"
 };
 
 Then("they should see the value for the Client ID {string}", async function (this: TestContext, text) {
