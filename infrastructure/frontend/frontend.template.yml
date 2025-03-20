@@ -148,7 +148,13 @@ Conditions:
   IsLocal: !Equals [ !Ref Environment, "local" ]
   IsNotLocal: !Not [ !Equals [ !Ref Environment, "local" ] ]
   IsProd: !Equals [ !Ref Environment, "production" ]
-  WebAclAssociated: !Not [ !Equals [ !Ref Environment, "dev" ] ]
+  WebAclAssociated:
+    !Not [
+      !Or [
+        !Equals [dev, !Ref Environment],
+        !Equals [build, !Ref Environment],
+      ],
+    ]
 
 Resources:
 

@@ -103,7 +103,13 @@ Conditions:
   DynatraceLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceLoggingEnabled ], true ]
   CslsLoggingEnabled: !Equals [ !FindInMap [ EnvironmentConfiguration, !Ref Environment, cslsLoggingEnabled ], true ]
   IsLocal: !Equals [ !Ref Environment, "local" ]
-  WebAclAssociated: !Not [ !Equals [ !Ref Environment, "dev" ] ]
+  WebAclAssociated:
+    !Not [
+      !Or [
+        !Equals [dev, !Ref Environment],
+        !Equals [build, !Ref Environment],
+      ],
+    ]
 
 Globals:
   Function:
