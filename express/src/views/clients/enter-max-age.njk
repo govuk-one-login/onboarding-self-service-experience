@@ -1,0 +1,27 @@
+{% extends "layouts/form.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% set pageTitle = "Max Age" %}
+
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/
+{% endset %}
+
+{% set formCancelUrl = backLinkPath %}
+
+{% set formButtonText = "Confirm" %}
+
+{% block formInputs %}
+  {{ form.radiosInput(
+      "max_age is only available to services not on the GOV.UK domain and those handling particularly sensitive data. You will need to contact GOV.UK One Login support to request to use max_age.",
+      "govuk-fieldset__legend--l",
+      name = "maxAgeEnabled",
+      items = [
+        {text: "Yes", value: "yes"},
+        {text: "No", value: "no"}
+      ],
+      isPageHeading = true
+    ) }}
+{% endblock %}
