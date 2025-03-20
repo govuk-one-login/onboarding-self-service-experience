@@ -905,3 +905,44 @@ export const processChangeIdTokenAlgorithmForm: RequestHandler = async (req, res
     req.session.updatedField = "ID token signing algorithm";
     res.redirect(`/services/${serviceId}/clients`);
 };
+
+export const showMaxAgeEnabledForm: RequestHandler = (req: Request, res: Response): void => {
+    res.render("clients/enter-max-age.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId
+    });
+};
+
+export const processMaxAgeEnabledForm = async (req: Request, res: Response): Promise<void> => {
+    const {context, params, app, body, session} = req;
+    const s4: SelfServiceServicesService = app.get("backing-service");
+
+    const {serviceId} = context;
+
+    const maxAgeEnabled = body.maxAgeEnabled;
+
+    if (!maxAgeEnabled || (maxAgeEnabled !== "yes" && maxAgeEnabled !== "no")) {
+        return res.render("clients/enter-max-age.njk", {
+            serviceId: req.context.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId,
+            errorMessages: {
+                "maxAgeEnabled-options": "Select yes if you want to enable Max Age"
+            }
+        });
+    }
+
+    const max_age_enabled = maxAgeEnabled === "yes";
+    // sending flag to Client Register API
+    await s4.updateClient(
+        nonNull(context.serviceId),
+        params.selfServiceClientId,
+        params.clientId,
+        {max_age_enabled},
+        nonNull(session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "Max Age Enabled";
+    res.redirect(`/services/${serviceId}/clients`);
+};

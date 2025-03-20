@@ -36,7 +36,9 @@ import {
     showChangeClientName,
     processChangeClientName,
     showChangeIdTokenAlgorithmForm,
-    processChangeIdTokenAlgorithmForm
+    processChangeIdTokenAlgorithmForm,
+    showMaxAgeEnabledForm,
+    processMaxAgeEnabledForm
 } from "../controllers/clients";
 import validateKeySource from "../middleware/validate-public-key";
 import validateUri from "../middleware/validators/uri-validator";
@@ -126,3 +128,5 @@ router
     .route("/:clientId/:selfServiceClientId/change-id-token-signing-algorithm")
     .get(showChangeIdTokenAlgorithmForm)
     .post(processChangeIdTokenAlgorithmForm);
+
+router.route("/:clientId/:selfServiceClientId/change-max-age-enabled").get(showMaxAgeEnabledForm).post(processMaxAgeEnabledForm);
