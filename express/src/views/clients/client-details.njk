@@ -124,6 +124,18 @@
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Manage client</h2>
 
+  {% set maxAgeEnabledContainer %}
+    {% if maxAgeEnabled %}
+      <div id="maxAgeEnabled">
+        Yes
+      </div>
+    {% else %}
+      <div id="maxAgeEnabled">
+        No
+      </div>
+    {% endif %}
+  {% endset %}
+
   {{ govukSummaryList({
     rows: [
       {
@@ -167,6 +179,17 @@
             href: urls.changeSectorIdentifierUri,
             text: "Change",
             visuallyHiddenText: "Sector identifier URI"
+          }]
+        }
+      },
+      {
+        key: {text: "Max Age Enabled"},
+        value: {html: maxAgeEnabledContainer},
+        actions: {
+          items: [{
+            href: urls.changeMaxAgeEnabled,
+            text: "Change",
+            visuallyHiddenText: "Max Age Enabled"
           }]
         }
       }
@@ -419,6 +442,9 @@
 
       <span class="govuk-body govuk-!-font-weight-bold">User attributes required</span>
       <p class="govuk-body">The information about your users that we send back to your service.</p>
+
+      <span class="govuk-body govuk-!-font-weight-bold">Max Age Enabled</span>
+      <p class="govuk-body">When the max_age parameter is included in your request, your user will be forced to re-authenticate if the time in seconds since authentication is greater than max_age. max_age must be set to zero or a positive integer.</p>
 
     </div>
   </details>

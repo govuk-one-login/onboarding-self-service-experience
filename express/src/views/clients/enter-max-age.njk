@@ -1,0 +1,30 @@
+{% extends "layouts/form.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set pageTitle = "Enter Max Age" %}
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/
+{% endset %}
+{% set formCancelUrl = backLinkPath %}
+{% set formButtonText = "Confirm" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Change Max Age</h1>
+  {{ govukWarningText({
+  text: "Max age is only available to services not on the GOV.UK domain and those handling particularly sensitive data.",
+  iconFallbackText: "Warning"
+}) }}
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.radiosInput(
+      name = "maxAgeEnabled",
+      items = [
+        {text: "Yes", value: "yes"},
+        {text: "No", value: "no"}
+      ]
+    ) }}
+{% endblock %}
