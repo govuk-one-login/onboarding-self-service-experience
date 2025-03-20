@@ -30,6 +30,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const identityVerificationSupported = client.identity_verification_supported;
     const claims = identityVerificationSupported && client.claims ? client.claims : [];
     const idTokenSigningAlgorithm = client.id_token_signing_algorithm ?? "";
+    const maxAgeEnabled = client.max_age_enabled;
 
     if (client.publicKeySource == "JWKS" && client.token_endpoint_auth_method != "client_secret_post") {
         displayedKey = client.jwksUri;
@@ -59,6 +60,7 @@ export const showClient: RequestHandler = async (req, res) => {
         ...(client.identity_verification_supported === true && {
             levelsOfConfidence: client.client_locs ? client.client_locs.join(" ") : ""
         }),
+        maxAgeEnabled: maxAgeEnabled,
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
@@ -93,7 +95,8 @@ export const showClient: RequestHandler = async (req, res) => {
             changeIdVerificationEnabledUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-identity-verification`,
             changeIdTokenSigningAlgorithm: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-id-token-signing-algorithm?algorithm=${encodeURIComponent(
                 idTokenSigningAlgorithm
-            )}`
+            )}`,
+            changeMaxAgeEnabled: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-max-age-enabled`
         },
         basicAuthCreds: {
             username: process.env.BASIC_AUTH_USERNAME ?? "",
