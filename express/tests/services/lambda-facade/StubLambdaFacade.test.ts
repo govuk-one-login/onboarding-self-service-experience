@@ -29,7 +29,8 @@ describe("Lambda Facade class tests", () => {
                                 {S: "claims"},
                                 {S: "identity_verification_supported"},
                                 {S: "client_locs"},
-                                {S: "id_token_signing_algorithm"}
+                                {S: "id_token_signing_algorithm"},
+                                {S: "max_age_enabled"}
                             ]
                         },
                         id_token_signing_algorithm: {S: "ES256"},
@@ -47,7 +48,8 @@ describe("Lambda Facade class tests", () => {
                         sk: {S: "client#d61db4f3-7403-431d-9ead-14cc96476ce4"},
                         subject_type: {S: "pairwise"},
                         token_endpoint_auth_method: {S: "private_key_jwt"},
-                        type: {S: "integration"}
+                        type: {S: "integration"},
+                        maxAgeEnabled: {S: false}
                     }
                 ]
             }
