@@ -169,6 +169,17 @@
             visuallyHiddenText: "Sector identifier URI"
           }]
         }
+      },
+      {
+        key: {text: "Max Age Enabled"},
+        value: {html: maxAgeEnabledContainer},
+        actions: {
+          items: [{
+            href: urls.changeMaxAgeEnabled,
+            text: "Change",
+            visuallyHiddenText: "Max Age Enabled"
+          }]
+        }
       }
     ]
   }) }}
@@ -419,6 +430,9 @@
 
       <span class="govuk-body govuk-!-font-weight-bold">User attributes required</span>
       <p class="govuk-body">The information about your users that we send back to your service.</p>
+
+      <span class="govuk-body govuk-!-font-weight-bold">Max Age Enabled</span>
+      <p class="govuk-body">Enabling the max lifespam that a user should be able to exist</p>
 
     </div>
   </details>
