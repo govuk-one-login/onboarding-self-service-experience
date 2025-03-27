@@ -153,6 +153,7 @@ Conditions:
       !Or [
         !Equals [dev, !Ref Environment],
         !Equals [build, !Ref Environment],
+        !Equals [staging, !Ref Environment],
       ],
     ]
 
