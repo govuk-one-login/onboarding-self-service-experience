@@ -24,6 +24,7 @@ const testRegistrationResponse = {
     response_type: "code",
     jar_validation_required: false,
     identity_verification_supported: false,
+    pkce_enforced: false,
     client_type: "web",
     service: {
         id: "service#1234Random",
@@ -48,6 +49,7 @@ const expectedDynamoRecord = {
     client_name: "integration",
     service_name: testRegistrationResponse.service.serviceName,
     identity_verification_supported: false,
+    pkce_enforced: false,
     claims: [],
     back_channel_logout_uri: testRegistrationResponse.back_channel_logout_uri,
     sector_identifier_uri: testRegistrationResponse.sector_identifier_uri,
@@ -67,7 +69,8 @@ const expectedDynamoRecord = {
         "sector_identifier_uri",
         "back_channel_logout_uri",
         "token_endpoint_auth_method",
-        "id_token_signing_algorithm"
+        "id_token_signing_algorithm",
+        "pkce_enforced"
     ]
 };
 
