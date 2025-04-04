@@ -126,10 +126,10 @@ export const TEST_SECTOR_IDENTIFIER_URI = "someSectorIdentifier";
 export const TEST_TOKEN_AUTH_METHOD = "private_key_jwt";
 export const TEST_TOKEN_AUTH_METHOD_ALT = "client_secret_post";
 export const TEST_TYPE = "someType";
-export const TEST_IDENTITY_VERIFICATION_SUPPORTED = true;
-export const TEST_IDENTITY_VERIFICATION_SUPPORTED_TX = "yes";
-export const TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT = false;
-export const TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT_TX = "no";
+export const TEST_BOOLEAN_SUPPORTED = true;
+export const TEST_BOOLEAN_SUPPORTED_TX = "yes";
+export const TEST_BOOLEAN_SUPPORTED_ALT = false;
+export const TEST_BOOLEAN_SUPPORTED_ALT_TX = "no";
 export const TEST_CLAIM = "someClaims";
 export const TEST_CLAIMS = ["cl1", "cl2"];
 export const TEST_CLAIMS_OUT = ["openid", "cl1", "cl2"];
@@ -160,7 +160,7 @@ export const TEST_DYNAMO_CLIENT = {
     token_endpoint_auth_method: {S: TEST_TOKEN_AUTH_METHOD},
     client_secret: {S: TEST_SECRET_HASH},
     type: {S: TEST_TYPE},
-    identity_verification_supported: {B: TEST_IDENTITY_VERIFICATION_SUPPORTED},
+    identity_verification_supported: {B: TEST_BOOLEAN_SUPPORTED},
     claims: {L: [{S: TEST_CLAIM}]},
     id_token_signing_algorithm: {S: TEST_ID_SIGNING_TOKEN_ALGORITHM},
     client_locs: {L: [{S: TEST_LEVELS_OF_CONFIDENCE}]}
@@ -187,7 +187,7 @@ export const TEST_CLIENT: Client = {
     token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD,
     client_secret: TEST_SECRET_HASH,
     type: TEST_TYPE,
-    identity_verification_supported: TEST_IDENTITY_VERIFICATION_SUPPORTED,
+    identity_verification_supported: TEST_BOOLEAN_SUPPORTED,
     claims: [TEST_CLAIM],
     id_token_signing_algorithm: TEST_ID_SIGNING_TOKEN_ALGORITHM,
     client_locs: [TEST_LEVELS_OF_CONFIDENCE]
