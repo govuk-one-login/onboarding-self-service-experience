@@ -23,6 +23,7 @@ export interface ClientFromDynamo {
     claims?: string[];
     id_token_signing_algorithm?: "ES256" | "RS256";
     client_locs?: string[];
+    max_age_enabled?: boolean;
 }
 
 export interface Client {
