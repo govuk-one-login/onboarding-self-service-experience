@@ -163,7 +163,8 @@ export const TEST_DYNAMO_CLIENT = {
     identity_verification_supported: {B: TEST_BOOLEAN_SUPPORTED},
     claims: {L: [{S: TEST_CLAIM}]},
     id_token_signing_algorithm: {S: TEST_ID_SIGNING_TOKEN_ALGORITHM},
-    client_locs: {L: [{S: TEST_LEVELS_OF_CONFIDENCE}]}
+    client_locs: {L: [{S: TEST_LEVELS_OF_CONFIDENCE}]},
+    max_age_enabled: {B: TEST_BOOLEAN_SUPPORTED_ALT}
 };
 
 export const TEST_CLIENT: Client = {
@@ -190,7 +191,8 @@ export const TEST_CLIENT: Client = {
     identity_verification_supported: TEST_BOOLEAN_SUPPORTED,
     claims: [TEST_CLAIM],
     id_token_signing_algorithm: TEST_ID_SIGNING_TOKEN_ALGORITHM,
-    client_locs: [TEST_LEVELS_OF_CONFIDENCE]
+    client_locs: [TEST_LEVELS_OF_CONFIDENCE],
+    max_age_enabled: TEST_BOOLEAN_SUPPORTED_ALT
 };
 
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>

@@ -31,7 +31,8 @@ const testRegistrationResponse = {
     },
     contact_email: "test.test@test.gov.uk",
     id_token_signing_algorithm: "RSA256",
-    client_locs: ["P2"]
+    client_locs: ["P2"],
+    max_age_enabled: false
 };
 
 const expectedDynamoRecord = {
@@ -54,6 +55,7 @@ const expectedDynamoRecord = {
     token_endpoint_auth_method: testRegistrationResponse.token_endpoint_auth_method,
     id_token_signing_algorithm: testRegistrationResponse.id_token_signing_algorithm,
     client_locs: testRegistrationResponse.client_locs,
+    max_age_enabled: testRegistrationResponse.max_age_enabled,
     default_fields: [
         "data",
         "public_key",
@@ -67,7 +69,8 @@ const expectedDynamoRecord = {
         "sector_identifier_uri",
         "back_channel_logout_uri",
         "token_endpoint_auth_method",
-        "id_token_signing_algorithm"
+        "id_token_signing_algorithm",
+        "max_age_enabled"
     ]
 };
 
