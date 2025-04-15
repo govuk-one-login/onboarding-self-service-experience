@@ -30,6 +30,7 @@ export type clientRegistryRegistrationResponse = {
     contact_email: string;
     id_token_signing_algorithm: "ES256" | "RS256";
     client_locs: string[];
+    max_age_enabled: false;
 };
 
 export const putServiceClientHandler = async (event: handlerInvokeEvent): Promise<APIGatewayProxyResult> => {
@@ -55,6 +56,7 @@ export const putServiceClientHandler = async (event: handlerInvokeEvent): Promis
         token_endpoint_auth_method: payload.token_endpoint_auth_method,
         id_token_signing_algorithm: payload.hasOwnProperty("id_token_signing_algorithm") ? payload.id_token_signing_algorithm : "",
         client_locs: payload.hasOwnProperty("client_locs") ? payload.client_locs : [],
+        max_age_enabled: false,
         default_fields: [
             "data",
             "public_key",
@@ -68,7 +70,8 @@ export const putServiceClientHandler = async (event: handlerInvokeEvent): Promis
             "sector_identifier_uri",
             "back_channel_logout_uri",
             "token_endpoint_auth_method",
-            "id_token_signing_algorithm"
+            "id_token_signing_algorithm",
+            "max_age_enabled"
         ]
     };
 

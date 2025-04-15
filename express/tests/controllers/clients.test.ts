@@ -32,7 +32,9 @@ import {
     showEnterIdentityVerificationForm,
     showGoLivePage,
     showChangeClientName,
-    processChangeClientName
+    processChangeClientName,
+    showMaxAgeEnabledForm,
+    processMaxAgeEnabledForm
 } from "../../src/controllers/clients";
 import {
     TEST_ACCESS_TOKEN,
@@ -40,6 +42,10 @@ import {
     TEST_BACK_CHANNEL_LOGOUT_URI,
     TEST_BASIC_AUTH_PASSWORD,
     TEST_BASIC_AUTH_USERNAME,
+    TEST_BOOLEAN_SUPPORTED,
+    TEST_BOOLEAN_SUPPORTED_ALT,
+    TEST_BOOLEAN_SUPPORTED_ALT_TX,
+    TEST_BOOLEAN_SUPPORTED_TX,
     TEST_CLAIM,
     TEST_CLAIMS,
     TEST_CLAIMS_OUT,
@@ -50,10 +56,6 @@ import {
     TEST_COGNITO_ID,
     TEST_EMAIL,
     TEST_ID_SIGNING_TOKEN_ALGORITHM,
-    TEST_IDENTITY_VERIFICATION_SUPPORTED,
-    TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT,
-    TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT_TX,
-    TEST_IDENTITY_VERIFICATION_SUPPORTED_TX,
     TEST_IP_ADDRESS,
     TEST_LEVELS_OF_CONFIDENCE,
     TEST_LEVELS_OF_CONFIDENCE_ALT,
@@ -138,6 +140,7 @@ describe("showClient Controller tests", () => {
             displayedKey: TEST_STATIC_KEY_UPDATE.public_key,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
+            maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -162,7 +165,8 @@ describe("showClient Controller tests", () => {
                 changeIdTokenSigningAlgorithm:
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
-                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
+                changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
+                changeMaxAgeEnabled: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-max-age-enabled`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -209,6 +213,7 @@ describe("showClient Controller tests", () => {
             contacts: TEST_CLIENT.contacts,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             token_endpoint_auth_method: TEST_CLIENT.token_endpoint_auth_method,
+            maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             urls: {
                 changeIdTokenSigningAlgorithm: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-id-token-signing-algorithm?algorithm=${TEST_ID_SIGNING_TOKEN_ALGORITHM}`,
                 changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
@@ -229,6 +234,7 @@ describe("showClient Controller tests", () => {
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
+                changeMaxAgeEnabled: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-max-age-enabled`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             },
@@ -273,6 +279,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: TEST_STATIC_KEY_UPDATE.public_key,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
+            maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             contacts: TEST_CLIENT.contacts,
             levelsOfConfidence: "",
@@ -297,6 +304,7 @@ describe("showClient Controller tests", () => {
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
+                changeMaxAgeEnabled: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-max-age-enabled`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLIENT.claims}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`
             },
@@ -342,6 +350,7 @@ describe("showClient Controller tests", () => {
             claims: TEST_CLIENT.claims,
             displayedKey: "",
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
+            maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
@@ -364,6 +373,7 @@ describe("showClient Controller tests", () => {
                 }/change-sector-identifier-uri?sectorIdentifierUri=${encodeURIComponent(TEST_CLIENT.sector_identifier_uri)}`,
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
+                changeMaxAgeEnabled: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-max-age-enabled`,
                 changeIdTokenSigningAlgorithm:
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
@@ -412,6 +422,7 @@ describe("showClient Controller tests", () => {
             displayedKey: TEST_SECRET_HASH,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
+            maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -432,6 +443,7 @@ describe("showClient Controller tests", () => {
 
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
+                changeMaxAgeEnabled: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-max-age-enabled`,
                 changeIdTokenSigningAlgorithm:
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
@@ -482,6 +494,7 @@ describe("showClient Controller tests", () => {
             displayedKey: "",
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
+            maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -502,6 +515,7 @@ describe("showClient Controller tests", () => {
 
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
+                changeMaxAgeEnabled: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-max-age-enabled`,
                 changeIdTokenSigningAlgorithm:
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
@@ -549,6 +563,7 @@ describe("showClient Controller tests", () => {
             claims: [],
             displayedKey: TEST_STATIC_KEY_UPDATE.public_key,
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
+            maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             identityVerificationSupported: false,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -571,6 +586,7 @@ describe("showClient Controller tests", () => {
 
                 changeContacts: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-contact`,
                 changeIdVerificationEnabledUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/enter-identity-verification`,
+                changeMaxAgeEnabled: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-max-age-enabled`,
                 changeIdTokenSigningAlgorithm:
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
@@ -2869,7 +2885,7 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
 
         const mockReq = request({
             body: {
-                identityVerificationSupported: TEST_IDENTITY_VERIFICATION_SUPPORTED_TX
+                identityVerificationSupported: TEST_BOOLEAN_SUPPORTED_TX
             },
             params: {
                 selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
@@ -2893,7 +2909,7 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             TEST_CLIENT_ID,
             {
                 accepted_levels_of_confidence: [TEST_LEVELS_OF_CONFIDENCE],
-                identity_verification_supported: TEST_IDENTITY_VERIFICATION_SUPPORTED
+                identity_verification_supported: TEST_BOOLEAN_SUPPORTED
             },
             TEST_ACCESS_TOKEN
         );
@@ -2907,7 +2923,7 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
 
         const mockReq = request({
             body: {
-                identityVerificationSupported: TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT_TX
+                identityVerificationSupported: TEST_BOOLEAN_SUPPORTED_ALT_TX
             },
             params: {
                 selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
@@ -2931,7 +2947,7 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             TEST_CLIENT_ID,
             {
                 accepted_levels_of_confidence: [TEST_LEVELS_OF_CONFIDENCE_ALT],
-                identity_verification_supported: TEST_IDENTITY_VERIFICATION_SUPPORTED_ALT
+                identity_verification_supported: TEST_BOOLEAN_SUPPORTED_ALT
             },
             TEST_ACCESS_TOKEN
         );
@@ -3119,5 +3135,143 @@ describe("processChangeClientName controller tests", () => {
         expect(mockRequest.session.updatedField).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(err);
         expect(mockResponse.redirect).toHaveBeenCalledWith("/there-is-a-problem");
+    });
+});
+
+describe("showMaxAgeEnabled controller tests", () => {
+    const mockRequest = request({
+        context: {
+            serviceId: TEST_SERVICE_ID
+        },
+        params: {
+            selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+            clientId: TEST_CLIENT_ID
+        },
+        query: {
+            clientName: TEST_CLIENT_NAME
+        }
+    });
+    const mockResponse = response();
+
+    showMaxAgeEnabledForm(mockRequest, mockResponse, mockNext);
+
+    expect(mockResponse.render).toHaveBeenCalledWith("clients/enter-max-age.njk", {
+        serviceId: TEST_SERVICE_ID,
+        selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+        clientId: TEST_CLIENT_ID
+    });
+});
+
+describe("processMaxAgeEnabled controller tests for updating flag", () => {
+    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("calls s4 change this flag to true and updates the value and then redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+
+        const mockReq = request({
+            body: {
+                maxAgeEnabled: TEST_BOOLEAN_SUPPORTED_TX
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        await processMaxAgeEnabledForm(mockReq, mockRes);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            {max_age_enabled: TEST_BOOLEAN_SUPPORTED},
+            TEST_ACCESS_TOKEN
+        );
+
+        expect(mockReq.session.updatedField).toStrictEqual("Max Age Enabled");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
+    });
+
+    it("calls s4 change this flag to false and updates the value and then redirects to /clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+
+        const mockReq = request({
+            body: {
+                maxAgeEnabled: TEST_BOOLEAN_SUPPORTED_ALT_TX
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        await processMaxAgeEnabledForm(mockReq, mockRes);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            {max_age_enabled: TEST_BOOLEAN_SUPPORTED_ALT},
+            TEST_ACCESS_TOKEN
+        );
+
+        expect(mockReq.session.updatedField).toStrictEqual("Max Age Enabled");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/services/" + TEST_SERVICE_ID + "/clients");
+    });
+
+    it("does not call s4 and re-renders the same template if the user submits without selecting an option", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+
+        const mockReq = request({
+            body: {},
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT,
+                id: TEST_SESSION_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockRes = response();
+        await processMaxAgeEnabledForm(mockReq, mockRes);
+
+        expect(s4UpdateClientSpy).not.toHaveBeenCalled();
+        expect(mockRes.render).toHaveBeenCalledWith("clients/enter-max-age.njk", {
+            serviceId: TEST_SERVICE_ID,
+            selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+            clientId: TEST_CLIENT_ID,
+            errorMessages: {
+                "maxAgeEnabled-options": "Select yes if you want to enable Max Age"
+            }
+        });
     });
 });
