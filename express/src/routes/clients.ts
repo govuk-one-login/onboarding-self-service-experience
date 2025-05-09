@@ -38,7 +38,9 @@ import {
     showChangeIdTokenAlgorithmForm,
     processChangeIdTokenAlgorithmForm,
     showMaxAgeEnabledForm,
-    processMaxAgeEnabledForm
+    processMaxAgeEnabledForm,
+    showChangePKCEEnforcedForm,
+    processChangePKCEEnforcedForm
 } from "../controllers/clients";
 import validateKeySource from "../middleware/validate-public-key";
 import validateUri from "../middleware/validators/uri-validator";
@@ -130,3 +132,5 @@ router
     .post(processChangeIdTokenAlgorithmForm);
 
 router.route("/:clientId/:selfServiceClientId/change-max-age-enabled").get(showMaxAgeEnabledForm).post(processMaxAgeEnabledForm);
+
+router.route("/:clientId/:selfServiceClientId/change-pkce-enforced").get(showChangePKCEEnforcedForm).post(processChangePKCEEnforcedForm);

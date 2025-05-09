@@ -30,11 +30,13 @@ describe("Lambda Facade class tests", () => {
                                 {S: "identity_verification_supported"},
                                 {S: "client_locs"},
                                 {S: "id_token_signing_algorithm"},
-                                {S: "max_age_enabled"}
+                                {S: "max_age_enabled"},
+                                {S: "pkce_enforced"}
                             ]
                         },
                         id_token_signing_algorithm: {S: "ES256"},
                         identity_verification_supported: {S: false},
+                        pkce_enforced: {S: false},
                         pk: {S: "service#277619fe-c056-45be-bc2a-43310613913c"},
                         post_logout_redirect_uris: {L: []},
                         public_key: {

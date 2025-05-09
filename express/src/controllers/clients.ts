@@ -31,6 +31,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const claims = identityVerificationSupported && client.claims ? client.claims : [];
     const idTokenSigningAlgorithm = client.id_token_signing_algorithm ?? "";
     const maxAgeEnabled = client.max_age_enabled;
+    const pkceEnforced = client.pkce_enforced;
 
     if (client.publicKeySource == "JWKS" && client.token_endpoint_auth_method != "client_secret_post") {
         displayedKey = client.jwksUri;
@@ -56,6 +57,7 @@ export const showClient: RequestHandler = async (req, res) => {
         contacts: contacts,
         token_endpoint_auth_method: client.token_endpoint_auth_method,
         identityVerificationSupported: identityVerificationSupported,
+        pkceEnforced: pkceEnforced,
         authMethod: client.token_endpoint_auth_method,
         ...(client.identity_verification_supported === true && {
             levelsOfConfidence: client.client_locs ? client.client_locs.join(" ") : ""
@@ -96,7 +98,8 @@ export const showClient: RequestHandler = async (req, res) => {
             changeIdTokenSigningAlgorithm: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-id-token-signing-algorithm?algorithm=${encodeURIComponent(
                 idTokenSigningAlgorithm
             )}`,
-            changeMaxAgeEnabled: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-max-age-enabled`
+            changeMaxAgeEnabled: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-max-age-enabled`,
+            changePKCEEnforcedUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-pkce-enforced`
         },
         basicAuthCreds: {
             username: process.env.BASIC_AUTH_USERNAME ?? "",
@@ -944,5 +947,46 @@ export const processMaxAgeEnabledForm = async (req: Request, res: Response): Pro
     );
 
     req.session.updatedField = "Max Age Enabled";
+    res.redirect(`/services/${serviceId}/clients`);
+};
+
+export const showChangePKCEEnforcedForm: RequestHandler = (req: Request, res: Response): void => {
+    res.render("clients/change-pkce-enforced.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId
+    });
+};
+
+export const processChangePKCEEnforcedForm = async (req: Request, res: Response): Promise<void> => {
+    const {context, params, app, body, session} = req;
+    const s4: SelfServiceServicesService = app.get("backing-service");
+
+    const {serviceId} = context;
+
+    const pkceEnforced = body.pkceEnforced;
+
+    if (!pkceEnforced || (pkceEnforced !== "yes" && pkceEnforced !== "no")) {
+        return res.render("clients/change-pkce-enforced.njk", {
+            serviceId: req.context.serviceId,
+            selfServiceClientId: req.params.selfServiceClientId,
+            clientId: req.params.clientId,
+            errorMessages: {
+                "pkceEnforced-options": "Select yes if you want to enforce PKCE"
+            }
+        });
+    }
+
+    const pkce_enforced = pkceEnforced === "yes";
+    // sending flag to Client Register API
+    await s4.updateClient(
+        nonNull(context.serviceId),
+        params.selfServiceClientId,
+        params.clientId,
+        {pkce_enforced},
+        nonNull(session.authenticationResult?.AccessToken)
+    );
+
+    req.session.updatedField = "PKCE enforced";
     res.redirect(`/services/${serviceId}/clients`);
 };
