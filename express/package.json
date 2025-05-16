@@ -18,8 +18,8 @@
     "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile-dev .."
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.808.0",
-    "@aws-sdk/util-dynamodb": "^3.808.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.810.0",
+    "@aws-sdk/util-dynamodb": "^3.810.0",
     "axios": "^1.9.0",
     "connect-dynamodb": "^3.0.5",
     "express": "^4.21.2",
