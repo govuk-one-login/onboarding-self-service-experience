@@ -4,8 +4,10 @@ updates:
     directories:
       - "/express"
       - "/backend/api"
+      - "/backend/api/tests/contract-tests"
       - "/backend/cognito"
       - "/"
+      - "/ui-automation-tests"
     schedule:
       interval: daily
     labels:
