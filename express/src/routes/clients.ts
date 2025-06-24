@@ -40,7 +40,9 @@ import {
     showMaxAgeEnabledForm,
     processMaxAgeEnabledForm,
     showChangePKCEEnforcedForm,
-    processChangePKCEEnforcedForm
+    processChangePKCEEnforcedForm,
+    showChangeLandingPageUrlForm,
+    processChangeLandingPageUrlForm
 } from "../controllers/clients";
 import validateKeySource from "../middleware/validate-public-key";
 import validateUri from "../middleware/validators/uri-validator";
@@ -134,3 +136,8 @@ router
 router.route("/:clientId/:selfServiceClientId/change-max-age-enabled").get(showMaxAgeEnabledForm).post(processMaxAgeEnabledForm);
 
 router.route("/:clientId/:selfServiceClientId/change-pkce-enforced").get(showChangePKCEEnforcedForm).post(processChangePKCEEnforcedForm);
+
+router
+    .route("/:clientId/:selfServiceClientId/change-landing-page-url")
+    .get(showChangeLandingPageUrlForm)
+    .post(validateUri("clients/change-landing-page-url.njk", "landingPageUrl"), processChangeLandingPageUrlForm);
