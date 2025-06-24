@@ -25,6 +25,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private id_token_signing_algorithm = "ES256";
     private maxAgeEnabled = false;
     private pkceEnforced = false;
+    private landingPageUrl = "";
 
     private user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
@@ -117,6 +118,10 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
         if (typeof updates.pkce_enforced !== "undefined") {
             this.pkceEnforced = updates.pkce_enforced as boolean;
         }
+
+        if (updates.landing_page_url) {
+            this.landingPageUrl = updates.landing_page_url as string;
+        }
     }
 
     async updateService(serviceId: string, selfServiceClientId: string, clientId: string, updates: ServiceNameUpdates): Promise<void> {
@@ -201,7 +206,8 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         type: {S: "integration"},
                         identity_verification_supported: {S: this.identityVerificationSupported},
                         maxAgeEnabled: {S: this.maxAgeEnabled},
-                        pkce_enforced: {S: this.pkceEnforced}
+                        pkce_enforced: {S: this.pkceEnforced},
+                        landing_page_url: {S: this.landingPageUrl}
                     }
                 ]
             }

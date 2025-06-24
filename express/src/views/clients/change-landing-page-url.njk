@@ -1,0 +1,18 @@
+{% extends "layouts/form.njk" %}
+
+{% set pageTitle = "Enter landing page URI" %}
+
+{% set backLinkPath %}
+  /services/{{ serviceId }}/clients/
+{% endset %}
+
+{% set formCancelUrl = backLinkPath %}
+{% set formButtonText = "Confirm" %}
+
+{% block beforeForm %}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">Enter landing page URI</h1>
+{% endblock %}
+
+{% block formInputs %}
+  {{ form.uriInput("", "landingPageUrl", "") }}
+{% endblock %}

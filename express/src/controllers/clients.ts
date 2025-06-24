@@ -32,6 +32,7 @@ export const showClient: RequestHandler = async (req, res) => {
     const idTokenSigningAlgorithm = client.id_token_signing_algorithm ?? "";
     const maxAgeEnabled = client.max_age_enabled;
     const pkceEnforced = client.pkce_enforced;
+    const landingPageUrl = client.landing_page_url;
 
     if (client.publicKeySource == "JWKS" && client.token_endpoint_auth_method != "client_secret_post") {
         displayedKey = client.jwksUri;
@@ -63,6 +64,7 @@ export const showClient: RequestHandler = async (req, res) => {
             levelsOfConfidence: client.client_locs ? client.client_locs.join(" ") : ""
         }),
         maxAgeEnabled: maxAgeEnabled,
+        landingPageUrl: landingPageUrl,
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
@@ -97,6 +99,9 @@ export const showClient: RequestHandler = async (req, res) => {
             changeIdVerificationEnabledUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/enter-identity-verification`,
             changeIdTokenSigningAlgorithm: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-id-token-signing-algorithm?algorithm=${encodeURIComponent(
                 idTokenSigningAlgorithm
+            )}`,
+            changeLandingPageUrl: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-landing-page-url?landingPageUrl=${encodeURIComponent(
+                landingPageUrl ?? ""
             )}`,
             changeMaxAgeEnabled: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-max-age-enabled`,
             changePKCEEnforcedUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-pkce-enforced`
@@ -990,3 +995,35 @@ export const processChangePKCEEnforcedForm = async (req: Request, res: Response)
     req.session.updatedField = "PKCE enforced";
     res.redirect(`/services/${serviceId}/clients`);
 };
+
+export const showChangeLandingPageUrlForm: RequestHandler = (req: Request, res: Response): void => {
+    res.render("clients/change-landing-page-url.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        values: {
+            landingPageUrl: req.query.landingPageUrl
+        }
+    });
+};
+
+export const processChangeLandingPageUrlForm: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+    const landingPageUrl = req.body.landingPageUrl;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {landing_page_url: landingPageUrl},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    if (typeof landingPageUrl === "string" && landingPageUrl.trim().length > 0) {
+        req.session.updatedField = "Landing page URI";
+    }
+
+    res.redirect(`/services/${req.context.serviceId}/clients`);
+};
+
+
