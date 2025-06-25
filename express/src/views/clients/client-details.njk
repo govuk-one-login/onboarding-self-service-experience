@@ -16,10 +16,10 @@
 {% endset %}
 
 {% block mainContent %}
-  {% if updatedField %}
+  {% if successBannerMessage %}
     {% call govukNotificationBanner({type: 'success'}) %}
       <h3 class="govuk-notification-banner__heading">
-        You have changed your {{ updatedField }}
+        {{ successBannerMessage }}
       </h3>
     {% endcall %}
   {% endif %}
