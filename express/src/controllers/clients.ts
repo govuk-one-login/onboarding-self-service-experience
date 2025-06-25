@@ -38,12 +38,16 @@ export const showClient: RequestHandler = async (req, res) => {
         displayedKey = client.jwksUri;
     }
 
+    const successBannerMessage = req.session.updatedField
+        ? generateSuccessBannerMessage(req.session.updatedField, identityVerificationSupported, landingPageUrl)
+        : undefined;
+
     res.render("clients/client-details.njk", {
         clientId: authClientId,
         selfServiceClientId: selfServiceClientId,
         serviceId: serviceId,
         serviceName: serviceName,
-        updatedField: req.session.updatedField,
+        successBannerMessage: successBannerMessage,
         redirectUris: redirectUris,
         scopesRequired: client.scopes,
         ...(client.token_endpoint_auth_method === "client_secret_post"
@@ -115,6 +119,23 @@ export const showClient: RequestHandler = async (req, res) => {
     // TODO we need to use a flash message package for Express
     req.session.serviceName = client.serviceName ? client.serviceName : client.clientName;
     req.session.updatedField = undefined;
+};
+
+const generateSuccessBannerMessage = (updatedField?: string, identityVerificationSupported?: boolean, landingPageUrl?: string) => {
+    let message;
+    if (updatedField === "identity verification") {
+        if (identityVerificationSupported) {
+            message = "You have enabled identity verification.";
+            if (!landingPageUrl) {
+                message += " It is strongly recommended that you set a landing page URI.";
+            }
+        } else {
+            message = "You have disabled identity verification.";
+        }
+    } else {
+        message = `You have changed your ${updatedField}`;
+    }
+    return message;
 };
 
 export const showGoLivePage: RequestHandler = (req, res) => {
@@ -1025,5 +1046,3 @@ export const processChangeLandingPageUrlForm: RequestHandler = async (req: Reque
 
     res.redirect(`/services/${req.context.serviceId}/clients`);
 };
-
-

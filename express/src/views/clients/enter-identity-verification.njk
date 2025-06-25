@@ -19,7 +19,13 @@
       "govuk-fieldset__legend--l",
       name = "identityVerificationSupported",
       items = [
-        {text: "Yes", value: "yes"},
+        {
+            text: "Yes",
+            value: "yes",
+            hint: {
+                text: "If you need identity verification, it is strongly recommended that you set a landing page URI to ensure that users can be returned to your service after in-person identity checks."
+                }
+        },
         {text: "No", value: "no"}
       ],
       isPageHeading = true
