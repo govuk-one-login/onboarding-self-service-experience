@@ -36,7 +36,9 @@ import {
     showMaxAgeEnabledForm,
     processMaxAgeEnabledForm,
     showChangePKCEEnforcedForm,
-    processChangePKCEEnforcedForm
+    processChangePKCEEnforcedForm,
+    showChangeLandingPageUrlForm,
+    processChangeLandingPageUrlForm
 } from "../../src/controllers/clients";
 import {
     TEST_ACCESS_TOKEN,
@@ -59,6 +61,7 @@ import {
     TEST_EMAIL,
     TEST_ID_SIGNING_TOKEN_ALGORITHM,
     TEST_IP_ADDRESS,
+    TEST_LANDING_PAGE_URL,
     TEST_LEVELS_OF_CONFIDENCE,
     TEST_LEVELS_OF_CONFIDENCE_ALT,
     TEST_POST_LOGOUT_REDIRECT_URI,
@@ -131,7 +134,7 @@ describe("showClient Controller tests", () => {
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
             token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD,
-            updatedField: undefined,
+            successBannerMessage: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
             userPublicKey: TEST_CLIENT.publicKey,
@@ -144,6 +147,7 @@ describe("showClient Controller tests", () => {
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             pkceEnforced: TEST_CLIENT.pkce_enforced,
+            landingPageUrl: TEST_LANDING_PAGE_URL,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -170,7 +174,10 @@ describe("showClient Controller tests", () => {
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
                 changeMaxAgeEnabled: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-max-age-enabled`,
-                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`,
+                changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -203,7 +210,7 @@ describe("showClient Controller tests", () => {
             selfServiceClientId: TEST_CLIENT.dynamoServiceId,
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
-            updatedField: undefined,
+            successBannerMessage: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
             userPublicKey: TEST_CLIENT.publicKey,
@@ -215,6 +222,7 @@ describe("showClient Controller tests", () => {
             idTokenSigningAlgorithm: TEST_CLIENT.id_token_signing_algorithm,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             pkceEnforced: TEST_CLIENT.pkce_enforced,
+            landingPageUrl: TEST_LANDING_PAGE_URL,
             contacts: TEST_CLIENT.contacts,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             token_endpoint_auth_method: TEST_CLIENT.token_endpoint_auth_method,
@@ -242,7 +250,10 @@ describe("showClient Controller tests", () => {
                 changeMaxAgeEnabled: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-max-age-enabled`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
-                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`,
+                changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -275,7 +286,7 @@ describe("showClient Controller tests", () => {
             selfServiceClientId: TEST_CLIENT.dynamoServiceId,
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
-            updatedField: undefined,
+            successBannerMessage: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
             userPublicKey: TEST_CLIENT.publicKey,
@@ -288,6 +299,7 @@ describe("showClient Controller tests", () => {
             maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             pkceEnforced: TEST_CLIENT.pkce_enforced,
+            landingPageUrl: TEST_LANDING_PAGE_URL,
             contacts: TEST_CLIENT.contacts,
             levelsOfConfidence: "",
             token_endpoint_auth_method: TEST_CLIENT.token_endpoint_auth_method,
@@ -314,7 +326,10 @@ describe("showClient Controller tests", () => {
                 changeMaxAgeEnabled: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-max-age-enabled`,
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLIENT.claims}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
-                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`,
+                changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -348,7 +363,7 @@ describe("showClient Controller tests", () => {
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
             token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD,
-            updatedField: undefined,
+            successBannerMessage: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
             userPublicKey: "",
@@ -361,6 +376,7 @@ describe("showClient Controller tests", () => {
             maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             pkceEnforced: TEST_CLIENT.pkce_enforced,
+            landingPageUrl: TEST_LANDING_PAGE_URL,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -387,7 +403,10 @@ describe("showClient Controller tests", () => {
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
-                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`,
+                changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -421,7 +440,7 @@ describe("showClient Controller tests", () => {
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
             token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD_ALT,
-            updatedField: undefined,
+            successBannerMessage: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
             client_secret: TEST_CLIENT.client_secret,
@@ -434,6 +453,7 @@ describe("showClient Controller tests", () => {
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             pkceEnforced: TEST_CLIENT.pkce_enforced,
+            landingPageUrl: TEST_LANDING_PAGE_URL,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -459,7 +479,10 @@ describe("showClient Controller tests", () => {
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
-                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`,
+                changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -495,7 +518,7 @@ describe("showClient Controller tests", () => {
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
             token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD_ALT,
-            updatedField: undefined,
+            successBannerMessage: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
             client_secret: "",
@@ -508,6 +531,7 @@ describe("showClient Controller tests", () => {
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             pkceEnforced: TEST_CLIENT.pkce_enforced,
+            landingPageUrl: TEST_LANDING_PAGE_URL,
             levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
@@ -533,7 +557,10 @@ describe("showClient Controller tests", () => {
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=${TEST_CLAIM}`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
-                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`,
+                changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -567,7 +594,7 @@ describe("showClient Controller tests", () => {
             serviceId: TEST_SERVICE_ID,
             serviceName: TEST_CLIENT.serviceName,
             token_endpoint_auth_method: TEST_TOKEN_AUTH_METHOD,
-            updatedField: undefined,
+            successBannerMessage: undefined,
             redirectUris: TEST_CLIENT.redirectUris,
             scopesRequired: TEST_CLIENT.scopes,
             userPublicKey: TEST_CLIENT.publicKey,
@@ -580,6 +607,7 @@ describe("showClient Controller tests", () => {
             maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             identityVerificationSupported: false,
             pkceEnforced: false,
+            landingPageUrl: TEST_LANDING_PAGE_URL,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
@@ -606,7 +634,10 @@ describe("showClient Controller tests", () => {
                     "/services/service#123/clients/ajedebd2343/456/change-id-token-signing-algorithm?algorithm=ES256",
                 changeClaims: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-claims?claims=`,
                 changeScopes: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-scopes?scopes=${TEST_SCOPES_IN[0]}`,
-                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`
+                changePKCEEnforcedUri: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${TEST_CLIENT.dynamoServiceId}/change-pkce-enforced`,
+                changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
+                    TEST_CLIENT.dynamoServiceId
+                }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
             },
             basicAuthCreds: {
                 username: TEST_BASIC_AUTH_USERNAME,
@@ -3434,5 +3465,76 @@ describe("processMaxAgeEnabled controller tests for updating flag", () => {
                 "maxAgeEnabled-options": "Select yes if you want to enable Max Age"
             }
         });
+    });
+});
+describe("showChangeLandingPageUrlForm controller tests", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it("renders the expected template with the expected values", () => {
+        const mockRequest = request({
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            query: {
+                landingPageUrl: TEST_LANDING_PAGE_URL
+            }
+        });
+        const mockResponse = response();
+
+        showChangeLandingPageUrlForm(mockRequest, mockResponse, mockNext);
+
+        expect(mockResponse.render).toHaveBeenCalledWith("clients/change-landing-page-url.njk", {
+            serviceId: TEST_SERVICE_ID,
+            selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+            clientId: TEST_CLIENT_ID,
+            values: {
+                landingPageUrl: TEST_LANDING_PAGE_URL
+            }
+        });
+    });
+});
+
+describe("processChangeLandingPageUrlForm controller tests", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it("calls s4 update client with the new landing page url and then redirects to`/services/:serviceId/clients", async () => {
+        s4UpdateClientSpy.mockResolvedValue();
+
+        const mockRequest = request({
+            session: {
+                authenticationResult: TEST_AUTHENTICATION_RESULT
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            body: {
+                landingPageUrl: TEST_LANDING_PAGE_URL
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            }
+        });
+        const mockResponse = response();
+
+        await processChangeLandingPageUrlForm(mockRequest, mockResponse, mockNext);
+
+        expect(s4UpdateClientSpy).toHaveBeenCalledWith(
+            TEST_SERVICE_ID,
+            TEST_SELF_SERVICE_CLIENT_ID,
+            TEST_CLIENT_ID,
+            {landing_page_url: TEST_LANDING_PAGE_URL},
+            TEST_AUTHENTICATION_RESULT.AccessToken
+        );
+        expect(mockRequest.session.updatedField).toBe("Landing page URI");
+        expect(mockResponse.redirect).toHaveBeenCalledWith(`/services/${TEST_SERVICE_ID}/clients`);
     });
 });
