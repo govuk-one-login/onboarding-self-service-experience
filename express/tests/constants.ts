@@ -123,6 +123,7 @@ export const TEST_SERVICE_TYPE = "serviceType";
 export const TEST_SUBJECT_TYPE = "subject";
 export const TEST_BACK_CHANNEL_LOGOUT_URI = "someBackChannel";
 export const TEST_SECTOR_IDENTIFIER_URI = "someSectorIdentifier";
+export const TEST_LANDING_PAGE_URL = "someLandingPageUrl";
 export const TEST_TOKEN_AUTH_METHOD = "private_key_jwt";
 export const TEST_TOKEN_AUTH_METHOD_ALT = "client_secret_post";
 export const TEST_TYPE = "someType";
@@ -165,7 +166,8 @@ export const TEST_DYNAMO_CLIENT = {
     id_token_signing_algorithm: {S: TEST_ID_SIGNING_TOKEN_ALGORITHM},
     client_locs: {L: [{S: TEST_LEVELS_OF_CONFIDENCE}]},
     max_age_enabled: {B: TEST_BOOLEAN_SUPPORTED_ALT},
-    pkce_enforced: {B: TEST_BOOLEAN_SUPPORTED_ALT}
+    pkce_enforced: {B: TEST_BOOLEAN_SUPPORTED_ALT},
+    landing_page_url: {S: TEST_LANDING_PAGE_URL}
 };
 
 export const TEST_CLIENT: Client = {
@@ -194,7 +196,8 @@ export const TEST_CLIENT: Client = {
     id_token_signing_algorithm: TEST_ID_SIGNING_TOKEN_ALGORITHM,
     client_locs: [TEST_LEVELS_OF_CONFIDENCE],
     max_age_enabled: TEST_BOOLEAN_SUPPORTED_ALT,
-    pkce_enforced: TEST_BOOLEAN_SUPPORTED_ALT
+    pkce_enforced: TEST_BOOLEAN_SUPPORTED_ALT,
+    landing_page_url: TEST_LANDING_PAGE_URL
 };
 
 export const constructFakeJwt = (jwtBody: Record<string, unknown>): string =>
