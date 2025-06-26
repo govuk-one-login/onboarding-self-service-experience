@@ -25,7 +25,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private id_token_signing_algorithm = "ES256";
     private maxAgeEnabled = false;
     private pkceEnforced = false;
-    private landingPageUrl = "";
+    private landingPageUrl: string | null = null;
 
     private user: DynamoUser = {
         last_name: {S: "we haven't collected this last name"},
@@ -207,7 +207,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         identity_verification_supported: {S: this.identityVerificationSupported},
                         maxAgeEnabled: {S: this.maxAgeEnabled},
                         pkce_enforced: {S: this.pkceEnforced},
-                        landing_page_url: {S: this.landingPageUrl}
+                        ...(this.landingPageUrl && {landing_page_url: {S: this.landingPageUrl}})
                     }
                 ]
             }
