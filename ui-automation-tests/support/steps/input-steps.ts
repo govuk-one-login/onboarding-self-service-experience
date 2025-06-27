@@ -21,7 +21,8 @@ const fields = {
     "change your static key": "serviceUserPublicKey",
     "change your jwks url": "jwksUrl",
     "back channel logout uri": "backChannelLogoutUri",
-    "sector identifier uri": "sectorIdentifierUri"
+    "sector identifier uri": "sectorIdentifierUri",
+    "landing page url": "landingPageUrl"
 };
 
 When("they submit the {} {string}", async function (fieldName, value) {
