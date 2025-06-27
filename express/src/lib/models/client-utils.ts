@@ -27,6 +27,7 @@ export function dynamoClientToDomainClient(client: ClientFromDynamo): Client {
         id_token_signing_algorithm: client.id_token_signing_algorithm,
         client_locs: client.client_locs,
         max_age_enabled: client.max_age_enabled,
-        pkce_enforced: client.pkce_enforced
+        pkce_enforced: client.pkce_enforced,
+        landing_page_url: client.landing_page_url
     };
 }

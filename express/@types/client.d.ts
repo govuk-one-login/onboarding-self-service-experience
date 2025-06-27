@@ -25,6 +25,7 @@ export interface ClientFromDynamo {
     client_locs?: string[];
     max_age_enabled?: boolean;
     pkce_enforced: boolean;
+    landing_page_url?: string;
 }
 
 export interface Client {
@@ -54,4 +55,5 @@ export interface Client {
     client_locs?: string[];
     max_age_enabled?: boolean;
     pkce_enforced: boolean;
+    landing_page_url?: string;
 }

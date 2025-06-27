@@ -16,10 +16,10 @@
 {% endset %}
 
 {% block mainContent %}
-  {% if updatedField %}
+  {% if successBannerMessage %}
     {% call govukNotificationBanner({type: 'success'}) %}
       <h3 class="govuk-notification-banner__heading">
-        You have changed your {{ updatedField }}
+        {{ successBannerMessage }}
       </h3>
     {% endcall %}
   {% endif %}
@@ -90,6 +90,14 @@
     <div id="levelsOfConfidence">{{ levelsOfConfidence }}</div>
   {% endset %}
 {% endif %}
+
+{% set landingPageUrlContainer %}
+    {% if landingPageUrl and landingPageUrl.length > 0 and landingPageUrl[0] !== "" %}
+      <div id="landingPageUrl">{{ landingPageUrl }}</div>
+    {% else %}
+      <div id="landingPageUrl">Not added yet</div>
+    {% endif %}
+  {% endset %}
 
   {{ govukSummaryList({
     rows: [
@@ -192,7 +200,18 @@
             visuallyHiddenText: "Max Age Enabled"
           }]
         }
-      }
+      },
+      {
+          key: {text: "Landing page URI"},
+          value: {html: landingPageUrlContainer},
+          actions: {
+            items: [{
+              href: urls.changeLandingPageUrl,
+              text: "Change",
+              visuallyHiddenText: "Landing page URI"
+            }]
+          }
+        }
     ]
   }) }}
 
