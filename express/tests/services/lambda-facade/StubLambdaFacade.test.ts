@@ -1,7 +1,7 @@
 import LambdaFacade from "../../../src/services/lambda-facade/StubLambdaFacade";
 
 describe("Lambda Facade class tests", () => {
-    it("Exercise mock listClients method", async () => {
+    it("returns expected data from the listClients method", async () => {
         const mockLambdaFacade = new LambdaFacade();
 
         const expected = {
@@ -60,7 +60,21 @@ describe("Lambda Facade class tests", () => {
         expect(result).toEqual(expected);
     });
 
-    it("Exercise mock listServices method", async () => {
+    it("successfully adds landingPageUrl", async () => {
+        const mockLambdaFacade = new LambdaFacade();
+
+        // Initially landingPageUrl should not be present
+        let result = await mockLambdaFacade.listClients();
+        expect(result.data.Items).toBeDefined();
+        expect(result.data.Items?.[0]).not.toHaveProperty("landing_page_url");
+
+        await mockLambdaFacade.updateClient("", "", "", {landing_page_url: "https://example.com"});
+
+        result = await mockLambdaFacade.listClients();
+        expect(result.data.Items?.[0]).toHaveProperty("landing_page_url", {S: "https://example.com"});
+    });
+
+    it("returns expected data from the listServices method", async () => {
         const mockLambdaFacade = new LambdaFacade();
 
         const expected = {
@@ -80,7 +94,7 @@ describe("Lambda Facade class tests", () => {
         expect(result).toEqual(expected);
     });
 
-    it("Exercise mock updateClient method", async () => {
+    it("returns undefined from the updateClient method", async () => {
         const mockLambdaFacade = new LambdaFacade();
 
         const update: Record<string, string | string[]> = {};

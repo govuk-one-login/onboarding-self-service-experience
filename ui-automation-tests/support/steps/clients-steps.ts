@@ -18,7 +18,8 @@ const fields = {
     "identity verification enabled": "idVerificationEnabledUri",
     claims: "claimsUri",
     "id token signing algorithm": "idTokenSigningAlgorithm",
-    "PKCE enforced": "changePKCEEnforcedUri"
+    "PKCE enforced": "changePKCEEnforcedUri",
+    "landing page url": "landingPageUrl"
 };
 
 Then("they should see the value for the Client ID {string}", async function (this: TestContext, text) {

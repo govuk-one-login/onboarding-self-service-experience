@@ -32,17 +32,22 @@ export const showClient: RequestHandler = async (req, res) => {
     const idTokenSigningAlgorithm = client.id_token_signing_algorithm ?? "";
     const maxAgeEnabled = client.max_age_enabled;
     const pkceEnforced = client.pkce_enforced;
+    const landingPageUrl = client.landing_page_url;
 
     if (client.publicKeySource == "JWKS" && client.token_endpoint_auth_method != "client_secret_post") {
         displayedKey = client.jwksUri;
     }
+
+    const successBannerMessage = req.session.updatedField
+        ? generateSuccessBannerMessage(req.session.updatedField, identityVerificationSupported, landingPageUrl)
+        : undefined;
 
     res.render("clients/client-details.njk", {
         clientId: authClientId,
         selfServiceClientId: selfServiceClientId,
         serviceId: serviceId,
         serviceName: serviceName,
-        updatedField: req.session.updatedField,
+        successBannerMessage: successBannerMessage,
         redirectUris: redirectUris,
         scopesRequired: client.scopes,
         ...(client.token_endpoint_auth_method === "client_secret_post"
@@ -63,6 +68,7 @@ export const showClient: RequestHandler = async (req, res) => {
             levelsOfConfidence: client.client_locs ? client.client_locs.join(" ") : ""
         }),
         maxAgeEnabled: maxAgeEnabled,
+        landingPageUrl: landingPageUrl,
         urls: {
             // TODO changeClientName is currently not used
             changeClientName: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-client-name?clientName=${encodeURIComponent(
@@ -98,6 +104,9 @@ export const showClient: RequestHandler = async (req, res) => {
             changeIdTokenSigningAlgorithm: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-id-token-signing-algorithm?algorithm=${encodeURIComponent(
                 idTokenSigningAlgorithm
             )}`,
+            changeLandingPageUrl: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-landing-page-url?landingPageUrl=${encodeURIComponent(
+                landingPageUrl ?? ""
+            )}`,
             changeMaxAgeEnabled: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-max-age-enabled`,
             changePKCEEnforcedUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-pkce-enforced`
         },
@@ -110,6 +119,23 @@ export const showClient: RequestHandler = async (req, res) => {
     // TODO we need to use a flash message package for Express
     req.session.serviceName = client.serviceName ? client.serviceName : client.clientName;
     req.session.updatedField = undefined;
+};
+
+const generateSuccessBannerMessage = (updatedField?: string, identityVerificationSupported?: boolean, landingPageUrl?: string) => {
+    let message;
+    if (updatedField === "identity verification") {
+        if (identityVerificationSupported) {
+            message = "You have enabled identity verification.";
+            if (!landingPageUrl) {
+                message += " It is strongly recommended that you set a landing page URI.";
+            }
+        } else {
+            message = "You have disabled identity verification.";
+        }
+    } else {
+        message = `You have changed your ${updatedField}`;
+    }
+    return message;
 };
 
 export const showGoLivePage: RequestHandler = (req, res) => {
@@ -989,4 +1015,34 @@ export const processChangePKCEEnforcedForm = async (req: Request, res: Response)
 
     req.session.updatedField = "PKCE enforced";
     res.redirect(`/services/${serviceId}/clients`);
+};
+
+export const showChangeLandingPageUrlForm: RequestHandler = (req: Request, res: Response): void => {
+    res.render("clients/change-landing-page-url.njk", {
+        serviceId: req.context.serviceId,
+        selfServiceClientId: req.params.selfServiceClientId,
+        clientId: req.params.clientId,
+        values: {
+            landingPageUrl: req.query.landingPageUrl
+        }
+    });
+};
+
+export const processChangeLandingPageUrlForm: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+    const landingPageUrl = req.body.landingPageUrl;
+    const s4: SelfServiceServicesService = req.app.get("backing-service");
+
+    await s4.updateClient(
+        nonNull(req.context.serviceId),
+        req.params.selfServiceClientId,
+        req.params.clientId,
+        {landing_page_url: landingPageUrl},
+        nonNull(req.session.authenticationResult?.AccessToken)
+    );
+
+    if (typeof landingPageUrl === "string" && landingPageUrl.trim().length > 0) {
+        req.session.updatedField = "Landing page URI";
+    }
+
+    res.redirect(`/services/${req.context.serviceId}/clients`);
 };
