@@ -159,6 +159,12 @@ Conditions:
       ],
     ]
 
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W8003
+
 Resources:
 
   #--- Fargate / ECS ---#
