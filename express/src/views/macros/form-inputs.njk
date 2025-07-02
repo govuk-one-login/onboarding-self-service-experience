@@ -1,10 +1,10 @@
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
-{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
-{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "dist/govuk/components/input/macro.njk" import govukInput %}
+{% from "dist/govuk/components/button/macro.njk" import govukButton %}
+{% from "dist/govuk/components/radios/macro.njk" import govukRadios %}
+{% from "dist/govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "dist/govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "dist/govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "dist/govuk/components/date-input/macro.njk" import govukDateInput %}
 
 {% macro generate(action, buttonText, buttonClasses, cancelUrl) %}
   <form class="form" method="post"{% if action %} action="{{ action }}"{% endif %} novalidate="novalidate">

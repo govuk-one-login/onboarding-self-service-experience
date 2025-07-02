@@ -11,7 +11,9 @@ import baseRoutes from "./routes/base";
 import register from "./routes/register";
 import services from "./routes/services";
 import signIn from "./routes/sign-in";
+import dotenv from "dotenv";
 
+dotenv.config();
 const app = Express();
 
 app.use((req, res, next) => {
