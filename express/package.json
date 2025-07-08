@@ -3,7 +3,7 @@
   "description": "DI Self-Service frontend",
   "scripts": {
     "start": "node dist/app.js",
-    "local": "npm run buildts && STUB_API=true node --inspect dist/app.js",
+    "local": "npm run build && nodemon --config nodemon.json --inspect -r 'dotenv/config' src/app.ts",
     "dev": "STUB_API=${STUB_API:-true} nodemon --config nodemon.json --inspect -r 'dotenv/config' src/app.ts",
     "docker": "docker run --rm --publish 3000:3000 self-service-frontend",
     "minifyjs": "for script in dist/assets/javascripts/*.js; do uglifyjs $script -cmo $script $(${CI:-false} || echo --source-map includeSources,url=${script##*/}.map); done",
