@@ -1,7 +1,7 @@
-{% extends "govuk/template.njk" %}
+{% extends "dist/govuk/template.njk" %}
 {% from "macros/back-link.njk" import backLink %}
-{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "dist/govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "dist/govuk/components/button/macro.njk" import govukButton %}
 
 {% set assetPath = "/assets" %}
 {% set showTopNav = showTopNav | default(true) %}
@@ -18,6 +18,10 @@
     This is a new service – your
     <a href="https://www.sign-in.service.gov.uk/contact-us?adminTool" class="govuk-link" rel="noreferrer noopener" target="_blank">feedback (opens in a new tab)</a> will help us improve it.
   {% endset %}
+{% endif %}
+
+{% if MAY_2025_REBRAND_ENABLED %}
+  {%set htmlClasses = 'govuk-template--rebranded'%}
 {% endif %}
 
 {% block pageTitle %}{% if errorMessages %}Error: {% endif %}{{ pageTitle }} - GOV.UK One Login{% endblock %}
