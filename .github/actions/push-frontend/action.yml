@@ -47,7 +47,7 @@ runs:
 
     - name: Deploy application
       id: deploy-application
-      uses: govuk-one-login/github-actions/secure-pipelines/deploy-fargate@db4b3614f5f863f56a5356052262878ecec83b31 # 22/07/2024
+      uses: govuk-one-login/github-actions/secure-pipelines/deploy-fargate@c8eefadf581d2087ce2af48b7060c1329cfa5251 # 09/07/2025
       with:
         aws-role-arn: ${{ inputs.deployment-role-arn }}
         artifact-bucket-name: ${{ inputs.artifact-bucket-name }}
