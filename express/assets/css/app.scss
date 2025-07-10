@@ -1,5 +1,5 @@
 $govuk-new-link-styles: true;
-@import "govuk-frontend/govuk/all";
+@import "govuk-frontend/dist/govuk/all";
 @import "modules/responsive-embed";
 @import "modules/borders";
 @import "modules/breadcrumbs";

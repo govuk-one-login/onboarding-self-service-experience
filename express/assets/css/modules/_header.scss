@@ -1,17 +1,20 @@
 .govuk-header__content {
   @include govuk-media-query($from: desktop) {
-    width: 48%;
+    width: 46%;
   }
 }
 
 .govuk-header__logo {
   @include govuk-media-query($from: desktop) {
-    width: 52%;
+    width: 54%;
+    padding-right: 0;
+
     .govuk-header__link--homepage {
       min-width: 464px;
       display: block;
     }
   }
+
   .govuk-phase-banner__content__tag {
     margin-left: 8px;
     position: relative;
@@ -22,7 +25,7 @@
 
 @media (min-width: 769px) and (max-width: 1010px) {
   .govuk-header__logo {
-    width: 55%;
+    width: 54%;
     padding-right: 0;
     padding-top: 14px;
     .govuk-header__link--homepage {
@@ -30,8 +33,9 @@
       display: block;
     }
   }
+
   .govuk-header__content {
-    width: 45%;
+    width: 46%;
     padding-left: 0;
   }
 }
@@ -42,6 +46,7 @@
       padding-left: 90px;
     }
   }
+  
   .govuk-header__link--homepage {
     min-width: 464px;
     display: block;
