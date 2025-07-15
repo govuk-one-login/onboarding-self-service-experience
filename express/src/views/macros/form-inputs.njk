@@ -1,10 +1,10 @@
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
-{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
-{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "dist/govuk/components/input/macro.njk" import govukInput %}
+{% from "dist/govuk/components/button/macro.njk" import govukButton %}
+{% from "dist/govuk/components/radios/macro.njk" import govukRadios %}
+{% from "dist/govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "dist/govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "dist/govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "dist/govuk/components/date-input/macro.njk" import govukDateInput %}
 
 {% macro generate(action, buttonText, buttonClasses, cancelUrl) %}
   <form class="form" method="post"{% if action %} action="{{ action }}"{% endif %} novalidate="novalidate">
@@ -28,24 +28,24 @@
   {{ govukInput({
     label: {
       text: label,
-      classes: labelClasses if labelClasses,
-      isPageHeading: isPageHeading if isPageHeading
+      classes: labelClasses if labelClasses else null,
+      isPageHeading: isPageHeading if isPageHeading else null
     } if label,
     hint: {
       text: hint
     } if hint,
     id: id,
     name: id,
-    type: type if type,
+    type: type if type else null,
     spellcheck: false,
-    disabled: disabled if disabled,
+    disabled: disabled,
     classes: classes | default("govuk-!-width-full"),
     autocomplete: autocomplete if autocomplete,
-    inputmode: inputmode if inputmode,
+    inputmode: inputmode if inputmode else null,
     value: value | default(values[id] if values and values.hasOwnProperty(id)),
     errorMessage: {
       text: errorMessages[id]
-    } if errorMessages and errorMessages.hasOwnProperty(id)
+    } if errorMessages and errorMessages.hasOwnProperty(id) else null
   }) }}
 {% endmacro %}
 
