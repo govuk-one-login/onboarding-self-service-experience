@@ -23,7 +23,6 @@ import {
     TEST_MFA_RESPONSE,
     TEST_PHONE_NUMBER,
     TEST_PROTOCOL,
-    TEST_RANDOM_NUMBER,
     TEST_SECURITY_CODE,
     TEST_SESSION_ID,
     TEST_TIMESTAMP,
@@ -37,7 +36,9 @@ import {AxiosResponse} from "axios";
 import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status";
 import console from "console";
 import {LimitExceededException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
+import crypto from "node:crypto";
 
+const fixedBuffer = Buffer.from("6e4195129066135da2c81745247bb0edf82e00da5a8925d1a1289629ad8633");
 describe("showCheckPhonePage controller tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -587,15 +588,10 @@ describe("checkEmailPasswordReset controller tests", () => {
         });
         const mockRes = response();
         const mockNext = jest.fn();
-        jest.spyOn(Math, "random").mockReturnValue(TEST_RANDOM_NUMBER);
+        jest.spyOn(crypto, "randomBytes").mockImplementation(() => fixedBuffer);
         await checkEmailPasswordReset(mockReq, mockRes, mockNext);
         expect(s4ForgotPasswordSpy).toHaveBeenNthCalledWith(1, TEST_EMAIL, TEST_PROTOCOL, TEST_HOST_NAME, false);
-        expect(s4RecoverCognitoSpy).toHaveBeenCalledWith(
-            mockReq,
-            TEST_EMAIL,
-            TEST_RANDOM_NUMBER * 100_000_000_000_000 + "",
-            TEST_PHONE_NUMBER
-        );
+        expect(s4RecoverCognitoSpy).toHaveBeenCalledWith(mockReq, TEST_EMAIL, fixedBuffer.toString("base64url"), TEST_PHONE_NUMBER);
         expect(s4ForgotPasswordSpy).toHaveBeenNthCalledWith(2, TEST_EMAIL, TEST_PROTOCOL, TEST_HOST_NAME, true);
         expect(mockRes.render).toHaveBeenCalledWith("sign-in/enter-email-code.njk");
     });

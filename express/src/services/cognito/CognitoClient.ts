@@ -37,6 +37,7 @@ import {
     verifyMobileUsingOTPCode
 } from "../../lib/fixedOTP";
 import * as process from "process";
+import {randomBytes} from "crypto";
 
 type CognitoCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes> = Command<
     ServiceInputTypes,
@@ -85,9 +86,7 @@ export default class CognitoClient implements CognitoInterface {
         if (isFixedOTPCredential(email)) {
             temporaryPassword = getFixedOTPCredentialTemporaryPassword(email);
         } else {
-            temporaryPassword = Math.floor(Math.random() * 100_000)
-                .toString()
-                .padStart(6, "0");
+            temporaryPassword = randomBytes(64).toString("base64url");
         }
 
         try {
@@ -118,9 +117,7 @@ export default class CognitoClient implements CognitoInterface {
                 MessageAction: "SUPPRESS",
                 Username: cognitoUserName,
                 UserPoolId: this.userPoolId,
-                TemporaryPassword: Math.floor(Math.random() * 100_000)
-                    .toString()
-                    .padStart(6, "0"),
+                TemporaryPassword: randomBytes(64).toString("base64url"),
                 UserAttributes: [
                     {Name: "email", Value: cognitoUserName},
                     {Name: "custom:signup_status", Value: "HasEmail,HasPassword,HasPhoneNumber,HasTextCode"}
@@ -141,9 +138,7 @@ export default class CognitoClient implements CognitoInterface {
         if (isFixedOTPCredential(email)) {
             temporaryPassword = getFixedOTPCredentialTemporaryPassword(email);
         } else {
-            temporaryPassword = Math.floor(Math.random() * 100_000)
-                .toString()
-                .padStart(6, "0");
+            temporaryPassword = randomBytes(64).toString("base64url");
         }
 
         try {
