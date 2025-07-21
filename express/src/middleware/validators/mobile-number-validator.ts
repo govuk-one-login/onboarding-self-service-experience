@@ -11,8 +11,6 @@ export default function validateMobileNumber(template: string): RequestHandler {
         if (isPseudonymisedFixedOTPCredential(req.body.mobileNumber)) {
             mobileNumber = getFixedOTPCredentialMobileNumber(req.body.mobileNumber);
         }
-
-        console.log("Validating => " + mobileNumber);
         const result = validate(mobileNumber);
 
         if (result.isValid) {
