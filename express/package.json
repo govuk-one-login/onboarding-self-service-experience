@@ -22,7 +22,7 @@
     "@aws-sdk/util-dynamodb": "^3.810.0",
     "axios": "^1.9.0",
     "connect-dynamodb": "^3.0.5",
-    "express": "^4.21.2",
+    "express": "^5.1.0",
     "express-async-errors": "^3.1.1",
     "express-session": "^1.17.3",
     "googleapis": "^148.0.0",
@@ -32,7 +32,7 @@
     "nunjucks": "^3.2.3"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17",
+    "@types/express": "^5.0.2",
     "@types/express-session": "^1.18.1",
     "@types/node": "^20.17.47",
     "@types/nunjucks": "^3.2.2",
