@@ -22,5 +22,8 @@
     "@pact-foundation/pact-core": "^15.2.1",
     "@pact-foundation/pact-node": "^10.17.7",
     "mocha": "^10.2.0"
+  },
+  "overrides": {
+    "form-data": "~2.5.4"
   }
 }
