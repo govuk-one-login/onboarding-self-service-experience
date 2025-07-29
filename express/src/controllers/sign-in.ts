@@ -11,6 +11,7 @@ import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import console from "console";
+import {secureRandom6DigitCode} from "../lib/utils/secure-random-code";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
 export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
@@ -257,9 +258,7 @@ const forgotPassword: RequestHandler = async (req, res) => {
             if (dynamoDBEntry != undefined && dynamoDBEntry.length > 2) {
                 const clientDetails = JSON.parse(dynamoDBEntry);
                 const mobileNumber = convertToCountryPrefixFormat(clientDetails.phone.S);
-                const password = Math.floor(Math.random() * 100_000_000_000_000)
-                    .toString()
-                    .padStart(15, "0");
+                const password = secureRandom6DigitCode();
 
                 const userID = clientDetails.pk.S.substring(5); // Skip over 'user#' prefix
 
