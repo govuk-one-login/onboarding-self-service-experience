@@ -242,10 +242,7 @@ Resources:
             - Name: BASIC_AUTH_PASSWORD
               Value: "{{resolve:secretsmanager:/self-service/frontend/basic-auth-password}}"
             - Name: MAY_2025_REBRAND_ENABLED
-              Value: !If
-                - IsProd
-                - false
-                - true
+              Value: true
 
           PortMappings:
             - ContainerPort: !Ref ContainerPort
