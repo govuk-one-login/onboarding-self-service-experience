@@ -29,7 +29,6 @@ import {
     TEST_PASSWORD,
     TEST_PHONE_NUMBER,
     TEST_PROTOCOL,
-    TEST_RANDOM_NUMBER,
     TEST_REFRESH_TOKEN,
     TEST_SECURITY_CODE,
     TEST_SIGN_UP_STATUS
@@ -37,18 +36,15 @@ import {
 import {mockClient} from "aws-sdk-client-mock";
 import "aws-sdk-client-mock-jest";
 import CognitoClient from "../../../src/services/cognito/CognitoClient";
+import crypto from "node:crypto";
 
 const mockCognitoClient = mockClient(CognitoIdentityProviderClient);
 
 describe("cognito client tests", () => {
     beforeEach(() => {
-        jest.spyOn(Math, "random").mockReturnValue(TEST_RANDOM_NUMBER);
         jest.clearAllMocks();
         mockCognitoClient.reset();
-    });
-
-    afterEach(() => {
-        jest.spyOn(Math, "random").mockRestore();
+        jest.spyOn(crypto, "randomInt").mockImplementation(() => 123456);
     });
 
     it("updates the user pool maf duration to 15 mins on instantiating a new client", () => {
@@ -65,9 +61,7 @@ describe("cognito client tests", () => {
         const cognitoClient = new CognitoClient();
         await cognitoClient.createUser(TEST_EMAIL);
 
-        const expectedTemporaryPassword = Math.floor(TEST_RANDOM_NUMBER * 100_000)
-            .toString()
-            .padStart(6, "0");
+        const expectedTemporaryPassword = "123456";
 
         expect(mockCognitoClient).toHaveReceivedCommandWith(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
@@ -85,9 +79,7 @@ describe("cognito client tests", () => {
         const cognitoClient = new CognitoClient();
         await cognitoClient.recoverUser(TEST_EMAIL);
 
-        const expectedTemporaryPassword = Math.floor(TEST_RANDOM_NUMBER * 100_000)
-            .toString()
-            .padStart(6, "0");
+        const expectedTemporaryPassword = "123456";
 
         expect(mockCognitoClient).toHaveReceivedCommandWith(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
@@ -106,9 +98,7 @@ describe("cognito client tests", () => {
         const cognitoClient = new CognitoClient();
         await cognitoClient.resendEmailAuthCode(TEST_EMAIL);
 
-        const expectedTemporaryPassword = Math.floor(TEST_RANDOM_NUMBER * 100_000)
-            .toString()
-            .padStart(6, "0");
+        const expectedTemporaryPassword = "123456";
 
         expect(mockCognitoClient).toHaveReceivedCommandWith(AdminCreateUserCommand, {
             DesiredDeliveryMediums: ["EMAIL"],
