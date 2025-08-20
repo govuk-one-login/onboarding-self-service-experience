@@ -12,3 +12,7 @@ router.get("/sign-out", signOut);
 router.get("/session-timeout", sessionTimeout);
 
 router.get("/there-is-a-problem", render("there-is-a-problem.njk"));
+
+router.get("/service-unavailable", function (req, res) {
+    res.redirect("/");
+});
