@@ -68,6 +68,12 @@ Parameters:
   ServiceUnavailableBannerStartDate:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/service-unavailable-banner-start-date
+  ShowServiceUnavailablePage:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/show-service-unavailable-page
+  ServiceUnavailablePageEndDate:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/service-unavailable-page-end-date
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -164,6 +170,7 @@ Conditions:
         !Equals [production, !Ref Environment],
       ],
     ]
+  IsServiceUnavailable: !Equals [!Ref ShowServiceUnavailablePage, "true"]
 
 Metadata:
   cfn-lint:
@@ -251,6 +258,10 @@ Resources:
               Value: !Ref ShowServiceUnavailableBanner
             - Name: SERVICE_UNAVAILABLE_BANNER_START_DATE
               Value: !Ref ServiceUnavailableBannerStartDate
+            - Name: SHOW_SERVICE_UNAVAILABLE_PAGE
+              Value: !Ref ShowServiceUnavailablePage
+            - Name: SERVICE_UNAVAILABLE_PAGE_END_DATE
+              Value: !Ref ServiceUnavailablePageEndDate
 
           PortMappings:
             - ContainerPort: !Ref ContainerPort
@@ -532,6 +543,9 @@ Resources:
       Port: !Ref ContainerPort
       Protocol: HTTP
       TargetType: ip
+      Matcher: 
+        HttpCode: !If [IsServiceUnavailable, "200,302", "200"]
+
 
   ApplicationSecurityGroup:
     Type: AWS::EC2::SecurityGroup

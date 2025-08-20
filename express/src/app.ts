@@ -1,5 +1,12 @@
 import {static as serveStatic, urlencoded} from "express";
-import {googleTagId, port, serviceUnavailableBannerStartDate, showServiceUnavailableBanner, showTestBanner} from "./config/environment";
+import {
+    googleTagId,
+    port,
+    serviceUnavailableBannerStartDate,
+    showServiceUnavailableBanner,
+    showTestBanner,
+    showServiceUnavailablePage
+} from "./config/environment";
 import Express from "./config/express";
 import Helmet from "./config/helmet";
 import {distribution} from "./config/resources";
@@ -11,6 +18,7 @@ import baseRoutes from "./routes/base";
 import register from "./routes/register";
 import services from "./routes/services";
 import signIn from "./routes/sign-in";
+import serviceUnavailable from "./routes/service-unavailable";
 
 const app = Express();
 
@@ -30,11 +38,20 @@ app.use(urlencoded({extended: true}));
 app.use(sessionStorage);
 app.use(signInStatus);
 
-app.use(baseRoutes);
-app.use("/register", register);
-app.use("/sign-in", signIn);
-app.use("/account", account);
-app.use("/services", services);
+if (!showServiceUnavailablePage) {
+    app.use(baseRoutes);
+    app.use("/register", register);
+    app.use("/sign-in", signIn);
+    app.use("/account", account);
+    app.use("/services", services);
+} else {
+    app.use(serviceUnavailable);
+    app.all("*", function (req, res) {
+        if (req.path !== "/service-unavailable") {
+            res.redirect("/service-unavailable");
+        }
+    });
+}
 
 app.use(notFoundHandler);
 app.use(errorHandler);
