@@ -38,7 +38,7 @@ jobs:
           deployment-role-arn: ${{ vars.FRONTEND_DEPLOYMENT_ROLE_ARN }}
           artifact-bucket-name: ${{ vars.FRONTEND_DEPLOYMENT_ARTIFACTS_BUCKET }}
           pipeline-name: ${{ vars.FRONTEND_PIPELINE_NAME }}
-          dynatrace-pass-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
+          dynatrace-paas-token: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
           container-repository-name: ${{ vars.FRONTEND_CONTAINER_REPOSITORY_NAME }}
           test-container-repository-name: ${{ vars.FRONTEND_TEST_CONTAINER_REPOSITORY_NAME }}
 
