@@ -3,6 +3,7 @@
 {% set pageTitle = "Sorry, the service is unavailable" %}
 
 {% block mainContent %}
+<p>{{ date | log }}</p>
   <h1 class="govuk-heading-l">Sorry, the service is unavailable</h1>
   {% if date !== undefined %}
   <p class="govuk-body">You will be able to use the service from {{date}}.</p>
