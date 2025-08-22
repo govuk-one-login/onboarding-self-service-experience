@@ -19,3 +19,7 @@ export const api = {
 export const sessionStorage = {
     tableName: process.env.SESSIONS_TABLE
 };
+
+export const showServiceUnavailablePage = process.env.SHOW_SERVICE_UNAVAILABLE_PAGE == "true";
+export const serviceUnavailablePageEndDate =
+    process.env.SERVICE_UNAVAILABLE_PAGE_END_DATE == "undefined" ? undefined : process.env.SERVICE_UNAVAILABLE_PAGE_END_DATE;

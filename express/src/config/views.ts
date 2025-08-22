@@ -9,10 +9,16 @@ export default function configureViews(app: Express) {
         throw new Error("Couldn't load govuk-frontend module");
     }
 
-    configure([views, govukViews], {
+    const env = configure([views, govukViews], {
         autoescape: true,
         noCache: true,
         express: app
+    });
+
+    // Add a custom filter named "log"
+    env.addFilter("log", function (value) {
+        console.log(value);
+        return value; // It's important to return the value so it can be used by other filters or rendered
     });
 
     app.engine("njk", render);
