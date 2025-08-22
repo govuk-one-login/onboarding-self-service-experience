@@ -10,7 +10,7 @@ inputs:
   deployment-role-arn:
     description: "The github actions role that is authorized to deploy the applications"
     required: true
-  dynatrace-pass-token:
+  dynatrace-paas-token:
     description: "The dynatrace paas token to download the OneAgent image"
     required: true
   pipeline-name:
@@ -43,7 +43,7 @@ runs:
       with:
         registry: khw46367.live.dynatrace.com
         username: khw46367
-        password: ${{ inputs.dynatrace-pass-token }}
+        password: ${{ inputs.dynatrace-paas-token }}
 
     - name: Deploy application
       id: deploy-application
