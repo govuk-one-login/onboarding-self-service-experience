@@ -14,6 +14,7 @@ $govuk-new-link-styles: true;
 @import "modules/side-navigation";
 @import "modules/show-password";
 @import "modules/tick-cross";
+@import "modules/notification-banner";
 
 @media (min-width: 415px) {
   div.feature-row {
