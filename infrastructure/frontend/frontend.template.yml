@@ -62,6 +62,12 @@ Parameters:
   UseStubOtp:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /self-service/frontend/use-stub-otp
+  ShowServiceUnavailableBanner:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/show-service-unavailable-banner
+  ServiceUnavailableBannerStartDate:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /self-service/frontend/service-unavailable-banner-start-date
   PermissionsBoundary:
     Type: String
     Default: ""
@@ -241,6 +247,10 @@ Resources:
               Value: "{{resolve:secretsmanager:/self-service/frontend/basic-auth-username}}"
             - Name: BASIC_AUTH_PASSWORD
               Value: "{{resolve:secretsmanager:/self-service/frontend/basic-auth-password}}"
+            - Name: SHOW_SERVICE_UNAVAILABLE_BANNER
+              Value: !Ref ShowServiceUnavailableBanner
+            - Name: SERVICE_UNAVAILABLE_BANNER_START_DATE
+              Value: !Ref ServiceUnavailableBannerStartDate
 
           PortMappings:
             - ContainerPort: !Ref ContainerPort
