@@ -19,3 +19,7 @@ export const api = {
 export const sessionStorage = {
     tableName: process.env.SESSIONS_TABLE
 };
+
+export const showServiceUnavailableBanner = process.env.SHOW_SERVICE_UNAVAILABLE_BANNER == "true";
+export const serviceUnavailableBannerStartDate =
+    process.env.SERVICE_UNAVAILABLE_BANNER_START_DATE == "undefined" ? undefined : process.env.SERVICE_UNAVAILABLE_BANNER_START_DATE;

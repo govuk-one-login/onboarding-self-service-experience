@@ -1,5 +1,5 @@
 import {static as serveStatic, urlencoded} from "express";
-import {googleTagId, port, showTestBanner} from "./config/environment";
+import {googleTagId, port, serviceUnavailableBannerStartDate, showServiceUnavailableBanner, showTestBanner} from "./config/environment";
 import Express from "./config/express";
 import Helmet from "./config/helmet";
 import {distribution} from "./config/resources";
@@ -41,6 +41,8 @@ app.use(errorHandler);
 
 app.locals.googleTagId = googleTagId;
 app.locals.showTestBanner = showTestBanner;
+app.locals.showServiceUnavailableBanner = showServiceUnavailableBanner;
+app.locals.serviceUnavailableBannerStartDate = serviceUnavailableBannerStartDate;
 
 app.set("trust proxy", true);
 

@@ -2,6 +2,7 @@
 {% from "macros/back-link.njk" import backLink %}
 {% from "dist/govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "dist/govuk/components/button/macro.njk" import govukButton %}
+{% from "dist/govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
 {% set assetPath = "/assets" %}
 {% set showTopNav = showTopNav | default(true) %}
@@ -10,6 +11,11 @@
 {% set phaseTagText  = "Test" if showTestBanner else "Beta" %}
 {% set phaseBannerClasses  = "test-banner" if showTestBanner %}
 {% set phaseBannerHtml = "This is a test environment." %}
+{% set serviceUnavailableNotificationBanner %}
+  <p class="govuk-notification-banner__heading">
+    This service will be unavailable on {{ serviceUnavailableBannerStartDate }}.
+  </p>
+{% endset %}
 
 {% set govUkGridClass = gridClass or "govuk-grid-column-two-thirds" %}
 
@@ -132,6 +138,12 @@
       classes: phaseBannerClasses
     }) }}
   </div>
+
+  {% if showServiceUnavailableBanner and serviceUnavailableBannerStartDate !== undefined  %}
+    <div class="govuk-width-container">
+      {{ govukNotificationBanner({ html: serviceUnavailableNotificationBanner })}}
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block content %}
