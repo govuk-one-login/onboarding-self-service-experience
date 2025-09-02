@@ -1,0 +1,16 @@
+{% extends "layouts/base.njk" %}
+
+{% set pageTitle = "Sorry, the service is unavailable" %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-l">Sorry, the service is unavailable</h1>
+  {% if date !== undefined %}
+  <p class="govuk-body">You will be able to use the service from {{date}}.</p>
+  {% else %}
+  <p class="govuk-body">You will be able to use the service soon.</p>
+  {% endif %}
+  <p class="govuk-body">If you need help urgently, contact us through our
+    <a class="govuk-link" href="https://www.sign-in.service.gov.uk/contact-us?adminTool">support form</a> or
+    <a class="govuk-link" href="https://ukgovernmentdigital.slack.com/archives/C02AQUJ6WTC">Slack channel</a>.
+  </p>
+{% endblock %}
