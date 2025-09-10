@@ -1,5 +1,5 @@
 # Use a slim lts-supported version.
-FROM node:lts-alpine as production
+FROM node:lts-alpine@sha256:d2166de198f26e17e5a442f537754dd616ab069c47cc57b889310a717e0abbf9 as production
 
 # Expose any necessary ports (if your application requires it)
 ARG PORT=3000
@@ -14,8 +14,8 @@ COPY . .
 
 # Install project dependencies
 WORKDIR /app/express
-RUN npm install --include-workspace-root \
-    && npm run build
+RUN npm ci --include-workspace-root \
+    && npm run build && npm ci --omit=dev
 
 # Add the Dynatrace OneAgent
 COPY --from=khw46367.live.dynatrace.com/linux/oneagent-codemodules-musl:nodejs / /

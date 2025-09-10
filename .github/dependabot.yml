@@ -51,13 +51,15 @@ updates:
     directory: /infrastructure/frontend
     schedule:
       interval: daily
+      time: "12:00"
+    target-branch: main
     labels:
-      - docker
       - dependabot
+      - dependencies
+      - docker
     commit-message:
-      prefix: "BAU"
-    groups:
-      docker-dependencies:
-        applies-to: version-updates
-        patterns:
-          - "*"
+      prefix: BAU
+    ignore:
+      - dependency-name: "node"
+        update-types:
+          - "version-update:semver-major"
