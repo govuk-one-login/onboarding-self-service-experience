@@ -32,6 +32,7 @@ import validateMobileSecurityCode from "../middleware/validators/mobile-code-val
 import validateMobileNumber from "../middleware/validators/mobile-number-validator";
 import validatePassword from "../middleware/validators/password-validator";
 import validateServiceName from "../middleware/validators/service-name-validator";
+import checkRegisterRedirect from "../middleware/register-state-machine";
 
 const router = Router();
 export default router;
@@ -41,14 +42,20 @@ router.get("/", (req, res) => {
 });
 
 router.route("/enter-email-address").get(showGetEmailForm).post(validateEmail("register/enter-email-address.njk"), processGetEmailForm);
-router.route("/account-exists").get(accountExists).post(processSignInForm("register/account-exists.njk"));
+router.use(checkRegisterRedirect);
+
 router.route("/enter-email-code").get(showCheckEmailForm).post(validateEmailSecurityCode, submitEmailSecurityCode);
+
+router.route("/account-exists").get(accountExists).post(processSignInForm("register/account-exists.njk"));
 router.route("/resend-email-code").get(showResendEmailCodeForm).post(resendEmailVerificationCode);
 
 router
     .route("/create-password")
     .get(showNewPasswordForm)
     .post(validatePassword("register/create-password.njk"), checkPasswordAllowed("register/create-password.njk"), updatePassword);
+
+router.route("/resume-before-password").get(showCheckEmailForm).post(validateEmailSecurityCode, submitEmailSecurityCode);
+router.route("/resume-after-password").get(resumeAfterPassword).post(resumeUserJourneyAfterPassword);
 
 router.use(checkAuthorisation);
 
@@ -67,6 +74,3 @@ router
     .route("/create-service")
     .get(showAddServiceForm)
     .post(validateServiceName("register/add-service-name.njk"), processAddServiceForm, sendDataToUserSpreadsheet, redirectToServicesList);
-
-router.route("/resume-before-password").get(showCheckEmailForm).post(validateEmailSecurityCode, submitEmailSecurityCode);
-router.route("/resume-after-password").get(resumeAfterPassword).post(resumeUserJourneyAfterPassword);
