@@ -122,7 +122,7 @@ export const processEmailAddress: RequestHandler = async (req, res) => {
         const signUpStatus: SignupStatus = await s4.getSignUpStatus(email);
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
-            console.info("Processing No HasEMail");
+            console.info("Processing No HasEmail");
             return res.redirect("/register/resume-before-password");
         }
 

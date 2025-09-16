@@ -30,7 +30,7 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
             console.info("In UserNameExistException");
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
-                console.info("Processing No HasEMail");
+                console.info("Processing No HasEmail");
                 return res.redirect("resume-before-password");
             }
 

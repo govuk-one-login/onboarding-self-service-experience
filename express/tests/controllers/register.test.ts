@@ -114,7 +114,7 @@ describe("processGetEmailForm controller tests", () => {
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(s4SignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(mockReq.session.save).toHaveBeenCalled();
-        expect(console.info).toHaveBeenCalledWith("Processing No HasEMail");
+        expect(console.info).toHaveBeenCalledWith("Processing No HasEmail");
         expect(mockRes.redirect).toHaveBeenCalledWith("resume-before-password");
     });
 

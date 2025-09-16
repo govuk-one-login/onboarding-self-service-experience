@@ -281,7 +281,7 @@ describe("processEmailAddress controller tests", () => {
         await processEmailAddress(mockReq, mockRes, mockNext);
 
         expect(s4GetSignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("Processing No HasEMail");
+        expect(console.info).toHaveBeenCalledWith("Processing No HasEmail");
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/resume-before-password");
     });
 
