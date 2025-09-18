@@ -54,9 +54,6 @@ router
     .get(showNewPasswordForm)
     .post(validatePassword("register/create-password.njk"), checkPasswordAllowed("register/create-password.njk"), updatePassword);
 
-router.route("/resume-before-password").get(showCheckEmailForm).post(validateEmailSecurityCode, submitEmailSecurityCode);
-router.route("/resume-after-password").get(resumeAfterPassword).post(resumeUserJourneyAfterPassword);
-
 router.use(checkAuthorisation);
 
 router
@@ -74,3 +71,6 @@ router
     .route("/create-service")
     .get(showAddServiceForm)
     .post(validateServiceName("register/add-service-name.njk"), processAddServiceForm, sendDataToUserSpreadsheet, redirectToServicesList);
+
+router.route("/resume-before-password").get(showCheckEmailForm).post(validateEmailSecurityCode, submitEmailSecurityCode);
+router.route("/resume-after-password").get(resumeAfterPassword).post(resumeUserJourneyAfterPassword);
