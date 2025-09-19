@@ -36,6 +36,7 @@ import checkRegisterRedirect from "../middleware/register-state-machine";
 
 const router = Router();
 export default router;
+router.use(checkRegisterRedirect);
 
 router.get("/", (req, res) => {
     res.redirect(303, path.join(req.baseUrl, "/enter-email-address"));
@@ -52,7 +53,6 @@ router
     .post(validatePassword("register/create-password.njk"), checkPasswordAllowed("register/create-password.njk"), updatePassword);
 
 router.use(checkAuthorisation);
-router.use(checkRegisterRedirect);
 
 router
     .route("/enter-phone-number")
