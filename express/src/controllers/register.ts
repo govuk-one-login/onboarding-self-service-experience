@@ -9,10 +9,12 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 import * as console from "console";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP";
-import {RegisterRoutes} from "../middleware/register-state-machine";
+import checkRegisterRedirect, {RegisterRoutes} from "../middleware/register-state-machine";
 
 export const showGetEmailForm: RequestHandler = async (req, res) => {
     console.log("rendered enter email address page");
+    await checkRegisterRedirect(req, res);
+    console.log("check register redirect done");
     req.session.previousPath = RegisterRoutes.enterEmailAddress;
     req.session.save();
 
@@ -68,6 +70,8 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
 
 export const showCheckEmailForm: RequestHandler = async (req, res) => {
     console.log("rendering enter email code page");
+    await checkRegisterRedirect(req, res);
+    console.log("check register redirect done");
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
@@ -174,8 +178,10 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     res.redirect("/register/create-password");
 };
 
-export const showNewPasswordForm: RequestHandler = (req, res) => {
+export const showNewPasswordForm: RequestHandler = async (req, res) => {
     console.log("rendering create password page");
+    await checkRegisterRedirect(req, res);
+    console.log("check register redirect done");
 
     // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
@@ -202,8 +208,10 @@ export const updatePassword: RequestHandler = async (req, res) => {
     res.redirect("/register/enter-phone-number");
 };
 
-export const showEnterMobileForm: RequestHandler = (req, res) => {
+export const showEnterMobileForm: RequestHandler = async (req, res) => {
     console.log("rendering enter phone number page");
+    await checkRegisterRedirect(req, res);
+    console.log("check register redirect done");
     req.session.previousPath = RegisterRoutes.enterPhoneNumber;
     req.session.save();
 
@@ -256,8 +264,10 @@ export const resendMobileVerificationCode: RequestHandler = (req, res, next) => 
     return processEnterMobileForm(req, res, next);
 };
 
-export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
+export const showSubmitMobileVerificationCode: RequestHandler = async (req, res) => {
     console.log("rendering enter text code page");
+    await checkRegisterRedirect(req, res);
+    console.log("check register redirect done");
     req.session.previousPath = RegisterRoutes.enterTextCode;
     req.session.save();
 
@@ -363,6 +373,8 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
 
 export const showResendPhoneCodeForm: RequestHandler = async (req, res) => {
     console.log("rendering resend phone code page");
+    await checkRegisterRedirect(req, res);
+    console.log("check register redirect done");
     req.session.previousPath = RegisterRoutes.resendTextCode;
     req.session.save();
 
@@ -371,6 +383,8 @@ export const showResendPhoneCodeForm: RequestHandler = async (req, res) => {
 
 export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
     console.log("rendering resend email code page");
+    await checkRegisterRedirect(req, res);
+    console.log("check register redirect done");
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
     if (
@@ -389,6 +403,8 @@ export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
 
 export const resumeAfterPassword: RequestHandler = async (req, res) => {
     console.log("rendering resume after password page");
+    await checkRegisterRedirect(req, res);
+    console.log("check register redirect done");
     req.session.previousPath = RegisterRoutes.resumeAfterPassword;
     req.session.save();
 
@@ -414,6 +430,8 @@ export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
 
 export const showAddServiceForm: RequestHandler = async (req, res) => {
     console.log("rendering create service page");
+    await checkRegisterRedirect(req, res);
+    console.log("check register redirect done");
     req.session.previousPath = RegisterRoutes.createService;
     req.session.save();
 
@@ -496,8 +514,10 @@ export const redirectToServicesList: RequestHandler = (req, res) => {
     res.redirect(`/services/${serviceId.substring(8)}/clients`);
 };
 
-export const accountExists: RequestHandler = (req, res) => {
+export const accountExists: RequestHandler = async (req, res) => {
     console.log("rendering account exists page");
+    await checkRegisterRedirect(req, res);
+    console.log("check register redirect done");
     req.session.previousPath = RegisterRoutes.accountExists;
     req.session.save();
 
