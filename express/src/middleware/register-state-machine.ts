@@ -26,6 +26,21 @@ export default function checkRegisterRedirect(req: Request, res: Response, next:
     next();
 }
 
+export const getNextPaths = (req: Request) => {
+    const currentPath = req.baseUrl + req.path;
+    console.log("Getting next path for: " + currentPath);
+    let nextPaths: string[] = [];
+
+    if (!registerStateMachine[currentPath]) {
+        console.log("not in state machine");
+    } else {
+        nextPaths = registerStateMachine[currentPath];
+    }
+
+    req.session.nextPaths = nextPaths;
+    req.session.save();
+};
+
 export enum RegisterRoutes {
     enterEmailAddress = "/register/enter-email-address",
     enterEmailCode = "/register/enter-email-code",
@@ -37,18 +52,19 @@ export enum RegisterRoutes {
     resendTextCode = "/register/resend-text-code",
     createService = "/register/create-service",
     resumeBeforePassword = "/register/resume-before-password",
-    resumeAfterPassword = "/register/resume-after-password"
+    resumeAfterPassword = "/register/resume-after-password",
+    tooManyCodes = "/register/too-many-codes"
 }
 
 const registerStateMachine: {[route: string]: string[]} = {
-    [RegisterRoutes.enterEmailCode]: [RegisterRoutes.enterEmailAddress, RegisterRoutes.resendEmailCode],
-    [RegisterRoutes.accountExists]: [RegisterRoutes.enterEmailAddress],
-    [RegisterRoutes.resendEmailCode]: [RegisterRoutes.enterEmailCode],
-    [RegisterRoutes.createPassword]: [RegisterRoutes.enterEmailCode, RegisterRoutes.resumeBeforePassword],
-    [RegisterRoutes.enterPhoneNumber]: [RegisterRoutes.createPassword, RegisterRoutes.resumeAfterPassword],
-    [RegisterRoutes.enterTextCode]: [RegisterRoutes.enterPhoneNumber, RegisterRoutes.resendTextCode],
+    [RegisterRoutes.enterEmailAddress]: [RegisterRoutes.enterEmailCode, RegisterRoutes.accountExists, RegisterRoutes.resumeBeforePassword, RegisterRoutes.resumeAfterPassword],
+    [RegisterRoutes.enterEmailCode]: [RegisterRoutes.resendEmailCode, RegisterRoutes.createPassword, RegisterRoutes.tooManyCodes],
+    [RegisterRoutes.resendEmailCode]: [RegisterRoutes.enterEmailCode, RegisterRoutes.tooManyCodes],
+    [RegisterRoutes.createPassword]: [RegisterRoutes.enterPhoneNumber],
+    [RegisterRoutes.enterPhoneNumber]: [RegisterRoutes.enterTextCode],
+    [RegisterRoutes.enterTextCode]: [RegisterRoutes.createService, RegisterRoutes.resendTextCode],
     [RegisterRoutes.resendTextCode]: [RegisterRoutes.enterTextCode],
-    [RegisterRoutes.createService]: [RegisterRoutes.enterTextCode, "/services"],
-    [RegisterRoutes.resumeBeforePassword]: [RegisterRoutes.enterEmailAddress, "/sign-in/enter-email-address"],
-    [RegisterRoutes.resumeAfterPassword]: [RegisterRoutes.enterEmailAddress, "/sign-in/enter-email-address"]
+    [RegisterRoutes.resumeBeforePassword]: [RegisterRoutes.createPassword],
+    [RegisterRoutes.resumeAfterPassword]: [RegisterRoutes.enterPhoneNumber],
+    [RegisterRoutes.tooManyCodes]: [] //todo
 };
