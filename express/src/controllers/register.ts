@@ -5,13 +5,18 @@ import {Service} from "../../@types/Service";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
 import {domainUserToDynamoUser} from "../lib/models/user-utils";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
-import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import * as console from "console";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP";
+import {RegisterRoutes} from "../middleware/register-state-machine";
 
-export const showGetEmailForm = render("register/enter-email-address.njk");
+export const showGetEmailForm: RequestHandler = async (req, res) => {
+    req.session.previousPath = RegisterRoutes.enterEmailAddress;
+    req.session.save();
+
+    res.render("register/enter-email-address.njk");
+};
 
 export const processGetEmailForm: RequestHandler = async (req, res) => {
     const emailAddress: string = req.body.emailAddress;
@@ -81,6 +86,9 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
         ip_address: req.ip,
         email: req.session.emailAddress
     });
+
+    req.session.previousPath = RegisterRoutes.enterEmailCode;
+    req.session.save();
 
     res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
@@ -166,6 +174,9 @@ export const showNewPasswordForm: RequestHandler = (req, res) => {
 
     // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
+        req.session.previousPath = RegisterRoutes.createPassword;
+        req.session.save();
+
         return res.render("register/create-password.njk");
     }
 
@@ -185,6 +196,9 @@ export const updatePassword: RequestHandler = async (req, res) => {
 };
 
 export const showEnterMobileForm: RequestHandler = (req, res) => {
+    req.session.previousPath = RegisterRoutes.enterPhoneNumber;
+    req.session.save();
+
     res.render("register/enter-phone-number.njk", {
         value: {mobileNumber: req.session.mobileNumber}
     });
@@ -233,6 +247,9 @@ export const resendMobileVerificationCode: RequestHandler = (req, res, next) => 
 };
 
 export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
+    req.session.previousPath = RegisterRoutes.enterTextCode;
+    req.session.save();
+
     res.render("common/enter-text-code.njk", {
         values: {
             mobileNumber: req.session.enteredMobileNumber,
@@ -332,7 +349,13 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
     res.redirect("/register/create-service");
 };
 
-export const showResendPhoneCodeForm = render("register/resend-text-code.njk");
+export const showResendPhoneCodeForm: RequestHandler = async (req, res) => {
+    req.session.previousPath = RegisterRoutes.resendTextCode;
+    req.session.save();
+
+    res.render("register/resend-text-code.njk");
+};
+
 export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
@@ -344,9 +367,18 @@ export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
         return;
     }
 
+    req.session.previousPath = RegisterRoutes.resendEmailCode;
+    req.session.save();
+
     res.render("register/resend-email-code.njk");
 };
-export const resumeAfterPassword = render("register/resume-after-password.njk");
+
+export const resumeAfterPassword: RequestHandler = async (req, res) => {
+    req.session.previousPath = RegisterRoutes.resumeAfterPassword;
+    req.session.save();
+
+    res.render("register/resume-after-password.njk");
+};
 
 export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
@@ -364,7 +396,12 @@ export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     return res.redirect("/register/enter-email-code");
 };
 
-export const showAddServiceForm = render("register/add-service-name.njk");
+export const showAddServiceForm: RequestHandler = async (req, res) => {
+    req.session.previousPath = RegisterRoutes.createService;
+    req.session.save();
+
+    res.render("register/add-service-name.njk");
+};
 
 export const processAddServiceForm: RequestHandler = async (req, res, next) => {
     const uuid = randomUUID();
@@ -442,6 +479,9 @@ export const redirectToServicesList: RequestHandler = (req, res) => {
 };
 
 export const accountExists: RequestHandler = (req, res) => {
+    req.session.previousPath = RegisterRoutes.accountExists;
+    req.session.save();
+
     res.render("register/account-exists.njk", {
         values: {
             emailAddress: req.session.emailAddress

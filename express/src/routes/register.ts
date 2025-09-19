@@ -32,6 +32,7 @@ import validateMobileSecurityCode from "../middleware/validators/mobile-code-val
 import validateMobileNumber from "../middleware/validators/mobile-number-validator";
 import validatePassword from "../middleware/validators/password-validator";
 import validateServiceName from "../middleware/validators/service-name-validator";
+import checkRegisterRedirect from "../middleware/register-state-machine";
 
 const router = Router();
 export default router;
@@ -51,6 +52,7 @@ router
     .post(validatePassword("register/create-password.njk"), checkPasswordAllowed("register/create-password.njk"), updatePassword);
 
 router.use(checkAuthorisation);
+router.use(checkRegisterRedirect);
 
 router
     .route("/enter-phone-number")
