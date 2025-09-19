@@ -1,6 +1,6 @@
-import {Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 
-export default async function checkRegisterRedirect(req: Request, res: Response) {
+export default function checkRegisterRedirect(req: Request, res: Response, next: NextFunction) {
     console.info("State Machine: routing to Page => " + req.path);
     const emailAddress = req.session.emailAddress;
     const previousPath = req.session.previousPath as string;
@@ -22,6 +22,8 @@ export default async function checkRegisterRedirect(req: Request, res: Response)
         console.info("Processing no email address");
         // need to also check is not enter-email-address (maybs)
     }
+
+    next();
 }
 
 export enum RegisterRoutes {

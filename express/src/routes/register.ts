@@ -32,9 +32,11 @@ import validateMobileSecurityCode from "../middleware/validators/mobile-code-val
 import validateMobileNumber from "../middleware/validators/mobile-number-validator";
 import validatePassword from "../middleware/validators/password-validator";
 import validateServiceName from "../middleware/validators/service-name-validator";
+import checkRegisterRedirect from "../middleware/register-state-machine";
 
 const router = Router();
 export default router;
+router.use(checkRegisterRedirect);
 
 router.get("/", (req, res) => {
     res.redirect(303, path.join(req.baseUrl, "/enter-email-address"));
