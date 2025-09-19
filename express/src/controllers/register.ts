@@ -12,6 +12,7 @@ import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} fr
 import {RegisterRoutes} from "../middleware/register-state-machine";
 
 export const showGetEmailForm: RequestHandler = async (req, res) => {
+    console.log("rendered enter email address page");
     req.session.previousPath = RegisterRoutes.enterEmailAddress;
     req.session.save();
 
@@ -61,15 +62,17 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
         throw error;
     }
 
+    console.log("redirecting to enter email code page from enter email address");
     res.redirect("/register/enter-email-code");
 };
 
 export const showCheckEmailForm: RequestHandler = async (req, res) => {
-    console.log("In register-showCheckEmailForm");
+    console.log("rendering enter email code page");
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     if (!req.session.emailAddress) {
+        console.log("redirecting to enter email address page from email code page");
         return res.redirect("/register");
     }
 
@@ -99,6 +102,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     if (!req.session.emailAddress) {
+        console.log("redirecting to enter email address page from enter email page (submit)");
         return res.redirect("/register");
     }
 
@@ -166,11 +170,12 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         }
     );
 
+    console.log("redirecting to create password page from enter email code page (submit)");
     res.redirect("/register/create-password");
 };
 
 export const showNewPasswordForm: RequestHandler = (req, res) => {
-    console.log("In register:showNewPasswordForm");
+    console.log("rendering create password page");
 
     // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
@@ -180,6 +185,7 @@ export const showNewPasswordForm: RequestHandler = (req, res) => {
         return res.render("register/create-password.njk");
     }
 
+    console.log("redirecting to sign in from create password page");
     res.redirect("/sign-in");
 };
 
@@ -192,10 +198,12 @@ export const updatePassword: RequestHandler = async (req, res) => {
     await s4.setEmailAsVerified(emailAddress);
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPassword);
 
+    console.log("redirecting to enter phone number page from create password page (submit)");
     res.redirect("/register/enter-phone-number");
 };
 
 export const showEnterMobileForm: RequestHandler = (req, res) => {
+    console.log("rendering enter phone number page");
     req.session.previousPath = RegisterRoutes.enterPhoneNumber;
     req.session.save();
 
@@ -210,6 +218,7 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
     const accessToken = req.session.authenticationResult?.AccessToken;
 
     if (!accessToken) {
+        console.log("redirecting to sign in from phone number page (submit)")
         return res.redirect("/sign-in");
     }
 
@@ -238,6 +247,7 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
         phone: req.session.enteredMobileNumber
     });
 
+    console.log("redirecting to enter text code from phone number page (submit)");
     res.redirect("/register/enter-text-code");
 };
 
@@ -247,6 +257,7 @@ export const resendMobileVerificationCode: RequestHandler = (req, res, next) => 
 };
 
 export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
+    console.log("rendering enter text code page");
     req.session.previousPath = RegisterRoutes.enterTextCode;
     req.session.save();
 
@@ -346,10 +357,12 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
         email: AuthenticationResultParser.getEmail(authenticationResult)
     });
 
+    console.log("redirecting to create service from enter text code page (submit)");
     res.redirect("/register/create-service");
 };
 
 export const showResendPhoneCodeForm: RequestHandler = async (req, res) => {
+    console.log("rendering resend phone code page");
     req.session.previousPath = RegisterRoutes.resendTextCode;
     req.session.save();
 
@@ -357,6 +370,7 @@ export const showResendPhoneCodeForm: RequestHandler = async (req, res) => {
 };
 
 export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
+    console.log("rendering resend email code page");
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
     if (
@@ -374,6 +388,7 @@ export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
 };
 
 export const resumeAfterPassword: RequestHandler = async (req, res) => {
+    console.log("rendering resume after password page");
     req.session.previousPath = RegisterRoutes.resumeAfterPassword;
     req.session.save();
 
@@ -393,10 +408,12 @@ export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     }
 
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
+    console.log("redirecting to enter email code page from resend email code (submit)");
     return res.redirect("/register/enter-email-code");
 };
 
 export const showAddServiceForm: RequestHandler = async (req, res) => {
+    console.log("rendering create service page");
     req.session.previousPath = RegisterRoutes.createService;
     req.session.save();
 
@@ -475,10 +492,12 @@ export const sendDataToUserSpreadsheet: RequestHandler = async (req, res, next) 
 
 export const redirectToServicesList: RequestHandler = (req, res) => {
     const serviceId = String(req.session.serviceId);
+    console.log("redirecting to services list page from create services page (submit)");
     res.redirect(`/services/${serviceId.substring(8)}/clients`);
 };
 
 export const accountExists: RequestHandler = (req, res) => {
+    console.log("rendering account exists page");
     req.session.previousPath = RegisterRoutes.accountExists;
     req.session.save();
 
@@ -502,5 +521,6 @@ export const resumeUserJourneyAfterPassword: RequestHandler = async (req, res) =
 
     // if User has already entered their phone number we 'resume' from re-entering their Phone number again.
     // This is to allow for the fact that they may have entered an incorrect number.
+    console.log("redirecting to enter phone number page from resume after password page (submit)");
     return res.redirect("enter-phone-number");
 };

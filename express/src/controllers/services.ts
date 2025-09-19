@@ -8,12 +8,14 @@ export const listServices: RequestHandler = async (req, res) => {
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
     if (!userId) {
+        console.log("no user id");
         return res.render("there-is-a-problem.njk");
     }
 
     const services = await s4.listServices(userId, nonNull(req.session.authenticationResult?.AccessToken));
 
     if (services.length === 0) {
+        console.log("redirecting to create service from list services")
         return res.redirect(`/register/create-service`);
     }
 
