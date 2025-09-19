@@ -26,6 +26,13 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Login to GDS Dev Dynatrace Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: khw46367.live.dynatrace.com
+        username: khw46367
+        password: ${{ inputs.dynatrace-paas-token }}
+
     - name: Push test image
       id: push-tests-image
       uses: govuk-one-login/github-actions/aws/ecr/build-docker-image@7e9f6ee1a1f7b30ca9cba4d3893d3ee6313decef # 9/07/2024
@@ -37,13 +44,6 @@ runs:
         image-tags: latest
         immutable-tags: false
         image-version: ${{ github.sha }}
-
-    - name: Login to GDS Dev Dynatrace Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: khw46367.live.dynatrace.com
-        username: khw46367
-        password: ${{ inputs.dynatrace-paas-token }}
 
     - name: Deploy application
       id: deploy-application
