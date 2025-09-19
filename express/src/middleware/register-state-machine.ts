@@ -35,6 +35,7 @@ export const getNextPaths = (req: Request) => {
         console.log("not in state machine");
     } else {
         nextPaths = registerStateMachine[currentPath];
+        console.log(nextPaths.join());
     }
 
     req.session.nextPaths = nextPaths;
