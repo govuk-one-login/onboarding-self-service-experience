@@ -56,25 +56,23 @@ router
     .get(showNewPasswordForm)
     .post(validatePassword("register/create-password.njk"), checkPasswordAllowed("register/create-password.njk"), updatePassword);
 
-router.use(checkAuthorisation);
-
 router
     .route("/enter-phone-number")
-    .get(showEnterMobileForm)
+    .get(checkAuthorisation, showEnterMobileForm)
     .post(validateMobileNumber("register/enter-phone-number.njk"), processEnterMobileForm);
 
 router
     .route("/enter-text-code")
-    .get(showSubmitMobileVerificationCode)
+    .get(checkAuthorisation, showSubmitMobileVerificationCode)
     .post(validateMobileSecurityCode("resend-text-code", false), submitMobileVerificationCode);
 
 router
     .route("/resend-text-code")
-    .get(showResendPhoneCodeForm)
+    .get(checkAuthorisation, showResendPhoneCodeForm)
     .post(resendMobileVerificationCode);
 router
     .route("/create-service")
-    .get(showAddServiceForm)
+    .get(checkAuthorisation, showAddServiceForm)
     .post(validateServiceName("register/add-service-name.njk"), processAddServiceForm, sendDataToUserSpreadsheet, redirectToServicesList);
 
 router
