@@ -12,6 +12,7 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import console from "console";
 import {secureRandom6DigitCode} from "../lib/utils/secure-random-code";
+import {RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
 export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
@@ -23,7 +24,7 @@ export const showCheckPhonePage: RequestHandler = (req, res) => {
     // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
         console.log("Redirecting to Sign-In");
-        return res.redirect("/sign-in");
+        return res.redirect(SignInRoutes.enterEmailAddress);
     }
 
     console.log("Redirecting to Enter Text Code");
@@ -39,7 +40,7 @@ export const showCheckPhonePage: RequestHandler = (req, res) => {
 export const confirmPasswordContinueRecovery: RequestHandler = async (req, res) => {
     console.log("In controllers/sign-in:confirmPasswordContinueRecovery()");
 
-    return res.redirect("/sign-in/forgot-password/continue-recovery");
+    return res.redirect(SignInRoutes.forgotPasswordContinueRecovery);
 };
 
 export const finishSignIn: RequestHandler = async (req, res) => {
@@ -53,7 +54,7 @@ export const finishSignIn: RequestHandler = async (req, res) => {
 
     // TODO this should probably be an error
     if (!user) {
-        return res.redirect("/sign-in/enter-text-code");
+        return res.redirect(SignInRoutes.enterTextCode);
     }
 
     if (req.session.updatedField === "password") {
@@ -68,7 +69,7 @@ export const finishSignIn: RequestHandler = async (req, res) => {
 
     req.session.isSignedIn = true;
     if (await signedInToAnotherDevice(user.email, s4)) {
-        res.redirect("/sign-in/signed-in-to-another-device");
+        res.redirect(SignInRoutes.signedInToAnotherAccount);
     } else {
         s4.sendTxMALog("SSE_LOG_IN_SUCCESS", {
             session_id: req.session.id,
@@ -91,7 +92,7 @@ export const finishSignIn: RequestHandler = async (req, res) => {
         );
 
         console.log("Redirecting to Services");
-        res.redirect("/services");
+        res.redirect(ServicesRoutes.listServices);
     }
 };
 
@@ -112,7 +113,7 @@ export const globalSignOut: RequestHandler = async (req, res) => {
         console.log(`globalSignOut() Session invalidated, Response HTTP Status Code: ${output.status}`);
     }
 
-    req.session.destroy(() => res.redirect("/sign-in/enter-email-address-global-sign-out"));
+    req.session.destroy(() => res.redirect(SignInRoutes.enterEmailAddressGlobalSignOut));
 };
 
 export const processEmailAddress: RequestHandler = async (req, res) => {
@@ -122,29 +123,29 @@ export const processEmailAddress: RequestHandler = async (req, res) => {
         const signUpStatus: SignupStatus = await s4.getSignUpStatus(email);
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
-            console.info("Processing No HasEMail");
-            return res.redirect("/register/resume-before-password");
+            console.info("Processing No HasEmail");
+            return res.redirect(RegisterRoutes.resumeBeforePassword);
         }
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
             console.info("Processing No HasPassword");
-            return res.redirect("/register/resume-before-password");
+            return res.redirect(RegisterRoutes.resumeBeforePassword);
         }
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
             console.info("Processing No HasPhoneNumber");
-            return res.redirect("/register/resume-after-password");
+            return res.redirect(RegisterRoutes.resumeAfterPassword);
         }
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
             console.info("Processing No HasTextCode");
-            return res.redirect("/register/resume-after-password");
+            return res.redirect(RegisterRoutes.resumeAfterPassword);
         }
     } catch (UserNotFoundException) {
         // If a user doesn't exist, carry on like normal
     }
 
-    res.redirect("/sign-in/enter-password");
+    res.redirect(SignInRoutes.enterPassword);
 };
 
 export const showSignInFormPassword = render("sign-in/enter-password.njk");
@@ -153,7 +154,7 @@ export const showResendPhoneCodePage = render("sign-in/resend-text-code.njk");
 export const showSignInPasswordResendTextCode = render("sign-in/resend-text-code/enter-password.njk");
 
 export const processResendPhoneCodePage: RequestHandler = (req, res) => {
-    res.redirect("/sign-in/resend-text-code/enter-password");
+    res.redirect(SignInRoutes.passwordResendTextCode);
 };
 
 export const forgotPasswordForm: RequestHandler = async (req, res) => {
@@ -270,7 +271,7 @@ const forgotPassword: RequestHandler = async (req, res) => {
             }
 
             req.session.emailAddress = email;
-            return res.redirect("/sign-in/account-not-found");
+            return res.redirect(SignInRoutes.accountNotFound);
         }
 
         if (error instanceof CognitoIdentityProviderServiceException) {

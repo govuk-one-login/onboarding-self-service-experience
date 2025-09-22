@@ -2,6 +2,7 @@ import {RequestHandler} from "express";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import {render} from "../middleware/request-handler";
+import {RegisterRoutes} from "../middleware/state-machine";
 
 export const listServices: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
@@ -14,7 +15,7 @@ export const listServices: RequestHandler = async (req, res) => {
     const services = await s4.listServices(userId, nonNull(req.session.authenticationResult?.AccessToken));
 
     if (services.length === 0) {
-        return res.redirect(`/register/create-service`);
+        return res.redirect(RegisterRoutes.createService);
     }
 
     req.session.serviceName = undefined;

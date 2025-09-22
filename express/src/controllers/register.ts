@@ -10,6 +10,7 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 import * as console from "console";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP";
+import {RegisterRoutes, SignInRoutes} from "../middleware/state-machine";
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 
@@ -30,33 +31,33 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
             console.info("In UserNameExistException");
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
-                console.info("Processing No HasEMail");
-                return res.redirect("resume-before-password");
+                console.info("Processing No HasEmail");
+                return res.redirect(RegisterRoutes.resumeBeforePassword);
             }
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
                 console.info("Processing No HasPassword");
-                return res.redirect("resume-before-password");
+                return res.redirect(RegisterRoutes.resumeBeforePassword);
             }
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
                 console.info("Processing No HasPhoneNumber");
-                return res.redirect("resume-after-password");
+                return res.redirect(RegisterRoutes.resumeAfterPassword);
             }
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
                 console.info("Processing No HasTextCode");
-                return res.redirect("resume-after-password");
+                return res.redirect(RegisterRoutes.resumeAfterPassword);
             }
 
             console.info("Redirecting to Default");
-            return res.redirect("/register/account-exists");
+            return res.redirect(RegisterRoutes.accountExists);
         }
 
         throw error;
     }
 
-    res.redirect("/register/enter-email-code");
+    res.redirect(RegisterRoutes.enterEmailCode);
 };
 
 export const showCheckEmailForm: RequestHandler = async (req, res) => {
@@ -65,7 +66,7 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     if (!req.session.emailAddress) {
-        return res.redirect("/register");
+        return res.redirect(RegisterRoutes.enterEmailAddress);
     }
 
     if (
@@ -91,7 +92,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     if (!req.session.emailAddress) {
-        return res.redirect("/register");
+        return res.redirect(RegisterRoutes.enterEmailAddress);
     }
 
     if (
@@ -158,10 +159,10 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         }
     );
 
-    res.redirect("/register/create-password");
+    res.redirect(RegisterRoutes.createPassword);
 };
 
-export const showNewPasswordForm: RequestHandler = (req, res) => {
+export const showNewPasswordForm: RequestHandler = async (req, res) => {
     console.log("In register:showNewPasswordForm");
 
     // TODO we should probably throw here and in similar cases?
@@ -169,10 +170,11 @@ export const showNewPasswordForm: RequestHandler = (req, res) => {
         return res.render("register/create-password.njk");
     }
 
-    res.redirect("/sign-in");
+    res.redirect(SignInRoutes.enterEmailAddress);
 };
 
 export const updatePassword: RequestHandler = async (req, res) => {
+
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const emailAddress = nonNull(req.session.emailAddress);
 
@@ -181,7 +183,7 @@ export const updatePassword: RequestHandler = async (req, res) => {
     await s4.setEmailAsVerified(emailAddress);
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPassword);
 
-    res.redirect("/register/enter-phone-number");
+    res.redirect(RegisterRoutes.enterPhoneNumber);
 };
 
 export const showEnterMobileForm: RequestHandler = (req, res) => {
@@ -196,7 +198,7 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
     const accessToken = req.session.authenticationResult?.AccessToken;
 
     if (!accessToken) {
-        return res.redirect("/sign-in");
+        return res.redirect(SignInRoutes.enterEmailAddress);
     }
 
     let mobileNumber = req.body.mobileNumber;
@@ -224,7 +226,7 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
         phone: req.session.enteredMobileNumber
     });
 
-    res.redirect("/register/enter-text-code");
+    res.redirect(RegisterRoutes.enterTextCode);
 };
 
 export const resendMobileVerificationCode: RequestHandler = (req, res, next) => {
@@ -236,19 +238,20 @@ export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
     res.render("common/enter-text-code.njk", {
         values: {
             mobileNumber: req.session.enteredMobileNumber,
-            textMessageNotReceivedUrl: "/register/resend-text-code"
+            textMessageNotReceivedUrl: RegisterRoutes.resendTextCode
         }
     });
 };
 
 export const submitMobileVerificationCode: RequestHandler = async (req, res) => {
+    console.log("In register:submitMobileVerificationCode");
     const securityCode = req.body.securityCode;
 
     if (!securityCode) {
         return res.render("common/enter-text-code.njk", {
             values: {
                 mobileNumber: req.session.mobileNumber,
-                textMessageNotReceivedUrl: "/register/resend-text-code"
+                textMessageNotReceivedUrl: RegisterRoutes.resendTextCode
             }
         });
     }
@@ -278,7 +281,7 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
                 values: {
                     securityCode: req.body.securityCode,
                     mobileNumber: req.session.enteredMobileNumber,
-                    textMessageNotReceivedUrl: "/register/resend-text-code"
+                    textMessageNotReceivedUrl: RegisterRoutes.resendTextCode
                 },
                 errorMessages: {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
@@ -329,10 +332,11 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
         email: AuthenticationResultParser.getEmail(authenticationResult)
     });
 
-    res.redirect("/register/create-service");
+    res.redirect(RegisterRoutes.createService);
 };
 
 export const showResendPhoneCodeForm = render("register/resend-text-code.njk");
+
 export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
@@ -346,6 +350,7 @@ export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
 
     res.render("register/resend-email-code.njk");
 };
+
 export const resumeAfterPassword = render("register/resume-after-password.njk");
 
 export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
@@ -361,7 +366,7 @@ export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     }
 
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
-    return res.redirect("/register/enter-email-code");
+    return res.redirect(RegisterRoutes.enterEmailCode);
 };
 
 export const showAddServiceForm = render("register/add-service-name.njk");
@@ -462,5 +467,5 @@ export const resumeUserJourneyAfterPassword: RequestHandler = async (req, res) =
 
     // if User has already entered their phone number we 'resume' from re-entering their Phone number again.
     // This is to allow for the fact that they may have entered an incorrect number.
-    return res.redirect("enter-phone-number");
+    return res.redirect(RegisterRoutes.enterPhoneNumber);
 };
