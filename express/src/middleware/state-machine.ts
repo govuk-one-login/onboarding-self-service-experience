@@ -1,3 +1,20 @@
+import {Request} from "express";
+
+export const getNextPaths = (req: Request) => {
+    const currentPath = req.baseUrl + req.path;
+    console.log("Getting next path for: " + currentPath);
+    let nextPaths: string[] = [];
+
+    if (!stateMachine[currentPath]) {
+        console.log(currentPath + " is not in state machine");
+    } else {
+        nextPaths = stateMachine[currentPath];
+    }
+
+    req.session.nextPaths = nextPaths;
+    req.session.save();
+};
+
 export enum RegisterRoutes {
     enterEmailAddress = "/register/enter-email-address",
     enterEmailCode = "/register/enter-email-code",
@@ -43,3 +60,23 @@ export enum ServicesRoutes {
     listServices = "/services",
     addNewService = "/services/add-new-service"
 }
+
+// currentPath and the list of paths they are allowed to navigate to
+const stateMachine: {[route: string]: string[]} = {
+    [RegisterRoutes.enterEmailAddress]: [
+        RegisterRoutes.enterEmailCode,
+        RegisterRoutes.accountExists,
+        RegisterRoutes.resumeBeforePassword,
+        RegisterRoutes.resumeAfterPassword
+    ],
+    [RegisterRoutes.enterEmailCode]: [RegisterRoutes.resendEmailCode, RegisterRoutes.createPassword, RegisterRoutes.tooManyCodes],
+    [RegisterRoutes.resendEmailCode]: [RegisterRoutes.enterEmailCode, RegisterRoutes.tooManyCodes],
+    [RegisterRoutes.createPassword]: [RegisterRoutes.enterPhoneNumber],
+    [RegisterRoutes.enterPhoneNumber]: [RegisterRoutes.enterTextCode],
+    [RegisterRoutes.enterTextCode]: [RegisterRoutes.createService, RegisterRoutes.resendTextCode],
+    [RegisterRoutes.resendTextCode]: [RegisterRoutes.enterTextCode],
+    [RegisterRoutes.resumeBeforePassword]: [RegisterRoutes.createPassword],
+    [RegisterRoutes.resumeAfterPassword]: [RegisterRoutes.enterPhoneNumber],
+    [SignInRoutes.enterEmailAddress]: [RegisterRoutes.resumeAfterPassword, RegisterRoutes.resumeBeforePassword],
+    [ServicesRoutes.listServices]: [RegisterRoutes.createService]
+};
