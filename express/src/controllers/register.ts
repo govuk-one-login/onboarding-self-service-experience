@@ -10,11 +10,12 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 import * as console from "console";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP";
-import {RegisterRoutes, SignInRoutes} from "../middleware/state-machine";
+import {getNextPaths, RegisterRoutes, SignInRoutes} from "../middleware/state-machine";
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 
 export const processGetEmailForm: RequestHandler = async (req, res) => {
+    getNextPaths(req);
     const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     console.info("In ProcessGetEmailForm");
@@ -90,6 +91,7 @@ export const showTooManyCodes = render("register/too-many-codes.njk");
 
 export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     console.log("In register-submitEmailSecurityCode");
+    getNextPaths(req);
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
@@ -176,6 +178,7 @@ export const showNewPasswordForm: RequestHandler = async (req, res) => {
 };
 
 export const updatePassword: RequestHandler = async (req, res) => {
+    getNextPaths(req);
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const emailAddress = nonNull(req.session.emailAddress);
@@ -196,6 +199,7 @@ export const showEnterMobileForm: RequestHandler = (req, res) => {
 
 export const processEnterMobileForm: RequestHandler = async (req, res) => {
     console.info("In Controller:Register - processEnterMobileForm()");
+    getNextPaths(req);
 
     const accessToken = req.session.authenticationResult?.AccessToken;
 
@@ -232,6 +236,7 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
 };
 
 export const resendMobileVerificationCode: RequestHandler = (req, res, next) => {
+    getNextPaths(req);
     req.body.mobileNumber = req.session.enteredMobileNumber;
     return processEnterMobileForm(req, res, next);
 };
@@ -247,6 +252,7 @@ export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
 
 export const submitMobileVerificationCode: RequestHandler = async (req, res) => {
     console.log("In register:submitMobileVerificationCode");
+    getNextPaths(req);
     const securityCode = req.body.securityCode;
 
     if (!securityCode) {
@@ -355,6 +361,7 @@ export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
 export const resumeAfterPassword = render("register/resume-after-password.njk");
 
 export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
+    getNextPaths(req);
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
     console.info("Resending E-Mail Verification Code");
@@ -442,6 +449,7 @@ export const sendDataToUserSpreadsheet: RequestHandler = async (req, res, next) 
 };
 
 export const redirectToServicesList: RequestHandler = (req, res) => {
+    getNextPaths(req);
     const serviceId = String(req.session.serviceId);
     res.redirect(`/services/${serviceId.substring(8)}/clients`);
 };
@@ -455,6 +463,7 @@ export const accountExists: RequestHandler = (req, res) => {
 };
 
 export const resumeUserJourneyAfterPassword: RequestHandler = async (req, res) => {
+    getNextPaths(req);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     console.info("In resumeUserJourney");

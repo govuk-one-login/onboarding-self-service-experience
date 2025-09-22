@@ -117,7 +117,6 @@ Feature: Users can sign up to the self-service experience
       When they submit an incorrect security code "000000"
        Then they should be redirected to a page with the title "You've entered too many security codes"
 
-
   Rule: The user does not receive their email security code and clicks 'Not received an email?' link
     Background:
       Given they submit a random valid email address
@@ -267,3 +266,49 @@ Feature: Users can sign up to the self-service experience
     Scenario: The user types everything correctly, creates an account and adds a service
       When they submit the service name "Test Service"
       Then they should see the text "Manage Test Service"
+
+  Rule: The user tries to navigate manually to a registration page
+    @ci
+    Scenario: User manually navigates to /enter-email-code
+      Given the user is on the "/register/enter-email-code" page
+      Then they should be redirected to the "/page-unavailable" page
+
+    @ci
+    Scenario: User manually navigates to /resend-email-code
+      Given the user is on the "/register/resend-email-code" page
+      Then they should be redirected to the "/page-unavailable" page
+
+    @ci
+    Scenario: User manually navigates to /create-password
+      Given the user is on the "/register/create-password" page
+      Then they should be redirected to the "/page-unavailable" page
+
+    @ci
+    Scenario: User manually navigates to /enter-phone-number
+      Given the user is on the "/register/enter-phone-number" page
+      Then they should be redirected to the "/page-unavailable" page
+    
+    @ci
+    Scenario: User manually navigates to /enter-text-code
+      Given the user is on the "/register/enter-text-code" page
+      Then they should be redirected to the "/page-unavailable" page
+
+    @ci
+    Scenario: User manually navigates to /resend-email-code
+      Given the user is on the "/register/resend-email-code" page
+      Then they should be redirected to the "/page-unavailable" page
+
+    @ci
+    Scenario: User manually navigates to /create-service
+      Given the user is on the "/register/create-service" page
+      Then they should be redirected to the "/page-unavailable" page
+
+    @ci
+    Scenario: User manually navigates to /resume-before-password
+      Given the user is on the "/register/resume-before-password" page
+      Then they should be redirected to the "/page-unavailable" page
+
+    @ci
+    Scenario: User manually navigates to /resume-after-password
+      Given the user is on the "/register/resume-after-password" page
+      Then they should be redirected to the "/page-unavailable" page

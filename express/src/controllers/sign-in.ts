@@ -12,7 +12,7 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import console from "console";
 import {secureRandom6DigitCode} from "../lib/utils/secure-random-code";
-import {RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine";
+import {getNextPaths, RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
 export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
@@ -117,6 +117,7 @@ export const globalSignOut: RequestHandler = async (req, res) => {
 };
 
 export const processEmailAddress: RequestHandler = async (req, res) => {
+    getNextPaths(req);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     try {
         const email = req.session.emailAddress as string;

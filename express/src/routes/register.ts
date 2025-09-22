@@ -33,6 +33,7 @@ import validateMobileSecurityCode from "../middleware/validators/mobile-code-val
 import validateMobileNumber from "../middleware/validators/mobile-number-validator";
 import validatePassword from "../middleware/validators/password-validator";
 import validateServiceName from "../middleware/validators/service-name-validator";
+import {allowUserJourneyMiddleware} from "../middleware/allow-user-journey-middleware";
 
 const router = Router();
 export default router;
@@ -42,41 +43,41 @@ router.get("/", (req, res) => {
 });
 
 router.route("/enter-email-address").get(showGetEmailForm).post(validateEmail("register/enter-email-address.njk"), processGetEmailForm);
-router.route("/account-exists").get(accountExists).post(processSignInForm("register/account-exists.njk"));
+router.route("/account-exists").get(allowUserJourneyMiddleware, accountExists).post(processSignInForm("register/account-exists.njk"));
 router
     .route("/enter-email-code")
-    .get(showCheckEmailForm)
+    .get(allowUserJourneyMiddleware, showCheckEmailForm)
     .post(validateEmailSecurityCode, submitEmailSecurityCode);
-router.route("/resend-email-code").get(showResendEmailCodeForm).post(resendEmailVerificationCode);
+router.route("/resend-email-code").get(allowUserJourneyMiddleware, showResendEmailCodeForm).post(resendEmailVerificationCode);
 
-router.route("/too-many-codes").get(showTooManyCodes);
+router.route("/too-many-codes").get(allowUserJourneyMiddleware, showTooManyCodes);
 
 router
     .route("/create-password")
-    .get(showNewPasswordForm)
+    .get(allowUserJourneyMiddleware, showNewPasswordForm)
     .post(validatePassword("register/create-password.njk"), checkPasswordAllowed("register/create-password.njk"), updatePassword);
 
 router
     .route("/enter-phone-number")
-    .get(checkAuthorisation, showEnterMobileForm)
+    .get(allowUserJourneyMiddleware, checkAuthorisation, showEnterMobileForm)
     .post(validateMobileNumber("register/enter-phone-number.njk"), processEnterMobileForm);
 
 router
     .route("/enter-text-code")
-    .get(checkAuthorisation, showSubmitMobileVerificationCode)
+    .get(allowUserJourneyMiddleware, checkAuthorisation, showSubmitMobileVerificationCode)
     .post(validateMobileSecurityCode("resend-text-code", false), submitMobileVerificationCode);
 
 router
     .route("/resend-text-code")
-    .get(checkAuthorisation, showResendPhoneCodeForm)
+    .get(allowUserJourneyMiddleware, checkAuthorisation, showResendPhoneCodeForm)
     .post(resendMobileVerificationCode);
 router
     .route("/create-service")
-    .get(checkAuthorisation, showAddServiceForm)
+    .get(allowUserJourneyMiddleware, checkAuthorisation, showAddServiceForm)
     .post(validateServiceName("register/add-service-name.njk"), processAddServiceForm, sendDataToUserSpreadsheet, redirectToServicesList);
 
 router
     .route("/resume-before-password")
-    .get(showCheckEmailForm)
+    .get(allowUserJourneyMiddleware, showCheckEmailForm)
     .post(validateEmailSecurityCode, submitEmailSecurityCode);
-router.route("/resume-after-password").get(resumeAfterPassword).post(resumeUserJourneyAfterPassword);
+router.route("/resume-after-password").get(allowUserJourneyMiddleware, resumeAfterPassword).post(resumeUserJourneyAfterPassword);
