@@ -13,6 +13,8 @@ router.get("/session-timeout", sessionTimeout);
 
 router.get("/there-is-a-problem", render("there-is-a-problem.njk"));
 
+router.get("/page-unavailable", render("mid-journey-navigation-error.njk"));
+
 router.get("/service-unavailable", function (req, res) {
     res.redirect("/");
 });
