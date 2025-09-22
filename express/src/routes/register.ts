@@ -19,6 +19,7 @@ import {
     showResendEmailCodeForm,
     showResendPhoneCodeForm,
     showSubmitMobileVerificationCode,
+    showTooManyCodes,
     submitEmailSecurityCode,
     submitMobileVerificationCode,
     updatePassword
@@ -42,8 +43,13 @@ router.get("/", (req, res) => {
 
 router.route("/enter-email-address").get(showGetEmailForm).post(validateEmail("register/enter-email-address.njk"), processGetEmailForm);
 router.route("/account-exists").get(accountExists).post(processSignInForm("register/account-exists.njk"));
-router.route("/enter-email-code").get(showCheckEmailForm).post(validateEmailSecurityCode, submitEmailSecurityCode);
+router
+    .route("/enter-email-code")
+    .get(showCheckEmailForm)
+    .post(validateEmailSecurityCode, submitEmailSecurityCode);
 router.route("/resend-email-code").get(showResendEmailCodeForm).post(resendEmailVerificationCode);
+
+router.route("/too-many-codes").get(showTooManyCodes);
 
 router
     .route("/create-password")
@@ -62,11 +68,17 @@ router
     .get(showSubmitMobileVerificationCode)
     .post(validateMobileSecurityCode("resend-text-code", false), submitMobileVerificationCode);
 
-router.route("/resend-text-code").get(showResendPhoneCodeForm).post(resendMobileVerificationCode);
+router
+    .route("/resend-text-code")
+    .get(showResendPhoneCodeForm)
+    .post(resendMobileVerificationCode);
 router
     .route("/create-service")
     .get(showAddServiceForm)
     .post(validateServiceName("register/add-service-name.njk"), processAddServiceForm, sendDataToUserSpreadsheet, redirectToServicesList);
 
-router.route("/resume-before-password").get(showCheckEmailForm).post(validateEmailSecurityCode, submitEmailSecurityCode);
+router
+    .route("/resume-before-password")
+    .get(showCheckEmailForm)
+    .post(validateEmailSecurityCode, submitEmailSecurityCode);
 router.route("/resume-after-password").get(resumeAfterPassword).post(resumeUserJourneyAfterPassword);

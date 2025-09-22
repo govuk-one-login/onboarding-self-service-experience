@@ -74,7 +74,7 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
         (await s4.getEmailCodeBlock(req.session.emailAddress.toLowerCase().trim()))
     ) {
         console.log("Email is code blocked");
-        return res.render("register/too-many-codes.njk");
+        return res.redirect(RegisterRoutes.tooManyCodes);
     }
 
     s4.sendTxMALog("SSE_EMAIL_VERIFICATION_REQUEST", {
@@ -85,6 +85,8 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 
     res.render("register/enter-email-code.njk", {values: {emailAddress: req.session.emailAddress}});
 };
+
+export const showTooManyCodes = render("register/too-many-codes.njk");
 
 export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
     console.log("In register-submitEmailSecurityCode");
@@ -100,7 +102,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         (await s4.getEmailCodeBlock(req.session.emailAddress.toLowerCase().trim()))
     ) {
         console.warn("Email blocked for OTP code");
-        return res.render("register/too-many-codes.njk");
+        return res.redirect(RegisterRoutes.tooManyCodes);
     }
 
     try {
@@ -119,7 +121,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
             if (req.session.emailCodeSubmitCount >= 6) {
                 console.warn("Email code block added");
                 await s4.putEmailCodeBlock(req.session.emailAddress.toLowerCase().trim());
-                return res.render("register/too-many-codes.njk");
+                return res.redirect(RegisterRoutes.tooManyCodes);
             }
 
             s4.sendTxMALog(
@@ -344,8 +346,7 @@ export const showResendEmailCodeForm: RequestHandler = async (req, res) => {
         (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
         (await s4.getEmailCodeBlock((req.session.emailAddress as string).toLowerCase().trim()))
     ) {
-        res.render("/register/too-many-codes.njk");
-        return;
+        return res.redirect(RegisterRoutes.tooManyCodes);
     }
 
     res.render("register/resend-email-code.njk");
@@ -361,8 +362,7 @@ export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
         (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
         (await s4.getEmailCodeBlock((req.session.emailAddress as string).toLowerCase().trim()))
     ) {
-        res.render("/register/too-many-codes.njk");
-        return;
+        return res.redirect(RegisterRoutes.tooManyCodes);
     }
 
     await s4.resendEmailAuthCode(req.session.emailAddress as string);
@@ -382,7 +382,7 @@ export const processAddServiceForm: RequestHandler = async (req, res, next) => {
 
     if (!userId) {
         console.info("Can't get CognitoId from authenticationResult in session");
-        return res.render("there-is-a-problem.njk");
+        return res.redirect("/there-is-a-problem");
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
@@ -392,7 +392,7 @@ export const processAddServiceForm: RequestHandler = async (req, res, next) => {
         await s4.newService(service, userId, nonNull(req.session.authenticationResult));
     } catch (error) {
         console.error(error);
-        return res.render("there-is-a-problem.njk");
+        return res.redirect("/there-is-a-problem");
     }
 
     req.session.serviceName = req.body.serviceName;
@@ -409,7 +409,7 @@ export const processAddServiceForm: RequestHandler = async (req, res, next) => {
         console.error("Unable to Register Client to Service - Service Items removed");
         console.error(error);
         await s4.deleteServiceEntries(uuid, accessToken);
-        return res.render("there-is-a-problem.njk");
+        return res.redirect("/there-is-a-problem");
     }
 
     req.session.serviceId = serviceId;
