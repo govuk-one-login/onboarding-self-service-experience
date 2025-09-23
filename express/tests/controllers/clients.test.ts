@@ -60,8 +60,6 @@ import {
     TEST_ID_SIGNING_TOKEN_ALGORITHM,
     TEST_IP_ADDRESS,
     TEST_LANDING_PAGE_URL,
-    TEST_LEVELS_OF_CONFIDENCE,
-    TEST_LEVELS_OF_CONFIDENCE_ALT,
     TEST_POST_LOGOUT_REDIRECT_URI,
     TEST_REDIRECT_URI,
     TEST_SCOPES_IN,
@@ -144,7 +142,6 @@ describe("showClient Controller tests", () => {
             maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             pkceEnforced: TEST_CLIENT.pkce_enforced,
             landingPageUrl: TEST_LANDING_PAGE_URL,
-            levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
@@ -216,7 +213,6 @@ describe("showClient Controller tests", () => {
             pkceEnforced: TEST_CLIENT.pkce_enforced,
             landingPageUrl: TEST_LANDING_PAGE_URL,
             contacts: TEST_CLIENT.contacts,
-            levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             token_endpoint_auth_method: TEST_CLIENT.token_endpoint_auth_method,
             maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             urls: {
@@ -289,7 +285,6 @@ describe("showClient Controller tests", () => {
             identityVerificationSupported: TEST_CLIENT.identity_verification_supported,
             pkceEnforced: TEST_CLIENT.pkce_enforced,
             landingPageUrl: TEST_LANDING_PAGE_URL,
-            levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
@@ -362,7 +357,6 @@ describe("showClient Controller tests", () => {
             maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             pkceEnforced: TEST_CLIENT.pkce_enforced,
             landingPageUrl: TEST_LANDING_PAGE_URL,
-            levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
@@ -436,7 +430,6 @@ describe("showClient Controller tests", () => {
             maxAgeEnabled: TEST_CLIENT.max_age_enabled,
             pkceEnforced: TEST_CLIENT.pkce_enforced,
             landingPageUrl: TEST_LANDING_PAGE_URL,
-            levelsOfConfidence: TEST_LEVELS_OF_CONFIDENCE,
             contacts: TEST_CLIENT.contacts,
             urls: {
                 changeClientName: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
@@ -2851,7 +2844,6 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
             {
-                accepted_levels_of_confidence: [TEST_LEVELS_OF_CONFIDENCE],
                 identity_verification_supported: TEST_BOOLEAN_SUPPORTED
             },
             TEST_ACCESS_TOKEN
@@ -2889,7 +2881,6 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
             {
-                accepted_levels_of_confidence: [TEST_LEVELS_OF_CONFIDENCE_ALT],
                 identity_verification_supported: TEST_BOOLEAN_SUPPORTED_ALT
             },
             TEST_ACCESS_TOKEN
