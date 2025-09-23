@@ -7,5 +7,4 @@ export type clientConfigRequest = {
     subject_type: string;
     service_type: string;
     sector_identifier_uri: string;
-    client_locs: string[];
 };

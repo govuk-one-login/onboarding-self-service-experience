@@ -64,9 +64,6 @@ export const showClient: RequestHandler = async (req, res) => {
         identityVerificationSupported: identityVerificationSupported,
         pkceEnforced: pkceEnforced,
         authMethod: client.token_endpoint_auth_method,
-        ...(client.identity_verification_supported === true && {
-            levelsOfConfidence: client.client_locs ? client.client_locs.join(" ") : ""
-        }),
         maxAgeEnabled: maxAgeEnabled,
         landingPageUrl: landingPageUrl,
         urls: {

@@ -11,7 +11,6 @@ describe("Lambda Facade class tests", () => {
                         back_channel_logout_uri: {S: []},
                         claims: {L: []},
                         clientId: {S: "P0_ZdXojEGDlaZEU8Q9Zlv-fo1s"},
-                        client_locs: {L: [{S: "P2"}]},
                         contacts: {L: [{S: "registered@test.gov.uk"}, {S: "mockuser2@gov.uk"}, {S: "mockuser3@gov.uk"}]},
                         data: {S: "SAM Service as a Service Service"},
                         default_fields: {
@@ -28,7 +27,6 @@ describe("Lambda Facade class tests", () => {
                                 {S: "service_type"},
                                 {S: "claims"},
                                 {S: "identity_verification_supported"},
-                                {S: "client_locs"},
                                 {S: "id_token_signing_algorithm"},
                                 {S: "max_age_enabled"},
                                 {S: "pkce_enforced"}
