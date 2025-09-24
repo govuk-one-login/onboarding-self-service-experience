@@ -254,5 +254,3 @@ export const TEST_PUBLIC_BETA_FORM_SUBMISSION = {
 };
 
 export const TEST_USER_ATTRIBUTES = ["phone", "email"];
-export const TEST_BASIC_AUTH_USERNAME = "4oxh6rwLNOPxRc_zK3SdY6X5mHHQhnW6V77PNJKowiA";
-export const TEST_BASIC_AUTH_PASSWORD = "uJojpxvIyBIDle1nHnI6Fk5czqcoICQlE4Nmj5s8Qgc";

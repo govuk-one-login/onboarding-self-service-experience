@@ -249,10 +249,6 @@ Resources:
                 - IsProd
                 - !Ref AWS::NoValue
                 - "{{resolve:secretsmanager:/self-service/frontend/fixed-otp-credentials}}"
-            - Name: BASIC_AUTH_USERNAME
-              Value: "{{resolve:secretsmanager:/self-service/frontend/basic-auth-username}}"
-            - Name: BASIC_AUTH_PASSWORD
-              Value: "{{resolve:secretsmanager:/self-service/frontend/basic-auth-password}}"
             - Name: SHOW_SERVICE_UNAVAILABLE_BANNER
               Value: !Ref ShowServiceUnavailableBanner
             - Name: SERVICE_UNAVAILABLE_BANNER_START_DATE
