@@ -275,7 +275,8 @@ describe("showVerifyMobileWithSmsCode controller tests", () => {
             headerActiveItem: "your-account",
             values: {
                 mobileNumber: TEST_PHONE_NUMBER,
-                textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code"
+                textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code",
+                backLinkPath: "/account/change-phone-number"
             }
         });
     });
@@ -336,7 +337,8 @@ describe("verifyMobileWithSmsCode controller tests", () => {
             values: {
                 securityCode: TEST_SECURITY_CODE,
                 mobileNumber: TEST_PHONE_NUMBER,
-                textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code"
+                textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code",
+                backLinkPath: "/account/change-phone-number"
             },
             errorMessages: {
                 securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
