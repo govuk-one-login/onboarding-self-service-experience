@@ -109,10 +109,6 @@ export const showClient: RequestHandler = async (req, res) => {
             )}`,
             changeMaxAgeEnabled: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-max-age-enabled`,
             changePKCEEnforcedUri: `/services/${serviceId}/clients/${authClientId}/${selfServiceClientId}/change-pkce-enforced`
-        },
-        basicAuthCreds: {
-            username: process.env.BASIC_AUTH_USERNAME ?? "",
-            password: process.env.BASIC_AUTH_PASSWORD ?? ""
         }
     });
 

@@ -44,8 +44,6 @@ import {
     TEST_ACCESS_TOKEN,
     TEST_AUTHENTICATION_RESULT,
     TEST_BACK_CHANNEL_LOGOUT_URI,
-    TEST_BASIC_AUTH_PASSWORD,
-    TEST_BASIC_AUTH_USERNAME,
     TEST_BOOLEAN_SUPPORTED,
     TEST_BOOLEAN_SUPPORTED_ALT,
     TEST_BOOLEAN_SUPPORTED_ALT_TX,
@@ -107,8 +105,6 @@ describe("showClient Controller tests", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        process.env.BASIC_AUTH_USERNAME = TEST_BASIC_AUTH_USERNAME;
-        process.env.BASIC_AUTH_PASSWORD = TEST_BASIC_AUTH_PASSWORD;
     });
 
     it("calls render with the expected template and options from the first client returned from s4 listClients", async () => {
@@ -178,10 +174,6 @@ describe("showClient Controller tests", () => {
                 changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
-            },
-            basicAuthCreds: {
-                username: TEST_BASIC_AUTH_USERNAME,
-                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -254,10 +246,6 @@ describe("showClient Controller tests", () => {
                 changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
-            },
-            basicAuthCreds: {
-                username: TEST_BASIC_AUTH_USERNAME,
-                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -330,10 +318,6 @@ describe("showClient Controller tests", () => {
                 changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
-            },
-            basicAuthCreds: {
-                username: TEST_BASIC_AUTH_USERNAME,
-                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -407,10 +391,6 @@ describe("showClient Controller tests", () => {
                 changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
-            },
-            basicAuthCreds: {
-                username: TEST_BASIC_AUTH_USERNAME,
-                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -483,10 +463,6 @@ describe("showClient Controller tests", () => {
                 changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
-            },
-            basicAuthCreds: {
-                username: TEST_BASIC_AUTH_USERNAME,
-                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -561,10 +537,6 @@ describe("showClient Controller tests", () => {
                 changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
-            },
-            basicAuthCreds: {
-                username: TEST_BASIC_AUTH_USERNAME,
-                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
@@ -638,10 +610,6 @@ describe("showClient Controller tests", () => {
                 changeLandingPageUrl: `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT.authClientId}/${
                     TEST_CLIENT.dynamoServiceId
                 }/change-landing-page-url?landingPageUrl=${encodeURIComponent(TEST_CLIENT.landing_page_url as string)}`
-            },
-            basicAuthCreds: {
-                username: TEST_BASIC_AUTH_USERNAME,
-                password: TEST_BASIC_AUTH_PASSWORD
             }
         });
         expect(mockRequest.session.serviceName).toStrictEqual(TEST_CLIENT.serviceName);
