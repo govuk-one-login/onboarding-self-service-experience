@@ -137,8 +137,6 @@ export const TEST_CLAIMS_OUT = ["openid", "cl1", "cl2"];
 export const TEST_CLAIMS_OUT2 = ["openid", "cl1"];
 export const TEST_DEFAULT_FIELD = "someFields";
 export const TEST_ID_SIGNING_TOKEN_ALGORITHM = "ES256";
-export const TEST_LEVELS_OF_CONFIDENCE = "P2";
-export const TEST_LEVELS_OF_CONFIDENCE_ALT = "P0";
 
 export const TEST_DYNAMO_CLIENT = {
     pk: {S: TEST_SERVICE_ID},
@@ -164,7 +162,6 @@ export const TEST_DYNAMO_CLIENT = {
     identity_verification_supported: {B: TEST_BOOLEAN_SUPPORTED},
     claims: {L: [{S: TEST_CLAIM}]},
     id_token_signing_algorithm: {S: TEST_ID_SIGNING_TOKEN_ALGORITHM},
-    client_locs: {L: [{S: TEST_LEVELS_OF_CONFIDENCE}]},
     max_age_enabled: {B: TEST_BOOLEAN_SUPPORTED_ALT},
     pkce_enforced: {B: TEST_BOOLEAN_SUPPORTED_ALT},
     landing_page_url: {S: TEST_LANDING_PAGE_URL}
@@ -194,7 +191,6 @@ export const TEST_CLIENT: Client = {
     identity_verification_supported: TEST_BOOLEAN_SUPPORTED,
     claims: [TEST_CLAIM],
     id_token_signing_algorithm: TEST_ID_SIGNING_TOKEN_ALGORITHM,
-    client_locs: [TEST_LEVELS_OF_CONFIDENCE],
     max_age_enabled: TEST_BOOLEAN_SUPPORTED_ALT,
     pkce_enforced: TEST_BOOLEAN_SUPPORTED_ALT,
     landing_page_url: TEST_LANDING_PAGE_URL

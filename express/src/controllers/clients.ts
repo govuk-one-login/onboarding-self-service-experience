@@ -64,9 +64,6 @@ export const showClient: RequestHandler = async (req, res) => {
         identityVerificationSupported: identityVerificationSupported,
         pkceEnforced: pkceEnforced,
         authMethod: client.token_endpoint_auth_method,
-        ...(client.identity_verification_supported === true && {
-            levelsOfConfidence: client.client_locs ? client.client_locs.join(" ") : ""
-        }),
         maxAgeEnabled: maxAgeEnabled,
         landingPageUrl: landingPageUrl,
         urls: {
@@ -851,7 +848,7 @@ export const processEnterIdentityVerificationForm = async (req: Request, res: Re
         nonNull(context.serviceId),
         params.selfServiceClientId,
         params.clientId,
-        {identity_verification_supported, accepted_levels_of_confidence: identity_verification_supported ? ["P2"] : ["P0"]},
+        {identity_verification_supported},
         nonNull(session.authenticationResult?.AccessToken)
     );
 

@@ -21,7 +21,6 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     private contacts = ["registered@test.gov.uk", "mockuser2@gov.uk", "mockuser3@gov.uk"];
     private claims: string[] = [];
     private identityVerificationSupported = false;
-    private client_locs = ["P2"];
     private id_token_signing_algorithm = "ES256";
     private maxAgeEnabled = false;
     private pkceEnforced = false;
@@ -169,7 +168,6 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                         back_channel_logout_uri: {S: this.backChannelLogoutUri},
                         subject_type: {S: "pairwise"},
                         contacts: convertToAttr(this.contacts),
-                        client_locs: {L: [{S: this.client_locs[0]}]},
                         id_token_signing_algorithm: {S: this.id_token_signing_algorithm},
                         public_key: {
                             S: this.publicKey
@@ -191,7 +189,6 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
                                 {S: "service_type"},
                                 {S: "claims"},
                                 {S: "identity_verification_supported"},
-                                {S: "client_locs"},
                                 {S: "id_token_signing_algorithm"},
                                 {S: "max_age_enabled"},
                                 {S: "pkce_enforced"}

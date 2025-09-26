@@ -22,7 +22,6 @@ export interface ClientFromDynamo {
     identity_verification_supported: boolean;
     claims?: string[];
     id_token_signing_algorithm?: "ES256" | "RS256";
-    client_locs?: string[];
     max_age_enabled?: boolean;
     pkce_enforced: boolean;
     landing_page_url?: string;
@@ -52,7 +51,6 @@ export interface Client {
     identity_verification_supported: boolean;
     claims?: string[];
     id_token_signing_algorithm?: "ES256" | "RS256";
-    client_locs?: string[];
     max_age_enabled?: boolean;
     pkce_enforced: boolean;
     landing_page_url?: string;
