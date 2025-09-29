@@ -114,8 +114,8 @@ describe("processGetEmailForm controller tests", () => {
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(s4SignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(mockReq.session.save).toHaveBeenCalled();
-        expect(console.info).toHaveBeenCalledWith("Processing No HasEMail");
-        expect(mockRes.redirect).toHaveBeenCalledWith("resume-before-password");
+        expect(console.info).toHaveBeenCalledWith("Processing No HasEmail");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/resume-before-password");
     });
 
     it("calls s4 createUser handles a UsernameExistsException and redirects to resume-before-password when the signup status is at the no password stage", async () => {
@@ -143,7 +143,7 @@ describe("processGetEmailForm controller tests", () => {
         expect(s4SignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(console.info).toHaveBeenCalledWith("Processing No HasPassword");
         expect(mockReq.session.save).toHaveBeenCalled();
-        expect(mockRes.redirect).toHaveBeenCalledWith("resume-before-password");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/resume-before-password");
     });
 
     it("calls s4 createUser handles a UsernameExistsException and redirects to resume-after-password when the signup status is at the no phone number stage", async () => {
@@ -172,7 +172,7 @@ describe("processGetEmailForm controller tests", () => {
         expect(s4SignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(console.info).toHaveBeenCalledWith("Processing No HasPhoneNumber");
         expect(mockReq.session.save).toHaveBeenCalled();
-        expect(mockRes.redirect).toHaveBeenCalledWith("resume-after-password");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/resume-after-password");
     });
 
     it("calls s4 createUser handles a UsernameExistsException and redirects to resume-after-password when the signup status is at the no text code stage", async () => {
@@ -202,7 +202,7 @@ describe("processGetEmailForm controller tests", () => {
         expect(s4SignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
         expect(mockReq.session.save).toHaveBeenCalled();
         expect(console.info).toHaveBeenCalledWith("Processing No HasTextCode");
-        expect(mockRes.redirect).toHaveBeenCalledWith("resume-after-password");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/resume-after-password");
     });
 
     it("throws any non-UsernameExistsException errors", async () => {
@@ -263,7 +263,7 @@ describe("showCheckEmailForm controller tests", () => {
 
         await showCheckEmailForm(mockReq, mockRes, mockNext);
         expect(s4SendTxmaLogSpy).not.toHaveBeenCalled();
-        expect(mockRes.redirect).toHaveBeenCalledWith("/register");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/enter-email-address");
     });
 
     it("it renders an error page if the code request count in the session is higher than 6", async () => {
@@ -279,7 +279,7 @@ describe("showCheckEmailForm controller tests", () => {
         const mockNext = jest.fn();
 
         await showCheckEmailForm(mockReq, mockRes, mockNext);
-        expect(mockRes.render).toHaveBeenCalledWith("register/too-many-codes.njk");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/too-many-codes");
     });
 
     it("it renders an error page if the user is code blocked for that email", async () => {
@@ -296,7 +296,7 @@ describe("showCheckEmailForm controller tests", () => {
         getEmailCodeBlockSpy.mockResolvedValue(true);
 
         await showCheckEmailForm(mockReq, mockRes, mockNext);
-        expect(mockRes.render).toHaveBeenCalledWith("register/too-many-codes.njk");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/too-many-codes");
     });
 });
 
@@ -312,7 +312,7 @@ describe("submitEmailSecurityCode controller tests", () => {
         const mockNext = jest.fn();
 
         await submitEmailSecurityCode(mockReq, mockRes, mockNext);
-        expect(mockRes.redirect).toHaveBeenCalledWith("/register");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/enter-email-address");
     });
 
     it("calls submitUserName password with the session email and security code, sets the signUp status and redirects to /register/create-password on success", async () => {
@@ -424,7 +424,7 @@ describe("submitEmailSecurityCode controller tests", () => {
         const mockNext = jest.fn();
         await submitEmailSecurityCode(mockReq, mockRes, mockNext);
         expect(putEmailCodeBlockSpy).toHaveBeenCalledWith(TEST_EMAIL.toLowerCase().trim());
-        expect(mockRes.render).toHaveBeenCalledWith("register/too-many-codes.njk");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/too-many-codes");
     });
 
     it("throws any other type of error thrown by s4 submitUserNamePassword", async () => {
@@ -515,7 +515,7 @@ describe("showNewPasswordForm controller tests", () => {
         const mockRes = response();
         const mockNext = jest.fn();
         showNewPasswordForm(mockReq, mockRes, mockNext);
-        expect(mockRes.redirect).toHaveBeenCalledWith("/sign-in");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/sign-in/enter-email-address");
     });
 });
 
@@ -579,7 +579,7 @@ describe("processEnterMobileForm controller tests", () => {
         const mockRes = response();
         const mockNext = jest.fn();
         await processEnterMobileForm(request(), mockRes, mockNext);
-        expect(mockRes.redirect).toHaveBeenCalledWith("/sign-in");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/sign-in/enter-email-address");
     });
 
     it("calls the various s4 methods and redirects to /register/enter-text-code when they are successful", async () => {
@@ -843,7 +843,7 @@ describe("resendEmailVerificationCode controller tests", () => {
 
         await resendEmailVerificationCode(mockReq, mockRes, mockNext);
         expect(s4ResendEmailCodeSpy).not.toHaveBeenCalled();
-        expect(mockRes.render).toHaveBeenCalledWith("/register/too-many-codes.njk");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/too-many-codes");
     });
 
     it("renders too many codes if the session has 6 or more email code submits", async () => {
@@ -861,7 +861,7 @@ describe("resendEmailVerificationCode controller tests", () => {
 
         await resendEmailVerificationCode(mockReq, mockRes, mockNext);
         expect(s4ResendEmailCodeSpy).not.toHaveBeenCalled();
-        expect(mockRes.render).toHaveBeenCalledWith("/register/too-many-codes.njk");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/too-many-codes");
     });
 });
 
@@ -902,7 +902,7 @@ describe("showResendEmailCodeForm controller tests", () => {
 
         await showResendEmailCodeForm(mockReq, mockRes, mockNext);
         expect(getEmailCodeBlockSpy).toHaveBeenCalledWith(TEST_EMAIL.toLowerCase().trim());
-        expect(mockRes.render).toHaveBeenCalledWith("/register/too-many-codes.njk");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/too-many-codes");
     });
 
     it("renders too many codes if the session has 6 or more email code submits", async () => {
@@ -919,7 +919,7 @@ describe("showResendEmailCodeForm controller tests", () => {
         const mockNext = jest.fn();
 
         await showResendEmailCodeForm(mockReq, mockRes, mockNext);
-        expect(mockRes.render).toHaveBeenCalledWith("/register/too-many-codes.njk");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/too-many-codes");
     });
 });
 
@@ -945,7 +945,7 @@ describe("processAddServiceForm controller tests", () => {
 
         await processAddServiceForm(mockReq, mockRes, mockNext);
 
-        expect(mockRes.render).toHaveBeenCalledWith("there-is-a-problem.njk");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/there-is-a-problem");
         expect(mockNext).not.toHaveBeenCalled();
     });
 
@@ -971,7 +971,7 @@ describe("processAddServiceForm controller tests", () => {
             TEST_COGNITO_ID,
             TEST_AUTHENTICATION_RESULT
         );
-        expect(mockRes.render).toHaveBeenCalledWith("there-is-a-problem.njk");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/there-is-a-problem");
     });
 
     it("calls s4 generateClient, renders the there-is-a-problem template and deletes the service entry if this throws an error", async () => {
@@ -1003,7 +1003,7 @@ describe("processAddServiceForm controller tests", () => {
             TEST_AUTHENTICATION_RESULT
         );
         expect(s4DeleteServiceEntriesSpy).toHaveBeenCalledWith(TEST_UUID, TEST_ACCESS_TOKEN);
-        expect(mockRes.render).toHaveBeenCalledWith("there-is-a-problem.njk");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/there-is-a-problem");
     });
 
     it("calls the s4 newService, generateClient and sendTxMALog and then calls next if all of these are successful", async () => {
@@ -1143,6 +1143,6 @@ describe("resumeUserJourneyAfterPassword controller tests", () => {
         expect(s4SubmitUsernamePasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_PASSWORD);
         expect(mockReq.session.cognitoSession).toStrictEqual(TEST_COGNITO_SESSION_STRING);
         expect(mockReq.session.authenticationResult).toStrictEqual(TEST_AUTHENTICATION_RESULT);
-        expect(mockRes.redirect).toHaveBeenCalledWith("enter-phone-number");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/register/enter-phone-number");
     });
 });

@@ -54,7 +54,7 @@ describe("showCheckPhonePage controller tests", () => {
         const mockRes = response();
         const mockNext = jest.fn();
         showCheckPhonePage(mockReq, mockRes, mockNext);
-        expect(mockRes.redirect).toHaveBeenCalledWith("/sign-in");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/sign-in/enter-email-address");
     });
 
     it("calls render with the enter text code template and expected render options", () => {
@@ -281,7 +281,7 @@ describe("processEmailAddress controller tests", () => {
         await processEmailAddress(mockReq, mockRes, mockNext);
 
         expect(s4GetSignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("Processing No HasEMail");
+        expect(console.info).toHaveBeenCalledWith("Processing No HasEmail");
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/resume-before-password");
     });
 
