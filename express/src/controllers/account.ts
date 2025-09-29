@@ -112,7 +112,8 @@ export const showVerifyMobileWithSmsCode: RequestHandler = (req, res) => {
         headerActiveItem: "your-account",
         values: {
             mobileNumber: req.session.enteredMobileNumber,
-            textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code"
+            textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code",
+            backLinkPath: "/account/change-phone-number"
         }
     });
 };
@@ -145,7 +146,8 @@ export const verifyMobileWithSmsCode: RequestHandler = async (req, res) => {
                 values: {
                     securityCode: req.body.securityCode,
                     mobileNumber: req.session.enteredMobileNumber,
-                    textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code"
+                    textMessageNotReceivedUrl: "/account/change-phone-number/resend-text-code",
+                    backLinkPath: "/account/change-phone-number"
                 },
                 errorMessages: {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"

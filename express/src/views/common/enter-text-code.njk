@@ -1,8 +1,11 @@
 {% extends "layouts/form.njk" %}
-{% from "macros/back-link.njk" import backLink %}
 
 {% set pageTitle = "Check your mobile phone" %}
-{% set backLinkHtml = backLink("#", {onclick: "history.back()"}) %}
+{% if values.backLinkPath !== undefined %}
+  {% set backLinkPath %}
+    {{ values.backLinkPath }}
+  {% endset %}
+{% endif %}
 
 {% block beforeForm %}
   <h1 class="govuk-heading-l">Check your mobile phone</h1>

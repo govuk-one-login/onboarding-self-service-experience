@@ -636,7 +636,8 @@ describe("showSubmitMobileVerificationCode controller tests", () => {
         expect(mockRes.render).toHaveBeenCalledWith("common/enter-text-code.njk", {
             values: {
                 mobileNumber: TEST_PHONE_NUMBER,
-                textMessageNotReceivedUrl: "/register/resend-text-code"
+                textMessageNotReceivedUrl: "/register/resend-text-code",
+                backLinkPath: "/register/enter-phone-number"
             }
         });
     });
@@ -666,7 +667,8 @@ describe("submitMobileVerificationCode controller tests", () => {
         expect(mockRes.render).toHaveBeenCalledWith("common/enter-text-code.njk", {
             values: {
                 mobileNumber: TEST_PHONE_NUMBER,
-                textMessageNotReceivedUrl: "/register/resend-text-code"
+                textMessageNotReceivedUrl: "/register/resend-text-code",
+                backLinkPath: "/register/enter-phone-number"
             }
         });
     });
@@ -713,7 +715,8 @@ describe("submitMobileVerificationCode controller tests", () => {
             values: {
                 securityCode: TEST_SECURITY_CODE,
                 mobileNumber: TEST_PHONE_NUMBER,
-                textMessageNotReceivedUrl: "/register/resend-text-code"
+                textMessageNotReceivedUrl: "/register/resend-text-code",
+                backLinkPath: "/register/enter-phone-number"
             },
             errorMessages: {
                 securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"

@@ -245,7 +245,8 @@ export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
     res.render("common/enter-text-code.njk", {
         values: {
             mobileNumber: req.session.enteredMobileNumber,
-            textMessageNotReceivedUrl: RegisterRoutes.resendTextCode
+            textMessageNotReceivedUrl: RegisterRoutes.resendTextCode,
+            backLinkPath: RegisterRoutes.enterPhoneNumber
         }
     });
 };
@@ -259,7 +260,8 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
         return res.render("common/enter-text-code.njk", {
             values: {
                 mobileNumber: req.session.mobileNumber,
-                textMessageNotReceivedUrl: RegisterRoutes.resendTextCode
+                textMessageNotReceivedUrl: RegisterRoutes.resendTextCode,
+                backLinkPath: RegisterRoutes.enterPhoneNumber
             }
         });
     }
@@ -289,7 +291,8 @@ export const submitMobileVerificationCode: RequestHandler = async (req, res) => 
                 values: {
                     securityCode: req.body.securityCode,
                     mobileNumber: req.session.enteredMobileNumber,
-                    textMessageNotReceivedUrl: RegisterRoutes.resendTextCode
+                    textMessageNotReceivedUrl: RegisterRoutes.resendTextCode,
+                    backLinkPath: RegisterRoutes.enterPhoneNumber
                 },
                 errorMessages: {
                     securityCode: "The code you entered is not correct or has expired - enter it again or request a new code"
