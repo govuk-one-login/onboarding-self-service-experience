@@ -28,10 +28,10 @@
     "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.859.0",
-    "@aws-sdk/client-sqs": "^3.859.0",
+    "@aws-sdk/client-dynamodb": "^3.899.0",
+    "@aws-sdk/client-sqs": "^3.899.0",
     "@pact-foundation/pact": "^13.1.5",
-    "axios": "^1.12.1",
+    "axios": "^1.12.2",
     "googleapis": "^148.0.0",
     "googleapis-common": "^7.2.0",
     "helmet": "^7.0.0"
@@ -42,7 +42,7 @@
     "@types/jest": "^29.5.14",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
-    "esbuild": "^0.25.8",
+    "esbuild": "^0.25.10",
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^4.2.1",
