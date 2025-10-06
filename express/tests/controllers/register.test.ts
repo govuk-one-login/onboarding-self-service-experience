@@ -583,6 +583,7 @@ describe("processEnterMobileForm controller tests", () => {
     });
 
     it("calls the various s4 methods and redirects to /register/enter-text-code when they are successful", async () => {
+        getEmailSpy.mockReturnValue(TEST_EMAIL);
         s4SetPhoneNumberSpy.mockResolvedValue();
         s4SendMobileNumberVerificationCodeSpy.mockResolvedValue();
         s4SetSignUpStatusSpy.mockResolvedValue();

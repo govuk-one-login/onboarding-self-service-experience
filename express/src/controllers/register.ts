@@ -201,7 +201,8 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
     console.info("In Controller:Register - processEnterMobileForm()");
     getNextPaths(req);
 
-    const accessToken = req.session.authenticationResult?.AccessToken;
+    const authenticationResult = req.session.authenticationResult;
+    const accessToken = authenticationResult?.AccessToken;
 
     if (!accessToken) {
         return res.redirect(SignInRoutes.enterEmailAddress);
@@ -216,13 +217,14 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
     mobileNumber = convertToCountryPrefixFormat(mobileNumber);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    await s4.setPhoneNumber(nonNull(req.session.emailAddress), mobileNumber);
+    const emailAddress = AuthenticationResultParser.getEmail(nonNull(authenticationResult));
+
+    await s4.setPhoneNumber(emailAddress, mobileNumber);
     await s4.sendMobileNumberVerificationCode(accessToken);
 
     req.session.mobileNumber = mobileNumber;
     req.session.enteredMobileNumber = req.body.mobileNumber;
 
-    const emailAddress = nonNull(req.session.emailAddress);
     await s4.setSignUpStatus(emailAddress, SignupStatusStage.HasPhoneNumber);
 
     s4.sendTxMALog("SSE_PHONE_VERIFICATION_REQUEST", {
