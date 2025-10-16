@@ -1,5 +1,5 @@
-import {getNextPaths} from "../../src/middleware/state-machine";
-import {request} from "../mocks";
+import {getNextPathsAndRedirect} from "../../src/middleware/state-machine";
+import {request, response} from "../mocks";
 
 describe("state-machine", () => {
     describe("getNextPaths - sign in", () => {
@@ -10,7 +10,9 @@ describe("state-machine", () => {
                     path: "/enter-email-address",
                     baseUrl: "/sign-in"
                 });
-                getNextPaths(req);
+                const mockRes = response();
+
+                getNextPathsAndRedirect(req, mockRes, "/test-url");
 
                 expect(req.session.nextPaths).toContain(expected);
             }
@@ -28,7 +30,9 @@ describe("state-machine", () => {
                 path: "/enter-email-address",
                 baseUrl: "/register"
             });
-            getNextPaths(req);
+            const mockRes = response();
+
+            getNextPathsAndRedirect(req, mockRes, "/test-url");
 
             expect(req.session.nextPaths).toContain(expected);
         });
@@ -38,7 +42,9 @@ describe("state-machine", () => {
                 path: "/enter-email-code",
                 baseUrl: "/register"
             });
-            getNextPaths(req);
+            const mockRes = response();
+
+            getNextPathsAndRedirect(req, mockRes, "/test-url");
 
             expect(req.session.nextPaths).toContain(expected);
         });
@@ -48,7 +54,9 @@ describe("state-machine", () => {
                 path: "/resend-email-code",
                 baseUrl: "/register"
             });
-            getNextPaths(req);
+            const mockRes = response();
+
+            getNextPathsAndRedirect(req, mockRes, "/test-url");
 
             expect(req.session.nextPaths).toContain("/register/enter-email-code");
         });
@@ -58,7 +66,9 @@ describe("state-machine", () => {
                 path: "/create-password",
                 baseUrl: "/register"
             });
-            getNextPaths(req);
+            const mockRes = response();
+
+            getNextPathsAndRedirect(req, mockRes, "/test-url");
 
             expect(req.session.nextPaths).toContain("/register/enter-phone-number");
         });
@@ -68,7 +78,9 @@ describe("state-machine", () => {
                 path: "/enter-phone-number",
                 baseUrl: "/register"
             });
-            getNextPaths(req);
+            const mockRes = response();
+
+            getNextPathsAndRedirect(req, mockRes, "/test-url");
 
             expect(req.session.nextPaths).toContain("/register/enter-text-code");
         });
@@ -78,7 +90,9 @@ describe("state-machine", () => {
                 path: "/enter-text-code",
                 baseUrl: "/register"
             });
-            getNextPaths(req);
+            const mockRes = response();
+
+            getNextPathsAndRedirect(req, mockRes, "/test-url");
 
             expect(req.session.nextPaths).toContain(expected);
         });
@@ -88,7 +102,9 @@ describe("state-machine", () => {
                 path: "/resend-text-code",
                 baseUrl: "/register"
             });
-            getNextPaths(req);
+            const mockRes = response();
+
+            getNextPathsAndRedirect(req, mockRes, "/test-url");
 
             expect(req.session.nextPaths).toContain("/register/enter-text-code");
         });
@@ -98,7 +114,9 @@ describe("state-machine", () => {
                 path: "/resume-before-password",
                 baseUrl: "/register"
             });
-            getNextPaths(req);
+            const mockRes = response();
+
+            getNextPathsAndRedirect(req, mockRes, "/test-url");
 
             expect(req.session.nextPaths).toContain("/register/create-password");
         });
@@ -108,7 +126,9 @@ describe("state-machine", () => {
                 path: "/resume-after-password",
                 baseUrl: "/register"
             });
-            getNextPaths(req);
+            const mockRes = response();
+
+            getNextPathsAndRedirect(req, mockRes, "/test-url");
 
             expect(req.session.nextPaths).toContain("/register/enter-phone-number");
         });
@@ -118,9 +138,11 @@ describe("state-machine", () => {
         it("should move from list services to /register/create-service", () => {
             const req = request({
                 path: "",
-                baseUrl: "/services"
+                baseUrl: "/services/"
             });
-            getNextPaths(req);
+            const mockRes = response();
+
+            getNextPathsAndRedirect(req, mockRes, "/test-url");
 
             expect(req.session.nextPaths).toContain("/register/create-service");
         });

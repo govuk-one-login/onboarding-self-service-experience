@@ -1,6 +1,6 @@
-import {Request} from "express";
+import {Request, Response} from "express";
 
-export const getNextPaths = (req: Request) => {
+export const getNextPathsAndRedirect = (req: Request, res: Response, redirectPath: string) => {
     const currentPath = req.baseUrl + req.path;
     console.log("Getting next path for: " + currentPath);
     let nextPaths: string[] = [];
@@ -13,6 +13,7 @@ export const getNextPaths = (req: Request) => {
 
     req.session.nextPaths = nextPaths;
     req.session.save();
+    res.redirect(redirectPath);
 };
 
 export enum RegisterRoutes {
@@ -31,7 +32,7 @@ export enum RegisterRoutes {
 }
 
 export enum AccountRoutes {
-    showAccount = "/account",
+    showAccount = "/account/",
     changePassword = "/account/change-password",
     changePhoneNumber = "/account/change-phone-number",
     enterTextCode = "/account/change-phone-number/enter-text-code",
@@ -57,7 +58,7 @@ export enum SignInRoutes {
 }
 
 export enum ServicesRoutes {
-    listServices = "/services",
+    listServices = "/services/",
     addNewService = "/services/add-new-service"
 }
 
@@ -75,8 +76,9 @@ const stateMachine: {[route: string]: string[]} = {
     [RegisterRoutes.enterPhoneNumber]: [RegisterRoutes.enterTextCode],
     [RegisterRoutes.enterTextCode]: [RegisterRoutes.createService, RegisterRoutes.resendTextCode],
     [RegisterRoutes.resendTextCode]: [RegisterRoutes.enterTextCode],
-    [RegisterRoutes.resumeBeforePassword]: [RegisterRoutes.createPassword],
+    [RegisterRoutes.resumeBeforePassword]: [RegisterRoutes.resendEmailCode, RegisterRoutes.createPassword, RegisterRoutes.tooManyCodes],
     [RegisterRoutes.resumeAfterPassword]: [RegisterRoutes.enterPhoneNumber],
     [SignInRoutes.enterEmailAddress]: [RegisterRoutes.resumeAfterPassword, RegisterRoutes.resumeBeforePassword],
-    [ServicesRoutes.listServices]: [RegisterRoutes.createService]
+    [ServicesRoutes.listServices]: [RegisterRoutes.createService],
+    [SignInRoutes.enterTextCode]: [RegisterRoutes.createService]
 };
