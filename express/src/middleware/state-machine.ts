@@ -31,7 +31,7 @@ export enum RegisterRoutes {
 }
 
 export enum AccountRoutes {
-    showAccount = "/account",
+    showAccount = "/account/",
     changePassword = "/account/change-password",
     changePhoneNumber = "/account/change-phone-number",
     enterTextCode = "/account/change-phone-number/enter-text-code",
@@ -57,7 +57,7 @@ export enum SignInRoutes {
 }
 
 export enum ServicesRoutes {
-    listServices = "/services",
+    listServices = "/services/",
     addNewService = "/services/add-new-service"
 }
 
@@ -78,5 +78,6 @@ const stateMachine: {[route: string]: string[]} = {
     [RegisterRoutes.resumeBeforePassword]: [RegisterRoutes.createPassword],
     [RegisterRoutes.resumeAfterPassword]: [RegisterRoutes.enterPhoneNumber],
     [SignInRoutes.enterEmailAddress]: [RegisterRoutes.resumeAfterPassword, RegisterRoutes.resumeBeforePassword],
-    [ServicesRoutes.listServices]: [RegisterRoutes.createService]
+    [ServicesRoutes.listServices]: [RegisterRoutes.createService],
+    [SignInRoutes.enterTextCode]: [RegisterRoutes.createService]
 };
