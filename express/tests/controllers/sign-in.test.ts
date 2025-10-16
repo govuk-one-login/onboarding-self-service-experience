@@ -210,7 +210,7 @@ describe("finishSignIn controller tests", () => {
                 outcome: "success"
             }
         );
-        expect(mockRes.redirect).toHaveBeenCalledWith("/services");
+        expect(mockRes.redirect).toHaveBeenCalledWith("/services/");
     });
 });
 

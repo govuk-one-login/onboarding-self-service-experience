@@ -12,7 +12,7 @@ import SelfServiceServicesService from "../services/self-service-services-servic
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import console from "console";
 import {secureRandom6DigitCode} from "../lib/utils/secure-random-code";
-import {getNextPaths, RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine";
+import {getNextPathsAndRedirect, RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
 export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
@@ -117,7 +117,6 @@ export const globalSignOut: RequestHandler = async (req, res) => {
 };
 
 export const processEmailAddress: RequestHandler = async (req, res) => {
-    getNextPaths(req);
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     try {
         const email = req.session.emailAddress as string;
@@ -125,28 +124,28 @@ export const processEmailAddress: RequestHandler = async (req, res) => {
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
             console.info("Processing No HasEmail");
-            return res.redirect(RegisterRoutes.resumeBeforePassword);
+            return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeBeforePassword);
         }
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
             console.info("Processing No HasPassword");
-            return res.redirect(RegisterRoutes.resumeBeforePassword);
+            return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeBeforePassword);
         }
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
             console.info("Processing No HasPhoneNumber");
-            return res.redirect(RegisterRoutes.resumeAfterPassword);
+            return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeAfterPassword);
         }
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
             console.info("Processing No HasTextCode");
-            return res.redirect(RegisterRoutes.resumeAfterPassword);
+            return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeAfterPassword);
         }
     } catch (UserNotFoundException) {
         // If a user doesn't exist, carry on like normal
     }
 
-    res.redirect(SignInRoutes.enterPassword);
+    getNextPathsAndRedirect(req, res, SignInRoutes.enterPassword);
 };
 
 export const showSignInFormPassword = render("sign-in/enter-password.njk");

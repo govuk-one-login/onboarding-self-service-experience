@@ -1,6 +1,6 @@
-import {Request} from "express";
+import {Request, Response} from "express";
 
-export const getNextPaths = (req: Request) => {
+export const getNextPathsAndRedirect = (req: Request, res: Response, redirectPath: string) => {
     const currentPath = req.baseUrl + req.path;
     console.log("Getting next path for: " + currentPath);
     let nextPaths: string[] = [];
@@ -13,6 +13,7 @@ export const getNextPaths = (req: Request) => {
 
     req.session.nextPaths = nextPaths;
     req.session.save();
+    res.redirect(redirectPath);
 };
 
 export enum RegisterRoutes {
