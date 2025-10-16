@@ -75,7 +75,7 @@ const stateMachine: {[route: string]: string[]} = {
     [RegisterRoutes.enterPhoneNumber]: [RegisterRoutes.enterTextCode],
     [RegisterRoutes.enterTextCode]: [RegisterRoutes.createService, RegisterRoutes.resendTextCode],
     [RegisterRoutes.resendTextCode]: [RegisterRoutes.enterTextCode],
-    [RegisterRoutes.resumeBeforePassword]: [RegisterRoutes.createPassword],
+    [RegisterRoutes.resumeBeforePassword]: [RegisterRoutes.resendEmailCode, RegisterRoutes.createPassword, RegisterRoutes.tooManyCodes],
     [RegisterRoutes.resumeAfterPassword]: [RegisterRoutes.enterPhoneNumber],
     [SignInRoutes.enterEmailAddress]: [RegisterRoutes.resumeAfterPassword, RegisterRoutes.resumeBeforePassword],
     [ServicesRoutes.listServices]: [RegisterRoutes.createService],
