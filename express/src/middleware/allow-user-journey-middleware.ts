@@ -6,7 +6,7 @@ export function transitionForbidden(req: Request): boolean {
     const currentPath = req.baseUrl + req.path;
     console.log("in nextPaths: "+ !nextPaths?.includes(currentPath));
     console.log("in optionalPaths: "+ !optionalPaths?.includes(currentPath))
-    return !nextPaths?.includes(currentPath) && !optionalPaths?.includes(req.path);
+    return !nextPaths?.includes(currentPath) || !optionalPaths?.includes(req.path);
 }
 
 export function allowUserJourneyMiddleware(req: Request, res: Response, next: NextFunction): void {
