@@ -45,7 +45,7 @@ router.get("/", (req, res) => {
 router
     .route("/enter-email-address")
     .get(showGetEmailForm)
-    .post(allowUserJourneyMiddleware, validateEmail("register/enter-email-address.njk"), processGetEmailForm);
+    .post(validateEmail("register/enter-email-address.njk"), processGetEmailForm);
 router
     .route("/account-exists")
     .get(allowUserJourneyMiddleware, accountExists)

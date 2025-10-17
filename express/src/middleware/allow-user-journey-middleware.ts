@@ -13,7 +13,7 @@ export function allowUserJourneyMiddleware(req: Request, res: Response, next: Ne
         const optionalPaths = req.session.optionalPaths as string[];
         console.warn(
             `User tried invalid journey to ${req.baseUrl + req.path}, but session indicates they should be on ${nextPath?.join(", ")}${
-                optionalPaths?.length > 0 ? "and optionalPaths " + optionalPaths?.join() : ""
+                optionalPaths?.length > 0 ? " and optionalPaths " + optionalPaths?.join() : ""
             }}`
         );
         return res.redirect("/page-unavailable");
