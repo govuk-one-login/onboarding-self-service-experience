@@ -59,7 +59,7 @@ router
 
 router
     .route("/enter-phone-number")
-    .get(allowUserJourneyMiddleware, checkAuthorisation, showEnterMobileForm)
+    .get(checkAuthorisation, showEnterMobileForm)
     .post(validateMobileNumber("register/enter-phone-number.njk"), processEnterMobileForm);
 
 router
