@@ -140,6 +140,12 @@ export default class SelfServiceServicesService {
         return this.cognito.setPhoneNumber(emailAddress, mobileNumber);
     }
 
+    setPhoneNumberWithoutAdmin(accessToken: string, mobileNumber: string): Promise<void> {
+        console.info("In self-service-services-service:setPhoneNumber()");
+
+        return this.cognito.setPhoneNumberWithoutAdmin(accessToken, mobileNumber);
+    }
+
     setMfaPreference(cognitoId: string): Promise<void> {
         console.info("In self-service-services-service:setMfaPreference()");
 

@@ -41,6 +41,8 @@ export default interface CognitoInterface {
 
     setPhoneNumber(username: string, phoneNumber: string): Promise<void>;
 
+    setPhoneNumberWithoutAdmin(accessToken: string, phoneNumber: string): Promise<void>;
+
     setSignUpStatus(username: string, status: string): Promise<void>;
 
     setUserPassword(userEmail: string, password: string): Promise<void>;

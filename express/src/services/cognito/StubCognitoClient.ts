@@ -150,6 +150,10 @@ export default class StubCognitoClient implements CognitoInterface {
         loggedInIdTokenPayload.phone_number = convertToCountryPrefixFormat(phoneNumber);
     }
 
+    async setPhoneNumberWithoutAdmin(accessToken: string, phoneNumber: string): Promise<void> {
+        loggedInIdTokenPayload.phone_number = convertToCountryPrefixFormat(phoneNumber);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async verifyMobileUsingSmsCode(accessToken: string, code: string, emailAddress: string): Promise<void> {
         await this.getOverriddenReturnValue("verifySmsCode", "code", code);

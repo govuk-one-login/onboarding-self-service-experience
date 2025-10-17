@@ -219,7 +219,7 @@ export const processEnterMobileForm: RequestHandler = async (req, res) => {
 
     const emailAddress = AuthenticationResultParser.getEmail(nonNull(authenticationResult));
 
-    await s4.setPhoneNumber(emailAddress, mobileNumber);
+    await s4.setPhoneNumberWithoutAdmin(accessToken, mobileNumber);
     await s4.sendMobileNumberVerificationCode(accessToken);
 
     req.session.mobileNumber = mobileNumber;
