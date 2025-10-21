@@ -22,7 +22,8 @@ import {
     GetUserCommand,
     VerifyUserAttributeCommand,
     UpdateUserPoolClientCommand,
-    AdminSetUserPasswordCommand
+    AdminSetUserPasswordCommand,
+    UpdateUserAttributesCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Command} from "@aws-sdk/types";
 import {cognito, region} from "../../config/environment";
@@ -374,6 +375,25 @@ export default class CognitoClient implements CognitoInterface {
             await this.sendCommand(AdminUpdateUserAttributesCommand, {
                 UserPoolId: this.userPoolId,
                 Username: cognitoUserName,
+                UserAttributes: [
+                    {
+                        Name: "phone_number",
+                        Value: phoneNumber
+                    }
+                ]
+            });
+        } catch (error) {
+            console.error(error as Error);
+            throw error;
+        }
+    }
+
+    async setPhoneNumberWithoutAdmin(accessToken: string, phoneNumber: string): Promise<void> {
+        console.info("In CognitoClient:setPhoneNumber()");
+
+        try {
+            await this.sendCommand(UpdateUserAttributesCommand, {
+                AccessToken: accessToken,
                 UserAttributes: [
                     {
                         Name: "phone_number",

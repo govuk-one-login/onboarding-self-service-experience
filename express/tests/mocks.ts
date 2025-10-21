@@ -38,6 +38,7 @@ export const mockCognitoInterface = {
     setMobilePhoneAsVerified: jest.fn(),
     setNewPassword: jest.fn(),
     setPhoneNumber: jest.fn(),
+    setPhoneNumberWithoutAdmin: jest.fn(),
     setSignUpStatus: jest.fn(),
     setUserPassword: jest.fn(),
     useRefreshToken: jest.fn(),

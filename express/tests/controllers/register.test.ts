@@ -51,7 +51,7 @@ const s4SendTxmaLogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendT
 const s4SetNewPasswordSpy = jest.spyOn(SelfServiceServicesService.prototype, "setNewPassword");
 const s4SetEmailAsVerifiedSpy = jest.spyOn(SelfServiceServicesService.prototype, "setEmailAsVerified");
 const s4SetSignUpStatusSpy = jest.spyOn(SelfServiceServicesService.prototype, "setSignUpStatus");
-const s4SetPhoneNumberSpy = jest.spyOn(SelfServiceServicesService.prototype, "setPhoneNumber");
+const s4SetPhoneNumberWithoutAdminSpy = jest.spyOn(SelfServiceServicesService.prototype, "setPhoneNumberWithoutAdmin");
 const s4SendMobileNumberVerificationCodeSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendMobileNumberVerificationCode");
 const s4VerifyMobileUsingSmsCodeSpy = jest.spyOn(SelfServiceServicesService.prototype, "verifyMobileUsingSmsCode");
 const s4SetMfaPreferenceSpy = jest.spyOn(SelfServiceServicesService.prototype, "setMfaPreference");
@@ -584,7 +584,7 @@ describe("processEnterMobileForm controller tests", () => {
 
     it("calls the various s4 methods and redirects to /register/enter-text-code when they are successful", async () => {
         getEmailSpy.mockReturnValue(TEST_EMAIL);
-        s4SetPhoneNumberSpy.mockResolvedValue();
+        s4SetPhoneNumberWithoutAdminSpy.mockResolvedValue();
         s4SendMobileNumberVerificationCodeSpy.mockResolvedValue();
         s4SetSignUpStatusSpy.mockResolvedValue();
         s4SendTxmaLogSpy.mockReturnValue();
@@ -605,7 +605,7 @@ describe("processEnterMobileForm controller tests", () => {
 
         await processEnterMobileForm(mockReq, mockRes, mockNext);
 
-        expect(s4SetPhoneNumberSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_PHONE_NUMBER);
+        expect(s4SetPhoneNumberWithoutAdminSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT.AccessToken, TEST_PHONE_NUMBER);
         expect(s4SendMobileNumberVerificationCodeSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockReq.session.mobileNumber).toStrictEqual(TEST_PHONE_NUMBER);
         expect(mockReq.session.enteredMobileNumber).toStrictEqual(TEST_PHONE_NUMBER);
