@@ -4,14 +4,17 @@ export const getNextPathsAndRedirect = (req: Request, res: Response, redirectPat
     const currentPath = req.baseUrl + req.path;
     console.log("Getting next path for: " + currentPath);
     let nextPaths: string[] = [];
+    let optionalPaths;
 
     if (!stateMachine[currentPath]) {
         console.log(currentPath + " is not in state machine");
     } else {
-        nextPaths = stateMachine[currentPath];
+        nextPaths = stateMachine[currentPath].expectedUserJourney;
+        optionalPaths = stateMachine[currentPath].optionalUserJourney;
     }
 
     req.session.nextPaths = nextPaths;
+    req.session.optionalPaths = optionalPaths;
     req.session.save();
     res.redirect(redirectPath);
 };
@@ -62,23 +65,63 @@ export enum ServicesRoutes {
     addNewService = "/services/add-new-service"
 }
 
+type Routes = ServicesRoutes | SignInRoutes | AccountRoutes | RegisterRoutes;
+
+type UserJourneys = {
+    expectedUserJourney: Routes[];
+    optionalUserJourney?: Routes[];
+};
+
 // currentPath and the list of paths they are allowed to navigate to
-const stateMachine: {[route: string]: string[]} = {
-    [RegisterRoutes.enterEmailAddress]: [
-        RegisterRoutes.enterEmailCode,
-        RegisterRoutes.accountExists,
-        RegisterRoutes.resumeBeforePassword,
-        RegisterRoutes.resumeAfterPassword
-    ],
-    [RegisterRoutes.enterEmailCode]: [RegisterRoutes.resendEmailCode, RegisterRoutes.createPassword, RegisterRoutes.tooManyCodes],
-    [RegisterRoutes.resendEmailCode]: [RegisterRoutes.enterEmailCode, RegisterRoutes.tooManyCodes],
-    [RegisterRoutes.createPassword]: [RegisterRoutes.enterPhoneNumber],
-    [RegisterRoutes.enterPhoneNumber]: [RegisterRoutes.enterTextCode],
-    [RegisterRoutes.enterTextCode]: [RegisterRoutes.createService, RegisterRoutes.resendTextCode],
-    [RegisterRoutes.resendTextCode]: [RegisterRoutes.enterTextCode],
-    [RegisterRoutes.resumeBeforePassword]: [RegisterRoutes.resendEmailCode, RegisterRoutes.createPassword, RegisterRoutes.tooManyCodes],
-    [RegisterRoutes.resumeAfterPassword]: [RegisterRoutes.enterPhoneNumber],
-    [SignInRoutes.enterEmailAddress]: [RegisterRoutes.resumeAfterPassword, RegisterRoutes.resumeBeforePassword],
-    [ServicesRoutes.listServices]: [RegisterRoutes.createService],
-    [SignInRoutes.enterTextCode]: [RegisterRoutes.createService]
+const stateMachine: {[route: string]: UserJourneys} = {
+    [RegisterRoutes.enterEmailAddress]: {
+        expectedUserJourney: [RegisterRoutes.enterEmailCode],
+        optionalUserJourney: [
+            RegisterRoutes.accountExists,
+            RegisterRoutes.resumeBeforePassword,
+            RegisterRoutes.resumeAfterPassword,
+            RegisterRoutes.resendEmailCode
+        ]
+    },
+    [RegisterRoutes.enterEmailCode]: {
+        expectedUserJourney: [RegisterRoutes.createPassword],
+        optionalUserJourney: [RegisterRoutes.tooManyCodes]
+    },
+    [RegisterRoutes.resendEmailCode]: {
+        expectedUserJourney: [RegisterRoutes.enterEmailCode],
+        optionalUserJourney: [RegisterRoutes.resendEmailCode, RegisterRoutes.tooManyCodes]
+    },
+    [RegisterRoutes.createPassword]: {
+        expectedUserJourney: [RegisterRoutes.enterPhoneNumber]
+    },
+    [RegisterRoutes.enterPhoneNumber]: {
+        expectedUserJourney: [RegisterRoutes.enterTextCode],
+        optionalUserJourney: [RegisterRoutes.resendTextCode, RegisterRoutes.enterPhoneNumber]
+    },
+    [RegisterRoutes.enterTextCode]: {
+        expectedUserJourney: [RegisterRoutes.createService]
+    },
+    [RegisterRoutes.resendTextCode]: {
+        expectedUserJourney: [RegisterRoutes.enterTextCode],
+        optionalUserJourney: [RegisterRoutes.resendTextCode, RegisterRoutes.enterPhoneNumber]
+    },
+    [RegisterRoutes.resumeBeforePassword]: {
+        expectedUserJourney: [RegisterRoutes.createPassword],
+        optionalUserJourney: [RegisterRoutes.tooManyCodes]
+    },
+    [RegisterRoutes.resumeAfterPassword]: {
+        expectedUserJourney: [RegisterRoutes.enterPhoneNumber]
+    },
+    [SignInRoutes.enterEmailAddress]: {
+        expectedUserJourney: [SignInRoutes.enterPassword],
+        optionalUserJourney: [RegisterRoutes.resumeAfterPassword, RegisterRoutes.resumeBeforePassword, RegisterRoutes.resendEmailCode]
+    },
+    [SignInRoutes.enterTextCode]: {
+        expectedUserJourney: [],
+        optionalUserJourney: [RegisterRoutes.createService]
+    },
+    [ServicesRoutes.listServices]: {
+        expectedUserJourney: [],
+        optionalUserJourney: [RegisterRoutes.createService]
+    }
 };
