@@ -1,7 +1,25 @@
 name: Deploy branch to development
 run-name: Deploy branch to development [${{ github.head_ref || github.ref_name }}]
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      frontend_deploy:
+        type: boolean
+        default: false
+        description: Frontend
+      backend_deploy:
+        type: boolean
+        default: false
+        description: Backend API
+      dynamodb_deploy:
+        type: boolean
+        default: false
+        description: DynamoDB
+      cognito_deploy:
+        type: boolean
+        default: false
+        description: Cognito
 
 permissions:
   id-token: write
@@ -9,6 +27,7 @@ permissions:
 
 jobs:
   deploy-frontend:
+    if: github.event.inputs.frontend_deploy == 'true'
     name: Deploy Frontend (dev)
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -34,6 +53,7 @@ jobs:
           test-container-repository-name: ${{ vars.FRONTEND_TEST_CONTAINER_REPOSITORY_NAME }}
 
   deploy-dynamodb:
+    if: github.event.inputs.dynamodb_deploy == 'true'
     name: Deploy Dynamodb (dev)
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -68,6 +88,7 @@ jobs:
           artifact-name: ${{ steps.build.outputs.artifact-name }}
 
   deploy-cognito:
+    if: github.event.inputs.cognito_deploy == 'true'
     name: Deploy Cognito (dev)
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -103,6 +124,7 @@ jobs:
           artifact-name: ${{ steps.build.outputs.artifact-name }}
 
   deploy-api:
+    if: github.event.inputs.backend_deploy == 'true'
     name: Deploy API (dev)
     runs-on: ubuntu-latest
     timeout-minutes: 15
