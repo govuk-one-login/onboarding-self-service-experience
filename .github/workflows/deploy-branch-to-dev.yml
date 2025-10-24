@@ -1,6 +1,6 @@
 name: Deploy branch to development
 run-name: Deploy branch to development [${{ github.head_ref || github.ref_name }}]
-
+#checkov:skip=CKV_GHA_7:This is only running against dev and speeds up deployments
 on:
   workflow_dispatch:
     inputs:
