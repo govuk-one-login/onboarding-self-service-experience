@@ -18,16 +18,16 @@
     "build-docker": "docker build --tag self-service-frontend --file ../infrastructure/frontend/Dockerfile-dev .."
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.859.0",
-    "@aws-sdk/util-dynamodb": "^3.859.0",
-    "axios": "^1.12.1",
+    "@aws-sdk/client-cognito-identity-provider": "^3.925.0",
+    "@aws-sdk/util-dynamodb": "^3.925.0",
+    "axios": "^1.13.2",
     "connect-dynamodb": "^3.0.5",
     "express": "^4.21.2",
     "express-async-errors": "^3.1.1",
     "express-session": "^1.18.2",
     "googleapis": "^148.0.0",
     "googleapis-common": "^7.2.0",
-    "govuk-frontend": "^5.11.1",
+    "govuk-frontend": "^5.13.0",
     "helmet": "^7.0.0",
     "nunjucks": "^3.2.3"
   },
