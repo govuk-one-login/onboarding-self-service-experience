@@ -591,11 +591,22 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - Effect: Allow
+          - Sid: "AllowAccessToELB"
+            Effect: Allow
             Action: s3:PutObject
             Resource: !Sub ${AccessLogsBucket.Arn}/AWSLogs/${AWS::AccountId}/*
             Principal:
               AWS: !FindInMap [ ElasticLoadBalancer, !Ref AWS::Region, AccountID ]
+          - Sid: "EnforceSSLRequests"
+            Effect: "Deny"
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              - !Sub "arn:aws:s3:::${AccessLogsBucket}/*"
+              - !Sub "arn:aws:s3:::${AccessLogsBucket}"
+            Condition:
+              Bool:
+                "aws:SecureTransport": "false"
 
 
   LoadBalancerWebACLAssociation:
