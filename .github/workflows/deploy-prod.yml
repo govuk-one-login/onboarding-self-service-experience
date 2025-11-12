@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Pull repository
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Push
         id: push
