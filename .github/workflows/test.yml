@@ -71,7 +71,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Install Node dependencies
-        run: npm install
+        run: npm ci
 
       - name: Generate coverage report
         run: npm run test:cov
@@ -95,7 +95,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Install Node dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run unit tests
         id: run-tests
