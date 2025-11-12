@@ -389,6 +389,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/get-user.getUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -424,6 +425,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/put-user.putUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -459,6 +461,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/update-user.updateUserHandler
       Description: Updates user data in DynamoDB
@@ -497,6 +500,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/get-services.getServicesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -532,6 +536,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/get-session-count.getSessionCountHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -567,6 +572,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/global-sign-out.globalSignOutHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -602,6 +608,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/put-service.putServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -632,6 +639,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/get-service-clients.getServiceClientsHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -667,6 +675,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/put-service-client.putServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -696,6 +705,7 @@ Resources:
         External:
           # AWS SDK v3 dependencies are already included in the lambda runtime
           - "@aws-sdk/*"
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/update-service.updateServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -727,6 +737,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/update-service-client.updateServiceClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -757,6 +768,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/dynamodb/put-service-user.putServiceUserHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -787,6 +799,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Description: Assumes a cross-account role and invokes the Auth register Lambda
       Handler: src/handlers/auth/register-client.registerClientHandler
@@ -816,6 +829,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Description: Updates a client using an HTTP endpoint
       Handler: src/handlers/auth/update-client.updateClientInRegistryHandler
@@ -847,6 +861,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/step-functions/new-service.newServiceHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -883,6 +898,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/step-functions/new-client.newClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -919,6 +935,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/step-functions/update-client.doUpdateClientHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -959,6 +976,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/step-functions/update-service.doUpdateServiceHandler
       Description: Updates service data in DynamoDB and Client Registry
@@ -1041,6 +1059,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: true
     Properties:
       Handler: src/handlers/logging/sqs-service.sendSQSMessageToTxMAHandler
       Description: Sends a message to the TxMA SQS
@@ -1263,6 +1282,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: True
     Properties:
       Handler: src/handlers/dynamodb/dynamo-db-service.getDynamoDBEntriesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -1298,6 +1318,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: True
     Properties:
       Handler: src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBClientEntriesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -1333,6 +1354,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: True
     Properties:
       Handler: src/handlers/dynamodb/dynamo-db-service.deleteDynamoDBServiceEntriesHandler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
@@ -1382,6 +1404,7 @@ Resources:
         Sourcemap: true
         External:
           - "@aws-sdk/*" # AWS SDK v3 dependencies are already included in the lambda runtime
+        UseNpmCi: True
     Properties:
       Handler: src/handlers/code-block/code-block-handler.handler
       CodeSigningConfigArn: !If [ UseCodeSigning, !Ref CodeSigningConfigArn, !Ref AWS::NoValue ]
