@@ -28,6 +28,7 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
 export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, res, next) => {
     console.error("ErrorRequestHandler: error info: " + err);
+    console.error("Err stack trace: " + (err as Error).stack);
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
