@@ -21,6 +21,7 @@
   "dependencies": {
     "@pact-foundation/pact-core": "^15.2.1",
     "@pact-foundation/pact-node": "^10.17.7",
+    "js-yaml": ">=4.1.1",
     "mocha": "^10.2.0",
     "pino": "^9.12.0"
   },
