@@ -62,7 +62,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 ENV DBUS_SESSION_BUS_ADDRESS autolaunch:
 ENV PUPPETEER_CACHE_DIR="/app/.cache/puppeteer"
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci
 
 COPY --chmod=005 run-tests.sh /run-tests.sh
 

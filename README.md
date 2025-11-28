@@ -62,7 +62,7 @@ environment variables to the stub values if they're not set explicitly (see [pac
 To run the application locally with stub services for S3 and Google Sheets:
 
 1. Copy .env.example to .env
-2. Run npm install
+2. Run npm ci
 3. Run npm run local
 
 To run the application using the actual Google Sheets services:

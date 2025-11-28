@@ -34,18 +34,11 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v5
 
-      - name: Install Tyepscript
-        run: npm install -D typescript
-
       - name: Install Node
         run: sudo apt install nodejs
 
-      - name: Install Pact Node
-        run: npm install @pact-foundation/pact-node --save
-
       - name: Install dependencies
-        working-directory: ./backend/api/tests/contract-tests
-        run: npm install
+        run: npm ci
 
       - name: Build
         working-directory: ./backend/api/tests/contract-tests

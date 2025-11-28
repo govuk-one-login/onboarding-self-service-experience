@@ -11,7 +11,8 @@ COPY package*.json ./
 
 WORKDIR /self-service/express
 COPY express/package*.json ./
-RUN npm install --include-workspace-root --omit=dev
+RUN npm ci --include-workspace-root \
+    && npm run build && npm ci --omit=dev
 
 COPY express/dist dist
 COPY express/stubs stubs
