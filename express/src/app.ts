@@ -56,6 +56,7 @@ if (!showServiceUnavailablePage) {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+// Pointless comment to force a re-deployment. Delete me if you've found me after this date: 10/12/25
 app.locals.googleTagId = googleTagId;
 app.locals.showTestBanner = showTestBanner;
 app.locals.showServiceUnavailableBanner = showServiceUnavailableBanner;
