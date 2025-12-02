@@ -180,7 +180,6 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         console.log("In LambdaFacade-getDynamoDBEntries");
 
         const endPoint: string = "/get-dynamodb-entries/" + userEmail;
-        console.log("EndPoint => " + endPoint);
 
         try {
             return await this.get(endPoint);
