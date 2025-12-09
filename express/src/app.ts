@@ -45,7 +45,6 @@ if (!showServiceUnavailablePage) {
     app.use("/account", account);
     app.use("/services", services);
 } else {
-    console.log("Service down flag enabled");
     app.use(serviceUnavailable);
     app.all("*", function (req, res) {
         if (req.path !== "/service-unavailable") {
