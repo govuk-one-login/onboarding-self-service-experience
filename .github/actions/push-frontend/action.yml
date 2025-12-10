@@ -39,7 +39,7 @@ runs:
         image-version: ${{ github.sha }}
 
     - name: Login to GDS Dev Dynatrace Container Registry
-      uses: docker/login-action@v3
+      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0 
       with:
         registry: khw46367.live.dynatrace.com
         username: khw46367
