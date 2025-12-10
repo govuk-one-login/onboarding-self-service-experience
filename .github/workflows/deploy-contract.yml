@@ -37,7 +37,11 @@ jobs:
       - name: Install Node
         run: sudo apt install nodejs
 
-      - name: Install dependencies
+      - name: Install api dependencies
+        run: npm ci
+
+      - name: Install pact
+        working-directory: ./backend/api/tests/contract-tests
         run: npm ci
 
       - name: Build

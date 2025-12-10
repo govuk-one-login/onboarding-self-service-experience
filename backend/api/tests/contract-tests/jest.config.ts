@@ -1,8 +1,10 @@
 import {Config} from "jest";
-import baseConfig from "../../../../jest.config.base";
 
 export default {
-    ...baseConfig,
+    rootDir: ".",
+    clearMocks: true,
+    moduleDirectories: ["node_modules", "src"],
+    collectCoverageFrom: ["*/**/*.ts", "!*/**/*.d.ts", "!**/tests/**/*"],
     displayName: "api pact-tests",
     preset: "ts-jest",
     testTimeout: 200000,
