@@ -35,7 +35,7 @@ Feature: Users can sign up to the self-service experience
       Then they should be redirected to the '<address>'
       Examples:
         | linkName       | address               |
-        | Contact us     | /contact-us?adminTool |
+        | Contact us     | https://www.sign-in.service.gov.uk/support |
         | privacy notice | /privacy-policy       |
 
   Rule: The user tries to submit an email address that is already registered
@@ -136,7 +136,7 @@ Feature: Users can sign up to the self-service experience
     @ci
     Scenario: The user does not receive their email security and wants to contact the service via support form
       When they click on the "support form" link
-      Then they should be redirected to the "/contact-us"
+      Then they should be redirected to the "https://www.sign-in.service.gov.uk/support"
 
   Rule: The user tries to set a password when creating an account
     Background:
@@ -236,7 +236,7 @@ Feature: Users can sign up to the self-service experience
     Scenario: The user wants to contact the service
       When they click on the "Problems receiving a text message?" link
       And they click on the "support form" link
-      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/contact-us?adminTool"
+      Then they should be directed to the URL "https://www.sign-in.service.gov.uk/support"
 
     @ci
     Scenario: The user wants the app to resend their code
