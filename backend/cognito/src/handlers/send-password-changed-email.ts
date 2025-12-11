@@ -191,7 +191,7 @@ function generateEmailBody() {
                         </table>
                         <div style="margin-top: 40px;"></div>
                         <p class="norrmal-text">Your password for the GOV.UK One Login admin tool has been changed.</p>
-                        <p class="norrmal-text">If you did not do this, contact us: <a style="word-wrap:break-word;color:#1d70b8" href="https://www.sign-in.service.gov.uk/contact-us?adminTool" target="_blank" data-saferedirecturl="GOV.UK">https://www.sign-in.service.gov.uk/contact-us?adminTool</a></p>
+                        <p class="norrmal-text">If you did not do this, <a style="word-wrap:break-word;color:#1d70b8" href="https://www.sign-in.service.gov.uk/support" target="_blank" data-saferedirecturl="GOV.UK">contact us</a></p>
                     </td>
                 </tr>
             </table>
