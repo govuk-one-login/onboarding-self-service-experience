@@ -49,7 +49,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Check linting and formatting
-        uses: govuk-one-login/github-actions/code-quality/check-linting@5dacba941def444d69f02843feaebed79b5fca51 # 11/04/2023
+        uses: govuk-one-login/github-actions/code-quality/check-linting@dc533fdf7254e2be498d804b43292c8f6e86844d # 15/12/2025
+        with:
+          python-version: 3.13
 
   check-vulnerabilities:
     name: Vulnerabilities
