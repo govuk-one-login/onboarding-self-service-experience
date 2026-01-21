@@ -41,7 +41,7 @@
     "@types/aws-lambda": "^8.10.152",
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.14",
-    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^5.57.1",
     "esbuild": "^0.25.8",
     "eslint": "^8.43.0",
