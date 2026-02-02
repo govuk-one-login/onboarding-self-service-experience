@@ -24,4 +24,4 @@ ENV LD_PRELOAD /opt/dynatrace/oneagent/agent/lib64/liboneagentproc.so
 USER node
 CMD STUB_API=${STUB_API:-false} npm start
 
-HEALTHCHECK CMD wget --spider http://localhost:$PORT
+HEALTHCHECK CMD wget --spider http://localhost:$PORT/healthcheck
