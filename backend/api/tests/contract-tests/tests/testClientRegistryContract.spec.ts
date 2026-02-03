@@ -37,7 +37,8 @@ describe("ClientRegistryProvider", () => {
             scopes: ["openid", "email", "phone"],
             subject_type: "pairwise",
             service_type: "MANDATORY",
-            sector_identifier_uri: "http://gov.uk"
+            sector_identifier_uri: "http://gov.uk",
+            accepted_levels_of_confidence: []
         };
 
         const expected_response: clientRegistryResponse = createExpectedResponse();

@@ -36,7 +36,8 @@ export const registerClientHandler = async (event: RegisterClientPayload, contex
         scopes: scopes,
         subject_type: subject_type,
         service_type: service_type,
-        sector_identifier_uri: sector_identifier_uri
+        sector_identifier_uri: sector_identifier_uri,
+        accepted_levels_of_confidence: [] // This value is purposely set to an empty array
     };
 
     const url = process.env.AUTH_REGISTRATION_BASE_URL + "/connect/register";

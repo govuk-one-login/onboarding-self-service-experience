@@ -7,4 +7,5 @@ export type clientConfigRequest = {
     subject_type: string;
     service_type: string;
     sector_identifier_uri: string;
+    accepted_levels_of_confidence: [];
 };
