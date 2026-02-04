@@ -261,7 +261,7 @@ Resources:
           PortMappings:
             - ContainerPort: !Ref ContainerPort
           HealthCheck:
-            Command: [ "CMD", "wget", "--spider", !Sub "http://localhost:${ContainerPort}" ]
+            Command: [ "CMD", "wget", "--spider", !Sub "http://localhost:${ContainerPort}/healthcheck" ]
           LogConfiguration:
             # https://docs.docker.com/config/containers/logging/awslogs/
             LogDriver: awslogs
@@ -533,6 +533,12 @@ Resources:
   ApplicationTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
+      HealthCheckEnabled: TRUE
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /healthcheck
+      HealthCheckTimeoutSeconds: 2
+      HealthCheckIntervalSeconds: 5
+      HealthyThresholdCount: 2
       Name: !Sub ${DeploymentName}-ecs
       VpcId: !ImportValue VPC-ID
       Port: !Ref ContainerPort

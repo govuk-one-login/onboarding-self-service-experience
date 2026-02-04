@@ -31,6 +31,10 @@ app.use((req, res, next) => {
 
 app.use(Helmet());
 
+app.get("/healthcheck", (req, res) => {
+    return res.status(200).send("OK");
+});
+
 app.use("/assets", serveStatic(distribution.assets));
 app.use("/assets/images", serveStatic(distribution.images));
 
@@ -63,4 +67,13 @@ app.locals.serviceUnavailableBannerStartDate = serviceUnavailableBannerStartDate
 
 app.set("trust proxy", true);
 
-app.listen(port, () => console.log(`Server running; listening on port ${port}, current time: ${new Date().toLocaleTimeString()}`));
+const server = app.listen(port, () =>
+    console.log(`Server running; listening on port ${port}, current time: ${new Date().toLocaleTimeString()}`)
+);
+
+process.on("SIGTERM", () => {
+    console.debug("Server shutdown signal received");
+    server.close(() => {
+        console.debug("Closed server");
+    });
+});
