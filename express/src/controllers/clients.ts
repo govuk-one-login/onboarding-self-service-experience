@@ -848,7 +848,13 @@ export const processEnterIdentityVerificationForm = async (req: Request, res: Re
         nonNull(context.serviceId),
         params.selfServiceClientId,
         params.clientId,
-        {identity_verification_supported},
+        {
+            identity_verification_supported: identity_verification_supported,
+            // We will only support medium clients in SSE.
+            // When we re-build this we should support the RP choosing these values
+            // If a client requires LOW or HIGH, these will need to be manually configured
+            accepted_levels_of_confidence: identity_verification_supported ? ["P0", "P2"] : ["P0"]
+        },
         nonNull(session.authenticationResult?.AccessToken)
     );
 

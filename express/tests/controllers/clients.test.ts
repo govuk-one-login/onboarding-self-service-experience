@@ -2844,7 +2844,8 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
             {
-                identity_verification_supported: TEST_BOOLEAN_SUPPORTED
+                identity_verification_supported: TEST_BOOLEAN_SUPPORTED,
+                accepted_levels_of_confidence: ["P0", "P2"]
             },
             TEST_ACCESS_TOKEN
         );
@@ -2881,7 +2882,8 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
             TEST_SELF_SERVICE_CLIENT_ID,
             TEST_CLIENT_ID,
             {
-                identity_verification_supported: TEST_BOOLEAN_SUPPORTED_ALT
+                identity_verification_supported: TEST_BOOLEAN_SUPPORTED_ALT,
+                accepted_levels_of_confidence: ["P0"]
             },
             TEST_ACCESS_TOKEN
         );
