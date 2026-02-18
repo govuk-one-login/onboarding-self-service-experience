@@ -15,9 +15,9 @@
     "@aws-sdk/client-sqs": "^3.810.0",
     "@aws-sdk/client-dynamodb": "^3.810.0",
     "@aws-sdk/util-dynamodb": "^3.810.0",
-    "@aws-lambda-powertools/logger": "2.24.1",
+    "@aws-lambda-powertools/logger": "2.31.0",
     "axios": "^1.13.5",
-    "esbuild": "^0.25.8",
+    "esbuild": "^0.27.3",
     "sinon": "^17.0.1"
   },
   "devDependencies": {
