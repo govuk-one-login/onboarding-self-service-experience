@@ -18,7 +18,7 @@
     "@aws-lambda-powertools/logger": "2.24.1",
     "axios": "^1.13.5",
     "esbuild": "^0.25.8",
-    "sinon": "^17.0.1"
+    "sinon": "^21.0.0"
   },
   "devDependencies": {
     "@types/sinon": "^17.0.3",
