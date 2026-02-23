@@ -1,10 +1,6 @@
 ("use strict");
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import pkg from "@pact-foundation/pact-node";
-const {publishPacts} = pkg;
-
+import {Publisher} from "@pact-foundation/pact-cli";
 import {resolve} from "path";
 
 const brokerUrl = process.env.PACT_URL || "";
@@ -25,7 +21,7 @@ const publishPact = async () => {
             branch: process.env.GIT_BRANCH
         };
 
-        const result = await publishPacts(publishOptions);
+        const result = await new Publisher(publishOptions).publish();
         console.log("Successfully published pacts: ", result);
     } catch (err) {
         console.error("Unable to publish pacts: ", err);
