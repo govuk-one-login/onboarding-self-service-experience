@@ -15,11 +15,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@pact-foundation/pact": "^16.0.2",
+    "@pact-foundation/pact-cli": "^16.1.5",
+    "@pact-foundation/pact-core": "^15.2.1",
     "@types/jest": "^30.0.0",
     "jest": "^29.7.0",
-    "@pact-foundation/pact": "^16.0.2",
-    "@pact-foundation/pact-core": "^15.2.1",
-    "@pact-foundation/pact-node": "^10.17.7",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
