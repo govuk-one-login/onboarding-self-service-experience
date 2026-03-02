@@ -28,7 +28,7 @@
     "googleapis": "^148.0.0",
     "googleapis-common": "^7.2.0",
     "govuk-frontend": "^5.11.1",
-    "helmet": "^7.0.0",
+    "helmet": "^8.1.0",
     "nunjucks": "^3.2.3"
   },
   "devDependencies": {
