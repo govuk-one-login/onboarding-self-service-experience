@@ -31,11 +31,12 @@ brew install jq
 
 **Install the right version of Node**
 
-Make sure you have an appropriate version of Node. At the time of writing our Lambdas use 18, which is the latest
-version
-provided by AWS, but you can use the most recent version.
+Make sure you have an appropriate version of Node. At the time of writing our Lambdas use 24, which is the latest
+version provided by AWS, but you can use the most recent version.
 
 You may use a Node version manager, such as `nodenv` or `nvm`, to install Node.
+
+There is a `.nvmrc` file at the root of the repository, which allows you to run `nvm install` to install and use the correct node version.
 
 ## Deploy developer stacks
 
