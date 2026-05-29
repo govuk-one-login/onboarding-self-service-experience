@@ -68,7 +68,7 @@ export async function enterTextIntoTextInput(page: Page, text: string, inputId: 
         throw new Error(`Could not find element with id ${inputId}`);
     }
 
-    await inputElement.click({clickCount: 3});
+    await inputElement.click();
     await inputElement.press("Backspace");
     await page.type(`#${inputId}`, text);
 }
