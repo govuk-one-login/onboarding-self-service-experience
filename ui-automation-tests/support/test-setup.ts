@@ -171,6 +171,7 @@ After(async function (this: TestContext, scenario) {
         });
         return this.attach(stream, "image/jpeg");
     }
+    await this.page.close();
 });
 
 AfterAll(async function () {
