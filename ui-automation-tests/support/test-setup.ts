@@ -119,7 +119,12 @@ BeforeAll({timeout: 60 * 1000}, async function () {
     console.log(`Running tests against ${host}`);
     browser = await puppeteer.launch({
         headless: true,
-        args: ["--no-sandbox"]
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox", // Companion flag for --no-sandbox
+            "--disable-dev-shm-usage", // Use /tmp instead of /dev/shm due to limited /dev/shm in docker environment
+            "--disable-gpu" // Disables hardware acceleration since Docker has no GPU
+        ]
     });
     console.log("Puppeteer launched...");
 
@@ -171,6 +176,7 @@ After(async function (this: TestContext, scenario) {
         });
         return this.attach(stream, "image/jpeg");
     }
+    await this.page.close();
 });
 
 AfterAll(async function () {
