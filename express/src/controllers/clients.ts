@@ -168,8 +168,8 @@ export const processChangeServiceNameForm: RequestHandler = async (req, res) => 
 
     await s4.updateService(
         serviceId,
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         {service_name: newServiceName},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
@@ -213,8 +213,8 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         req.body.update,
         nonNull(req.session.authenticationResult?.AccessToken)
     );
@@ -243,8 +243,8 @@ export const processEnterClientSecretHashForm: RequestHandler = async (req, res)
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         {client_secret: req.body.secretHash},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
@@ -314,8 +314,8 @@ export const processAddRedirectUriForm: RequestHandler = async (req, res) => {
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         {redirect_uris: newRedirectUris},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
@@ -373,8 +373,8 @@ export const processRemoveRedirectUriFrom: RequestHandler = async (req, res) => 
         const newPostLogoutRedirectUris = currentRedirectUris.filter(uri => uri !== redirectUriToRemove);
         await s4.updateClient(
             nonNull(req.context.serviceId),
-            req.params.selfServiceClientId,
-            req.params.clientId,
+            req.params.selfServiceClientId as string,
+            req.params.clientId as string,
             {redirect_uris: newPostLogoutRedirectUris},
             nonNull(req.session.authenticationResult?.AccessToken)
         );
@@ -422,8 +422,8 @@ export const processChangeScopesForm: RequestHandler = async (req: Request, res:
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         {scopes: attributes},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
@@ -490,8 +490,8 @@ export const processAddPostLogoutUriForm: RequestHandler = async (req, res) => {
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         {post_logout_redirect_uris: newPostLogoutRedirectUris},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
@@ -540,8 +540,8 @@ export const processRemovePostLogoutUriFrom: RequestHandler = async (req, res) =
         const newPostLogoutRedirectUris = currentPostLogoutRedirectUris.filter(uri => uri !== postLogoutRedirectUriToRemove);
         await s4.updateClient(
             nonNull(req.context.serviceId),
-            req.params.selfServiceClientId,
-            req.params.clientId,
+            req.params.selfServiceClientId as string,
+            req.params.clientId as string,
             {post_logout_redirect_uris: newPostLogoutRedirectUris},
             nonNull(req.session.authenticationResult?.AccessToken)
         );
@@ -590,8 +590,8 @@ export const processChangeBackChannelLogOutUriForm: RequestHandler = async (req,
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         {back_channel_logout_uri: backChannelLogoutUri},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
@@ -620,8 +620,8 @@ export const processChangeSectorIdentifierUriForm: RequestHandler = async (req, 
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         {sector_identifier_uri: sectorIdentifierUri},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
@@ -673,8 +673,8 @@ export const processConfirmContactRemovalForm: RequestHandler = async (req, res)
         } else {
             await s4.updateClient(
                 nonNull(req.context.serviceId),
-                req.params.selfServiceClientId,
-                req.params.clientId,
+                req.params.selfServiceClientId as string,
+                req.params.clientId as string,
                 {contacts: updateContactsResult},
                 nonNull(req.session.authenticationResult?.AccessToken)
             );
@@ -737,8 +737,8 @@ export const processEnterContactEmailForm: RequestHandler = async (req, res) => 
         } else {
             await s4.updateClient(
                 nonNull(req.context.serviceId),
-                req.params.selfServiceClientId,
-                req.params.clientId,
+                req.params.selfServiceClientId as string,
+                req.params.clientId as string,
                 {contacts: updateContactsResult},
                 nonNull(req.session.authenticationResult?.AccessToken)
             );
@@ -786,8 +786,8 @@ export const processChangeClaimsForm: RequestHandler = async (req: Request, res:
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         {claims: attributes},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
@@ -846,8 +846,8 @@ export const processEnterIdentityVerificationForm = async (req: Request, res: Re
     // sending flag to Client Register API
     await s4.updateClient(
         nonNull(context.serviceId),
-        params.selfServiceClientId,
-        params.clientId,
+        params.selfServiceClientId as string,
+        params.clientId as string,
         {
             identity_verification_supported: identity_verification_supported,
             // We will only support medium clients in SSE.
@@ -893,8 +893,8 @@ export const processChangeClientName = async (req: Request, res: Response): Prom
     try {
         await s4.updateClient(
             nonNull(req.context.serviceId),
-            req.params.selfServiceClientId,
-            req.params.clientId,
+            req.params.selfServiceClientId as string,
+            req.params.clientId as string,
             {client_name: newClientName},
             req.session.authenticationResult?.AccessToken as string
         );
@@ -924,8 +924,8 @@ export const processChangeIdTokenAlgorithmForm: RequestHandler = async (req, res
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         {id_token_signing_algorithm: newIdTokenSigningAlgorithm},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
@@ -965,8 +965,8 @@ export const processMaxAgeEnabledForm = async (req: Request, res: Response): Pro
     // sending flag to Client Register API
     await s4.updateClient(
         nonNull(context.serviceId),
-        params.selfServiceClientId,
-        params.clientId,
+        params.selfServiceClientId as string,
+        params.clientId as string,
         {max_age_enabled},
         nonNull(session.authenticationResult?.AccessToken)
     );
@@ -1006,8 +1006,8 @@ export const processChangePKCEEnforcedForm = async (req: Request, res: Response)
     // sending flag to Client Register API
     await s4.updateClient(
         nonNull(context.serviceId),
-        params.selfServiceClientId,
-        params.clientId,
+        params.selfServiceClientId as string,
+        params.clientId as string,
         {pkce_enforced},
         nonNull(session.authenticationResult?.AccessToken)
     );
@@ -1033,8 +1033,8 @@ export const processChangeLandingPageUrlForm: RequestHandler = async (req: Reque
 
     await s4.updateClient(
         nonNull(req.context.serviceId),
-        req.params.selfServiceClientId,
-        req.params.clientId,
+        req.params.selfServiceClientId as string,
+        req.params.clientId as string,
         {landing_page_url: landingPageUrl},
         nonNull(req.session.authenticationResult?.AccessToken)
     );
