@@ -15,7 +15,6 @@ export const sendSQSMessageToTxMAHandler = async (event: APIGatewayProxyEvent): 
     if (event.body != null) {
         payload = JSON.parse(event.body);
         const queueUrl = process.env.QUEUEURL;
-        console.log(queueUrl);
         const messageParams = {
             MessageBody: JSON.stringify(payload),
             QueueUrl: queueUrl
