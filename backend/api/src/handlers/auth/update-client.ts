@@ -25,6 +25,7 @@ export const updateClientInRegistryHandler = async (event: UpdateClientPayload, 
         event.updates.client_name = event.updates.service_name;
     }
 
+    logger.info(`Updating Client ID ${event.clientId} in the Client Registry`);
     const response = await axios
         .put(url, event.updates, {
             headers: {

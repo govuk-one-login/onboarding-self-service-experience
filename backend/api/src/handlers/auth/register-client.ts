@@ -40,6 +40,8 @@ export const registerClientHandler = async (event: RegisterClientPayload, contex
     };
 
     const url = process.env.AUTH_REGISTRATION_BASE_URL + "/connect/register";
+
+    logger.info(`Creating Client ${event.service.serviceName} in the Client Registry`);
     const result = await axios
         .post(url, JSON.stringify(clientConfig), {
             headers: {
