@@ -257,6 +257,8 @@ Resources:
               Value: !Ref ShowServiceUnavailablePage
             - Name: SERVICE_UNAVAILABLE_PAGE_END_DATE
               Value: !Ref ServiceUnavailablePageEndDate
+            - Name: ENVIRONMENT
+              Value: !Ref Environment
 
           PortMappings:
             - ContainerPort: !Ref ContainerPort

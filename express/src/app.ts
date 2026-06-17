@@ -19,6 +19,7 @@ import register from "./routes/register";
 import services from "./routes/services";
 import signIn from "./routes/sign-in";
 import serviceUnavailable from "./routes/service-unavailable";
+import { requestLoggingMiddleware } from "./lib/requestLogging";
 
 const app = Express();
 
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
 });
 
 app.use(Helmet());
+app.use(requestLoggingMiddleware)
 
 app.get("/healthcheck", (req, res) => {
     return res.status(200).send("OK");
