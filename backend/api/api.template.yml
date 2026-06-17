@@ -815,6 +815,7 @@ Resources:
         Variables:
           AUTH_REGISTRATION_BASE_URL: "{{resolve:ssm:/self-service/api/auth-base-url}}"
           AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/client-registry-api-key}}"
+          API_KEY_VERSION: "2"
       KmsKeyArn: !GetAtt EnvironmentVariablesEncryptionKey.Arn
 
   UpdateAuthClientFunction:
@@ -845,6 +846,7 @@ Resources:
         Variables:
           AUTH_REGISTRATION_BASE_URL: "{{resolve:ssm:/self-service/api/auth-base-url}}"
           AUTH_API_KEY: "{{resolve:secretsmanager:/self-service/api/client-registry-api-key}}"
+          API_KEY_VERSION: "2"
       KmsKeyArn: !GetAtt EnvironmentVariablesEncryptionKey.Arn
 
   #--- Step Functions ---#
