@@ -31,11 +31,10 @@ app.use((req, res, next) => {
 });
 
 app.use(Helmet());
-app.use(requestLoggingMiddleware)
-
 app.get("/healthcheck", (req, res) => {
     return res.status(200).send("OK");
 });
+app.use(requestLoggingMiddleware)
 
 app.use("/assets", serveStatic(distribution.assets));
 app.use("/assets/images", serveStatic(distribution.images));
