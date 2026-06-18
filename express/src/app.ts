@@ -38,11 +38,10 @@ app.get("/healthcheck", (req, res) => {
 
 app.use("/assets", serveStatic(distribution.assets));
 app.use("/assets/images", serveStatic(distribution.images));
-app.use(requestLoggingMiddleware);
-
 app.use(urlencoded({extended: true}));
 app.use(sessionStorage);
 app.use(signInStatus);
+app.use(requestLoggingMiddleware);
 
 if (!showServiceUnavailablePage) {
     app.use(baseRoutes);

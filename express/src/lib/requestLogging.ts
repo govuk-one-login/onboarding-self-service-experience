@@ -5,6 +5,7 @@ interface ResponseWithRaw {
     statusCode: number;
     raw?: {
         getHeader: (name: string) => string | number | string[] | undefined;
+        session?: Record<string, unknown>;
     };
 }
 
@@ -14,6 +15,7 @@ interface RequestWithRaw {
     url: string;
     raw?: {
         headers?: Record<string, string | string[] | undefined>;
+        session?: Record<string, unknown>;
     };
 }
 
@@ -21,6 +23,7 @@ export const requestSerializer = (req: RequestWithRaw) => ({
     id: req.id,
     method: req.method,
     url: req.url,
+    sessionId: req.raw?.session?.id || "unknown",
     headers: {
         "user-agent": req.raw?.headers?.["user-agent"],
         referer: req.raw?.headers?.["referer"]
