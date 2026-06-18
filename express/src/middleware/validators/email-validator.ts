@@ -1,6 +1,6 @@
 import {RequestHandler} from "express";
 import validate from "../../lib/validators/email-validator";
-import logger from "express/src/lib/logger";
+import logger from "../../lib/logger";
 
 export default function validateEmail(template: string): RequestHandler {
     logger.debug("In validateEmail()");

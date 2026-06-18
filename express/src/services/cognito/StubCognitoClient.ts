@@ -15,7 +15,7 @@ import {promises as fs} from "fs";
 import path from "path";
 import {convertToCountryPrefixFormat} from "../../lib/mobile-number";
 import CognitoInterface from "./CognitoInterface";
-import logger from "express/src/lib/logger";
+import logger from "../../lib/logger";
 
 const kid = {kid: "bIXchwnF2Iyc/lFMKTHBvG+R6x1ea9ZN3sEegxjnL/k=", alg: "RS256"};
 

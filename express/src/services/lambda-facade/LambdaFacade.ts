@@ -9,7 +9,7 @@ import axios, {Axios, AxiosResponse} from "axios";
 import {TxMAEvent} from "../../types/txma-event";
 import {createHash} from "crypto";
 import {CodeBlockResponse} from "express/src/types/code-block-response";
-import logger from "express/src/lib/logger";
+import logger from "../../lib/logger";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export default class LambdaFacade implements LambdaFacadeInterface {

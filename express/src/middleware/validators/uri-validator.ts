@@ -1,6 +1,6 @@
 import {RequestHandler} from "express";
 import validate from "../../lib/validators/uri-validator";
-import logger from "express/src/lib/logger";
+import logger from "../../lib/logger";
 
 export default function validateUri(template: string, uriBodyField: string, isGovUrl = false, allowEmptyValue = false): RequestHandler {
     logger.debug("In validateUri()");

@@ -1,6 +1,6 @@
 import {RequestHandler} from "express";
 import validate from "../../lib/validators/password-validator";
-import logger from "express/src/lib/logger";
+import logger from "../../lib/logger";
 
 export default function validatePassword(render: string, passwordField = "password"): RequestHandler {
     logger.debug("In validatePassword()");

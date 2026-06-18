@@ -38,7 +38,7 @@ import {
 } from "../../lib/fixedOTP";
 import * as process from "process";
 import {secureRandom6DigitCode} from "../../lib/utils/secure-random-code";
-import logger from "express/src/lib/logger";
+import logger from "../../lib/logger";
 
 type CognitoCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes> = Command<
     ServiceInputTypes,
