@@ -104,7 +104,7 @@ describe("showClient Controller tests", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        jest.spyOn(logger, "error")
+        jest.spyOn(logger, "error");
     });
 
     it("calls render with the expected template and options from the first client returned from s4 listClients", async () => {

@@ -44,7 +44,7 @@ jest.spyOn(crypto, "randomInt").mockImplementation(() => TEST_RANDOM_NUMBER);
 describe("showCheckPhonePage controller tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        jest.spyOn(logger, "info")
+        jest.spyOn(logger, "info");
     });
     it.each(["emailAddress", "mfaResponse"])("redirects to the /sign-in page if the %s session value in session is null", field => {
         const mockReq = request({
