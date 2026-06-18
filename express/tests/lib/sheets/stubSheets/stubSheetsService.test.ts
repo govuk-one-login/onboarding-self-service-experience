@@ -1,11 +1,11 @@
-import logger from "lib/logger";
+import logger from "../../../../src/lib/logger"
 import StubSheetsService from "../../../../src/lib/sheets/stubSheets/stubSheetsService";
 import {TEST_SPREAD_SHEET_ID} from "../../../constants";
 
 describe("stub Sheets Service tests", () => {
     beforeEach(async () => {
         jest.clearAllMocks();
-        jest.spyOn(console, "log");
+        jest.spyOn(logger, "debug");
     });
 
     it("logs stub service when the constructor is called", () => {

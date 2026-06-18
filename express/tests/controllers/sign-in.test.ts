@@ -37,13 +37,14 @@ import {AxiosResponse} from "axios";
 import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status";
 import {LimitExceededException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import crypto from "node:crypto";
-import logger from "lib/logger";
+import logger from "../../src/lib/logger";
 
 jest.spyOn(crypto, "randomInt").mockImplementation(() => TEST_RANDOM_NUMBER);
 
 describe("showCheckPhonePage controller tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(logger, "info")
     });
     it.each(["emailAddress", "mfaResponse"])("redirects to the /sign-in page if the %s session value in session is null", field => {
         const mockReq = request({

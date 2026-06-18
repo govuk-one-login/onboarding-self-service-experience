@@ -1,4 +1,4 @@
-import logger from "lib/logger";
+import logger from "../../../src/lib/logger";
 import SheetsService from "../../../src/lib/sheets/SheetsService";
 
 const TEST_SPREADSHEET_ID = "someSpreadSheet";
@@ -7,7 +7,7 @@ describe("Sheets Service tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
         delete process.env.USE_STUB_SHEETS;
-        jest.spyOn(console, "log");
+        jest.spyOn(logger, "debug");
     });
 
     afterEach(() => {

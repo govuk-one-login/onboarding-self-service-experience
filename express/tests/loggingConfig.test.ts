@@ -1,4 +1,4 @@
-import {responseSerializer} from "lib/requestLogging";
+import {responseSerializer} from "../src/lib/requestLogging";
 
 describe("Request Logging Middleware Configuration", () => {
     it("should serialize response with only allowed headers", () => {

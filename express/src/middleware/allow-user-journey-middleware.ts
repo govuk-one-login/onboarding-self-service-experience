@@ -1,4 +1,5 @@
 import type {NextFunction, Request, Response} from "express";
+import logger from "../lib/logger";
 
 export function transitionForbidden(req: Request): boolean {
     const nextPaths = req.session.nextPaths as string[];

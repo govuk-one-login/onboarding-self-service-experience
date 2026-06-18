@@ -41,7 +41,7 @@ import AuthenticationResultParser from "../../src/lib/authentication-result-pars
 import {domainUserToDynamoUser} from "../../src/lib/models/user-utils";
 import crypto from "crypto";
 import {AxiosResponse} from "axios";
-import logger from "lib/logger";
+import logger from "../../src/lib/logger";
 
 const s4CreateUserSpy = jest.spyOn(SelfServiceServicesService.prototype, "createUser");
 const s4SignUpStatusSpy = jest.spyOn(SelfServiceServicesService.prototype, "getSignUpStatus");
