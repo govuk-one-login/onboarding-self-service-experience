@@ -20,6 +20,7 @@ import services from "./routes/services";
 import signIn from "./routes/sign-in";
 import serviceUnavailable from "./routes/service-unavailable";
 import {requestLoggingMiddleware} from "./lib/requestLogging";
+import logger from "./lib/logger";
 
 const app = Express();
 
@@ -69,7 +70,7 @@ app.locals.serviceUnavailableBannerStartDate = serviceUnavailableBannerStartDate
 app.set("trust proxy", true);
 
 const server = app.listen(port, () =>
-    console.log(`Server running; listening on port ${port}, current time: ${new Date().toLocaleTimeString()}`)
+    logger.debug(`Server running; listening on port ${port}, current time: ${new Date().toLocaleTimeString()}`)
 );
 
 process.on("SIGTERM", () => {

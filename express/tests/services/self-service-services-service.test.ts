@@ -33,7 +33,6 @@ import {
 } from "../constants";
 import {mockCognitoInterface, mockLambdaFacade} from "../mocks";
 import SelfServiceServicesService from "../../src/services/self-service-services-service";
-import console from "console";
 import SelfServiceError from "../../src/lib/errors";
 import {AdminGetUserCommandOutput, AdminInitiateAuthCommandOutput} from "@aws-sdk/client-cognito-identity-provider";
 import {SignupStatus} from "../../src/lib/utils/signup-status";
@@ -46,7 +45,7 @@ describe("SelfServiceServicesService tests", () => {
         jest.spyOn(AuthenticationResultParser, "getCognitoId").mockReturnValue(TEST_COGNITO_ID);
         jest.spyOn(AuthenticationResultParser, "getEmail").mockReturnValue(TEST_EMAIL);
         jest.spyOn(AuthenticationResultParser, "getPhoneNumber").mockReturnValue(TEST_PHONE_NUMBER);
-        jest.spyOn(console, "info");
+        jest.spyOn(logger, "info");
         jest.spyOn(SignupStatus.prototype, "setStage");
         jest.spyOn(SignupStatus.prototype, "getState");
         jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);

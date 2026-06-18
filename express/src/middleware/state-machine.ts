@@ -1,13 +1,14 @@
 import {Request, Response} from "express";
+import logger from "../lib/logger";
 
 export const getNextPathsAndRedirect = (req: Request, res: Response, redirectPath: string) => {
     const currentPath = req.baseUrl + req.path;
-    console.log("Getting next path for: " + currentPath);
+    logger.debug("Getting next path for: " + currentPath);
     let nextPaths: string[] = [];
     let optionalPaths;
 
     if (!stateMachine[currentPath]) {
-        console.log(currentPath + " is not in state machine");
+        logger.debug(currentPath + " is not in state machine");
     } else {
         nextPaths = stateMachine[currentPath].expectedUserJourney;
         optionalPaths = stateMachine[currentPath].optionalUserJourney;

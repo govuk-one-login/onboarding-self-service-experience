@@ -5,7 +5,6 @@ import {Service} from "../../../@types/Service";
 import {api} from "../../config/environment";
 import AuthenticationResultParser from "../../lib/authentication-result-parser";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./LambdaFacadeInterface";
-import console from "console";
 import axios, {Axios, AxiosResponse} from "axios";
 import {TxMAEvent} from "../../types/txma-event";
 import {createHash} from "crypto";
@@ -18,7 +17,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
     public readonly EMAIL_BLOCK_PREFIX = "email:block:";
 
     constructor() {
-        console.log("Creating Lambda facade...");
+        logger.debug("Creating Lambda facade...");
 
         this.client = axios.create({
             baseURL: api.baseUrl,
@@ -144,7 +143,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async getEmailCodeBlock(email: string): Promise<boolean> {
-        console.log("Getting email code block");
+        logger.debug("Getting email code block");
         try {
             const hash = this.getBase64UrlHash(email);
             const codeBlockResponse = await this.post("/code-block/get", {id: this.EMAIL_BLOCK_PREFIX + hash});
@@ -156,7 +155,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async putEmailCodeBlock(email: string): Promise<void> {
-        console.log("Putting email code block");
+        logger.debug("Putting email code block");
         try {
             const hash = this.getBase64UrlHash(email);
             await this.client.post(`/code-block/put`, {id: this.EMAIL_BLOCK_PREFIX + hash});
@@ -167,7 +166,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async removeEmailCodeBlock(email: string): Promise<void> {
-        console.log("Removing email code block");
+        logger.debug("Removing email code block");
         try {
             const hash = this.getBase64UrlHash(email);
             await this.client.post(`/code-block/delete`, {id: this.EMAIL_BLOCK_PREFIX + hash});

@@ -28,7 +28,6 @@ import {
 import {Command} from "@aws-sdk/types";
 import {cognito, region} from "../../config/environment";
 import CognitoInterface from "./CognitoInterface";
-import console from "console";
 import {
     fixedOTPInitialise,
     getFixedOTPCredentialEmailAddress,

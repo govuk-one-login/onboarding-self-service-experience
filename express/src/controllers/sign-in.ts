@@ -24,11 +24,11 @@ export const showCheckPhonePage: RequestHandler = (req, res) => {
 
     // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
-        console.log("Redirecting to Sign-In");
+        logger.debug("Redirecting to Sign-In");
         return res.redirect(SignInRoutes.enterEmailAddress);
     }
 
-    console.log("Redirecting to Enter Text Code");
+    logger.debug("Redirecting to Enter Text Code");
     res.render("common/enter-text-code.njk", {
         headerActiveItem: "sign-in",
         values: {
@@ -49,9 +49,9 @@ export const finishSignIn: RequestHandler = async (req, res) => {
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const authenticationResult = nonNull(req.session.authenticationResult);
-    console.log("Calling getSelfServiceUser");
+    logger.debug("Calling getSelfServiceUser");
     const user = await s4.getSelfServiceUser(authenticationResult);
-    console.log("Back from getSelfServiceUser");
+    logger.debug("Back from getSelfServiceUser");
 
     // TODO this should probably be an error
     if (!user) {
@@ -92,14 +92,14 @@ export const finishSignIn: RequestHandler = async (req, res) => {
             }
         );
 
-        console.log("Redirecting to Services");
+        logger.debug("Redirecting to Services");
         res.redirect(ServicesRoutes.listServices);
     }
 };
 
 async function signedInToAnotherDevice(email: string, s4: SelfServiceServicesService) {
     const sessions = await s4.sessionCount(email);
-    console.log(`Found ${sessions} session(s)`);
+    logger.debug(`Found ${sessions} session(s)`);
     return sessions > 1;
 }
 
@@ -111,7 +111,7 @@ export const globalSignOut: RequestHandler = async (req, res) => {
     if (accessToken) {
         const user = await s4.getSelfServiceUser(authenticationResult);
         const output = await s4.globalSignOut(user.email, accessToken);
-        console.log(`globalSignOut() Session invalidated, Response HTTP Status Code: ${output.status}`);
+        logger.debug(`globalSignOut() Session invalidated, Response HTTP Status Code: ${output.status}`);
     }
 
     req.session.destroy(() => res.redirect(SignInRoutes.enterEmailAddressGlobalSignOut));
@@ -224,7 +224,7 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
 
 export const organiseDynamoDBForRecoveredUser: RequestHandler = async (req, res, next) => {
     logger.debug("In controllers/sign-in:organiseDynamoDBForRecoveredUser");
-    console.log("*** Authentication Result => " + req.session.authenticationResult);
+    logger.debug("*** Authentication Result => " + req.session.authenticationResult);
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
@@ -252,7 +252,7 @@ const forgotPassword: RequestHandler = async (req, res) => {
         await s4.forgotPassword(email, req.protocol, host, false);
     } catch (error) {
         if (error instanceof UserNotFoundException) {
-            console.log("UserNotFoundException");
+            logger.debug("UserNotFoundException");
 
             const dynamoDBEntryResponse = await s4.getDynamoDBEntries(email);
             const dynamoDBEntry = JSON.stringify(dynamoDBEntryResponse.data);

@@ -35,7 +35,6 @@ import {User} from "../../@types/user";
 import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
 import {AxiosResponse} from "axios";
 import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status";
-import console from "console";
 import {LimitExceededException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import crypto from "node:crypto";
 import logger from "lib/logger";

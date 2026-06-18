@@ -1,5 +1,6 @@
 import {readFile} from "fs/promises";
 import {resources} from "../../config/resources";
+import logger from "../logger";
 
 const allowedEmailDomains = loadAllowedEmailDomains();
 
@@ -14,7 +15,7 @@ function getEmailDomain(email: string) {
 }
 
 async function loadAllowedEmailDomains(): Promise<string[]> {
-    console.log("Loading allowed email domains....");
+    logger.debug("Loading allowed email domains....");
     return (await readFile(resources.validDomains, {encoding: "utf8"}))
         .trim()
         .split("\n")

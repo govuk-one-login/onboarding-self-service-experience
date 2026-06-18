@@ -36,7 +36,6 @@ import {
     TEST_UUID
 } from "../constants";
 import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
-import console from "console";
 import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status";
 import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
 import {domainUserToDynamoUser} from "../../src/lib/models/user-utils";
@@ -73,7 +72,7 @@ const removeEmailCodeBlockSpy = jest.spyOn(SelfServiceServicesService.prototype,
 describe("processGetEmailForm controller tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        jest.spyOn(console, "info");
+        jest.spyOn(logger, "info");
     });
 
     it("calls s4 createUser and redirects to /register/enter-email-code on success", async () => {

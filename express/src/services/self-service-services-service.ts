@@ -262,12 +262,12 @@ export default class SelfServiceServicesService {
         try {
             const userData = await this.cognito.getUser(accessToken);
             if (userData.$metadata.httpStatusCode != 200) {
-                console.log(`validateToken() ${message} - Invalid token, HTTP response code: ` + userData.$metadata.httpStatusCode);
+                logger.debug(`validateToken() ${message} - Invalid token, HTTP response code: ` + userData.$metadata.httpStatusCode);
                 throw new Error(`validateToken() ${message} - Invalid token, HTTP response code: ` + userData.$metadata.httpStatusCode);
             }
-            console.log(`validateToken() ${message}  - token is valid`);
+            logger.debug(`validateToken() ${message}  - token is valid`);
         } catch (e) {
-            console.log(`validateToken() ${message} - invalid token, exception ` + JSON.stringify(e, null, 4));
+            logger.debug(`validateToken() ${message} - invalid token, exception ` + JSON.stringify(e, null, 4));
             throw e;
         }
     }
@@ -322,7 +322,7 @@ export default class SelfServiceServicesService {
         await sheetsService.init().catch(error => logger.error("updateUserSpreadsheet: " + error));
         await sheetsService
             .appendValues(values, process.env.USER_SIGNUP_SHEET_DATA_RANGE as string, process.env.USER_SIGNUP_SHEET_HEADER_RANGE as string)
-            .then(() => console.log("Saved to sheets"))
+            .then(() => logger.debug("Saved to sheets"))
             .catch(reason => {
                 logger.error("updateUserSpreadsheet: " + reason);
             });
@@ -404,7 +404,7 @@ export default class SelfServiceServicesService {
 
     async deleteServiceEntries(serviceID: string, accessToken: string) {
         logger.debug("In self-service-services-service:deleteServiceEntries()");
-        console.log("Service ID => " + serviceID);
+        logger.debug("Service ID => " + serviceID);
         await this.validateToken(accessToken, "deleteServiceEntries");
         await this.lambda.deleteServiceEntries(serviceID, accessToken);
     }

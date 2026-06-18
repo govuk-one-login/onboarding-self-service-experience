@@ -15,11 +15,11 @@ export default function validateMobileNumber(template: string): RequestHandler {
         const result = validate(mobileNumber);
 
         if (result.isValid) {
-            console.log("*** Validated ***");
+            logger.debug("*** Validated ***");
             return next();
         }
 
-        console.log("*** NOT Validated ***");
+        logger.debug("*** NOT Validated ***");
 
         res.render(template, {
             values: {

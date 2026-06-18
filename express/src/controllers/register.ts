@@ -74,7 +74,7 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
         (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
         (await s4.getEmailCodeBlock(req.session.emailAddress.toLowerCase().trim()))
     ) {
-        console.log("Email is code blocked");
+        logger.debug("Email is code blocked");
         return getNextPathsAndRedirect(req, res, RegisterRoutes.tooManyCodes);
     }
 

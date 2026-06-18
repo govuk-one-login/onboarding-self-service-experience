@@ -1,7 +1,6 @@
 import {NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import {RequestHandler} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
-import console from "console";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import * as process from "process";
 import {
@@ -43,10 +42,10 @@ export default function processSignInForm(template: string): RequestHandler {
         try {
             req.session.mfaResponse = await s4.login(email, password);
         } catch (error) {
-            console.log(JSON.stringify(error));
+            logger.debug(JSON.stringify(error));
 
             if (error instanceof NotAuthorizedException) {
-                console.log("NotAuthorizedException");
+                logger.debug("NotAuthorizedException");
 
                 s4.sendTxMALog(
                     "SSE_INVALID_CREDENTIAL",
@@ -72,7 +71,7 @@ export default function processSignInForm(template: string): RequestHandler {
             }
 
             if (error instanceof UserNotFoundException) {
-                console.log("UserNotFoundException");
+                logger.debug("UserNotFoundException");
 
                 if (process.env.USE_COGNITO_DR == "true") {
                     const dynamoDBEntryResponse = await s4.getDynamoDBEntries(email);
@@ -94,7 +93,7 @@ export default function processSignInForm(template: string): RequestHandler {
                 return res.redirect("/sign-in/account-not-found");
             }
 
-            console.log("Unknown Error");
+            logger.debug("Unknown Error");
             throw error;
         }
 

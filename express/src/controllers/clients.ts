@@ -2,7 +2,6 @@ import {RequestHandler} from "express";
 import getAuthApiCompliantPublicKey from "../lib/public-key";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
-import console from "console";
 import {removeContact, addContact} from "../lib/updateContacts";
 import validate from "../lib/validators/email-validator";
 import {Request, Response} from "express-serve-static-core";
