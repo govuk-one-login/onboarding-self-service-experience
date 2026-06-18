@@ -19,6 +19,7 @@ import {Request} from "express";
 import {TxMAEvent, TxMAExtension, TxMAUser} from "../types/txma-event";
 import SheetsService from "../lib/sheets/SheetsService";
 import {v4 as uuid_4} from "uuid";
+import logger from "../lib/logger";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -349,7 +350,7 @@ export default class SelfServiceServicesService {
     }
 
     getDynamoDBEntries(email: string) {
-        console.log("In self-service-services-service-getDynamoDBEntries");
+        logger.debug("In self-service-services-service-getDynamoDBEntries");
         return this.lambda.getDynamoDBEntries(email);
     }
 

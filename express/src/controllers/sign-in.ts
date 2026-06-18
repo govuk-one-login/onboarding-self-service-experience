@@ -13,13 +13,14 @@ import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import console from "console";
 import {secureRandom6DigitCode} from "../lib/utils/secure-random-code";
 import {getNextPathsAndRedirect, RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine";
+import logger from "../lib/logger";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
 export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
 export const showCheckPhonePage: RequestHandler = (req, res) => {
-    console.log("In controllers/sign-in-showCheckPhonePage");
+    logger.debug("In controllers/sign-in-showCheckPhonePage");
 
     // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
@@ -38,13 +39,13 @@ export const showCheckPhonePage: RequestHandler = (req, res) => {
 };
 
 export const confirmPasswordContinueRecovery: RequestHandler = async (req, res) => {
-    console.log("In controllers/sign-in:confirmPasswordContinueRecovery()");
+    logger.debug("In controllers/sign-in:confirmPasswordContinueRecovery()");
 
     return res.redirect(SignInRoutes.forgotPasswordContinueRecovery);
 };
 
 export const finishSignIn: RequestHandler = async (req, res) => {
-    console.log("In controllers/sign-in:finishSignIn()");
+    logger.debug("In controllers/sign-in:finishSignIn()");
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const authenticationResult = nonNull(req.session.authenticationResult);
@@ -222,7 +223,7 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
 };
 
 export const organiseDynamoDBForRecoveredUser: RequestHandler = async (req, res, next) => {
-    console.log("In controllers/sign-in:organiseDynamoDBForRecoveredUser");
+    logger.debug("In controllers/sign-in:organiseDynamoDBForRecoveredUser");
     console.log("*** Authentication Result => " + req.session.authenticationResult);
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");

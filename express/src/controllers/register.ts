@@ -11,6 +11,7 @@ import * as console from "console";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP";
 import {getNextPathsAndRedirect, RegisterRoutes, SignInRoutes} from "../middleware/state-machine";
+import logger from "../lib/logger";
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 
@@ -61,7 +62,7 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
 };
 
 export const showCheckEmailForm: RequestHandler = async (req, res) => {
-    console.log("In register-showCheckEmailForm");
+    logger.debug("In register-showCheckEmailForm");
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
@@ -89,7 +90,7 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 export const showTooManyCodes = render("register/too-many-codes.njk");
 
 export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
-    console.log("In register-submitEmailSecurityCode");
+    logger.debug("In register-submitEmailSecurityCode");
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     if (!req.session.emailAddress) {
@@ -164,7 +165,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
 };
 
 export const showNewPasswordForm: RequestHandler = async (req, res) => {
-    console.log("In register:showNewPasswordForm");
+    logger.debug("In register:showNewPasswordForm");
 
     // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
@@ -247,7 +248,7 @@ export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
 };
 
 export const submitMobileVerificationCode: RequestHandler = async (req, res) => {
-    console.log("In register:submitMobileVerificationCode");
+    logger.debug("In register:submitMobileVerificationCode");
     const securityCode = req.body.securityCode;
 
     if (!securityCode) {

@@ -10,6 +10,7 @@ import axios, {Axios, AxiosResponse} from "axios";
 import {TxMAEvent} from "../../types/txma-event";
 import {createHash} from "crypto";
 import {CodeBlockResponse} from "express/src/types/code-block-response";
+import logger from "express/src/lib/logger";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export default class LambdaFacade implements LambdaFacadeInterface {
@@ -177,7 +178,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async getDynamoDBEntries(userEmail: string): Promise<AxiosResponse> {
-        console.log("In LambdaFacade-getDynamoDBEntries");
+        logger.debug("In LambdaFacade-getDynamoDBEntries");
 
         const endPoint: string = "/get-dynamodb-entries/" + userEmail;
 
@@ -190,7 +191,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async deleteClientEntries(userID: string, serviceID: string, accessToken: string): Promise<void> {
-        console.log("In LambdaFacade-deleteClientEntries");
+        logger.debug("In LambdaFacade-deleteClientEntries");
 
         const body = {
             userId: userID,
@@ -206,7 +207,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
     }
 
     async deleteServiceEntries(serviceID: string, accessToken: string): Promise<void> {
-        console.log("In LambdaFacade-deleteServiceEntries");
+        logger.debug("In LambdaFacade-deleteServiceEntries");
 
         const body = {
             serviceId: serviceID

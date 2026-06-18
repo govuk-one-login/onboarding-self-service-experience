@@ -39,6 +39,7 @@ import {
 } from "../../lib/fixedOTP";
 import * as process from "process";
 import {secureRandom6DigitCode} from "../../lib/utils/secure-random-code";
+import logger from "express/src/lib/logger";
 
 type CognitoCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes> = Command<
     ServiceInputTypes,
@@ -79,7 +80,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async createUser(email: string): Promise<void> {
-        console.log("In CognitoClient:createUser");
+        logger.debug("In CognitoClient:createUser");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
         let temporaryPassword: string;
@@ -108,7 +109,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async recoverUser(email: string): Promise<void> {
-        console.log("In CognitoClient:recoverUser");
+        logger.debug("In CognitoClient:recoverUser");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
 
