@@ -21,7 +21,7 @@ export default function validateKeySource(req: Request, res: Response, next: Nex
             };
         }
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         return res.render("clients/change-public-key.njk", {
             serviceId: req.context.serviceId,
             selfServiceClientId: req.params.selfServiceClientId,

@@ -1,5 +1,6 @@
 import {createPublicKey} from "crypto";
 import validate from "../lib/validators/uri-validator";
+import logger from "./logger";
 
 const BEGIN = "-----BEGIN PUBLIC KEY-----";
 const END = "-----END PUBLIC KEY-----";
@@ -8,7 +9,7 @@ export default function getAuthApiCompliantPublicKey(publicKey: string): string 
     try {
         return makeAuthCompliant(publicKey);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         throw new Error(`Failed to convert public key\n${publicKey}`);
     }
 }
@@ -21,7 +22,7 @@ export function isPublicKeyValid(enteredPublicKey: string): string {
             throw new Error("Not RSA Type");
         }
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         throw new Error(`Failed to convert public key\n${enteredPublicKey}`);
     }
 

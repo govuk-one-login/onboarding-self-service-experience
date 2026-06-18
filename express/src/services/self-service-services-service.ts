@@ -92,7 +92,7 @@ export default class SelfServiceServicesService {
                 codeSentTo: nonNull(response.ChallengeParameters?.CODE_DELIVERY_DESTINATION)
             };
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -319,12 +319,12 @@ export default class SelfServiceServicesService {
         values.set("service-name", serviceName);
 
         const sheetsService: SheetsService = new SheetsService(process.env.USER_SIGNUP_SHEET_ID as string);
-        await sheetsService.init().catch(error => console.error("updateUserSpreadsheet: " + error));
+        await sheetsService.init().catch(error => logger.error("updateUserSpreadsheet: " + error));
         await sheetsService
             .appendValues(values, process.env.USER_SIGNUP_SHEET_DATA_RANGE as string, process.env.USER_SIGNUP_SHEET_HEADER_RANGE as string)
             .then(() => console.log("Saved to sheets"))
             .catch(reason => {
-                console.error("updateUserSpreadsheet: " + reason);
+                logger.error("updateUserSpreadsheet: " + reason);
             });
     }
 
@@ -344,7 +344,7 @@ export default class SelfServiceServicesService {
                 return;
             },
             error => {
-                console.error("sendTxMALog errored: " + error);
+                logger.error("sendTxMALog errored: " + error);
             }
         );
     }

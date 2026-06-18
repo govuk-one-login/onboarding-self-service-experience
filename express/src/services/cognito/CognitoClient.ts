@@ -103,7 +103,7 @@ export default class CognitoClient implements CognitoInterface {
                 ]
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -126,7 +126,7 @@ export default class CognitoClient implements CognitoInterface {
                 ]
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -153,7 +153,7 @@ export default class CognitoClient implements CognitoInterface {
                 UserAttributes: [{Name: "email", Value: cognitoUserName}]
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -180,7 +180,7 @@ export default class CognitoClient implements CognitoInterface {
                 AccessToken: accessToken
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -191,7 +191,7 @@ export default class CognitoClient implements CognitoInterface {
                 AccessToken: accessToken
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -222,7 +222,7 @@ export default class CognitoClient implements CognitoInterface {
                 ProposedPassword: proposedPassword
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -244,7 +244,7 @@ export default class CognitoClient implements CognitoInterface {
                 }
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -265,7 +265,7 @@ export default class CognitoClient implements CognitoInterface {
                 }
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -283,7 +283,7 @@ export default class CognitoClient implements CognitoInterface {
                 UserPoolId: this.userPoolId
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -305,7 +305,7 @@ export default class CognitoClient implements CognitoInterface {
                 ]
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -327,7 +327,7 @@ export default class CognitoClient implements CognitoInterface {
                 ]
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -362,7 +362,7 @@ export default class CognitoClient implements CognitoInterface {
                 ]
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -384,7 +384,7 @@ export default class CognitoClient implements CognitoInterface {
                 ]
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -403,7 +403,7 @@ export default class CognitoClient implements CognitoInterface {
                 ]
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -417,7 +417,7 @@ export default class CognitoClient implements CognitoInterface {
                 AttributeName: "phone_number"
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -438,7 +438,7 @@ export default class CognitoClient implements CognitoInterface {
                     Code: code
                 });
             } catch (error) {
-                console.error(error as Error);
+                logger.error(error as Error);
                 throw error;
             }
         }
@@ -459,7 +459,7 @@ export default class CognitoClient implements CognitoInterface {
                 UserPoolId: this.userPoolId
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -478,7 +478,7 @@ export default class CognitoClient implements CognitoInterface {
                 UserPoolId: this.userPoolId
             });
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }

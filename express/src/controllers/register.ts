@@ -395,7 +395,7 @@ export const processAddServiceForm: RequestHandler = async (req, res, next) => {
         console.info("Adding Service:" + service.serviceName);
         await s4.newService(service, userId, nonNull(req.session.authenticationResult));
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         return getNextPathsAndRedirect(req, res, "/there-is-a-problem");
     }
 
@@ -410,8 +410,8 @@ export const processAddServiceForm: RequestHandler = async (req, res, next) => {
         body = JSON.parse(generatedClient.data.output).body;
         serviceId = JSON.parse(body).pk;
     } catch (error) {
-        console.error("Unable to Register Client to Service - Service Items removed");
-        console.error(error);
+        logger.error("Unable to Register Client to Service - Service Items removed");
+        logger.error(error);
         await s4.deleteServiceEntries(uuid, accessToken);
         return getNextPathsAndRedirect(req, res, "/there-is-a-problem");
     }

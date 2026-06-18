@@ -32,7 +32,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/put-user", user, accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -51,7 +51,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/new-service", JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -83,7 +83,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post(`/update-client`, JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -106,7 +106,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post(`/update-service`, JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -129,7 +129,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/update-user", JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -138,7 +138,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/txma-logging", message);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -150,7 +150,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             const codeBlockResponse = await this.post("/code-block/get", {id: this.EMAIL_BLOCK_PREFIX + hash});
             return (codeBlockResponse.data as CodeBlockResponse).blocked;
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -161,7 +161,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             const hash = this.getBase64UrlHash(email);
             await this.client.post(`/code-block/put`, {id: this.EMAIL_BLOCK_PREFIX + hash});
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -172,7 +172,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
             const hash = this.getBase64UrlHash(email);
             await this.client.post(`/code-block/delete`, {id: this.EMAIL_BLOCK_PREFIX + hash});
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -185,7 +185,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             return await this.get(endPoint);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -201,7 +201,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/delete-dynamodb-client-entries/", JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -216,7 +216,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/delete-dynamodb-service-entries/", JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }

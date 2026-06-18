@@ -87,6 +87,7 @@ import {
 } from "../../src/controllers/clients";
 import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
 import console from "console";
+import logger from "lib/logger";
 
 const s4ListClientsSpy = jest.spyOn(SelfServiceServicesService.prototype, "listClients");
 const s4SendTxmaLogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
@@ -3214,7 +3215,7 @@ describe("processChangeClientName controller tests", () => {
             TEST_ACCESS_TOKEN
         );
         expect(mockRequest.session.updatedField).toBeUndefined();
-        expect(console.error).toHaveBeenCalledWith(err);
+        expect(logger.error).toHaveBeenCalledWith(err);
         expect(mockResponse.redirect).toHaveBeenCalledWith("/there-is-a-problem");
     });
 });
