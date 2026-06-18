@@ -60,7 +60,6 @@ export default class RealSheetsService implements SheetsService {
                     range: range
                 });
                 const data = response.data;
-                console.debug("Values: " + data.values);
                 if (data.values) {
                     resolve(data.values);
                 } else {

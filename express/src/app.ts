@@ -19,7 +19,7 @@ import register from "./routes/register";
 import services from "./routes/services";
 import signIn from "./routes/sign-in";
 import serviceUnavailable from "./routes/service-unavailable";
-import { requestLoggingMiddleware } from "./lib/requestLogging";
+import {requestLoggingMiddleware} from "./lib/requestLogging";
 
 const app = Express();
 
@@ -37,7 +37,7 @@ app.get("/healthcheck", (req, res) => {
 
 app.use("/assets", serveStatic(distribution.assets));
 app.use("/assets/images", serveStatic(distribution.images));
-app.use(requestLoggingMiddleware)
+app.use(requestLoggingMiddleware);
 
 app.use(urlencoded({extended: true}));
 app.use(sessionStorage);
@@ -73,8 +73,8 @@ const server = app.listen(port, () =>
 );
 
 process.on("SIGTERM", () => {
-    console.debug("Server shutdown signal received");
+    logger.debug("Server shutdown signal received");
     server.close(() => {
-        console.debug("Closed server");
+        logger.debug("Closed server");
     });
 });

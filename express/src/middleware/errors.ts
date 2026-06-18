@@ -14,7 +14,7 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
         sessionId = req.session.id;
         userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
     } catch {
-        console.debug("RequestHandler: unable to establish identifiers from session.");
+        logger.debug("RequestHandler: unable to establish identifiers from session.");
     }
 
     s4.sendTxMALog("SSE_ERROR_UNAVAILABLE", {
@@ -39,7 +39,7 @@ export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, 
         sessionId = req.session.id;
         userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
     } catch {
-        console.debug("ErrorRequestHandler: unable to establish identifiers from session.");
+        logger.debug("ErrorRequestHandler: unable to establish identifiers from session.");
     }
 
     s4.sendTxMALog("SSE_ERROR_PROBLEM", {
