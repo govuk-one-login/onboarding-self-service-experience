@@ -7,7 +7,6 @@ import {domainUserToDynamoUser} from "../lib/models/user-utils";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
-import * as console from "console";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP";
 import {getNextPathsAndRedirect, RegisterRoutes, SignInRoutes} from "../middleware/state-machine";
@@ -101,7 +100,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
         (await s4.getEmailCodeBlock(req.session.emailAddress.toLowerCase().trim()))
     ) {
-        console.warn("Email blocked for OTP code");
+        logger.warn("Email blocked for OTP code");
         return getNextPathsAndRedirect(req, res, RegisterRoutes.tooManyCodes);
     }
 
@@ -119,7 +118,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
             req.session.save();
 
             if (req.session.emailCodeSubmitCount >= 6) {
-                console.warn("Email code block added");
+                logger.warn("Email code block added");
                 await s4.putEmailCodeBlock(req.session.emailAddress.toLowerCase().trim());
                 return getNextPathsAndRedirect(req, res, RegisterRoutes.tooManyCodes);
             }

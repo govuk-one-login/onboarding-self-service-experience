@@ -11,7 +11,7 @@ export function allowUserJourneyMiddleware(req: Request, res: Response, next: Ne
     if (transitionForbidden(req)) {
         const nextPath = req.session.nextPaths as string[];
         const optionalPaths = req.session.optionalPaths as string[];
-        console.warn(
+        logger.warn(
             `User tried invalid journey to ${req.baseUrl + req.path}, but session indicates they should be on ${nextPath?.join(", ")}${
                 optionalPaths?.length > 0 ? " and optionalPaths " + optionalPaths?.join(", ") : ""
             }`
