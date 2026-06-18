@@ -1,9 +1,10 @@
 import {NextFunction, Request, Response} from "express";
 import validate from "../../lib/validators/security-code-validator";
 import {isPseudonymisedFixedOTPCredential, getFixedOTPCredentialSecurityCode} from "../../lib/fixedOTP";
+import logger from "express/src/lib/logger";
 
 export default function validateEmailSecurityCode(req: Request, res: Response, next: NextFunction) {
-    console.info("In validateEmailSecurityCode()");
+    logger.debug("In validateEmailSecurityCode()");
 
     if (isPseudonymisedFixedOTPCredential(req.body.securityCode.trim())) {
         req.body.securityCode = getFixedOTPCredentialSecurityCode(req.body.securityCode);

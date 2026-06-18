@@ -1,7 +1,8 @@
 import {RequestHandler} from "express";
+import logger from "express/src/lib/logger";
 
 export default function validateServiceName(render: string): RequestHandler {
-    console.info("In validateServiceName()");
+    logger.debug("In validateServiceName()");
 
     return (req, res, next) => {
         const serviceName: string = req.body.serviceName.trim();

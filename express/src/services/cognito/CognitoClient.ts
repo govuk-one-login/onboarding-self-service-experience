@@ -132,7 +132,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async resendEmailAuthCode(email: string): Promise<void> {
-        console.info("In CognitoClient:resendEmailAuthCode()");
+        logger.debug("In CognitoClient:resendEmailAuthCode()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
         let temporaryPassword: string;
@@ -159,7 +159,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     login(email: string, password: string): Promise<AdminInitiateAuthCommandOutput> {
-        console.info("In CognitoClient:login()");
+        logger.debug("In CognitoClient:login()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
 
@@ -197,7 +197,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     setNewPassword(email: string, password: string, session: string): Promise<RespondToAuthChallengeCommandOutput> {
-        console.info("In CognitoClient:setNewPassword()");
+        logger.debug("In CognitoClient:setNewPassword()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
 
@@ -213,7 +213,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async changePassword(accessToken: string, previousPassword: string, proposedPassword: string): Promise<void> {
-        console.info("In CognitoClient:changePassword()");
+        logger.debug("In CognitoClient:changePassword()");
 
         try {
             await this.sendCommand(ChangePasswordCommand, {
@@ -228,7 +228,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async forgotPassword(email: string, protocol: string, host: string, useRecoveredAccountURL: boolean): Promise<void> {
-        console.info("In CognitoClient:forgotPassword()");
+        logger.debug("In CognitoClient:forgotPassword()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
 
@@ -250,7 +250,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async confirmForgotPassword(emailAddress: string, password: string, confirmationCode: string): Promise<void> {
-        console.info("In CognitoClient:confirmForgotPassword()");
+        logger.debug("In CognitoClient:confirmForgotPassword()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
@@ -271,7 +271,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setUserPassword(emailAddress: string, password: string): Promise<void> {
-        console.info("In CognitoClient:setUserPassword()");
+        logger.debug("In CognitoClient:setUserPassword()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
@@ -289,7 +289,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setEmailAsVerified(email: string): Promise<void> {
-        console.info("In CognitoClient:setEmailVerified()");
+        logger.debug("In CognitoClient:setEmailVerified()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
 
@@ -311,7 +311,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setSignUpStatus(emailAddress: string, status: string): Promise<void> {
-        console.info("In CognitoClient:setSignUpStatus()");
+        logger.debug("In CognitoClient:setSignUpStatus()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
@@ -333,7 +333,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async adminGetUserCommandOutput(emailAddress: string): Promise<AdminGetUserCommandOutput> {
-        console.info("In CognitoClient:adminGetUserCommandOutput()");
+        logger.debug("In CognitoClient:adminGetUserCommandOutput()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
@@ -346,7 +346,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setMobilePhoneAsVerified(emailAddress: string): Promise<void> {
-        console.info("In CognitoClient:setMobilePhoneAsVerified()");
+        logger.debug("In CognitoClient:setMobilePhoneAsVerified()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
@@ -368,7 +368,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setPhoneNumber(emailAddress: string, phoneNumber: string): Promise<void> {
-        console.info("In CognitoClient:setPhoneNumber()");
+        logger.debug("In CognitoClient:setPhoneNumber()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
@@ -390,7 +390,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setPhoneNumberWithoutAdmin(accessToken: string, phoneNumber: string): Promise<void> {
-        console.info("In CognitoClient:setPhoneNumber()");
+        logger.debug("In CognitoClient:setPhoneNumber()");
 
         try {
             await this.sendCommand(UpdateUserAttributesCommand, {
@@ -409,7 +409,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async sendMobileNumberVerificationCode(accessToken: string): Promise<void> {
-        console.info("In CognitoClient:sendMobileNumberVerification()");
+        logger.debug("In CognitoClient:sendMobileNumberVerification()");
 
         try {
             await this.sendCommand(GetUserAttributeVerificationCodeCommand, {
@@ -426,7 +426,7 @@ export default class CognitoClient implements CognitoInterface {
      * {@link https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_VerifyUserAttribute.html VerifyUserAttribute}
      */
     async verifyMobileUsingSmsCode(accessToken: string, code: string, emailAddress: string): Promise<void> {
-        console.info("In CognitoClient:verifyMobileUsingSmsCode()");
+        logger.debug("In CognitoClient:verifyMobileUsingSmsCode()");
 
         if (isFixedOTPCredential(emailAddress)) {
             verifyMobileUsingOTPCode(emailAddress, code);
@@ -445,7 +445,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async setMfaPreference(userName: string): Promise<void> {
-        console.info("In CognitoClient:setMfaPreference()");
+        logger.debug("In CognitoClient:setMfaPreference()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(userName);
 
@@ -465,7 +465,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     async resetMfaPreference(username: string): Promise<void> {
-        console.info("In CognitoClient:resetMfaPreference()");
+        logger.debug("In CognitoClient:resetMfaPreference()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(username);
 
@@ -484,7 +484,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     respondToMfaChallenge(emailAddress: string, mfaCode: string, session: string): Promise<AdminRespondToAuthChallengeCommandOutput> {
-        console.info("In CognitoClient:respondToMfaChallenge()");
+        logger.debug("In CognitoClient:respondToMfaChallenge()");
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(emailAddress);
 
@@ -501,7 +501,7 @@ export default class CognitoClient implements CognitoInterface {
     }
 
     useRefreshToken(refreshToken: string): Promise<AdminInitiateAuthCommandOutput> {
-        console.info("In CognitoClient:useRefreshToken()");
+        logger.debug("In CognitoClient:useRefreshToken()");
 
         return this.sendCommand(AdminInitiateAuthCommand, {
             UserPoolId: this.userPoolId,

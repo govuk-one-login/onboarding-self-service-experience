@@ -18,7 +18,7 @@ export const showGetEmailForm = render("register/enter-email-address.njk");
 export const processGetEmailForm: RequestHandler = async (req, res) => {
     const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    console.info("In ProcessGetEmailForm");
+    logger.debug("In ProcessGetEmailForm");
 
     req.session.emailAddress = emailAddress;
     req.session.save();
@@ -29,7 +29,7 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
         if (error instanceof UsernameExistsException) {
             const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
 
-            console.info("In UserNameExistException");
+            logger.debug("In UserNameExistException");
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
                 console.info("Processing No HasEmail");
@@ -194,7 +194,7 @@ export const showEnterMobileForm: RequestHandler = (req, res) => {
 };
 
 export const processEnterMobileForm: RequestHandler = async (req, res) => {
-    console.info("In Controller:Register - processEnterMobileForm()");
+    logger.debug("In Controller:Register - processEnterMobileForm()");
 
     const authenticationResult = req.session.authenticationResult;
     const accessToken = authenticationResult?.AccessToken;
@@ -461,7 +461,7 @@ export const accountExists: RequestHandler = (req, res) => {
 export const resumeUserJourneyAfterPassword: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    console.info("In resumeUserJourney");
+    logger.debug("In resumeUserJourney");
     const userName = nonNull(req.session.emailAddress);
     const userPassword = nonNull(req.body["password"]);
 

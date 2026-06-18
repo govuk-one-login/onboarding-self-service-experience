@@ -1,8 +1,9 @@
 import {NextFunction, Request, Response} from "express";
 import getAuthApiCompliantPublicKey, {isPublicKeyValid, validateJwksURL} from "../lib/public-key";
+import logger from "../lib/logger";
 
 export default function validateKeySource(req: Request, res: Response, next: NextFunction) {
-    console.info("In convertPublicKeyForAuth()");
+    logger.debug("In convertPublicKeyForAuth()");
     let errorMessages;
 
     try {

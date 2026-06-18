@@ -10,9 +10,10 @@ import {
     isFixedOTPCredential,
     isPseudonymisedFixedOTPCredential
 } from "../lib/fixedOTP";
+import logger from "../lib/logger";
 
 export default function processSignInForm(template: string): RequestHandler {
-    console.info("In processSignInForm()");
+    logger.debug("In processSignInForm()");
 
     return async (req, res) => {
         let email = req.session.emailAddress as string;

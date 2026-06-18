@@ -1,8 +1,9 @@
 import {RequestHandler} from "express";
 import validate from "../../lib/validators/email-validator";
+import logger from "express/src/lib/logger";
 
 export default function validateEmail(template: string): RequestHandler {
-    console.info("In validateEmail()");
+    logger.debug("In validateEmail()");
 
     return async (req, res, next) => {
         const emailAddress = req.body.emailAddress.trim();

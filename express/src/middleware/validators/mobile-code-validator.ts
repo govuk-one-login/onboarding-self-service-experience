@@ -2,9 +2,10 @@ import {Request, RequestHandler} from "express";
 import {obscureNumber} from "../../lib/mobile-number";
 import validate from "../../lib/validators/security-code-validator";
 import {getFixedOTPCredentialSMSCode, isPseudonymisedFixedOTPCredential} from "../../lib/fixedOTP";
+import logger from "express/src/lib/logger";
 
 export default function validateMobileSecurityCode(textMessageNotReceivedUrl: string, hideNumber = true): RequestHandler {
-    console.info("In validateMobileSecurityCode()");
+    logger.debug("In validateMobileSecurityCode()");
 
     return (req, res, next) => {
         let securityCode: string = req.body.securityCode.trim();
@@ -33,7 +34,7 @@ export default function validateMobileSecurityCode(textMessageNotReceivedUrl: st
 }
 
 function getMobileNumber(req: Request): string {
-    console.info("In getMobileNumber()");
+    logger.debug("In getMobileNumber()");
 
     return nonNull(req.session.mfaResponse?.codeSentTo ?? req.session.enteredMobileNumber ?? req.session.mobileNumber);
 }
