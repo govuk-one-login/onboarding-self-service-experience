@@ -208,7 +208,7 @@ export const processChangePublicKeyForm: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
-    console.info("Process Change of Public Key Form");
+    logger.info("Process Change of Public Key Form");
     req.session.updatedField = "public key";
     req.session.save();
 

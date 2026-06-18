@@ -37,6 +37,7 @@ import console from "console";
 import SelfServiceError from "../../src/lib/errors";
 import {AdminGetUserCommandOutput, AdminInitiateAuthCommandOutput} from "@aws-sdk/client-cognito-identity-provider";
 import {SignupStatus} from "../../src/lib/utils/signup-status";
+import logger from "lib/logger";
 const mockS4Instance = new SelfServiceServicesService(mockCognitoInterface, mockLambdaFacade);
 
 describe("SelfServiceServicesService tests", () => {
@@ -58,19 +59,19 @@ describe("SelfServiceServicesService tests", () => {
 
     it("calls cognito ChangePassword when the changePassword method is called", () => {
         mockS4Instance.changePassword(TEST_ACCESS_TOKEN, TEST_CURRENT_PASSWORD, TEST_NEW_PASSWORD);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:changePassword()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:changePassword()");
         expect(mockCognitoInterface.changePassword).toHaveBeenCalledWith(TEST_ACCESS_TOKEN, TEST_CURRENT_PASSWORD, TEST_NEW_PASSWORD);
     });
 
     it("calls cognito forgotPassword when the forgotPassword method is called", () => {
         mockS4Instance.forgotPassword(TEST_EMAIL, TEST_PROTOCOL, TEST_HOST_NAME, true);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:forgotPassword()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:forgotPassword()");
         expect(mockCognitoInterface.forgotPassword).toHaveBeenCalledWith(TEST_EMAIL, TEST_PROTOCOL, TEST_HOST_NAME, true);
     });
 
     it("calls cognito confirmForgotPassword when the confirmForgotPassword method is called", () => {
         mockS4Instance.confirmForgotPassword(TEST_EMAIL, TEST_CURRENT_PASSWORD, TEST_SECURITY_CODE);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:confirmForgotPassword()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:confirmForgotPassword()");
         expect(mockCognitoInterface.confirmForgotPassword).toHaveBeenCalledWith(TEST_EMAIL, TEST_CURRENT_PASSWORD, TEST_SECURITY_CODE);
     });
 
@@ -84,7 +85,7 @@ describe("SelfServiceServicesService tests", () => {
             TEST_SECURITY_CODE,
             TEST_MFA_RESPONSE.cognitoSession
         );
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:respondToMfaChallenge()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:respondToMfaChallenge()");
     });
 
     it("calls cognito respondToMfaChallenge when the respondToMfaChallenge method and returns the AuthenticationResult", async () => {
@@ -95,7 +96,7 @@ describe("SelfServiceServicesService tests", () => {
             TEST_SECURITY_CODE,
             TEST_MFA_RESPONSE.cognitoSession
         );
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:respondToMfaChallenge()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:respondToMfaChallenge()");
         expect(receivedAuthenticationResult).toStrictEqual(TEST_AUTHENTICATION_RESULT);
     });
 
@@ -103,14 +104,14 @@ describe("SelfServiceServicesService tests", () => {
         await expect(mockS4Instance.getSelfServiceUser({...TEST_AUTHENTICATION_RESULT, IdToken: undefined})).rejects.toThrow(
             new SelfServiceError("IdToken not present")
         );
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:getSelfServiceUser()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:getSelfServiceUser()");
     });
 
     it("throws an error when getSelfServiceUser is called with an authentication result with no AccessToken", async () => {
         await expect(mockS4Instance.getSelfServiceUser({...TEST_AUTHENTICATION_RESULT, AccessToken: undefined})).rejects.toThrow(
             new SelfServiceError("AccessToken not present")
         );
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:getSelfServiceUser()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:getSelfServiceUser()");
     });
 
     it("calls validate token and getUserByCognitoId and returns a user when the getSelfServiceUser method is called ", async () => {
@@ -126,7 +127,7 @@ describe("SelfServiceServicesService tests", () => {
         expect(mockCognitoInterface.getUser).toHaveBeenCalledWith(TEST_ACCESS_TOKEN);
         expect(mockLambdaFacade.getUserByCognitoId).toHaveBeenCalledWith(TEST_COGNITO_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(receivedUser).toStrictEqual(TEST_USER);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:getSelfServiceUser()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:getSelfServiceUser()");
     });
 
     it("calls cognito login with the mail and password when the login method is called", async () => {
@@ -147,7 +148,7 @@ describe("SelfServiceServicesService tests", () => {
             cognitoId: TEST_COGNITO_ID,
             codeSentTo: TEST_PHONE_NUMBER
         });
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:login()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:login()");
     });
 
     it("calls validate token and lambda putUser when the putUser method is called", async () => {
@@ -157,7 +158,7 @@ describe("SelfServiceServicesService tests", () => {
         await mockS4Instance.putUser(TEST_ONBOARDING_TABLE_ITEM, TEST_ACCESS_TOKEN);
         expect(mockCognitoInterface.getUser).toHaveBeenCalledWith(TEST_ACCESS_TOKEN);
         expect(mockLambdaFacade.putUser).toHaveBeenCalledWith(TEST_ONBOARDING_TABLE_ITEM, TEST_ACCESS_TOKEN);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:putUser()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:putUser()");
     });
 
     it("calls cognito setNewPassword when the setNewPassword method is called and returns the Authentication Result", async () => {
@@ -166,7 +167,7 @@ describe("SelfServiceServicesService tests", () => {
         const receivedAuthenticationResult = await mockS4Instance.setNewPassword(TEST_EMAIL, TEST_PASSWORD, TEST_COGNITO_SESSION_STRING);
         expect(mockCognitoInterface.setNewPassword).toHaveBeenCalledWith(TEST_EMAIL, TEST_PASSWORD, TEST_COGNITO_SESSION_STRING);
         expect(receivedAuthenticationResult).toStrictEqual(TEST_AUTHENTICATION_RESULT);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:setNewPassword()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:setNewPassword()");
     });
 
     it("calls cognito setEmailAsVerified when the setEmailAsVerified method is called", async () => {
@@ -174,14 +175,14 @@ describe("SelfServiceServicesService tests", () => {
 
         await mockS4Instance.setEmailAsVerified(TEST_EMAIL);
         expect(mockCognitoInterface.setEmailAsVerified).toHaveBeenCalledWith(TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:setEmailAsVerified()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:setEmailAsVerified()");
     });
 
     it("calls cognito createUser when the createUser method is called", async () => {
         mockCognitoInterface.createUser.mockResolvedValue(void 0);
 
         await mockS4Instance.createUser(TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:createUser()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:createUser()");
         expect(mockCognitoInterface.createUser).toHaveBeenCalledWith(TEST_EMAIL);
     });
 
@@ -189,7 +190,7 @@ describe("SelfServiceServicesService tests", () => {
         mockCognitoInterface.resendEmailAuthCode.mockResolvedValue(void 0);
 
         await mockS4Instance.resendEmailAuthCode(TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:resendEmailAuthCode()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:resendEmailAuthCode()");
         expect(mockCognitoInterface.resendEmailAuthCode).toHaveBeenCalledWith(TEST_EMAIL);
     });
 
@@ -197,7 +198,7 @@ describe("SelfServiceServicesService tests", () => {
         mockCognitoInterface.login.mockResolvedValue(void 0);
 
         await mockS4Instance.submitUsernamePassword(TEST_EMAIL, TEST_PASSWORD);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:submitUsernamePassword()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:submitUsernamePassword()");
         expect(mockCognitoInterface.login).toHaveBeenCalledWith(TEST_EMAIL, TEST_PASSWORD);
     });
 
@@ -205,7 +206,7 @@ describe("SelfServiceServicesService tests", () => {
         mockCognitoInterface.setPhoneNumber.mockResolvedValue(void 0);
 
         await mockS4Instance.setPhoneNumber(TEST_EMAIL, TEST_PHONE_NUMBER);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:setPhoneNumber()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:setPhoneNumber()");
         expect(mockCognitoInterface.setPhoneNumber).toHaveBeenCalledWith(TEST_EMAIL, TEST_PHONE_NUMBER);
     });
 
@@ -213,7 +214,7 @@ describe("SelfServiceServicesService tests", () => {
         mockCognitoInterface.setMfaPreference.mockResolvedValue(void 0);
 
         await mockS4Instance.setMfaPreference(TEST_COGNITO_ID);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:setMfaPreference()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:setMfaPreference()");
         expect(mockCognitoInterface.setMfaPreference).toHaveBeenCalledWith(TEST_COGNITO_ID);
     });
 
@@ -221,7 +222,7 @@ describe("SelfServiceServicesService tests", () => {
         mockCognitoInterface.resetMfaPreference.mockResolvedValue(void 0);
 
         await mockS4Instance.resetMfaPreference(TEST_COGNITO_ID);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:resetMfaPreference()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:resetMfaPreference()");
         expect(mockCognitoInterface.resetMfaPreference).toHaveBeenCalledWith(TEST_COGNITO_ID);
     });
 
@@ -229,7 +230,7 @@ describe("SelfServiceServicesService tests", () => {
         mockCognitoInterface.sendMobileNumberVerificationCode.mockResolvedValue(void 0);
 
         await mockS4Instance.sendMobileNumberVerificationCode(TEST_ACCESS_TOKEN);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:sendMobileVerificationCode()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:sendMobileVerificationCode()");
         expect(mockCognitoInterface.sendMobileNumberVerificationCode).toHaveBeenCalledWith(TEST_ACCESS_TOKEN);
     });
 
@@ -241,7 +242,7 @@ describe("SelfServiceServicesService tests", () => {
         mockCognitoInterface.useRefreshToken.mockResolvedValue(refreshTokenResponse);
 
         const response = await mockS4Instance.useRefreshToken(TEST_REFRESH_TOKEN);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:useRefreshToken()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:useRefreshToken()");
         expect(mockCognitoInterface.useRefreshToken).toHaveBeenCalledWith(TEST_REFRESH_TOKEN);
         expect(response).toStrictEqual(refreshTokenResponse);
     });
@@ -250,7 +251,7 @@ describe("SelfServiceServicesService tests", () => {
         mockCognitoInterface.verifyMobileUsingSmsCode.mockResolvedValue(void 0);
 
         await mockS4Instance.verifyMobileUsingSmsCode(TEST_ACCESS_TOKEN, TEST_SECURITY_CODE, TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:verifyMobileUsingSmsCode()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:verifyMobileUsingSmsCode()");
         expect(mockCognitoInterface.verifyMobileUsingSmsCode).toHaveBeenCalledWith(TEST_ACCESS_TOKEN, TEST_SECURITY_CODE, TEST_EMAIL);
     });
 
@@ -258,7 +259,7 @@ describe("SelfServiceServicesService tests", () => {
         mockCognitoInterface.setMobilePhoneAsVerified.mockResolvedValue(void 0);
 
         await mockS4Instance.setMobilePhoneAsVerified(TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:setMobilePhoneAsVerified()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:setMobilePhoneAsVerified()");
         expect(mockCognitoInterface.setMobilePhoneAsVerified).toHaveBeenCalledWith(TEST_EMAIL);
     });
 
@@ -267,7 +268,7 @@ describe("SelfServiceServicesService tests", () => {
         jest.spyOn(mockS4Instance, "getSignUpStatus").mockResolvedValue(mockSignUpStatus);
 
         await mockS4Instance.setSignUpStatus(TEST_EMAIL, TEST_SIGN_UP_STATUS_STAGE);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:setSignUpStatus()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:setSignUpStatus()");
         expect(mockS4Instance.getSignUpStatus).toHaveBeenCalledWith(TEST_EMAIL);
         expect(mockSignUpStatus.setStage).toHaveBeenCalledWith(TEST_SIGN_UP_STATUS_STAGE, true);
         expect(mockCognitoInterface.setSignUpStatus).toHaveBeenCalledWith(TEST_EMAIL, mockSignUpStatus.getState());
@@ -316,7 +317,7 @@ describe("SelfServiceServicesService tests", () => {
             TEST_EMAIL,
             TEST_AUTHENTICATION_RESULT.AccessToken
         );
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:newService()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:newService()");
     });
 
     it("calls the validateToken and lambda generateClient method with the expected values when the generateClient method is called", async () => {
@@ -325,7 +326,7 @@ describe("SelfServiceServicesService tests", () => {
         await mockS4Instance.generateClient(TEST_SERVICE, TEST_AUTHENTICATION_RESULT);
         expect(mockCognitoInterface.getUser).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockLambdaFacade.generateClient).toHaveBeenCalledWith(TEST_SERVICE, TEST_AUTHENTICATION_RESULT);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:generateClient");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:generateClient");
     });
 
     it("calls the validateToken and lambda updateClient method with the expected values when the updateClient method is called", async () => {
@@ -341,7 +342,7 @@ describe("SelfServiceServicesService tests", () => {
             mockUpdates,
             TEST_ACCESS_TOKEN
         );
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:updateClient()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:updateClient()");
     });
 
     it("calls the validateToken and lambda updateService method with the expected values when the updateService method is called", async () => {
@@ -357,7 +358,7 @@ describe("SelfServiceServicesService tests", () => {
             mockUpdates,
             TEST_ACCESS_TOKEN
         );
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:updateService()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:updateService()");
     });
 
     it("calls the validateToken and lambda listServices method with the expected values when the listServices method is called", async () => {
@@ -372,7 +373,7 @@ describe("SelfServiceServicesService tests", () => {
         expect(mockCognitoInterface.getUser).toHaveBeenCalledWith(TEST_ACCESS_TOKEN);
         expect(mockLambdaFacade.listServices).toHaveBeenCalledWith(TEST_USER_ID, TEST_ACCESS_TOKEN);
         expect(receivedServices).toStrictEqual([TEST_SERVICE, TEST_SERVICE]);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:listServices()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:listServices()");
     });
 
     it("calls the validateToken and lambda updateUser method with the expected values when the updateUser method is called", async () => {
@@ -383,7 +384,7 @@ describe("SelfServiceServicesService tests", () => {
         await mockS4Instance.updateUser(TEST_USER_ID, mockUserUpdates, TEST_ACCESS_TOKEN);
         expect(mockCognitoInterface.getUser).toHaveBeenCalledWith(TEST_ACCESS_TOKEN);
         expect(mockLambdaFacade.updateUser).toHaveBeenCalledWith(TEST_USER_ID, mockUserUpdates, TEST_ACCESS_TOKEN);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:updateUser()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:updateUser()");
     });
 
     it("calls the validateToken and lambda listClients method with the expected values when the listClients method is called", async () => {
@@ -398,7 +399,7 @@ describe("SelfServiceServicesService tests", () => {
         expect(mockCognitoInterface.getUser).toHaveBeenCalledWith(TEST_ACCESS_TOKEN);
         expect(mockLambdaFacade.listClients).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_ACCESS_TOKEN);
         expect(receivedClients).toStrictEqual([TEST_CLIENT, TEST_CLIENT]);
-        expect(console.info).toHaveBeenCalledWith("In self-service-services-service:listClients()");
+        expect(logger.info).toHaveBeenCalledWith("In self-service-services-service:listClients()");
     });
 
     it("calls the cognito globalSignOut and lambda globalSignOut methods  with the expected values when the globalSignOut method is called", async () => {

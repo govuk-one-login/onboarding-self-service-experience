@@ -38,6 +38,7 @@ import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status
 import console from "console";
 import {LimitExceededException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import crypto from "node:crypto";
+import logger from "lib/logger";
 
 jest.spyOn(crypto, "randomInt").mockImplementation(() => TEST_RANDOM_NUMBER);
 
@@ -281,7 +282,7 @@ describe("processEmailAddress controller tests", () => {
         await processEmailAddress(mockReq, mockRes, mockNext);
 
         expect(s4GetSignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("Processing No HasEmail");
+        expect(logger.info).toHaveBeenCalledWith("Processing No HasEmail");
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/resume-before-password");
     });
 
@@ -301,7 +302,7 @@ describe("processEmailAddress controller tests", () => {
         await processEmailAddress(mockReq, mockRes, mockNext);
 
         expect(s4GetSignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("Processing No HasPassword");
+        expect(logger.info).toHaveBeenCalledWith("Processing No HasPassword");
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/resume-before-password");
     });
 
@@ -322,7 +323,7 @@ describe("processEmailAddress controller tests", () => {
         await processEmailAddress(mockReq, mockRes, mockNext);
 
         expect(s4GetSignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("Processing No HasPhoneNumber");
+        expect(logger.info).toHaveBeenCalledWith("Processing No HasPhoneNumber");
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/resume-after-password");
     });
 
@@ -344,7 +345,7 @@ describe("processEmailAddress controller tests", () => {
         await processEmailAddress(mockReq, mockRes, mockNext);
 
         expect(s4GetSignUpStatusSpy).toHaveBeenCalledWith(TEST_EMAIL);
-        expect(console.info).toHaveBeenCalledWith("Processing No HasTextCode");
+        expect(logger.info).toHaveBeenCalledWith("Processing No HasTextCode");
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/resume-after-password");
     });
 
