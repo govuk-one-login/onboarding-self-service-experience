@@ -3,7 +3,7 @@ import pino from "pino";
 import {Writable} from "stream";
 import helmet from "helmet";
 import pinoHttp from "pino-http";
-import request from "supertest"
+import request from "supertest";
 import {requestSerializer, responseSerializer} from "../../src/lib/requestLogging";
 interface LogEntry {
     req: {

@@ -14,7 +14,7 @@ import MfaResponse from "../types/mfa-response";
 import CognitoInterface from "./cognito/CognitoInterface";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
-import console from "console";
+
 import {Request} from "express";
 import {TxMAEvent, TxMAExtension, TxMAUser} from "../types/txma-event";
 import SheetsService from "../lib/sheets/SheetsService";

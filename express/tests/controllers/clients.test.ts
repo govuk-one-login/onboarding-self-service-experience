@@ -86,7 +86,7 @@ import {
     processChangeClaimsForm
 } from "../../src/controllers/clients";
 import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
-import console from "console";
+
 import logger from "lib/logger";
 
 const s4ListClientsSpy = jest.spyOn(SelfServiceServicesService.prototype, "listClients");

@@ -10,7 +10,7 @@ import {convertToCountryPrefixFormat, obscureNumber} from "../lib/mobile-number"
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
-import console from "console";
+
 import {secureRandom6DigitCode} from "../lib/utils/secure-random-code";
 import {getNextPathsAndRedirect, RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine";
 import logger from "../lib/logger";
