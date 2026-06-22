@@ -10,24 +10,25 @@ import {convertToCountryPrefixFormat, obscureNumber} from "../lib/mobile-number"
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
-import console from "console";
+
 import {secureRandom6DigitCode} from "../lib/utils/secure-random-code";
 import {getNextPathsAndRedirect, RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine";
+import logger from "../lib/logger";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
 export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
 
 // TODO this only renders the page but it needs to resend the mobile OTP but we need the password to do this or find another way
 export const showCheckPhonePage: RequestHandler = (req, res) => {
-    console.log("In controllers/sign-in-showCheckPhonePage");
+    logger.debug("In controllers/sign-in-showCheckPhonePage");
 
     // TODO we should probably throw here or use middleware to validate the required values
     if (!req.session.emailAddress || !req.session.mfaResponse) {
-        console.log("Redirecting to Sign-In");
+        logger.debug("Redirecting to Sign-In");
         return res.redirect(SignInRoutes.enterEmailAddress);
     }
 
-    console.log("Redirecting to Enter Text Code");
+    logger.debug("Redirecting to Enter Text Code");
     res.render("common/enter-text-code.njk", {
         headerActiveItem: "sign-in",
         values: {
@@ -38,19 +39,19 @@ export const showCheckPhonePage: RequestHandler = (req, res) => {
 };
 
 export const confirmPasswordContinueRecovery: RequestHandler = async (req, res) => {
-    console.log("In controllers/sign-in:confirmPasswordContinueRecovery()");
+    logger.debug("In controllers/sign-in:confirmPasswordContinueRecovery()");
 
     return res.redirect(SignInRoutes.forgotPasswordContinueRecovery);
 };
 
 export const finishSignIn: RequestHandler = async (req, res) => {
-    console.log("In controllers/sign-in:finishSignIn()");
+    logger.debug("In controllers/sign-in:finishSignIn()");
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
     const authenticationResult = nonNull(req.session.authenticationResult);
-    console.log("Calling getSelfServiceUser");
+    logger.debug("Calling getSelfServiceUser");
     const user = await s4.getSelfServiceUser(authenticationResult);
-    console.log("Back from getSelfServiceUser");
+    logger.debug("Back from getSelfServiceUser");
 
     // TODO this should probably be an error
     if (!user) {
@@ -58,7 +59,7 @@ export const finishSignIn: RequestHandler = async (req, res) => {
     }
 
     if (req.session.updatedField === "password") {
-        console.info("Finishing Sign-In");
+        logger.info("Finishing Sign-In");
 
         await s4.updateUser(
             AuthenticationResultParser.getCognitoId(authenticationResult),
@@ -91,14 +92,14 @@ export const finishSignIn: RequestHandler = async (req, res) => {
             }
         );
 
-        console.log("Redirecting to Services");
+        logger.debug("Redirecting to Services");
         res.redirect(ServicesRoutes.listServices);
     }
 };
 
 async function signedInToAnotherDevice(email: string, s4: SelfServiceServicesService) {
     const sessions = await s4.sessionCount(email);
-    console.log(`Found ${sessions} session(s)`);
+    logger.debug(`Found ${sessions} session(s)`);
     return sessions > 1;
 }
 
@@ -110,7 +111,7 @@ export const globalSignOut: RequestHandler = async (req, res) => {
     if (accessToken) {
         const user = await s4.getSelfServiceUser(authenticationResult);
         const output = await s4.globalSignOut(user.email, accessToken);
-        console.log(`globalSignOut() Session invalidated, Response HTTP Status Code: ${output.status}`);
+        logger.debug(`globalSignOut() Session invalidated, Response HTTP Status Code: ${output.status}`);
     }
 
     req.session.destroy(() => res.redirect(SignInRoutes.enterEmailAddressGlobalSignOut));
@@ -123,22 +124,22 @@ export const processEmailAddress: RequestHandler = async (req, res) => {
         const signUpStatus: SignupStatus = await s4.getSignUpStatus(email);
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
-            console.info("Processing No HasEmail");
+            logger.info("Processing No HasEmail");
             return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeBeforePassword);
         }
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
-            console.info("Processing No HasPassword");
+            logger.info("Processing No HasPassword");
             return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeBeforePassword);
         }
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
-            console.info("Processing No HasPhoneNumber");
+            logger.info("Processing No HasPhoneNumber");
             return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeAfterPassword);
         }
 
         if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
-            console.info("Processing No HasTextCode");
+            logger.info("Processing No HasTextCode");
             return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeAfterPassword);
         }
     } catch (UserNotFoundException) {
@@ -194,7 +195,7 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
         await s4.confirmForgotPassword(loginName as string, password as string, confirmationCode as string);
     } catch (error) {
         if (error instanceof LimitExceededException) {
-            console.info("Tried to change password too many times. Advised to try again in 15 minutes.");
+            logger.info("Tried to change password too many times. Advised to try again in 15 minutes.");
 
             return res.render("sign-in/create-new-password.njk", {
                 errorMessages: {
@@ -222,8 +223,8 @@ export const confirmForgotPassword: RequestHandler = async (req, res, next) => {
 };
 
 export const organiseDynamoDBForRecoveredUser: RequestHandler = async (req, res, next) => {
-    console.log("In controllers/sign-in:organiseDynamoDBForRecoveredUser");
-    console.log("*** Authentication Result => " + req.session.authenticationResult);
+    logger.debug("In controllers/sign-in:organiseDynamoDBForRecoveredUser");
+    logger.debug("*** Authentication Result => " + req.session.authenticationResult);
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
@@ -251,7 +252,7 @@ const forgotPassword: RequestHandler = async (req, res) => {
         await s4.forgotPassword(email, req.protocol, host, false);
     } catch (error) {
         if (error instanceof UserNotFoundException) {
-            console.log("UserNotFoundException");
+            logger.debug("UserNotFoundException");
 
             const dynamoDBEntryResponse = await s4.getDynamoDBEntries(email);
             const dynamoDBEntry = JSON.stringify(dynamoDBEntryResponse.data);
@@ -281,10 +282,10 @@ const forgotPassword: RequestHandler = async (req, res) => {
             };
 
             if (error instanceof UserNotFoundException) {
-                console.info("User does not exist.");
+                logger.info("User does not exist.");
                 options.errorMessages.emailAddress = "User does not exist.";
             } else if (error instanceof LimitExceededException) {
-                console.info("Tried to change password too many times. Advised to try again in 15 minutes.");
+                logger.info("Tried to change password too many times. Advised to try again in 15 minutes.");
                 options.errorMessages.emailAddress = "You have tried to change your password too many times. Try again in 15 minutes.";
             } else {
                 throw error;

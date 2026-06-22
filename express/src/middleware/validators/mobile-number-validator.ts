@@ -1,9 +1,10 @@
 import {RequestHandler} from "express";
 import {validateNumber as validate} from "../../lib/mobile-number";
 import {isPseudonymisedFixedOTPCredential, getFixedOTPCredentialMobileNumber} from "../../lib/fixedOTP";
+import logger from "../../lib/logger";
 
 export default function validateMobileNumber(template: string): RequestHandler {
-    console.info("In validateMobileNumber()");
+    logger.debug("In validateMobileNumber()");
 
     return (req, res, next) => {
         let mobileNumber: string = req.body.mobileNumber;
@@ -14,11 +15,11 @@ export default function validateMobileNumber(template: string): RequestHandler {
         const result = validate(mobileNumber);
 
         if (result.isValid) {
-            console.log("*** Validated ***");
+            logger.debug("*** Validated ***");
             return next();
         }
 
-        console.log("*** NOT Validated ***");
+        logger.debug("*** NOT Validated ***");
 
         res.render(template, {
             values: {

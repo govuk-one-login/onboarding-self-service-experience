@@ -1,4 +1,5 @@
 import {CodeMismatchException} from "@aws-sdk/client-cognito-identity-provider";
+import logger from "./logger";
 
 interface fixedOTPCredential {
     Id: string;
@@ -89,7 +90,7 @@ function verifyMFACode(emailAddress: string, securityCode: string, expiredCode: 
 }
 
 export function fixedOTPInitialise(): void {
-    console.log("in fixedOTP - fixedOTPInitialise");
+    logger.debug("In fixedOTP - fixedOTPInitialise");
 
     const fixedOTPCredentialsSecret = process.env.FIXED_OTP_CREDENTIALS as string;
 
@@ -102,7 +103,7 @@ export function fixedOTPInitialise(): void {
 }
 
 export function verifyMobileUsingOTPCode(emailAddress: string, smsCode: string): void {
-    console.log("in fixedOTP - verifyMobileUsingOTPCode");
+    logger.debug("In fixedOTP - verifyMobileUsingOTPCode");
     verifyMFACode(emailAddress, smsCode, expiredSMSCode);
 }
 
@@ -111,7 +112,7 @@ export function respondToMFAChallengeForFixedOTPCredential(email: string, securi
 }
 
 export function isFixedOTPCredential(credential: string): boolean {
-    console.log("in fixedOTP - isFixedOTPCredential");
+    logger.debug("In fixedOTP - isFixedOTPCredential");
 
     let index = -1;
 
@@ -131,31 +132,31 @@ export function isPseudonymisedFixedOTPCredential(credential: string): boolean {
 }
 
 export function getFixedOTPCredentialEmailAddress(emailAddress: string): string {
-    console.log("in fixedOTP - getFixedOTPCredentialEmailAddress");
+    logger.debug("In fixedOTP - getFixedOTPCredentialEmailAddress");
     return getAttribute("ADDRESS", emailAddress);
 }
 
 export function getFixedOTPCredentialTemporaryPassword(emailAddress: string): string {
-    console.log("in fixedOTP - getFixedOTPCredentialTemporaryPassword");
+    logger.debug("In fixedOTP - getFixedOTPCredentialTemporaryPassword");
     return getAttribute("OTP", emailAddress);
 }
 
 export function getFixedOTPCredentialSecurityCode(emailAddress: string): string {
-    console.log("in fixedOTP - getFixedOTPCredentialSecurityCode");
+    logger.debug("In fixedOTP - getFixedOTPCredentialSecurityCode");
     return getAttribute("OTP", emailAddress);
 }
 
 export function getFixedOTPCredentialPassword(emailAddress: string): string {
-    console.log("in fixedOTP - getFixedOTPCredentialPassword");
+    logger.debug("In fixedOTP - getFixedOTPCredentialPassword");
     return getAttribute("PASSWORD", emailAddress);
 }
 
 export function getFixedOTPCredentialMobileNumber(target: string): string {
-    console.log("in fixedOTP - getFixedOTPCredentialMobileNumber");
+    logger.debug("In fixedOTP - getFixedOTPCredentialMobileNumber");
     return getAttribute("MOBILE", target);
 }
 
 export function getFixedOTPCredentialSMSCode(emailAddress: string): string {
-    console.log("in fixedOTP - getFixedOTPCredentialSMSCode");
+    logger.debug("In fixedOTP - getFixedOTPCredentialSMSCode");
     return getAttribute("SMS", emailAddress);
 }

@@ -2,6 +2,7 @@ import {promises as fs} from "fs";
 import {JWT} from "googleapis-common";
 import {google} from "googleapis";
 import SheetsService from "../interface";
+import logger from "../../logger";
 
 export default class RealSheetsService implements SheetsService {
     private readonly SCOPES: string[] = ["https://www.googleapis.com/auth/spreadsheets"];
@@ -18,7 +19,7 @@ export default class RealSheetsService implements SheetsService {
         try {
             serviceCredentials = JSON.parse(process.env.GOOGLE_SHEET_CREDENTIALS || "null");
         } catch (error) {
-            console.log("RealSheetsService: parse had error: " + error);
+            logger.debug("RealSheetsService: parse had error: " + error);
             throw error;
         }
 
@@ -27,7 +28,7 @@ export default class RealSheetsService implements SheetsService {
             try {
                 googleCreds = JSON.stringify(serviceCredentials);
             } catch (error) {
-                console.log("RealSheetsService: stringify had error: " + error);
+                logger.debug("RealSheetsService: stringify had error: " + error);
                 throw error;
             }
             return googleCreds;
@@ -60,14 +61,13 @@ export default class RealSheetsService implements SheetsService {
                     range: range
                 });
                 const data = response.data;
-                console.debug("Values: " + data.values);
                 if (data.values) {
                     resolve(data.values);
                 } else {
                     reject(new Error(`No values returned for range ${range} from sheet with ID ${sheetId}`));
                 }
             } catch (error) {
-                console.log(error);
+                logger.debug(error);
                 reject(new Error(`Could not read range ${range} from sheet with ID ${sheetId}`));
             }
         });
@@ -85,7 +85,7 @@ export default class RealSheetsService implements SheetsService {
 
     // eslint-disable-next-line
     private async appendRow(token: JWT, range: string, row: any[]) {
-        console.log("Sheets Service insert range: " + range);
+        logger.debug("Sheets Service insert range: " + range);
         // eslint-disable-next-line
         const request: any = {
             auth: token,
@@ -100,7 +100,7 @@ export default class RealSheetsService implements SheetsService {
 
         const sheets = google.sheets("v4");
         const response = (await sheets.spreadsheets.values.append(request)).data;
-        console.log("Sheets Service row appended: " + JSON.stringify(response, null, 2));
+        logger.debug("Sheets Service row appended: " + JSON.stringify(response, null, 2));
     }
 
     async appendValues(form: Map<string, string>, dataRange: string, headerRange: string): Promise<void> {

@@ -5,11 +5,11 @@ import {Service} from "../../../@types/Service";
 import {api} from "../../config/environment";
 import AuthenticationResultParser from "../../lib/authentication-result-parser";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./LambdaFacadeInterface";
-import console from "console";
 import axios, {Axios, AxiosResponse} from "axios";
 import {TxMAEvent} from "../../types/txma-event";
 import {createHash} from "crypto";
 import {CodeBlockResponse} from "express/src/types/code-block-response";
+import logger from "../../lib/logger";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export default class LambdaFacade implements LambdaFacadeInterface {
@@ -17,7 +17,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
     public readonly EMAIL_BLOCK_PREFIX = "email:block:";
 
     constructor() {
-        console.log("Creating Lambda facade...");
+        logger.debug("Creating Lambda facade...");
 
         this.client = axios.create({
             baseURL: api.baseUrl,
@@ -31,7 +31,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/put-user", user, accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -50,7 +50,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/new-service", JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -82,7 +82,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post(`/update-client`, JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -105,7 +105,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post(`/update-service`, JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -128,7 +128,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/update-user", JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
@@ -137,60 +137,60 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/txma-logging", message);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
 
     async getEmailCodeBlock(email: string): Promise<boolean> {
-        console.log("Getting email code block");
+        logger.debug("Getting email code block");
         try {
             const hash = this.getBase64UrlHash(email);
             const codeBlockResponse = await this.post("/code-block/get", {id: this.EMAIL_BLOCK_PREFIX + hash});
             return (codeBlockResponse.data as CodeBlockResponse).blocked;
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
 
     async putEmailCodeBlock(email: string): Promise<void> {
-        console.log("Putting email code block");
+        logger.debug("Putting email code block");
         try {
             const hash = this.getBase64UrlHash(email);
             await this.client.post(`/code-block/put`, {id: this.EMAIL_BLOCK_PREFIX + hash});
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
 
     async removeEmailCodeBlock(email: string): Promise<void> {
-        console.log("Removing email code block");
+        logger.debug("Removing email code block");
         try {
             const hash = this.getBase64UrlHash(email);
             await this.client.post(`/code-block/delete`, {id: this.EMAIL_BLOCK_PREFIX + hash});
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
 
     async getDynamoDBEntries(userEmail: string): Promise<AxiosResponse> {
-        console.log("In LambdaFacade-getDynamoDBEntries");
+        logger.debug("In LambdaFacade-getDynamoDBEntries");
 
         const endPoint: string = "/get-dynamodb-entries/" + userEmail;
 
         try {
             return await this.get(endPoint);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
 
     async deleteClientEntries(userID: string, serviceID: string, accessToken: string): Promise<void> {
-        console.log("In LambdaFacade-deleteClientEntries");
+        logger.debug("In LambdaFacade-deleteClientEntries");
 
         const body = {
             userId: userID,
@@ -200,13 +200,13 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/delete-dynamodb-client-entries/", JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }
 
     async deleteServiceEntries(serviceID: string, accessToken: string): Promise<void> {
-        console.log("In LambdaFacade-deleteServiceEntries");
+        logger.debug("In LambdaFacade-deleteServiceEntries");
 
         const body = {
             serviceId: serviceID
@@ -215,7 +215,7 @@ export default class LambdaFacade implements LambdaFacadeInterface {
         try {
             await this.post("/delete-dynamodb-service-entries/", JSON.stringify(body), accessToken);
         } catch (error) {
-            console.error(error as Error);
+            logger.error(error as Error);
             throw error;
         }
     }

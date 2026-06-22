@@ -2,6 +2,7 @@ import {ErrorRequestHandler, RequestHandler} from "express";
 import requestHandler, {errorHandler as errorRequestHandler} from "./request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import AuthenticationResultParser from "../lib/authentication-result-parser";
+import logger from "../lib/logger";
 
 export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
@@ -13,7 +14,7 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
         sessionId = req.session.id;
         userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
     } catch {
-        console.debug("RequestHandler: unable to establish identifiers from session.");
+        logger.debug("RequestHandler: unable to establish identifiers from session.");
     }
 
     s4.sendTxMALog("SSE_ERROR_UNAVAILABLE", {
@@ -27,7 +28,7 @@ export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
 export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, res, next) => {
-    console.error("ErrorRequestHandler: error info: " + err);
+    logger.error("ErrorRequestHandler: error info: " + err);
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
@@ -38,7 +39,7 @@ export const errorHandler: ErrorRequestHandler = errorRequestHandler((err, req, 
         sessionId = req.session.id;
         userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
     } catch {
-        console.debug("ErrorRequestHandler: unable to establish identifiers from session.");
+        logger.debug("ErrorRequestHandler: unable to establish identifiers from session.");
     }
 
     s4.sendTxMALog("SSE_ERROR_PROBLEM", {

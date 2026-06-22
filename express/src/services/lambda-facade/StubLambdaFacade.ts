@@ -4,8 +4,8 @@ import {AxiosResponse} from "axios";
 import {Service} from "../../../@types/Service";
 import {DynamoUser} from "../../../@types/user";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./LambdaFacadeInterface";
-import console from "console";
 import {TxMAEvent} from "../../types/txma-event";
+import logger from "../../lib/logger";
 
 const defaultPublicKey =
     "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
@@ -38,7 +38,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     };
 
     constructor() {
-        console.log("Creating stub Lambda facade...");
+        logger.debug("Creating stub Lambda facade...");
     }
 
     getUserByCognitoId(): Promise<AxiosResponse> {
@@ -212,12 +212,12 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     }
 
     async deleteClientEntries(oldUserID: string, serviceID: string): Promise<void> {
-        console.log("Stubbing Deletion of Client Entries for:  Client ID =>" + oldUserID + ", ServiceID => " + serviceID);
+        logger.debug("Stubbing Deletion of Client Entries for:  Client ID =>" + oldUserID + ", ServiceID => " + serviceID);
         return;
     }
 
     async deleteServiceEntries(serviceID: string): Promise<void> {
-        console.log("Stubbing Deletion of Service Entries for: ServiceID => " + serviceID);
+        logger.debug("Stubbing Deletion of Service Entries for: ServiceID => " + serviceID);
         return;
     }
 
@@ -232,7 +232,7 @@ export default class StubLambdaFacade implements LambdaFacadeInterface {
     }
 
     async sendTxMALog(message: TxMAEvent): Promise<void> {
-        console.log(JSON.stringify(message));
+        logger.debug(JSON.stringify(message));
         return;
     }
 

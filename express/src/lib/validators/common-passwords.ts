@@ -1,5 +1,6 @@
 import {readFile} from "fs/promises";
 import {resources} from "../../config/resources";
+import logger from "../logger";
 
 const minimumPasswordLength = 8;
 const commonPasswords = loadCommonPasswords();
@@ -19,6 +20,6 @@ async function loadCommonPasswords() {
             .filter(password => password.length >= minimumPasswordLength)
     );
 
-    console.log(`Loaded ${passwords.size} common passwords of ${minimumPasswordLength} characters or more`);
+    logger.debug(`Loaded ${passwords.size} common passwords of ${minimumPasswordLength} characters or more`);
     return passwords;
 }

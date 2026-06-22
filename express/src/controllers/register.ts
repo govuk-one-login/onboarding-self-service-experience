@@ -7,17 +7,17 @@ import {domainUserToDynamoUser} from "../lib/models/user-utils";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number";
 import {render} from "../middleware/request-handler";
 import SelfServiceServicesService from "../services/self-service-services-service";
-import * as console from "console";
 import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
 import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP";
 import {getNextPathsAndRedirect, RegisterRoutes, SignInRoutes} from "../middleware/state-machine";
+import logger from "../lib/logger";
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 
 export const processGetEmailForm: RequestHandler = async (req, res) => {
     const emailAddress: string = req.body.emailAddress;
     const s4: SelfServiceServicesService = req.app.get("backing-service");
-    console.info("In ProcessGetEmailForm");
+    logger.debug("In ProcessGetEmailForm");
 
     req.session.emailAddress = emailAddress;
     req.session.save();
@@ -28,29 +28,29 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
         if (error instanceof UsernameExistsException) {
             const signUpStatus: SignupStatus = await s4.getSignUpStatus(emailAddress);
 
-            console.info("In UserNameExistException");
+            logger.debug("In UserNameExistException");
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasEmail)) {
-                console.info("Processing No HasEmail");
+                logger.info("Processing No HasEmail");
                 return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeBeforePassword);
             }
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasPassword)) {
-                console.info("Processing No HasPassword");
+                logger.info("Processing No HasPassword");
                 return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeBeforePassword);
             }
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasPhoneNumber)) {
-                console.info("Processing No HasPhoneNumber");
+                logger.info("Processing No HasPhoneNumber");
                 return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeAfterPassword);
             }
 
             if (!signUpStatus.hasStage(SignupStatusStage.HasTextCode)) {
-                console.info("Processing No HasTextCode");
+                logger.info("Processing No HasTextCode");
                 return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeAfterPassword);
             }
 
-            console.info("Redirecting to Default");
+            logger.info("Redirecting to Default");
             return getNextPathsAndRedirect(req, res, RegisterRoutes.accountExists);
         }
 
@@ -61,7 +61,7 @@ export const processGetEmailForm: RequestHandler = async (req, res) => {
 };
 
 export const showCheckEmailForm: RequestHandler = async (req, res) => {
-    console.log("In register-showCheckEmailForm");
+    logger.debug("In register-showCheckEmailForm");
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
@@ -73,7 +73,7 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
         (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
         (await s4.getEmailCodeBlock(req.session.emailAddress.toLowerCase().trim()))
     ) {
-        console.log("Email is code blocked");
+        logger.debug("Email is code blocked");
         return getNextPathsAndRedirect(req, res, RegisterRoutes.tooManyCodes);
     }
 
@@ -89,7 +89,7 @@ export const showCheckEmailForm: RequestHandler = async (req, res) => {
 export const showTooManyCodes = render("register/too-many-codes.njk");
 
 export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
-    console.log("In register-submitEmailSecurityCode");
+    logger.debug("In register-submitEmailSecurityCode");
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     if (!req.session.emailAddress) {
@@ -100,7 +100,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
         (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
         (await s4.getEmailCodeBlock(req.session.emailAddress.toLowerCase().trim()))
     ) {
-        console.warn("Email blocked for OTP code");
+        logger.warn("Email blocked for OTP code");
         return getNextPathsAndRedirect(req, res, RegisterRoutes.tooManyCodes);
     }
 
@@ -118,7 +118,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
             req.session.save();
 
             if (req.session.emailCodeSubmitCount >= 6) {
-                console.warn("Email code block added");
+                logger.warn("Email code block added");
                 await s4.putEmailCodeBlock(req.session.emailAddress.toLowerCase().trim());
                 return getNextPathsAndRedirect(req, res, RegisterRoutes.tooManyCodes);
             }
@@ -164,7 +164,7 @@ export const submitEmailSecurityCode: RequestHandler = async (req, res) => {
 };
 
 export const showNewPasswordForm: RequestHandler = async (req, res) => {
-    console.log("In register:showNewPasswordForm");
+    logger.debug("In register:showNewPasswordForm");
 
     // TODO we should probably throw here and in similar cases?
     if (req.session.cognitoSession !== undefined) {
@@ -193,7 +193,7 @@ export const showEnterMobileForm: RequestHandler = (req, res) => {
 };
 
 export const processEnterMobileForm: RequestHandler = async (req, res) => {
-    console.info("In Controller:Register - processEnterMobileForm()");
+    logger.debug("In Controller:Register - processEnterMobileForm()");
 
     const authenticationResult = req.session.authenticationResult;
     const accessToken = authenticationResult?.AccessToken;
@@ -247,7 +247,7 @@ export const showSubmitMobileVerificationCode: RequestHandler = (req, res) => {
 };
 
 export const submitMobileVerificationCode: RequestHandler = async (req, res) => {
-    console.log("In register:submitMobileVerificationCode");
+    logger.debug("In register:submitMobileVerificationCode");
     const securityCode = req.body.securityCode;
 
     if (!securityCode) {
@@ -360,7 +360,7 @@ export const resumeAfterPassword = render("register/resume-after-password.njk");
 export const resendEmailVerificationCode: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = await req.app.get("backing-service");
 
-    console.info("Resending E-Mail Verification Code");
+    logger.info("Resending E-Mail Verification Code");
     if (
         (req.session.emailCodeSubmitCount && req.session.emailCodeSubmitCount >= 6) ||
         (await s4.getEmailCodeBlock((req.session.emailAddress as string).toLowerCase().trim()))
@@ -384,17 +384,17 @@ export const processAddServiceForm: RequestHandler = async (req, res, next) => {
     const userId = AuthenticationResultParser.getCognitoId(nonNull(req.session.authenticationResult));
 
     if (!userId) {
-        console.info("Can't get CognitoId from authenticationResult in session");
+        logger.info("Can't get CognitoId from authenticationResult in session");
         return getNextPathsAndRedirect(req, res, "/there-is-a-problem");
     }
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     try {
-        console.info("Adding Service:" + service.serviceName);
+        logger.info("Adding Service:" + service.serviceName);
         await s4.newService(service, userId, nonNull(req.session.authenticationResult));
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         return getNextPathsAndRedirect(req, res, "/there-is-a-problem");
     }
 
@@ -404,13 +404,13 @@ export const processAddServiceForm: RequestHandler = async (req, res, next) => {
     let body;
     const accessToken = nonNull(req.session.authenticationResult?.AccessToken);
     try {
-        console.info("Generating Client to Service:" + service.serviceName);
+        logger.info("Generating Client to Service:" + service.serviceName);
         const generatedClient = await s4.generateClient(service, nonNull(req.session.authenticationResult));
         body = JSON.parse(generatedClient.data.output).body;
         serviceId = JSON.parse(body).pk;
     } catch (error) {
-        console.error("Unable to Register Client to Service - Service Items removed");
-        console.error(error);
+        logger.error("Unable to Register Client to Service - Service Items removed");
+        logger.error(error);
         await s4.deleteServiceEntries(uuid, accessToken);
         return getNextPathsAndRedirect(req, res, "/there-is-a-problem");
     }
@@ -460,7 +460,7 @@ export const accountExists: RequestHandler = (req, res) => {
 export const resumeUserJourneyAfterPassword: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
-    console.info("In resumeUserJourney");
+    logger.debug("In resumeUserJourney");
     const userName = nonNull(req.session.emailAddress);
     const userPassword = nonNull(req.body["password"]);
 

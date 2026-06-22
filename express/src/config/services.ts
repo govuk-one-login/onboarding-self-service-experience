@@ -7,6 +7,7 @@ import StubLambdaFacade from "../services/lambda-facade/StubLambdaFacade";
 import CognitoClient from "../services/cognito/CognitoClient";
 import LambdaFacade from "../services/lambda-facade/LambdaFacade";
 import SelfServiceServicesService from "../services/self-service-services-service";
+import logger from "../lib/logger";
 
 export default function configureServices(app: Express) {
     let cognito: CognitoInterface;
@@ -21,5 +22,5 @@ export default function configureServices(app: Express) {
     }
 
     app.set("backing-service", new SelfServiceServicesService(cognito, api));
-    console.log("Backing service created");
+    logger.debug("Backing service created");
 }

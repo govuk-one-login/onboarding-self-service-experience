@@ -2,10 +2,10 @@ import {CodeMismatchException, NotAuthorizedException} from "@aws-sdk/client-cog
 import {NextFunction, Request, Response} from "express";
 import SelfServiceServicesService from "../services/self-service-services-service";
 import {isFixedOTPCredential, respondToMFAChallengeForFixedOTPCredential} from "../lib/fixedOTP";
-import console from "console";
+import logger from "../lib/logger";
 
 export default async function processSecurityCode(req: Request, res: Response, next: NextFunction) {
-    console.info("In processSecurityCode()");
+    logger.debug("In processSecurityCode()");
 
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 

@@ -19,6 +19,8 @@ import register from "./routes/register";
 import services from "./routes/services";
 import signIn from "./routes/sign-in";
 import serviceUnavailable from "./routes/service-unavailable";
+import {requestLoggingMiddleware} from "./lib/requestLogging";
+import logger from "./lib/logger";
 
 const app = Express();
 
@@ -30,17 +32,16 @@ app.use((req, res, next) => {
 });
 
 app.use(Helmet());
-
 app.get("/healthcheck", (req, res) => {
     return res.status(200).send("OK");
 });
 
 app.use("/assets", serveStatic(distribution.assets));
 app.use("/assets/images", serveStatic(distribution.images));
-
 app.use(urlencoded({extended: true}));
 app.use(sessionStorage);
 app.use(signInStatus);
+app.use(requestLoggingMiddleware);
 
 if (!showServiceUnavailablePage) {
     app.use(baseRoutes);
@@ -68,12 +69,12 @@ app.locals.serviceUnavailableBannerStartDate = serviceUnavailableBannerStartDate
 app.set("trust proxy", true);
 
 const server = app.listen(port, () =>
-    console.log(`Server running; listening on port ${port}, current time: ${new Date().toLocaleTimeString()}`)
+    logger.debug(`Server running; listening on port ${port}, current time: ${new Date().toLocaleTimeString()}`)
 );
 
 process.on("SIGTERM", () => {
-    console.debug("Server shutdown signal received");
+    logger.debug("Server shutdown signal received");
     server.close(() => {
-        console.debug("Closed server");
+        logger.debug("Closed server");
     });
 });

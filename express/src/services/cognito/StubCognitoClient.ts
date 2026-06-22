@@ -15,6 +15,7 @@ import {promises as fs} from "fs";
 import path from "path";
 import {convertToCountryPrefixFormat} from "../../lib/mobile-number";
 import CognitoInterface from "./CognitoInterface";
+import logger from "../../lib/logger";
 
 const kid = {kid: "bIXchwnF2Iyc/lFMKTHBvG+R6x1ea9ZN3sEegxjnL/k=", alg: "RS256"};
 
@@ -95,7 +96,7 @@ export default class StubCognitoClient implements CognitoInterface {
         .then(buffer => JSON.parse(buffer.toString()));
 
     constructor() {
-        console.log("Creating stub Cognito client...");
+        logger.debug("Creating stub Cognito client...");
     }
 
     async createUser(email: string): Promise<void> {
@@ -177,8 +178,8 @@ export default class StubCognitoClient implements CognitoInterface {
     }
 
     async setSignUpStatus(username: string, status: string): Promise<void> {
-        console.log(username);
-        console.log(status);
+        logger.debug(username);
+        logger.debug(status);
 
         return;
     }

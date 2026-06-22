@@ -1,3 +1,4 @@
+import logger from "../logger";
 import SheetsInterface from "./interface";
 
 export default class SheetsService implements SheetsInterface {
@@ -10,12 +11,12 @@ export default class SheetsService implements SheetsInterface {
 
     async init() {
         if (process.env.USE_STUB_SHEETS === "true") {
-            console.log("Using Stub Sheets Service");
+            logger.debug("Using Stub Sheets Service");
             const module = await import("./stubSheets/stubSheetsService");
             const service = module.default;
             this.implementation = new service(this.spreadsheetId);
         } else {
-            console.log("Using the actual implementation of the Sheets Service");
+            logger.debug("Using the actual implementation of the Sheets Service");
             const module = await import("./realSheets/realSheetsService");
             const service = module.default;
             this.implementation = new service(this.spreadsheetId);

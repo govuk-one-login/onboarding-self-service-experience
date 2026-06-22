@@ -86,7 +86,8 @@ import {
     processChangeClaimsForm
 } from "../../src/controllers/clients";
 import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
-import console from "console";
+
+import logger from "../../src/lib/logger";
 
 const s4ListClientsSpy = jest.spyOn(SelfServiceServicesService.prototype, "listClients");
 const s4SendTxmaLogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
@@ -103,6 +104,7 @@ describe("showClient Controller tests", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(logger, "error");
     });
 
     it("calls render with the expected template and options from the first client returned from s4 listClients", async () => {
@@ -3214,7 +3216,7 @@ describe("processChangeClientName controller tests", () => {
             TEST_ACCESS_TOKEN
         );
         expect(mockRequest.session.updatedField).toBeUndefined();
-        expect(console.error).toHaveBeenCalledWith(err);
+        expect(logger.error).toHaveBeenCalledWith(err);
         expect(mockResponse.redirect).toHaveBeenCalledWith("/there-is-a-problem");
     });
 });

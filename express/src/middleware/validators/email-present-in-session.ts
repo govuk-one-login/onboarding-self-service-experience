@@ -1,7 +1,8 @@
 import {RequestHandler} from "express";
+import logger from "../../lib/logger";
 
 export default function checkEmailIsPresentInSession(template: string, renderOptions?: object): RequestHandler {
-    console.info("In checkEmailIsPresentInSession()");
+    logger.debug("In checkEmailIsPresentInSession()");
 
     return (req, res, next) => {
         if (!req.session.emailAddress) {
