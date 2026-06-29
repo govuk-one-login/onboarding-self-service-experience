@@ -1,9 +1,10 @@
 {
-  "$schema": "https://raw.githubusercontent.com/govuk-one-login/quality-gates/refs/tags/v0.11.0/schemas/schema.json",
+  "$schema": "https://raw.githubusercontent.com/govuk-one-login/quality-gates/refs/tags/v0.12.0/schemas/schema.json",
   "services": [
     {
       "serviceTag": "orchestration",
-      "promotionType": "securePipelines",
+      "promotionType": "other",
+      "promotionTypeDetails": ["Only dev and production environments"],
       "checks": [
         {
           "checkTypes": [
