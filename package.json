@@ -38,7 +38,7 @@
     "helmet": "^8.1.0"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.152",
+    "@types/aws-lambda": "^8.10.162",
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.14",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
@@ -47,10 +47,10 @@
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "fs-extra": "^11.3.0",
+    "fs-extra": "^11.3.5",
     "jest": "^29.5.0",
     "prettier": "2.8.8",
-    "ts-jest": "^29.4.0",
+    "ts-jest": "^29.4.11",
     "ts-node": "^10.9.1",
     "typescript": "^5.8.3"
   }
