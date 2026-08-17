@@ -2,12 +2,11 @@ const getMock = jest.fn();
 const appendMock = jest.fn();
 const JwtMock = jest.fn();
 
-jest.mock("googleapis-common", () => ({
-    JWT: JwtMock
-}));
-
 jest.mock("googleapis", () => ({
     google: {
+        auth: {
+            JWT: JwtMock
+        },
         sheets: jest.fn(() => ({
             spreadsheets: {
                 values: {
@@ -59,7 +58,11 @@ describe("RealSheetsService tests", () => {
         const sheetsService = new RealSheetsService(TEST_SPREADSHEET_ID);
         await sheetsService.appendValues(TEST_DATA_TO_APPEND, TEST_DATA_RANGE, TEST_HEADER_RANGE);
 
-        expect(JwtMock).toHaveBeenCalledWith(TEST_EMAIL, undefined, TEST_PRIVATE_KEY, TEST_SCOPES, undefined);
+        expect(JwtMock).toHaveBeenCalledWith({
+            email: TEST_EMAIL,
+            key: TEST_PRIVATE_KEY,
+            scopes: TEST_SCOPES
+        });
         expect(getMock).toHaveBeenCalledWith({
             auth: TEST_JWT,
             spreadsheetId: TEST_SPREADSHEET_ID,

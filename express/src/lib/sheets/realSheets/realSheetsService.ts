@@ -1,6 +1,5 @@
 import {promises as fs} from "fs";
-import {JWT} from "googleapis-common";
-import {google} from "googleapis";
+import {Auth, google} from "googleapis";
 import SheetsService from "../interface";
 import logger from "../../logger";
 
@@ -8,7 +7,7 @@ export default class RealSheetsService implements SheetsService {
     private readonly SCOPES: string[] = ["https://www.googleapis.com/auth/spreadsheets"];
     private readonly SPREADSHEET_ID: string;
 
-    private jwt: JWT | undefined = undefined;
+    private jwt: Auth.JWT | undefined = undefined;
 
     constructor(spreadsheetId: string) {
         this.SPREADSHEET_ID = spreadsheetId;
@@ -38,11 +37,15 @@ export default class RealSheetsService implements SheetsService {
     }
 
     // eslint-disable-next-line
-    private async createToken(data: any): Promise<JWT> {
+    private async createToken(data: any): Promise<Auth.JWT> {
         return new Promise(async (resolve, reject) => {
             try {
                 const creds = JSON.parse(data);
-                this.jwt = new JWT(creds.client_email, undefined, creds.private_key, this.SCOPES, undefined);
+                this.jwt = new google.auth.JWT({
+                    email: creds.client_email,
+                    key: creds.private_key,
+                    scopes: this.SCOPES
+                });
                 resolve(this.jwt);
             } catch (error) {
                 reject(error);
@@ -51,7 +54,7 @@ export default class RealSheetsService implements SheetsService {
     }
 
     // eslint-disable-next-line
-    private async readRange(token: JWT, range: string, sheetId: string): Promise<any[][]> {
+    private async readRange(token: Auth.JWT, range: string, sheetId: string): Promise<any[][]> {
         return new Promise(async function (resolve, reject) {
             const sheets = google.sheets("v4");
             try {
@@ -74,7 +77,7 @@ export default class RealSheetsService implements SheetsService {
     }
 
     // eslint-disable-next-line
-    private async createRow(token: JWT, form: Map<string, string>, headings: any[][]): Promise<any[][]> {
+    private async createRow(token: Auth.JWT, form: Map<string, string>, headings: any[][]): Promise<any[][]> {
         // eslint-disable-next-line
         const row: any[] = [];
         headings[0].forEach(heading => {
@@ -84,7 +87,7 @@ export default class RealSheetsService implements SheetsService {
     }
 
     // eslint-disable-next-line
-    private async appendRow(token: JWT, range: string, row: any[]) {
+    private async appendRow(token: Auth.JWT, range: string, row: any[]) {
         logger.debug("Sheets Service insert range: " + range);
         // eslint-disable-next-line
         const request: any = {
@@ -105,7 +108,7 @@ export default class RealSheetsService implements SheetsService {
 
     async appendValues(form: Map<string, string>, dataRange: string, headerRange: string): Promise<void> {
         const creds: string = await RealSheetsService.readCreds();
-        const token: JWT = await this.createToken(creds);
+        const token: Auth.JWT = await this.createToken(creds);
         // eslint-disable-next-line
         const headings: any[] = await this.readRange(token, headerRange, this.SPREADSHEET_ID);
         // eslint-disable-next-line
