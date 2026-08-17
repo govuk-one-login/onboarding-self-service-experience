@@ -83,8 +83,9 @@ export default class CognitoClient implements CognitoInterface {
 
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
         let temporaryPassword: string;
+        const isAcceptanceTestUser = isFixedOTPCredential(email);
 
-        if (isFixedOTPCredential(email)) {
+        if (isAcceptanceTestUser) {
             temporaryPassword = getFixedOTPCredentialTemporaryPassword(email);
         } else {
             temporaryPassword = secureRandom6DigitCode();
@@ -99,7 +100,8 @@ export default class CognitoClient implements CognitoInterface {
                 UserAttributes: [
                     {Name: "email", Value: cognitoUserName},
                     {Name: "custom:signup_status", Value: ""}
-                ]
+                ],
+                ...(isAcceptanceTestUser && {MessageAction: "SUPPRESS"})
             });
         } catch (error) {
             logger.error(error as Error);
@@ -136,7 +138,9 @@ export default class CognitoClient implements CognitoInterface {
         const cognitoUserName = this.translatePseudonymisedEmailAddress(email);
         let temporaryPassword: string;
 
-        if (isFixedOTPCredential(email)) {
+        const isAcceptanceTestClient = isFixedOTPCredential(email);
+
+        if (isAcceptanceTestClient) {
             temporaryPassword = getFixedOTPCredentialTemporaryPassword(email);
         } else {
             temporaryPassword = secureRandom6DigitCode();
@@ -147,7 +151,7 @@ export default class CognitoClient implements CognitoInterface {
                 DesiredDeliveryMediums: ["EMAIL"],
                 Username: cognitoUserName,
                 UserPoolId: this.userPoolId,
-                MessageAction: "RESEND",
+                MessageAction: isAcceptanceTestClient ? "SUPPRESS" : "RESEND",
                 TemporaryPassword: temporaryPassword,
                 UserAttributes: [{Name: "email", Value: cognitoUserName}]
             });
