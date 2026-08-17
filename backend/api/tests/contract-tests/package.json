@@ -25,6 +25,7 @@
     "typescript": "^5.9.3"
   },
   "overrides": {
-    "form-data": "~2.5.4"
+    "form-data": "~2.5.4",
+    "js-yaml": "5.2.2"
   }
 }
