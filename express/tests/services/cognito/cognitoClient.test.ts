@@ -38,6 +38,7 @@ import {mockClient} from "aws-sdk-client-mock";
 import "aws-sdk-client-mock-jest";
 import CognitoClient from "../../../src/services/cognito/CognitoClient";
 import crypto from "node:crypto";
+import * as fixedOTP from "../../../src/lib/fixedOTP";
 
 const mockCognitoClient = mockClient(CognitoIdentityProviderClient);
 
@@ -362,6 +363,50 @@ describe("cognito client tests", () => {
             },
             ClientId: TEST_COGNITO_CLIENT_ID,
             UserPoolId: TEST_COGNITO_USER_POOL_ID
+        });
+    });
+
+    describe("acceptance test user", () => {
+        const isFixedOtpSpy = jest.spyOn(fixedOTP, "isFixedOTPCredential");
+        const getFixedOtpCodeSpy = jest.spyOn(fixedOTP, "getFixedOTPCredentialTemporaryPassword");
+
+        it("sends an admin create user command with the messageAction SUPRESS when creating an acceptance test user", async () => {
+            const expectedTemporaryPassword = "123456";
+            isFixedOtpSpy.mockReturnValue(true);
+            getFixedOtpCodeSpy.mockReturnValue(expectedTemporaryPassword);
+
+            const cognitoClient = new CognitoClient();
+            await cognitoClient.createUser(TEST_EMAIL);
+
+            expect(mockCognitoClient).toHaveReceivedCommandWith(AdminCreateUserCommand, {
+                DesiredDeliveryMediums: ["EMAIL"],
+                Username: TEST_EMAIL,
+                UserPoolId: TEST_COGNITO_USER_POOL_ID,
+                TemporaryPassword: expectedTemporaryPassword,
+                UserAttributes: [
+                    {Name: "email", Value: TEST_EMAIL},
+                    {Name: "custom:signup_status", Value: ""}
+                ],
+                MessageAction: "SUPPRESS"
+            });
+        });
+
+        it("sends resends the code with the messageAction SUPRESS when resending the email code for an acceptance test user", async () => {
+            const expectedTemporaryPassword = "123456";
+            isFixedOtpSpy.mockReturnValue(true);
+            getFixedOtpCodeSpy.mockReturnValue(expectedTemporaryPassword);
+
+            const cognitoClient = new CognitoClient();
+            await cognitoClient.resendEmailAuthCode(TEST_EMAIL);
+
+            expect(mockCognitoClient).toHaveReceivedCommandWith(AdminCreateUserCommand, {
+                DesiredDeliveryMediums: ["EMAIL"],
+                Username: TEST_EMAIL,
+                UserPoolId: TEST_COGNITO_USER_POOL_ID,
+                TemporaryPassword: expectedTemporaryPassword,
+                UserAttributes: [{Name: "email", Value: TEST_EMAIL}],
+                MessageAction: "SUPPRESS"
+            });
         });
     });
 });
