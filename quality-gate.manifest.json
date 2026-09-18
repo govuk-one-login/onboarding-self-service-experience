@@ -4,7 +4,7 @@
     {
       "product": "Orchestration - Onboarding",
       "component": "self-service-experience",
-      "promotionType": "other",
+      "promotionType": "securePipelines",
       "promotionTypeDetails": [
         "Only dev and production environments"
       ],
