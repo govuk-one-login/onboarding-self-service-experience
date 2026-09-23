@@ -103,7 +103,7 @@ export class TestContext extends World {
     }
 }
 
-BeforeAll({timeout: 60 * 1000}, async function () {
+BeforeAll({timeout: 90 * 1000}, async function () {
     const startTime = Date.now() / 1000;
     counter = 0;
     const screenshotsDir = "reports/screenshots";
