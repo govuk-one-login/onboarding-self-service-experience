@@ -104,6 +104,7 @@ export class TestContext extends World {
 }
 
 BeforeAll({timeout: 60 * 1000}, async function () {
+    const startTime = Date.now() / 1000;
     counter = 0;
     const screenshotsDir = "reports/screenshots";
     if (fse.pathExistsSync(screenshotsDir)) {
@@ -126,32 +127,39 @@ BeforeAll({timeout: 60 * 1000}, async function () {
             "--disable-gpu" // Disables hardware acceleration since Docker has no GPU
         ]
     });
-    console.log("Puppeteer launched...");
+    console.log(`Puppeteer launched. Elapsed time: ${Math.floor(Date.now() / 1000 - startTime)}s`);
 
     const page = await browser.newPage();
+    console.log(`Browser initialised. Elapsed time: ${Math.floor(Date.now() / 1000 - startTime)}s`);
 
     await page.goto(`${host}/register`);
+    console.log(`Navigated to /register. Elapsed time: ${Math.floor(Date.now() / 1000 - startTime)}s`);
 
     await enterTextIntoTextInput(page, username, "emailAddress");
     await clickSubmitButton(page);
+    console.log(`Navigated to email OTP page. Elapsed time: ${Math.floor(Date.now() / 1000 - startTime)}s`);
 
     await enterTextIntoTextInput(page, email_otp_code, "securityCode");
     await clickSubmitButton(page);
+    console.log(`Navigated to password page. Elapsed time: ${Math.floor(Date.now() / 1000 - startTime)}s`);
 
     await enterTextIntoTextInput(page, password, "password");
     await clickSubmitButton(page);
+    console.log(`Navigated to mobile number page. Elapsed time: ${Math.floor(Date.now() / 1000 - startTime)}s`);
 
     await enterTextIntoTextInput(page, mobile_number, "mobileNumber");
     await clickSubmitButton(page);
+    console.log(`Navigated to SMS OTP page. Elapsed time: ${Math.floor(Date.now() / 1000 - startTime)}s`);
 
     await enterTextIntoTextInput(page, sms_otp_code, "securityCode");
     await clickSubmitButton(page);
+    console.log(`Navigated to service name page. Elapsed time: ${Math.floor(Date.now() / 1000 - startTime)}s`);
 
     await enterTextIntoTextInput(page, servicename, "serviceName");
     await clickSubmitButton(page, 60000);
 
     if ((await page.title()) === "Client details - GOV.UK One Login") {
-        console.log("Test setup completed, running tests...");
+        console.log(`Test setup completed. Elapsed time: ${Math.floor(Date.now() / 1000 - startTime)}s`);
     } else {
         throw new Error("Test setup incomplete.");
     }
