@@ -10,10 +10,10 @@
     "compile": "tsc"
   },
   "dependencies": {
-    "@aws-sdk/client-sfn": "^3.1134.0",
-    "@aws-sdk/client-sns": "^3.1134.0",
-    "@aws-sdk/client-sqs": "^3.1134.0",
-    "@aws-sdk/client-dynamodb": "^3.1134.0",
+    "@aws-sdk/client-sfn": "^3.1135.0",
+    "@aws-sdk/client-sns": "^3.1135.0",
+    "@aws-sdk/client-sqs": "^3.1135.0",
+    "@aws-sdk/client-dynamodb": "^3.1135.0",
     "@aws-sdk/util-dynamodb": "^3.996.9",
     "@aws-lambda-powertools/logger": "2.35.0",
     "axios": "^1.20.0",
