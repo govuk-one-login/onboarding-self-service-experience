@@ -48,9 +48,9 @@
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "fs-extra": "^11.4.0",
+    "fs-extra": "^11.4.1",
     "jest": "^29.5.0",
-    "prettier": "3.9.7",
+    "prettier": "3.9.8",
     "ts-jest": "^29.4.12",
     "ts-node": "^10.9.1",
     "typescript": "^5.8.3"
