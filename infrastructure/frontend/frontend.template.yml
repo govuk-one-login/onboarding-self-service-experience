@@ -101,31 +101,37 @@ Mappings:
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
       # Local builds do not support dynatrace
       dynatraceLoggingEnabled: false
+      prototypePasswordSecretArn: "unused"
     dev:
       cslsLoggingEnabled: true
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
       dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      prototypePasswordSecretArn: "arn:aws:secretsmanager:eu-west-2:494650018671:secret:/self-service/frontend/prototype-password-Hy4TIC"
     build:
       cslsLoggingEnabled: true
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
       dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      prototypePasswordSecretArn: "arn:aws:secretsmanager:eu-west-2:399055180839:secret:/self-service/frontend/prototype-password-1MNV3F"
     staging:
       cslsLoggingEnabled: true
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
       dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      prototypePasswordSecretArn: "arn:aws:secretsmanager:eu-west-2:325730373996:secret:/self-service/frontend/prototype-password-NMPWIZ"
     integration:
       cslsLoggingEnabled: true
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
       dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      prototypePasswordSecretArn: "arn:aws:secretsmanager:eu-west-2:663985455444:secret:/self-service/frontend/prototype-password-fjAAsi"
     production:
       cslsLoggingEnabled: true
       clslSubscriptionFilterArn: arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2
       dynatraceLoggingEnabled: true
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+      prototypePasswordSecretArn: "arn:aws:secretsmanager:eu-west-2:389946456390:secret:/self-service/frontend/prototype-password-boX1lP"
     default:
       cslsLoggingEnabled: false
       dynatraceLoggingEnabled: false
@@ -259,7 +265,6 @@ Resources:
               Value: !Ref ServiceUnavailablePageEndDate
             - Name: ENVIRONMENT
               Value: !Ref Environment
-
           PortMappings:
             - ContainerPort: !Ref ContainerPort
           HealthCheck:
@@ -299,6 +304,8 @@ Resources:
                   - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
                     - ':DT_CONNECTION_POINT::'
               - !Ref AWS::NoValue
+            - Name: PROTOTYPE_PASSWORD
+              ValueFrom: !FindInMap [ prototypePasswordSecretArn, Environment, !Ref Environment ]
 
   LogAuditLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
@@ -391,6 +398,13 @@ Resources:
               - Effect: Allow
                 Action: kms:Decrypt
                 Resource: arn:aws:kms:eu-west-2:216552277552:key/*
+        - PolicyName: GetPrototypeSecret
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !FindInMap [ prototypePasswordSecretArn, Environment, !Ref Environment ]
 
   TaskRole:
     Type: AWS::IAM::Role
