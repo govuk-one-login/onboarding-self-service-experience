@@ -1,4 +1,4 @@
-export type FrontendEnvironmentVariable = "PROTOTYPE_PASSWORD"
+export type FrontendEnvironmentVariable = "PROTOTYPE_PASSWORD";
 
 export const getEnvOrThrow = (name: FrontendEnvironmentVariable): string => {
     const envVar = process.env[name];

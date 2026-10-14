@@ -1,9 +1,9 @@
-import { RequestHandler } from "express";
-import { getEnvOrThrow } from "../lib/utils/get-env";
+import {RequestHandler} from "express";
+import {getEnvOrThrow} from "../lib/utils/get-env";
 
 export const showPrototypePage: RequestHandler = (_, res) => {
-    const prototypePassword = getEnvOrThrow('PROTOTYPE_PASSWORD')
+    const prototypePassword = getEnvOrThrow("PROTOTYPE_PASSWORD");
     res.render("clients/prototype.njk", {
-       password: prototypePassword
+        password: prototypePassword
     });
 };

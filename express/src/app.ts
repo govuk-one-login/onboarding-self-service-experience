@@ -21,7 +21,7 @@ import signIn from "./routes/sign-in";
 import serviceUnavailable from "./routes/service-unavailable";
 import {requestLoggingMiddleware} from "./lib/requestLogging";
 import logger from "./lib/logger";
-import prototypeRouter from "./routes/prototype"
+import prototypeRouter from "./routes/prototype";
 
 const app = Express();
 
@@ -50,7 +50,7 @@ if (!showServiceUnavailablePage) {
     app.use("/sign-in", signIn);
     app.use("/account", account);
     app.use("/services", services);
-    app.use(prototypeRouter)
+    app.use(prototypeRouter);
 } else {
     app.use(serviceUnavailable);
     app.all("*", function (req, res) {

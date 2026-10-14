@@ -305,7 +305,7 @@ Resources:
                     - ':DT_CONNECTION_POINT::'
               - !Ref AWS::NoValue
             - Name: PROTOTYPE_PASSWORD
-              ValueFrom: !FindInMap [ prototypePasswordSecretArn, Environment, !Ref Environment ]
+              ValueFrom: !FindInMap [ EnvironmentConfiguration, !Ref Environment, prototypePasswordSecretArn ]
 
   LogAuditLogGroup:
     # checkov:skip=CKV_AWS_158:Ensure that CloudWatch Log Group is encrypted by KMS
@@ -404,7 +404,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: secretsmanager:GetSecretValue
-                Resource: !FindInMap [ prototypePasswordSecretArn, Environment, !Ref Environment ]
+                Resource: !FindInMap [ EnvironmentConfiguration, !Ref Environment, prototypePasswordSecretArn ]
 
   TaskRole:
     Type: AWS::IAM::Role
