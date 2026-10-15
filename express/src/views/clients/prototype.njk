@@ -1,0 +1,31 @@
+{% extends "layouts/account.njk" %}
+{% from "dist/govuk/components/input/macro.njk" import govukInput %}
+{% from "dist/govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "dist/govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+
+{% set sidenavActiveItem = "prototype-sidenav" %}
+{% set headerActiveItem = "prototype" %}
+{% set pageTitle = "Access the GOV.UK One Login prototype" %}
+
+{% block mainContent%}
+  <h1 class="govuk-heading-l govuk-!-margin-top-3">GOV.UK One Login prototype</h1>
+  <p class="govuk-body">The prototype lets service teams explore GOV.UK One Login journeys and understand how they can fit in with the rest of your service.</p>
+  <p class="govuk-body">The prototype is password protected. Because you're signed in, you can use the password below to access it.</p>
+
+{% call govukInsetText() %}
+  Password: <p class="govuk-body govuk-!-font-weight-bold">{{password}}</p>
+{% endcall %}
+
+  {{ govukButton({
+  text: "Open the prototype",
+  classes: "govuk-button--secondary govuk-!-font-size-18",
+   href: "https://govuk-one-login-prototype-6d2545e2d700.herokuapp.com/manage-prototype/password?returnURL=%2F",
+  isStartButton: true,
+  attributes: {
+    target: "_blank",
+    rel: "noreferrer noopener"
+  }
+}) }}
+{% endblock %}
+
