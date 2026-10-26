@@ -7,7 +7,7 @@
     "exampleotp-tests": "cucumber-js  exampleotp-features"
   },
   "devDependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.1134.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.1152.0",
     "@axe-core/puppeteer": "^4.13.0",
     "@cucumber/cucumber": "^12.8.3",
     "@types/chance": "^1.1.8",
@@ -22,6 +22,6 @@
     "puppeteer": "^25.11.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.8.3",
-    "uuid": "^14.0.2"
+    "uuid": "^14.0.3"
   }
 }
