@@ -435,6 +435,10 @@ export const processAddServiceForm: RequestHandler = async (req, res, next) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const sendDataToUserSpreadsheet: RequestHandler = async (req, res, next) => {
+    if (process.env.GOOGLE_SHEETS_INTEGRATION_ENABLED === "false") {
+        next();
+        return;
+    }
     const s4: SelfServiceServicesService = req.app.get("backing-service");
 
     const {mobileNumber, emailAddress, serviceName} = req.session;
