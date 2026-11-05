@@ -178,6 +178,7 @@ Metadata:
       ignore_checks:
         - W6001
         - W8003
+        - E3724 # The latest version of cfn-lint seems to think that CodeSigningConfigArn is not a valid parameter in Globals
 
 Resources:
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html

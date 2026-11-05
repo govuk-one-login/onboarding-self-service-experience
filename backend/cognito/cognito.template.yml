@@ -2,6 +2,12 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Cognito UserPool and Client for the Admin Tool | v1.0.0
 Transform: AWS::Serverless-2016-10-31
 
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - E3724 # The latest version of cfn-lint seems to think that CodeSigningConfigArn is not a valid parameter in Globals
+
 Parameters:
   Environment:
     Description: "The name of the environment to deploy to."
