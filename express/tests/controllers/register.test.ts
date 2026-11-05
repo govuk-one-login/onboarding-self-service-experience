@@ -1061,6 +1061,7 @@ describe("sendDataToUserSpreadsheet controller tests", () => {
     });
 
     it("calls s4 updateUserSpreadsheet with session values and then calls next", async () => {
+        process.env.GOOGLE_SHEETS_INTEGRATION_ENABLED = "true";
         s4updateUserSpreadsheetSpy.mockResolvedValue();
 
         const mockReq = request({
@@ -1074,6 +1075,24 @@ describe("sendDataToUserSpreadsheet controller tests", () => {
 
         await sendDataToUserSpreadsheet(mockReq, response(), mockNext);
         expect(s4updateUserSpreadsheetSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_PHONE_NUMBER, TEST_SERVICE_NAME);
+        expect(mockNext).toHaveBeenCalled();
+    });
+
+    it("skips s4 SheetService call when feature flag disabled", async () => {
+        process.env.GOOGLE_SHEETS_INTEGRATION_ENABLED = "false";
+        s4updateUserSpreadsheetSpy.mockResolvedValue();
+
+        const mockReq = request({
+            session: {
+                mobileNumber: TEST_PHONE_NUMBER,
+                emailAddress: TEST_EMAIL,
+                serviceName: TEST_SERVICE_NAME
+            }
+        });
+        const mockNext = jest.fn();
+
+        await sendDataToUserSpreadsheet(mockReq, response(), mockNext);
+        expect(s4updateUserSpreadsheetSpy).not.toHaveBeenCalled();
         expect(mockNext).toHaveBeenCalled();
     });
 });

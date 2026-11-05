@@ -58,10 +58,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Run security audit
-        uses: govuk-one-login/github-actions/code-quality/run-security-audit@5dacba941def444d69f02843feaebed79b5fca51 # 11/04/2023
+      - name: Pull repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          workspaces: true
+          fetch-depth: ${{ steps.check-merge-commit.outputs.fetch-depth }}
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          cache: npm
+      - name: Run npm audit
+        shell: bash
+        run: npm audit --workspaces --include-workspace-root --omit=dev
 
   sonarcloud:
     if: startsWith(github.head_ref, 'dependabot') != true
