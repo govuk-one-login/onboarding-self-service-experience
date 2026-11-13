@@ -1,5 +1,5 @@
-import {getNextPathsAndRedirect} from "../../src/middleware/state-machine";
-import {request, response} from "../mocks";
+import {getNextPathsAndRedirect} from "../../src/middleware/state-machine.js";
+import {request, response} from "../mocks.js";
 
 describe("state-machine", () => {
     describe("getNextPaths - sign in", () => {

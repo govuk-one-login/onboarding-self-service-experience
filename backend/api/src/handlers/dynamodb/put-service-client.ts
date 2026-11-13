@@ -1,8 +1,8 @@
 import {APIGatewayProxyResult} from "aws-lambda";
-import DynamoDbClient from "../../dynamodb-client";
+import DynamoDbClient from "../../dynamodb-client.js";
 import {randomUUID} from "crypto";
-import {OnboardingTableItem} from "../../onboarding-table-item";
-import {handlerInvokeEvent} from "../handler-utils";
+import {OnboardingTableItem} from "../../onboarding-table-item.js";
+import {handlerInvokeEvent} from "../handler-utils.js";
 
 const client = new DynamoDbClient();
 

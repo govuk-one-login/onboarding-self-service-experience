@@ -1,8 +1,8 @@
 import {RequestHandler} from "express";
-import AuthenticationResultParser from "../lib/authentication-result-parser";
-import SelfServiceServicesService from "../services/self-service-services-service";
-import {render} from "../middleware/request-handler";
-import {getNextPathsAndRedirect, RegisterRoutes} from "../middleware/state-machine";
+import AuthenticationResultParser from "../lib/authentication-result-parser.js";
+import SelfServiceServicesService from "../services/self-service-services-service.js";
+import {render} from "../middleware/request-handler.js";
+import {getNextPathsAndRedirect, RegisterRoutes} from "../middleware/state-machine.js";
 
 export const listServices: RequestHandler = async (req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");

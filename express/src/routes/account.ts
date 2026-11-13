@@ -7,12 +7,12 @@ import {
     showChangePhoneNumberForm,
     showVerifyMobileWithSmsCode,
     verifyMobileWithSmsCode
-} from "../controllers/account";
-import checkAuthorisation from "../middleware/authoriser";
-import checkPasswordAllowed from "../middleware/validators/common-password-validator";
-import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator";
-import validateMobileNumber from "../middleware/validators/mobile-number-validator";
-import validatePassword from "../middleware/validators/password-validator";
+} from "../controllers/account.js";
+import checkAuthorisation from "../middleware/authoriser.js";
+import checkPasswordAllowed from "../middleware/validators/common-password-validator.js";
+import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator.js";
+import validateMobileNumber from "../middleware/validators/mobile-number-validator.js";
+import validatePassword from "../middleware/validators/password-validator.js";
 
 const router = Router();
 export default router;

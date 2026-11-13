@@ -1,5 +1,5 @@
 import {RequestHandler} from "express";
-import logger from "../../lib/logger";
+import logger from "../../lib/logger.js";
 
 export default function validateServiceName(render: string): RequestHandler {
     logger.debug("In validateServiceName()");

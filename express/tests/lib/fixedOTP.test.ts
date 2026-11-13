@@ -9,7 +9,7 @@ import {
     isPseudonymisedFixedOTPCredential,
     respondToMFAChallengeForFixedOTPCredential,
     verifyMobileUsingOTPCode
-} from "../../src/lib/fixedOTP";
+} from "../../src/lib/fixedOTP.js";
 import {CodeMismatchException} from "@aws-sdk/client-cognito-identity-provider";
 import process from "process";
 

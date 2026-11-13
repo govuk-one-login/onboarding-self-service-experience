@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
-import validate from "../../lib/validators/security-code-validator";
-import {isPseudonymisedFixedOTPCredential, getFixedOTPCredentialSecurityCode} from "../../lib/fixedOTP";
-import logger from "../../lib/logger";
+import validate from "../../lib/validators/security-code-validator.js";
+import {isPseudonymisedFixedOTPCredential, getFixedOTPCredentialSecurityCode} from "../../lib/fixedOTP.js";
+import logger from "../../lib/logger.js";
 
 export default function validateEmailSecurityCode(req: Request, res: Response, next: NextFunction) {
     logger.debug("In validateEmailSecurityCode()");

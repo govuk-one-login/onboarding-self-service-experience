@@ -1,4 +1,4 @@
-import SelfServiceServicesService from "../../src/services/self-service-services-service";
+import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
 import {
     accountExists,
     processAddServiceForm,
@@ -16,8 +16,8 @@ import {
     submitEmailSecurityCode,
     submitMobileVerificationCode,
     updatePassword
-} from "../../src/controllers/register";
-import {request, response} from "../mocks";
+} from "../../src/controllers/register.js";
+import {request, response} from "../mocks.js";
 import {
     TEST_ACCESS_TOKEN,
     TEST_AUTHENTICATION_RESULT,
@@ -34,14 +34,14 @@ import {
     TEST_SESSION_ID,
     TEST_TIMESTAMP,
     TEST_UUID
-} from "../constants";
+} from "../constants.js";
 import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
-import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status";
-import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
-import {domainUserToDynamoUser} from "../../src/lib/models/user-utils";
+import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status.js";
+import AuthenticationResultParser from "../../src/lib/authentication-result-parser.js";
+import {domainUserToDynamoUser} from "../../src/lib/models/user-utils.js";
 import crypto from "crypto";
 import {AxiosResponse} from "axios";
-import logger from "../../src/lib/logger";
+import logger from "../../src/lib/logger.js";
 
 const s4CreateUserSpy = jest.spyOn(SelfServiceServicesService.prototype, "createUser");
 const s4SignUpStatusSpy = jest.spyOn(SelfServiceServicesService.prototype, "getSignUpStatus");

@@ -1,4 +1,4 @@
-import {request, response} from "../mocks";
+import {request, response} from "../mocks.js";
 import {
     confirmForgotPassword,
     confirmForgotPasswordForm,
@@ -10,7 +10,7 @@ import {
     processEmailAddress,
     showCheckPhonePage,
     checkEmailPasswordReset
-} from "../../src/controllers/sign-in";
+} from "../../src/controllers/sign-in.js";
 import {
     TEST_AUTHENTICATION_RESULT,
     TEST_COGNITO_ID,
@@ -28,16 +28,16 @@ import {
     TEST_SESSION_ID,
     TEST_TIMESTAMP,
     TEST_USER
-} from "../constants";
-import {obscureNumber} from "../../src/lib/mobile-number";
-import SelfServiceServicesService from "../../src/services/self-service-services-service";
+} from "../constants.js";
+import {obscureNumber} from "../../src/lib/mobile-number.js";
+import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
 import {User} from "../../@types/user";
-import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
+import AuthenticationResultParser from "../../src/lib/authentication-result-parser.js";
 import {AxiosResponse} from "axios";
-import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status";
+import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status.js";
 import {LimitExceededException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import crypto from "node:crypto";
-import logger from "../../src/lib/logger";
+import logger from "../../src/lib/logger.js";
 
 jest.spyOn(crypto, "randomInt").mockImplementation(() => TEST_RANDOM_NUMBER);
 

@@ -32,8 +32,8 @@ const templateId = "template-id";
 process.env.SECURITY_CODE_TEXT_MESSAGE_TEMPLATE = templateId;
 
 import {toByteArray} from "base64-js";
-import {lambdaHandler} from "../../src/handlers/send-security-code-text-message";
-import {mockLambdaContext, smsSenderTrigger} from "../mocks";
+import {lambdaHandler} from "../../src/handlers/send-security-code-text-message.js";
+import {mockLambdaContext, smsSenderTrigger} from "../mocks.js";
 
 describe("Custom SMS sender", () => {
     it("Send SMS with a security code", async () => {

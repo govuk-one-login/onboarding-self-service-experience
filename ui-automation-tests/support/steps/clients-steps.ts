@@ -1,5 +1,5 @@
 import {Then} from "@cucumber/cucumber";
-import {TestContext} from "../test-setup";
+import {TestContext} from "../test-setup.js";
 import {strict as assert} from "assert";
 
 const fields = {

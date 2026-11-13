@@ -18,8 +18,8 @@ jest.mock("@aws-sdk/client-dynamodb", () => {
     };
 });
 
-import DynamoDbClient from "../src/dynamodb-client";
-import {TEST_DYNAMO_TABLE_NAME} from "./setup";
+import DynamoDbClient from "../src/dynamodb-client.js";
+import {TEST_DYNAMO_TABLE_NAME} from "./setup.js";
 
 const queryCommandParams = {
     TableName: TEST_DYNAMO_TABLE_NAME,

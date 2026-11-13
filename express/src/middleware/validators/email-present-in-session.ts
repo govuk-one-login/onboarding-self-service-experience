@@ -1,5 +1,5 @@
 import {RequestHandler} from "express";
-import logger from "../../lib/logger";
+import logger from "../../lib/logger.js";
 
 export default function checkEmailIsPresentInSession(template: string, renderOptions?: object): RequestHandler {
     logger.debug("In checkEmailIsPresentInSession()");

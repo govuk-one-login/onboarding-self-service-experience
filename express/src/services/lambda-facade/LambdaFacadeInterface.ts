@@ -3,7 +3,7 @@ import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import {AxiosResponse} from "axios";
 import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
 import {Service} from "../../../@types/Service";
-import {TxMAEvent} from "../../types/txma-event";
+import {TxMAEvent} from "../../types/txma-event.js";
 
 export type UserUpdates = Record<string, string | Date>;
 export type ClientUpdates = Record<string, string | string[] | boolean>;

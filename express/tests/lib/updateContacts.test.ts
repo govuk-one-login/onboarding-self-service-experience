@@ -1,4 +1,4 @@
-import {removeContact, addContact} from "../../src/lib/updateContacts";
+import {removeContact, addContact} from "../../src/lib/updateContacts.js";
 
 describe("removeContact", () => {
     test("should remove a contact that exists and is not the initial one", () => {

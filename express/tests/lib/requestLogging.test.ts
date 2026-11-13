@@ -4,8 +4,8 @@ import {Writable} from "stream";
 import helmet from "helmet";
 import pinoHttp from "pino-http";
 import request from "supertest";
-import {requestSerializer, responseSerializer} from "../../src/lib/requestLogging";
-import sessionStorage from "./../../src/config/session-storage";
+import {requestSerializer, responseSerializer} from "../../src/lib/requestLogging.js";
+import sessionStorage from "./../../src/config/session-storage.js";
 interface LogEntry {
     req: {
         headers: Record<string, string | undefined>;

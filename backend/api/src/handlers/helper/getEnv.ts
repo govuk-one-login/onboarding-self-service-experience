@@ -1,4 +1,4 @@
-import {EnvironmentVariable} from "../types/handler-env-var";
+import {EnvironmentVariable} from "../types/handler-env-var.js";
 
 export const getEnvOrThrow = (name: EnvironmentVariable): string => {
     const envVar = process.env[name];

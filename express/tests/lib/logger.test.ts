@@ -1,4 +1,4 @@
-import logger from "../../src/lib/logger";
+import logger from "../../src/lib/logger.js";
 
 describe("Logger", () => {
     it("should export a logger instance", () => {

@@ -1,5 +1,5 @@
-import checkAuthorisation from "../../src/middleware/authoriser";
-import {request, response} from "../mocks";
+import checkAuthorisation from "../../src/middleware/authoriser.js";
+import {request, response} from "../mocks.js";
 
 const mockNext = jest.fn();
 const mockRes = response();

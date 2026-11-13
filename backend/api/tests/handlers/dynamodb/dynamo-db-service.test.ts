@@ -2,10 +2,10 @@ import {
     deleteDynamoDBClientEntriesHandler,
     deleteDynamoDBServiceEntriesHandler,
     getDynamoDBEntriesHandler
-} from "../../../src/handlers/dynamodb/dynamo-db-service";
-import DynamoDbClient from "../../../src/dynamodb-client";
-import {constructTestApiGatewayEvent} from "../utils";
-import {TEST_ACCESS_TOKEN, TEST_DATA_TABLE_ITEM, TEST_SERVICE_ID, TEST_USER_EMAIL, TEST_USER_ID} from "../constants";
+} from "../../../src/handlers/dynamodb/dynamo-db-service.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
+import {constructTestApiGatewayEvent} from "../utils.js";
+import {TEST_ACCESS_TOKEN, TEST_DATA_TABLE_ITEM, TEST_SERVICE_ID, TEST_USER_EMAIL, TEST_USER_ID} from "../constants.js";
 
 describe("getDynamoDBEntriesHandler tests", () => {
     beforeEach(() => {

@@ -2,14 +2,14 @@ const getCodeBlockMock = jest.fn();
 const putCodeBlockMock = jest.fn();
 const deleteCodeBlockMock = jest.fn();
 
-jest.mock("../../../src/handlers/dynamodb/code-block-service", () => ({
+jest.mock("../../../src/handlers/dynamodb/code-block-service.js", () => ({
     getCodeBlock: getCodeBlockMock,
     putCodeBlock: putCodeBlockMock,
     deleteCodeBlock: deleteCodeBlockMock
 }));
 
-import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils";
-import {handler} from "../../../src/handlers/code-block/code-block-handler";
+import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils.js";
+import {handler} from "../../../src/handlers/code-block/code-block-handler.js";
 
 describe("Code Block handler tests", () => {
     it("rejects non post requests", async () => {

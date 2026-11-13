@@ -5,11 +5,11 @@ import {
     NotAuthorizedException
 } from "@aws-sdk/client-cognito-identity-provider";
 import {RequestHandler} from "express";
-import AuthenticationResultParser from "../lib/authentication-result-parser";
-import {convertToCountryPrefixFormat} from "../lib/mobile-number";
-import {render} from "../middleware/request-handler";
-import SelfServiceServicesService from "../services/self-service-services-service";
-import logger from "../lib/logger";
+import AuthenticationResultParser from "../lib/authentication-result-parser.js";
+import {convertToCountryPrefixFormat} from "../lib/mobile-number.js";
+import {render} from "../middleware/request-handler.js";
+import SelfServiceServicesService from "../services/self-service-services-service.js";
+import logger from "../lib/logger.js";
 
 export const showChangePasswordForm = render("account/change-password.njk");
 

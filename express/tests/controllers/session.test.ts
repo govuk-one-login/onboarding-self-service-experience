@@ -1,5 +1,5 @@
-import {request, response} from "../mocks";
-import {signOut} from "../../src/controllers/session";
+import {request, response} from "../mocks.js";
+import {signOut} from "../../src/controllers/session.js";
 
 describe("signOut controller tests", () => {
     it("calls destroy and redirects to /", () => {

@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["ES2022"],
-    "target": "ES2022",
-    "module": "CommonJS",
+    "module": "ESNext",
+    "target": "ESNext",
     "strict": true,
     "sourceMap": true,
     "skipLibCheck": true,
@@ -10,10 +9,9 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "allowUnreachableCode": false,
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "removeComments": true,
     "noUnusedLocals": true,
-    "baseUrl": "./",
     "outDir": "./dist",
     "rootDir": "."
   },

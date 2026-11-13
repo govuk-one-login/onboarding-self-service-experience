@@ -1,8 +1,8 @@
-import {getServicesHandler} from "../../../src/handlers/dynamodb/get-services";
-import DynamoDbClient from "../../../src/dynamodb-client";
-import {constructTestApiGatewayEvent} from "../utils";
+import {getServicesHandler} from "../../../src/handlers/dynamodb/get-services.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
+import {constructTestApiGatewayEvent} from "../utils.js";
 import {GetItemCommandOutput} from "@aws-sdk/client-dynamodb";
-import {TEST_ACCESS_TOKEN, TEST_DATA_TABLE_ITEM, TEST_USER_ID} from "../constants";
+import {TEST_ACCESS_TOKEN, TEST_DATA_TABLE_ITEM, TEST_USER_ID} from "../constants.js";
 
 describe("getServicesHandler tests", () => {
     beforeEach(() => {

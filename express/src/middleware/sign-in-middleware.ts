@@ -1,8 +1,8 @@
 import {CodeMismatchException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
 import {NextFunction, Request, Response} from "express";
-import SelfServiceServicesService from "../services/self-service-services-service";
-import {isFixedOTPCredential, respondToMFAChallengeForFixedOTPCredential} from "../lib/fixedOTP";
-import logger from "../lib/logger";
+import SelfServiceServicesService from "../services/self-service-services-service.js";
+import {isFixedOTPCredential, respondToMFAChallengeForFixedOTPCredential} from "../lib/fixedOTP.js";
+import logger from "../lib/logger.js";
 
 export default async function processSecurityCode(req: Request, res: Response, next: NextFunction) {
     logger.debug("In processSecurityCode()");

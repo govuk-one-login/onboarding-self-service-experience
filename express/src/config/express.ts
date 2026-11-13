@@ -1,10 +1,10 @@
 import express, {Express} from "express";
 import "express-async-errors";
-import "../lib/utils/optional";
-import RequestContext from "../types/request-context";
-import "./session-data";
-import configureViews from "./views";
-import configureServices from "./services";
+import "../lib/utils/optional.js";
+import RequestContext from "../types/request-context.js";
+import "./session-data.js";
+import configureViews from "./views.js";
+import configureServices from "./services.js";
 
 export default function Express(): Express {
     const app = express();

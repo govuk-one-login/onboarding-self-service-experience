@@ -1,8 +1,8 @@
-import DynamoDbClient from "../../../src/dynamodb-client";
-import {TEST_SERVICE_ID, TEST_SERVICE_NAME, TEST_USER_DYNAMO_ID, TEST_USER_EMAIL} from "../constants";
-import {putServiceUserHandler} from "../../../src/handlers/dynamodb/put-service-user";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
+import {TEST_SERVICE_ID, TEST_SERVICE_NAME, TEST_USER_DYNAMO_ID, TEST_USER_EMAIL} from "../constants.js";
+import {putServiceUserHandler} from "../../../src/handlers/dynamodb/put-service-user.js";
 import {PutItemCommandOutput} from "@aws-sdk/client-dynamodb";
-import {handlerInvokeEvent} from "../../../src/handlers/handler-utils";
+import {handlerInvokeEvent} from "../../../src/handlers/handler-utils.js";
 
 const TEST_PUT_USER_PAYLOAD = {
     service: {

@@ -1,7 +1,7 @@
 const timestampMock = jest.fn();
-jest.mock("../../src/lib/timestamp", () => timestampMock);
+jest.mock("../../src/lib/timestamp.js", () => timestampMock);
 
-import SelfServiceServicesService from "../../src/services/self-service-services-service";
+import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
 import {
     processAddPostLogoutUriForm,
     processAddRedirectUriForm,
@@ -39,7 +39,7 @@ import {
     processChangePKCEEnforcedForm,
     showChangeLandingPageUrlForm,
     processChangeLandingPageUrlForm
-} from "../../src/controllers/clients";
+} from "../../src/controllers/clients.js";
 import {
     TEST_ACCESS_TOKEN,
     TEST_AUTHENTICATION_RESULT,
@@ -76,18 +76,18 @@ import {
     TEST_TIMESTAMP_STRING,
     TEST_TOKEN_AUTH_METHOD,
     TEST_TOKEN_AUTH_METHOD_ALT
-} from "../constants";
-import {request, response} from "../mocks";
+} from "../constants.js";
+import {request, response} from "../mocks.js";
 import {
     processChangeScopesForm,
     processChangePublicKeyForm,
     showChangeScopesForm,
     showChangeClaimsForm,
     processChangeClaimsForm
-} from "../../src/controllers/clients";
-import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
+} from "../../src/controllers/clients.js";
+import AuthenticationResultParser from "../../src/lib/authentication-result-parser.js";
 
-import logger from "../../src/lib/logger";
+import logger from "../../src/lib/logger.js";
 
 const s4ListClientsSpy = jest.spyOn(SelfServiceServicesService.prototype, "listClients");
 const s4SendTxmaLogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");

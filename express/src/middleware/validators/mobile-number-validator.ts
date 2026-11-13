@@ -1,7 +1,7 @@
 import {RequestHandler} from "express";
-import {validateNumber as validate} from "../../lib/mobile-number";
-import {isPseudonymisedFixedOTPCredential, getFixedOTPCredentialMobileNumber} from "../../lib/fixedOTP";
-import logger from "../../lib/logger";
+import {validateNumber as validate} from "../../lib/mobile-number.js";
+import {isPseudonymisedFixedOTPCredential, getFixedOTPCredentialMobileNumber} from "../../lib/fixedOTP.js";
+import logger from "../../lib/logger.js";
 
 export default function validateMobileNumber(template: string): RequestHandler {
     logger.debug("In validateMobileNumber()");

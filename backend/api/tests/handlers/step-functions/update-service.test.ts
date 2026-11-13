@@ -1,18 +1,18 @@
 const validateAuthorisationHeaderMock = jest.fn();
 
-jest.mock("../../../src/handlers/helper/validate-authorisation-header", () => ({
+jest.mock("../../../src/handlers/helper/validate-authorisation-header.js", () => ({
     validateAuthorisationHeader: validateAuthorisationHeaderMock
 }));
 
 import {SFNClient, StartSyncExecutionCommand, SyncExecutionStatus} from "@aws-sdk/client-sfn";
 import {mockClient} from "aws-sdk-client-mock";
-import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils";
-import {doUpdateServiceHandler, UpdateServiceBody} from "../../../src/handlers/step-functions/update-service";
-import {TEST_CLIENT_ID, TEST_SELF_SERVICE_CLIENT_ID, TEST_SERVICE_ID, TEST_USER_EMAIL, TEST_USER_ID} from "../constants";
-import {TEST_STATE_MACHINE_ARN} from "../../setup";
+import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils.js";
+import {doUpdateServiceHandler, UpdateServiceBody} from "../../../src/handlers/step-functions/update-service.js";
+import {TEST_CLIENT_ID, TEST_SELF_SERVICE_CLIENT_ID, TEST_SERVICE_ID, TEST_USER_EMAIL, TEST_USER_ID} from "../constants.js";
+import {TEST_STATE_MACHINE_ARN} from "../../setup.js";
 import "aws-sdk-client-mock-jest";
 
-import DynamoDbClient from "../../../src/dynamodb-client";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
 
 const checkServiceUserExistsSpy = jest.spyOn(DynamoDbClient.prototype, "checkServiceUserExists");
 

@@ -1,8 +1,8 @@
-import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
-import {request, response} from "../mocks";
-import {TEST_AUTHENTICATION_RESULT, TEST_COGNITO_ID, TEST_SERVICE} from "../constants";
-import {listServices} from "../../src/controllers/services";
-import SelfServiceServicesService from "../../src/services/self-service-services-service";
+import AuthenticationResultParser from "../../src/lib/authentication-result-parser.js";
+import {request, response} from "../mocks.js";
+import {TEST_AUTHENTICATION_RESULT, TEST_COGNITO_ID, TEST_SERVICE} from "../constants.js";
+import {listServices} from "../../src/controllers/services.js";
+import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
 
 describe("listServices controller tests", () => {
     const getCognitoIdSpy = jest.spyOn(AuthenticationResultParser, "getCognitoId");

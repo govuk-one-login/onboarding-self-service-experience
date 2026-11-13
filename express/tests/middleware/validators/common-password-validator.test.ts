@@ -1,6 +1,6 @@
 import {Request} from "express";
-import checkPasswordAllowed from "../../../src/middleware/validators/common-password-validator";
-import {request, response} from "../../mocks";
+import checkPasswordAllowed from "../../../src/middleware/validators/common-password-validator.js";
+import {request, response} from "../../mocks.js";
 
 jest.mock("fs/promises", () => {
     return {

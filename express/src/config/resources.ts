@@ -1,5 +1,5 @@
 import path from "path";
-import {allowedEmailDomainsSource} from "./environment";
+import {allowedEmailDomainsSource} from "./environment.js";
 
 const baseDir = path.join(__dirname, "../..");
 const resourcesDir = path.join(baseDir, "resources");

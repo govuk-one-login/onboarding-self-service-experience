@@ -1,11 +1,11 @@
 import connect from "connect-dynamodb";
 import e, {RequestHandler} from "express";
 import session, {SessionData} from "express-session";
-import {region, sessionSecret, sessionStorage} from "./environment";
+import {region, sessionSecret, sessionStorage} from "./environment.js";
 import {DynamoDB} from "@aws-sdk/client-dynamodb";
 import {randomUUID} from "crypto";
-import {createMd5Hash} from "../controllers/utils";
-import logger from "../lib/logger";
+import {createMd5Hash} from "../controllers/utils.js";
+import logger from "../lib/logger.js";
 
 export default getSessionStorage();
 

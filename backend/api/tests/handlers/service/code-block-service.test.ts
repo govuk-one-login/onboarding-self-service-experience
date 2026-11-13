@@ -1,6 +1,6 @@
 import {mockClient} from "aws-sdk-client-mock";
 import "aws-sdk-client-mock-jest";
-import {CODE_BLOCK_TTL, deleteCodeBlock, getCodeBlock, putCodeBlock} from "../../../src/handlers/dynamodb/code-block-service";
+import {CODE_BLOCK_TTL, deleteCodeBlock, getCodeBlock, putCodeBlock} from "../../../src/handlers/dynamodb/code-block-service.js";
 import {DeleteItemCommand, DynamoDBClient, GetItemCommand, PutItemCommand} from "@aws-sdk/client-dynamodb";
 import {marshall} from "@aws-sdk/util-dynamodb";
 

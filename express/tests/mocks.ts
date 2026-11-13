@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import SelfServiceServicesService from "../src/services/self-service-services-service";
+import SelfServiceServicesService from "../src/services/self-service-services-service.js";
 
 export const mockLambdaFacade = {
     sendTxMALog: jest.fn(),

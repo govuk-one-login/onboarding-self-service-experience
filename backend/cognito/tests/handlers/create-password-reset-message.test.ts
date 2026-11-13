@@ -1,5 +1,5 @@
-import {generateEmailBody, handler} from "../../src/handlers/create-password-reset-message";
-import {TEST_CODE_PARAM, TEST_EMAIL, TEST_HOST, TEST_PROTOCOL, mockCustomPasswordResetMessage} from "../mocks";
+import {generateEmailBody, handler} from "../../src/handlers/create-password-reset-message.js";
+import {TEST_CODE_PARAM, TEST_EMAIL, TEST_HOST, TEST_PROTOCOL, mockCustomPasswordResetMessage} from "../mocks.js";
 
 describe("create-password-reset-message handler tests", () => {
     it("throws an error for missing client metadata", async () => {

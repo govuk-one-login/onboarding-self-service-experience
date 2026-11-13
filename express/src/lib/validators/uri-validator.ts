@@ -1,4 +1,4 @@
-import {ValidationResult} from "../../types/validation-result";
+import {ValidationResult} from "../../types/validation-result.js";
 
 export default function validateUri(uri: string, isGovUrl?: boolean, allowEmptyValue?: boolean): ValidationResult {
     uri = uri.trim();

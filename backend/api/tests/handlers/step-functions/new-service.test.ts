@@ -1,9 +1,9 @@
 import {SFNClient, StartSyncExecutionCommand, SyncExecutionStatus} from "@aws-sdk/client-sfn";
 import {mockClient} from "aws-sdk-client-mock";
-import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils";
-import {newServiceHandler} from "../../../src/handlers/step-functions/new-service";
-import {TEST_SERVICE_ID, TEST_SERVICE_NAME} from "../constants";
-import {TEST_STATE_MACHINE_ARN} from "../../setup";
+import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils.js";
+import {newServiceHandler} from "../../../src/handlers/step-functions/new-service.js";
+import {TEST_SERVICE_ID, TEST_SERVICE_NAME} from "../constants.js";
+import {TEST_STATE_MACHINE_ARN} from "../../setup.js";
 import "aws-sdk-client-mock-jest";
 
 const TEST_NEW_SERVICE = {

@@ -1,7 +1,7 @@
-import {getUserHandler} from "../../../src/handlers/dynamodb/get-user";
-import DynamoDbClient from "../../../src/dynamodb-client";
-import {constructTestApiGatewayEvent} from "../utils";
-import {TEST_ACCESS_TOKEN, TEST_USER_CONFIG, TEST_USER_ID} from "../constants";
+import {getUserHandler} from "../../../src/handlers/dynamodb/get-user.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
+import {constructTestApiGatewayEvent} from "../utils.js";
+import {TEST_ACCESS_TOKEN, TEST_USER_CONFIG, TEST_USER_ID} from "../constants.js";
 import {GetItemCommandOutput} from "@aws-sdk/client-dynamodb";
 
 describe("getUserHandler tests", () => {

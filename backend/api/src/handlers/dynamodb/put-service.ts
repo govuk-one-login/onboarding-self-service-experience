@@ -1,5 +1,5 @@
-import DynamoDbClient from "../../dynamodb-client";
-import {handlerInvokeEvent, handlerResult} from "../handler-utils";
+import DynamoDbClient from "../../dynamodb-client.js";
+import {handlerInvokeEvent, handlerResult} from "../handler-utils.js";
 
 const client = new DynamoDbClient();
 

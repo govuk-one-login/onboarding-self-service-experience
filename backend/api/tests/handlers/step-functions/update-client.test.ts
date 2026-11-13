@@ -1,11 +1,11 @@
 import {SFNClient, StartSyncExecutionCommand, SyncExecutionStatus} from "@aws-sdk/client-sfn";
 import {mockClient} from "aws-sdk-client-mock";
-import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils";
-import {doUpdateClientHandler} from "../../../src/handlers/step-functions/update-client";
-import {TEST_ACCESS_TOKEN, TEST_SERVICE_ID, TEST_USER_EMAIL, TEST_USER_ID} from "../constants";
-import {TEST_STATE_MACHINE_ARN} from "../../setup";
+import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils.js";
+import {doUpdateClientHandler} from "../../../src/handlers/step-functions/update-client.js";
+import {TEST_ACCESS_TOKEN, TEST_SERVICE_ID, TEST_USER_EMAIL, TEST_USER_ID} from "../constants.js";
+import {TEST_STATE_MACHINE_ARN} from "../../setup.js";
 import "aws-sdk-client-mock-jest";
-import DynamoDbClient from "../../../src/dynamodb-client";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
 
 const TEST_UPDATE_CLIENT_PAYLOAD = {
     serviceId: TEST_SERVICE_ID,

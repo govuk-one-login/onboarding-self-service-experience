@@ -1,6 +1,7 @@
 {
   "name": "gds-di-self-service-backend-api",
   "description": "DI Self-Service backend - API",
+  "type": "module",
   "scripts": {
     "build": "../../infrastructure/dev/deploy.sh api --no-deploy",
     "deploy": "../../infrastructure/dev/deploy.sh api",

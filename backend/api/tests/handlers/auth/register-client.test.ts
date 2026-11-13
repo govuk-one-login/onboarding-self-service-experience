@@ -1,7 +1,7 @@
 import sinon from "sinon";
 import axios from "axios";
-import {RegisterClientPayload, registerClientHandler} from "../../../src/handlers/auth/register-client";
-import {mockLambdaContext} from "../utils";
+import {RegisterClientPayload, registerClientHandler} from "../../../src/handlers/auth/register-client.js";
+import {mockLambdaContext} from "../utils.js";
 
 const postRequest = async (data: RegisterClientPayload): Promise<string> => {
     const result = await registerClientHandler(data, mockLambdaContext);

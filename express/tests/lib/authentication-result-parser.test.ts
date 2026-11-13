@@ -1,5 +1,5 @@
-import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
-import {constructFakeJwt} from "../constants";
+import AuthenticationResultParser from "../../src/lib/authentication-result-parser.js";
+import {constructFakeJwt} from "../constants.js";
 
 describe("AuthenticationResultParser tests", () => {
     it("getRefreshToken method tests", () => {

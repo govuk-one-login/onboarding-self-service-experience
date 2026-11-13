@@ -2,8 +2,8 @@ const helmetMock = jest.fn();
 
 jest.mock("helmet", () => helmetMock);
 
-import Helmet from "../../src/config/helmet";
-import {TEST_HELMET_CONFIG} from "../constants";
+import Helmet from "../../src/config/helmet.js";
+import {TEST_HELMET_CONFIG} from "../constants.js";
 
 describe("helmet config tests", () => {
     it("applies the expected values when calling the Helmet function", () => {

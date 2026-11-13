@@ -1,4 +1,4 @@
-import {SignupStatusStage} from "../src/lib/utils/signup-status";
+import {SignupStatusStage} from "../src/lib/utils/signup-status.js";
 import {OnboardingTableItem} from "../@types/OnboardingTableItem";
 import {Service, ServiceFromDynamo} from "../@types/Service";
 import {DynamoUser} from "../@types/user";

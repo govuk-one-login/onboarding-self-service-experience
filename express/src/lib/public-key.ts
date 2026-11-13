@@ -1,6 +1,6 @@
 import {createPublicKey} from "crypto";
-import validate from "../lib/validators/uri-validator";
-import logger from "./logger";
+import validate from "../lib/validators/uri-validator.js";
+import logger from "./logger.js";
 
 const BEGIN = "-----BEGIN PUBLIC KEY-----";
 const END = "-----END PUBLIC KEY-----";

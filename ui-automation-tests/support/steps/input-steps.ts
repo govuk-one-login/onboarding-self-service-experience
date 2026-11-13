@@ -1,6 +1,6 @@
 import {When, Then} from "@cucumber/cucumber";
-import {enterTextIntoTextInput, checkErrorMessageDisplayedForField, clickSubmitButton} from "./shared-functions";
-import {TestContext} from "../test-setup";
+import {enterTextIntoTextInput, checkErrorMessageDisplayedForField, clickSubmitButton} from "./shared-functions.js";
+import {TestContext} from "../test-setup.js";
 import {strict as assert} from "assert";
 import Chance from "chance";
 

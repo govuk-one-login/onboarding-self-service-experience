@@ -1,8 +1,8 @@
-import {getSessionCountHandler} from "../../../src/handlers/dynamodb/get-session-count";
-import DynamoDbClient from "../../../src/dynamodb-client";
+import {getSessionCountHandler} from "../../../src/handlers/dynamodb/get-session-count.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
 import {ScanCommandOutput} from "@aws-sdk/client-dynamodb";
-import {constructTestApiGatewayEvent} from "../utils";
-import {TEST_USER_EMAIL} from "../constants";
+import {constructTestApiGatewayEvent} from "../utils.js";
+import {TEST_USER_EMAIL} from "../constants.js";
 
 describe("getSessionCountHandler tests", () => {
     beforeEach(() => {

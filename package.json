@@ -1,6 +1,7 @@
 {
   "name": "gds-di-self-service-common",
   "description": "DI Self-Service monorepo",
+  "type": "module",
   "workspaces": [
     "backend/api",
     "backend/cognito",

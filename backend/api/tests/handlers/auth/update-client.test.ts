@@ -1,6 +1,6 @@
 import axios, {AxiosError, AxiosResponse} from "axios";
-import {UpdateClientPayload, updateClientInRegistryHandler, logger} from "../../../src/handlers/auth/update-client";
-import {mockLambdaContext} from "../utils";
+import {UpdateClientPayload, updateClientInRegistryHandler, logger} from "../../../src/handlers/auth/update-client.js";
+import {mockLambdaContext} from "../utils.js";
 
 const postRequest = async (data: UpdateClientPayload): Promise<string> => {
     const result = await updateClientInRegistryHandler(data, mockLambdaContext);

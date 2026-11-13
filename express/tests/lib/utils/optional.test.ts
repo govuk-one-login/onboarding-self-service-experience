@@ -1,4 +1,4 @@
-import "lib/utils/optional";
+import "lib/utils/optional.js";
 
 describe("Get requested values if they are non-null or throw an exception", () => {
     describe("Get optional value", () => {

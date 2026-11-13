@@ -1,6 +1,6 @@
 import {Router} from "express";
-import checkAuthorisation from "../middleware/authoriser";
-import {showPrototypePage} from "../controllers/prototype";
+import checkAuthorisation from "../middleware/authoriser.js";
+import {showPrototypePage} from "../controllers/prototype.js";
 
 const router = Router();
 export default router;

@@ -1,16 +1,16 @@
 const IsFixedCredMock = jest.fn();
 const IsPseudoFixedOTPCredMock = jest.fn();
 
-jest.mock("../../src/services/self-service-services-service");
-jest.mock("../../src/lib/fixedOTP", () => ({
+jest.mock("../../src/services/self-service-services-service.js");
+jest.mock("../../src/lib/fixedOTP.js", () => ({
     isFixedOTPCredential: IsFixedCredMock,
     isPseudonymisedFixedOTPCredential: IsPseudoFixedOTPCredMock
 }));
 
-import processSignInForm from "../../src/middleware/process-sign-in-form";
-import {request, response} from "../mocks";
+import processSignInForm from "../../src/middleware/process-sign-in-form.js";
+import {request, response} from "../mocks.js";
 import {NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
-import SelfServiceServicesService from "../../src/services/self-service-services-service";
+import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
 import {AxiosResponse} from "axios";
 import {
     TEST_DYNAMO_USER,
@@ -21,7 +21,7 @@ import {
     TEST_PHONE_NUMBER,
     TEST_SESSION_ID,
     TEST_TEMPLATE_PATH
-} from "../constants";
+} from "../constants.js";
 
 const s4LoginSpy = jest.spyOn(SelfServiceServicesService.prototype, "login");
 const s4SendTxmaLogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");

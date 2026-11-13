@@ -1,7 +1,7 @@
 import {promises as fs} from "fs";
 import {Auth, google} from "googleapis";
-import SheetsService from "../interface";
-import logger from "../../logger";
+import SheetsService from "../interface.js";
+import logger from "../../logger.js";
 
 export default class RealSheetsService implements SheetsService {
     private readonly SCOPES: string[] = ["https://www.googleapis.com/auth/spreadsheets"];

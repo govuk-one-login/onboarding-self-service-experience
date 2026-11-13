@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import logger from "../lib/logger";
+import logger from "../lib/logger.js";
 
 export const getNextPathsAndRedirect = (req: Request, res: Response, redirectPath: string) => {
     const currentPath = req.baseUrl + req.path;

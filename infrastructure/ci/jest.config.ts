@@ -1,5 +1,5 @@
 import {Config} from "jest";
-import baseConfig from "../../jest.config";
+import baseConfig from "../../jest.config.js";
 
 export default {
     ...baseConfig,

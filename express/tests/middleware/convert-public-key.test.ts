@@ -1,6 +1,6 @@
-import validateKeySource from "../../src/middleware/validate-public-key";
-import {publicKeyCompact, publicKeyWithHeaders} from "../lib/public-key.test";
-import {request, response} from "../mocks";
+import validateKeySource from "../../src/middleware/validate-public-key.js";
+import {publicKeyCompact, publicKeyWithHeaders} from "../lib/public-key.test.js";
+import {request, response} from "../mocks.js";
 import {
     TEST_AUTHENTICATION_RESULT,
     TEST_CLIENT_ID,
@@ -11,7 +11,7 @@ import {
     TEST_BAD_PUBLIC_KEY,
     TEST_STATIC_KEY_UPDATE,
     TEST_JWKS_KEY_UPDATE
-} from "../constants";
+} from "../constants.js";
 
 describe("Validate and convert submitted Static public key", () => {
     it("Call next middleware if public key successfully converted", () => {

@@ -1,7 +1,7 @@
-import DynamoDbClient from "../../../src/dynamodb-client";
-import {getServiceClientsHandler} from "../../../src/handlers/dynamodb/get-service-clients";
-import {TEST_ACCESS_TOKEN, TEST_SERVICE_ID, TEST_USER_ID} from "../constants";
-import {constructTestApiGatewayEvent} from "../utils";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
+import {getServiceClientsHandler} from "../../../src/handlers/dynamodb/get-service-clients.js";
+import {TEST_ACCESS_TOKEN, TEST_SERVICE_ID, TEST_USER_ID} from "../constants.js";
+import {constructTestApiGatewayEvent} from "../utils.js";
 
 const VALID_GET_CLIENT_REQUEST = constructTestApiGatewayEvent({
     body: "",

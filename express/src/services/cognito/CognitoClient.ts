@@ -26,8 +26,8 @@ import {
     UpdateUserAttributesCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import {Command} from "@aws-sdk/types";
-import {cognito, region} from "../../config/environment";
-import CognitoInterface from "./CognitoInterface";
+import {cognito, region} from "../../config/environment.js";
+import CognitoInterface from "./CognitoInterface.js";
 import {
     fixedOTPInitialise,
     getFixedOTPCredentialEmailAddress,
@@ -35,10 +35,10 @@ import {
     isFixedOTPCredential,
     isPseudonymisedFixedOTPCredential,
     verifyMobileUsingOTPCode
-} from "../../lib/fixedOTP";
+} from "../../lib/fixedOTP.js";
 import * as process from "process";
-import {secureRandom6DigitCode} from "../../lib/utils/secure-random-code";
-import logger from "../../lib/logger";
+import {secureRandom6DigitCode} from "../../lib/utils/secure-random-code.js";
+import logger from "../../lib/logger.js";
 
 type CognitoCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes> = Command<
     ServiceInputTypes,

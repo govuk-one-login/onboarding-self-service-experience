@@ -18,8 +18,8 @@ jest.mock("googleapis", () => ({
     }
 }));
 
-import RealSheetsService from "../../../../src/lib/sheets/realSheets/realSheetsService";
-import {TEST_DATA_RANGE, TEST_DATA_TO_APPEND, TEST_HEADER_RANGE, TEST_JWT, TEST_SCOPES} from "../../../constants";
+import RealSheetsService from "../../../../src/lib/sheets/realSheets/realSheetsService.js";
+import {TEST_DATA_RANGE, TEST_DATA_TO_APPEND, TEST_HEADER_RANGE, TEST_JWT, TEST_SCOPES} from "../../../constants.js";
 
 const TEST_EMAIL = "SomeEmail";
 const TEST_PRIVATE_KEY = "somePrivateKey";

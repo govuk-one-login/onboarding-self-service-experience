@@ -1,7 +1,7 @@
 import {NextFunction} from "express";
-import {allowUserJourneyMiddleware} from "../../src/middleware/allow-user-journey-middleware";
-import {request, response} from "../mocks";
-import {RegisterRoutes} from "../../src/middleware/state-machine";
+import {allowUserJourneyMiddleware} from "../../src/middleware/allow-user-journey-middleware.js";
+import {request, response} from "../mocks.js";
+import {RegisterRoutes} from "../../src/middleware/state-machine.js";
 
 describe("Allow user journey middleware", () => {
     it("Should call next when use journey is valid", () => {

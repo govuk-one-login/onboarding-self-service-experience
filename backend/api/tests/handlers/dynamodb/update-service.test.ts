@@ -1,7 +1,7 @@
-import {updateServiceHandler} from "../../../src/handlers/dynamodb/update-service";
-import DynamoDbClient from "../../../src/dynamodb-client";
-import {TEST_SERVICE_ID, TEST_SERVICE_NAME} from "../constants";
-import {handlerInvokeEvent} from "../../../src/handlers/handler-utils";
+import {updateServiceHandler} from "../../../src/handlers/dynamodb/update-service.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
+import {TEST_SERVICE_ID, TEST_SERVICE_NAME} from "../constants.js";
+import {handlerInvokeEvent} from "../../../src/handlers/handler-utils.js";
 
 const TEST_SERVICE_UPDATES = {
     serviceId: TEST_SERVICE_ID,

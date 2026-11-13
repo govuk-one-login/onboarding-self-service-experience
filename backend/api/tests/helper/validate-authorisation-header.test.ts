@@ -1,5 +1,5 @@
-import {validateAuthorisationHeader} from "../../../api/src/handlers/helper/validate-authorisation-header";
-import {TEST_ACCESS_TOKEN, TEST_USER_ID} from "../handlers/constants";
+import {validateAuthorisationHeader} from "../../../api/src/handlers/helper/validate-authorisation-header.js";
+import {TEST_ACCESS_TOKEN, TEST_USER_ID} from "../handlers/constants.js";
 
 describe("validateAuthorisationHEader tests", () => {
     it("returns a 401 for no access token", () => {

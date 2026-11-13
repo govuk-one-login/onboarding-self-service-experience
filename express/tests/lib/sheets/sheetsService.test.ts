@@ -1,5 +1,5 @@
-import logger from "../../../src/lib/logger";
-import SheetsService from "../../../src/lib/sheets/SheetsService";
+import logger from "../../../src/lib/logger.js";
+import SheetsService from "../../../src/lib/sheets/SheetsService.js";
 
 const TEST_SPREADSHEET_ID = "someSpreadSheet";
 

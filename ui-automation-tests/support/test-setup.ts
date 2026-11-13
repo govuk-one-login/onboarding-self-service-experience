@@ -1,7 +1,7 @@
 import {After, AfterAll, Before, BeforeAll, setWorldConstructor, setDefaultTimeout} from "@cucumber/cucumber";
 import {IWorldOptions} from "@cucumber/cucumber/lib/support_code_library_builder/world";
 import puppeteer, {Browser, Page} from "puppeteer";
-import {enterTextIntoTextInput, clickSubmitButton} from "./steps/shared-functions";
+import {enterTextIntoTextInput, clickSubmitButton} from "./steps/shared-functions.js";
 import Chance from "chance";
 import fse from "fs-extra";
 

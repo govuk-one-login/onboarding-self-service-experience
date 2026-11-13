@@ -1,4 +1,4 @@
-import {ValidationResult} from "../../types/validation-result";
+import {ValidationResult} from "../../types/validation-result.js";
 
 export default function validateSecurityCode(securityCode: string): ValidationResult {
     if (!securityCode) {

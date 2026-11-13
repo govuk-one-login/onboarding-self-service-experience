@@ -1,6 +1,6 @@
 import {Router} from "express";
-import {render} from "../middleware/request-handler";
-import {serviceUnavailablePageEndDate} from "../config/environment";
+import {render} from "../middleware/request-handler.js";
+import {serviceUnavailablePageEndDate} from "../config/environment.js";
 
 const router = Router();
 export default router;

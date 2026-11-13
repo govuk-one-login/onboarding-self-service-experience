@@ -2,15 +2,15 @@ import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} 
 import {randomUUID} from "crypto";
 import {RequestHandler} from "express";
 import {Service} from "../../@types/Service";
-import AuthenticationResultParser from "../lib/authentication-result-parser";
-import {domainUserToDynamoUser} from "../lib/models/user-utils";
-import {convertToCountryPrefixFormat} from "../lib/mobile-number";
-import {render} from "../middleware/request-handler";
-import SelfServiceServicesService from "../services/self-service-services-service";
-import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
-import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP";
-import {getNextPathsAndRedirect, RegisterRoutes, SignInRoutes} from "../middleware/state-machine";
-import logger from "../lib/logger";
+import AuthenticationResultParser from "../lib/authentication-result-parser.js";
+import {domainUserToDynamoUser} from "../lib/models/user-utils.js";
+import {convertToCountryPrefixFormat} from "../lib/mobile-number.js";
+import {render} from "../middleware/request-handler.js";
+import SelfServiceServicesService from "../services/self-service-services-service.js";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status.js";
+import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP.js";
+import {getNextPathsAndRedirect, RegisterRoutes, SignInRoutes} from "../middleware/state-machine.js";
+import logger from "../lib/logger.js";
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 

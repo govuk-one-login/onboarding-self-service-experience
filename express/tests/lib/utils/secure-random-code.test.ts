@@ -1,4 +1,4 @@
-import {secureRandom6DigitCode} from "../../../src/lib/utils/secure-random-code";
+import {secureRandom6DigitCode} from "../../../src/lib/utils/secure-random-code.js";
 
 describe("secureRandom6DigitCode tests", () => {
     it("generates a random 6 digit code", () => {

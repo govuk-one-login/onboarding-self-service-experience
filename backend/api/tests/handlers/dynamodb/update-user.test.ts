@@ -1,8 +1,8 @@
-import {updateUserHandler} from "../../../src/handlers/dynamodb/update-user";
-import DynamoDbClient from "../../../src/dynamodb-client";
-import {TEST_ACCESS_TOKEN, TEST_COGNITO_USER_ID, TEST_SERVICE_NAME, TEST_USER_ID, TEST_USER_PHONE_NUMBER} from "../constants";
+import {updateUserHandler} from "../../../src/handlers/dynamodb/update-user.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
+import {TEST_ACCESS_TOKEN, TEST_COGNITO_USER_ID, TEST_SERVICE_NAME, TEST_USER_ID, TEST_USER_PHONE_NUMBER} from "../constants.js";
 import {UpdateItemCommandOutput} from "@aws-sdk/client-dynamodb";
-import {constructTestApiGatewayEvent} from "../utils";
+import {constructTestApiGatewayEvent} from "../utils.js";
 
 const TEST_USER_UPDATES = {
     userId: TEST_USER_ID,

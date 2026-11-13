@@ -1,4 +1,4 @@
-import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
+import AuthenticationResultParser from "../../src/lib/authentication-result-parser.js";
 import {
     TEST_ACCESS_TOKEN,
     TEST_AUTHENTICATION_RESULT,
@@ -30,13 +30,13 @@ import {
     TEST_USER,
     TEST_USER_FROM_DYNAMO,
     TEST_USER_ID
-} from "../constants";
-import {mockCognitoInterface, mockLambdaFacade} from "../mocks";
-import SelfServiceServicesService from "../../src/services/self-service-services-service";
-import SelfServiceError from "../../src/lib/errors";
+} from "../constants.js";
+import {mockCognitoInterface, mockLambdaFacade} from "../mocks.js";
+import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
+import SelfServiceError from "../../src/lib/errors.js";
 import {AdminGetUserCommandOutput, AdminInitiateAuthCommandOutput} from "@aws-sdk/client-cognito-identity-provider";
-import {SignupStatus} from "../../src/lib/utils/signup-status";
-import logger from "../../src/lib/logger";
+import {SignupStatus} from "../../src/lib/utils/signup-status.js";
+import logger from "../../src/lib/logger.js";
 const mockS4Instance = new SelfServiceServicesService(mockCognitoInterface, mockLambdaFacade);
 
 describe("SelfServiceServicesService tests", () => {

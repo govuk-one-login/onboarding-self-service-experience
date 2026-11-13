@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
-import getAuthApiCompliantPublicKey, {isPublicKeyValid, validateJwksURL} from "../lib/public-key";
-import logger from "../lib/logger";
+import getAuthApiCompliantPublicKey, {isPublicKeyValid, validateJwksURL} from "../lib/public-key.js";
+import logger from "../lib/logger.js";
 
 export default function validateKeySource(req: Request, res: Response, next: NextFunction) {
     logger.debug("In convertPublicKeyForAuth()");

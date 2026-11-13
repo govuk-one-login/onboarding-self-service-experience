@@ -1,8 +1,8 @@
-import {putUserHandler} from "../../../src/handlers/dynamodb/put-user";
-import DynamoDbClient from "../../../src/dynamodb-client";
+import {putUserHandler} from "../../../src/handlers/dynamodb/put-user.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
 import {PutItemCommandOutput} from "@aws-sdk/client-dynamodb";
-import {TEST_USER_EMAIL, TEST_USER_PHONE_NUMBER} from "../constants";
-import {handlerInvokeEvent} from "../../../src/handlers/handler-utils";
+import {TEST_USER_EMAIL, TEST_USER_PHONE_NUMBER} from "../constants.js";
+import {handlerInvokeEvent} from "../../../src/handlers/handler-utils.js";
 
 const TEST_USER = {
     userEmail: TEST_USER_EMAIL,

@@ -1,14 +1,14 @@
 const IsFixedCredMock = jest.fn();
 const respondToMFAChallengeForFixedOTPCredentialMock = jest.fn();
 
-jest.mock("../../src/lib/fixedOTP", () => ({
+jest.mock("../../src/lib/fixedOTP.js", () => ({
     isFixedOTPCredential: IsFixedCredMock,
     respondToMFAChallengeForFixedOTPCredential: respondToMFAChallengeForFixedOTPCredentialMock
 }));
 
-import SelfServiceServicesService from "../../src/services/self-service-services-service";
-import {mockCognitoInterface, mockLambdaFacade, request, response} from "../mocks";
-import processSecurityCode from "../../src/middleware/sign-in-middleware";
+import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
+import {mockCognitoInterface, mockLambdaFacade, request, response} from "../mocks.js";
+import processSecurityCode from "../../src/middleware/sign-in-middleware.js";
 import {
     TEST_AUTHENTICATION_RESULT,
     TEST_COGNITO_SESSION,
@@ -19,7 +19,7 @@ import {
     TEST_PHONE_NUMBER,
     TEST_SECURITY_CODE,
     TEST_SESSION_ID
-} from "../constants";
+} from "../constants.js";
 import {CodeMismatchException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
 
 const resetMfaPreferenceSpy = jest.spyOn(SelfServiceServicesService.prototype, "resetMfaPreference");

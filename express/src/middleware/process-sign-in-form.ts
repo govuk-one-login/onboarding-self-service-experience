@@ -1,15 +1,15 @@
 import {NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
 import {RequestHandler} from "express";
-import SelfServiceServicesService from "../services/self-service-services-service";
-import {convertToCountryPrefixFormat} from "../lib/mobile-number";
+import SelfServiceServicesService from "../services/self-service-services-service.js";
+import {convertToCountryPrefixFormat} from "../lib/mobile-number.js";
 import * as process from "process";
 import {
     getFixedOTPCredentialEmailAddress,
     getFixedOTPCredentialPassword,
     isFixedOTPCredential,
     isPseudonymisedFixedOTPCredential
-} from "../lib/fixedOTP";
-import logger from "../lib/logger";
+} from "../lib/fixedOTP.js";
+import logger from "../lib/logger.js";
 
 export default function processSignInForm(template: string): RequestHandler {
     logger.debug("In processSignInForm()");

@@ -1,5 +1,5 @@
-import SelfServiceServicesService from "../../src/services/self-service-services-service";
-import {request, response} from "../mocks";
+import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
+import {request, response} from "../mocks.js";
 import {
     TEST_AUTHENTICATION_RESULT,
     TEST_COGNITO_ID,
@@ -12,15 +12,15 @@ import {
     TEST_SESSION_ID,
     TEST_TIMESTAMP,
     TEST_USER
-} from "../constants";
+} from "../constants.js";
 import {
     changePassword,
     processChangePhoneNumberForm,
     showAccount,
     showVerifyMobileWithSmsCode,
     verifyMobileWithSmsCode
-} from "../../src/controllers/account";
-import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
+} from "../../src/controllers/account.js";
+import AuthenticationResultParser from "../../src/lib/authentication-result-parser.js";
 import {
     CodeMismatchException,
     CognitoIdentityProviderServiceException,

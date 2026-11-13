@@ -1,4 +1,4 @@
-import {ValidationResult} from "../types/validation-result";
+import {ValidationResult} from "../types/validation-result.js";
 
 const obscuredNumberRegex = /^\+\*{8}[0-9]{4}$/;
 const invalidFormatMessage = "Enter a UK mobile phone number, like 07700 900000";

@@ -1,6 +1,6 @@
-import logger from "../../../../src/lib/logger";
-import StubSheetsService from "../../../../src/lib/sheets/stubSheets/stubSheetsService";
-import {TEST_SPREAD_SHEET_ID} from "../../../constants";
+import logger from "../../../../src/lib/logger.js";
+import StubSheetsService from "../../../../src/lib/sheets/stubSheets/stubSheetsService.js";
+import {TEST_SPREAD_SHEET_ID} from "../../../constants.js";
 
 describe("stub Sheets Service tests", () => {
     beforeEach(async () => {

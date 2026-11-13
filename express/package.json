@@ -1,6 +1,7 @@
 {
   "name": "gds-di-self-service-frontend",
   "description": "DI Self-Service frontend",
+  "type": "module",
   "scripts": {
     "start": "node dist/app.js",
     "local": "npm run build && nodemon --config nodemon.json --inspect -r 'dotenv/config' src/app.ts",

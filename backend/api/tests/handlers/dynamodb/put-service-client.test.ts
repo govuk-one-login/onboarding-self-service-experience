@@ -1,5 +1,5 @@
-import {putServiceClientHandler} from "../../../src/handlers/dynamodb/put-service-client";
-import DynamoDbClient from "../../../src/dynamodb-client";
+import {putServiceClientHandler} from "../../../src/handlers/dynamodb/put-service-client.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
 import ResolvedValue = jest.ResolvedValue;
 
 const randomId = "1234Random";

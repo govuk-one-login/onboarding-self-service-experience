@@ -1,6 +1,6 @@
-import validateServiceName from "../../../src/middleware/validators/service-name-validator";
-import {TEST_TEMPLATE_PATH} from "../../constants";
-import {request, response} from "../../mocks";
+import validateServiceName from "../../../src/middleware/validators/service-name-validator.js";
+import {TEST_TEMPLATE_PATH} from "../../constants.js";
+import {request, response} from "../../mocks.js";
 
 describe("validateServiceName middleware tests", () => {
     it.each(["", "     "])("renders the provided template path with an error message when the service name is '%s'", serviceName => {

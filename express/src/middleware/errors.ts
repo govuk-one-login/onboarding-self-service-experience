@@ -1,8 +1,8 @@
 import {ErrorRequestHandler, RequestHandler} from "express";
-import requestHandler, {errorHandler as errorRequestHandler} from "./request-handler";
-import SelfServiceServicesService from "../services/self-service-services-service";
-import AuthenticationResultParser from "../lib/authentication-result-parser";
-import logger from "../lib/logger";
+import requestHandler, {errorHandler as errorRequestHandler} from "./request-handler.js";
+import SelfServiceServicesService from "../services/self-service-services-service.js";
+import AuthenticationResultParser from "../lib/authentication-result-parser.js";
+import logger from "../lib/logger.js";
 
 export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");

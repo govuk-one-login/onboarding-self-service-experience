@@ -1,5 +1,5 @@
 import axios, {AxiosInstance} from "axios";
-import LambdaFacade from "../../../src/services/lambda-facade/LambdaFacade";
+import LambdaFacade from "../../../src/services/lambda-facade/LambdaFacade.js";
 import {
     TEST_ACCESS_TOKEN,
     TEST_API_BASE_URL,
@@ -11,9 +11,9 @@ import {
     TEST_SELF_SERVICE_CLIENT_ID,
     TEST_SERVICE,
     TEST_SERVICE_ID
-} from "../../constants";
-import AuthenticationResultParser from "../../../src/lib/authentication-result-parser";
-import {TxMAEvent} from "../../../src/types/txma-event";
+} from "../../constants.js";
+import AuthenticationResultParser from "../../../src/lib/authentication-result-parser.js";
+import {TxMAEvent} from "../../../src/types/txma-event.js";
 import {createHash} from "crypto";
 
 const axiosCreateSpy = jest.spyOn(axios, "create");

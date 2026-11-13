@@ -1,6 +1,6 @@
 import {Request} from "express";
-import validateUri from "../../../src/middleware/validators/uri-validator";
-import {request, response} from "../../mocks";
+import validateUri from "../../../src/middleware/validators/uri-validator.js";
+import {request, response} from "../../mocks.js";
 
 let req: Request;
 

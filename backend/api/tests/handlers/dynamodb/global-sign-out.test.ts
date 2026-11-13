@@ -1,7 +1,7 @@
-import {globalSignOutHandler} from "../../../src/handlers/dynamodb/global-sign-out";
-import DynamoDbClient from "../../../src/dynamodb-client";
-import {constructTestApiGatewayEvent} from "../utils";
-import {TEST_USER_EMAIL} from "../constants";
+import {globalSignOutHandler} from "../../../src/handlers/dynamodb/global-sign-out.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
+import {constructTestApiGatewayEvent} from "../utils.js";
+import {TEST_USER_EMAIL} from "../constants.js";
 
 describe("globalSignOutHandler tests", () => {
     beforeEach(() => {

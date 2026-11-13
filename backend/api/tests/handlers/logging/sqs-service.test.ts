@@ -1,8 +1,8 @@
 import {SQSClient, SendMessageCommand} from "@aws-sdk/client-sqs";
-import {TEST_MESSAGE_ID} from "../constants";
-import {constructTestApiGatewayEvent} from "../utils";
-import {sendSQSMessageToTxMAHandler} from "./../../../src/handlers/logging/sqs-service";
-import {TEST_SQS_QUEUE_URL} from "../../setup";
+import {TEST_MESSAGE_ID} from "../constants.js";
+import {constructTestApiGatewayEvent} from "../utils.js";
+import {sendSQSMessageToTxMAHandler} from "./../../../src/handlers/logging/sqs-service.js";
+import {TEST_SQS_QUEUE_URL} from "../../setup.js";
 import {mockClient} from "aws-sdk-client-mock";
 import "aws-sdk-client-mock-jest";
 

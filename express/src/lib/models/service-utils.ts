@@ -1,5 +1,5 @@
 import {Service, ServiceFromDynamo} from "../../../@types/Service";
-import logger from "../logger";
+import logger from "../logger.js";
 
 export function dynamoServiceToDomainService(service: ServiceFromDynamo): Service {
     return {id: service.pk.S.substring("service#".length), serviceName: service.service_name.S};

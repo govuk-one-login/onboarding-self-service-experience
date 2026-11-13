@@ -1,6 +1,6 @@
 import {Given, Then, When} from "@cucumber/cucumber";
 import {strict as assert} from "assert";
-import {TestContext} from "../test-setup";
+import {TestContext} from "../test-setup.js";
 import {
     checkErrorMessageDisplayedForField,
     checkUrl,
@@ -14,7 +14,7 @@ import {
     getLinkWithHref,
     getLinkWithHrefStarting,
     clickYourAccountSubnavLink
-} from "./shared-functions";
+} from "./shared-functions.js";
 
 import AxePuppeteer from "@axe-core/puppeteer";
 

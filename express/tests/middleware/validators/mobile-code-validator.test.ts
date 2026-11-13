@@ -1,6 +1,6 @@
 import {Request} from "express";
-import validateMobileSecurityCode from "../../../src/middleware/validators/mobile-code-validator";
-import {request, response} from "../../mocks";
+import validateMobileSecurityCode from "../../../src/middleware/validators/mobile-code-validator.js";
+import {request, response} from "../../mocks.js";
 
 let req: Request;
 

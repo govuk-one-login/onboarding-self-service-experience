@@ -1,4 +1,4 @@
-import LambdaFacade from "../../../src/services/lambda-facade/StubLambdaFacade";
+import LambdaFacade from "../../../src/services/lambda-facade/StubLambdaFacade.js";
 
 describe("Lambda Facade class tests", () => {
     it("returns expected data from the listClients method", async () => {
