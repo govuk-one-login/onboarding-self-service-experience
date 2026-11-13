@@ -5,8 +5,7 @@ import {enterTextIntoTextInput, clickSubmitButton} from "./steps/shared-function
 import Chance from "chance";
 import fse from "fs-extra";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const {World} = require("@cucumber/cucumber");
+import {World} from "@cucumber/cucumber";
 
 const chance = new Chance.Chance();
 

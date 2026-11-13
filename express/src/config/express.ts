@@ -21,6 +21,6 @@ export default function Express(): Express {
     });
 
     configureServices(app);
-    configureViews(app);
+    app.set("nunjucksEngine", configureViews(app));
     return app;
 }
