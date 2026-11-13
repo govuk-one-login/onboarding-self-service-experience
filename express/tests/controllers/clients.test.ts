@@ -1048,39 +1048,37 @@ describe("processRemoveRedirectUriFrom controller tests", () => {
     });
 
     it("redirects to /change-redirect-uris with a non update message if there is only 1 redirect uri for the client", async () => {
-        async () => {
-            s4ListClientsSpy.mockResolvedValue([TEST_CLIENT]);
+        s4ListClientsSpy.mockResolvedValue([TEST_CLIENT]);
 
-            const mockRequest = request({
-                session: {
-                    id: TEST_SESSION_ID,
-                    authenticationResult: TEST_AUTHENTICATION_RESULT
-                },
-                params: {
-                    selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
-                    clientId: TEST_CLIENT_ID
-                },
-                body: {
-                    removeUri: "yes",
-                    uriToRemove: TEST_CLIENT.redirectUris[0]
-                },
-                context: {
-                    serviceId: TEST_SERVICE_ID
-                },
-                ip: TEST_IP_ADDRESS
-            });
-            const mockResponse = response();
+        const mockRequest = request({
+            session: {
+                id: TEST_SESSION_ID,
+                authenticationResult: TEST_AUTHENTICATION_RESULT
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            body: {
+                removeUri: "yes",
+                uriToRemove: TEST_CLIENT.redirectUris[0]
+            },
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            ip: TEST_IP_ADDRESS
+        });
+        const mockResponse = response();
 
-            await processRemoveRedirectUriFrom(mockRequest, mockResponse, mockNext);
+        await processRemoveRedirectUriFrom(mockRequest, mockResponse, mockNext);
 
-            expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
-            expect(mockResponse.redirect).toHaveBeenCalledWith(
-                `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT_ID}/${TEST_SELF_SERVICE_CLIENT_ID}/change-redirect-uris?updateResult=${encodeURIComponent(
-                    "Not updated. At least one redirect URI is required"
-                )}`
-            );
-            expect(s4UpdateClientSpy).not.toHaveBeenCalled();
-        };
+        expect(s4ListClientsSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
+        expect(mockResponse.redirect).toHaveBeenCalledWith(
+            `/services/${TEST_SERVICE_ID}/clients/${TEST_CLIENT_ID}/${TEST_SELF_SERVICE_CLIENT_ID}/change-redirect-uris?updateResult=${encodeURIComponent(
+                "Not updated. At least one redirect URI is required"
+            )}`
+        );
+        expect(s4UpdateClientSpy).not.toHaveBeenCalled();
     });
 
     it("calls update client with the updated redirect uris, sends a txma log and redirects back to  /change-redirect-uris with a success message url encoded", async () => {
