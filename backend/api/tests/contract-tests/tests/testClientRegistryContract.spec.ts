@@ -1,5 +1,3 @@
-"use strict";
-
 import {MatchersV3, PactV3} from "@pact-foundation/pact";
 import * as path from "path";
 import {public_key, registerClientHandler, RegisterClientPayload} from "../../../src/handlers/auth/register-client";

@@ -1,5 +1,3 @@
-("use strict");
-
 import {Publisher} from "@pact-foundation/pact-cli";
 import {resolve} from "path";
 
