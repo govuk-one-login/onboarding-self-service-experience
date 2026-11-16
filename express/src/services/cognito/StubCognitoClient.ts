@@ -13,10 +13,12 @@ import {MetadataBearer} from "@aws-sdk/types";
 import * as crypto from "crypto";
 import {promises as fs} from "fs";
 import path from "path";
+import {fileURLToPath} from "url";
 import {convertToCountryPrefixFormat} from "../../lib/mobile-number.js";
 import CognitoInterface from "./CognitoInterface.js";
 import logger from "../../lib/logger.js";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const kid = {kid: "bIXchwnF2Iyc/lFMKTHBvG+R6x1ea9ZN3sEegxjnL/k=", alg: "RS256"};
 
 const accessTokenPayload = {
