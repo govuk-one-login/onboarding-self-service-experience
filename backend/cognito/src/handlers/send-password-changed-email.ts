@@ -7,7 +7,7 @@ import {PostConfirmationConfirmForgotPassword} from "aws-lambda";
 const client = new SESClient({region: "eu-west-2"});
 */
 
-exports.handler = async (event: PostConfirmationConfirmForgotPassword): Promise<PostConfirmationConfirmForgotPassword> => {
+export const handler = async (event: PostConfirmationConfirmForgotPassword): Promise<PostConfirmationConfirmForgotPassword> => {
     /*const toAddress = event.request.clientMetadata?.email;
 
     if (!toAddress) {
