@@ -3,6 +3,7 @@ import requestHandler, {errorHandler as errorRequestHandler} from "./request-han
 import SelfServiceServicesService from "../services/self-service-services-service.js";
 import AuthenticationResultParser from "../lib/authentication-result-parser.js";
 import logger from "../lib/logger.js";
+import {nonNull} from "../lib/utils/optional.js";
 
 export const notFoundHandler: RequestHandler = requestHandler((req, res) => {
     const s4: SelfServiceServicesService = req.app.get("backing-service");

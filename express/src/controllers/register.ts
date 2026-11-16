@@ -11,6 +11,7 @@ import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status.js";
 import {getFixedOTPCredentialMobileNumber, isPseudonymisedFixedOTPCredential} from "../lib/fixedOTP.js";
 import {getNextPathsAndRedirect, RegisterRoutes, SignInRoutes} from "../middleware/state-machine.js";
 import logger from "../lib/logger.js";
+import {nonNull} from "../lib/utils/optional.js";
 
 export const showGetEmailForm = render("register/enter-email-address.njk");
 

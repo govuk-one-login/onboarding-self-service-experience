@@ -6,6 +6,7 @@ import {DynamoDB} from "@aws-sdk/client-dynamodb";
 import {randomUUID} from "crypto";
 import {createMd5Hash} from "../controllers/utils.js";
 import logger from "../lib/logger.js";
+import {nonNull} from "../lib/utils/optional.js";
 
 export default getSessionStorage();
 

@@ -39,6 +39,7 @@ import {
 import * as process from "process";
 import {secureRandom6DigitCode} from "../../lib/utils/secure-random-code.js";
 import logger from "../../lib/logger.js";
+import {nonNull} from "../../lib/utils/optional.js";
 
 type CognitoCommand<Input extends ServiceInputTypes, Output extends ServiceOutputTypes> = Command<
     ServiceInputTypes,

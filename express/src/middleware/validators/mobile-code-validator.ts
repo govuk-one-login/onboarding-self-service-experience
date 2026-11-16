@@ -3,6 +3,7 @@ import {obscureNumber} from "../../lib/mobile-number.js";
 import validate from "../../lib/validators/security-code-validator.js";
 import {getFixedOTPCredentialSMSCode, isPseudonymisedFixedOTPCredential} from "../../lib/fixedOTP.js";
 import logger from "../../lib/logger.js";
+import {nonNull} from "../../lib/utils/optional.js";
 
 export default function validateMobileSecurityCode(textMessageNotReceivedUrl: string, hideNumber = true): RequestHandler {
     logger.debug("In validateMobileSecurityCode()");

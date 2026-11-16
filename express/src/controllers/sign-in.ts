@@ -14,6 +14,7 @@ import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status.js";
 import {secureRandom6DigitCode} from "../lib/utils/secure-random-code.js";
 import {getNextPathsAndRedirect, RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine.js";
 import logger from "../lib/logger.js";
+import {nonNull} from "../lib/utils/optional.js";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
 export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");

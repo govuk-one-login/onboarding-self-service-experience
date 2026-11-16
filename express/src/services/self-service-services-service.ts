@@ -20,6 +20,7 @@ import {TxMAEvent, TxMAExtension, TxMAUser} from "../types/txma-event.js";
 import SheetsService from "../lib/sheets/SheetsService.js";
 import {v4 as uuid_4} from "uuid";
 import logger from "../lib/logger.js";
+import {nonNull} from "../lib/utils/optional.js";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;

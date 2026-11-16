@@ -1,9 +1,7 @@
-global.nonNull = nonNull;
-
-function nonNull<Type>(value: Type | undefined): NonNullable<Type>;
-function nonNull<Type, Key extends keyof Type>(object: Type, property: Key): NonNullable<Type[Key]>;
-function nonNull<Type, Key extends keyof Type>(object: Type, ...properties: Key[]): NonNullable<Pick<Type, Key>>;
-function nonNull<Type, Key extends keyof Type>(object: Type, ...properties: Key[]): NonNullable<Type | Type[Key] | Pick<Type, Key>> {
+export function nonNull<Type>(value: Type | undefined): NonNullable<Type>;
+export function nonNull<Type, Key extends keyof Type>(object: Type, property: Key): NonNullable<Type[Key]>;
+export function nonNull<Type, Key extends keyof Type>(object: Type, ...properties: Key[]): NonNullable<Pick<Type, Key>>;
+export function nonNull<Type, Key extends keyof Type>(object: Type, ...properties: Key[]): NonNullable<Type | Type[Key] | Pick<Type, Key>> {
     if (properties.length == 0) {
         return tryGetValue(object);
     }

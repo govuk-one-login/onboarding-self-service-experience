@@ -10,6 +10,7 @@ import {convertToCountryPrefixFormat} from "../lib/mobile-number.js";
 import {render} from "../middleware/request-handler.js";
 import SelfServiceServicesService from "../services/self-service-services-service.js";
 import logger from "../lib/logger.js";
+import {nonNull} from "../lib/utils/optional.js";
 
 export const showChangePasswordForm = render("account/change-password.njk");
 
