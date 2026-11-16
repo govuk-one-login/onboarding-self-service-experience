@@ -434,7 +434,6 @@ export const processAddServiceForm: RequestHandler = async (req, res, next) => {
     next();
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const sendDataToUserSpreadsheet: RequestHandler = async (req, res, next) => {
     if (process.env.GOOGLE_SHEETS_INTEGRATION_ENABLED === "false") {
         next();

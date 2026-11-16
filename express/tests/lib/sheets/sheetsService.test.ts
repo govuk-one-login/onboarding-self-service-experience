@@ -27,7 +27,7 @@ describe("Sheets Service tests", () => {
         await sheetService.init();
         expect(logger.debug).toHaveBeenCalledWith("Using the actual implementation of the Sheets Service");
     });
-    
+
     it("uses real sheets service when USE_STUB_SHEETS is not set", async () => {
         const sheetService = new SheetsService(TEST_SPREADSHEET_ID);
         await sheetService.init();

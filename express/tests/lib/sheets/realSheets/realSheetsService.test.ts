@@ -48,7 +48,8 @@ describe("RealSheetsService tests", () => {
         });
     });
 
-    afterEach(() => {
+    afterAll(() => {
+        vi.clearAllMocks();
         delete process.env.GOOGLE_SHEET_CREDENTIALS;
     });
 

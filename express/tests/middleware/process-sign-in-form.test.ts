@@ -13,12 +13,12 @@ import {
     TEST_SESSION_ID,
     TEST_TEMPLATE_PATH
 } from "../constants.js";
-import { isFixedOTPCredential, isPseudonymisedFixedOTPCredential } from "../../src/lib/fixedOTP.js";
+import {isFixedOTPCredential, isPseudonymisedFixedOTPCredential} from "../../src/lib/fixedOTP.js";
 
 vi.mock("../../src/services/self-service-services-service.js");
 vi.mock("../../src/lib/fixedOTP.js", () => ({
     isFixedOTPCredential: vi.fn(),
-    isPseudonymisedFixedOTPCredential: vi.fn(),
+    isPseudonymisedFixedOTPCredential: vi.fn()
 }));
 
 const s4LoginSpy = vi.spyOn(SelfServiceServicesService.prototype, "login");

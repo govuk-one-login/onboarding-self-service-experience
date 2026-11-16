@@ -2,10 +2,10 @@
   "default": {
     "tags": "@ci and @smoke",
     "failFast": true,
-    "requireModule": [
-      "ts-node/register"
+    "loader": [
+      "ts-node/esm"
     ],
-    "require": [
+    "import": [
       "support/test-setup.ts",
       "support/steps/**/*.ts"
     ],

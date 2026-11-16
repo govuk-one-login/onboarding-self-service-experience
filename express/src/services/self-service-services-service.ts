@@ -329,7 +329,6 @@ export default class SelfServiceServicesService {
             });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
     sendTxMALog(eventName: string, user: TxMAUser, extensions: TxMAExtension | undefined = undefined) {
         const txmaEvent: TxMAEvent = {
             timestamp: Math.floor(Date.now() / 1000),
@@ -339,7 +338,6 @@ export default class SelfServiceServicesService {
             extensions: extensions
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
         this.lambda.sendTxMALog(txmaEvent).then(
             () => {
                 return;

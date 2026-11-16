@@ -29,7 +29,7 @@
     "test:express": "vitest run --passWithNoTests ./express/tests --config ./vitest.config.ts",
     "test:backend": "vitest run --passWithNoTests ./backend --config ./vitest.config.ts",
     "test:cov": "vitest run --coverage",
-    "lint": "prettier . --check ; eslint '*.ts' --quiet --fix",
+    "lint": "eslint . --max-warnings=0 && prettier --check \"**/*.{ts,json}\"",
     "lint:fix": "prettier . --write ; eslint . --fix",
     "pii-scan": "infrastructure/dev/pii_scan.sh -p *template*.yml -i infrastructure/config/pii_scan_ignore.txt -s infrastructure/config/pii_scan_skip.txt"
   },
@@ -43,13 +43,15 @@
     "jiti": "^2.7.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.7",
+    "@eslint/js": "^10.0.1",
     "@types/aws-lambda": "^8.10.163",
     "@types/fs-extra": "^11.0.4",
     "@typescript-eslint/eslint-plugin": "^8.72.2",
     "@typescript-eslint/parser": "^8.72.2",
     "chalk": "^5.6.2",
     "esbuild": "^0.28.2",
-    "eslint": "^8.57.1",
+    "eslint": "^10.14.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^4.2.1",
     "fs-extra": "^11.4.0",

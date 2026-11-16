@@ -15,7 +15,7 @@ export default function validateUri(uri: string, isGovUrl?: boolean, allowEmptyV
 
     try {
         validUri = new URL(uri);
-    } catch (ignored) {
+    } catch {
         return {isValid: false, errorMessage: "Enter your URIs in the format https://example.com"};
     }
 

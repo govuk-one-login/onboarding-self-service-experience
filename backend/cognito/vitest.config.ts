@@ -4,6 +4,6 @@ export default defineConfig({
     test: {
         clearMocks: true,
         globals: true,
-        include: ["**/*.{test,spec}.ts"],
+        include: ["**/*.{test,spec}.ts"]
     }
 });

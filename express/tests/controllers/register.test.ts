@@ -44,7 +44,7 @@ import logger from "../../src/lib/logger.js";
 
 vi.mock("crypto", () => {
     return {
-        randomUUID: () => TEST_UUID,
+        randomUUID: () => TEST_UUID
     };
 });
 

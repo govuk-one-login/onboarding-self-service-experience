@@ -143,6 +143,7 @@ export const processEmailAddress: RequestHandler = async (req, res) => {
             logger.info("Processing No HasTextCode");
             return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeAfterPassword);
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (UserNotFoundException) {
         // If a user doesn't exist, carry on like normal
     }

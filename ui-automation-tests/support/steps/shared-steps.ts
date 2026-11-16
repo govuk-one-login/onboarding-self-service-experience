@@ -16,7 +16,7 @@ import {
     clickYourAccountSubnavLink
 } from "./shared-functions.js";
 
-import AxePuppeteer from "@axe-core/puppeteer";
+import {AxePuppeteer} from "@axe-core/puppeteer";
 
 Given("the user is signed in", async function (this: TestContext) {
     await this.goToPath("/sign-in");
@@ -203,7 +203,6 @@ Then(/^there should be no accessibility violations$/, async function (this: Test
     assert.equal(results.violations.length, 0, "Accessibility Violations Detected : " + JSON.stringify(results.violations));
 });
 
-// eslint-disable-next-line
 Then("pause whilst waiting to complete", {timeout: 1 * 5000}, async function () {});
 
 Then("they they should not see a link that points to {string}", async function (href: string) {

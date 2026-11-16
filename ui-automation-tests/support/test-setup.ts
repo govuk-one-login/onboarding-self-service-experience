@@ -1,11 +1,9 @@
-import {After, AfterAll, Before, BeforeAll, setWorldConstructor, setDefaultTimeout} from "@cucumber/cucumber";
-import {IWorldOptions} from "@cucumber/cucumber/lib/support_code_library_builder/world";
+import {After, AfterAll, Before, BeforeAll, setWorldConstructor, setDefaultTimeout, World} from "@cucumber/cucumber";
+import type {IWorldOptions} from "@cucumber/cucumber";
 import puppeteer, {Browser, Page} from "puppeteer";
 import {enterTextIntoTextInput, clickSubmitButton} from "./steps/shared-functions.js";
 import Chance from "chance";
 import fse from "fs-extra";
-
-import {World} from "@cucumber/cucumber";
 
 const chance = new Chance.Chance();
 
@@ -24,6 +22,7 @@ const sms_otp_code = "789012";
 
 export class TestContext extends World {
     private browserPage: Page | undefined;
+    host!: string;
 
     // Track the current state of the user credentials.
     private _username: string = username;
@@ -181,7 +180,7 @@ After(async function (this: TestContext, scenario) {
             path: `${screenshotsDir}/${counter}-${result}-[${name}].jpeg`,
             fullPage: true
         });
-        return this.attach(stream, "image/jpeg");
+        return this.attach(Buffer.from(stream), "image/jpeg");
     }
     await this.page.close();
 });
