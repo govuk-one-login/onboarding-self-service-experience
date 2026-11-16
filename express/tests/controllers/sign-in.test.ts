@@ -31,7 +31,7 @@ import {
 } from "../constants.js";
 import {obscureNumber} from "../../src/lib/mobile-number.js";
 import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
-import {User} from "../../@types/user";
+import {User} from "../../@types/user.js";
 import AuthenticationResultParser from "../../src/lib/authentication-result-parser.js";
 import {AxiosResponse} from "axios";
 import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status.js";

@@ -1,7 +1,7 @@
 import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
 import {randomUUID} from "crypto";
 import {RequestHandler} from "express";
-import {Service} from "../../@types/Service";
+import {Service} from "../../@types/service.js";
 import AuthenticationResultParser from "../lib/authentication-result-parser.js";
 import {domainUserToDynamoUser} from "../lib/models/user-utils.js";
 import {convertToCountryPrefixFormat} from "../lib/mobile-number.js";

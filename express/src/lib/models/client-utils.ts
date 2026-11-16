@@ -1,4 +1,4 @@
-import {Client, ClientFromDynamo} from "../../../@types/client";
+import {Client, ClientFromDynamo} from "../../../@types/client.js";
 
 export function dynamoClientToDomainClient(client: ClientFromDynamo): Client {
     return {

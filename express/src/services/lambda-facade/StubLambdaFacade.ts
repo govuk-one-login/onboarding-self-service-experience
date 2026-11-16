@@ -1,8 +1,8 @@
 import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import {convertToAttr} from "@aws-sdk/util-dynamodb";
 import {AxiosResponse} from "axios";
-import {Service} from "../../../@types/Service";
-import {DynamoUser} from "../../../@types/user";
+import {Service} from "../../../@types/service.js";
+import {DynamoUser} from "../../../@types/user.js";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./LambdaFacadeInterface.js";
 import {TxMAEvent} from "../../types/txma-event.js";
 import logger from "../../lib/logger.js";

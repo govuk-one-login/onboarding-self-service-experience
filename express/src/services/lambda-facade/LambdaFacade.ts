@@ -1,7 +1,7 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
-import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
-import {Service} from "../../../@types/Service";
+import {OnboardingTableItem} from "../../../@types/onboardingTableItem.js";
+import {Service} from "../../../@types/service.js";
 import {api} from "../../config/environment.js";
 import AuthenticationResultParser from "../../lib/authentication-result-parser.js";
 import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./LambdaFacadeInterface.js";

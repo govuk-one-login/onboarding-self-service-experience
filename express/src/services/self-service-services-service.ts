@@ -1,10 +1,10 @@
 import {AdminInitiateAuthCommandOutput, AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {unmarshall} from "@aws-sdk/util-dynamodb";
 import {AxiosResponse} from "axios";
-import {Client, ClientFromDynamo} from "../../@types/client";
-import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
-import {Service} from "../../@types/Service";
-import {DynamoUser, User} from "../../@types/user";
+import {Client, ClientFromDynamo} from "../../@types/client.js";
+import {OnboardingTableItem} from "../../@types/onboardingTableItem.js";
+import {Service} from "../../@types/service.js";
+import {DynamoUser, User} from "../../@types/user.js";
 import AuthenticationResultParser from "../lib/authentication-result-parser.js";
 import SelfServiceError from "../lib/errors.js";
 import {dynamoClientToDomainClient} from "../lib/models/client-utils.js";

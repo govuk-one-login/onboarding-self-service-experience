@@ -1,8 +1,8 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
 import {AxiosResponse} from "axios";
-import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
-import {Service} from "../../../@types/Service";
+import {OnboardingTableItem} from "../../../@types/onboardingTableItem.js";
+import {Service} from "../../../@types/service.js";
 import {TxMAEvent} from "../../types/txma-event.js";
 
 export type UserUpdates = Record<string, string | Date>;
