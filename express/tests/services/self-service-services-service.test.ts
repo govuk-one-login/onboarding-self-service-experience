@@ -37,6 +37,7 @@ import SelfServiceError from "../../src/lib/errors.js";
 import {AdminGetUserCommandOutput, AdminInitiateAuthCommandOutput} from "@aws-sdk/client-cognito-identity-provider";
 import {SignupStatus} from "../../src/lib/utils/signup-status.js";
 import logger from "../../src/lib/logger.js";
+
 const mockS4Instance = new SelfServiceServicesService(mockCognitoInterface, mockLambdaFacade);
 
 describe("SelfServiceServicesService tests", () => {

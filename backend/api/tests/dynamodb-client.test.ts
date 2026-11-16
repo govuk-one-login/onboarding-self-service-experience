@@ -1,3 +1,6 @@
+import DynamoDbClient from "../src/dynamodb-client.js";
+import {TEST_DYNAMO_TABLE_NAME} from "./setup.js";
+
 const {send, queryCommand, scanCommand, updateItemCommand, deleteItemCommand} = vi.hoisted(() => ({
     send: vi.fn(),
     queryCommand: vi.fn(),
@@ -19,9 +22,6 @@ vi.mock("@aws-sdk/client-dynamodb", () => {
         DeleteItemCommand: deleteItemCommand
     };
 });
-
-import DynamoDbClient from "../src/dynamodb-client.js";
-import {TEST_DYNAMO_TABLE_NAME} from "./setup.js";
 
 const queryCommandParams = {
     TableName: TEST_DYNAMO_TABLE_NAME,

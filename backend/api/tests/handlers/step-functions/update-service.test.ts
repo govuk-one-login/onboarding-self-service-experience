@@ -1,11 +1,3 @@
-const {validateAuthorisationHeaderMock} = vi.hoisted(() => ({
-    validateAuthorisationHeaderMock: vi.fn()
-}));
-
-vi.mock("../../../src/handlers/helper/validate-authorisation-header.js", () => ({
-    validateAuthorisationHeader: validateAuthorisationHeaderMock
-}));
-
 import {SFNClient, StartSyncExecutionCommand, SyncExecutionStatus} from "@aws-sdk/client-sfn";
 import {mockClient} from "aws-sdk-client-mock";
 import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils.js";
@@ -13,8 +5,15 @@ import {doUpdateServiceHandler, UpdateServiceBody} from "../../../src/handlers/s
 import {TEST_CLIENT_ID, TEST_SELF_SERVICE_CLIENT_ID, TEST_SERVICE_ID, TEST_USER_EMAIL, TEST_USER_ID} from "../constants.js";
 import {TEST_STATE_MACHINE_ARN} from "../../setup.js";
 import "aws-sdk-client-mock-jest/vitest";
-
 import DynamoDbClient from "../../../src/dynamodb-client.js";
+
+const {validateAuthorisationHeaderMock} = vi.hoisted(() => ({
+    validateAuthorisationHeaderMock: vi.fn()
+}));
+
+vi.mock("../../../src/handlers/helper/validate-authorisation-header.js", () => ({
+    validateAuthorisationHeader: validateAuthorisationHeaderMock
+}));
 
 const checkServiceUserExistsSpy = vi.spyOn(DynamoDbClient.prototype, "checkServiceUserExists");
 

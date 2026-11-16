@@ -1,3 +1,6 @@
+import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils.js";
+import {handler} from "../../../src/handlers/code-block/code-block-handler.js";
+
 const {getCodeBlockMock, putCodeBlockMock, deleteCodeBlockMock} = vi.hoisted(() => ({
     getCodeBlockMock: vi.fn(),
     putCodeBlockMock: vi.fn(),
@@ -9,9 +12,6 @@ vi.mock("../../../src/handlers/dynamodb/code-block-service.js", () => ({
     putCodeBlock: putCodeBlockMock,
     deleteCodeBlock: deleteCodeBlockMock
 }));
-
-import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils.js";
-import {handler} from "../../../src/handlers/code-block/code-block-handler.js";
 
 describe("Code Block handler tests", () => {
     it("rejects non post requests", async () => {

@@ -1,3 +1,6 @@
+import {toByteArray} from "base64-js";
+import {mockLambdaContext, smsSenderTrigger} from "../mocks.js";
+
 const {sendSms, decrypt} = vi.hoisted(() => ({
     sendSms: vi.fn(),
     decrypt: vi.fn().mockImplementation(() => {
@@ -33,9 +36,6 @@ const templateId = "template-id";
 
 process.env.SECURITY_CODE_TEXT_MESSAGE_TEMPLATE = templateId;
 
-import {toByteArray} from "base64-js";
-import {mockLambdaContext, smsSenderTrigger} from "../mocks.js";
-
 describe("Custom SMS sender", () => {
     beforeEach(async () => {
         vi.clearAllMocks();
@@ -60,7 +60,7 @@ describe("Custom SMS sender", () => {
 
     it("Throw an error for missing code", async () => {
         const {lambdaHandler} = await import("../../src/handlers/send-security-code-text-message.js");
-        
+
         await expect(lambdaHandler(smsSenderTrigger(phoneNumber), mockLambdaContext)).rejects.toThrow(/missing.*code/i);
     });
 });

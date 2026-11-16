@@ -1,4 +1,5 @@
 import helmet from "helmet";
+
 export default function Helmet() {
     return helmet({
         referrerPolicy: {

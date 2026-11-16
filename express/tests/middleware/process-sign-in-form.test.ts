@@ -1,10 +1,3 @@
-vi.mock("../../src/services/self-service-services-service.js");
-vi.mock("../../src/lib/fixedOTP.js", () => ({
-    isFixedOTPCredential: vi.fn(),
-    isPseudonymisedFixedOTPCredential: vi.fn(),
-}));
-
-
 import processSignInForm from "../../src/middleware/process-sign-in-form.js";
 import {request, response} from "../mocks.js";
 import {NotAuthorizedException, UserNotFoundException} from "@aws-sdk/client-cognito-identity-provider";
@@ -21,6 +14,12 @@ import {
     TEST_TEMPLATE_PATH
 } from "../constants.js";
 import { isFixedOTPCredential, isPseudonymisedFixedOTPCredential } from "../../src/lib/fixedOTP.js";
+
+vi.mock("../../src/services/self-service-services-service.js");
+vi.mock("../../src/lib/fixedOTP.js", () => ({
+    isFixedOTPCredential: vi.fn(),
+    isPseudonymisedFixedOTPCredential: vi.fn(),
+}));
 
 const s4LoginSpy = vi.spyOn(SelfServiceServicesService.prototype, "login");
 const s4SendTxmaLogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");

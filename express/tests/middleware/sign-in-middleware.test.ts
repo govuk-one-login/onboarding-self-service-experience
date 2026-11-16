@@ -1,13 +1,3 @@
-const {IsFixedCredMock, respondToMFAChallengeForFixedOTPCredentialMock} = vi.hoisted(() => ({
-    IsFixedCredMock: vi.fn(),
-    respondToMFAChallengeForFixedOTPCredentialMock: vi.fn()
-}));
-
-vi.mock("../../src/lib/fixedOTP.js", () => ({
-    isFixedOTPCredential: IsFixedCredMock,
-    respondToMFAChallengeForFixedOTPCredential: respondToMFAChallengeForFixedOTPCredentialMock
-}));
-
 import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
 import {mockCognitoInterface, mockLambdaFacade, request, response} from "../mocks.js";
 import processSecurityCode from "../../src/middleware/sign-in-middleware.js";
@@ -23,6 +13,16 @@ import {
     TEST_SESSION_ID
 } from "../constants.js";
 import {CodeMismatchException, NotAuthorizedException} from "@aws-sdk/client-cognito-identity-provider";
+
+const {IsFixedCredMock, respondToMFAChallengeForFixedOTPCredentialMock} = vi.hoisted(() => ({
+    IsFixedCredMock: vi.fn(),
+    respondToMFAChallengeForFixedOTPCredentialMock: vi.fn()
+}));
+
+vi.mock("../../src/lib/fixedOTP.js", () => ({
+    isFixedOTPCredential: IsFixedCredMock,
+    respondToMFAChallengeForFixedOTPCredential: respondToMFAChallengeForFixedOTPCredentialMock
+}));
 
 const resetMfaPreferenceSpy = vi.spyOn(SelfServiceServicesService.prototype, "resetMfaPreference");
 const submitUsernamePasswordSpy = vi.spyOn(SelfServiceServicesService.prototype, "submitUsernamePassword");
