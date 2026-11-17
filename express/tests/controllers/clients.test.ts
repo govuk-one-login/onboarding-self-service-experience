@@ -3220,26 +3220,32 @@ describe("processChangeClientName controller tests", () => {
 });
 
 describe("showMaxAgeEnabled controller tests", () => {
-    const mockRequest = request({
-        context: {
-            serviceId: TEST_SERVICE_ID
-        },
-        params: {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it("renders the expected template with the expected values", () => {
+        const mockRequest = request({
+            context: {
+                serviceId: TEST_SERVICE_ID
+            },
+            params: {
+                selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
+                clientId: TEST_CLIENT_ID
+            },
+            query: {
+                clientName: TEST_CLIENT_NAME
+            }
+        });
+        const mockResponse = response();
+
+        showMaxAgeEnabledForm(mockRequest, mockResponse, mockNext);
+
+        expect(mockResponse.render).toHaveBeenCalledWith("clients/enter-max-age.njk", {
+            serviceId: TEST_SERVICE_ID,
             selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
             clientId: TEST_CLIENT_ID
-        },
-        query: {
-            clientName: TEST_CLIENT_NAME
-        }
-    });
-    const mockResponse = response();
-
-    showMaxAgeEnabledForm(mockRequest, mockResponse, mockNext);
-
-    expect(mockResponse.render).toHaveBeenCalledWith("clients/enter-max-age.njk", {
-        serviceId: TEST_SERVICE_ID,
-        selfServiceClientId: TEST_SELF_SERVICE_CLIENT_ID,
-        clientId: TEST_CLIENT_ID
+        });
     });
 });
 
