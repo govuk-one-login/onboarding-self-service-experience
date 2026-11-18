@@ -1,4 +1,4 @@
-import pinoHttp from "pino-http";
+import {pinoHttp} from "pino-http";
 import logger from "./logger.js";
 
 interface ResponseWithRaw {
