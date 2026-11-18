@@ -2,8 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/govuk-one-login/quality-gates/refs/tags/v0.19.0/schemas/schema.json",
   "services": [
     {
-      "product": "Orchestration - Onboarding",
-      "component": "self-service-experience",
+      "product": "Orchestration - Onboarding Self Service",
+      "component": "onboarding-self-service-experience",
       "promotionType": "securePipelines",
       "promotionTypeDetails": [
         "Only dev and production environments"
