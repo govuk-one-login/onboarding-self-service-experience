@@ -115,4 +115,4 @@ jobs:
         id: run-tests
         env:
           REPORT: ${{ runner.temp }}/unit-tests.report
-        run: npm run test -- --config infrastructure/ci/jest.config.ts
+        run: npm test
