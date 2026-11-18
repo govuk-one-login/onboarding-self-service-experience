@@ -1,6 +1,7 @@
 import axios, {AxiosError, AxiosResponse} from "axios";
 import {UpdateClientPayload, updateClientInRegistryHandler, logger} from "../../../src/handlers/auth/update-client.js";
 import {mockLambdaContext} from "../utils.js";
+import {MockInstance} from "vitest";
 
 const postRequest = async (data: UpdateClientPayload): Promise<string> => {
     const result = await updateClientInRegistryHandler(data, mockLambdaContext);
@@ -11,8 +12,8 @@ const EXPECTED_RESPONSE =
     '{"statusCode":200,"body":"{\\"clientId\\":\\"123\\",\\"updates\\":{\\"serviceName\\":\\"My test service\\"},\\"serviceId\\":\\"456\\",\\"selfServiceClientId\\":\\"789\\"}"}';
 
 describe("exercise update-client api", () => {
-    let axiosPutStub: jest.SpyInstance;
-    let consoleErrorStub: jest.SpyInstance;
+    let axiosPutStub: MockInstance;
+    let consoleErrorStub: MockInstance;
 
     const updateClientRequest = {
         clientId: "123",
@@ -24,8 +25,8 @@ describe("exercise update-client api", () => {
     };
 
     beforeEach(() => {
-        axiosPutStub = jest.spyOn(axios, "put");
-        consoleErrorStub = jest.spyOn(logger, "error");
+        axiosPutStub = vi.spyOn(axios, "put");
+        consoleErrorStub = vi.spyOn(logger, "error");
     });
 
     afterEach(() => {

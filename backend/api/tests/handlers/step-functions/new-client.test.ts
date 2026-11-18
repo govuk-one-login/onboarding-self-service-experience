@@ -4,7 +4,7 @@ import {constructTestApiGatewayEvent, mockLambdaContext} from "../utils.js";
 import {newClientHandler} from "../../../src/handlers/step-functions/new-client.js";
 import {TEST_SERVICE_ID, TEST_SERVICE_NAME, TEST_USER_EMAIL} from "../constants.js";
 import {TEST_STATE_MACHINE_ARN} from "../../setup.js";
-import "aws-sdk-client-mock-jest";
+import "aws-sdk-client-mock-jest/vitest";
 
 const TEST_NEW_CLIENT = {
     contactEmail: TEST_USER_EMAIL,
@@ -21,7 +21,7 @@ const mockSfnClient = mockClient(SFNClient);
 
 describe("newClientHandler tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("returns a 200 for a successful state machine invoke", async () => {

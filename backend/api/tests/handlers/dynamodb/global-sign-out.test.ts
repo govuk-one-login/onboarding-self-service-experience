@@ -5,12 +5,12 @@ import {TEST_USER_EMAIL} from "../constants.js";
 
 describe("globalSignOutHandler tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls the dynamo client with a delete command with the expected values and returns a 200 with the expected response body", async () => {
         const mockDeleteSessionResponse = {deletedItemCount: 3};
-        const deleteSessionSpy = jest.spyOn(DynamoDbClient.prototype, "deleteSessions").mockResolvedValue(mockDeleteSessionResponse);
+        const deleteSessionSpy = vi.spyOn(DynamoDbClient.prototype, "deleteSessions").mockResolvedValue(mockDeleteSessionResponse);
 
         const serviceHandlerResponse = await globalSignOutHandler(
             constructTestApiGatewayEvent({body: "", pathParameters: {userEmail: TEST_USER_EMAIL}})
@@ -25,7 +25,7 @@ describe("globalSignOutHandler tests", () => {
 
     it("calls the dynamo client with a delete command with the expected values and returns a 500 when the dynamo client throws an error", async () => {
         const error = "SomeAwsError";
-        const deleteSessionSpy = jest.spyOn(DynamoDbClient.prototype, "deleteSessions").mockRejectedValue(error);
+        const deleteSessionSpy = vi.spyOn(DynamoDbClient.prototype, "deleteSessions").mockRejectedValue(error);
 
         const serviceHandlerResponse = await globalSignOutHandler(
             constructTestApiGatewayEvent({body: "", pathParameters: {userEmail: TEST_USER_EMAIL}})
@@ -39,7 +39,7 @@ describe("globalSignOutHandler tests", () => {
     });
 
     it("calls the dynamo client with a delete command without the expected values and returns a 400 when the dynamo client throws an error", async () => {
-        const deleteSessionSpy = jest.spyOn(DynamoDbClient.prototype, "deleteSessions");
+        const deleteSessionSpy = vi.spyOn(DynamoDbClient.prototype, "deleteSessions");
         const serviceHandlerResponse = await globalSignOutHandler(constructTestApiGatewayEvent());
 
         expect(deleteSessionSpy).not.toHaveBeenCalled();

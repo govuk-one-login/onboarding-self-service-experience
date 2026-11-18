@@ -25,12 +25,12 @@ const TEST_SERVICE_RECORD = {
 
 describe("putServiceHandler tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("returns a 200 and the stringified record in the response when the dynamo put is successful", async () => {
         const dynamoPutItemResponse: PutItemCommandOutput = {$metadata: {httpStatusCode: 200}, Attributes: {}};
-        const dynamoPutSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockResolvedValue(dynamoPutItemResponse);
+        const dynamoPutSpy = vi.spyOn(DynamoDbClient.prototype, "put").mockResolvedValue(dynamoPutItemResponse);
 
         const response = await putServiceHandler(TEST_PUT_SERVICE_EVENT);
 
@@ -43,7 +43,7 @@ describe("putServiceHandler tests", () => {
 
     it("returns a 500 and a stringified error when the dynamo client throws an error", async () => {
         const dynamoErr = "SomeDynamoError";
-        const dynamoPutSpy = jest.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(dynamoErr);
+        const dynamoPutSpy = vi.spyOn(DynamoDbClient.prototype, "put").mockRejectedValue(dynamoErr);
 
         const response = await putServiceHandler(TEST_PUT_SERVICE_EVENT);
 

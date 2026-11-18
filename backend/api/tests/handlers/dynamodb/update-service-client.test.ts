@@ -1,10 +1,9 @@
 import {updateServiceClientHandler} from "../../../src/handlers/dynamodb/update-service-client.js";
 import DynamoDbClient from "../../../src/dynamodb-client.js";
-import ResolvedValue = jest.ResolvedValue;
 
 const randomId = "1234Random";
-jest.mock("crypto", () => ({
-    randomUUID: jest.fn(() => randomId)
+vi.mock("crypto", () => ({
+    randomUUID: vi.fn(() => randomId)
 }));
 
 const testRegistrationResponse = {
@@ -16,22 +15,18 @@ const testRegistrationResponse = {
     selfServiceClientId: "570278c3-a5fd-4825-a8cf-bfdf578ee7a5"
 };
 
-function createResolvedValue(): ResolvedValue<string> {
-    return <ResolvedValue<string>>{
-        serviceId: "1ded3d65-d088-4319-9431-ea5a3323799d",
-        selfServiceClientId: "570278c3-a5fd-4825-a8cf-bfdf578ee7a5"
-    };
-}
-
 const resolvedBody = '{"serviceId":"1ded3d65-d088-4319-9431-ea5a3323799d","selfServiceClientId":"570278c3-a5fd-4825-a8cf-bfdf578ee7a5"}';
 
 describe("updateServiceClientHandler tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls the dynamo client with a update command with the expected values and returns a 200 with the expected response body", async () => {
-        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "updateClient").mockResolvedValue(createResolvedValue());
+        const itemSpy = vi.spyOn(DynamoDbClient.prototype, "updateClient").mockResolvedValue({
+            serviceId: "1ded3d65-d088-4319-9431-ea5a3323799d",
+            selfServiceClientId: "570278c3-a5fd-4825-a8cf-bfdf578ee7a5"
+        });
 
         const updateServiceHandlerResponse = await updateServiceClientHandler({
             statusCode: 200,
@@ -52,7 +47,7 @@ describe("updateServiceClientHandler tests", () => {
 
     it("calls the dynamo client with a update command with the expected values and returns a 500 when the dynamo client throws an error", async () => {
         const error = "SomeAwsError";
-        const itemSpy = jest.spyOn(DynamoDbClient.prototype, "updateClient").mockRejectedValue(error);
+        const itemSpy = vi.spyOn(DynamoDbClient.prototype, "updateClient").mockRejectedValue(error);
 
         const updateServiceHandlerResponse = await updateServiceClientHandler({
             statusCode: 200,

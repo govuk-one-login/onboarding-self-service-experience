@@ -5,8 +5,8 @@
   "scripts": {
     "build": "../../infrastructure/dev/deploy.sh cognito --no-deploy",
     "deploy": "../../infrastructure/dev/deploy.sh cognito",
-    "test": "jest --silent",
-    "test:cov": "jest --silent --coverage",
+    "test": "vitest run --config ./vitest.config.ts ./tests",
+    "test:cov": "vitest run --coverage --config ./vitest.config.ts ./tests",
     "compile": "tsc"
   },
   "dependencies": {

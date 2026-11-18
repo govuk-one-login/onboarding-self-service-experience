@@ -17,12 +17,12 @@ const TEST_UPDATE_SERVICE_EVENT: handlerInvokeEvent = {
 
 describe("handlerName tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("returns a 200 and the stringified record in the response when the update is successful", async () => {
         const serviceUpdateResponse = {message: "All records updated successfully"};
-        const updateServiceSpy = jest.spyOn(DynamoDbClient.prototype, "updateService").mockResolvedValue(serviceUpdateResponse);
+        const updateServiceSpy = vi.spyOn(DynamoDbClient.prototype, "updateService").mockResolvedValue(serviceUpdateResponse);
 
         const response = await updateServiceHandler(TEST_UPDATE_SERVICE_EVENT);
 
@@ -35,7 +35,7 @@ describe("handlerName tests", () => {
 
     it("returns a 500 and a stringified error when the dynamo client throws", async () => {
         const dynamoErr = "SomeDynamoErr";
-        const updateServiceSpy = jest.spyOn(DynamoDbClient.prototype, "updateService").mockRejectedValue(dynamoErr);
+        const updateServiceSpy = vi.spyOn(DynamoDbClient.prototype, "updateService").mockRejectedValue(dynamoErr);
 
         const response = await updateServiceHandler(TEST_UPDATE_SERVICE_EVENT);
 

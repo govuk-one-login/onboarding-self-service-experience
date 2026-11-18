@@ -6,12 +6,12 @@ import {TEST_USER_EMAIL} from "../constants.js";
 
 describe("getSessionCountHandler tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls the dynamo client with a get command with the expected values and returns a 200 with the expected response body", async () => {
         const dynamoResponse: ScanCommandOutput = {$metadata: {}, Count: 1};
-        const getSessionsSpy = jest.spyOn(DynamoDbClient.prototype, "getSessions").mockResolvedValue(dynamoResponse);
+        const getSessionsSpy = vi.spyOn(DynamoDbClient.prototype, "getSessions").mockResolvedValue(dynamoResponse);
 
         const testApiGatewayEvent = constructTestApiGatewayEvent({
             body: "",
@@ -31,7 +31,7 @@ describe("getSessionCountHandler tests", () => {
 
     it("calls the dynamo client with a get command with the expected values and returns a 500 when the dynamo client throws an error", async () => {
         const error = "SomeAwsError";
-        const getSessionsSpy = jest.spyOn(DynamoDbClient.prototype, "getSessions").mockRejectedValue(error);
+        const getSessionsSpy = vi.spyOn(DynamoDbClient.prototype, "getSessions").mockRejectedValue(error);
 
         const testApiGatewayEvent = constructTestApiGatewayEvent({
             body: "",
@@ -50,7 +50,7 @@ describe("getSessionCountHandler tests", () => {
     });
 
     it("Returns a 400 and does not call the dynamo client when there is no userEmail Path Parameter", async () => {
-        const getSessionsSpy = jest.spyOn(DynamoDbClient.prototype, "getSessions").mockResolvedValue({$metadata: {}});
+        const getSessionsSpy = vi.spyOn(DynamoDbClient.prototype, "getSessions").mockResolvedValue({$metadata: {}});
         const serviceHandlerResponse = await getSessionCountHandler(constructTestApiGatewayEvent());
         expect(serviceHandlerResponse).toStrictEqual({
             statusCode: 400,

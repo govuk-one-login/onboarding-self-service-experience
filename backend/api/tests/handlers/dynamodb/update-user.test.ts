@@ -12,12 +12,12 @@ const TEST_USER_UPDATES = {
 };
 describe("updateUserHandler tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("returns a  400 for no UserId in the update body", async () => {
         const updateUserResponse: UpdateItemCommandOutput = {$metadata: {httpStatusCode: 200}};
-        const updateUserSpy = jest.spyOn(DynamoDbClient.prototype, "updateUser").mockResolvedValue(updateUserResponse);
+        const updateUserSpy = vi.spyOn(DynamoDbClient.prototype, "updateUser").mockResolvedValue(updateUserResponse);
 
         const response = await updateUserHandler(
             constructTestApiGatewayEvent({
@@ -40,7 +40,7 @@ describe("updateUserHandler tests", () => {
 
     it("returns a 403 if the userId in the request body does not match the access token", async () => {
         const updateUserResponse: UpdateItemCommandOutput = {$metadata: {httpStatusCode: 200}};
-        const updateUserSpy = jest.spyOn(DynamoDbClient.prototype, "updateUser").mockResolvedValue(updateUserResponse);
+        const updateUserSpy = vi.spyOn(DynamoDbClient.prototype, "updateUser").mockResolvedValue(updateUserResponse);
 
         const response = await updateUserHandler(
             constructTestApiGatewayEvent({
@@ -65,7 +65,7 @@ describe("updateUserHandler tests", () => {
 
     it("returns a 200 and the stringified record in the response when the update is successful", async () => {
         const updateUserResponse: UpdateItemCommandOutput = {$metadata: {httpStatusCode: 200}};
-        const updateUserSpy = jest.spyOn(DynamoDbClient.prototype, "updateUser").mockResolvedValue(updateUserResponse);
+        const updateUserSpy = vi.spyOn(DynamoDbClient.prototype, "updateUser").mockResolvedValue(updateUserResponse);
 
         const response = await updateUserHandler(
             constructTestApiGatewayEvent({
@@ -86,7 +86,7 @@ describe("updateUserHandler tests", () => {
 
     it("returns a 500 and a stringified error when the dynamo client throws", async () => {
         const dynamoErr = "SomeDynamoErr";
-        const updateUserSpy = jest.spyOn(DynamoDbClient.prototype, "updateUser").mockRejectedValue(dynamoErr);
+        const updateUserSpy = vi.spyOn(DynamoDbClient.prototype, "updateUser").mockRejectedValue(dynamoErr);
 
         const response = await updateUserHandler(
             constructTestApiGatewayEvent({

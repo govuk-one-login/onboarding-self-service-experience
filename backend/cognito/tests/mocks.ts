@@ -13,9 +13,9 @@ export const mockLambdaContext: Context = {
     logGroupName: "someLogGroupName",
     logStreamName: "someLogStreamName",
     getRemainingTimeInMillis: () => 1,
-    done: jest.fn(),
-    fail: jest.fn(),
-    succeed: jest.fn()
+    done: vi.fn(),
+    fail: vi.fn(),
+    succeed: vi.fn()
 };
 
 export const TEST_PROTOCOL = "https";

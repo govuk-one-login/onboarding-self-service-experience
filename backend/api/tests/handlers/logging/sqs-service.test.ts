@@ -4,7 +4,7 @@ import {constructTestApiGatewayEvent} from "../utils.js";
 import {sendSQSMessageToTxMAHandler} from "./../../../src/handlers/logging/sqs-service.js";
 import {TEST_SQS_QUEUE_URL} from "../../setup.js";
 import {mockClient} from "aws-sdk-client-mock";
-import "aws-sdk-client-mock-jest";
+import "aws-sdk-client-mock-jest/vitest";
 
 const mockSqsClient = mockClient(SQSClient);
 
@@ -19,8 +19,8 @@ const TEST_HANDLER_EVENT = constructTestApiGatewayEvent({
 
 describe("sendSQSMessageToTxMAHandler tests", () => {
     beforeEach(() => {
-        jest.spyOn(console, "log");
-        jest.clearAllMocks();
+        vi.spyOn(console, "log");
+        vi.clearAllMocks();
         mockSqsClient.reset();
     });
 
