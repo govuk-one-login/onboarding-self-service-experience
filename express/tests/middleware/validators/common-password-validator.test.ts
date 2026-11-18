@@ -2,15 +2,15 @@ import {Request} from "express";
 import checkPasswordAllowed from "../../../src/middleware/validators/common-password-validator.js";
 import {request, response} from "../../mocks.js";
 
-jest.mock("fs/promises", () => {
+vi.mock("fs/promises", () => {
     return {
-        readFile: jest.fn(() => "common-password")
+        readFile: vi.fn(() => "common-password")
     };
 });
 
 let req: Request;
 
-const next = jest.fn();
+const next = vi.fn();
 const res = response();
 const validator = checkPasswordAllowed("template.njk");
 

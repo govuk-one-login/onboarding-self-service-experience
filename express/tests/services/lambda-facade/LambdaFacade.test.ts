@@ -16,19 +16,23 @@ import AuthenticationResultParser from "../../../src/lib/authentication-result-p
 import {TxMAEvent} from "../../../src/types/txma-event.js";
 import {createHash} from "crypto";
 
-const axiosCreateSpy = jest.spyOn(axios, "create");
-const mockPost = jest.fn();
-const mockGet = jest.fn();
+const axiosCreateSpy = vi.spyOn(axios, "create");
+const mockPost = vi.fn();
+const mockGet = vi.fn();
 
 describe("Lambda Facade class tests", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
+    beforeAll(() => {
+        process.env.API_BASE_URL = TEST_API_BASE_URL;
         axiosCreateSpy.mockReturnValue({
             post: mockPost,
             get: mockGet
         } as unknown as AxiosInstance);
 
-        jest.spyOn(AuthenticationResultParser, "getEmail").mockReturnValue(TEST_EMAIL);
+        vi.spyOn(AuthenticationResultParser, "getEmail").mockReturnValue(TEST_EMAIL);
+    });
+
+    afterAll(() => {
+        vi.clearAllMocks();
     });
 
     it("calls create with the expected values when a Lambda Facade is instantiated", () => {

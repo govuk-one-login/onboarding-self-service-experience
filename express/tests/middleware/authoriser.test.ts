@@ -1,12 +1,12 @@
 import checkAuthorisation from "../../src/middleware/authoriser.js";
 import {request, response} from "../mocks.js";
 
-const mockNext = jest.fn();
+const mockNext = vi.fn();
 const mockRes = response();
 
 describe("Verify access token in the session", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("Redirect to the session timeout page if there is no access token", async () => {

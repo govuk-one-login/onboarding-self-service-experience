@@ -1,8 +1,8 @@
 import validateEmail from "../../../src/lib/validators/email-validator.js";
 
-jest.mock("fs/promises", () => {
+vi.mock("fs/promises", () => {
     return {
-        readFile: jest.fn(() => `allowed.domain\ngov.uk`)
+        readFile: vi.fn(() => `allowed.domain\ngov.uk`)
     };
 });
 

@@ -1,11 +1,9 @@
-const IsFixedCredMock = jest.fn();
-const IsPseudoFixedOTPCredMock = jest.fn();
-
-jest.mock("../../src/services/self-service-services-service.js");
-jest.mock("../../src/lib/fixedOTP.js", () => ({
-    isFixedOTPCredential: IsFixedCredMock,
-    isPseudonymisedFixedOTPCredential: IsPseudoFixedOTPCredMock
+vi.mock("../../src/services/self-service-services-service.js");
+vi.mock("../../src/lib/fixedOTP.js", () => ({
+    isFixedOTPCredential: vi.fn(),
+    isPseudonymisedFixedOTPCredential: vi.fn(),
 }));
+
 
 import processSignInForm from "../../src/middleware/process-sign-in-form.js";
 import {request, response} from "../mocks.js";
@@ -22,24 +20,26 @@ import {
     TEST_SESSION_ID,
     TEST_TEMPLATE_PATH
 } from "../constants.js";
+import { isFixedOTPCredential, isPseudonymisedFixedOTPCredential } from "../../src/lib/fixedOTP.js";
 
-const s4LoginSpy = jest.spyOn(SelfServiceServicesService.prototype, "login");
-const s4SendTxmaLogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
-const s4RecoverCognitoSpy = jest.spyOn(SelfServiceServicesService.prototype, "recoverCognitoAccount");
-const s4GetDynamoDbEntriesSpy = jest.spyOn(SelfServiceServicesService.prototype, "getDynamoDBEntries");
+const s4LoginSpy = vi.spyOn(SelfServiceServicesService.prototype, "login");
+const s4SendTxmaLogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+const s4RecoverCognitoSpy = vi.spyOn(SelfServiceServicesService.prototype, "recoverCognitoAccount");
+const s4GetDynamoDbEntriesSpy = vi.spyOn(SelfServiceServicesService.prototype, "getDynamoDBEntries");
 
-const mockNext = jest.fn();
+const mockNext = vi.fn();
 
 describe("processSignInForm tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         delete process.env.USE_COGNITO_DR;
+        const isPseudonymisedFixedOTPCredentialMock = vi.mocked(isPseudonymisedFixedOTPCredential);
+        isPseudonymisedFixedOTPCredentialMock.mockReturnValue(false);
     });
 
     it.each([null, ""])(
         "renders the provided template with a enter password error message when the submitted password is '%s'",
         async password => {
-            IsPseudoFixedOTPCredMock.mockReturnValue(false);
             const mockRequest = request({
                 session: {
                     emailAddress: TEST_EMAIL
@@ -65,7 +65,6 @@ describe("processSignInForm tests", () => {
     );
 
     it("renders the template with an Incorrect password error message when s4.login throws an NotAuthorizedException", async () => {
-        IsPseudoFixedOTPCredMock.mockReturnValue(false);
         s4LoginSpy.mockRejectedValue(new NotAuthorizedException({$metadata: {}, message: "Incorrect Password"}));
         const mockRequest = request({
             session: {
@@ -103,7 +102,6 @@ describe("processSignInForm tests", () => {
     });
 
     it("renders the account not found template when s4.login throws a UserNotFoundException", async () => {
-        IsPseudoFixedOTPCredMock.mockReturnValue(false);
         s4LoginSpy.mockRejectedValue(new UserNotFoundException({$metadata: {}, message: "User Not Found"}));
         const mockRequest = request({
             session: {
@@ -123,7 +121,6 @@ describe("processSignInForm tests", () => {
 
     it("renders the account recovery route if USE_COGNITO_DR is true", async () => {
         process.env.USE_COGNITO_DR = "true";
-        IsPseudoFixedOTPCredMock.mockReturnValue(false);
         s4LoginSpy.mockRejectedValue(new UserNotFoundException({$metadata: {}, message: "User Not Found"}));
         s4GetDynamoDbEntriesSpy.mockResolvedValue({data: TEST_DYNAMO_USER} as AxiosResponse);
         const mockRequest = request({
@@ -146,8 +143,8 @@ describe("processSignInForm tests", () => {
 
     it("sets the session value password if email is fixed credential", async () => {
         s4LoginSpy.mockResolvedValue(TEST_MFA_RESPONSE);
-        IsPseudoFixedOTPCredMock.mockReturnValue(false);
-        IsFixedCredMock.mockReturnValue(true);
+        const isFixedOTPCredentialMock = vi.mocked(isFixedOTPCredential);
+        isFixedOTPCredentialMock.mockReturnValue(true);
         const mockRequest = request({
             session: {
                 emailAddress: TEST_EMAIL,

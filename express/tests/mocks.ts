@@ -2,50 +2,50 @@ import {Request, Response} from "express";
 import SelfServiceServicesService from "../src/services/self-service-services-service.js";
 
 export const mockLambdaFacade = {
-    sendTxMALog: jest.fn(),
-    getDynamoDBEntries: jest.fn(),
-    deleteClientEntries: jest.fn(),
-    deleteServiceEntries: jest.fn(),
-    generateClient: jest.fn(),
-    getUserByCognitoId: jest.fn(),
-    globalSignOut: jest.fn(),
-    putUser: jest.fn(),
-    updateUser: jest.fn(),
-    newService: jest.fn(),
-    listServices: jest.fn(),
-    listClients: jest.fn(),
-    updateClient: jest.fn(),
-    updateService: jest.fn(),
-    sessionCount: jest.fn(),
-    getEmailCodeBlock: jest.fn(),
-    putEmailCodeBlock: jest.fn(),
-    removeEmailCodeBlock: jest.fn()
+    sendTxMALog: vi.fn(),
+    getDynamoDBEntries: vi.fn(),
+    deleteClientEntries: vi.fn(),
+    deleteServiceEntries: vi.fn(),
+    generateClient: vi.fn(),
+    getUserByCognitoId: vi.fn(),
+    globalSignOut: vi.fn(),
+    putUser: vi.fn(),
+    updateUser: vi.fn(),
+    newService: vi.fn(),
+    listServices: vi.fn(),
+    listClients: vi.fn(),
+    updateClient: vi.fn(),
+    updateService: vi.fn(),
+    sessionCount: vi.fn(),
+    getEmailCodeBlock: vi.fn(),
+    putEmailCodeBlock: vi.fn(),
+    removeEmailCodeBlock: vi.fn()
 };
 
 export const mockCognitoInterface = {
-    login: jest.fn(),
-    adminGetUserCommandOutput: jest.fn(),
-    changePassword: jest.fn(),
-    confirmForgotPassword: jest.fn(),
-    createUser: jest.fn(),
-    recoverUser: jest.fn(),
-    resendEmailAuthCode: jest.fn(),
-    respondToMfaChallenge: jest.fn(),
-    sendMobileNumberVerificationCode: jest.fn(),
-    setEmailAsVerified: jest.fn(),
-    setMfaPreference: jest.fn(),
-    resetMfaPreference: jest.fn(),
-    setMobilePhoneAsVerified: jest.fn(),
-    setNewPassword: jest.fn(),
-    setPhoneNumber: jest.fn(),
-    setPhoneNumberWithoutAdmin: jest.fn(),
-    setSignUpStatus: jest.fn(),
-    setUserPassword: jest.fn(),
-    useRefreshToken: jest.fn(),
-    verifyMobileUsingSmsCode: jest.fn(),
-    forgotPassword: jest.fn(),
-    getUser: jest.fn(),
-    globalSignOut: jest.fn()
+    login: vi.fn(),
+    adminGetUserCommandOutput: vi.fn(),
+    changePassword: vi.fn(),
+    confirmForgotPassword: vi.fn(),
+    createUser: vi.fn(),
+    recoverUser: vi.fn(),
+    resendEmailAuthCode: vi.fn(),
+    respondToMfaChallenge: vi.fn(),
+    sendMobileNumberVerificationCode: vi.fn(),
+    setEmailAsVerified: vi.fn(),
+    setMfaPreference: vi.fn(),
+    resetMfaPreference: vi.fn(),
+    setMobilePhoneAsVerified: vi.fn(),
+    setNewPassword: vi.fn(),
+    setPhoneNumber: vi.fn(),
+    setPhoneNumberWithoutAdmin: vi.fn(),
+    setSignUpStatus: vi.fn(),
+    setUserPassword: vi.fn(),
+    useRefreshToken: vi.fn(),
+    verifyMobileUsingSmsCode: vi.fn(),
+    forgotPassword: vi.fn(),
+    getUser: vi.fn(),
+    globalSignOut: vi.fn()
 };
 
 export const request = (properties?: Partial<Request> | Record<string, unknown>) => {
@@ -54,7 +54,7 @@ export const request = (properties?: Partial<Request> | Record<string, unknown>)
     return {
         body: {},
         session: {
-            save: jest.fn(),
+            save: vi.fn(),
             ...(session as Partial<Request["session"]>)
         },
         app: {
@@ -68,4 +68,4 @@ export const request = (properties?: Partial<Request> | Record<string, unknown>)
 };
 
 export const response = (properties?: Partial<Response>) =>
-    ({render: jest.fn(), redirect: jest.fn(), locals: {}, ...properties} as Partial<Response> as Response);
+    ({render: vi.fn(), redirect: vi.fn(), locals: {}, ...properties} as Partial<Response> as Response);

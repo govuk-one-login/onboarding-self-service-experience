@@ -4,7 +4,7 @@ import {request, response} from "../../mocks.js";
 
 let req: Request;
 
-const next = jest.fn();
+const next = vi.fn();
 const res = response();
 
 describe("Validate submitted email security code", () => {

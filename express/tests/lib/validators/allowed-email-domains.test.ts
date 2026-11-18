@@ -1,8 +1,8 @@
 import hasAllowedDomain from "../../../src/lib/validators/allowed-email-domains.js";
 
-jest.mock("fs/promises", () => {
+vi.mock("fs/promises", () => {
     return {
-        readFile: jest.fn(() => `.partial.subdomain\nfull.domain`)
+        readFile: vi.fn(() => `.partial.subdomain\nfull.domain`)
     };
 });
 

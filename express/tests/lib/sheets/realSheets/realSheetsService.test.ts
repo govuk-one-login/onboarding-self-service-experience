@@ -1,13 +1,15 @@
-const getMock = jest.fn();
-const appendMock = jest.fn();
-const JwtMock = jest.fn();
+const {getMock, appendMock, jwtMock} = vi.hoisted(() => ({
+    getMock: vi.fn(),
+    appendMock: vi.fn(),
+    jwtMock: vi.fn()
+}));
 
-jest.mock("googleapis", () => ({
+vi.mock("googleapis", () => ({
     google: {
         auth: {
-            JWT: JwtMock
+            JWT: jwtMock
         },
-        sheets: jest.fn(() => ({
+        sheets: vi.fn(() => ({
             spreadsheets: {
                 values: {
                     get: getMock,
@@ -39,7 +41,7 @@ const TEST_APPEND_ROWS_RESPONSE = {
 
 describe("RealSheetsService tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         process.env.GOOGLE_SHEET_CREDENTIALS = JSON.stringify({
             client_email: TEST_EMAIL,
             private_key: TEST_PRIVATE_KEY
@@ -51,25 +53,28 @@ describe("RealSheetsService tests", () => {
     });
 
     it("calls the expected functions when the appendValues method is called", async () => {
-        JwtMock.mockResolvedValue(TEST_JWT);
+        const jwtInstance = {token: TEST_JWT};
+        jwtMock.mockImplementation(function () {
+            return jwtInstance;
+        });
         getMock.mockResolvedValue(TEST_GET_VALUES_RESPONSE);
         appendMock.mockResolvedValue(TEST_APPEND_ROWS_RESPONSE);
 
         const sheetsService = new RealSheetsService(TEST_SPREADSHEET_ID);
         await sheetsService.appendValues(TEST_DATA_TO_APPEND, TEST_DATA_RANGE, TEST_HEADER_RANGE);
 
-        expect(JwtMock).toHaveBeenCalledWith({
+        expect(jwtMock).toHaveBeenCalledWith({
             email: TEST_EMAIL,
             key: TEST_PRIVATE_KEY,
             scopes: TEST_SCOPES
         });
         expect(getMock).toHaveBeenCalledWith({
-            auth: TEST_JWT,
+            auth: jwtInstance,
             spreadsheetId: TEST_SPREADSHEET_ID,
             range: TEST_HEADER_RANGE
         });
         expect(appendMock).toHaveBeenCalledWith({
-            auth: TEST_JWT,
+            auth: jwtInstance,
             spreadsheetId: TEST_SPREADSHEET_ID,
             range: TEST_DATA_RANGE,
             valueInputOption: "USER_ENTERED",

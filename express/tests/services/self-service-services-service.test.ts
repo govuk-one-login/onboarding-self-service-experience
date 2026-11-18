@@ -41,20 +41,20 @@ const mockS4Instance = new SelfServiceServicesService(mockCognitoInterface, mock
 
 describe("SelfServiceServicesService tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.spyOn(AuthenticationResultParser, "getCognitoId").mockReturnValue(TEST_COGNITO_ID);
-        jest.spyOn(AuthenticationResultParser, "getEmail").mockReturnValue(TEST_EMAIL);
-        jest.spyOn(AuthenticationResultParser, "getPhoneNumber").mockReturnValue(TEST_PHONE_NUMBER);
-        jest.spyOn(logger, "info");
-        jest.spyOn(logger, "debug");
-        jest.spyOn(SignupStatus.prototype, "setStage");
-        jest.spyOn(SignupStatus.prototype, "getState");
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.spyOn(AuthenticationResultParser, "getCognitoId").mockReturnValue(TEST_COGNITO_ID);
+        vi.spyOn(AuthenticationResultParser, "getEmail").mockReturnValue(TEST_EMAIL);
+        vi.spyOn(AuthenticationResultParser, "getPhoneNumber").mockReturnValue(TEST_PHONE_NUMBER);
+        vi.spyOn(logger, "info");
+        vi.spyOn(logger, "debug");
+        vi.spyOn(SignupStatus.prototype, "setStage");
+        vi.spyOn(SignupStatus.prototype, "getState");
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.restoreAllMocks();
-        jest.useRealTimers();
+        vi.restoreAllMocks();
+        vi.useRealTimers();
     });
 
     it("calls cognito ChangePassword when the changePassword method is called", () => {
@@ -265,7 +265,7 @@ describe("SelfServiceServicesService tests", () => {
 
     it("calls expected cognito methods with the expected values when the setSignUpStatus method is called", async () => {
         const mockSignUpStatus = new SignupStatus();
-        jest.spyOn(mockS4Instance, "getSignUpStatus").mockResolvedValue(mockSignUpStatus);
+        vi.spyOn(mockS4Instance, "getSignUpStatus").mockResolvedValue(mockSignUpStatus);
 
         await mockS4Instance.setSignUpStatus(TEST_EMAIL, TEST_SIGN_UP_STATUS_STAGE);
         expect(logger.debug).toHaveBeenCalledWith("In self-service-services-service:setSignUpStatus()");

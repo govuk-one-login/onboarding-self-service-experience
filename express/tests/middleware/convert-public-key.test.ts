@@ -15,7 +15,7 @@ import {
 
 describe("Validate and convert submitted Static public key", () => {
     it("Call next middleware if public key successfully converted", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const req = request();
         const res = response();
 
@@ -31,7 +31,7 @@ describe("Validate and convert submitted Static public key", () => {
     });
 
     it("it re-renders with error messages if the public key is invalid", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const req = request({
             body: {
                 publicKeySource: TEST_STATIC_KEY_UPDATE.public_key_source,
@@ -68,7 +68,7 @@ describe("Validate and convert submitted Static public key", () => {
     });
 
     it("Fail if public key unsuccessfully converted", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const mockReq = request({
             body: {
                 publicKeySource: TEST_STATIC_KEY_UPDATE.public_key_source,
@@ -114,7 +114,7 @@ describe("Validate and convert submitted Static public key", () => {
 
 describe("Validate and convert submitted JWKS public key", () => {
     it("Call next middleware if public key successfully converted", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const req = request();
         const res = response();
 
@@ -130,7 +130,7 @@ describe("Validate and convert submitted JWKS public key", () => {
     });
 
     it("it re-renders with error messages if the public key is invalid", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const req = request({
             body: {
                 publicKeySource: TEST_JWKS_KEY_UPDATE.public_key_source,
@@ -167,7 +167,7 @@ describe("Validate and convert submitted JWKS public key", () => {
     });
 
     it("Fail if public key unsuccessfully converted", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const mockReq = request({
             body: {
                 publicKeySource: TEST_JWKS_KEY_UPDATE.public_key_source,

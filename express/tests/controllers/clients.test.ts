@@ -1,5 +1,5 @@
-const timestampMock = jest.fn();
-jest.mock("../../src/lib/timestamp.js", () => timestampMock);
+const timestampMock = vi.fn();
+vi.mock("../../src/lib/timestamp.js", () => timestampMock);
 
 import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
 import {
@@ -89,22 +89,22 @@ import AuthenticationResultParser from "../../src/lib/authentication-result-pars
 
 import logger from "../../src/lib/logger.js";
 
-const s4ListClientsSpy = jest.spyOn(SelfServiceServicesService.prototype, "listClients");
-const s4SendTxmaLogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
-const s4UpdateServiceSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateService");
-const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
-jest.spyOn(AuthenticationResultParser, "getCognitoId").mockReturnValue(TEST_COGNITO_ID);
+const s4ListClientsSpy = vi.spyOn(SelfServiceServicesService.prototype, "listClients");
+const s4SendTxmaLogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+const s4UpdateServiceSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateService");
+const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
+vi.spyOn(AuthenticationResultParser, "getCognitoId").mockReturnValue(TEST_COGNITO_ID);
 timestampMock.mockReturnValue(TEST_TIMESTAMP_STRING);
 
-const mockNext = jest.fn();
+const mockNext = vi.fn();
 
 describe("showClient Controller tests", () => {
     const defaultPublicKey =
         "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAp2mLkQGo24Kz1rut0oZlviMkGomlQCH+iT1pFvegZFXq39NPjRWyatmXp/XIUPqCq9Kk8/+tq4Sgjw+EM5tATJ06j5r+35of58ATGVPniW//IhGizrv6/ebGcGEUJ0Y/ZmlCHYPV+lbewpttQ/IYKM1nr3k/Rl6qepbVYe+MpGubluQvdhgUYel9OzxiOvUk7XI0axPquiXzoEgmNNOai8+WhYTkBqE3/OucAv+XwXdnx4XHmKzMwTv93dYMpUmvTxWcSeEJ/4/SrbiK4PyHWVKU2BozfSUejVNhahAzZeyyDwhYJmhBaZi/3eOOlqGXj9UdkOXbl3vcwBH8wD30O9/4F5ERLKxzOaMnKZ+RpnygWF0qFhf+UeFMy+O06sdgiaFnXaSCsIy/SohspkKiLjNnhvrDNmPLMQbQKQlJdcp6zUzI7Gzys7luEmOxyMpA32lDBQcjL7KNwM15s4ytfrJ46XEPZUXESce2gj6NazcPPsrTa/Q2+oLS9GWupGh7AgMBAAE=";
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.spyOn(logger, "error");
+        vi.clearAllMocks();
+        vi.spyOn(logger, "error");
     });
 
     it("calls render with the expected template and options from the first client returned from s4 listClients", async () => {
@@ -542,7 +542,7 @@ describe("showClient Controller tests", () => {
 
 describe("showGoLivePage controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls render with the expected template path and render options", () => {
@@ -575,7 +575,7 @@ describe("showGoLivePage controller tests", () => {
 
 describe("showChangeServiceNameForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls render with the expected values", () => {
@@ -602,7 +602,7 @@ describe("showChangeServiceNameForm controller tests", () => {
 
 describe("processChangeServiceNameForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls render with the change-service-name template and error message if service name is empty", async () => {
@@ -675,7 +675,7 @@ describe("processChangeServiceNameForm controller tests", () => {
 
 describe("showChangePublicKeyForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls render with the change-public-key-template and expected options", () => {
@@ -709,7 +709,7 @@ describe("showChangePublicKeyForm controller tests", () => {
 
 describe("processChangePublicKeyForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 update client with the new public key and sends a SSE_UPDATE_PUBLIC_KEY log when the selfServiceClientId is not empty", async () => {
@@ -808,7 +808,7 @@ describe("processChangePublicKeyForm controller tests", () => {
 
 describe("showChangeRedirectUrlsForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 list client and renders the change redirect uris template with the expected values", async () => {
@@ -846,7 +846,7 @@ describe("showChangeRedirectUrlsForm controller tests", () => {
 
 describe("showAddRedirectUriForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 list client and renders the add redirect uri template with the expected values", async () => {
@@ -880,7 +880,7 @@ describe("showAddRedirectUriForm controller tests", () => {
 
 describe("processAddRedirectUriForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("redirects back to the /change-redirect-uris with an error message if the redirect uri is already added to the client", async () => {
@@ -973,7 +973,7 @@ describe("processAddRedirectUriForm controller tests", () => {
 
 describe("showConfirmRedirectUriRemovalForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 list client and renders the confirm-redirect-uri-removal template with the expected values", async () => {
@@ -1010,7 +1010,7 @@ describe("showConfirmRedirectUriRemovalForm controller tests", () => {
 
 describe("processRemoveRedirectUriFrom controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("redirects to /change-redirect-uris with a non update message if the redirect uri to remove is not in the client", async () => {
@@ -1214,7 +1214,7 @@ describe("processRemoveRedirectUriFrom controller tests", () => {
 
 describe("showChangePostLogoutUrisForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 list client to retrieve the client details and renders the change-post-logout-uris template with the expected values", async () => {
@@ -1252,7 +1252,7 @@ describe("showChangePostLogoutUrisForm controller tests", () => {
 
 describe("showAddPostLogoutUriForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 list client to retrieve the client details and renders the add-post-logout-uri template with the expected values", async () => {
@@ -1286,7 +1286,7 @@ describe("showAddPostLogoutUriForm controller tests", () => {
 
 describe("processAddPostLogoutUriForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("redirects back to /change-post-logout-uris with a 'URI already exists' message if the client already has the URI", async () => {
@@ -1380,7 +1380,7 @@ describe("processAddPostLogoutUriForm controller tests", () => {
 
 describe("showConfirmPostLogoutUriRemovalForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 list client and renders the confirm-post-logout-uri-removal template with the expected values", async () => {
@@ -1417,7 +1417,7 @@ describe("showConfirmPostLogoutUriRemovalForm controller tests", () => {
 
 describe("processRemovePostLogoutUriFrom controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("does not update the client if the post logout redirect uri is not in the client config and redirects back to /change-post-logout-uris with an update message", async () => {
@@ -1632,7 +1632,7 @@ describe("processRemovePostLogoutUriFrom controller tests", () => {
 
 describe("showChangeBackChannelLogoutUriForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the expected template with the expected values", () => {
@@ -1665,7 +1665,7 @@ describe("showChangeBackChannelLogoutUriForm controller tests", () => {
 
 describe("processChangeBackChannelLogOutUriForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 update client with the new backchannel logout uri and then redirects to`/services/:serviceId/clients", async () => {
@@ -1704,7 +1704,7 @@ describe("processChangeBackChannelLogOutUriForm controller tests", () => {
 
 describe("showChangeSectorIdentifierUriForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the expected template with the expected values", () => {
@@ -1737,7 +1737,7 @@ describe("showChangeSectorIdentifierUriForm controller tests", () => {
 
 describe("processChangeSectorIdentifierUriForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 update client with the new sectorIdentifierUri  and then redirects to`/services/:serviceId/clients", async () => {
@@ -1776,7 +1776,7 @@ describe("processChangeSectorIdentifierUriForm controller tests", () => {
 
 describe("showEnterContactForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 list client and renders the confirm-post-logout-uri-removal template with the expected values", async () => {
@@ -1812,7 +1812,7 @@ describe("showEnterContactForm controller tests", () => {
 
 describe("showConfirmContactRemovalForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the confirm-contact-removal template with the expected values", () => {
@@ -1843,7 +1843,7 @@ describe("showConfirmContactRemovalForm controller tests", () => {
 
 describe("processConfirmContactRemovalForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("removes the contact if the user has selected yes and it is not the initial contact, and redirects to enter-contact", async () => {
@@ -1994,7 +1994,7 @@ describe("processConfirmContactRemovalForm controller tests", () => {
 
 describe("showEnterContactEmailForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the expected template with the expected values", () => {
@@ -2021,7 +2021,7 @@ describe("showEnterContactEmailForm controller tests", () => {
 
 describe("processEnterContactEmailForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the enter-contact-email template with an error message when the contact is already added", async () => {
@@ -2138,22 +2138,22 @@ describe("processEnterContactEmailForm controller tests", () => {
 });
 
 describe("processChangePublicKey controller tests", () => {
-    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 change the public key and adds the value, sends a TxMA log and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2173,7 +2173,7 @@ describe("processChangePublicKey controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processChangePublicKeyForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, "", TEST_CLIENT_ID, TEST_STATIC_KEY_UPDATE, TEST_ACCESS_TOKEN);
@@ -2193,7 +2193,7 @@ describe("processChangePublicKey controller tests", () => {
     it("calls s4 change the static public key and updates the value, sends a TxMA log and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2213,7 +2213,7 @@ describe("processChangePublicKey controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processChangePublicKeyForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -2240,15 +2240,15 @@ describe("processChangePublicKey controller tests", () => {
 describe("showChangeScopesForm controller tests for executing form", () => {
     const changeScopesForm = "clients/change-scopes.njk";
     const mockRes = response();
-    const s4ResultSpy = jest.spyOn(mockRes, "render");
+    const s4ResultSpy = vi.spyOn(mockRes, "render");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 scopes controller", async () => {
@@ -2269,7 +2269,7 @@ describe("showChangeScopesForm controller tests for executing form", () => {
             },
             ip: TEST_IP_ADDRESS
         });
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         showChangeScopesForm(mockReq, mockRes, mockNext);
         expect(s4ResultSpy).toHaveBeenCalledWith(changeScopesForm, {
@@ -2282,22 +2282,22 @@ describe("showChangeScopesForm controller tests for executing form", () => {
 });
 
 describe("processChangeScopesForm controller tests for updating key", () => {
-    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 change array of scopes and updates the value and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2317,7 +2317,7 @@ describe("processChangeScopesForm controller tests for updating key", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processChangeScopesForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -2334,7 +2334,7 @@ describe("processChangeScopesForm controller tests for updating key", () => {
     it("calls s4 change single scope and updates the value and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2354,7 +2354,7 @@ describe("processChangeScopesForm controller tests for updating key", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processChangeScopesForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -2372,15 +2372,15 @@ describe("processChangeScopesForm controller tests for updating key", () => {
 describe("showChangeClaimsForm controller tests for executing form", () => {
     const changeClaimsForm = "clients/change-claims.njk";
     const mockRes = response();
-    const s4ResultSpy = jest.spyOn(mockRes, "render");
+    const s4ResultSpy = vi.spyOn(mockRes, "render");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 claims controller", async () => {
@@ -2401,7 +2401,7 @@ describe("showChangeClaimsForm controller tests for executing form", () => {
             },
             ip: TEST_IP_ADDRESS
         });
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         showChangeClaimsForm(mockReq, mockRes, mockNext);
         expect(s4ResultSpy).toHaveBeenCalledWith(changeClaimsForm, {
@@ -2414,22 +2414,22 @@ describe("showChangeClaimsForm controller tests for executing form", () => {
 });
 
 describe("processChangeClaimsForm controller tests for updating key", () => {
-    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 change array of claims and updates the value and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2449,7 +2449,7 @@ describe("processChangeClaimsForm controller tests for updating key", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processChangeClaimsForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -2466,7 +2466,7 @@ describe("processChangeClaimsForm controller tests for updating key", () => {
     it("calls s4 change single claim and updates the value and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2486,7 +2486,7 @@ describe("processChangeClaimsForm controller tests for updating key", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processChangeClaimsForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -2502,22 +2502,22 @@ describe("processChangeClaimsForm controller tests for updating key", () => {
 });
 
 describe("processChangePublicKey controller tests", () => {
-    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 change the public key and adds the value, sends a TxMA log and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2537,7 +2537,7 @@ describe("processChangePublicKey controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processChangePublicKeyForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(TEST_SERVICE_ID, "", TEST_CLIENT_ID, TEST_STATIC_KEY_UPDATE, TEST_ACCESS_TOKEN);
@@ -2557,7 +2557,7 @@ describe("processChangePublicKey controller tests", () => {
     it("calls s4 change the public key and updates the value, sends a TxMA log and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockRequest = request({
             context: {
@@ -2585,22 +2585,22 @@ describe("processChangePublicKey controller tests", () => {
 });
 
 describe("processEnterClientSecretHashForm controller tests", () => {
-    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 change the secret hash and adds the value, sends a TxMA log and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2620,7 +2620,7 @@ describe("processEnterClientSecretHashForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processEnterClientSecretHashForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -2646,7 +2646,7 @@ describe("processEnterClientSecretHashForm controller tests", () => {
     it("calls s4 change the secret hash and updates the value, sends a TxMA log and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2666,7 +2666,7 @@ describe("processEnterClientSecretHashForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processEnterClientSecretHashForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -2691,22 +2691,22 @@ describe("processEnterClientSecretHashForm controller tests", () => {
 });
 
 describe("processChangeClaimsForm controller tests for updating key", () => {
-    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 change array of claims and updates the value and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2726,7 +2726,7 @@ describe("processChangeClaimsForm controller tests for updating key", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processChangeScopesForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -2743,7 +2743,7 @@ describe("processChangeClaimsForm controller tests for updating key", () => {
     it("calls s4 change single claim and updates the value and then redirects to /clients", async () => {
         s4UpdateClientSpy.mockResolvedValue();
         s4SendTxMALogSpy.mockReturnValue();
-        AuthenticationResultParser.getCognitoId = jest.fn().mockReturnValue(TEST_COGNITO_ID);
+        AuthenticationResultParser.getCognitoId = vi.fn().mockReturnValue(TEST_COGNITO_ID);
 
         const mockReq = request({
             body: {
@@ -2763,7 +2763,7 @@ describe("processChangeClaimsForm controller tests for updating key", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processChangeScopesForm(mockReq, mockRes, mockNext);
 
         expect(s4UpdateClientSpy).toHaveBeenCalledWith(
@@ -2780,7 +2780,7 @@ describe("processChangeClaimsForm controller tests for updating key", () => {
 
 describe("showEnterIdentityVerificationForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the expected template with the expected values", () => {
@@ -2806,14 +2806,14 @@ describe("showEnterIdentityVerificationForm controller tests", () => {
 });
 
 describe("processEnterIdentityVerificationForm controller tests for updating flag", () => {
-    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 change this flag to true and updates the value and then redirects to /clients", async () => {
@@ -2927,7 +2927,7 @@ describe("processEnterIdentityVerificationForm controller tests for updating fla
 
 describe("showChangePKCEEnforcedForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the expected template with the expected values", () => {
@@ -2953,14 +2953,14 @@ describe("showChangePKCEEnforcedForm controller tests", () => {
 });
 
 describe("processChangePKCEEnforcedForm controller tests for updating flag", () => {
-    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 change this flag to true and updates the value and then redirects to /clients", async () => {
@@ -3072,7 +3072,7 @@ describe("processChangePKCEEnforcedForm controller tests for updating flag", () 
 
 describe("showChangeClientName controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the expected template with the expected values", () => {
@@ -3104,11 +3104,11 @@ describe("showChangeClientName controller tests", () => {
 });
 
 describe("processChangeClientName controller tests", () => {
-    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.spyOn(console, "error");
+        vi.clearAllMocks();
+        vi.spyOn(console, "error");
     });
 
     it("calls s4 updateClient with the new client name and redirects to /clients", async () => {
@@ -3221,7 +3221,7 @@ describe("processChangeClientName controller tests", () => {
 
 describe("showMaxAgeEnabled controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the expected template with the expected values", () => {
@@ -3250,14 +3250,14 @@ describe("showMaxAgeEnabled controller tests", () => {
 });
 
 describe("processMaxAgeEnabled controller tests for updating flag", () => {
-    const s4UpdateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateClient");
+    const s4UpdateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateClient");
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 change this flag to true and updates the value and then redirects to /clients", async () => {
@@ -3364,7 +3364,7 @@ describe("processMaxAgeEnabled controller tests for updating flag", () => {
 });
 describe("showChangeLandingPageUrlForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the expected template with the expected values", () => {
@@ -3397,7 +3397,7 @@ describe("showChangeLandingPageUrlForm controller tests", () => {
 
 describe("processChangeLandingPageUrlForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 update client with the new landing page url and then redirects to`/services/:serviceId/clients", async () => {

@@ -30,15 +30,15 @@ import {
 
 describe("showAccount controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
-    const getSelfServiceUserSpy = jest.spyOn(SelfServiceServicesService.prototype, "getSelfServiceUser");
-    const authenticationResultParserSpy = jest.spyOn(AuthenticationResultParser, "getPhoneNumber");
+    const getSelfServiceUserSpy = vi.spyOn(SelfServiceServicesService.prototype, "getSelfServiceUser");
+    const authenticationResultParserSpy = vi.spyOn(AuthenticationResultParser, "getPhoneNumber");
 
     it("calls s4 to retrieve the user details and renders the account template", async () => {
         getSelfServiceUserSpy.mockResolvedValue(TEST_USER);
@@ -49,7 +49,7 @@ describe("showAccount controller tests", () => {
         });
         authenticationResultParserSpy.mockReturnValue(TEST_PHONE_NUMBER);
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await showAccount(mockReq, mockRes, mockNext);
         expect(getSelfServiceUserSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT);
@@ -64,18 +64,18 @@ describe("showAccount controller tests", () => {
 });
 
 describe("changePassword controller tests", () => {
-    const s4ChangePasswordSpy = jest.spyOn(SelfServiceServicesService.prototype, "changePassword");
-    const s4UpdateUserSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateUser");
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
-    const authenticationResultParserSpy = jest.spyOn(AuthenticationResultParser, "getCognitoId");
+    const s4ChangePasswordSpy = vi.spyOn(SelfServiceServicesService.prototype, "changePassword");
+    const s4UpdateUserSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateUser");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const authenticationResultParserSpy = vi.spyOn(AuthenticationResultParser, "getCognitoId");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls s4 change the user password and updates the password updated date, sends a TxMA log and then redirects to /account ", async () => {
@@ -95,7 +95,7 @@ describe("changePassword controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await changePassword(mockReq, mockRes, mockNext);
         expect(s4ChangePasswordSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT.AccessToken, TEST_CURRENT_PASSWORD, TEST_NEW_PASSWORD);
         expect(s4UpdateUserSpy).toHaveBeenCalledWith(
@@ -134,7 +134,7 @@ describe("changePassword controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await changePassword(mockReq, mockRes, mockNext);
         expect(mockRes.render).toHaveBeenCalledWith("account/change-password.njk", {
             values: {
@@ -167,7 +167,7 @@ describe("changePassword controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await changePassword(mockReq, mockRes, mockNext);
         expect(mockRes.render).toHaveBeenCalledWith("account/change-password.njk", {
             values: {
@@ -200,7 +200,7 @@ describe("changePassword controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await expect(() => changePassword(mockReq, mockRes, mockNext)).rejects.toThrow(CognitoIdentityProviderServiceException);
     });
 
@@ -220,20 +220,20 @@ describe("changePassword controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await expect(() => changePassword(mockReq, mockRes, mockNext)).rejects.toThrow(error);
     });
 });
 
 describe("processChangeNumberForm", () => {
-    const s4SetPhoneNumberSpy = jest.spyOn(SelfServiceServicesService.prototype, "setPhoneNumber");
-    const s4UpdateUserSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateUser");
-    const s4SendVerificationCodeSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendMobileNumberVerificationCode");
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
-    const authenticationResultParserEmailSpy = jest.spyOn(AuthenticationResultParser, "getEmail");
+    const s4SetPhoneNumberSpy = vi.spyOn(SelfServiceServicesService.prototype, "setPhoneNumber");
+    const s4UpdateUserSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateUser");
+    const s4SendVerificationCodeSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendMobileNumberVerificationCode");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const authenticationResultParserEmailSpy = vi.spyOn(AuthenticationResultParser, "getEmail");
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls the s4 service with the expected parameters and renders the enter text code page", async () => {
@@ -252,7 +252,7 @@ describe("processChangeNumberForm", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processChangePhoneNumberForm(mockReq, mockRes, mockNext);
         expect(mockRes.redirect).toHaveBeenCalledWith("/account/change-phone-number/enter-text-code");
@@ -261,13 +261,13 @@ describe("processChangeNumberForm", () => {
 
 describe("showVerifyMobileWithSmsCode controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls res.render with the expected values", () => {
         const mockReq = request({session: {enteredMobileNumber: TEST_PHONE_NUMBER}});
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         showVerifyMobileWithSmsCode(mockReq, mockRes, mockNext);
 
@@ -284,14 +284,14 @@ describe("showVerifyMobileWithSmsCode controller tests", () => {
 
 describe("verifyMobileWithSmsCode controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
-    const s4VerifyMobileSpy = jest.spyOn(SelfServiceServicesService.prototype, "verifyMobileUsingSmsCode");
-    const s4SetMobilePhoneAsVerifiedSpy = jest.spyOn(SelfServiceServicesService.prototype, "setMobilePhoneAsVerified");
-    const authenticationResultParserEmailSpy = jest.spyOn(AuthenticationResultParser, "getEmail");
-    const authenticationResultParserGetCognitoSpy = jest.spyOn(AuthenticationResultParser, "getCognitoId");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const s4VerifyMobileSpy = vi.spyOn(SelfServiceServicesService.prototype, "verifyMobileUsingSmsCode");
+    const s4SetMobilePhoneAsVerifiedSpy = vi.spyOn(SelfServiceServicesService.prototype, "setMobilePhoneAsVerified");
+    const authenticationResultParserEmailSpy = vi.spyOn(AuthenticationResultParser, "getEmail");
+    const authenticationResultParserGetCognitoSpy = vi.spyOn(AuthenticationResultParser, "getCognitoId");
 
     it("renders the enter text code page with an error message  upon a CodeMismatchException", async () => {
         s4VerifyMobileSpy.mockRejectedValue(
@@ -315,7 +315,7 @@ describe("verifyMobileWithSmsCode controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await verifyMobileWithSmsCode(mockReq, mockRes, mockNext);
 
@@ -364,7 +364,7 @@ describe("verifyMobileWithSmsCode controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await verifyMobileWithSmsCode(mockReq, mockRes, mockNext);
 

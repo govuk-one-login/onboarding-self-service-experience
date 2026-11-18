@@ -10,7 +10,7 @@ describe("validateServiceName middleware tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         const testServiceNameValidation = validateServiceName(TEST_TEMPLATE_PATH);
         testServiceNameValidation(mockReq, mockRes, mockNext);
@@ -29,7 +29,7 @@ describe("validateServiceName middleware tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         const testServiceNameValidation = validateServiceName(TEST_TEMPLATE_PATH);
         testServiceNameValidation(mockReq, mockRes, mockNext);

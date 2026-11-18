@@ -1,8 +1,8 @@
 import isCommonPassword from "../../../src/lib/validators/common-passwords.js";
 
-jest.mock("fs/promises", () => {
+vi.mock("fs/promises", () => {
     return {
-        readFile: jest.fn(() => "common-password")
+        readFile: vi.fn(() => "common-password")
     };
 });
 

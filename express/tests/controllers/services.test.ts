@@ -5,11 +5,11 @@ import {listServices} from "../../src/controllers/services.js";
 import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
 
 describe("listServices controller tests", () => {
-    const getCognitoIdSpy = jest.spyOn(AuthenticationResultParser, "getCognitoId");
-    const listServicesSpy = jest.spyOn(SelfServiceServicesService.prototype, "listServices");
+    const getCognitoIdSpy = vi.spyOn(AuthenticationResultParser, "getCognitoId");
+    const listServicesSpy = vi.spyOn(SelfServiceServicesService.prototype, "listServices");
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the there-is-a-problem template when there is no userId returned from the authentication result parser", async () => {
@@ -20,7 +20,7 @@ describe("listServices controller tests", () => {
             }
         });
         const mockRes = response();
-        await listServices(mockReq, mockRes, jest.fn());
+        await listServices(mockReq, mockRes, vi.fn());
         expect(getCognitoIdSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT);
         expect(mockRes.render).toHaveBeenCalledWith("there-is-a-problem.njk");
     });
@@ -35,7 +35,7 @@ describe("listServices controller tests", () => {
             }
         });
         const mockRes = response();
-        await listServices(mockReq, mockRes, jest.fn());
+        await listServices(mockReq, mockRes, vi.fn());
         expect(getCognitoIdSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT);
         expect(listServicesSpy).toHaveBeenCalledWith(TEST_COGNITO_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/create-service");
@@ -50,7 +50,7 @@ describe("listServices controller tests", () => {
             }
         });
         const mockRes = response();
-        await listServices(mockReq, mockRes, jest.fn());
+        await listServices(mockReq, mockRes, vi.fn());
         expect(getCognitoIdSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT);
         expect(listServicesSpy).toHaveBeenCalledWith(TEST_COGNITO_ID, TEST_AUTHENTICATION_RESULT.AccessToken);
         expect(mockRes.render).toHaveBeenCalledWith("services/services.njk", {services: [TEST_SERVICE]});

@@ -39,12 +39,12 @@ import {LimitExceededException, UserNotFoundException} from "@aws-sdk/client-cog
 import crypto from "node:crypto";
 import logger from "../../src/lib/logger.js";
 
-jest.spyOn(crypto, "randomInt").mockImplementation(() => TEST_RANDOM_NUMBER);
+vi.spyOn(crypto, "randomInt").mockImplementation(() => TEST_RANDOM_NUMBER);
 
 describe("showCheckPhonePage controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.spyOn(logger, "info");
+        vi.clearAllMocks();
+        vi.spyOn(logger, "info");
     });
     it.each(["emailAddress", "mfaResponse"])("redirects to the /sign-in page if the %s session value in session is null", field => {
         const mockReq = request({
@@ -53,7 +53,7 @@ describe("showCheckPhonePage controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         showCheckPhonePage(mockReq, mockRes, mockNext);
         expect(mockRes.redirect).toHaveBeenCalledWith("/sign-in/enter-email-address");
     });
@@ -66,7 +66,7 @@ describe("showCheckPhonePage controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         showCheckPhonePage(mockReq, mockRes, mockNext);
         expect(mockRes.render).toHaveBeenCalledWith("common/enter-text-code.njk", {
             headerActiveItem: "sign-in",
@@ -80,30 +80,30 @@ describe("showCheckPhonePage controller tests", () => {
 
 describe("confirmPasswordContinueRecovery controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls render with the expected template path", () => {
         const mockReq = response();
-        confirmPasswordContinueRecovery(request(), mockReq, jest.fn());
+        confirmPasswordContinueRecovery(request(), mockReq, vi.fn());
         expect(mockReq.redirect).toHaveBeenCalledWith("/sign-in/forgot-password/continue-recovery");
     });
 });
 
 describe("finishSignIn controller tests", () => {
-    const s4GetSelfServiceUserSpy = jest.spyOn(SelfServiceServicesService.prototype, "getSelfServiceUser");
-    const s4UpdateUserSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateUser");
-    const getCognitoSpy = jest.spyOn(AuthenticationResultParser, "getCognitoId");
-    const s4SessionCount = jest.spyOn(SelfServiceServicesService.prototype, "sessionCount");
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const s4GetSelfServiceUserSpy = vi.spyOn(SelfServiceServicesService.prototype, "getSelfServiceUser");
+    const s4UpdateUserSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateUser");
+    const getCognitoSpy = vi.spyOn(AuthenticationResultParser, "getCognitoId");
+    const s4SessionCount = vi.spyOn(SelfServiceServicesService.prototype, "sessionCount");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("redirects to /sign-in/enter-text-code if s4 does not return a user", async () => {
@@ -115,7 +115,7 @@ describe("finishSignIn controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await finishSignIn(mockReq, mockRes, mockNext);
         expect(s4GetSelfServiceUserSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT);
         expect(mockRes.redirect).toHaveBeenCalledWith("/sign-in/enter-text-code");
@@ -136,7 +136,7 @@ describe("finishSignIn controller tests", () => {
         });
 
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await finishSignIn(mockReq, mockRes, mockNext);
 
@@ -160,7 +160,7 @@ describe("finishSignIn controller tests", () => {
         });
 
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await finishSignIn(mockReq, mockRes, mockNext);
 
@@ -186,7 +186,7 @@ describe("finishSignIn controller tests", () => {
         });
 
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await finishSignIn(mockReq, mockRes, mockNext);
 
@@ -216,11 +216,11 @@ describe("finishSignIn controller tests", () => {
 });
 
 describe("globalSignOut controller tests", () => {
-    const s4GetSelfServiceUserSpy = jest.spyOn(SelfServiceServicesService.prototype, "getSelfServiceUser");
-    const s4GlobalSignOutSpy = jest.spyOn(SelfServiceServicesService.prototype, "globalSignOut");
+    const s4GetSelfServiceUserSpy = vi.spyOn(SelfServiceServicesService.prototype, "getSelfServiceUser");
+    const s4GlobalSignOutSpy = vi.spyOn(SelfServiceServicesService.prototype, "globalSignOut");
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
     it("calls s4 for user and global sign out if access token is present and then destroys the session", async () => {
         s4GetSelfServiceUserSpy.mockResolvedValue(TEST_USER);
@@ -229,11 +229,11 @@ describe("globalSignOut controller tests", () => {
         const mockReq = request({
             session: {
                 authenticationResult: TEST_AUTHENTICATION_RESULT,
-                destroy: jest.fn().mockImplementation(arg => arg())
+                destroy: vi.fn().mockImplementation(arg => arg())
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await globalSignOut(mockReq, mockRes, mockNext);
         expect(s4GetSelfServiceUserSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT);
@@ -247,10 +247,10 @@ describe("globalSignOut controller tests", () => {
         const mockReq = request({
             session: {
                 authenticationResult: {...TEST_AUTHENTICATION_RESULT, AccessToken: null},
-                destroy: jest.fn().mockImplementation(arg => arg())
+                destroy: vi.fn().mockImplementation(arg => arg())
             }
         });
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await globalSignOut(mockReq, mockRes, mockNext);
         expect(s4GetSelfServiceUserSpy).not.toHaveBeenCalled();
@@ -261,11 +261,11 @@ describe("globalSignOut controller tests", () => {
 });
 
 describe("processEmailAddress controller tests", () => {
-    const s4GetSignUpStatusSpy = jest.spyOn(SelfServiceServicesService.prototype, "getSignUpStatus");
+    const s4GetSignUpStatusSpy = vi.spyOn(SelfServiceServicesService.prototype, "getSignUpStatus");
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.spyOn(console, "info");
+        vi.clearAllMocks();
+        vi.spyOn(console, "info");
     });
 
     it("calls s4 get to get the sign up status and redirects to /register/resume-before-password if there is no email", async () => {
@@ -277,7 +277,7 @@ describe("processEmailAddress controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processEmailAddress(mockReq, mockRes, mockNext);
 
@@ -297,7 +297,7 @@ describe("processEmailAddress controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processEmailAddress(mockReq, mockRes, mockNext);
 
@@ -318,7 +318,7 @@ describe("processEmailAddress controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processEmailAddress(mockReq, mockRes, mockNext);
 
@@ -340,7 +340,7 @@ describe("processEmailAddress controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processEmailAddress(mockReq, mockRes, mockNext);
 
@@ -363,7 +363,7 @@ describe("processEmailAddress controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processEmailAddress(mockReq, mockRes, mockNext);
 
@@ -380,7 +380,7 @@ describe("processEmailAddress controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processEmailAddress(mockReq, mockRes, mockNext);
 
@@ -390,10 +390,10 @@ describe("processEmailAddress controller tests", () => {
 });
 
 describe("forgotPasswordForm controller tests", () => {
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("sends a txma log and renders the /sign-in/forgot-password template with the email address in the options", async () => {
@@ -407,7 +407,7 @@ describe("forgotPasswordForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await forgotPasswordForm(mockReq, mockRes, mockNext);
 
@@ -433,7 +433,7 @@ describe("confirmForgotPasswordForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         confirmForgotPasswordForm(mockReq, mockRes, mockNext);
         expect(mockRes.render).toHaveBeenCalledWith("sign-in/create-new-password.njk", {
@@ -444,11 +444,11 @@ describe("confirmForgotPasswordForm controller tests", () => {
 });
 
 describe("confirmForgotPassword controller tests", () => {
-    const s4ConfirmForgotPasswordSpy = jest.spyOn(SelfServiceServicesService.prototype, "confirmForgotPassword");
-    const s4SendTxMALogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+    const s4ConfirmForgotPasswordSpy = vi.spyOn(SelfServiceServicesService.prototype, "confirmForgotPassword");
+    const s4SendTxMALogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
     it("handles a LimitExceededException and renders the /sign-in/create-new-password template with an error message", async () => {
         s4ConfirmForgotPasswordSpy.mockRejectedValue(
@@ -466,7 +466,7 @@ describe("confirmForgotPassword controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await confirmForgotPassword(mockReq, mockRes, mockNext);
         expect(s4ConfirmForgotPasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_CURRENT_PASSWORD, TEST_SECURITY_CODE);
         expect(mockRes.render).toHaveBeenCalledWith("sign-in/create-new-password.njk", {
@@ -490,7 +490,7 @@ describe("confirmForgotPassword controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await expect(confirmForgotPassword(mockReq, mockRes, mockNext)).rejects.toThrow();
         expect(s4ConfirmForgotPasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_CURRENT_PASSWORD, TEST_SECURITY_CODE);
         expect(mockRes.render).not.toHaveBeenCalled();
@@ -512,7 +512,7 @@ describe("confirmForgotPassword controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await confirmForgotPassword(mockReq, mockRes, mockNext);
         expect(mockReq.session.emailAddress).toStrictEqual(TEST_EMAIL);
         expect(mockReq.session.updatedField).toStrictEqual("password");
@@ -526,10 +526,10 @@ describe("confirmForgotPassword controller tests", () => {
 });
 
 describe("organiseDynamoDBForRecoveredUser controller tests", () => {
-    const s4RecreateDynamoDBAccountLinksSpy = jest.spyOn(SelfServiceServicesService.prototype, "recreateDynamoDBAccountLinks");
+    const s4RecreateDynamoDBAccountLinksSpy = vi.spyOn(SelfServiceServicesService.prototype, "recreateDynamoDBAccountLinks");
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 recreateDynamoDBAccountLinks with the expected values and then calls next()", async () => {
@@ -540,7 +540,7 @@ describe("organiseDynamoDBForRecoveredUser controller tests", () => {
                 cognitoID: TEST_COGNITO_ID
             }
         });
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await organiseDynamoDBForRecoveredUser(mockReq, response(), mockNext);
         expect(s4RecreateDynamoDBAccountLinksSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT, TEST_COGNITO_ID);
         expect(mockNext).toHaveBeenCalled();
@@ -548,12 +548,12 @@ describe("organiseDynamoDBForRecoveredUser controller tests", () => {
 });
 
 describe("checkEmailPasswordReset controller tests", () => {
-    const s4ForgotPasswordSpy = jest.spyOn(SelfServiceServicesService.prototype, "forgotPassword");
-    const s4GetDynamoDbEntriesSpy = jest.spyOn(SelfServiceServicesService.prototype, "getDynamoDBEntries");
-    const s4RecoverCognitoSpy = jest.spyOn(SelfServiceServicesService.prototype, "recoverCognitoAccount");
+    const s4ForgotPasswordSpy = vi.spyOn(SelfServiceServicesService.prototype, "forgotPassword");
+    const s4GetDynamoDbEntriesSpy = vi.spyOn(SelfServiceServicesService.prototype, "getDynamoDBEntries");
+    const s4RecoverCognitoSpy = vi.spyOn(SelfServiceServicesService.prototype, "recoverCognitoAccount");
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 forgotPassword and calls render with the /sign-in/enter-email-code template", async () => {
@@ -566,7 +566,7 @@ describe("checkEmailPasswordReset controller tests", () => {
             protocol: TEST_PROTOCOL
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await checkEmailPasswordReset(mockReq, mockRes, mockNext);
         expect(s4ForgotPasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_PROTOCOL, TEST_HOST_NAME, false);
         expect(mockRes.render).toHaveBeenCalledWith("sign-in/enter-email-code.njk");
@@ -590,7 +590,7 @@ describe("checkEmailPasswordReset controller tests", () => {
             protocol: TEST_PROTOCOL
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await checkEmailPasswordReset(mockReq, mockRes, mockNext);
         expect(s4ForgotPasswordSpy).toHaveBeenNthCalledWith(1, TEST_EMAIL, TEST_PROTOCOL, TEST_HOST_NAME, false);
         expect(s4RecoverCognitoSpy).toHaveBeenCalledWith(mockReq, TEST_EMAIL, "123456", TEST_PHONE_NUMBER);
@@ -616,7 +616,7 @@ describe("checkEmailPasswordReset controller tests", () => {
             protocol: TEST_PROTOCOL
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await checkEmailPasswordReset(mockReq, mockRes, mockNext);
         expect(s4ForgotPasswordSpy).toHaveBeenNthCalledWith(1, TEST_EMAIL, TEST_PROTOCOL, TEST_HOST_NAME, false);
         expect(s4RecoverCognitoSpy).not.toHaveBeenCalled();
@@ -641,7 +641,7 @@ describe("checkEmailPasswordReset controller tests", () => {
             protocol: TEST_PROTOCOL
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await checkEmailPasswordReset(mockReq, mockRes, mockNext);
         expect(s4ForgotPasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_PROTOCOL, TEST_HOST_NAME, false);
         expect(mockRes.render).toHaveBeenCalledWith("sign-in/enter-email-address.njk", {

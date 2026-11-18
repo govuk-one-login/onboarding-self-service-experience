@@ -13,7 +13,7 @@ describe("Allow user journey middleware", () => {
             }
         });
         const res = response();
-        const nextFunction: NextFunction = jest.fn();
+        const nextFunction: NextFunction = vi.fn();
 
         allowUserJourneyMiddleware(req, res, nextFunction);
 
@@ -30,7 +30,7 @@ describe("Allow user journey middleware", () => {
             }
         });
         const res = response();
-        const nextFunction: NextFunction = jest.fn();
+        const nextFunction: NextFunction = vi.fn();
 
         allowUserJourneyMiddleware(req, res, nextFunction);
 
