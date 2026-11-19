@@ -33,20 +33,20 @@ import {
     TEST_REFRESH_TOKEN,
     TEST_SECURITY_CODE,
     TEST_SIGN_UP_STATUS
-} from "../../constants";
+} from "../../constants.js";
 import {mockClient} from "aws-sdk-client-mock";
-import "aws-sdk-client-mock-jest";
-import CognitoClient from "../../../src/services/cognito/CognitoClient";
+import "aws-sdk-client-mock-jest/vitest";
+import CognitoClient from "../../../src/services/cognito/CognitoClient.js";
 import crypto from "node:crypto";
-import * as fixedOTP from "../../../src/lib/fixedOTP";
+import * as fixedOTP from "../../../src/lib/fixedOTP.js";
 
 const mockCognitoClient = mockClient(CognitoIdentityProviderClient);
 
 describe("cognito client tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         mockCognitoClient.reset();
-        jest.spyOn(crypto, "randomInt").mockImplementation(() => TEST_RANDOM_NUMBER);
+        vi.spyOn(crypto, "randomInt").mockImplementation(() => TEST_RANDOM_NUMBER);
     });
 
     it("updates the user pool maf duration to 15 mins on instantiating a new client", () => {
@@ -367,8 +367,8 @@ describe("cognito client tests", () => {
     });
 
     describe("acceptance test user", () => {
-        const isFixedOtpSpy = jest.spyOn(fixedOTP, "isFixedOTPCredential");
-        const getFixedOtpCodeSpy = jest.spyOn(fixedOTP, "getFixedOTPCredentialTemporaryPassword");
+        const isFixedOtpSpy = vi.spyOn(fixedOTP, "isFixedOTPCredential");
+        const getFixedOtpCodeSpy = vi.spyOn(fixedOTP, "getFixedOTPCredentialTemporaryPassword");
 
         it("sends an admin create user command with the messageAction SUPRESS when creating an acceptance test user", async () => {
             const expectedTemporaryPassword = "123456";

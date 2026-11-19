@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
-import SelfServiceServicesService from "../services/self-service-services-service";
-import logger from "../lib/logger";
+import SelfServiceServicesService from "../services/self-service-services-service.js";
+import logger from "../lib/logger.js";
 
 // TODO This only checks the user is signed in but doesn't check the user's permissions to view objects or do actions
 export default async function checkAuthorisation(req: Request, res: Response, next: NextFunction) {

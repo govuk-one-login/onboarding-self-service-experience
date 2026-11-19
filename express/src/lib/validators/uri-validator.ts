@@ -1,4 +1,4 @@
-import {ValidationResult} from "../../types/validation-result";
+import {ValidationResult} from "../../types/validation-result.js";
 
 export default function validateUri(uri: string, isGovUrl?: boolean, allowEmptyValue?: boolean): ValidationResult {
     uri = uri.trim();
@@ -15,7 +15,7 @@ export default function validateUri(uri: string, isGovUrl?: boolean, allowEmptyV
 
     try {
         validUri = new URL(uri);
-    } catch (ignored) {
+    } catch {
         return {isValid: false, errorMessage: "Enter your URIs in the format https://example.com"};
     }
 

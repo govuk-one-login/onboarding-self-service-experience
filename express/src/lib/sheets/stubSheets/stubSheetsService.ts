@@ -1,5 +1,5 @@
-import logger from "../../logger";
-import SheetsService from "../interface";
+import logger from "../../logger.js";
+import SheetsService from "../interface.js";
 
 export default class StubSheetsService implements SheetsService {
     private readonly spreadsheetId: string;

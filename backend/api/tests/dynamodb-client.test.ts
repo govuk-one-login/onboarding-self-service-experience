@@ -1,12 +1,17 @@
-const send = jest.fn();
-const queryCommand = jest.fn();
-const scanCommand = jest.fn();
-const updateItemCommand = jest.fn();
-const deleteItemCommand = jest.fn();
+import DynamoDbClient from "../src/dynamodb-client.js";
+import {TEST_DYNAMO_TABLE_NAME} from "./setup.js";
 
-jest.mock("@aws-sdk/client-dynamodb", () => {
+const {send, queryCommand, scanCommand, updateItemCommand, deleteItemCommand} = vi.hoisted(() => ({
+    send: vi.fn(),
+    queryCommand: vi.fn(),
+    scanCommand: vi.fn(),
+    updateItemCommand: vi.fn(),
+    deleteItemCommand: vi.fn()
+}));
+
+vi.mock("@aws-sdk/client-dynamodb", () => {
     return {
-        DynamoDBClient: jest.fn(() => {
+        DynamoDBClient: vi.fn(function () {
             return {
                 send: send
             };
@@ -17,9 +22,6 @@ jest.mock("@aws-sdk/client-dynamodb", () => {
         DeleteItemCommand: deleteItemCommand
     };
 });
-
-import DynamoDbClient from "../src/dynamodb-client";
-import {TEST_DYNAMO_TABLE_NAME} from "./setup";
 
 const queryCommandParams = {
     TableName: TEST_DYNAMO_TABLE_NAME,

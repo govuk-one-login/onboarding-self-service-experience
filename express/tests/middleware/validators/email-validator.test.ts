@@ -1,10 +1,10 @@
 import {Request} from "express";
-import validateEmail from "../../../src/middleware/validators/email-validator";
-import {request, response} from "../../mocks";
+import validateEmail from "../../../src/middleware/validators/email-validator.js";
+import {request, response} from "../../mocks.js";
 
 let req: Request;
 
-const next = jest.fn();
+const next = vi.fn();
 const res = response();
 const validator = validateEmail("template.njk");
 

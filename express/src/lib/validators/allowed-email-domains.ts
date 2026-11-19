@@ -1,6 +1,6 @@
 import {readFile} from "fs/promises";
-import {resources} from "../../config/resources";
-import logger from "../logger";
+import {resources} from "../../config/resources.js";
+import logger from "../logger.js";
 
 const allowedEmailDomains = loadAllowedEmailDomains();
 

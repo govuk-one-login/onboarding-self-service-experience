@@ -1,4 +1,4 @@
-import validateSecurityCode from "../../../src/lib/validators/security-code-validator";
+import validateSecurityCode from "../../../src/lib/validators/security-code-validator.js";
 
 describe("Validate security codes", () => {
     it("Accept valid 6 digit codes", () => {

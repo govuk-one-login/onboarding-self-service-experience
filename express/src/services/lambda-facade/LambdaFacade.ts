@@ -1,17 +1,16 @@
 import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {QueryCommandOutput} from "@aws-sdk/client-dynamodb";
-import {OnboardingTableItem} from "../../../@types/OnboardingTableItem";
-import {Service} from "../../../@types/Service";
-import {api} from "../../config/environment";
-import AuthenticationResultParser from "../../lib/authentication-result-parser";
-import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./LambdaFacadeInterface";
+import {OnboardingTableItem} from "../../../@types/onboardingTableItem.js";
+import {Service} from "../../../@types/service.js";
+import {api} from "../../config/environment.js";
+import AuthenticationResultParser from "../../lib/authentication-result-parser.js";
+import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./LambdaFacadeInterface.js";
 import axios, {Axios, AxiosResponse} from "axios";
-import {TxMAEvent} from "../../types/txma-event";
+import {TxMAEvent} from "../../types/txma-event.js";
 import {createHash} from "crypto";
-import {CodeBlockResponse} from "express/src/types/code-block-response";
-import logger from "../../lib/logger";
+import {CodeBlockResponse} from "../../types/code-block-response.js";
+import logger from "../../lib/logger.js";
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export default class LambdaFacade implements LambdaFacadeInterface {
     private readonly client: Axios;
     public readonly EMAIL_BLOCK_PREFIX = "email:block:";

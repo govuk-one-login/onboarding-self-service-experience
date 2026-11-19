@@ -1,10 +1,10 @@
 import {Request} from "express";
-import setSignInStatus from "../../src/middleware/sign-in-status";
-import {request, response} from "../mocks";
+import setSignInStatus from "../../src/middleware/sign-in-status.js";
+import {request, response} from "../mocks.js";
 
 let req: Request;
 
-const next = jest.fn();
+const next = vi.fn();
 const res = response();
 
 describe("Set sign-in status on the response", () => {

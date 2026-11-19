@@ -1,7 +1,7 @@
 import {Given, Then} from "@cucumber/cucumber";
-import {clickSubmitButton, enterTextIntoTextInput} from "./shared-functions";
+import {clickSubmitButton, enterTextIntoTextInput} from "./shared-functions.js";
 import {strict as assert} from "assert";
-import {TestContext} from "../test-setup";
+import {TestContext} from "../test-setup.js";
 
 const publicKey = `
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzub4UEORDbGXh36oJCG+

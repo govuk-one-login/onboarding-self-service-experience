@@ -1,25 +1,26 @@
 import {AdminInitiateAuthCommandOutput, AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 import {unmarshall} from "@aws-sdk/util-dynamodb";
 import {AxiosResponse} from "axios";
-import {Client, ClientFromDynamo} from "../../@types/client";
-import {OnboardingTableItem} from "../../@types/OnboardingTableItem";
-import {Service} from "../../@types/Service";
-import {DynamoUser, User} from "../../@types/user";
-import AuthenticationResultParser from "../lib/authentication-result-parser";
-import SelfServiceError from "../lib/errors";
-import {dynamoClientToDomainClient} from "../lib/models/client-utils";
-import {dynamoServicesToDomainServices} from "../lib/models/service-utils";
-import {domainUserToDynamoUser, userToDomainUser} from "../lib/models/user-utils";
-import MfaResponse from "../types/mfa-response";
-import CognitoInterface from "./cognito/CognitoInterface";
-import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface";
-import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
+import {Client, ClientFromDynamo} from "../../@types/client.js";
+import {OnboardingTableItem} from "../../@types/onboardingTableItem.js";
+import {Service} from "../../@types/service.js";
+import {DynamoUser, User} from "../../@types/user.js";
+import AuthenticationResultParser from "../lib/authentication-result-parser.js";
+import SelfServiceError from "../lib/errors.js";
+import {dynamoClientToDomainClient} from "../lib/models/client-utils.js";
+import {dynamoServicesToDomainServices} from "../lib/models/service-utils.js";
+import {domainUserToDynamoUser, userToDomainUser} from "../lib/models/user-utils.js";
+import MfaResponse from "../types/mfa-response.js";
+import CognitoInterface from "./cognito/CognitoInterface.js";
+import LambdaFacadeInterface, {ClientUpdates, ServiceNameUpdates, UserUpdates} from "./lambda-facade/LambdaFacadeInterface.js";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status.js";
 
 import {Request} from "express";
-import {TxMAEvent, TxMAExtension, TxMAUser} from "../types/txma-event";
-import SheetsService from "../lib/sheets/SheetsService";
+import {TxMAEvent, TxMAExtension, TxMAUser} from "../types/txma-event.js";
+import SheetsService from "../lib/sheets/SheetsService.js";
 import {v4 as uuid_4} from "uuid";
-import logger from "../lib/logger";
+import logger from "../lib/logger.js";
+import {nonNull} from "../lib/utils/optional.js";
 
 export default class SelfServiceServicesService {
     private cognito: CognitoInterface;
@@ -328,7 +329,6 @@ export default class SelfServiceServicesService {
             });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
     sendTxMALog(eventName: string, user: TxMAUser, extensions: TxMAExtension | undefined = undefined) {
         const txmaEvent: TxMAEvent = {
             timestamp: Math.floor(Date.now() / 1000),
@@ -338,7 +338,6 @@ export default class SelfServiceServicesService {
             extensions: extensions
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handling middleware must take 4 arguments
         this.lambda.sendTxMALog(txmaEvent).then(
             () => {
                 return;

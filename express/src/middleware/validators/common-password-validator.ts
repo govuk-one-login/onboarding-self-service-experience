@@ -1,7 +1,7 @@
 import {RequestHandler} from "express";
-import isCommonPassword from "../../lib/validators/common-passwords";
-import {getFixedOTPCredentialPassword, isPseudonymisedFixedOTPCredential} from "../../lib/fixedOTP";
-import logger from "../../lib/logger";
+import isCommonPassword from "../../lib/validators/common-passwords.js";
+import {getFixedOTPCredentialPassword, isPseudonymisedFixedOTPCredential} from "../../lib/fixedOTP.js";
+import logger from "../../lib/logger.js";
 
 const errorMessage = "Enter a stronger password. Do not use very common passwords like ‘password’ or a sequence of numbers.";
 

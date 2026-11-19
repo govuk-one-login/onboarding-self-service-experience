@@ -1,12 +1,12 @@
-import {getServicesHandler} from "../../../src/handlers/dynamodb/get-services";
-import DynamoDbClient from "../../../src/dynamodb-client";
-import {constructTestApiGatewayEvent} from "../utils";
+import {getServicesHandler} from "../../../src/handlers/dynamodb/get-services.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
+import {constructTestApiGatewayEvent} from "../utils.js";
 import {GetItemCommandOutput} from "@aws-sdk/client-dynamodb";
-import {TEST_ACCESS_TOKEN, TEST_DATA_TABLE_ITEM, TEST_USER_ID} from "../constants";
+import {TEST_ACCESS_TOKEN, TEST_DATA_TABLE_ITEM, TEST_USER_ID} from "../constants.js";
 
 describe("getServicesHandler tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("returns a 400 when there is no userId Path parameter and does not call the dynamo client", async () => {
@@ -22,7 +22,7 @@ describe("getServicesHandler tests", () => {
             $metadata: {},
             Item: TEST_DATA_TABLE_ITEM
         };
-        const getServicesSpy = jest.spyOn(DynamoDbClient.prototype, "getServices").mockResolvedValue(mockDynamoResponse);
+        const getServicesSpy = vi.spyOn(DynamoDbClient.prototype, "getServices").mockResolvedValue(mockDynamoResponse);
 
         const testApiGatewayEvent = constructTestApiGatewayEvent({
             body: "",
@@ -43,7 +43,7 @@ describe("getServicesHandler tests", () => {
             $metadata: {},
             Item: TEST_DATA_TABLE_ITEM
         };
-        const getServicesSpy = jest.spyOn(DynamoDbClient.prototype, "getServices").mockResolvedValue(mockDynamoResponse);
+        const getServicesSpy = vi.spyOn(DynamoDbClient.prototype, "getServices").mockResolvedValue(mockDynamoResponse);
 
         const testApiGatewayEvent = constructTestApiGatewayEvent({
             body: "",
@@ -62,7 +62,7 @@ describe("getServicesHandler tests", () => {
 
     it("calls the dynamo client with a get command with the expected values and returns a 500 when the dynamo client throws an error", async () => {
         const error = "SomeAwsError";
-        const getServicesSpy = jest.spyOn(DynamoDbClient.prototype, "getServices").mockRejectedValue(error);
+        const getServicesSpy = vi.spyOn(DynamoDbClient.prototype, "getServices").mockRejectedValue(error);
 
         const testApiGatewayEvent = constructTestApiGatewayEvent({
             body: "",

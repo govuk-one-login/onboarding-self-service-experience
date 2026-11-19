@@ -1,6 +1,7 @@
 {
   "name": "gds-di-self-service-acceptance-tests",
   "description": "DI self-service acceptance tests",
+  "type": "module",
   "scripts": {
     "acceptance-tests": "cucumber-js acceptance-features",
     "accessibility-tests": "cucumber-js accessibility-features",

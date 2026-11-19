@@ -1,6 +1,6 @@
 import {strict as assert} from "assert";
 import {ElementHandle, Page} from "puppeteer";
-import {timeout as defaultTimeout} from "../test-setup";
+import {timeout as defaultTimeout} from "../test-setup.js";
 
 export async function getLink(page: Page, linkText: string): Promise<ElementHandle> {
     const links = await page.$$(`::-p-xpath(//a[contains(text(), "${linkText}")])`);

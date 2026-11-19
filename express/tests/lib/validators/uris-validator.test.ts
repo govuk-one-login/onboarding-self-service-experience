@@ -1,4 +1,4 @@
-import validateUri from "../../../src/lib/validators/uri-validator";
+import validateUri from "../../../src/lib/validators/uri-validator.js";
 
 describe("Validate URIs", () => {
     it("Reject empty value", () => {

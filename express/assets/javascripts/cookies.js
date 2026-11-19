@@ -1,5 +1,3 @@
-"use strict";
-
 const cookieBanner = function () {
     const PROD_HOSTNAME = "sign-in.service.gov.uk";
     const COOKIES_PREFERENCES_SET = "cookies_preferences_set";

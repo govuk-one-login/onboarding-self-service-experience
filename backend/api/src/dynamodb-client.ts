@@ -19,7 +19,7 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import {convertToAttr, marshall} from "@aws-sdk/util-dynamodb";
 import * as process from "process";
-import {OnboardingTableItem} from "./onboarding-table-item";
+import {OnboardingTableItem} from "./onboarding-table-item.js";
 import {createHash} from "crypto";
 
 type AttributeData = number | boolean | string | string[];

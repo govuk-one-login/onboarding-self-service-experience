@@ -6,22 +6,22 @@ import {
     showServiceUnavailableBanner,
     showTestBanner,
     showServiceUnavailablePage
-} from "./config/environment";
-import Express from "./config/express";
-import Helmet from "./config/helmet";
-import {distribution} from "./config/resources";
-import sessionStorage from "./config/session-storage";
-import {errorHandler, notFoundHandler} from "./middleware/errors";
-import signInStatus from "./middleware/sign-in-status";
-import account from "./routes/account";
-import baseRoutes from "./routes/base";
-import register from "./routes/register";
-import services from "./routes/services";
-import signIn from "./routes/sign-in";
-import serviceUnavailable from "./routes/service-unavailable";
-import {requestLoggingMiddleware} from "./lib/requestLogging";
-import logger from "./lib/logger";
-import prototypeRouter from "./routes/prototype";
+} from "./config/environment.js";
+import Express from "./config/express.js";
+import Helmet from "./config/helmet.js";
+import {distribution} from "./config/resources.js";
+import sessionStorage from "./config/session-storage.js";
+import {errorHandler, notFoundHandler} from "./middleware/errors.js";
+import signInStatus from "./middleware/sign-in-status.js";
+import account from "./routes/account.js";
+import baseRoutes from "./routes/base.js";
+import register from "./routes/register.js";
+import services from "./routes/services.js";
+import signIn from "./routes/sign-in.js";
+import serviceUnavailable from "./routes/service-unavailable.js";
+import {requestLoggingMiddleware} from "./lib/requestLogging.js";
+import logger from "./lib/logger.js";
+import prototypeRouter from "./routes/prototype.js";
 
 const app = Express();
 

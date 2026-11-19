@@ -1,4 +1,4 @@
-import SelfServiceServicesService from "../../src/services/self-service-services-service";
+import SelfServiceServicesService from "../../src/services/self-service-services-service.js";
 import {
     accountExists,
     processAddServiceForm,
@@ -16,8 +16,8 @@ import {
     submitEmailSecurityCode,
     submitMobileVerificationCode,
     updatePassword
-} from "../../src/controllers/register";
-import {request, response} from "../mocks";
+} from "../../src/controllers/register.js";
+import {request, response} from "../mocks.js";
 import {
     TEST_ACCESS_TOKEN,
     TEST_AUTHENTICATION_RESULT,
@@ -34,45 +34,50 @@ import {
     TEST_SESSION_ID,
     TEST_TIMESTAMP,
     TEST_UUID
-} from "../constants";
+} from "../constants.js";
 import {CodeMismatchException, NotAuthorizedException, UsernameExistsException} from "@aws-sdk/client-cognito-identity-provider";
-import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status";
-import AuthenticationResultParser from "../../src/lib/authentication-result-parser";
-import {domainUserToDynamoUser} from "../../src/lib/models/user-utils";
-import crypto from "crypto";
+import {SignupStatus, SignupStatusStage} from "../../src/lib/utils/signup-status.js";
+import AuthenticationResultParser from "../../src/lib/authentication-result-parser.js";
+import {domainUserToDynamoUser} from "../../src/lib/models/user-utils.js";
 import {AxiosResponse} from "axios";
-import logger from "../../src/lib/logger";
+import logger from "../../src/lib/logger.js";
 
-const s4CreateUserSpy = jest.spyOn(SelfServiceServicesService.prototype, "createUser");
-const s4SignUpStatusSpy = jest.spyOn(SelfServiceServicesService.prototype, "getSignUpStatus");
-const s4SubmitUsernamePasswordSpy = jest.spyOn(SelfServiceServicesService.prototype, "submitUsernamePassword");
-const s4SetSignupStatusSpy = jest.spyOn(SelfServiceServicesService.prototype, "setSignUpStatus");
-const s4SendTxmaLogSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
-const s4SetNewPasswordSpy = jest.spyOn(SelfServiceServicesService.prototype, "setNewPassword");
-const s4SetEmailAsVerifiedSpy = jest.spyOn(SelfServiceServicesService.prototype, "setEmailAsVerified");
-const s4SetSignUpStatusSpy = jest.spyOn(SelfServiceServicesService.prototype, "setSignUpStatus");
-const s4SetPhoneNumberWithoutAdminSpy = jest.spyOn(SelfServiceServicesService.prototype, "setPhoneNumberWithoutAdmin");
-const s4SendMobileNumberVerificationCodeSpy = jest.spyOn(SelfServiceServicesService.prototype, "sendMobileNumberVerificationCode");
-const s4VerifyMobileUsingSmsCodeSpy = jest.spyOn(SelfServiceServicesService.prototype, "verifyMobileUsingSmsCode");
-const s4SetMfaPreferenceSpy = jest.spyOn(SelfServiceServicesService.prototype, "setMfaPreference");
-const s4PutUserSpy = jest.spyOn(SelfServiceServicesService.prototype, "putUser");
-const s4NewServiceSpy = jest.spyOn(SelfServiceServicesService.prototype, "newService");
-const s4GenerateClientSpy = jest.spyOn(SelfServiceServicesService.prototype, "generateClient");
-const s4DeleteServiceEntriesSpy = jest.spyOn(SelfServiceServicesService.prototype, "deleteServiceEntries");
-const s4ResendEmailCodeSpy = jest.spyOn(SelfServiceServicesService.prototype, "resendEmailAuthCode");
-const s4updateUserSpreadsheetSpy = jest.spyOn(SelfServiceServicesService.prototype, "updateUserSpreadsheet");
+vi.mock("crypto", () => {
+    return {
+        randomUUID: () => TEST_UUID
+    };
+});
 
-const getEmailSpy = jest.spyOn(AuthenticationResultParser, "getEmail");
-const getCognitoIdSpy = jest.spyOn(AuthenticationResultParser, "getCognitoId");
+const s4CreateUserSpy = vi.spyOn(SelfServiceServicesService.prototype, "createUser");
+const s4SignUpStatusSpy = vi.spyOn(SelfServiceServicesService.prototype, "getSignUpStatus");
+const s4SubmitUsernamePasswordSpy = vi.spyOn(SelfServiceServicesService.prototype, "submitUsernamePassword");
+const s4SetSignupStatusSpy = vi.spyOn(SelfServiceServicesService.prototype, "setSignUpStatus");
+const s4SendTxmaLogSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendTxMALog");
+const s4SetNewPasswordSpy = vi.spyOn(SelfServiceServicesService.prototype, "setNewPassword");
+const s4SetEmailAsVerifiedSpy = vi.spyOn(SelfServiceServicesService.prototype, "setEmailAsVerified");
+const s4SetSignUpStatusSpy = vi.spyOn(SelfServiceServicesService.prototype, "setSignUpStatus");
+const s4SetPhoneNumberWithoutAdminSpy = vi.spyOn(SelfServiceServicesService.prototype, "setPhoneNumberWithoutAdmin");
+const s4SendMobileNumberVerificationCodeSpy = vi.spyOn(SelfServiceServicesService.prototype, "sendMobileNumberVerificationCode");
+const s4VerifyMobileUsingSmsCodeSpy = vi.spyOn(SelfServiceServicesService.prototype, "verifyMobileUsingSmsCode");
+const s4SetMfaPreferenceSpy = vi.spyOn(SelfServiceServicesService.prototype, "setMfaPreference");
+const s4PutUserSpy = vi.spyOn(SelfServiceServicesService.prototype, "putUser");
+const s4NewServiceSpy = vi.spyOn(SelfServiceServicesService.prototype, "newService");
+const s4GenerateClientSpy = vi.spyOn(SelfServiceServicesService.prototype, "generateClient");
+const s4DeleteServiceEntriesSpy = vi.spyOn(SelfServiceServicesService.prototype, "deleteServiceEntries");
+const s4ResendEmailCodeSpy = vi.spyOn(SelfServiceServicesService.prototype, "resendEmailAuthCode");
+const s4updateUserSpreadsheetSpy = vi.spyOn(SelfServiceServicesService.prototype, "updateUserSpreadsheet");
 
-const getEmailCodeBlockSpy = jest.spyOn(SelfServiceServicesService.prototype, "getEmailCodeBlock");
-const putEmailCodeBlockSpy = jest.spyOn(SelfServiceServicesService.prototype, "putEmailCodeBlock");
-const removeEmailCodeBlockSpy = jest.spyOn(SelfServiceServicesService.prototype, "removeEmailCodeBlock");
+const getEmailSpy = vi.spyOn(AuthenticationResultParser, "getEmail");
+const getCognitoIdSpy = vi.spyOn(AuthenticationResultParser, "getCognitoId");
+
+const getEmailCodeBlockSpy = vi.spyOn(SelfServiceServicesService.prototype, "getEmailCodeBlock");
+const putEmailCodeBlockSpy = vi.spyOn(SelfServiceServicesService.prototype, "putEmailCodeBlock");
+const removeEmailCodeBlockSpy = vi.spyOn(SelfServiceServicesService.prototype, "removeEmailCodeBlock");
 
 describe("processGetEmailForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.spyOn(logger, "info");
+        vi.clearAllMocks();
+        vi.spyOn(logger, "info");
     });
 
     it("calls s4 createUser and redirects to /register/enter-email-code on success", async () => {
@@ -84,7 +89,7 @@ describe("processGetEmailForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processGetEmailForm(mockReq, mockRes, mockNext);
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
@@ -108,7 +113,7 @@ describe("processGetEmailForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processGetEmailForm(mockReq, mockRes, mockNext);
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
@@ -136,7 +141,7 @@ describe("processGetEmailForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processGetEmailForm(mockReq, mockRes, mockNext);
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
@@ -165,7 +170,7 @@ describe("processGetEmailForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processGetEmailForm(mockReq, mockRes, mockNext);
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
@@ -195,7 +200,7 @@ describe("processGetEmailForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processGetEmailForm(mockReq, mockRes, mockNext);
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
@@ -214,7 +219,7 @@ describe("processGetEmailForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await expect(processGetEmailForm(mockReq, mockRes, mockNext)).rejects.toThrow();
         expect(s4CreateUserSpy).toHaveBeenCalledWith(TEST_EMAIL);
@@ -225,7 +230,7 @@ describe("processGetEmailForm controller tests", () => {
 
 describe("showCheckEmailForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the form with the expected options and sends a txma log", async () => {
@@ -239,7 +244,7 @@ describe("showCheckEmailForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await showCheckEmailForm(mockReq, mockRes, mockNext);
 
@@ -259,7 +264,7 @@ describe("showCheckEmailForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await showCheckEmailForm(mockReq, mockRes, mockNext);
         expect(s4SendTxmaLogSpy).not.toHaveBeenCalled();
@@ -276,7 +281,7 @@ describe("showCheckEmailForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await showCheckEmailForm(mockReq, mockRes, mockNext);
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/too-many-codes");
@@ -291,7 +296,7 @@ describe("showCheckEmailForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         getEmailCodeBlockSpy.mockResolvedValue(true);
 
@@ -302,14 +307,14 @@ describe("showCheckEmailForm controller tests", () => {
 
 describe("submitEmailSecurityCode controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.resetAllMocks();
+        vi.clearAllMocks();
+        vi.resetAllMocks();
     });
 
     it("redirects to /register if there is no emailAddress in the session", async () => {
         const mockReq = request();
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await submitEmailSecurityCode(mockReq, mockRes, mockNext);
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/enter-email-address");
@@ -334,7 +339,7 @@ describe("submitEmailSecurityCode controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await submitEmailSecurityCode(mockReq, mockRes, mockNext);
         expect(s4SubmitUsernamePasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_SECURITY_CODE);
         expect(mockReq.session.cognitoSession).toStrictEqual(TEST_COGNITO_SESSION_STRING);
@@ -376,7 +381,7 @@ describe("submitEmailSecurityCode controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await submitEmailSecurityCode(mockReq, mockRes, mockNext);
         expect(s4SubmitUsernamePasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_SECURITY_CODE);
         expect(s4SetSignupStatusSpy).not.toHaveBeenCalled();
@@ -421,7 +426,7 @@ describe("submitEmailSecurityCode controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await submitEmailSecurityCode(mockReq, mockRes, mockNext);
         expect(putEmailCodeBlockSpy).toHaveBeenCalledWith(TEST_EMAIL.toLowerCase().trim());
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/too-many-codes");
@@ -441,7 +446,7 @@ describe("submitEmailSecurityCode controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await expect(submitEmailSecurityCode(mockReq, mockRes, mockNext)).rejects.toThrow();
         expect(s4SubmitUsernamePasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_SECURITY_CODE);
     });
@@ -467,7 +472,7 @@ describe("submitEmailSecurityCode controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await submitEmailSecurityCode(mockReq, mockRes, mockNext);
         expect(s4SubmitUsernamePasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_SECURITY_CODE);
         expect(s4SetSignupStatusSpy).not.toHaveBeenCalled();
@@ -495,7 +500,7 @@ describe("submitEmailSecurityCode controller tests", () => {
 
 describe("showNewPasswordForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders register/create-password template if there is a cognitoSession present in the session", () => {
@@ -505,7 +510,7 @@ describe("showNewPasswordForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         showNewPasswordForm(mockReq, mockRes, mockNext);
         expect(mockRes.render).toHaveBeenCalledWith("register/create-password.njk");
     });
@@ -513,7 +518,7 @@ describe("showNewPasswordForm controller tests", () => {
     it("redirects to the /sign-in if there is no cognitoSession present in the session", async () => {
         const mockReq = request();
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         showNewPasswordForm(mockReq, mockRes, mockNext);
         expect(mockRes.redirect).toHaveBeenCalledWith("/sign-in/enter-email-address");
     });
@@ -521,7 +526,7 @@ describe("showNewPasswordForm controller tests", () => {
 
 describe("updatePassword controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls the s4 functions with the session email and redirects to register/enter-phone-number", async () => {
@@ -539,7 +544,7 @@ describe("updatePassword controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await updatePassword(mockReq, mockRes, mockNext);
         expect(s4SetNewPasswordSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_CURRENT_PASSWORD, TEST_COGNITO_SESSION_STRING);
@@ -552,7 +557,7 @@ describe("updatePassword controller tests", () => {
 
 describe("showEnterMobileForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the template with the expected options", () => {
@@ -562,7 +567,7 @@ describe("showEnterMobileForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         showEnterMobileForm(mockReq, mockRes, mockNext);
         expect(mockRes.render).toHaveBeenCalledWith("register/enter-phone-number.njk", {
             value: {mobileNumber: TEST_PHONE_NUMBER}
@@ -572,12 +577,12 @@ describe("showEnterMobileForm controller tests", () => {
 
 describe("processEnterMobileForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("redirects to /sign-in if there is no access token in the session", async () => {
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         await processEnterMobileForm(request(), mockRes, mockNext);
         expect(mockRes.redirect).toHaveBeenCalledWith("/sign-in/enter-email-address");
     });
@@ -601,7 +606,7 @@ describe("processEnterMobileForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processEnterMobileForm(mockReq, mockRes, mockNext);
 
@@ -622,7 +627,7 @@ describe("processEnterMobileForm controller tests", () => {
 
 describe("showSubmitMobileVerificationCode controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the enter-text-code template with the expected options", () => {
@@ -632,7 +637,7 @@ describe("showSubmitMobileVerificationCode controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
         showSubmitMobileVerificationCode(mockReq, mockRes, mockNext);
         expect(mockRes.render).toHaveBeenCalledWith("common/enter-text-code.njk", {
             values: {
@@ -646,12 +651,12 @@ describe("showSubmitMobileVerificationCode controller tests", () => {
 
 describe("submitMobileVerificationCode controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
+        vi.clearAllMocks();
+        vi.useFakeTimers().setSystemTime(TEST_TIMESTAMP);
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("re-renders the enter code template with an error message if securityCode is empty", async () => {
@@ -661,7 +666,7 @@ describe("submitMobileVerificationCode controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await submitMobileVerificationCode(mockReq, mockRes, mockNext);
 
@@ -697,7 +702,7 @@ describe("submitMobileVerificationCode controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await submitMobileVerificationCode(mockReq, mockRes, mockNext);
         expect(s4VerifyMobileUsingSmsCodeSpy).toHaveBeenCalledWith(TEST_AUTHENTICATION_RESULT.AccessToken, TEST_SECURITY_CODE, TEST_EMAIL);
@@ -742,7 +747,7 @@ describe("submitMobileVerificationCode controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await expect(submitMobileVerificationCode(mockReq, mockRes, mockNext)).rejects.toThrow();
     });
@@ -769,7 +774,7 @@ describe("submitMobileVerificationCode controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await submitMobileVerificationCode(mockReq, mockRes, mockNext);
 
@@ -813,7 +818,7 @@ describe("submitMobileVerificationCode controller tests", () => {
 
 describe("resendEmailVerificationCode controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 resendEmailAuthCode with the session email and then redirects to /register/enter-email-code", async () => {
@@ -826,7 +831,7 @@ describe("resendEmailVerificationCode controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await resendEmailVerificationCode(mockReq, mockRes, mockNext);
         expect(s4ResendEmailCodeSpy).toHaveBeenCalledWith(TEST_EMAIL);
@@ -843,7 +848,7 @@ describe("resendEmailVerificationCode controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await resendEmailVerificationCode(mockReq, mockRes, mockNext);
         expect(s4ResendEmailCodeSpy).not.toHaveBeenCalled();
@@ -861,7 +866,7 @@ describe("resendEmailVerificationCode controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await resendEmailVerificationCode(mockReq, mockRes, mockNext);
         expect(s4ResendEmailCodeSpy).not.toHaveBeenCalled();
@@ -871,8 +876,8 @@ describe("resendEmailVerificationCode controller tests", () => {
 
 describe("showResendEmailCodeForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.resetAllMocks();
+        vi.clearAllMocks();
+        vi.resetAllMocks();
     });
 
     it("renders the resend email code form if email is not code blocked", async () => {
@@ -885,7 +890,7 @@ describe("showResendEmailCodeForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await showResendEmailCodeForm(mockReq, mockRes, mockNext);
         expect(getEmailCodeBlockSpy).toHaveBeenCalledWith(TEST_EMAIL.toLowerCase().trim());
@@ -902,7 +907,7 @@ describe("showResendEmailCodeForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await showResendEmailCodeForm(mockReq, mockRes, mockNext);
         expect(getEmailCodeBlockSpy).toHaveBeenCalledWith(TEST_EMAIL.toLowerCase().trim());
@@ -920,7 +925,7 @@ describe("showResendEmailCodeForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await showResendEmailCodeForm(mockReq, mockRes, mockNext);
         expect(mockRes.redirect).toHaveBeenCalledWith("/register/too-many-codes");
@@ -929,8 +934,7 @@ describe("showResendEmailCodeForm controller tests", () => {
 
 describe("processAddServiceForm controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-        jest.spyOn(crypto, "randomUUID").mockReturnValue(TEST_UUID);
+        vi.clearAllMocks();
     });
 
     it("renders the there-is-a-problem if no userId is returned from the AuthenticationResultParser", async () => {
@@ -945,7 +949,7 @@ describe("processAddServiceForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processAddServiceForm(mockReq, mockRes, mockNext);
 
@@ -966,7 +970,7 @@ describe("processAddServiceForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processAddServiceForm(mockReq, mockRes, mockNext);
 
@@ -993,7 +997,7 @@ describe("processAddServiceForm controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processAddServiceForm(mockReq, mockRes, mockNext);
 
@@ -1027,7 +1031,7 @@ describe("processAddServiceForm controller tests", () => {
             ip: TEST_IP_ADDRESS
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await processAddServiceForm(mockReq, mockRes, mockNext);
         expect(s4NewServiceSpy).toHaveBeenCalledWith(
@@ -1057,7 +1061,7 @@ describe("processAddServiceForm controller tests", () => {
 
 describe("sendDataToUserSpreadsheet controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 updateUserSpreadsheet with session values and then calls next", async () => {
@@ -1071,7 +1075,7 @@ describe("sendDataToUserSpreadsheet controller tests", () => {
                 serviceName: TEST_SERVICE_NAME
             }
         });
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await sendDataToUserSpreadsheet(mockReq, response(), mockNext);
         expect(s4updateUserSpreadsheetSpy).toHaveBeenCalledWith(TEST_EMAIL, TEST_PHONE_NUMBER, TEST_SERVICE_NAME);
@@ -1089,7 +1093,7 @@ describe("sendDataToUserSpreadsheet controller tests", () => {
                 serviceName: TEST_SERVICE_NAME
             }
         });
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await sendDataToUserSpreadsheet(mockReq, response(), mockNext);
         expect(s4updateUserSpreadsheetSpy).not.toHaveBeenCalled();
@@ -1099,7 +1103,7 @@ describe("sendDataToUserSpreadsheet controller tests", () => {
 
 describe("redirectToServicesList controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls redirect with the substring of the serviceId", () => {
@@ -1109,7 +1113,7 @@ describe("redirectToServicesList controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         redirectToServicesList(mockReq, mockRes, mockNext);
         expect(mockRes.redirect).toHaveBeenCalledWith(`/services/${TEST_SERVICE_ID.substring(8)}/clients`);
@@ -1118,7 +1122,7 @@ describe("redirectToServicesList controller tests", () => {
 
 describe("accountExists controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the account exists template with the session email", () => {
@@ -1128,7 +1132,7 @@ describe("accountExists controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         accountExists(mockReq, mockRes, mockNext);
         expect(mockRes.render).toHaveBeenCalledWith("register/account-exists.njk", {
@@ -1141,7 +1145,7 @@ describe("accountExists controller tests", () => {
 
 describe("resumeUserJourneyAfterPassword controller tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls s4 submitUsernamePassword with the email and password and redirects to enter-phone-number", async () => {
@@ -1159,7 +1163,7 @@ describe("resumeUserJourneyAfterPassword controller tests", () => {
             }
         });
         const mockRes = response();
-        const mockNext = jest.fn();
+        const mockNext = vi.fn();
 
         await resumeUserJourneyAfterPassword(mockReq, mockRes, mockNext);
 

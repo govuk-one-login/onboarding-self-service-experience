@@ -1,23 +1,28 @@
-const sendSms = jest.fn();
-const decrypt = jest.fn().mockImplementation(() => {
-    return {
-        plaintext: "531836"
-    };
-});
+import {toByteArray} from "base64-js";
+import {mockLambdaContext, smsSenderTrigger} from "../mocks.js";
 
-jest.mock("notifications-node-client", () => {
+const {sendSms, decrypt} = vi.hoisted(() => ({
+    sendSms: vi.fn(),
+    decrypt: vi.fn().mockImplementation(() => {
+        return {
+            plaintext: "531836"
+        };
+    })
+}));
+
+vi.mock("notifications-node-client", () => {
     return {
-        NotifyClient: jest.fn(() => {
+        NotifyClient: vi.fn(function () {
             return {sendSms: sendSms};
         })
     };
 });
 
-jest.mock("@aws-crypto/client-node", () => {
+vi.mock("@aws-crypto/client-node", () => {
     return {
-        CommitmentPolicy: jest.fn(),
-        KmsKeyringNode: jest.fn(),
-        buildClient: jest.fn(() => {
+        CommitmentPolicy: vi.fn(),
+        KmsKeyringNode: vi.fn(),
+        buildClient: vi.fn(() => {
             return {
                 decrypt: decrypt
             };
@@ -31,12 +36,14 @@ const templateId = "template-id";
 
 process.env.SECURITY_CODE_TEXT_MESSAGE_TEMPLATE = templateId;
 
-import {toByteArray} from "base64-js";
-import {lambdaHandler} from "../../src/handlers/send-security-code-text-message";
-import {mockLambdaContext, smsSenderTrigger} from "../mocks";
-
 describe("Custom SMS sender", () => {
+    beforeEach(async () => {
+        vi.clearAllMocks();
+    });
+
     it("Send SMS with a security code", async () => {
+        const {lambdaHandler} = await import("../../src/handlers/send-security-code-text-message.js");
+
         await lambdaHandler(smsSenderTrigger(phoneNumber, encryptedCode), mockLambdaContext);
 
         expect(sendSms).toBeCalledTimes(1);
@@ -52,6 +59,8 @@ describe("Custom SMS sender", () => {
     });
 
     it("Throw an error for missing code", async () => {
+        const {lambdaHandler} = await import("../../src/handlers/send-security-code-text-message.js");
+
         await expect(lambdaHandler(smsSenderTrigger(phoneNumber), mockLambdaContext)).rejects.toThrow(/missing.*code/i);
     });
 });

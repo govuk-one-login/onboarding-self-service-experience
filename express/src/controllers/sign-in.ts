@@ -4,16 +4,17 @@ import {
     UserNotFoundException
 } from "@aws-sdk/client-cognito-identity-provider";
 import {RequestHandler} from "express";
-import {port} from "../config/environment";
-import AuthenticationResultParser from "../lib/authentication-result-parser";
-import {convertToCountryPrefixFormat, obscureNumber} from "../lib/mobile-number";
-import {render} from "../middleware/request-handler";
-import SelfServiceServicesService from "../services/self-service-services-service";
-import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status";
+import {port} from "../config/environment.js";
+import AuthenticationResultParser from "../lib/authentication-result-parser.js";
+import {convertToCountryPrefixFormat, obscureNumber} from "../lib/mobile-number.js";
+import {render} from "../middleware/request-handler.js";
+import SelfServiceServicesService from "../services/self-service-services-service.js";
+import {SignupStatus, SignupStatusStage} from "../lib/utils/signup-status.js";
 
-import {secureRandom6DigitCode} from "../lib/utils/secure-random-code";
-import {getNextPathsAndRedirect, RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine";
-import logger from "../lib/logger";
+import {secureRandom6DigitCode} from "../lib/utils/secure-random-code.js";
+import {getNextPathsAndRedirect, RegisterRoutes, ServicesRoutes, SignInRoutes} from "../middleware/state-machine.js";
+import logger from "../lib/logger.js";
+import {nonNull} from "../lib/utils/optional.js";
 
 export const showSignInFormEmail = render("sign-in/enter-email-address.njk");
 export const showSignInFormEmailGlobalSignOut = render("sign-in/enter-email-address-global-sign-out.njk");
@@ -142,6 +143,7 @@ export const processEmailAddress: RequestHandler = async (req, res) => {
             logger.info("Processing No HasTextCode");
             return getNextPathsAndRedirect(req, res, RegisterRoutes.resumeAfterPassword);
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (UserNotFoundException) {
         // If a user doesn't exist, carry on like normal
     }

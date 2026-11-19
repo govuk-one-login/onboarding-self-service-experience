@@ -17,14 +17,14 @@ import {
     showSignInFormEmailGlobalSignOut,
     organiseDynamoDBForRecoveredUser,
     confirmPasswordContinueRecovery
-} from "../controllers/sign-in";
-import processSignInForm from "../middleware/process-sign-in-form";
-import {render} from "../middleware/request-handler";
-import processSecurityCode from "../middleware/sign-in-middleware";
-import checkPasswordAllowed from "../middleware/validators/common-password-validator";
-import checkEmailInSession from "../middleware/validators/email-present-in-session";
-import validateEmail from "../middleware/validators/email-validator";
-import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator";
+} from "../controllers/sign-in.js";
+import processSignInForm from "../middleware/process-sign-in-form.js";
+import {render} from "../middleware/request-handler.js";
+import processSecurityCode from "../middleware/sign-in-middleware.js";
+import checkPasswordAllowed from "../middleware/validators/common-password-validator.js";
+import checkEmailInSession from "../middleware/validators/email-present-in-session.js";
+import validateEmail from "../middleware/validators/email-validator.js";
+import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator.js";
 
 const router = Router();
 export default router;

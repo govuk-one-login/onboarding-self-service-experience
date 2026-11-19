@@ -2,18 +2,18 @@ import {
     deleteDynamoDBClientEntriesHandler,
     deleteDynamoDBServiceEntriesHandler,
     getDynamoDBEntriesHandler
-} from "../../../src/handlers/dynamodb/dynamo-db-service";
-import DynamoDbClient from "../../../src/dynamodb-client";
-import {constructTestApiGatewayEvent} from "../utils";
-import {TEST_ACCESS_TOKEN, TEST_DATA_TABLE_ITEM, TEST_SERVICE_ID, TEST_USER_EMAIL, TEST_USER_ID} from "../constants";
+} from "../../../src/handlers/dynamodb/dynamo-db-service.js";
+import DynamoDbClient from "../../../src/dynamodb-client.js";
+import {constructTestApiGatewayEvent} from "../utils.js";
+import {TEST_ACCESS_TOKEN, TEST_DATA_TABLE_ITEM, TEST_SERVICE_ID, TEST_USER_EMAIL, TEST_USER_ID} from "../constants.js";
 
 describe("getDynamoDBEntriesHandler tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls the getListOfClients and returns the client which includes the userEmail specified in the path params", async () => {
-        const getListOfItemsSpy = jest
+        const getListOfItemsSpy = vi
             .spyOn(DynamoDbClient.prototype, "getListOfClients")
             .mockResolvedValue({Items: [TEST_DATA_TABLE_ITEM], $metadata: {httpStatusCode: 200}});
 
@@ -34,7 +34,7 @@ describe("getDynamoDBEntriesHandler tests", () => {
 
     it("calls the dynamo client with a scan command with the expected values and throws an error when the dynamo client throws an error", async () => {
         const error = "SomeAwsError";
-        const getListOfItemsSpy = jest.spyOn(DynamoDbClient.prototype, "getListOfClients").mockRejectedValue(new Error(error));
+        const getListOfItemsSpy = vi.spyOn(DynamoDbClient.prototype, "getListOfClients").mockRejectedValue(new Error(error));
         const testEvent = constructTestApiGatewayEvent({
             body: "",
             pathParameters: {userEmail: TEST_USER_EMAIL},
@@ -46,7 +46,7 @@ describe("getDynamoDBEntriesHandler tests", () => {
     });
 
     it("returns a 400 for no userEmail parameter", async () => {
-        const getListOfItemsSpy = jest
+        const getListOfItemsSpy = vi
             .spyOn(DynamoDbClient.prototype, "getListOfClients")
             .mockResolvedValue({Items: [TEST_DATA_TABLE_ITEM], $metadata: {httpStatusCode: 200}});
 
@@ -69,7 +69,7 @@ describe("getDynamoDBEntriesHandler tests", () => {
         };
         TEST_CLIENT_ENTRY_WITH_DIFFERENT_EMAIL.contacts.L = [{S: "someEmailWhichDoesNotMatchTheProvidedOne"}];
 
-        const getListOfItemsSpy = jest
+        const getListOfItemsSpy = vi
             .spyOn(DynamoDbClient.prototype, "getListOfClients")
             .mockResolvedValue({Items: [TEST_CLIENT_ENTRY_WITH_DIFFERENT_EMAIL], $metadata: {httpStatusCode: 200}});
 
@@ -91,12 +91,12 @@ describe("getDynamoDBEntriesHandler tests", () => {
 
 describe("deleteDynamoDBClientEntriesHandler tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls the dynamo client with a delete command with the expected values and returns a 200 with the expected response body", async () => {
-        const deleteEntriesSpy = jest.spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries").mockResolvedValue();
-        const checkServiceUserExistSpy = jest.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(true);
+        const deleteEntriesSpy = vi.spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries").mockResolvedValue();
+        const checkServiceUserExistSpy = vi.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(true);
 
         const serviceHandlerResponse = await deleteDynamoDBClientEntriesHandler(
             constructTestApiGatewayEvent({
@@ -118,7 +118,7 @@ describe("deleteDynamoDBClientEntriesHandler tests", () => {
     });
 
     it("throws an error when no userId is provided in the event body", async () => {
-        const deleteEntriesSpy = jest.spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries").mockResolvedValue();
+        const deleteEntriesSpy = vi.spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries").mockResolvedValue();
 
         await expect(
             deleteDynamoDBClientEntriesHandler(
@@ -135,7 +135,7 @@ describe("deleteDynamoDBClientEntriesHandler tests", () => {
     });
 
     it("throws an error when no serviceId is provided in the event body", async () => {
-        const deleteEntriesSpy = jest.spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries").mockResolvedValue();
+        const deleteEntriesSpy = vi.spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries").mockResolvedValue();
 
         await expect(
             deleteDynamoDBClientEntriesHandler(
@@ -153,7 +153,7 @@ describe("deleteDynamoDBClientEntriesHandler tests", () => {
 
     it("calls the dynamo client with a delete command with the expected values and throws an error when the dynamo client throws an error", async () => {
         const error = "SomeAwsError";
-        const deleteClientEntriesSpy = jest
+        const deleteClientEntriesSpy = vi
             .spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries")
             .mockRejectedValue(new Error(error));
 
@@ -174,8 +174,8 @@ describe("deleteDynamoDBClientEntriesHandler tests", () => {
     });
 
     it("returns a 403 when there is no service-user relation", async () => {
-        const deleteEntriesSpy = jest.spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries").mockResolvedValue();
-        const checkServiceUserExistSpy = jest.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(false);
+        const deleteEntriesSpy = vi.spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries").mockResolvedValue();
+        const checkServiceUserExistSpy = vi.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(false);
 
         const serviceHandlerResponse = await deleteDynamoDBClientEntriesHandler(
             constructTestApiGatewayEvent({
@@ -197,8 +197,8 @@ describe("deleteDynamoDBClientEntriesHandler tests", () => {
     });
 
     it("returns a 403 when the userId in the path params does not match the access token", async () => {
-        const deleteEntriesSpy = jest.spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries").mockResolvedValue();
-        const checkServiceUserExistSpy = jest.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(true);
+        const deleteEntriesSpy = vi.spyOn(DynamoDbClient.prototype, "deleteDynamoDBClientEntries").mockResolvedValue();
+        const checkServiceUserExistSpy = vi.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(true);
 
         const serviceHandlerResponse = await deleteDynamoDBClientEntriesHandler(
             constructTestApiGatewayEvent({
@@ -222,12 +222,12 @@ describe("deleteDynamoDBClientEntriesHandler tests", () => {
 
 describe("deleteDynamoDBServiceEntriesHandler tests", () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("calls the dynamo client with a delete command with the expected values and returns a 200 with the expected response body", async () => {
-        const deleteEntriesSpy = jest.spyOn(DynamoDbClient.prototype, "deleteDynamoDBServiceEntries").mockResolvedValue();
-        const checkServiceUserExistSpy = jest.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(true);
+        const deleteEntriesSpy = vi.spyOn(DynamoDbClient.prototype, "deleteDynamoDBServiceEntries").mockResolvedValue();
+        const checkServiceUserExistSpy = vi.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(true);
 
         const serviceHandlerResponse = await deleteDynamoDBServiceEntriesHandler(
             constructTestApiGatewayEvent({
@@ -248,8 +248,8 @@ describe("deleteDynamoDBServiceEntriesHandler tests", () => {
     });
 
     it("returns a 403 for no service-user relationship", async () => {
-        const deleteEntriesSpy = jest.spyOn(DynamoDbClient.prototype, "deleteDynamoDBServiceEntries").mockResolvedValue();
-        const checkServiceUserExistSpy = jest.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(false);
+        const deleteEntriesSpy = vi.spyOn(DynamoDbClient.prototype, "deleteDynamoDBServiceEntries").mockResolvedValue();
+        const checkServiceUserExistSpy = vi.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(false);
 
         const serviceHandlerResponse = await deleteDynamoDBServiceEntriesHandler(
             constructTestApiGatewayEvent({
@@ -271,8 +271,8 @@ describe("deleteDynamoDBServiceEntriesHandler tests", () => {
 
     it("calls the dynamo client with a delete command with the expected values and throws an error when the dynamo client throws an error", async () => {
         const error = "SomeAwsError";
-        const deleteEntriesSpy = jest.spyOn(DynamoDbClient.prototype, "deleteDynamoDBServiceEntries").mockRejectedValue(new Error(error));
-        const checkServiceUserExistSpy = jest.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(true);
+        const deleteEntriesSpy = vi.spyOn(DynamoDbClient.prototype, "deleteDynamoDBServiceEntries").mockRejectedValue(new Error(error));
+        const checkServiceUserExistSpy = vi.spyOn(DynamoDbClient.prototype, "checkServiceUserExists").mockResolvedValue(true);
 
         await expect(
             deleteDynamoDBServiceEntriesHandler(
@@ -290,7 +290,7 @@ describe("deleteDynamoDBServiceEntriesHandler tests", () => {
     });
 
     it("throws an error when there is no serviceId provided", async () => {
-        const deleteEntriesSpy = jest.spyOn(DynamoDbClient.prototype, "deleteDynamoDBServiceEntries").mockResolvedValue();
+        const deleteEntriesSpy = vi.spyOn(DynamoDbClient.prototype, "deleteDynamoDBServiceEntries").mockResolvedValue();
 
         await expect(
             deleteDynamoDBServiceEntriesHandler(

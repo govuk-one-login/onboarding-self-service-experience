@@ -43,9 +43,9 @@ import {
     processChangePKCEEnforcedForm,
     showChangeLandingPageUrlForm,
     processChangeLandingPageUrlForm
-} from "../controllers/clients";
-import validateKeySource from "../middleware/validate-public-key";
-import validateUri from "../middleware/validators/uri-validator";
+} from "../controllers/clients.js";
+import validateKeySource from "../middleware/validate-public-key.js";
+import validateUri from "../middleware/validators/uri-validator.js";
 
 const router = Router();
 export default router;

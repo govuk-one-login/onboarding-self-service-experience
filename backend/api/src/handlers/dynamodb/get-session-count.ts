@@ -1,5 +1,5 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
-import DynamoDbClient from "../../dynamodb-client";
+import DynamoDbClient from "../../dynamodb-client.js";
 
 const client = new DynamoDbClient();
 

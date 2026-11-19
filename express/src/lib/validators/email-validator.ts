@@ -1,8 +1,8 @@
-import hasAllowedDomain from "./allowed-email-domains";
-import isRfc822Compliant from "../utils/rfc822-validate";
-import {ValidationResult} from "../../types/validation-result";
-import {isPseudonymisedFixedOTPCredential} from "../fixedOTP";
-import logger from "../logger";
+import hasAllowedDomain from "./allowed-email-domains.js";
+import isRfc822Compliant from "../utils/rfc822-validate.js";
+import {ValidationResult} from "../../types/validation-result.js";
+import {isPseudonymisedFixedOTPCredential} from "../fixedOTP.js";
+import logger from "../logger.js";
 
 export default async function validateEmail(emailAddress: string): Promise<ValidationResult> {
     logger.debug("In lib:email-validator:Validate Email()");

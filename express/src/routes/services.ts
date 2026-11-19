@@ -1,10 +1,10 @@
 import {Router} from "express";
-import {listServices, showAddNewServiceForm} from "../controllers/services";
-import checkAuthorisation from "../middleware/authoriser";
-import setRequestContext from "../middleware/request-context";
-import clients from "./clients";
-import {processAddServiceForm, redirectToServicesList} from "../controllers/register";
-import validateServiceName from "../middleware/validators/service-name-validator";
+import {listServices, showAddNewServiceForm} from "../controllers/services.js";
+import checkAuthorisation from "../middleware/authoriser.js";
+import setRequestContext from "../middleware/request-context.js";
+import clients from "./clients.js";
+import {processAddServiceForm, redirectToServicesList} from "../controllers/register.js";
+import validateServiceName from "../middleware/validators/service-name-validator.js";
 
 const router = Router();
 export default router;

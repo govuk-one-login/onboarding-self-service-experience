@@ -23,17 +23,17 @@ import {
     submitEmailSecurityCode,
     submitMobileVerificationCode,
     updatePassword
-} from "../controllers/register";
-import checkAuthorisation from "../middleware/authoriser";
-import processSignInForm from "../middleware/process-sign-in-form";
-import checkPasswordAllowed from "../middleware/validators/common-password-validator";
-import validateEmailSecurityCode from "../middleware/validators/email-code-validator";
-import validateEmail from "../middleware/validators/email-validator";
-import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator";
-import validateMobileNumber from "../middleware/validators/mobile-number-validator";
-import validatePassword from "../middleware/validators/password-validator";
-import validateServiceName from "../middleware/validators/service-name-validator";
-import {allowUserJourneyMiddleware} from "../middleware/allow-user-journey-middleware";
+} from "../controllers/register.js";
+import checkAuthorisation from "../middleware/authoriser.js";
+import processSignInForm from "../middleware/process-sign-in-form.js";
+import checkPasswordAllowed from "../middleware/validators/common-password-validator.js";
+import validateEmailSecurityCode from "../middleware/validators/email-code-validator.js";
+import validateEmail from "../middleware/validators/email-validator.js";
+import validateMobileSecurityCode from "../middleware/validators/mobile-code-validator.js";
+import validateMobileNumber from "../middleware/validators/mobile-number-validator.js";
+import validatePassword from "../middleware/validators/password-validator.js";
+import validateServiceName from "../middleware/validators/service-name-validator.js";
+import {allowUserJourneyMiddleware} from "../middleware/allow-user-journey-middleware.js";
 
 const router = Router();
 export default router;

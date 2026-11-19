@@ -1,6 +1,6 @@
 import {RequestParamHandler} from "express";
-import {ContextProperty} from "../types/request-context";
-import logger from "../lib/logger";
+import {ContextProperty} from "../types/request-context.js";
+import logger from "../lib/logger.js";
 
 export default setRequestContext();
 

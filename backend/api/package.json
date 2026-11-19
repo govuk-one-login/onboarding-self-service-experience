@@ -1,12 +1,13 @@
 {
   "name": "gds-di-self-service-backend-api",
   "description": "DI Self-Service backend - API",
+  "type": "module",
   "scripts": {
     "build": "../../infrastructure/dev/deploy.sh api --no-deploy",
     "deploy": "../../infrastructure/dev/deploy.sh api",
     "testpact": "npm --prefix tests/contract-tests run build && npm --prefix tests/contract-tests run test",
-    "test": "jest --silent",
-    "test:cov": "jest --silent --coverage",
+    "test": "vitest run --config ./vitest.config.ts ./tests",
+    "test:cov": "vitest run --coverage --config ./vitest.config.ts ./tests",
     "compile": "tsc"
   },
   "dependencies": {

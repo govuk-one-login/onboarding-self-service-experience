@@ -1,13 +1,13 @@
 import {Express} from "express";
-import {useStubApi} from "./environment";
-import LambdaFacadeInterface from "../services/lambda-facade/LambdaFacadeInterface";
-import CognitoInterface from "../services/cognito/CognitoInterface";
-import StubCognitoClient from "../services/cognito/StubCognitoClient";
-import StubLambdaFacade from "../services/lambda-facade/StubLambdaFacade";
-import CognitoClient from "../services/cognito/CognitoClient";
-import LambdaFacade from "../services/lambda-facade/LambdaFacade";
-import SelfServiceServicesService from "../services/self-service-services-service";
-import logger from "../lib/logger";
+import {useStubApi} from "./environment.js";
+import LambdaFacadeInterface from "../services/lambda-facade/LambdaFacadeInterface.js";
+import CognitoInterface from "../services/cognito/CognitoInterface.js";
+import StubCognitoClient from "../services/cognito/StubCognitoClient.js";
+import StubLambdaFacade from "../services/lambda-facade/StubLambdaFacade.js";
+import CognitoClient from "../services/cognito/CognitoClient.js";
+import LambdaFacade from "../services/lambda-facade/LambdaFacade.js";
+import SelfServiceServicesService from "../services/self-service-services-service.js";
+import logger from "../lib/logger.js";
 
 export default function configureServices(app: Express) {
     let cognito: CognitoInterface;

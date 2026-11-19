@@ -1,8 +1,8 @@
-import {SignupStatusStage} from "../src/lib/utils/signup-status";
-import {OnboardingTableItem} from "../@types/OnboardingTableItem";
-import {Service, ServiceFromDynamo} from "../@types/Service";
-import {DynamoUser} from "../@types/user";
-import {Client} from "../@types/client";
+import {SignupStatusStage} from "../src/lib/utils/signup-status.js";
+import {OnboardingTableItem} from "../@types/onboardingTableItem.js";
+import {Service, ServiceFromDynamo} from "../@types/service.js";
+import {DynamoUser} from "../@types/user.js";
+import {Client} from "../@types/client.js";
 
 export const TEST_TEMPLATE_PATH = "some/template/to/render";
 export const TEST_PASSWORD = "somePassword";

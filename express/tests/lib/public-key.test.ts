@@ -1,5 +1,5 @@
-import getAuthApiCompliantPublicKey, {isPublicKeyValid, validateJwksURL} from "../../src/lib/public-key";
-import {TEST_JWKS_KEY_UPDATE} from "../constants";
+import getAuthApiCompliantPublicKey, {isPublicKeyValid, validateJwksURL} from "../../src/lib/public-key.js";
+import {TEST_JWKS_KEY_UPDATE} from "../constants.js";
 
 const header = "-----BEGIN PUBLIC KEY-----";
 const footer = "-----END PUBLIC KEY-----";

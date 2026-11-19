@@ -1,8 +1,8 @@
 import {DeleteItemCommand, DynamoDBClient, GetItemCommand, PutItemCommand} from "@aws-sdk/client-dynamodb";
-import {CodeBlockEntry} from "../types/code-block-entry";
-import {getEnvOrThrow} from "../helper/getEnv";
+import {CodeBlockEntry} from "../types/code-block-entry.js";
+import {getEnvOrThrow} from "../helper/getEnv.js";
 import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
-import {logger} from "../helper/logger";
+import {logger} from "../helper/logger.js";
 
 const dynamoClient = new DynamoDBClient();
 export const CODE_BLOCK_TTL = 60 * 60; // 1 Hour in seconds

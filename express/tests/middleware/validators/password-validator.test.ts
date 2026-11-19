@@ -1,10 +1,10 @@
 import {Request} from "express";
-import validatePassword from "../../../src/middleware/validators/password-validator";
-import {request, response} from "../../mocks";
+import validatePassword from "../../../src/middleware/validators/password-validator.js";
+import {request, response} from "../../mocks.js";
 
 let req: Request;
 
-const next = jest.fn();
+const next = vi.fn();
 const res = response();
 const validator = validatePassword("template.njk");
 

@@ -1,5 +1,5 @@
 import {CodeMismatchException} from "@aws-sdk/client-cognito-identity-provider";
-import logger from "./logger";
+import logger from "./logger.js";
 
 interface fixedOTPCredential {
     Id: string;

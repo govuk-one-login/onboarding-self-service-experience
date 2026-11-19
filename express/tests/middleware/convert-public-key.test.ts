@@ -1,6 +1,6 @@
-import validateKeySource from "../../src/middleware/validate-public-key";
-import {publicKeyCompact, publicKeyWithHeaders} from "../lib/public-key.test";
-import {request, response} from "../mocks";
+import validateKeySource from "../../src/middleware/validate-public-key.js";
+import {publicKeyCompact, publicKeyWithHeaders} from "../lib/public-key.test.js";
+import {request, response} from "../mocks.js";
 import {
     TEST_AUTHENTICATION_RESULT,
     TEST_CLIENT_ID,
@@ -11,11 +11,11 @@ import {
     TEST_BAD_PUBLIC_KEY,
     TEST_STATIC_KEY_UPDATE,
     TEST_JWKS_KEY_UPDATE
-} from "../constants";
+} from "../constants.js";
 
 describe("Validate and convert submitted Static public key", () => {
     it("Call next middleware if public key successfully converted", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const req = request();
         const res = response();
 
@@ -31,7 +31,7 @@ describe("Validate and convert submitted Static public key", () => {
     });
 
     it("it re-renders with error messages if the public key is invalid", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const req = request({
             body: {
                 publicKeySource: TEST_STATIC_KEY_UPDATE.public_key_source,
@@ -68,7 +68,7 @@ describe("Validate and convert submitted Static public key", () => {
     });
 
     it("Fail if public key unsuccessfully converted", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const mockReq = request({
             body: {
                 publicKeySource: TEST_STATIC_KEY_UPDATE.public_key_source,
@@ -114,7 +114,7 @@ describe("Validate and convert submitted Static public key", () => {
 
 describe("Validate and convert submitted JWKS public key", () => {
     it("Call next middleware if public key successfully converted", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const req = request();
         const res = response();
 
@@ -130,7 +130,7 @@ describe("Validate and convert submitted JWKS public key", () => {
     });
 
     it("it re-renders with error messages if the public key is invalid", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const req = request({
             body: {
                 publicKeySource: TEST_JWKS_KEY_UPDATE.public_key_source,
@@ -167,7 +167,7 @@ describe("Validate and convert submitted JWKS public key", () => {
     });
 
     it("Fail if public key unsuccessfully converted", () => {
-        const next = jest.fn();
+        const next = vi.fn();
         const mockReq = request({
             body: {
                 publicKeySource: TEST_JWKS_KEY_UPDATE.public_key_source,

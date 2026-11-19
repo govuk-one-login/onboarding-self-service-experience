@@ -1,6 +1,6 @@
 import {APIGatewayEvent} from "aws-lambda";
-import DynamoDbClient from "../../dynamodb-client";
-import {validateAuthorisationHeader} from "../helper/validate-authorisation-header";
+import DynamoDbClient from "../../dynamodb-client.js";
+import {validateAuthorisationHeader} from "../helper/validate-authorisation-header.js";
 
 const client = new DynamoDbClient();
 

@@ -1,11 +1,10 @@
-import "config/session-data";
 import {Request} from "express";
-import checkEmailIsPresentInSession from "../../../src/middleware/validators/email-present-in-session";
-import {request, response} from "../../mocks";
+import checkEmailIsPresentInSession from "../../../src/middleware/validators/email-present-in-session.js";
+import {request, response} from "../../mocks.js";
 
 let req: Request;
 
-const next = jest.fn();
+const next = vi.fn();
 const res = response();
 const validator = checkEmailIsPresentInSession("template.njk", {});
 

@@ -1,6 +1,6 @@
 import {Router} from "express";
-import {sessionTimeout, signOut} from "../controllers/session";
-import {render} from "../middleware/request-handler";
+import {sessionTimeout, signOut} from "../controllers/session.js";
+import {render} from "../middleware/request-handler.js";
 
 const router = Router();
 export default router;

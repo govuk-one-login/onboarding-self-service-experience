@@ -1,6 +1,6 @@
 import {APIGatewayEvent, APIGatewayProxyResult, Context} from "aws-lambda";
-import {deleteCodeBlock, getCodeBlock, putCodeBlock} from "../dynamodb/code-block-service";
-import {logger} from "../helper/logger";
+import {deleteCodeBlock, getCodeBlock, putCodeBlock} from "../dynamodb/code-block-service.js";
+import {logger} from "../helper/logger.js";
 
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
     logger.addContext(context);

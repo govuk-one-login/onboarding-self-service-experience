@@ -1,7 +1,7 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from "aws-lambda";
-import {stepFunctionHandler} from "./step-function-handler";
-import {validateAuthorisationHeader} from "../helper/validate-authorisation-header";
-import DynamoDbClient from "../../dynamodb-client";
+import {stepFunctionHandler} from "./step-function-handler.js";
+import {validateAuthorisationHeader} from "../helper/validate-authorisation-header.js";
+import DynamoDbClient from "../../dynamodb-client.js";
 
 type ClientUpdates = Record<string, string | string[] | boolean>;
 

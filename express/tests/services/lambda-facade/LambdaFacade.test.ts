@@ -1,5 +1,5 @@
 import axios, {AxiosInstance} from "axios";
-import LambdaFacade from "../../../src/services/lambda-facade/LambdaFacade";
+import LambdaFacade from "../../../src/services/lambda-facade/LambdaFacade.js";
 import {
     TEST_ACCESS_TOKEN,
     TEST_API_BASE_URL,
@@ -11,24 +11,28 @@ import {
     TEST_SELF_SERVICE_CLIENT_ID,
     TEST_SERVICE,
     TEST_SERVICE_ID
-} from "../../constants";
-import AuthenticationResultParser from "../../../src/lib/authentication-result-parser";
-import {TxMAEvent} from "../../../src/types/txma-event";
+} from "../../constants.js";
+import AuthenticationResultParser from "../../../src/lib/authentication-result-parser.js";
+import {TxMAEvent} from "../../../src/types/txma-event.js";
 import {createHash} from "crypto";
 
-const axiosCreateSpy = jest.spyOn(axios, "create");
-const mockPost = jest.fn();
-const mockGet = jest.fn();
+const axiosCreateSpy = vi.spyOn(axios, "create");
+const mockPost = vi.fn();
+const mockGet = vi.fn();
 
 describe("Lambda Facade class tests", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
+    beforeAll(() => {
+        process.env.API_BASE_URL = TEST_API_BASE_URL;
         axiosCreateSpy.mockReturnValue({
             post: mockPost,
             get: mockGet
         } as unknown as AxiosInstance);
 
-        jest.spyOn(AuthenticationResultParser, "getEmail").mockReturnValue(TEST_EMAIL);
+        vi.spyOn(AuthenticationResultParser, "getEmail").mockReturnValue(TEST_EMAIL);
+    });
+
+    afterAll(() => {
+        vi.clearAllMocks();
     });
 
     it("calls create with the expected values when a Lambda Facade is instantiated", () => {

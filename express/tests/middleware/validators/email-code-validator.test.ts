@@ -1,10 +1,10 @@
 import {Request} from "express";
-import validator from "../../../src/middleware/validators/email-code-validator";
-import {request, response} from "../../mocks";
+import validator from "../../../src/middleware/validators/email-code-validator.js";
+import {request, response} from "../../mocks.js";
 
 let req: Request;
 
-const next = jest.fn();
+const next = vi.fn();
 const res = response();
 
 describe("Validate submitted email security code", () => {

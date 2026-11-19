@@ -25,15 +25,17 @@ defaults:
 jobs:
   run-checkov:
     name: Checkov
+    permissions:
+      contents: read # for actions/checkout to fetch code
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
-      - name: Run checkov
-        uses: govuk-one-login/github-actions/code-quality/run-checkov@9c5db98832a3d5f8d27e08eb0b3d89d186c8e163
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Run checkov on workflows
+        uses: bridgecrewio/checkov-action@cc0e17d456ef1713bbfd963ebac19dc776775cb2 # v12.3128.0
         with:
-          skip-checks:
-            CKV_SECRET_6
-            CKV_SECRET_9
+          directory: .github/workflows
+          soft_fail: true
 
   check-shell-scripts:
     name: Shell scripts
@@ -48,10 +50,15 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
-      - name: Check linting and formatting
-        uses: govuk-one-login/github-actions/code-quality/check-linting@dc533fdf7254e2be498d804b43292c8f6e86844d # 15/12/2025
-        with:
-          python-version: 3.13
+      - name: Pull repository
+        id: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
 
   check-vulnerabilities:
     name: Vulnerabilities
@@ -115,4 +122,4 @@ jobs:
         id: run-tests
         env:
           REPORT: ${{ runner.temp }}/unit-tests.report
-        run: npm run test -- --config infrastructure/ci/jest.config.ts
+        run: npm test

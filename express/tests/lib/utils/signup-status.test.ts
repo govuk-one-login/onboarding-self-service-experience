@@ -1,5 +1,4 @@
-import "lib/utils/signup-status";
-import {SignupStatus, SignupStatusStage} from "../../../src/lib/utils/signup-status";
+import {SignupStatus, SignupStatusStage} from "../../../src/lib/utils/signup-status.js";
 
 describe("Exercise Signup Status class", () => {
     describe("Set empty status and add one stage", () => {

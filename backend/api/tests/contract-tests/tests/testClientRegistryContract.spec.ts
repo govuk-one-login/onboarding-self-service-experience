@@ -1,12 +1,10 @@
-"use strict";
-
 import {MatchersV3, PactV3} from "@pact-foundation/pact";
 import * as path from "path";
-import {public_key, registerClientHandler, RegisterClientPayload} from "../../../src/handlers/auth/register-client";
-import {clientConfigRequest} from "../../../src/handlers/types/client-config-request";
-import {clientRegistryResponse} from "../../../src/handlers/types/client-registry-response";
-import {mockLambdaContext} from "../../handlers/utils";
-import {updateClientInRegistryHandler, UpdateClientPayload} from "../../../src/handlers/auth/update-client";
+import {public_key, registerClientHandler, RegisterClientPayload} from "../../../src/handlers/auth/register-client.js";
+import {clientConfigRequest} from "../../../src/handlers/types/client-config-request.js";
+import {clientRegistryResponse} from "../../../src/handlers/types/client-registry-response.js";
+import {mockLambdaContext} from "../../handlers/utils.js";
+import {updateClientInRegistryHandler, UpdateClientPayload} from "../../../src/handlers/auth/update-client.js";
 
 describe("ClientRegistryProvider", () => {
     const {like} = MatchersV3;
